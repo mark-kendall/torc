@@ -557,21 +557,25 @@ void TorcNetwork::GetAsynchronousSafe(TorcNetworkRequest *Request, QObject *Pare
 
 void TorcNetwork::ConfigurationAdded(const QNetworkConfiguration &Config)
 {
+    (void)Config;
     UpdateConfiguration();
 }
 
 void TorcNetwork::ConfigurationChanged(const QNetworkConfiguration &Config)
 {
+    (void)Config;
     UpdateConfiguration();
 }
 
 void TorcNetwork::ConfigurationRemoved(const QNetworkConfiguration &Config)
 {
+    (void)Config;
     UpdateConfiguration();
 }
 
 void TorcNetwork::OnlineStateChanged(bool Online)
 {
+    (void)Online;
     UpdateConfiguration();
 }
 
@@ -761,6 +765,8 @@ void TorcNetwork::DownloadProgress(qint64 Received, qint64 Total)
 
 void TorcNetwork::Authenticate(QNetworkReply *Reply, QAuthenticator *Authenticator)
 {
+    (void)Reply;
+    (void)Authenticator;
     LOG(VB_GENERAL, LOG_INFO, "Authentication required");
 }
 

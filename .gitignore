@@ -1,3 +1,4 @@
+torc-server
 *.a
 *.o
 moc_*.cpp

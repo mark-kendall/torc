@@ -720,6 +720,8 @@ class TorcBonjourPriv
                  const char *HostTarget, uint16_t Port, uint16_t TxtLen,
                  const unsigned char *TxtRecord)
     {
+        (void)Fullname;
+
         if (!Reference)
             return;
 
@@ -826,6 +828,7 @@ void BonjourRegisterCallback(DNSServiceRef Ref, DNSServiceFlags Flags,
 {
     (void)Ref;
     (void)Flags;
+    (void)Domain;
 
     TorcBonjourPriv *bonjour = static_cast<TorcBonjourPriv *>(Object);
     if (kDNSServiceErr_NoError != Errorcode)
@@ -886,6 +889,9 @@ void BonjourResolveCallback(DNSServiceRef Ref, DNSServiceFlags Flags,
                             uint16_t Port, uint16_t TxtLen,
                             const unsigned char *TxtRecord, void *Object)
 {
+    (void)Flags;
+    (void) InterfaceIndex;
+
     TorcBonjourPriv *bonjour = static_cast<TorcBonjourPriv*>(Object);
     if (!bonjour)
     {

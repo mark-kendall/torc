@@ -116,7 +116,7 @@ bool TorcNetworkRequest::WaitForStart(int Timeout)
 {
     m_readTimer->Restart();
 
-    while (!m_started && !m_replyFinished && !(*m_abort))
+    while (!m_started && !m_replyFinished && !(*m_abort) && (m_readTimer->Elapsed() < Timeout))
         QThread::usleep(50000);
 
     return m_started || m_replyFinished;

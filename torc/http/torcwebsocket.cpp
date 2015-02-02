@@ -82,9 +82,9 @@ TorcWebSocket::TorcWebSocket(TorcQThread *Parent, TorcHTTPRequest *Request, QTcp
     m_frameOpCode(OpContinuation),
     m_frameMasked(false),
     m_framePayloadLength(0),
+    m_framePayloadReadPosition(0),
     m_frameMask(QByteArray(4, 0)),
     m_framePayload(QByteArray()),
-    m_framePayloadReadPosition(0),
     m_bufferedPayload(NULL),
     m_bufferedPayloadOpCode(OpContinuation),
     m_closeReceived(false),
@@ -128,9 +128,9 @@ TorcWebSocket::TorcWebSocket(TorcQThread *Parent, const QHostAddress &Address, q
     m_frameOpCode(OpContinuation),
     m_frameMasked(false),
     m_framePayloadLength(0),
+    m_framePayloadReadPosition(0),
     m_frameMask(QByteArray(4, 0)),
     m_framePayload(QByteArray()),
-    m_framePayloadReadPosition(0),
     m_bufferedPayload(NULL),
     m_bufferedPayloadOpCode(OpContinuation),
     m_closeReceived(false),
@@ -376,7 +376,7 @@ bool TorcWebSocket::ProcessUpgradeRequest(TorcHTTPConnection *Connection, TorcHT
     Request->SetConnection(HTTPConnectionUpgrade);
     Request->SetResponseHeader("Upgrade", "websocket");
     Request->SetResponseHeader("Sec-WebSocket-Accept", nonce);
-    if (!protocol == SubProtocolNone)
+    if (protocol != SubProtocolNone)
         Request->SetResponseHeader("Sec-WebSocket-Protocol", SubProtocolsToString(protocol));
 
     // if this is a Torc peer connecting, we want TorcNetworkedContext to handle this
@@ -1087,7 +1087,7 @@ void TorcWebSocket::ReadyRead(void)
                         m_framePayloadReadPosition = 0;
                         m_framePayloadLength = 0;
                     }
-                    else if (m_framePayload.size() > m_framePayloadLength)
+                    else if (m_framePayload.size() > (qint64)m_framePayloadLength)
                     {
                         // this shouldn't happen
                         InitiateClose(CloseUnexpectedError, QString("Read error"));
@@ -1184,6 +1184,7 @@ void TorcWebSocket::Connected(void)
 
 void TorcWebSocket::Error(QAbstractSocket::SocketError SocketError)
 {
+    (void)SocketError;
     if (m_socket)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("WebSocket error: %1 ('%2')").arg(m_socket->error()).arg(m_socket->errorString()));

@@ -171,7 +171,7 @@ void TorcCommandLinePriv::Add(const QString Keys, const QVariant &Default, const
     {
         QString options = valid.join(" OR ");
         m_help.insert(options, HelpText);
-        if (options.size() > m_maxLength)
+        if (options.size() > (int)m_maxLength)
             m_maxLength = options.size() + 2;
     }
 }

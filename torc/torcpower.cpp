@@ -224,12 +224,12 @@ TorcPower::TorcPower()
   : QObject(),
     TorcHTTPService(this, "power", "power", TorcPower::staticMetaObject, "ShuttingDown,Suspending,Hibernating,Restarting,WokeUp,LowBattery,Refresh"),
     m_lastBatteryLevel(UnknownPower),
+    m_priv(TorcPowerPriv::Create(this)),
     canShutdown(false),
     canSuspend(false),
     canHibernate(false),
     canRestart(false),
-    batteryLevel(UnknownPower),
-    m_priv(TorcPowerPriv::Create(this))
+    batteryLevel(UnknownPower)
 {
     m_powerGroupItem = new TorcSettingGroup(gRootSetting, tr("Power"));
     m_powerEnabled   = new TorcSetting(m_powerGroupItem, QString(TORC_CORE + "EnablePower"),

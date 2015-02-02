@@ -488,7 +488,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket, int *Abort)
                     break;
 
                 quint64 start      = (*it).first;
-                quint64 chunksize  = (*it).second - start + 1;
+                qint64 chunksize  = (*it).second - start + 1;
                 sent  = Socket->write(m_responseContent->data() + start, chunksize);
                 if (chunksize != sent)
                     LOG(VB_GENERAL, LOG_WARNING, QString("Buffer size %1 - but sent %2").arg(chunksize).arg(sent));
@@ -904,8 +904,8 @@ QList<QPair<quint64,quint64> > TorcHTTPRequest::StringToRanges(const QString &Ra
                 if (parts.size() != 2)
                     continue;
 
-                quint64 start = 0;
-                quint64 end = 0;
+                qint64 start = 0;
+                qint64 end = 0;
                 bool ok = false;
                 bool havefirst  = !parts[0].trimmed().isEmpty();
                 bool havesecond = !parts[1].trimmed().isEmpty();

@@ -297,6 +297,8 @@ quint64 TorcBinaryPListSerialiser::BinaryFromVariant(const QString &Name, const 
 
 quint64 TorcBinaryPListSerialiser::BinaryFromStringList(const QString &Name, const QStringList &Value)
 {
+    (void)Name;
+
     quint64 result = m_objectOffsets.size();
     START_OBJECT
 
@@ -349,6 +351,8 @@ quint64 TorcBinaryPListSerialiser::BinaryFromArray(const QString &Name, const QV
 
 quint64 TorcBinaryPListSerialiser::BinaryFromMap(const QString &Name, const QVariantMap &Value)
 {
+    (void)Name;
+
     quint64 result = m_objectOffsets.size();
     START_OBJECT
 

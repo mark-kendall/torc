@@ -115,6 +115,8 @@ void TorcXMLSerialiser::ListToXML(const QString &Name, const QVariantList &Value
 
 void TorcXMLSerialiser::StringListToXML(const QString &Name, const QStringList &Value)
 {
+    (void)Name;
+
     QStringList::const_iterator it = Value.begin();
     for ( ; it != Value.end(); ++it)
     {
