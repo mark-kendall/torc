@@ -19,11 +19,18 @@ DEFINES    += GIT_VERSION='"\\\"$(shell git describe --always)\\\""'
 QT         += sql network
 QT         -= gui
 
+# libraries
 LIBS       += -lz
 !mac:LIBS  += -ldns_sd
 
 DEPENDPATH  += ./torc ./torc/http ./torc/upnp
 INCLUDEPATH += $$DEPENDPATH
+
+# HTML
+install.path   = $${PREFIX}/share/torc/html/
+install.files  = html/index.html
+install.files += html/css html/fonts html/img html/js
+INSTALLS      += install
 
 HEADERS += torc/torclogging.h
 HEADERS += torc/torcloggingdefs.h

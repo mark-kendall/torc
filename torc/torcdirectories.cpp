@@ -56,7 +56,7 @@ void InitialiseTorcDirectories(void)
 
     gInstallDir = QString(PREFIX) + "/";
     gPluginDir  = QString(PREFIX) + "/lib/torc/plugins";
-    gShareDir   = QString(RUNPREFIX) + "/";
+    gShareDir   = QString(RUNPREFIX) + "/share/torc";
     gConfDir    = QDir::homePath() + "/.torc";
     gTransDir   = gShareDir + "i18n/";
 }
