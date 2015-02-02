@@ -34,9 +34,7 @@
 #include "torccoreutils.h"
 
 // zlib
-#if defined(CONFIG_ZLIB) && CONFIG_ZLIB
 #include "zlib.h"
-#endif
 
 /// \brief Parse a QDataTime from the given QString
 QDateTime TorcCoreUtils::DateTimeFromString(const QString &String)
@@ -131,11 +129,7 @@ void TorcCoreUtils::QtMessage(QtMsgType Type, const QMessageLogContext &Context,
 ///\brief Return true if zlib support is available.
 bool TorcCoreUtils::HasZlib(void)
 {
-#if defined(CONFIG_ZLIB) && CONFIG_ZLIB
     return true;
-#else
-    return false;
-#endif
 }
 
 /*! \brief Compress the supplied data using GZip.
@@ -147,7 +141,6 @@ QByteArray* TorcCoreUtils::GZipCompress(QByteArray *Source)
 {
     QByteArray *result = NULL;
 
-#if defined(CONFIG_ZLIB) && CONFIG_ZLIB
     // this shouldn't happen
     if (!Source || (Source && Source->size() < 0))
         return result;
@@ -189,8 +182,6 @@ QByteArray* TorcCoreUtils::GZipCompress(QByteArray *Source)
     } while (stream.avail_out == 0);
 
     deflateEnd(&stream);
-#endif
-
     return result;
 }
 
@@ -203,7 +194,6 @@ QByteArray* TorcCoreUtils::GZipCompressFile(QFile *Source)
 {
     QByteArray *result = NULL;
 
-#if defined(CONFIG_ZLIB) && CONFIG_ZLIB
     // this shouldn't happen
     if (!Source || (Source && Source->size() < 0))
         return result;
@@ -257,7 +247,5 @@ QByteArray* TorcCoreUtils::GZipCompressFile(QFile *Source)
     }
 
     deflateEnd(&stream);
-#endif
-
     return result;
 }

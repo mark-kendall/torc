@@ -19,6 +19,8 @@ DEFINES    += GIT_VERSION='"\\\"$(shell git describe --always)\\\""'
 QT         += sql network
 QT         -= gui
 
+LIBS       += -lz
+
 DEPENDPATH  += ./torc ./torc/http ./torc/upnp
 INCLUDEPATH += $$DEPENDPATH
 
