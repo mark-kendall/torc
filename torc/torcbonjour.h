@@ -5,12 +5,9 @@
 #include <QObject>
 #include <QHostInfo>
 
-// Torc
-#include "torccoreexport.h"
-
 class TorcBonjourPriv;
 
-class TORC_CORE_PUBLIC TorcBonjour : public QObject
+class TorcBonjour : public QObject
 {
     Q_OBJECT
 

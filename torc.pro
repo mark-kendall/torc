@@ -20,6 +20,7 @@ QT         += sql network
 QT         -= gui
 
 LIBS       += -lz
+!mac:LIBS  += -ldns_sd
 
 DEPENDPATH  += ./torc ./torc/http ./torc/upnp
 INCLUDEPATH += $$DEPENDPATH
@@ -51,6 +52,7 @@ HEADERS += torc/torcsetting.h
 HEADERS += torc/torcrpcrequest.h
 HEADERS += torc/torcdirectories.h
 HEADERS += torc/torcmime.h
+HEADERS += torc/torcbonjour.h
 HEADERS += torc/http/torchttprequest.h
 HEADERS += torc/http/torchttpservice.h
 HEADERS += torc/http/torchttpserver.h
@@ -91,6 +93,7 @@ SOURCES += torc/torcsetting.cpp
 SOURCES += torc/torcrpcrequest.cpp
 SOURCES += torc/torcdirectories.cpp
 SOURCES += torc/torcmime.cpp
+SOURCES += torc/torcbonjour.cpp
 SOURCES += torc/http/torchttprequest.cpp
 SOURCES += torc/http/torchttpserver.cpp
 SOURCES += torc/http/torchtmlhandler.cpp

@@ -24,9 +24,7 @@
 #include "torcadminthread.h"
 #include "torclanguage.h"
 #include "torcnetwork.h"
-#if defined(CONFIG_LIBDNS_SD) && CONFIG_LIBDNS_SD
 #include "torcbonjour.h"
-#endif
 #include "torcevent.h"
 #include "torchttpserver.h"
 #include "upnp/torcupnp.h"
@@ -590,22 +588,18 @@ TorcNetworkedContext::TorcNetworkedContext()
     connect(this, SIGNAL(RequestCancelled(QString,TorcRPCRequest*)), this, SLOT(HandleCancelRequest(QString,TorcRPCRequest*)));
     connect(this, SIGNAL(UpgradeRequest(TorcHTTPRequest*,QTcpSocket*)), this, SLOT(HandleUpgrade(TorcHTTPRequest*,QTcpSocket*)));
 
-#if defined(CONFIG_LIBDNS_SD) && CONFIG_LIBDNS_SD
     // always create the global instance
     TorcBonjour::Instance();
 
     // but immediately suspend if network access is disallowed
     if (!TorcNetwork::IsAllowed())
         TorcBonjour::Suspend(true);
-#endif
 
     // start browsing early for other Torc applications
     // Torc::Client implies it is a consumer of media - may need revisiting
     if (gLocalContext->FlagIsSet(Torc::Client))
     {
-#if defined(CONFIG_LIBDNS_SD) && CONFIG_LIBDNS_SD
         m_bonjourBrowserReference = TorcBonjour::Instance()->Browse("_torc._tcp.");
-#endif
 
         // NB TorcSSDP singleton isn't running yet - but the request will be queued
         TorcSSDP::Search(TORC_ROOT_UPNP_DEVICE, this);
@@ -626,7 +620,6 @@ TorcNetworkedContext::~TorcNetworkedContext()
     // cancel upnp search
     TorcSSDP::CancelSearch(TORC_ROOT_UPNP_DEVICE, this);
 
-#if defined(CONFIG_LIBDNS_SD) && CONFIG_LIBDNS_SD
     // stop browsing for torc._tcp
     if (m_bonjourBrowserReference)
         TorcBonjour::Instance()->Deregister(m_bonjourBrowserReference);
@@ -634,7 +627,6 @@ TorcNetworkedContext::~TorcNetworkedContext()
 
     // N.B. We delete the global instance here
     TorcBonjour::TearDown();
-#endif
 
     {
         QWriteLocker locker(m_discoveredServicesLock);
@@ -715,7 +707,6 @@ bool TorcNetworkedContext::event(QEvent *Event)
         {
             if (event->Data().contains("txtrecords"))
             {
-#if defined(CONFIG_LIBDNS_SD) && CONFIG_LIBDNS_SD
                 // txtrecords is Bonjour specific
                 QMap<QByteArray,QByteArray> records = TorcBonjour::TxtRecordToMap(event->Data().value("txtrecords").toByteArray());
 
@@ -775,7 +766,6 @@ bool TorcNetworkedContext::event(QEvent *Event)
                             Remove(uuid, TorcNetworkService::Bonjour);
                     }
                 }
-#endif
             }
             else if (event->Data().contains("usn"))
             {
