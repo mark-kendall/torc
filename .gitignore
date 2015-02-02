@@ -20,3 +20,4 @@ Makefile
 *qrc_*
 *.obj
 *.stash
+*.cache
