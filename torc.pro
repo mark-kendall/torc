@@ -24,6 +24,7 @@ QT         -= gui
 # libraries
 LIBS       += -lz
 !mac:LIBS  += -ldns_sd
+LIBS       += -lrt
 
 DEPENDPATH  += ./torc ./torc/http ./torc/upnp
 INCLUDEPATH += $$DEPENDPATH
@@ -33,6 +34,14 @@ install.path   = $${PREFIX}/share/torc/html/
 install.files  = html/index.html
 install.files += html/css html/fonts html/img html/js
 INSTALLS      += install
+
+# linux power support
+unix:qtHaveModule(dbus) {
+    QT += dbus
+    HEADERS += torc/platforms/torcpowerunixdbus.h
+    SOURCES += torc/platforms/torcpowerunixdbus.cpp
+    DEFINES += USING_QTDBUS
+}
 
 HEADERS += torc/torclogging.h
 HEADERS += torc/torcloggingdefs.h
