@@ -461,7 +461,7 @@ void TorcBinaryPListSerialiser::CountObjects(quint64 &Count, const QVariant &Val
             bool dict = false;
             QVariantList list = Value.toList();
             QVariantList::const_iterator it = list.begin();
-            uint type = list.isEmpty() ? 0 : list[0].type();
+            uint type = list.isEmpty() ? QMetaType::UnknownType : static_cast<QMetaType::Type>(list[0].type());
             for ( ; it != list.end(); ++it)
             {
                 if ((*it).type() != type)
