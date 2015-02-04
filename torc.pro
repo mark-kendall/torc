@@ -15,6 +15,8 @@ INSTALLS    = target
 DEFINES    += PREFIX=\\\"$${PREFIX}\\\"
 DEFINES    += RUNPREFIX=\\\"$${RUNPREFIX}\\\"
 DEFINES    += GIT_VERSION='"\\\"$(shell git describe --always)\\\""'
+DEFINES    += _GNU_SOURCE
+DEFINES    += __STDC_LIMIT_MACROS
 
 QT         += sql network
 QT         -= gui
