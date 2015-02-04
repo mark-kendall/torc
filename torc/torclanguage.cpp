@@ -55,7 +55,7 @@ QMap<QString,int> TorcLanguage::gLanguageMap;
  * \todo Add support for multiple translation files (e.g. plugins as well ).
 */
 TorcLanguage::TorcLanguage()
-  : QAbstractListModel(),
+  : QObject(),
     TorcHTTPService(this, "languages", "languages", TorcLanguage::staticMetaObject, BLACKLIST),
     m_translator(new QTranslator()),
     m_lock(new QReadWriteLock(QReadWriteLock::Recursive))
@@ -79,42 +79,6 @@ TorcLanguage::~TorcLanguage()
     }
 
     delete m_lock;
-}
-
-QVariant TorcLanguage::data(const QModelIndex &Index, int Role) const
-{
-    QReadLocker locker(m_lock);
-
-    int row = Index.row();
-
-    if (row < 0 || row >= m_languages.size())
-        return QVariant();
-
-    switch (Role)
-    {
-        case (Qt::UserRole + 2):
-            return QVariant::fromValue(m_languages.at(row).name());
-        case (Qt::UserRole + 1):
-        default:
-            break;
-    }
-
-    return QVariant::fromValue(m_languages.at(row).nativeLanguageName());
-}
-
-QHash<int,QByteArray> TorcLanguage::roleNames(void) const
-{
-    QReadLocker locker(m_lock);
-    QHash<int,QByteArray> roles;
-    roles.insert(Qt::UserRole + 1, "languageCode");
-    roles.insert(Qt::UserRole + 2, "languageString");
-    return roles;
-}
-
-int TorcLanguage::rowCount(const QModelIndex&) const
-{
-    QReadLocker locker(m_lock);
-    return m_languages.size();
 }
 
 /*! \brief Set the current language for this application.

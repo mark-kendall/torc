@@ -4,7 +4,6 @@
 // Qt
 #include <QObject>
 #include <QHostAddress>
-#include <QAbstractListModel>
 
 // Torc
 #include "http/torchttpservice.h"
@@ -112,7 +111,7 @@ class TorcNetworkService : public QObject
 Q_DECLARE_METATYPE(TorcNetworkService*);
 Q_DECLARE_OPERATORS_FOR_FLAGS(TorcNetworkService::ServiceSources);
 
-class TorcNetworkedContext: public QAbstractListModel, public TorcHTTPService
+class TorcNetworkedContext: public QObject, public TorcHTTPService
 {
     friend class TorcNetworkedContextObject;
     friend class TorcNetworkService;
@@ -123,11 +122,6 @@ class TorcNetworkedContext: public QAbstractListModel, public TorcHTTPService
     Q_PROPERTY(QVariantList peers READ GetPeers NOTIFY PeersChanged)
 
   public:
-    // QAbstractListModel
-    QVariant                   data                (const QModelIndex &Index, int Role) const;
-    QHash<int,QByteArray>      roleNames           (void) const;
-    int                        rowCount            (const QModelIndex &Parent = QModelIndex()) const;
-
     // TorcWebSocket
     static void                UpgradeSocket       (TorcHTTPRequest *Request, QTcpSocket *Socket);
 

@@ -3,17 +3,17 @@
 
 // Qt
 #include <QMap>
+#include <QObject>
 #include <QLocale>
 #include <QTranslator>
 #include <QReadWriteLock>
-#include <QAbstractListModel>
 
 // Torc
 #include "torchttpservice.h"
 
 #define DEFAULT_QT_LANGUAGE (QLocale::AnyLanguage)
 
-class TorcLanguage : public QAbstractListModel, public TorcHTTPService
+class TorcLanguage : public QObject, public TorcHTTPService
 {
     Q_OBJECT
     Q_CLASSINFO("Version",   "1.0.0")
@@ -48,12 +48,6 @@ class TorcLanguage : public QAbstractListModel, public TorcHTTPService
     QString                  GetTranslation        (const QString &Context, const QString &String,
                                                     const QString &Disambiguation, int Number);
     void                     SubscriberDeleted     (QObject *Subscriber);
-
-  public:
-    // QAbstractListModel
-    QVariant                 data                  (const QModelIndex &Index, int Role) const;
-    QHash<int,QByteArray>    roleNames             (void) const;
-    int                      rowCount              (const QModelIndex &Parent = QModelIndex()) const;
 
   private:
     void                     InitialiseTranslations (void);

@@ -48,8 +48,7 @@
 
 TorcSetting::TorcSetting(TorcSetting *Parent, const QString &DBName, const QString &UIName,
                          Type SettingType, bool Persistent, const QVariant &Default)
-  : QAbstractListModel(),
-    m_parent(Parent),
+  : m_parent(Parent),
     m_type(SettingType),
     m_persistent(Persistent),
     m_dbName(DBName),
@@ -107,41 +106,6 @@ TorcSetting::~TorcSetting()
     delete m_childrenLock;
 }
 
-int TorcSetting::rowCount(const QModelIndex&) const
-{
-    // TODO does this need locking
-    return m_children.size();
-}
-
-QVariant TorcSetting::data(const QModelIndex &Index, int Role) const
-{
-    // TODO does this need locking
-
-    if (!Index.isValid())
-        return QVariant();
-
-    int row = Index.row();
-
-    if (row < 0 || row >= m_children.size() || Role != Qt::DisplayRole)
-        return QVariant();
-
-    return QVariant::fromValue(m_children.at(row));
-}
-
-QHash<int,QByteArray> TorcSetting::roleNames(void) const
-{
-    QHash<int,QByteArray> roles;
-    roles.insert(Qt::DisplayRole, "m_value");
-    roles.insert(Qt::DisplayRole, "m_uiName");
-    roles.insert(Qt::DisplayRole, "m_description");
-    roles.insert(Qt::DisplayRole, "m_helpText");
-    roles.insert(Qt::DisplayRole, "m_default");
-    roles.insert(Qt::DisplayRole, "m_persistent");
-    roles.insert(Qt::DisplayRole, "m_isActive");
-    roles.insert(Qt::DisplayRole, "m_type");
-    return roles;
-}
-
 QVariant::Type TorcSetting::GetStorageType(void)
 {
     return m_default.type();
@@ -155,9 +119,7 @@ void TorcSetting::AddChild(TorcSetting *Child)
             QMutexLocker locker(m_childrenLock);
 
             int position = m_children.size();
-            beginInsertRows(QModelIndex(), position, position);
             m_children.insert(position, Child);
-            endInsertRows();
         }
 
         Child->UpRef();
@@ -174,9 +136,7 @@ void TorcSetting::RemoveChild(TorcSetting *Child)
             {
                 if (m_children.at(i) == Child)
                 {
-                    beginRemoveRows(QModelIndex(), i, i);
                     m_children.removeAt(i);
-                    endRemoveRows();
                     break;
                 }
             }

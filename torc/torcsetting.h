@@ -4,14 +4,14 @@
 // Qt
 #include <QSet>
 #include <QMutex>
+#include <QObject>
 #include <QVariant>
 #include <QStringList>
-#include <QAbstractListModel>
 
 // Torc
 #include "torcreferencecounted.h"
 
-class TorcSetting : public QAbstractListModel, public TorcReferenceCounter
+class TorcSetting : public QObject, public TorcReferenceCounter
 {
     Q_OBJECT
     Q_ENUMS(Type)
@@ -37,10 +37,6 @@ class TorcSetting : public QAbstractListModel, public TorcReferenceCounter
     Q_PROPERTY (int      m_isActive    READ IsActive()       NOTIFY ActiveChanged()      )
     Q_PROPERTY (Type     m_type        READ GetSettingType   CONSTANT                    )
 
-    // QAbstractListModel
-    QVariant               data                 (const QModelIndex &Index, int Role) const;
-    QHash<int,QByteArray>  roleNames            (void) const;
-
   public:
     QVariant::Type         GetStorageType       (void);
     void                   AddChild             (TorcSetting *Child);
@@ -50,9 +46,6 @@ class TorcSetting : public QAbstractListModel, public TorcReferenceCounter
     QSet<TorcSetting*>     GetChildren          (void);
 
   public slots:
-    // QAbstractListModel
-    int                    rowCount             (const QModelIndex &Parent = QModelIndex()) const;
-
     void                   SetValue             (const QVariant &Value);
     void                   SetRange             (int Begin, int End, int Step);
     bool                   IsActive             (void);

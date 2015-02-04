@@ -575,7 +575,7 @@ void TorcNetworkService::RemoveSource(ServiceSource Source)
  * \sa TorcNetworkService
  */
 TorcNetworkedContext::TorcNetworkedContext()
-  : QAbstractListModel(),
+  : QObject(),
     TorcHTTPService(this, "peers", "peers", TorcNetworkedContext::staticMetaObject, BLACKLIST),
     m_discoveredServicesLock(new QReadWriteLock(QReadWriteLock::Recursive)),
     m_bonjourBrowserReference(0)
@@ -649,33 +649,6 @@ QVariantList TorcNetworkedContext::GetPeers(void)
         result.append(service->ToMap());
 
     return result;
-}
-
-QVariant TorcNetworkedContext::data(const QModelIndex &Index, int Role) const
-{
-    // no locking required - discovered services are changed in this thread.
-    int row = Index.row();
-
-    if (row < 0 || row >= m_discoveredServices.size() || Role != Qt::DisplayRole)
-        return QVariant();
-
-    return QVariant::fromValue(m_discoveredServices.at(row));
-}
-
-QHash<int,QByteArray> TorcNetworkedContext::roleNames(void) const
-{
-    QHash<int,QByteArray> roles;
-    roles.insert(Qt::DisplayRole, "name");
-    roles.insert(Qt::DisplayRole, "uuid");
-    roles.insert(Qt::DisplayRole, "port");
-    roles.insert(Qt::DisplayRole, "m_uiaddress");
-    return roles;
-}
-
-int TorcNetworkedContext::rowCount(const QModelIndex&) const
-{
-    // no locking required - discovered services are changed in this thread.
-    return m_discoveredServices.size();
 }
 
 void TorcNetworkedContext::Connected(TorcNetworkService *Peer)
@@ -775,7 +748,7 @@ bool TorcNetworkedContext::event(QEvent *Event)
         }
     }
 
-    return QAbstractListModel::event(Event);
+    return QObject::event(Event);
 }
 
 /*! \brief Respond to a valid WebSocket upgrade request and schedule creation of a WebSocket on the give QTcpSocket
@@ -951,10 +924,7 @@ void TorcNetworkedContext::Add(TorcNetworkService *Peer)
     {
         {
             QWriteLocker locker(m_discoveredServicesLock);
-            int position = m_discoveredServices.size();
-            beginInsertRows(QModelIndex(), position, position);
             m_discoveredServices.append(Peer);
-            endInsertRows();
         }
 
         m_serviceList.append(Peer->GetUuid());
@@ -980,11 +950,8 @@ void TorcNetworkedContext::Remove(const QString &UUID, TorcNetworkService::Servi
                     if (m_discoveredServices.at(i)->GetSources() > TorcNetworkService::Spontaneous)
                         return;
 
-                    // remove the item from the model
-                    beginRemoveRows(QModelIndex(), i, i);
+                    // remove the item
                     m_discoveredServices.takeAt(i)->deleteLater();
-                    endRemoveRows();
-
                     break;
                 }
             }
