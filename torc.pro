@@ -24,7 +24,7 @@ QT         -= gui
 # libraries
 LIBS       += -lz
 !mac:LIBS  += -ldns_sd
-LIBS       += -lrt
+!mac:LIBS  += -lrt
 
 DEPENDPATH  += ./torc ./torc/http ./torc/upnp
 INCLUDEPATH += $$DEPENDPATH
