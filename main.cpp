@@ -30,7 +30,7 @@ int main(int argc, char **argv)
         if (justexit)
             return ret;
 
-        if (int error = TorcLocalContext::Create(cmdline.data(), Torc::Database | Torc::Server | Torc::Client | Torc::Storage | Torc::Power | Torc::USB | Torc::Network))
+        if (int error = TorcLocalContext::Create(cmdline.data()))
             return error;
     }
 

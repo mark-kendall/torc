@@ -592,14 +592,10 @@ TorcNetworkedContext::TorcNetworkedContext()
     TorcBonjour::Instance();
 
     // start browsing early for other Torc applications
-    // Torc::Client implies it is a consumer of media - may need revisiting
-    if (gLocalContext->FlagIsSet(Torc::Client))
-    {
-        m_bonjourBrowserReference = TorcBonjour::Instance()->Browse("_torc._tcp.");
+    m_bonjourBrowserReference = TorcBonjour::Instance()->Browse("_torc._tcp.");
 
-        // NB TorcSSDP singleton isn't running yet - but the request will be queued
-        TorcSSDP::Search(TORC_ROOT_UPNP_DEVICE, this);
-    }
+    // NB TorcSSDP singleton isn't running yet - but the request will be queued
+    TorcSSDP::Search(TORC_ROOT_UPNP_DEVICE, this);
 
     TorcUPNPDescription upnp(QString("uuid:%1").arg(gLocalContext->GetUuid()), TORC_ROOT_UPNP_DEVICE, "LOCATION", 1000);
     TorcSSDP::Announce(upnp);

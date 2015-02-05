@@ -738,8 +738,7 @@ class TorcHTTPServerObject : public TorcAdminObject, public TorcStringFactory
         Destroy();
 
         QMutexLocker locker(TorcHTTPServer::gWebServerLock);
-        if (gLocalContext->FlagIsSet(Torc::Server))
-            TorcHTTPServer::gWebServer = new TorcHTTPServer();
+        TorcHTTPServer::gWebServer = new TorcHTTPServer();
     }
 
     void Destroy(void)

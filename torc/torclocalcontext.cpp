@@ -64,7 +64,7 @@ static void ExitHandler(int Sig)
 class TorcLocalContextPriv
 {
   public:
-    TorcLocalContextPriv(Torc::ApplicationFlags ApplicationFlags, TorcCommandLine *CommandLine);
+    TorcLocalContextPriv(TorcCommandLine *CommandLine);
    ~TorcLocalContextPriv();
 
     bool    Init                 (void);
@@ -74,7 +74,6 @@ class TorcLocalContextPriv
     void    SetPreference        (const QString &Name, const QString &Value);
     QString GetUuid              (void);
 
-    Torc::ApplicationFlags m_flags;
     TorcSQLiteDB         *m_sqliteDB;
     QString               m_dbName;
     QMap<QString,QString> m_localSettings;
@@ -88,9 +87,8 @@ class TorcLocalContextPriv
     QString               m_uuidString;
 };
 
-TorcLocalContextPriv::TorcLocalContextPriv(Torc::ApplicationFlags ApplicationFlags, TorcCommandLine *CommandLine)
-  : m_flags(ApplicationFlags),
-    m_sqliteDB(NULL),
+TorcLocalContextPriv::TorcLocalContextPriv(TorcCommandLine *CommandLine)
+  : m_sqliteDB(NULL),
     m_dbName(QString("")),
     m_localSettingsLock(new QReadWriteLock(QReadWriteLock::Recursive)),
     m_preferencesLock(new QReadWriteLock(QReadWriteLock::Recursive)),
@@ -176,31 +174,24 @@ bool TorcLocalContextPriv::Init(void)
     m_language->LoadPreferences();
 
     // Open the local database
-    if (m_flags & Torc::Database)
+    if (m_dbName.isEmpty())
+        m_dbName = configdir + "/" + QCoreApplication::applicationName() + "-settings.sqlite";
+
+    m_sqliteDB = new TorcSQLiteDB(m_dbName);
+
+    if (!m_sqliteDB || (m_sqliteDB && !m_sqliteDB->IsValid()))
+        return false;
+
+    // Load the settings
     {
-        if (m_dbName.isEmpty())
-            m_dbName = configdir + "/" + QCoreApplication::applicationName() + "-settings.sqlite";
-
-        m_sqliteDB = new TorcSQLiteDB(m_dbName);
-
-        if (!m_sqliteDB || (m_sqliteDB && !m_sqliteDB->IsValid()))
-            return false;
-
-        // Load the settings
-        {
-            QWriteLocker locker(m_localSettingsLock);
-            m_sqliteDB->LoadSettings(m_localSettings);
-        }
-
-        // Load preferences
-        {
-            QWriteLocker locker(m_preferencesLock);
-            m_sqliteDB->LoadPreferences(m_preferences);
-        }
+        QWriteLocker locker(m_localSettingsLock);
+        m_sqliteDB->LoadSettings(m_localSettings);
     }
-    else
+
+    // Load preferences
     {
-        LOG(VB_GENERAL, LOG_INFO, "Running without database");
+        QWriteLocker locker(m_preferencesLock);
+        m_sqliteDB->LoadPreferences(m_preferences);
     }
 
     // Create the root settings object
@@ -222,17 +213,8 @@ bool TorcLocalContextPriv::Init(void)
     LOG(VB_GENERAL, LOG_INFO, QString("Qt runtime version '%1' (compiled with '%2')")
         .arg(qVersion()).arg(QT_VERSION_STR));
 
-    // create an admin thread (and associated objects). This is only
-    // required if the UI runs in the main thread.
-    if (m_flags & Torc::AdminThread)
-    {
-        m_adminThread = new TorcAdminThread();
-        m_adminThread->start();
-    }
-    else
-    {
-        TorcAdminObject::CreateObjects();
-    }
+    // we don't use an admin thread as purely a server (i.e. no gui) - may need to revisit
+    TorcAdminObject::CreateObjects();
 
     return true;
 }
@@ -303,12 +285,12 @@ int Torc::StringToAction(const QString &Action)
     return metaEnum.keyToValue(Action.toLatin1());
 }
 
-qint16 TorcLocalContext::Create(TorcCommandLine* CommandLine, Torc::ApplicationFlags ApplicationFlags)
+qint16 TorcLocalContext::Create(TorcCommandLine* CommandLine)
 {
     if (gLocalContext)
         return GENERIC_EXIT_OK;
 
-    gLocalContext = new TorcLocalContext(CommandLine, ApplicationFlags);
+    gLocalContext = new TorcLocalContext(CommandLine);
     if (gLocalContext && gLocalContext->Init())
         return GENERIC_EXIT_OK;
 
@@ -379,9 +361,9 @@ void TorcLocalContext::UserMessage(int Type, int Destination, int Timeout,
  * \todo Add priority generation based on role and maybe user setting.
  * \todo Convert Q_INVOKABLEs to public slots.
 */
-TorcLocalContext::TorcLocalContext(TorcCommandLine* CommandLine, Torc::ApplicationFlags ApplicationFlags)
+TorcLocalContext::TorcLocalContext(TorcCommandLine* CommandLine)
   : QObject(),
-    m_priv(new TorcLocalContextPriv(ApplicationFlags, CommandLine))
+    m_priv(new TorcLocalContextPriv(CommandLine))
 {
     // Initialise TorcQThread FIRST
     TorcQThread::SetMainThread();
@@ -565,9 +547,4 @@ qint64 TorcLocalContext::GetStartTime(void)
 int TorcLocalContext::GetPriority(void)
 {
     return 0;
-}
-
-bool TorcLocalContext::FlagIsSet(Torc::ApplicationFlag Flag)
-{
-    return m_priv->m_flags & Flag;
 }

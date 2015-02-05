@@ -248,7 +248,7 @@ TorcPower::TorcPower()
                                        tr("Allow Torc to restart the system"),
                                        TorcSetting::Checkbox, true, QVariant((bool)true));
 
-    m_powerEnabled->SetActive(gLocalContext->FlagIsSet(Torc::Power));
+    m_powerEnabled->SetActive(true);
     // 'allow' depends on both underlying platform capabilities and top level setting
     m_allowShutdown->SetActiveThreshold(2);
     m_allowSuspend->SetActiveThreshold(2);
@@ -548,8 +548,7 @@ static class TorcPowerObject : public TorcAdminObject, public TorcStringFactory
 
     void Create(void)
     {
-        if (gLocalContext->FlagIsSet(Torc::Power))
-            TorcPower::Create();
+        TorcPower::Create();
     }
 
     void Destroy(void)
