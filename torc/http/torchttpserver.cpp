@@ -601,7 +601,7 @@ bool TorcHTTPServer::Open(void)
     // advertise service if not already doing so
     if (!m_httpBonjourReference || !m_torcBonjourReference)
     {
-        // add the 'root' apiversion, as would be returned by '/services/GetVersion'
+        // add the 'root' apiversion, as would be returned by '/services/GetServiceVersion'
         int index = TorcHTMLServicesHelp::staticMetaObject.indexOfClassInfo("Version");
 
         QMap<QByteArray,QByteArray> map;

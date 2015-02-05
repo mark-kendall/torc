@@ -364,7 +364,7 @@ void TorcHTTPService::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTTPConne
     HTTPRequestType type = Request->GetHTTPRequestType();
 
     bool helprequest    = method.compare("Help") == 0;
-    bool versionrequest = method.compare("GetVersion") == 0;
+    bool versionrequest = method.compare("GetServiceVersion") == 0;
 
     if (helprequest || versionrequest)
     {
@@ -520,8 +520,8 @@ QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVarian
             return result;
         }
 
-        // implicit 'GetVersion' method
-        if (method.compare("GetVersion") == 0)
+        // implicit 'GetServiceVersion' method
+        if (method.compare("GetServiceVersion") == 0)
         {
             QVariantMap result;
             QVariantMap version;
@@ -735,7 +735,7 @@ void TorcHTTPService::UserHelp(TorcHTTPRequest *Request, TorcHTTPConnection *Con
     stream << "<a href='" << SERVICES_DIRECTORY << "'>" << tr("Services") << "</a> " << GetUIName() << "</h1>";
 
     stream << "<h3>" << tr("Method list for ") << m_signature << " (Version: " << m_version << ")</h3>";
-    stream << "QString GetVersion() (HEAD,GET,OPTIONS)<br>";
+    stream << "QString GetServiceVersion() (HEAD,GET,OPTIONS)<br>";
 
     int count   = 0;
 
