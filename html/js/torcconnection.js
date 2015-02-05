@@ -119,6 +119,7 @@ var TorcConnection = function ($, torc, statusChanged) {
     }
 
     function disconnected() {
+        console.log('Disconnected');
         // notify subscribers that they have been disconnected and delete subscription
         Object.getOwnPropertyNames(subscriptions).forEach(function (element) {
             if (typeof subscriptions[element].subscriptionChanges === 'function') { subscriptions[element].subscriptionChanges(); }
@@ -132,6 +133,7 @@ var TorcConnection = function ($, torc, statusChanged) {
     }
 
     function socketStatusChanged (status) {
+        console.log(status);
         // notify the ui
         statusChanged(status);
 
