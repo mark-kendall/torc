@@ -852,7 +852,7 @@ QString TorcHTTPRequest::AllowedToString(int Allowed)
     if (Allowed & HTTPPost)    result << "POST";
     if (Allowed & HTTPPut)     result << "PUT";
     if (Allowed & HTTPDelete)  result << "DELETE";
-    if (Allowed & HTTPOptions) result << "OPTONS";
+    if (Allowed & HTTPOptions) result << "OPTIONS";
 
     return result.join(", ");
 }
