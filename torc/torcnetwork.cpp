@@ -43,28 +43,7 @@ bool TorcNetwork::IsAvailable(void)
 {
     QMutexLocker locker(gNetworkLock);
 
-    return gNetwork ? gNetwork->IsOnline() && gNetwork->IsAllowedPriv() : false;
-}
-
-bool TorcNetwork::IsAllowed(void)
-{
-    QMutexLocker locker(gNetworkLock);
-
-    return gNetwork ? gNetwork->IsAllowedPriv() : false;
-}
-
-bool TorcNetwork::IsAllowedInbound(void)
-{
-    QMutexLocker locker(gNetworkLock);
-
-    return gNetwork ? gNetwork->IsAllowedInboundPriv() : false;
-}
-
-bool TorcNetwork::IsAllowedOutbound(void)
-{
-    QMutexLocker locker(gNetworkLock);
-
-    return gNetwork ? gNetwork->IsAllowedOutboundPriv() : false;
+    return gNetwork ? gNetwork->IsOnline() : false;
 }
 
 bool TorcNetwork::IsOwnAddress(const QHostAddress &Address)
@@ -92,7 +71,7 @@ bool TorcNetwork::Get(TorcNetworkRequest* Request)
 {
     QMutexLocker locker(gNetworkLock);
 
-    if (gNetwork->IsOnline() && IsAllowedOutbound())
+    if (gNetwork->IsOnline())
     {
         emit gNetwork->NewRequest(Request);
         return true;
@@ -141,7 +120,7 @@ bool TorcNetwork::GetAsynchronous(TorcNetworkRequest *Request, QObject *Parent)
 
     QMutexLocker locker(gNetworkLock);
 
-    if (gNetwork->IsOnline() && gNetwork->IsAllowedOutbound())
+    if (gNetwork->IsOnline())
     {
         emit gNetwork->NewAsyncRequest(Request, Parent);
         return true;
@@ -325,38 +304,6 @@ TorcNetwork::TorcNetwork()
 {
     LOG(VB_GENERAL, LOG_INFO, "Opening network access manager");
 
-    // create settings and establish correct behaviour
-    m_networkGroup   = new TorcSettingGroup(gRootSetting, tr("Network"));
-    m_networkAllowed = new TorcSetting(m_networkGroup, SETTING_NETWORKALLOWED,
-                                       tr("Enable network access"), TorcSetting::Checkbox,
-                                       true, QVariant((bool)true));
-    m_networkAllowedInbound = new TorcSetting(m_networkAllowed, SETTING_NETWORKALLOWEDINBOUND,
-                                       tr("Allow other devices to connect to Torc"), TorcSetting::Checkbox,
-                                       true, QVariant((bool)true));
-    m_networkAllowedOutbound = new TorcSetting(m_networkAllowed, SETTING_NETWORKALLOWEDOUTBOUND,
-                                       tr("Allow Torc to connect to other devices"), TorcSetting::Checkbox,
-                                       true, QVariant((bool)true));
-
-    m_networkAllowed->SetActive(gLocalContext->FlagIsSet(Torc::Network));
-    m_networkAllowedInbound->SetActiveThreshold(2);
-    m_networkAllowedOutbound->SetActiveThreshold(2);
-    if (m_networkAllowed->IsActive())
-    {
-        m_networkAllowedInbound->SetActive(true);
-        m_networkAllowedOutbound->SetActive(true);
-    }
-    if (m_networkAllowed->GetValue().toBool())
-    {
-        m_networkAllowedInbound->SetActive(true);
-        m_networkAllowedOutbound->SetActive(true);
-    }
-
-    connect(m_networkAllowed, SIGNAL(ValueChanged(bool)),  this,                     SLOT(SetAllowed(bool)));
-    connect(m_networkAllowed, SIGNAL(ValueChanged(bool)),  m_networkAllowedInbound,  SLOT(SetActive(bool)));
-    connect(m_networkAllowed, SIGNAL(ActiveChanged(bool)), m_networkAllowedInbound,  SLOT(SetActive(bool)));
-    connect(m_networkAllowed, SIGNAL(ValueChanged(bool)),  m_networkAllowedOutbound, SLOT(SetActive(bool)));
-    connect(m_networkAllowed, SIGNAL(ActiveChanged(bool)), m_networkAllowedOutbound, SLOT(SetActive(bool)));
-
     connect(m_manager, SIGNAL(configurationAdded(const QNetworkConfiguration&)),
             this,      SLOT(ConfigurationAdded(const QNetworkConfiguration&)));
     connect(m_manager, SIGNAL(configurationChanged(const QNetworkConfiguration&)),
@@ -376,12 +323,8 @@ TorcNetwork::TorcNetwork()
     // direct connection for authentication requests
     connect(this, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)), this, SLOT(Authenticate(QNetworkReply*,QAuthenticator*)), Qt::DirectConnection);
 
-    // hide the network group if there is nothing to change
-    m_networkGroup->SetActive(gLocalContext->FlagIsSet(Torc::Network));
-
     // set initial state
     setConfiguration(m_manager->defaultConfiguration());
-    SetAllowed(m_networkAllowed->IsActive() && m_networkAllowed->GetValue().toBool());
     UpdateConfiguration(true);
 }
 
@@ -389,36 +332,6 @@ TorcNetwork::~TorcNetwork()
 {
     // release any outstanding requests
     CloseConnections();
-
-    // remove settings
-    if (m_networkAllowedInbound)
-    {
-        m_networkAllowedInbound->Remove();
-        m_networkAllowedInbound->DownRef();
-    }
-
-    if (m_networkAllowedOutbound)
-    {
-        m_networkAllowedOutbound->Remove();
-        m_networkAllowedOutbound->DownRef();
-    }
-
-    if (m_networkAllowed)
-    {
-        m_networkAllowed->Remove();
-        m_networkAllowed->DownRef();
-    }
-
-    if (m_networkGroup)
-    {
-        m_networkGroup->Remove();
-        m_networkGroup->DownRef();
-    }
-
-    m_networkAllowedInbound  = NULL;
-    m_networkAllowedOutbound = NULL;
-    m_networkAllowed         = NULL;
-    m_networkGroup           = NULL;
 
     // delete the configuration manager
     if (m_manager)
@@ -433,43 +346,9 @@ bool TorcNetwork::IsOnline(void)
     return m_online;
 }
 
-bool TorcNetwork::IsAllowedPriv(void)
-{
-    if (m_networkAllowed)
-        return m_networkAllowed->IsActive() && m_networkAllowed->GetValue().toBool();
-
-    return false;
-}
-
-bool TorcNetwork::IsAllowedInboundPriv(void)
-{
-    if (m_networkAllowedInbound)
-        return m_networkAllowedInbound->IsActive() && m_networkAllowedInbound->GetValue().toBool();
-
-    return false;
-}
-
-bool TorcNetwork::IsAllowedOutboundPriv(void)
-{
-    if (m_networkAllowedOutbound)
-        return m_networkAllowedOutbound->IsActive() && m_networkAllowedOutbound->GetValue().toBool();
-
-    return false;
-}
-
 bool TorcNetwork::IsOwnAddressPriv(const QHostAddress &Address)
 {
     return m_interface.allAddresses().contains(Address);
-}
-
-void TorcNetwork::SetAllowed(bool Allow)
-{
-    if (!Allow)
-        CloseConnections();
-
-    gLocalContext->NotifyEvent(Allow ? Torc::NetworkEnabled : Torc::NetworkDisabled);
-    setNetworkAccessible(Allow ? Accessible : NotAccessible);
-    LOG(VB_GENERAL, LOG_INFO, QString("Network access %1").arg(Allow ? "allowed" : "not allowed"));
 }
 
 void TorcNetwork::GetSafe(TorcNetworkRequest* Request)

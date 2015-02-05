@@ -67,16 +67,12 @@ class TorcHTTPServer : public QTcpServer
     static QMutex*                    gWebServerLock;
     static QString                    gPlatform;
 
-  private slots:
-    void           Enable             (bool Enable);
-
   private:
     static void    ExpireWebSocketTokens (void);
     bool           AuthenticateUser   (const QString &Header, QString &UserName);
     void           UpdateOriginWhitelist (void);
 
   private:
-    TorcSetting                      *m_enabled;
     TorcSetting                      *m_port;
     bool                              m_requiresAuthentication;
     TorcHTMLHandler                  *m_defaultHandler;

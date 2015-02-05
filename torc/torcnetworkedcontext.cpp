@@ -591,10 +591,6 @@ TorcNetworkedContext::TorcNetworkedContext()
     // always create the global instance
     TorcBonjour::Instance();
 
-    // but immediately suspend if network access is disallowed
-    if (!TorcNetwork::IsAllowed())
-        TorcBonjour::Suspend(true);
-
     // start browsing early for other Torc applications
     // Torc::Client implies it is a consumer of media - may need revisiting
     if (gLocalContext->FlagIsSet(Torc::Client))

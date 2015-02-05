@@ -281,7 +281,6 @@ QString         TorcHTTPServer::gPlatform = QString("");
 
 TorcHTTPServer::TorcHTTPServer()
   : QTcpServer(),
-    m_enabled(NULL),
     m_port(NULL),
     m_requiresAuthentication(true),
     m_defaultHandler(NULL),
@@ -292,23 +291,6 @@ TorcHTTPServer::TorcHTTPServer()
     m_torcBonjourReference(0),
     m_webSocketsLock(new QMutex(QMutex::Recursive))
 {
-    // create main setting
-    TorcSetting *parent = gRootSetting->FindChild(SETTING_NETWORKALLOWEDINBOUND, true);
-    if (parent)
-    {
-        m_enabled = new TorcSetting(parent, SETTING_WEBSERVERENABLED, tr("Enable internal web server"),
-                                    TorcSetting::Checkbox, true, QVariant((bool)true));
-        m_enabled->SetActiveThreshold(2);
-        if (parent->IsActive())
-            m_enabled->SetActive(true);
-        if (parent->GetValue().toBool())
-            m_enabled->SetActive(true);
-        connect(parent,    SIGNAL(ValueChanged(bool)),  m_enabled, SLOT(SetActive(bool)));
-        connect(parent,    SIGNAL(ActiveChanged(bool)), m_enabled, SLOT(SetActive(bool)));
-        connect(m_enabled, SIGNAL(ValueChanged(bool)),  this,      SLOT(Enable(bool)));
-        connect(m_enabled, SIGNAL(ActiveChanged(bool)), this,      SLOT(Enable(bool)));
-    }
-
     // port setting - this could become a user editable setting
     m_port = new TorcSetting(NULL, TORC_CORE + "WebServerPort", QString(), TorcSetting::Integer, true, QVariant((int)4840));
 
@@ -345,9 +327,7 @@ TorcHTTPServer::TorcHTTPServer()
     gLocalContext->AddObserver(this);
 
     // and start
-    // NB this will start and stop purely on the basis of the setting, irrespective
-    // of network availability and hence is still available via 'localhost'
-    Enable(true);
+    Open();
 }
 
 TorcHTTPServer::~TorcHTTPServer()
@@ -367,13 +347,6 @@ TorcHTTPServer::~TorcHTTPServer()
         m_port->Remove();
         m_port->DownRef();
         m_port = NULL;
-    }
-
-    if (m_enabled)
-    {
-        m_enabled->Remove();
-        m_enabled->DownRef();
-        m_enabled = NULL;
     }
 
     delete m_webSocketsLock;
@@ -547,15 +520,6 @@ void TorcHTTPServer::UpdateOriginWhitelist(void)
             m_originWhitelist += QString("%1%2:%3 ").arg("http://").arg(host).arg(port);
 
     LOG(VB_NETWORK, LOG_INFO, "Origin whitelist: " + m_originWhitelist);
-
-}
-
-void TorcHTTPServer::Enable(bool Enable)
-{
-    if (Enable && m_enabled && m_enabled->IsActive() && m_enabled->GetValue().toBool())// && TorcNetwork::IsAvailable())
-        Open();
-    else
-        Close();
 }
 
 bool TorcHTTPServer::Open(void)

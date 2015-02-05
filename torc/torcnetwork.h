@@ -11,8 +11,6 @@
 #include "torctimer.h"
 #include "torcnetworkrequest.h"
 
-#define NETWORK_TIMEOUT 20000
-
 #define DEFAULT_MAC_ADDRESS QString("00:00:00:00:00:00")
 #define DEFAULT_STREAMED_BUFFER_SIZE (1024 * 1024 * 10)
 #define DEFAULT_STREAMED_READ_SIZE   (32768)
@@ -20,10 +18,6 @@
 #define DEFAULT_USER_AGENT           QByteArray("Wget/1.12 (linux-gnu))")
 
 class TorcNetworkRequest;
-
-#define SETTING_NETWORKALLOWED         QString(TORC_CORE + "AllowNetwork")
-#define SETTING_NETWORKALLOWEDINBOUND  QString(TORC_CORE + "AllowInboundNetwork")
-#define SETTING_NETWORKALLOWEDOUTBOUND QString(TORC_CORE + "AllowOutboundNetwork")
 
 class TorcNetwork : QNetworkAccessManager
 {
@@ -34,9 +28,6 @@ class TorcNetwork : QNetworkAccessManager
   public:
     // Public API
     static bool IsAvailable         (void);
-    static bool IsAllowed           (void);
-    static bool IsAllowedInbound    (void);
-    static bool IsAllowedOutbound   (void);
     static bool IsOwnAddress        (const QHostAddress &Address);
     static QString GetMACAddress    (void);
     static QNetworkInterface GetInterface (void);
@@ -81,7 +72,6 @@ class TorcNetwork : QNetworkAccessManager
 
   private slots:
     // Torc
-    void    SetAllowed              (bool Allow);
     void    GetSafe                 (TorcNetworkRequest* Request);
     void    CancelSafe              (TorcNetworkRequest* Request);
     void    PokeSafe                (TorcNetworkRequest* Request);
@@ -96,9 +86,6 @@ class TorcNetwork : QNetworkAccessManager
   protected:
     TorcNetwork();
     bool    IsOnline                (void);
-    bool    IsAllowedPriv           (void);
-    bool    IsAllowedInboundPriv    (void);
-    bool    IsAllowedOutboundPriv   (void);
     bool    IsOwnAddressPriv        (const QHostAddress &Address);
     bool    CheckHeaders            (TorcNetworkRequest* Request, QNetworkReply *Reply);
     bool    Redirected              (TorcNetworkRequest* Request, QNetworkReply *Reply);
@@ -110,10 +97,6 @@ class TorcNetwork : QNetworkAccessManager
 
   private:
     bool                             m_online;
-    TorcSettingGroup                *m_networkGroup;
-    TorcSetting                     *m_networkAllowed;
-    TorcSetting                     *m_networkAllowedInbound;
-    TorcSetting                     *m_networkAllowedOutbound;
     QNetworkConfigurationManager    *m_manager;
     QNetworkConfiguration            m_configuration;
     QNetworkInterface                m_interface;
