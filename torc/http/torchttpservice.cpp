@@ -320,18 +320,24 @@ TorcHTTPService::TorcHTTPService(QObject *Parent, const QString &Signature, cons
     }
 
     // analyse properties
+    int invalidindex = -1;
     for (int i = m_metaObject.propertyOffset(); i < m_metaObject.propertyCount(); ++i)
     {
         QMetaProperty property = m_metaObject.property(i);
 
         if (property.isReadable() && ((property.hasNotifySignal() && property.notifySignalIndex() > -1) || property.isConstant()))
         {
-            // NB this will potentially insert multiple entries with key -1 for constant properties
-            m_properties.insert(property.notifySignalIndex(), property.propertyIndex());
+            // constant properties are given a signal index < 0
             if (property.notifySignalIndex() > -1)
+            {
+                m_properties.insert(property.notifySignalIndex(), property.propertyIndex());
                 LOG(VB_GENERAL, LOG_DEBUG, QString("Adding property '%1' with signal index %2").arg(property.name()).arg(property.notifySignalIndex()));
+            }
             else
+            {
+                m_properties.insert(invalidindex--, property.propertyIndex());
                 LOG(VB_GENERAL, LOG_DEBUG, QString("Adding constant property '%1'").arg(property.name()));
+            }
         }
     }
 
