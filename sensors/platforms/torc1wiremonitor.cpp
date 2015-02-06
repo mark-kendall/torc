@@ -119,7 +119,7 @@ void Torc1WireMonitor::DirectoryChanged(const QString&)
     }
 
     QStringList devices;
-    QDirIterator it(ONE_WIRE_DIRECTORY, QDir::Files | QDir::NoDotAndDotDot, QDirIterator::FollowSymlinks);
+    QDirIterator it(ONE_WIRE_DIRECTORY, QDir::Dirs | QDir::NoDotAndDotDot, QDirIterator::NoIteratorFlags);
     if (it.hasNext())
     {
         while (it.hasNext())
