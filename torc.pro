@@ -26,7 +26,7 @@ LIBS       += -lz
 !mac:LIBS  += -ldns_sd
 !mac:LIBS  += -lrt
 
-DEPENDPATH  += ./torc ./torc/http ./torc/upnp
+DEPENDPATH  += ./torc ./torc/http ./torc/upnp ./sensors ./sensors/platforms
 INCLUDEPATH += $$DEPENDPATH
 
 # HTML
@@ -88,6 +88,11 @@ HEADERS += torc/http/torcbinaryplistserialiser.h
 HEADERS += torc/http/torcjsonrpc.h
 HEADERS += torc/upnp/torcupnp.h
 HEADERS += torc/upnp/torcssdp.h
+HEADERS += sensors/torcsensor.h
+HEADERS += sensors/torcsensors.h
+HEADERS += sensors/torctemperaturesensor.h
+HEADERS += sensors/platforms/torc1wiremonitor.h
+HEADERS += sensors/platforms/torc1wireds18b20.h
 
 SOURCES += torc/torcloggingimp.cpp
 SOURCES += torc/torcplist.cpp
@@ -129,6 +134,12 @@ SOURCES += torc/http/torcbinaryplistserialiser.cpp
 SOURCES += torc/http/torcjsonrpc.cpp
 SOURCES += torc/upnp/torcupnp.cpp
 SOURCES += torc/upnp/torcssdp.cpp
+SOURCES += sensors/torcsensor.cpp
+SOURCES += sensors/torcsensors.cpp
+SOURCES += sensors/torctemperaturesensor.cpp
+SOURCES += sensors/platforms/torc1wiremonitor.cpp
+SOURCES += sensors/platforms/torc1wireds18b20.cpp
+
 SOURCES += main.cpp
 
 QMAKE_CLEAN += $(TARGET)
