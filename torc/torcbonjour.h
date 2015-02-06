@@ -23,9 +23,6 @@ class TorcBonjour : public QObject
     quint32 Browse          (const QByteArray &Type);
     void    Deregister      (quint32 Reference);
 
-  protected:
-    bool    event           (QEvent *Event);
-
   private slots:
     void    SuspendPriv     (bool Suspend);
     void    socketReadyRead (int Socket);

@@ -1086,38 +1086,6 @@ void TorcBonjour::HostLookup(const QHostInfo &HostInfo)
         m_priv->HostLookup(HostInfo);
 }
 
-/*! \fn TorcBonjour::event
- *  \brief Implements QObject::event
- *
- * Listens for TorcNetwork related events and suspends or resumes Bonjour activities
- * appropriately (although strictly speaking, this is probably not necessary as this
- * will be handled internally by Bonjour).
-*/
-bool TorcBonjour::event(QEvent *Event)
-{
-    if (Event->type() == TorcEvent::TorcEventType && m_priv)
-    {
-        TorcEvent* torcevent = dynamic_cast<TorcEvent*>(Event);
-        if (torcevent)
-        {
-            int event = torcevent->GetEvent();
-
-            if (event == Torc::NetworkDisabled)
-            {
-                if (!m_priv->IsSuspended())
-                    m_priv->Suspend();
-            }
-            else if (event == Torc::NetworkEnabled)
-            {
-                if (m_priv->IsSuspended())
-                    m_priv->Resume();
-            }
-        }
-    }
-
-    return QObject::event(Event);
-}
-
 void TorcBonjour::SuspendPriv(bool Suspend)
 {
     if (m_priv)
