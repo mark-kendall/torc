@@ -17,8 +17,6 @@
 class TorcHTTPConnection;
 class TorcHTTPHandler;
 
-#define SETTING_WEBSERVERENABLED QString(TORC_CORE + "WebServerEnabled")
-
 class TorcHTTPServer : public QTcpServer
 {
     Q_OBJECT

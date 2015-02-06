@@ -708,8 +708,6 @@ void TorcHTTPServer::WebSocketClosed(void)
 
 class TorcHTTPServerObject : public TorcAdminObject, public TorcStringFactory
 {
-    Q_DECLARE_TR_FUNCTIONS(TorcHTTPServerObject)
-
   public:
     TorcHTTPServerObject()
       : TorcAdminObject(TORC_ADMIN_HIGH_PRIORITY)
