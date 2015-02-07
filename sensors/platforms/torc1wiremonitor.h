@@ -10,6 +10,8 @@
 // Torc
 #include "../torcsensor.h"
 
+#define ONE_WIRE_DIRECTORY QString("/sys/bus/w1/devices")
+
 class Torc1WireMonitor : public QObject
 {
     Q_OBJECT

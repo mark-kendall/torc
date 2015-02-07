@@ -30,8 +30,6 @@
 #include "torc1wiremonitor.h"
 #include "torc1wireds18b20.h"
 
-#define ONE_WIRE_DIRECTORY QString("/sys/bus/w1/devices")
-
 /*! \class Torc1WireMonitor
  *  \brief A class to monitor the one wire files system (OWFS) for 1Wire devices.
  *
