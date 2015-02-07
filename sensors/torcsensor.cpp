@@ -78,7 +78,7 @@ TorcSensor::TorcSensor(TorcSensor::Type Type, double Value, double RangeMinimum,
     uniqueId(UniqueId),
     userName(QString("")),
     userDescription(QString("")),
-    m_lock(new QMutex())
+    m_lock(new QMutex(QMutex::Recursive))
 {
     // guard against stupidity
     if (operatingRangeMax <= operatingRangeMin)
