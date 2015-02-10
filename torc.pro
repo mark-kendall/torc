@@ -27,6 +27,7 @@ LIBS       += -lz
 !mac:LIBS  += -lrt
 
 DEPENDPATH  += ./torc ./torc/http ./torc/upnp ./sensors ./sensors/platforms
+DEPENDPATH  += ./outputs ./outputs/platforms
 INCLUDEPATH += $$DEPENDPATH
 
 # HTML
@@ -41,6 +42,12 @@ unix:qtHaveModule(dbus) {
     HEADERS += torc/platforms/torcpowerunixdbus.h
     SOURCES += torc/platforms/torcpowerunixdbus.cpp
     DEFINES += USING_QTDBUS
+}
+
+# I2c on the Raspberry Pi
+{
+    HEADERS += outputs/platforms/torci2cpca9685.h
+    SOURCES += outputs/platforms/torci2cpca9685.cpp
 }
 
 HEADERS += torc/torclogging.h
@@ -93,6 +100,9 @@ HEADERS += sensors/torcsensors.h
 HEADERS += sensors/torctemperaturesensor.h
 HEADERS += sensors/platforms/torc1wiremonitor.h
 HEADERS += sensors/platforms/torc1wireds18b20.h
+HEADERS += outputs/torcoutput.h
+HEADERS += outputs/torcoutputs.h
+HEADERS += outputs/torcpwmoutput.h
 
 SOURCES += torc/torcloggingimp.cpp
 SOURCES += torc/torcplist.cpp
@@ -139,6 +149,9 @@ SOURCES += sensors/torcsensors.cpp
 SOURCES += sensors/torctemperaturesensor.cpp
 SOURCES += sensors/platforms/torc1wiremonitor.cpp
 SOURCES += sensors/platforms/torc1wireds18b20.cpp
+SOURCES += outputs/torcoutput.cpp
+SOURCES += outputs/torcoutputs.cpp
+SOURCES += outputs/torcpwmoutput.cpp
 
 SOURCES += main.cpp
 
