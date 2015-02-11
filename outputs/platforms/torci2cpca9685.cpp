@@ -123,7 +123,7 @@ TorcI2CPCA9685::TorcI2CPCA9685(int Address, const QVariantMap &Details)
             QVariantMap details = channels.value(QString::number(i)).toMap();
             if (details.contains("userName"))
                 m_outputs[i]->SetUserName(details.value("userName").toString());
-            if (details.constBegin("userDescription"))
+            if (details.contains("userDescription"))
                 m_outputs[i]->SetUserDescription(details.value("userDescription").toString());
         }
     }
@@ -185,7 +185,9 @@ class TorcI2CPCA9685Factory : public TorcI2CDeviceFactory
 {
     TorcI2CDevice* Create(int Address, const QString &Name, const QVariantMap &Details)
     {
+        LOG(VB_GENERAL, LOG_INFO, "XXXXX");
         if (PCA9685 == Name)
-            return new TorcI2CPCA9685(Address, Details);;
+            return new TorcI2CPCA9685(Address, Details);
+        return NULL;
     }
-};
+} TorcI2CPCA9685Factory;
