@@ -50,7 +50,7 @@ class TorcOutput : public QObject, public TorcHTTPService, public TorcReferenceC
     QString          GetUserName            (void);
     QString          GetUserDescription     (void);
 
-    void             SetValue               (double Value);
+    virtual void     SetValue               (double Value);
     void             SetUserName            (const QString &Name);
     void             SetUserDescription     (const QString &Description);
 

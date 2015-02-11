@@ -20,16 +20,32 @@
 * USA.
 */
 
-
 // Torc
+#include "torclogging.h"
 #include "../torcpwmoutput.h"
 #include "torci2cpca9685.h"
+
+// wiringPi
+#include <wiringPiI2C.h>
+
+// PCA9685
+#include <stdint.h>
+#define MODE1         0x00
+#define MODE2         0x01
+#define LED0_ON_LOW   0x06
+#define LED0_ON_HIGH  0x07
+#define LED0_OFF_LOW  0x08
+#define LED0_OFF_HIGH 0x09
+#define PRESCALE      0xFE
+#define CLOCKFREQ     25000000.0
 
 class TorcI2CPCA9685Channel : public TorcPWMOutput
 {
   public:
     TorcI2CPCA9685Channel(int Address, int Number, TorcI2CPCA9685 *Parent);
     ~TorcI2CPCA9685Channel();
+
+    void SetValue (double Value);
 
   private:
     int             m_channelNumber;
@@ -41,21 +57,60 @@ TorcI2CPCA9685Channel::TorcI2CPCA9685Channel(int Address, int Number, TorcI2CPCA
     m_channelNumber(Number),
     m_parent(Parent)
 {
+    m_parent->SetPWM(m_channelNumber, value);
 }
 
 TorcI2CPCA9685Channel::~TorcI2CPCA9685Channel()
 {
+    // always turn the output off completely on exit
+    m_parent->SetPWM(m_channelNumber, 0.0);
 }
 
+void TorcI2CPCA9685Channel::SetValue(double Value)
+{
+    QMutexLocker locker(m_lock);
+
+    // ignore same value updates
+    if (qFuzzyCompare(Value + 1.0f, value + 1.0f))
+        return;
+
+    m_parent->SetPWM(m_channelNumber, Value);
+    TorcPWMOutput::SetValue(Value);
+}
+    
 TorcI2CPCA9685::TorcI2CPCA9685(int Address)
-  : m_address(Address)
+  : m_address(Address),
+    m_fd(-1)
 {
     // nullify outputs in case they aren't created
     memset(m_outputs, 0, 16);
 
-    // TODO add all i2c gubbins here
+    // open a handle to the device
+    m_fd = wiringPiI2CSetup(m_address);
+    if (m_fd < 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Failed to open I2C device at address 0x%1").arg(m_address, 0, 16));
+        return;
+    }
+
+    LOG(VB_GENERAL, LOG_INFO, QString("Opened PCA9685 I2C device at address 0x%1").arg(m_address, 0, 16));
+
+    // reset
+    if (wiringPiI2CWriteReg8(m_fd, MODE1, 0x00) < 0 || wiringPiI2CWriteReg8(m_fd, MODE2, 0x04) < 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Failed to reset PCA9685 device");
+        return;
+    }
+
+    // set frequency to 1000Hz
+    // stop error checking here:)
+    (int)wiringPiI2CWriteReg8(m_fd, MODE1, 0x01);
+    (int)wiringPiI2CWriteReg8(m_fd, PRESCALE, (uint8_t)((CLOCKFREQ / 4096 / 1000) -1));
+    (int)wiringPiI2CWriteReg8(m_fd, MODE1, 0x80);
+    (int)wiringPiI2CWriteReg8(m_fd, MODE2, 0x04);
 
     // create individual channel services
+    // this will also reset each channel to the default value (0)
     for (int i = 0; i < 16; i++)
     {
         m_outputs[i] = new TorcI2CPCA9685Channel(m_address, i, this);
@@ -75,4 +130,42 @@ TorcI2CPCA9685::~TorcI2CPCA9685()
             m_outputs[i] = NULL;
         }
     }
+
+    // close device
+    if (m_fd > -1)
+        close(m_fd);
+}
+
+/*! \brief Set the hardware PWM for given channel.
+ *
+ * \todo Randomise on time?
+ * \todo check return values
+ */
+bool TorcI2CPCA9685::SetPWM(int Channel, double Value)
+{
+    if (m_fd < 0 || Channel < 0 || Channel > 15)
+        return false;
+
+    // sanity check range
+    double value = Value;
+    if (value < 0.0) value = 0.0;
+    if (value > 1.0) value = 1.0;
+
+    // convert 0.0 to 1.0 to 0 to 4095
+    int offtime = (int)((value * 4095.0) + 0.5);
+    int ontime  = 0;
+
+    // turn completely on or off if required
+    // 'off' supercedes 'on' per spec
+    if (offtime < 1)
+        offtime |= 0x1000;
+    else if (offtime > 4094)
+        ontime |= 0x1000;
+
+    (int)wiringPiI2CWriteReg8(m_fd, LED0_ON_LOW   + (4 * Channel), ontime & 0xFF);
+    (int)wiringPiI2CWriteReg8(m_fd, LED0_ON_HIGH  + (4 * Channel), ontime >> 8);
+    (int)wiringPiI2CWriteReg8(m_fd, LED0_OFF_LOW  + (4 * Channel), offtime & 0xFF);
+    (int)wiringPiI2CWriteReg8(m_fd, LED0_OFF_HIGH + (4 * Channel), offtime >> 8);
+    
+    return true;
 }
