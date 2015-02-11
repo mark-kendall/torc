@@ -82,7 +82,7 @@ TorcI2CPCA9685::TorcI2CPCA9685(int Address, const QVariantMap &Details)
   : TorcI2CDevice(Address)
 {
     // nullify outputs in case they aren't created
-    memset(m_outputs, 0, 16);
+    memset(m_outputs, 0, sizeof(TorcI2CPCA9685Channel*) * 16);
 
     // open a handle to the device
     m_fd = wiringPiI2CSetup(m_address);

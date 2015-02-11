@@ -48,7 +48,11 @@ unix:qtHaveModule(dbus) {
 linux-rasp-pi-g++ {
     LIBS += -lwiringPi
     HEADERS += outputs/platforms/torci2cpca9685.h
+    HEADERS += outputs/platforms/torci2cbus.h
+    HEADERS += outputs/platforms/torcpigpio.h
     SOURCES += outputs/platforms/torci2cpca9685.cpp
+    SOURCES += outputs/platforms/torci2cbus.cpp
+    SOURCES += outputs/platforms/torcpigpio.cpp
 }
 
 HEADERS += torc/torclogging.h
@@ -104,7 +108,7 @@ HEADERS += sensors/platforms/torc1wireds18b20.h
 HEADERS += outputs/torcoutput.h
 HEADERS += outputs/torcoutputs.h
 HEADERS += outputs/torcpwmoutput.h
-HEADERS += outputs/platforms/torci2cbus.h
+HEADERS += outputs/torcswitchoutput.h
 
 SOURCES += torc/torcloggingimp.cpp
 SOURCES += torc/torcplist.cpp
@@ -154,7 +158,7 @@ SOURCES += sensors/platforms/torc1wireds18b20.cpp
 SOURCES += outputs/torcoutput.cpp
 SOURCES += outputs/torcoutputs.cpp
 SOURCES += outputs/torcpwmoutput.cpp
-SOURCES += outputs/platforms/torci2cbus.cpp
+SOURCES += outputs/torcswitchoutput.cpp
 
 HEADERS += torccentral.h
 SOURCES += main.cpp
