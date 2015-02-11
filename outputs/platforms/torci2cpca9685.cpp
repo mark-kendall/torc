@@ -53,7 +53,7 @@ class TorcI2CPCA9685Channel : public TorcPWMOutput
 };
 
 TorcI2CPCA9685Channel::TorcI2CPCA9685Channel(int Address, int Number, TorcI2CPCA9685 *Parent)
-  : TorcPWMOutput(0.0, "PCA9685", QString("I2C_PCA9685_0x%1_%2").arg(Address, 0, 16).arg(Number)),
+  : TorcPWMOutput(0.0, PCA9685, QString("I2C_PCA9685_0x%1_%2").arg(Address, 0, 16).arg(Number)),
     m_channelNumber(Number),
     m_parent(Parent)
 {
@@ -78,9 +78,8 @@ void TorcI2CPCA9685Channel::SetValue(double Value)
     TorcPWMOutput::SetValue(Value);
 }
     
-TorcI2CPCA9685::TorcI2CPCA9685(int Address)
-  : m_address(Address),
-    m_fd(-1)
+TorcI2CPCA9685::TorcI2CPCA9685(int Address, const QVariantMap &Details)
+  : TorcI2CDevice(Address)
 {
     // nullify outputs in case they aren't created
     memset(m_outputs, 0, 16);
@@ -93,7 +92,8 @@ TorcI2CPCA9685::TorcI2CPCA9685(int Address)
         return;
     }
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Opened PCA9685 I2C device at address 0x%1").arg(m_address, 0, 16));
+    LOG(VB_GENERAL, LOG_INFO, QString("Opened %1 I2C device at address 0x%2")
+        .arg(PCA9685).arg(m_address, 0, 16));
 
     // reset
     if (wiringPiI2CWriteReg8(m_fd, MODE1, 0x00) < 0 || wiringPiI2CWriteReg8(m_fd, MODE2, 0x04) < 0)
@@ -111,10 +111,21 @@ TorcI2CPCA9685::TorcI2CPCA9685(int Address)
 
     // create individual channel services
     // this will also reset each channel to the default value (0)
+    QVariantMap channels = Details.value("channels").toMap();
+
     for (int i = 0; i < 16; i++)
     {
         m_outputs[i] = new TorcI2CPCA9685Channel(m_address, i, this);
         TorcOutputs::gOutputs->AddOutput(m_outputs[i]);
+
+        if (channels.contains(QString::number(i)))
+        {
+            QVariantMap details = channels.value(QString::number(i)).toMap();
+            if (details.contains("userName"))
+                m_outputs[i]->SetUserName(details.value("userName").toString());
+            if (details.constBegin("userDescription"))
+                m_outputs[i]->SetUserDescription(details.value("userDescription").toString());
+        }
     }
 }
 
@@ -169,3 +180,12 @@ bool TorcI2CPCA9685::SetPWM(int Channel, double Value)
     
     return true;
 }
+
+class TorcI2CPCA9685Factory : public TorcI2CDeviceFactory
+{
+    TorcI2CDevice* Create(int Address, const QString &Name, const QVariantMap &Details)
+    {
+        if (PCA9685 == Name)
+            return new TorcI2CPCA9685(Address, Details);;
+    }
+};

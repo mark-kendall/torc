@@ -104,6 +104,7 @@ HEADERS += sensors/platforms/torc1wireds18b20.h
 HEADERS += outputs/torcoutput.h
 HEADERS += outputs/torcoutputs.h
 HEADERS += outputs/torcpwmoutput.h
+HEADERS += outputs/platforms/torci2cbus.h
 
 SOURCES += torc/torcloggingimp.cpp
 SOURCES += torc/torcplist.cpp
@@ -153,7 +154,10 @@ SOURCES += sensors/platforms/torc1wireds18b20.cpp
 SOURCES += outputs/torcoutput.cpp
 SOURCES += outputs/torcoutputs.cpp
 SOURCES += outputs/torcpwmoutput.cpp
+SOURCES += outputs/platforms/torci2cbus.cpp
 
+HEADERS += torccentral.h
 SOURCES += main.cpp
+SOURCES += torccentral.cpp
 
 QMAKE_CLEAN += $(TARGET)
