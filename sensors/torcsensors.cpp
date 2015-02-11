@@ -42,7 +42,7 @@ TorcSensors* TorcSensors::gSensors = new TorcSensors();
 */
 TorcSensors::TorcSensors()
   : QObject(),
-    TorcHTTPService(this, SENSORS_DIRECTORY, "sensors", TorcSensors::staticMetaObject, BLACKLIST),
+    TorcHTTPService(this, SENSORS_DIRECTORY, "Sensors", TorcSensors::staticMetaObject, BLACKLIST),
     m_lock(new QMutex())
 {
 }
@@ -116,4 +116,21 @@ void TorcSensors::RemoveSensor(TorcSensor *Sensor)
     sensorList.removeOne(Sensor);
     LOG(VB_GENERAL, LOG_INFO, QString("Sensor %1 removed from list").arg(Sensor->GetUniqueId()));
     emit SensorsChanged();
+}
+
+
+void TorcSensors::UpdateSensor(const QString &Id, const QString &Name, const QString &Description)
+{
+    QMutexLocker locker(m_lock);
+
+    foreach(TorcSensor* sensor, sensorList)
+    {
+        if (sensor->GetUniqueId() == Id)
+        {
+            if (!Name.isEmpty())
+                sensor->SetUserName(Name);
+            if (!Description.isEmpty())
+                sensor->SetUserDescription(Description);
+        }
+    }
 }

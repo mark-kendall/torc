@@ -35,6 +35,7 @@ class TorcSensors : public QObject, public TorcHTTPService
   public:
     void                AddSensor                 (TorcSensor *Sensor);
     void                RemoveSensor              (TorcSensor *Sensor);
+    void                UpdateSensor              (const QString &Id, const QString &Name, const QString &Description);
 
   private:
     QList<TorcSensor*>  sensorList;
