@@ -2,6 +2,7 @@
 #define TORCCENTRAL_H
 
 // Qt
+#include <QMutex>
 #include <QObject>
 #include <QVariant>
 

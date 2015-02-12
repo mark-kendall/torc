@@ -30,14 +30,6 @@
 #include "torc/torcadminthread.h"
 #include "sensors/torcsensors.h"
 #include "outputs/torcoutputs.h"
-
-#ifdef USING_I2C
-#include "outputs/platforms/torci2cbus.h"
-#endif
-#ifdef USING_PIGPIO
-#include "outputs/platforms/torcpigpio.h"
-#endif
-
 #include "torccentral.h"
 
 TorcCentral::TorcCentral()
