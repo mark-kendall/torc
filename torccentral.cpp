@@ -61,8 +61,10 @@ TorcCentral::~TorcCentral()
     // deregister for events
     gLocalContext->RemoveObserver(this);
 
+#ifdef USING_I2C
     // cleanup any devices
     TorcI2CBus::gTorcI2CBus->CleanupDevices();
+#endif
 }
 
 bool TorcCentral::LoadConfig(void)
@@ -121,6 +123,7 @@ bool TorcCentral::LoadConfig(void)
 
 void TorcCentral::LoadDevices(void)
 {
+#ifdef USING_I2C
     // I2C
     // TODO move most of this code into TorcI2CBus
     if (m_config.contains("I2C"))
@@ -139,6 +142,7 @@ void TorcCentral::LoadDevices(void)
             }
         }
     }
+#endif
 }
 
 void TorcCentral::SensorsChanged(void)

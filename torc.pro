@@ -47,6 +47,7 @@ unix:qtHaveModule(dbus) {
 # I2c on the Raspberry Pi
 linux-rasp-pi-g++ {
     LIBS += -lwiringPi
+    DEFINES += USING_I2C
     HEADERS += outputs/platforms/torci2cpca9685.h
     HEADERS += outputs/platforms/torci2cbus.h
     HEADERS += outputs/platforms/torcpigpio.h
