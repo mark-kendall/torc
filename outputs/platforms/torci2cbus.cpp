@@ -56,49 +56,68 @@ TorcI2CDeviceFactory* TorcI2CDeviceFactory::NextFactory(void) const
 TorcI2CBus* TorcI2CBus::gTorcI2CBus = new TorcI2CBus();
 
 TorcI2CBus::TorcI2CBus()
-  : m_lock(new QMutex(QMutex::Recursive))
+  : TorcDeviceHandler(),
+    m_lock(new QMutex(QMutex::Recursive))
 {
 }
 
 TorcI2CBus::~TorcI2CBus()
 {
-    CleanupDevices();
+    Destroy();
     delete m_lock;
 }
 
-void TorcI2CBus::SetupDevice(int Address, const QVariantMap &Details)
+void TorcI2CBus::Create(const QVariantMap &Details)
 {
     QMutexLocker locker(m_lock);
 
-    if (m_devices.contains(Address))
+    if (Details.contains("I2C"))
     {
-        LOG(VB_GENERAL, LOG_WARNING, QString("I2C bus already contains device at 0x%1 - ignoring").arg(Address, 0, 16));
-        return;
-    }
+        QVariantMap i2c = Details.value("I2C").toMap();
+        QVariantMap::iterator it = i2c.begin();
+        for ( ; it != i2c.end(); ++it)
+        {
+            bool ok = false;
+            // N.B. assumes hexadecimal 0xXX
+            int address = it.key().toInt(&ok, 16);
+            if (!ok)
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse I2C address '%1'").arg(it.key()));
+                continue;
+            }
 
-    if (!Details.contains("model"))
-    {
-        LOG(VB_GENERAL, LOG_WARNING, QString("I2C device at 0x%1 does not give model - ignoring").arg(Address, 0, 16));
-        return;
-    }
+            if (m_devices.contains(address))
+            {
+                LOG(VB_GENERAL, LOG_WARNING, QString("I2C bus already contains device at 0x%1 - ignoring").arg(address, 0, 16));
+                continue;
+            }
 
-    QString model = Details.value("model").toString();
-    TorcI2CDevice* device = NULL;
-    TorcI2CDeviceFactory* factory = TorcI2CDeviceFactory::GetTorcI2CDeviceFactory();
-    for ( ; factory; factory = factory->NextFactory())
-    {
-        device = factory->Create(Address, model, Details);
-        if (device)
-            break;
-    }
+            QVariantMap details = it.value().toMap();
+            if (!details.contains("model"))
+            {
+                LOG(VB_GENERAL, LOG_WARNING, QString("I2C device at 0x%1 does not give model - ignoring").arg(address, 0, 16));
+                continue;
+            }
 
-    if (device)
-        m_devices.insert(Address, device);
-    else
-        LOG(VB_GENERAL, LOG_WARNING, QString("Unable to find handler for I2C device '%1'").arg(model));
+            QString model = details.value("model").toString();
+            TorcI2CDevice* device = NULL;
+            TorcI2CDeviceFactory* factory = TorcI2CDeviceFactory::GetTorcI2CDeviceFactory();
+            for ( ; factory; factory = factory->NextFactory())
+            {
+                device = factory->Create(address, model, details);
+                if (device)
+                    break;
+            }
+
+            if (device)
+                m_devices.insert(address, device);
+            else
+                LOG(VB_GENERAL, LOG_WARNING, QString("Unable to find handler for I2C device '%1'").arg(model));
+        }
+    }
 }
 
-void TorcI2CBus::CleanupDevices(void)
+void TorcI2CBus::Destroy(void)
 {
     QMutexLocker locker(m_lock);
 

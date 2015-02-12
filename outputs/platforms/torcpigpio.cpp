@@ -47,55 +47,73 @@ void TorcPiGPIO::SetupPins(const QVariantMap &GPIO)
 {
     QMutexLocker locker(m_lock);
 
-    TorcPiGPIO::gPiGPIO->Check();
-
-    QVariantMap::const_iterator it = GPIO.begin();
-    for ( ; it != GPIO.end(); ++it)
+    static bool debugged = false;
+    if (!debugged)
     {
-        bool ok = false;
-        int pin = it.key().toInt(&ok);
-        if (ok && pin >= 0 and pin < NUMBER_PINS)
+        debugged = true;
+
+        if (!m_setup)
         {
-            QVariantMap details = it.value().toMap();
+            // NB wiringPi will have terminated the program already!
+            LOG(VB_GENERAL, LOG_ERR, "wiringPi is not initialised");
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_INFO, QString("%1 GPIO pins available").arg(NUMBER_PINS));
+        }
+    }
 
-            if (!details.contains("state"))
+    if (GPIO.contains("GPIO"))
+    {
+        QVariantMap gpio = GPIO.value("GPIO").toMap();
+        QVariantMap::const_iterator it = gpio.begin();
+        for ( ; it != gpio.end(); ++it)
+        {
+            bool ok = false;
+            int pin = it.key().toInt(&ok);
+            if (ok && pin >= 0 and pin < NUMBER_PINS)
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("GPIO Pin #%1 has no state - specify input or output").arg(pin));
-                continue;
-            }
+                QVariantMap details = it.value().toMap();
 
-            if (m_inputs.contains(pin) || m_outputs.contains(pin))
-            {
-                LOG(VB_GENERAL, LOG_ERR, QString("GPIO Pin #%1 is already in use").arg(pin));
-                continue;
-            }
+                if (!details.contains("state"))
+                {
+                    LOG(VB_GENERAL, LOG_ERR, QString("GPIO Pin #%1 has no state - specify input or output").arg(pin));
+                    continue;
+                }
 
-            QString name  = details.value("userName").toString();
-            QString desc  = details.value("userDescription").toString();
-            QString state = details.value("state").toString();
+                if (m_inputs.contains(pin) || m_outputs.contains(pin))
+                {
+                    LOG(VB_GENERAL, LOG_ERR, QString("GPIO Pin #%1 is already in use").arg(pin));
+                    continue;
+                }
 
-            if (state.toUpper() == "OUTPUT")
-            {
-                TorcPiOutput* output = new TorcPiOutput(pin);
-                TorcOutputs::gOutputs->AddOutput(output);
-                m_outputs.insert(pin, output);
-                output->SetUserName(name);
-                output->SetUserDescription(desc);
+                QString name  = details.value("userName").toString();
+                QString desc  = details.value("userDescription").toString();
+                QString state = details.value("state").toString();
+
+                if (state.toUpper() == "OUTPUT")
+                {
+                    TorcPiOutput* output = new TorcPiOutput(pin);
+                    TorcOutputs::gOutputs->AddOutput(output);
+                    m_outputs.insert(pin, output);
+                    output->SetUserName(name);
+                    output->SetUserDescription(desc);
+                }
+                else if (state.toUpper() == "INPUT")
+                {
+                    LOG(VB_GENERAL, LOG_INFO, "GPIO inputs not implemented - yet");
+                }
+                else
+                {
+                    LOG(VB_GENERAL, LOG_ERR, QString("GPIO Pin #%1 unknown state '%2'").arg(pin).arg(state));
+                    continue;
+                }
             }
-            else if (state.toUpper() == "INPUT")
-            {
-                LOG(VB_GENERAL, LOG_INFO, "GPIO inputs not implemented - yet");
-            }
-            else
-            {
-                LOG(VB_GENERAL, LOG_ERR, QString("GPIO Pin #%1 unknown state '%2'").arg(pin).arg(state));
-                continue;
-            } 
         }
     }
 }
 
-void TorcPiGPIO::CleanupPins(void)
+void TorcPiGPIO::Destroy(void)
 {
     QMutexLocker locker(m_lock);
 
@@ -111,23 +129,4 @@ void TorcPiGPIO::CleanupPins(void)
          it2.value()->DownRef();
     }
     m_outputs.clear();
-}
-
-void TorcPiGPIO::Check(void)
-{
-    QMutexLocker locker(m_lock);
-
-    static bool debugged = false;
-    if (!debugged)
-    {
-        debugged = true;
-
-        if (!m_setup)
-        {
-            // NB wiringPi will have terminated the program already!
-            LOG(VB_GENERAL, LOG_ERR, "wiringPi is not initialised");
-        }
-
-        LOG(VB_GENERAL, LOG_INFO, QString("%1 GPIO pins available").arg(NUMBER_PINS));
-    }        
 }

@@ -8,10 +8,11 @@
 #include <QMutex>
 
 // Torc
+#include "torccentral.h"
 #include "torcpioutput.h"
 class TorcPiInput;
 
-class TorcPiGPIO
+class TorcPiGPIO : public TorcDeviceHandler
 {
   public:
     TorcPiGPIO();
@@ -19,15 +20,12 @@ class TorcPiGPIO
 
     static TorcPiGPIO* gPiGPIO;
 
-    void                       SetupPins   (const QVariantMap &GPIO);
-    void                       CleanupPins (void); 
+    void                       Create      (const QVariantMap &GPIO);
+    void                       Destroy     (void);
 
   private:
-    void                       Check       (void);
-
-  private:
-    QMap<int,TorcPiInput*>    m_inputs;
-    QMap<int,TorcPiOutput*>     m_outputs;
+    QMap<int,TorcPiInput*>     m_inputs;
+    QMap<int,TorcPiOutput*>    m_outputs;
     QMutex                    *m_lock;
     bool                       m_setup;
 };

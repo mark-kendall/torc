@@ -57,7 +57,7 @@ TorcCentral::TorcCentral()
 
     if (LoadConfig())
     {
-        LoadDevices();
+        TorcDeviceHandler::Start(m_config);
         SensorsChanged();
         OutputsChanged();
     }
@@ -68,14 +68,8 @@ TorcCentral::~TorcCentral()
     // deregister for events
     gLocalContext->RemoveObserver(this);
 
-#ifdef USING_PIGPIO
-        TorcPiGPIO::gPiGPIO->CleanupPins();
-#endif
-
-#ifdef USING_I2C
     // cleanup any devices
-    TorcI2CBus::gTorcI2CBus->CleanupDevices();
-#endif
+    TorcDeviceHandler::Stop();
 }
 
 bool TorcCentral::LoadConfig(void)
@@ -130,40 +124,6 @@ bool TorcCentral::LoadConfig(void)
 
     LOG(VB_GENERAL, LOG_INFO, QString("Loaded config from %1").arg(config));
     return true;
-}
-
-void TorcCentral::LoadDevices(void)
-{
-    // GPIO
-    if (m_config.contains("GPIO"))
-    {
-        QVariantMap gpio = m_config.value("GPIO").toMap();
-
-#ifdef USING_PIGPIO
-        TorcPiGPIO::gPiGPIO->SetupPins(gpio);
-#endif
-    }
-
-#ifdef USING_I2C
-    // I2C
-    // TODO move most of this code into TorcI2CBus
-    if (m_config.contains("I2C"))
-    {
-        QVariantMap i2c = m_config.value("I2C").toMap();
-        QVariantMap::iterator it = i2c.begin();
-        for ( ; it != i2c.end(); ++it)
-        {
-            bool ok = false;
-            // N.B. assumes hexadecimal 0xXX
-            int address = it.key().toInt(&ok, 16);
-            if (ok)
-            {
-                QVariantMap device = it.value().toMap();
-                TorcI2CBus::gTorcI2CBus->SetupDevice(address, device);
-            }
-        }
-    }
-#endif
 }
 
 void TorcCentral::SensorsChanged(void)
@@ -236,4 +196,44 @@ class TorcCentralObject : public TorcAdminObject
   private:
     TorcCentral *m_object;
 } TorcCentralObject;
+
+QList<TorcDeviceHandler*> TorcDeviceHandler::gTorcDeviceHandlers;
+TorcDeviceHandler* TorcDeviceHandler::gTorcDeviceHandler = NULL;
+QMutex* TorcDeviceHandler::gTorcDeviceHandlersLock = new QMutex(QMutex::Recursive);
+
+TorcDeviceHandler::TorcDeviceHandler()
+{
+    QMutexLocker lock(gTorcDeviceHandlersLock);
+    m_nextTorcDeviceHandler = gTorcDeviceHandler;
+    gTorcDeviceHandler = this;
+}
+
+TorcDeviceHandler::~TorcDeviceHandler()
+{
+}
+
+TorcDeviceHandler* TorcDeviceHandler::GetNextHandler(void)
+{
+    return m_nextTorcDeviceHandler;
+}
+
+TorcDeviceHandler* TorcDeviceHandler::GetDeviceHandler(void)
+{
+    return gTorcDeviceHandler;
+}
+
+void TorcDeviceHandler::Start(const QVariantMap &Details)
+{
+    TorcDeviceHandler* handler = TorcDeviceHandler::GetDeviceHandler();
+    for ( ; handler; handler = handler->GetNextHandler())
+        handler->Create(Details);
+}
+
+void TorcDeviceHandler::Stop(void)
+{
+    TorcDeviceHandler* handler = TorcDeviceHandler::GetDeviceHandler();
+    for ( ; handler; handler = handler->GetNextHandler())
+        handler->Destroy();
+}
+
 

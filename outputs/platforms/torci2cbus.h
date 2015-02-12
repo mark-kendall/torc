@@ -6,6 +6,9 @@
 #include <QMutex>
 #include <QVariant>
 
+// Torc
+#include "torccentral.h"
+
 class TorcI2CDevice
 {
   public:
@@ -32,7 +35,7 @@ class TorcI2CDeviceFactory
     TorcI2CDeviceFactory*          nextTorcI2CDeviceFactory;
 };
 
-class TorcI2CBus
+class TorcI2CBus : public TorcDeviceHandler
 {
   public:
     TorcI2CBus();
@@ -40,8 +43,8 @@ class TorcI2CBus
 
     static TorcI2CBus *gTorcI2CBus;
 
-    void SetupDevice         (int Address, const QVariantMap &Details);
-    void CleanupDevices      (void);
+    void Create              (const QVariantMap &Details);
+    void Destroy             (void);
 
   private:
     QMutex                  *m_lock;
