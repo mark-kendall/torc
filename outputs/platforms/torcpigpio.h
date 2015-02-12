@@ -23,12 +23,14 @@ class TorcPiGPIO
 
     static TorcPiGPIO* gPiGPIO;
 
+    void               Check      (void);
     bool               ReservePin (int Pin, void* Owner, TorcPiGPIO::State InOut);
     void               ReleasePin (int Pin, void* Owner);
 
   private:
     QMap<int, QPair<TorcPiGPIO::State,void*> > pins;
     QMutex            *m_lock;
+    bool               m_setup;
 };
 
 #endif // TORCPIGPIO_H

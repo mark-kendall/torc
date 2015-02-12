@@ -30,7 +30,14 @@
 #include "torc/torcadminthread.h"
 #include "sensors/torcsensors.h"
 #include "outputs/torcoutputs.h"
+
+#ifdef USING_I2C
 #include "outputs/platforms/torci2cbus.h"
+#endif
+#ifdef USING_PIGPIO
+#include "outputs/platforms/torcpigpio.h"
+#endif
+
 #include "torccentral.h"
 
 TorcCentral::TorcCentral()
@@ -123,6 +130,10 @@ bool TorcCentral::LoadConfig(void)
 
 void TorcCentral::LoadDevices(void)
 {
+#ifdef USING_PIGPIO
+    TorcPiGPIO::gPiGPIO->Check();
+#endif
+
 #ifdef USING_I2C
     // I2C
     // TODO move most of this code into TorcI2CBus

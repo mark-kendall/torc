@@ -24,12 +24,17 @@
 #include "torclogging.h"
 #include "torcpigpio.h"
 
+// wiringPi
+#include "wiringPi.h"
+
 TorcPiGPIO* TorcPiGPIO::gPiGPIO = new TorcPiGPIO();
 
 TorcPiGPIO::TorcPiGPIO()
-  : m_lock(new QMutex(QMutex::Recursive))
+  : m_lock(new QMutex(QMutex::Recursive)),
+    m_setup(false)
 {
-    LOG(VB_GENERAL, LOG_INFO, QString("GPIO - %1 pins available").arg(NUMBER_PINS));
+    if (wiringPiSetup() > -1)
+        m_setup = true;
 }
 
 TorcPiGPIO::~TorcPiGPIO()
@@ -37,10 +42,29 @@ TorcPiGPIO::~TorcPiGPIO()
     delete m_lock;
 }
 
-bool TorcPiGPIO::ReservePin(int Pin, void *Owner, TorcPiGPIO::State InOut)
+void TorcPiGPIO::Check(void)
 {
     QMutexLocker locker(m_lock);
 
+    static bool debugged = false;
+    if (!debugged)
+    {
+        debugged = true;
+
+        if (!m_setup)
+        {
+            // NB wiringPi will have terminated the program already!
+            LOG(VB_GENERAL, LOG_ERR, "wiringPi is not initialised");
+        }
+
+        LOG(VB_GENERAL, LOG_INFO, QString("%1 GPIO pins available").arg(NUMBER_PINS));
+    }        
+}
+
+bool TorcPiGPIO::ReservePin(int Pin, void *Owner, TorcPiGPIO::State InOut)
+{
+    QMutexLocker locker(m_lock);
+        
     if (Pin < 0 || Pin >= NUMBER_PINS)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("GPIO #1 invalid").arg(Pin));
