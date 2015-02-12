@@ -52,9 +52,11 @@ linux-rasp-pi-g++ {
     HEADERS += outputs/platforms/torci2cpca9685.h
     HEADERS += outputs/platforms/torci2cbus.h
     HEADERS += outputs/platforms/torcpigpio.h
+    HEADERS += outputs/platforms/torcpioutput.h
     SOURCES += outputs/platforms/torci2cpca9685.cpp
     SOURCES += outputs/platforms/torci2cbus.cpp
     SOURCES += outputs/platforms/torcpigpio.cpp
+    SOURCES += outputs/platforms/torcpioutput.cpp
 }
 
 HEADERS += torc/torclogging.h

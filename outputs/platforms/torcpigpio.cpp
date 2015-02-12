@@ -23,6 +23,7 @@
 // Torc
 #include "torclogging.h"
 #include "torcpigpio.h"
+#include "torcoutputs.h"
 
 // wiringPi
 #include "wiringPi.h"
@@ -42,6 +43,76 @@ TorcPiGPIO::~TorcPiGPIO()
     delete m_lock;
 }
 
+void TorcPiGPIO::SetupPins(const QVariantMap &GPIO)
+{
+    QMutexLocker locker(m_lock);
+
+    TorcPiGPIO::gPiGPIO->Check();
+
+    QVariantMap::const_iterator it = GPIO.begin();
+    for ( ; it != GPIO.end(); ++it)
+    {
+        bool ok = false;
+        int pin = it.key().toInt(&ok);
+        if (ok && pin >= 0 and pin < NUMBER_PINS)
+        {
+            QVariantMap details = it.value().toMap();
+
+            if (!details.contains("state"))
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("GPIO Pin #%1 has no state - specify input or output").arg(pin));
+                continue;
+            }
+
+            if (m_inputs.contains(pin) || m_outputs.contains(pin))
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("GPIO Pin #%1 is already in use").arg(pin));
+                continue;
+            }
+
+            QString name  = details.value("userName").toString();
+            QString desc  = details.value("userDescription").toString();
+            QString state = details.value("state").toString();
+
+            if (state.toUpper() == "OUTPUT")
+            {
+                TorcPiOutput* output = new TorcPiOutput(pin);
+                TorcOutputs::gOutputs->AddOutput(output);
+                m_outputs.insert(pin, output);
+                output->SetUserName(name);
+                output->SetUserDescription(desc);
+            }
+            else if (state.toUpper() == "INPUT")
+            {
+                LOG(VB_GENERAL, LOG_INFO, "GPIO inputs not implemented - yet");
+            }
+            else
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("GPIO Pin #%1 unknown state '%2'").arg(pin).arg(state));
+                continue;
+            } 
+        }
+    }
+}
+
+void TorcPiGPIO::CleanupPins(void)
+{
+    QMutexLocker locker(m_lock);
+
+/*(    QMap<int,TorcPiInput*>::iterator it = m_inputs.begin();
+    for ( ; it != m_inputs.end(); ++it)
+         it.value().DownRef();
+    m_inputs.clear
+*/
+    QMap<int,TorcPiOutput*>::iterator it2 = m_outputs.begin();
+    for ( ; it2 != m_outputs.end(); ++it2)
+    {
+         TorcOutputs::gOutputs->RemoveOutput(it2.value());
+         it2.value()->DownRef();
+    }
+    m_outputs.clear();
+}
+
 void TorcPiGPIO::Check(void)
 {
     QMutexLocker locker(m_lock);
@@ -59,67 +130,4 @@ void TorcPiGPIO::Check(void)
 
         LOG(VB_GENERAL, LOG_INFO, QString("%1 GPIO pins available").arg(NUMBER_PINS));
     }        
-}
-
-bool TorcPiGPIO::ReservePin(int Pin, void *Owner, TorcPiGPIO::State InOut)
-{
-    QMutexLocker locker(m_lock);
-        
-    if (Pin < 0 || Pin >= NUMBER_PINS)
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("GPIO #1 invalid").arg(Pin));
-        return false;
-    }
-
-    if (!Owner)
-    {
-        LOG(VB_GENERAL, LOG_ERR, "Non-existent owner cannot reserve pin");
-        return false;
-    }
-
-    if (InOut == TorcPiGPIO::Unused)
-    {
-        LOG(VB_GENERAL, LOG_ERR, "Cannot reserve GPIO in Unused state");
-        return false;
-    }
-
-    if (pins.contains(Pin))
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("GPIO #%1 already reserved").arg(Pin));
-        return false;
-    }
-
-    pins.insert(Pin, QPair<TorcPiGPIO::State,void*>(InOut, Owner));
-    return true;
-}
-
-void TorcPiGPIO::ReleasePin(int Pin, void *Owner)
-{
-    QMutexLocker locker(m_lock);
-
-    if (Pin < 0 || Pin >= NUMBER_PINS)
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("GPIO #1 invalid").arg(Pin));
-        return;
-    }
-
-    if (!Owner)
-    {
-        LOG(VB_GENERAL, LOG_ERR, "Non-existent owner cannot release pin");
-        return;
-    }
-
-    if (!pins.contains(Pin))
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("GPIO #%1 cannot be released - not reserved").arg(Pin));
-        return;
-    }
-
-    if (pins.value(Pin).second != Owner)
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("Cannot release GPIO #%1 - wrong owner").arg(Pin));
-        return;
-    }
-
-    pins.remove(Pin);
 }

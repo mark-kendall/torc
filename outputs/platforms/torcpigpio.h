@@ -7,30 +7,29 @@
 #include <QMap>
 #include <QMutex>
 
+// Torc
+#include "torcpioutput.h"
+class TorcPiInput;
+
 class TorcPiGPIO
 {
-  public:
-    enum State
-    {
-        Unused = 0,
-        Input,
-        Output
-    };
-
   public:
     TorcPiGPIO();
    ~TorcPiGPIO();
 
     static TorcPiGPIO* gPiGPIO;
 
-    void               Check      (void);
-    bool               ReservePin (int Pin, void* Owner, TorcPiGPIO::State InOut);
-    void               ReleasePin (int Pin, void* Owner);
+    void                       SetupPins   (const QVariantMap &GPIO);
+    void                       CleanupPins (void); 
 
   private:
-    QMap<int, QPair<TorcPiGPIO::State,void*> > pins;
-    QMutex            *m_lock;
-    bool               m_setup;
+    void                       Check       (void);
+
+  private:
+    QMap<int,TorcPiInput*>    m_inputs;
+    QMap<int,TorcPiOutput*>     m_outputs;
+    QMutex                    *m_lock;
+    bool                       m_setup;
 };
 
 #endif // TORCPIGPIO_H

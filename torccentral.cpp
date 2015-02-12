@@ -68,6 +68,10 @@ TorcCentral::~TorcCentral()
     // deregister for events
     gLocalContext->RemoveObserver(this);
 
+#ifdef USING_PIGPIO
+        TorcPiGPIO::gPiGPIO->CleanupPins();
+#endif
+
 #ifdef USING_I2C
     // cleanup any devices
     TorcI2CBus::gTorcI2CBus->CleanupDevices();
@@ -130,9 +134,15 @@ bool TorcCentral::LoadConfig(void)
 
 void TorcCentral::LoadDevices(void)
 {
+    // GPIO
+    if (m_config.contains("GPIO"))
+    {
+        QVariantMap gpio = m_config.value("GPIO").toMap();
+
 #ifdef USING_PIGPIO
-    TorcPiGPIO::gPiGPIO->Check();
+        TorcPiGPIO::gPiGPIO->SetupPins(gpio);
 #endif
+    }
 
 #ifdef USING_I2C
     // I2C
