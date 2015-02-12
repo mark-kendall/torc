@@ -50,11 +50,9 @@ linux-rasp-pi-g++ {
     DEFINES += USING_I2C
     DEFINES += USING_PIGPIO
     HEADERS += outputs/platforms/torci2cpca9685.h
-    HEADERS += outputs/platforms/torci2cbus.h
     HEADERS += outputs/platforms/torcpigpio.h
     HEADERS += outputs/platforms/torcpioutput.h
     SOURCES += outputs/platforms/torci2cpca9685.cpp
-    SOURCES += outputs/platforms/torci2cbus.cpp
     SOURCES += outputs/platforms/torcpigpio.cpp
     SOURCES += outputs/platforms/torcpioutput.cpp
 }
@@ -113,6 +111,8 @@ HEADERS += outputs/torcoutput.h
 HEADERS += outputs/torcoutputs.h
 HEADERS += outputs/torcpwmoutput.h
 HEADERS += outputs/torcswitchoutput.h
+HEADERS += outputs/platforms/torci2cbus.h
+HEADERS += control/torccontrol.h
 
 SOURCES += torc/torcloggingimp.cpp
 SOURCES += torc/torcplist.cpp
@@ -163,6 +163,8 @@ SOURCES += outputs/torcoutput.cpp
 SOURCES += outputs/torcoutputs.cpp
 SOURCES += outputs/torcpwmoutput.cpp
 SOURCES += outputs/torcswitchoutput.cpp
+SOURCES += outputs/platforms/torci2cbus.cpp
+SOURCES += control/torccontrol.cpp
 
 HEADERS += torccentral.h
 SOURCES += main.cpp
