@@ -185,7 +185,6 @@ class TorcI2CPCA9685Factory : public TorcI2CDeviceFactory
 {
     TorcI2CDevice* Create(int Address, const QString &Name, const QVariantMap &Details)
     {
-        LOG(VB_GENERAL, LOG_INFO, "XXXXX");
         if (PCA9685 == Name)
             return new TorcI2CPCA9685(Address, Details);
         return NULL;
