@@ -129,6 +129,9 @@ void Torc1WireMonitor::DirectoryChanged(const QString&)
             if (!name.startsWith("28-"))
                 continue;
 
+            // ensure device id is 1Wire_XXX
+            name = "1Wire" + name;
+
             // build the list of known devices.
             devices.append(name);
 
