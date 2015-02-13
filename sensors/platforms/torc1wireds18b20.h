@@ -17,7 +17,7 @@ class Torc1WireDS18B20 : public TorcTemperatureSensor
     Q_OBJECT
 
   public:
-    Torc1WireDS18B20(const QString &UniqueId);
+    Torc1WireDS18B20(const QString &UniqueId, const QString &Filename);
     ~Torc1WireDS18B20();
 
     void   Read  (double Value, bool Valid);
@@ -32,7 +32,7 @@ class Torc1WireReadThread : public TorcQThread
     Q_OBJECT
 
   public:
-    Torc1WireReadThread(Torc1WireDS18B20 *Parent);
+    Torc1WireReadThread(Torc1WireDS18B20 *Parent, const QString &Filename);
     void Start(void);
     void Finish(void);
 
@@ -42,5 +42,6 @@ class Torc1WireReadThread : public TorcQThread
   private:
     Torc1WireDS18B20  *m_parent;
     QTimer            *m_timer;
+    QString            m_file;
 };
 #endif // TORC1WIREDS18B20_H

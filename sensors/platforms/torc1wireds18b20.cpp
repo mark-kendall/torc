@@ -29,10 +29,11 @@
 #include "torc1wiremonitor.h"
 #include "torc1wireds18b20.h"
 
-Torc1WireReadThread::Torc1WireReadThread(Torc1WireDS18B20 *Parent)
+Torc1WireReadThread::Torc1WireReadThread(Torc1WireDS18B20 *Parent, const QString &Filename)
   : TorcQThread("1Wire"),
     m_parent(Parent),
-    m_timer(NULL) 
+    m_timer(NULL),
+    m_file(ONE_WIRE_DIRECTORY + "/" + Filename + "/w1_slave") 
 {   
 }   
 
@@ -56,13 +57,12 @@ void Torc1WireReadThread::Finish(void)
 
 void Torc1WireReadThread::Read(void)
 {
-    QString uniqueId = m_parent->GetUniqueId();
-    QFile file(ONE_WIRE_DIRECTORY + "/" + uniqueId + "/w1_slave");
+    QFile file(m_file);
     
     // open
     if (!file.open(QIODevice::ReadOnly))
     {   
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to read device %1").arg(uniqueId));
+        LOG(VB_GENERAL, LOG_ERR, QString("Failed to read device %1").arg(m_file));
     }
     else
     {   
@@ -73,7 +73,7 @@ void Torc1WireReadThread::Read(void)
         QString line = text.readLine();
         if (!line.contains("crc") || !line.contains("YES"))
         {   
-            LOG(VB_GENERAL, LOG_ERR, QString("CRC check failed for device %1").arg(uniqueId));
+            LOG(VB_GENERAL, LOG_ERR, QString("CRC check failed for device %1").arg(m_file));
         }
         else
         {   
@@ -82,7 +82,7 @@ void Torc1WireReadThread::Read(void)
             int index = line.lastIndexOf("t=");
             if (index < 0)
             {   
-                LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse temperature for device %1").arg(uniqueId));
+                LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse temperature for device %1").arg(m_file));
             }
             else
             {   
@@ -96,7 +96,7 @@ void Torc1WireReadThread::Read(void)
                     return;
                 }   
                 
-                LOG(VB_GENERAL, LOG_ERR, QString("Failed to convert temperature for device %1").arg(uniqueId));
+                LOG(VB_GENERAL, LOG_ERR, QString("Failed to convert temperature for device %1").arg(m_file));
             }   
         }   
     }   
@@ -105,10 +105,10 @@ void Torc1WireReadThread::Read(void)
     m_parent->Read(0, false);
 }
 
-Torc1WireDS18B20::Torc1WireDS18B20(const QString &UniqueId)
+Torc1WireDS18B20::Torc1WireDS18B20(const QString &UniqueId, const QString &Filename)
   : TorcTemperatureSensor(TorcTemperatureSensor::Celsius, 0, -55.0, 125.0,
                           DS18B20NAME, UniqueId),
-    m_readThread(new Torc1WireReadThread(this))
+    m_readThread(new Torc1WireReadThread(this, Filename))
 {
     m_readThread->start();
 }
@@ -128,5 +128,4 @@ void Torc1WireDS18B20::Read(double Value, bool Valid)
     else
         SetValid(false);
 }
-
-           
+          

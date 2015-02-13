@@ -130,7 +130,7 @@ void Torc1WireMonitor::DirectoryChanged(const QString&)
                 continue;
 
             // ensure device id is 1Wire_XXX
-            name = "1Wire" + name;
+            name = "1Wire_" + name;
 
             // build the list of known devices.
             devices.append(name);
@@ -140,7 +140,7 @@ void Torc1WireMonitor::DirectoryChanged(const QString&)
             {
                 LOG(VB_GENERAL, LOG_INFO, QString("New 1Wire %1 digital thermometer: %2")
                     .arg(DS18B20NAME).arg(it.fileName()));
-                m_sensors.insert(name, new Torc1WireDS18B20(it.fileName()));
+                m_sensors.insert(name, new Torc1WireDS18B20(name, it.fileName()));
             }
         }
     }
