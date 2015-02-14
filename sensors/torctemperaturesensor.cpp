@@ -65,7 +65,7 @@ TorcSensor::Type TorcTemperatureSensor::GetType(void)
  */
 double TorcTemperatureSensor::ScaleValue(double Value)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(lock);
 
     // no change required
     if (currentUnits == defaultUnits)

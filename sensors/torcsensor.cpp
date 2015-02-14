@@ -23,9 +23,10 @@
 // Torc
 #include "torclogging.h"
 #include "torcsensors.h"
+#include "torcnetworksensors.h"
 #include "torcsensor.h"
 
-#define BLACKLIST ""
+#define BLACKLIST QString("SetValue,SetValid")
 
 QString TorcSensor::TypeToString(TorcSensor::Type Type)
 {
@@ -34,6 +35,7 @@ QString TorcSensor::TypeToString(TorcSensor::Type Type)
         case TorcSensor::Temperature: return QString("temperature");
         case TorcSensor::pH:          return QString("pH");
         case TorcSensor::Switch:      return QString("switch");
+        case TorcSensor::PWM:         return QString("pwm");
         default: break;
     }
 
@@ -45,6 +47,7 @@ TorcSensor::Type TorcSensor::StringToType(const QString &Type)
     if ("temperature" == Type) return TorcSensor::Temperature;
     if ("pH" == Type)          return TorcSensor::pH;
     if ("switch" == Type)      return TorcSensor::Switch;
+    if ("pwm" == Type)         return TorcSensor::PWM;
     return TorcSensor::Unknown;
 }
 
@@ -61,10 +64,10 @@ TorcSensor::TorcSensor(TorcSensor::Type Type, double Value, double RangeMinimum,
                        const QString &ShortUnits,    const QString &LongUnits,
                        const QString &ModelId,       const QString &UniqueId)
   : QObject(),
-    TorcHTTPService(this, SENSORS_DIRECTORY + "/" + TypeToString(Type) + "/" + UniqueId, UniqueId, TorcSensor::staticMetaObject, BLACKLIST),
-    TorcReferenceCounter(),
-    valid(false),
-    value(Value),
+    TorcHTTPService(this, SENSORS_DIRECTORY + "/" + TypeToString(Type) + "/" + UniqueId,
+                    UniqueId, TorcSensor::staticMetaObject,
+                    UniqueId.contains(NETWORK_SENSORS_STRING) ? QString("") : BLACKLIST),
+    TorcDevice(false, Value, Value, ModelId, UniqueId),
     valueScaled(Value),
     operatingRangeMin(RangeMinimum),
     operatingRangeMax(RangeMaximum),
@@ -73,12 +76,7 @@ TorcSensor::TorcSensor(TorcSensor::Type Type, double Value, double RangeMinimum,
     outOfRangeLow(true),
     outOfRangeHigh(false),
     shortUnits(ShortUnits),
-    longUnits(LongUnits),
-    modelId(ModelId),
-    uniqueId(UniqueId),
-    userName(QString("")),
-    userDescription(QString("")),
-    m_lock(new QMutex(QMutex::Recursive))
+    longUnits(LongUnits)
 {
     // guard against stupidity
     if (operatingRangeMax <= operatingRangeMin)
@@ -94,7 +92,6 @@ TorcSensor::TorcSensor(TorcSensor::Type Type, double Value, double RangeMinimum,
 
 TorcSensor::~TorcSensor()
 {
-    delete m_lock;
 }
 
 void TorcSensor::SubscriberDeleted(QObject *Subscriber)
@@ -108,7 +105,7 @@ void TorcSensor::SubscriberDeleted(QObject *Subscriber)
 */
 void TorcSensor::SetValid(bool Valid)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(lock);
 
     if (Valid == valid)
         return;
@@ -123,7 +120,7 @@ void TorcSensor::SetValid(bool Valid)
 */
 void TorcSensor::SetValue(double Value)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(lock);
 
     // a call to SetValue implies there is a valid reading
     if (!valid)
@@ -172,7 +169,7 @@ void TorcSensor::SetValue(double Value)
 /// userName is the identity given to this sensor by the end user e.g. Room, Tank
 void TorcSensor::SetUserName(const QString &Name)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(lock);
 
     if (Name == userName)
         return;
@@ -184,7 +181,7 @@ void TorcSensor::SetUserName(const QString &Name)
 /// shortUnits are the abbreviated, translated units shared with the user e.g. °C.
 void TorcSensor::SetShortUnits(const QString &Units)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(lock);
 
     if (Units == shortUnits)
         return;
@@ -196,7 +193,7 @@ void TorcSensor::SetShortUnits(const QString &Units)
 /// longUnits are the full units shared with the user e.g. Degrees Celsisus.
 void TorcSensor::SetLongUnits(const QString &Units)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(lock);
 
     if (Units == longUnits)
         return;
@@ -208,7 +205,7 @@ void TorcSensor::SetLongUnits(const QString &Units)
 /// userDescription gives a short description of the purpose of the sensor (e.g. monitor tank temperature).
 void TorcSensor::SetUserDescription(const QString &Description)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(lock);
 
     if (Description == userDescription)
         return;
@@ -219,21 +216,21 @@ void TorcSensor::SetUserDescription(const QString &Description)
 
 bool TorcSensor::GetValid(void)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(lock);
 
     return valid;
 }
 
 double TorcSensor::GetValue(void)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(lock);
 
     return value;
 }
 
 double TorcSensor::GetValueScaled(void)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(lock);
 
     return valueScaled;
 }
@@ -252,42 +249,42 @@ double TorcSensor::GetOperatingRangeMax(void)
 
 double TorcSensor::GetOperatingRangeMinScaled(void)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(lock);
 
     return operatingRangeMinScaled;
 }
 
 double TorcSensor::GetOperatingRangeMaxScaled(void)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(lock);
 
     return operatingRangeMaxScaled;
 }
 
 bool TorcSensor::GetOutOfRangeLow(void)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(lock);
 
     return outOfRangeLow;
 }
 
 bool TorcSensor::GetOutOfRangeHigh(void)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(lock);
 
     return outOfRangeHigh;
 }
 
 QString TorcSensor::GetShortUnits(void)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(lock);
 
     return shortUnits;
 }
 
 QString TorcSensor::GetLongUnits(void)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(lock);
 
     return longUnits;
 }
@@ -308,14 +305,14 @@ QString TorcSensor::GetUniqueId(void)
 
 QString TorcSensor::GetUserName(void)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(lock);
 
     return userName;
 }
 
 QString TorcSensor::GetUserDescription(void)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(lock);
 
     return userDescription;
 }

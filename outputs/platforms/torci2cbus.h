@@ -47,7 +47,6 @@ class TorcI2CBus : public TorcDeviceHandler
     void Destroy             (void);
 
   private:
-    QMutex                  *m_lock;
     QMap<int,TorcI2CDevice*> m_devices;
 };
 #endif // TORCI2CBUS_H

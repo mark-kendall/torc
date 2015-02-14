@@ -26,7 +26,6 @@ class TorcPiGPIO : public TorcDeviceHandler
   private:
     QMap<int,TorcPiInput*>     m_inputs;
     QMap<int,TorcPiOutput*>    m_outputs;
-    QMutex                    *m_lock;
     bool                       m_setup;
 };
 

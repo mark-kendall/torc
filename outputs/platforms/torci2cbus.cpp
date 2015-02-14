@@ -56,15 +56,13 @@ TorcI2CDeviceFactory* TorcI2CDeviceFactory::NextFactory(void) const
 TorcI2CBus* TorcI2CBus::gTorcI2CBus = new TorcI2CBus();
 
 TorcI2CBus::TorcI2CBus()
-  : TorcDeviceHandler(),
-    m_lock(new QMutex(QMutex::Recursive))
+  : TorcDeviceHandler()
 {
 }
 
 TorcI2CBus::~TorcI2CBus()
 {
     Destroy();
-    delete m_lock;
 }
 
 void TorcI2CBus::Create(const QVariantMap &Details)

@@ -6,12 +6,12 @@
 #include <QObject>
 
 // Torc
-#include "torcreferencecounted.h"
 #include "http/torchttpservice.h"
+#include "torcdevice.h"
 
 #define SENSORS_DIRECTORY QString("sensors")
 
-class TorcSensor : public QObject, public TorcHTTPService, public TorcReferenceCounter
+class TorcSensor : public QObject, public TorcHTTPService, public TorcDevice
 {
     Q_OBJECT
     Q_ENUMS(Type)
@@ -39,6 +39,7 @@ class TorcSensor : public QObject, public TorcHTTPService, public TorcReferenceC
         Temperature,
         pH,
         Switch,
+        PWM,
         MaxType
     };
 
@@ -76,6 +77,10 @@ class TorcSensor : public QObject, public TorcHTTPService, public TorcReferenceC
     void             SetUserName               (const QString &Name);
     void             SetUserDescription        (const QString &Description);
 
+    // These 2 slots will be blacklisted unless it is a networked sensor
+    void             SetValue                  (double Value);
+    void             SetValid                  (bool   Valid);
+
     bool             GetValid                  (void);
     double           GetValue                  (void);
     double           GetValueScaled            (void);
@@ -93,8 +98,6 @@ class TorcSensor : public QObject, public TorcHTTPService, public TorcReferenceC
     QString          GetUserDescription        (void);
 
   protected slots:
-    void             SetValue                  (double Value);
-    void             SetValid                  (bool   Valid);
 
   protected:
     virtual double   ScaleValue                (double Value) = 0;
@@ -102,8 +105,6 @@ class TorcSensor : public QObject, public TorcHTTPService, public TorcReferenceC
     void             SetLongUnits              (const QString &Units);
 
   protected:
-    bool             valid;
-    double           value;
     double           valueScaled;
     double           operatingRangeMin;
     double           operatingRangeMax;
@@ -117,12 +118,6 @@ class TorcSensor : public QObject, public TorcHTTPService, public TorcReferenceC
     double           alarmHighScaled;
     QString          shortUnits;
     QString          longUnits;
-    QString          modelId;
-    QString          uniqueId;
-    QString          userName;
-    QString          userDescription;
-
-    QMutex          *m_lock;
 };
 
 #endif // TORCSENSOR_H

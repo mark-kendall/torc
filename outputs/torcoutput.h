@@ -8,10 +8,11 @@
 // Torc
 #include "torcreferencecounted.h"
 #include "torchttpservice.h"
+#include "torcdevice.h"
 
 #define OUTPUTS_DIRECTORY QString("outputs")
 
-class TorcOutput : public QObject, public TorcHTTPService, public TorcReferenceCounter
+class TorcOutput : public QObject, public TorcHTTPService, public TorcDevice
 {
     Q_OBJECT
     Q_ENUMS(Type)
@@ -58,16 +59,6 @@ class TorcOutput : public QObject, public TorcHTTPService, public TorcReferenceC
     void             ValueChanged           (double Value);
     void             UserNameChanged        (const QString &Name);
     void             UserDescriptionChanged (const QString &Description);
-
-
-  protected:
-    double           value;
-    QString          modelId;
-    QString          uniqueId;
-    QString          userName;
-    QString          userDescription;
-
-    QMutex          *m_lock;
 };
 
 #endif // TORCOUTPUT_H

@@ -43,7 +43,7 @@ TorcSensors* TorcSensors::gSensors = new TorcSensors();
 TorcSensors::TorcSensors()
   : QObject(),
     TorcHTTPService(this, SENSORS_DIRECTORY, "Sensors", TorcSensors::staticMetaObject, BLACKLIST),
-    m_lock(new QMutex())
+    m_lock(new QMutex(QMutex::Recursive))
 {
 }
 
@@ -96,7 +96,7 @@ void TorcSensors::AddSensor(TorcSensor *Sensor)
 
     Sensor->UpRef();
     sensorList.append(Sensor);
-    LOG(VB_GENERAL, LOG_INFO, QString("Added sensor %1 to list").arg(Sensor->GetUniqueId()));
+    LOG(VB_GENERAL, LOG_INFO, QString("Registered sensor '%1'").arg(Sensor->GetUniqueId()));
     emit SensorsChanged();
 }
 
@@ -114,7 +114,7 @@ void TorcSensors::RemoveSensor(TorcSensor *Sensor)
 
     Sensor->DownRef();
     sensorList.removeOne(Sensor);
-    LOG(VB_GENERAL, LOG_INFO, QString("Sensor %1 removed from list").arg(Sensor->GetUniqueId()));
+    LOG(VB_GENERAL, LOG_INFO, QString("Sensor %1 de-registered").arg(Sensor->GetUniqueId()));
     emit SensorsChanged();
 }
 

@@ -31,8 +31,7 @@
 TorcPiGPIO* TorcPiGPIO::gPiGPIO = new TorcPiGPIO();
 
 TorcPiGPIO::TorcPiGPIO()
-  : m_lock(new QMutex(QMutex::Recursive)),
-    m_setup(false)
+  : m_setup(false)
 {
     if (wiringPiSetup() > -1)
         m_setup = true;
@@ -40,7 +39,6 @@ TorcPiGPIO::TorcPiGPIO()
 
 TorcPiGPIO::~TorcPiGPIO()
 {
-    delete m_lock;
 }
 
 void TorcPiGPIO::Create(const QVariantMap &GPIO)
