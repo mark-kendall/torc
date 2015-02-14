@@ -45,7 +45,7 @@ TorcPiOutput::~TorcPiOutput()
 
 void TorcPiOutput::SetValue(double Value)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(lock);
 
     // as in TorcSwithcOutput::SetValue
     double newvalue = Value == 0.0 ? 0 : 1;

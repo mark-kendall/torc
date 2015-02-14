@@ -68,7 +68,7 @@ TorcI2CPCA9685Channel::~TorcI2CPCA9685Channel()
 
 void TorcI2CPCA9685Channel::SetValue(double Value)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(lock);
 
     // ignore same value updates
     if (qFuzzyCompare(Value + 1.0f, value + 1.0f))
