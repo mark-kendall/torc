@@ -80,7 +80,7 @@ void TorcOutputs::AddOutput(TorcOutput *Output)
 
     Output->UpRef();
     outputList.append(Output);
-    LOG(VB_GENERAL, LOG_INFO, QString("Added output %1 to list").arg(Output->GetUniqueId()));
+    LOG(VB_GENERAL, LOG_INFO, QString("Registered output %1").arg(Output->GetUniqueId()));
     emit OutputsChanged();
 }
 
@@ -98,6 +98,6 @@ void TorcOutputs::RemoveOutput(TorcOutput *Output)
 
     Output->DownRef();
     outputList.removeOne(Output);
-    LOG(VB_GENERAL, LOG_INFO, QString("Output %1 removed from list").arg(Output->GetUniqueId()));
+    LOG(VB_GENERAL, LOG_INFO, QString("Output %1 deregistered").arg(Output->GetUniqueId()));
     emit OutputsChanged();
 }
