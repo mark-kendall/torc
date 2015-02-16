@@ -115,7 +115,7 @@ TorcI2CPCA9685::TorcI2CPCA9685(int Address, const QVariantMap &Details)
 
     for (int i = 0; i < 16; i++)
     {
-        QString id = QString("I2C_PCA9685_0x%1_%2").arg(Address, 0, 16).arg(i);
+        QString id = QString("I2C_0x%1_PCA9685_%2").arg(Address, 0, 16).arg(i);
 
         if (!TorcDevice::UniqueIdAvailable(id))
         {
