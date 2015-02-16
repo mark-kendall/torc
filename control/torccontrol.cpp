@@ -178,7 +178,7 @@ void TorcControl::InputValueChanged(double Value)
         return;
 
     // ignore known values
-    if (m_inputValues.contains(input) && qFuzzyCompare(m_inputValues.value(input) + 1.0, 1.0))
+    if (m_inputValues.contains(input) && qFuzzyCompare(m_inputValues.value(input) + 1.0, Value + 1.0))
         return;
 
     m_inputValues[input] = Value;
@@ -220,7 +220,7 @@ void TorcControl::CheckInputValues(void)
             break;
         case TorcControl::Equal:
             // single value ==
-            newvalue = qFuzzyCompare(m_inputValues.first() + 1.0, m_operationValue) ? 1 : 0;
+            newvalue = qFuzzyCompare(m_inputValues.first() + 1.0, m_operationValue + 1.0) ? 1 : 0;
             break;
         case TorcControl::LessThan:
             // single value <
@@ -357,7 +357,7 @@ void TorcControl::SetValue(double Value)
 {
     QMutexLocker locker(lock);
 
-    if (qFuzzyCompare(Value + 1.0, 1.0))
+    if (qFuzzyCompare(Value + 1.0, value + 1.0))
         return;
 
     value = Value;
