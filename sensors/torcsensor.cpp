@@ -93,6 +93,12 @@ TorcSensor::~TorcSensor()
 {
 }
 
+void TorcSensor::Start(void)
+{
+    emit ValidChanged(valid);
+    emit ValueChanged(value);
+}
+
 void TorcSensor::SubscriberDeleted(QObject *Subscriber)
 {
     TorcHTTPService::HandleSubscriberDeleted(Subscriber);

@@ -53,6 +53,7 @@ class TorcSensor : public TorcDevice, public TorcHTTPService
 
 
     virtual TorcSensor::Type GetType           (void) = 0;
+    void             Start                     (void);
 
   protected:
     virtual ~TorcSensor();
@@ -96,8 +97,6 @@ class TorcSensor : public TorcDevice, public TorcHTTPService
     QString          GetUniqueId               (void);
     QString          GetUserName               (void);
     QString          GetUserDescription        (void);
-
-  protected slots:
 
   protected:
     virtual double   ScaleValue                (double Value) = 0;

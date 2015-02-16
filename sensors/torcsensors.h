@@ -23,6 +23,8 @@ class TorcSensors : public QObject, public TorcHTTPService
     TorcSensors();
     ~TorcSensors();
 
+    void                Start                     (void);
+
   public slots:
     // TorcHTTPService
     void                SubscriberDeleted         (QObject *Subscriber);

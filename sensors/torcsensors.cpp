@@ -52,6 +52,14 @@ TorcSensors::~TorcSensors()
     delete m_lock;
 }
 
+void TorcSensors::Start(void)
+{
+    QMutexLocker locker(m_lock);
+
+    foreach (TorcSensor *sensor, sensorList)
+        sensor->Start();
+}
+
 void TorcSensors::SubscriberDeleted(QObject *Subscriber)
 {
     TorcHTTPService::HandleSubscriberDeleted(Subscriber);

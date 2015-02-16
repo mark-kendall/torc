@@ -54,6 +54,7 @@ TorcCentral::TorcCentral()
         SensorsChanged();
         OutputsChanged();
         TorcControls::gControls->Validate();
+        TorcSensors::gSensors->Start();
     }
 }
 
