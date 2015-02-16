@@ -33,10 +33,20 @@
 #include "control/torccontrols.h"
 #include "torccentral.h"
 
+QByteArray* TorcCentral::gStateGraph = new QByteArray();
+QMutex*     TorcCentral::gStateGraphLock = new QMutex(QMutex::Recursive);
+
 TorcCentral::TorcCentral()
   : QObject(),
     m_config(QVariantMap())
 {
+    // reset state graph
+    {
+        QMutexLocker locker(gStateGraphLock);
+        gStateGraph->clear();
+        gStateGraph->append("digraph G {\r\n    rankdir=\"LR\";\r\n    node [shape=rect];\r\n");
+    }
+
     // listen for interesting events
     gLocalContext->AddObserver(this);
 
@@ -54,6 +64,25 @@ TorcCentral::TorcCentral()
         SensorsChanged();
         OutputsChanged();
         TorcControls::gControls->Validate();
+
+        // complete the state graph
+        {
+            QMutexLocker locker(gStateGraphLock);
+            gStateGraph->append("\r\n}\r\n");
+
+            QString graph = GetTorcConfigDir() + "/stategraph.dot";
+            QFile file(graph);
+            if (file.open(QIODevice::ReadWrite))
+            {
+                file.write(*gStateGraph);
+                file.close();
+            }
+            else
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("Failed to open '%1' to write state graph").arg(graph));
+            }
+        }
+
         TorcSensors::gSensors->Start();
     }
 }

@@ -22,6 +22,7 @@
 
 // Torc
 #include "torclogging.h"
+#include "torccentral.h"
 #include "torcsensor.h"
 #include "torcoutput.h"
 #include "torccontrol.h"
@@ -137,17 +138,23 @@ void TorcControl::Validate(void)
     }
 
     // if we get this far, everything is validated and we can 'join the dots'
+    TorcCentral::gStateGraphLock->lock();
+
     QMap<QObject*,QString>::iterator it = m_outputs.begin();
     for ( ; it != m_outputs.end(); ++it)
     {
         if (qobject_cast<TorcOutput*>(it.key()))
         {
-            connect(this, SIGNAL(ValueChanged(double)), qobject_cast<TorcOutput*>(it.key()), SLOT(SetValue(double)));
+            TorcOutput* output = qobject_cast<TorcOutput*>(it.key());
+            TorcCentral::gStateGraph->append(QString("\"%1\"->\"%2\"\r\n").arg(uniqueId).arg(output->GetUniqueId()));
+            connect(this, SIGNAL(ValueChanged(double)), output, SLOT(SetValue(double)));
         }
         else
         {
-            connect(this, SIGNAL(ValidChanged(bool)), qobject_cast<TorcControl*>(it.key()), SLOT(InputValidChanged(bool)));
-            connect(this, SIGNAL(ValueChanged(double)), qobject_cast<TorcControl*>(it.key()), SLOT(InputValueChanged(double)));
+            TorcControl* control = qobject_cast<TorcControl*>(it.key());
+            TorcCentral::gStateGraph->append(QString("\"%1\"->\"%2\"\r\n").arg(uniqueId).arg(control->GetUniqueId()));
+            connect(this, SIGNAL(ValidChanged(bool)), control, SLOT(InputValidChanged(bool)));
+            connect(this, SIGNAL(ValueChanged(double)), control, SLOT(InputValueChanged(double)));
         }
     }
 
@@ -161,6 +168,8 @@ void TorcControl::Validate(void)
 
     LOG(VB_GENERAL, LOG_INFO, QString("%1: Ready").arg(uniqueId));
     m_validated = true;
+
+    TorcCentral::gStateGraphLock->unlock();
 }
 
 void TorcControl::InputValueChanged(double Value)

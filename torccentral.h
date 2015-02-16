@@ -16,6 +16,9 @@ class TorcCentral : public QObject
 
     bool        event          (QEvent *Event);
 
+    static      QByteArray    *gStateGraph;
+    static      QMutex        *gStateGraphLock;
+
   public slots:
     void        SensorsChanged (void);
     void        OutputsChanged (void);
