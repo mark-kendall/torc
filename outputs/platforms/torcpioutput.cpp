@@ -41,6 +41,9 @@ TorcPiOutput::TorcPiOutput(int Pin, const QString &UniqueId)
 
 TorcPiOutput::~TorcPiOutput()
 {
+    // always return the pin to its default state.
+    // we must do this here to trigger the correct SetValue implementation
+    SetValue(defaultValue);
 }
 
 void TorcPiOutput::SetValue(double Value)
