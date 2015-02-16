@@ -22,6 +22,7 @@
 
 // Torc
 #include "torclogging.h"
+#include "torcsensor.h"
 #include "torcoutput.h"
 #include "torccontrol.h"
 
@@ -81,6 +82,8 @@ TorcControl::~TorcControl()
 }
 
 /*! \fn Validate
+ *
+ * \note We always assume an object of a given type has the correct signals/slots
 */
 void TorcControl::Validate(void)
 {
@@ -89,7 +92,29 @@ void TorcControl::Validate(void)
     if (m_validated)
         return;
 
-    // need one or more outputs
+    // we need one or more inputs for a regular control
+    if (m_inputList.isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("%1 needs at least one input").arg(uniqueId));
+        return;
+    }
+
+    // validate inputs
+    foreach (QString input, m_inputList)
+    {
+        QObject *object = TorcDevice::GetObjectforId(input);
+
+        // valid object
+        if (!object)
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to find input '%1' for '%2'").arg(input).arg(uniqueId));
+            return;
+        }
+
+        m_inputs.insert(object, input);
+    }
+
+    // we always need one or more outputs
     if (m_outputList.isEmpty())
     {
         LOG(VB_GENERAL, LOG_ERR, QString("%1 needs at least one output").arg(uniqueId));
@@ -105,45 +130,6 @@ void TorcControl::Validate(void)
         if (!object)
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Failed to find output '%1' for device %2").arg(output).arg(uniqueId));
-            return;
-        }
-
-        // is it another control or an output?
-        TorcOutput  *outputobject  = qobject_cast<TorcOutput*>(object);
-        TorcControl *controlobject = qobject_cast<TorcControl*>(object);
-
-        if (outputobject)
-        {
-            // an output is not designated valid - it is just given a value (it cannot be indeterminate)
-            // if this control becomes invlalid, its value will return to the default.
-            // has SetValue slot?
-            if (outputobject->staticMetaObject.indexOfSlot("SetValue(double)") < 0)
-            {
-                LOG(VB_GENERAL, LOG_ERR, QString("Output '%1' has no SetValue slot").arg(output));
-                return;
-            }
-        }
-        else if (controlobject)
-        {
-            // has valid update slot?
-            if (controlobject->staticMetaObject.indexOfSlot("InputValidChanged(bool)") < 0)
-            {
-
-                LOG(VB_GENERAL, LOG_ERR, QString("Control '%1' ('%2') has no InputValidChanged slot")
-                    .arg(output).arg(controlobject->staticMetaObject.className()));
-                return;
-            }
-
-            // has value update slot?
-            if (controlobject->staticMetaObject.indexOfSlot("InputValueChanged(double)") < 0)
-            {
-                LOG(VB_GENERAL, LOG_ERR, QString("Control '%1' has no InputValueChanged slot").arg(output));
-                return;
-            }
-        }
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR, QString("Output '%1' has unknown/unsupported type").arg(output));
             return;
         }
 
