@@ -12,7 +12,7 @@
 
 #define OUTPUTS_DIRECTORY QString("outputs")
 
-class TorcOutput : public QObject, public TorcHTTPService, public TorcDevice
+class TorcOutput : public TorcDevice, public TorcHTTPService
 {
     Q_OBJECT
     Q_ENUMS(Type)

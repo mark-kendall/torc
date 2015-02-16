@@ -118,6 +118,7 @@ HEADERS += outputs/torcpwmoutput.h
 HEADERS += outputs/torcswitchoutput.h
 HEADERS += outputs/platforms/torci2cbus.h
 HEADERS += control/torccontrol.h
+HEADERS += control/torccontrols.h
 
 SOURCES += torc/torcloggingimp.cpp
 SOURCES += torc/torcplist.cpp
@@ -175,6 +176,7 @@ SOURCES += outputs/torcpwmoutput.cpp
 SOURCES += outputs/torcswitchoutput.cpp
 SOURCES += outputs/platforms/torci2cbus.cpp
 SOURCES += control/torccontrol.cpp
+SOURCES += control/torccontrols.cpp
 
 HEADERS += torccentral.h
 HEADERS += torcdevice.h

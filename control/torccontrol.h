@@ -4,12 +4,15 @@
 // Qt
 #include <QMap>
 #include <QObject>
+#include <QStringList>
 
 // Torc
 #include "torcdevice.h"
 
-class TorcControl : public QObject, public TorcDevice
+class TorcControl : public TorcDevice
 {
+    friend class TorcControls;
+
     Q_OBJECT
     Q_ENUMS(Operation)
     Q_PROPERTY(bool    valid           READ GetValid()           NOTIFY ValidChanged())
@@ -21,17 +24,26 @@ class TorcControl : public QObject, public TorcDevice
   public:
     enum Operation
     {
-        None = 0,
-        Equals,
+        None,
+        Equal,
         LessThan,
         GreaterThan,
         LessThanOrEqual,
-        GreaterThanOrEqual
+        GreaterThanOrEqual,
+        Any,
+        All
     };
 
-  public:
-    TorcControl(const QVariantMap &Details);
+    static TorcControl::Operation StringToOperation (const QString &Operation);
+    static QString                OperationToString (TorcControl::Operation Operation);
+
+  protected:
+    TorcControl(const QString &UniqueId, const QStringList &Inputs, const QStringList &Outputs,
+                TorcControl::Operation Operation, double OperationValue);
     virtual ~TorcControl();
+
+  public:
+    void                   Validate               (void);
 
   public slots:
     void                   InputValueChanged      (double Value);
@@ -53,13 +65,23 @@ class TorcControl : public QObject, public TorcDevice
     void                   UserDescriptionChanged (const QString &Description);
 
   private:
+    void                   InputValidChangedPriv  (QObject* Input, bool Valid);
+    void                   CheckInputValues       (void);
+    void                   SetValue               (double Value);
     void                   SetValid               (bool Valid);
+    void                   CalculateOutput        (void);
 
   private:
-    QMap<QString,QObject*> m_inputs;
-    QMap<QString,QObject*> m_outputs;
+    bool                   m_validated;
+    QStringList            m_inputList;
+    QStringList            m_outputList;
+    QMap<QObject*,QString> m_inputs;
+    QMap<QObject*,QString> m_outputs;
+    QMap<QObject*,double>  m_inputValues;
+    QMap<QObject*,bool>    m_inputValids;
     TorcControl::Operation m_operation;
     double                 m_operationValue;
+    bool                   m_allInputsValid;
 };
 
 #endif // TORCCONTROL_H

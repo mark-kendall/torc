@@ -63,11 +63,10 @@ TorcSensor::Type TorcSensor::StringToType(const QString &Type)
 TorcSensor::TorcSensor(TorcSensor::Type Type, double Value, double RangeMinimum, double RangeMaximum,
                        const QString &ShortUnits,    const QString &LongUnits,
                        const QString &ModelId,       const QString &UniqueId)
-  : QObject(),
+  : TorcDevice(false, Value, Value, ModelId, UniqueId),
     TorcHTTPService(this, SENSORS_DIRECTORY + "/" + TypeToString(Type) + "/" + UniqueId,
                     UniqueId, TorcSensor::staticMetaObject,
                     UniqueId.contains(NETWORK_SENSORS_STRING) ? QString("") : BLACKLIST),
-    TorcDevice(false, Value, Value, ModelId, UniqueId),
     valueScaled(Value),
     operatingRangeMin(RangeMinimum),
     operatingRangeMax(RangeMaximum),

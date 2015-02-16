@@ -11,7 +11,7 @@
 
 #define SENSORS_DIRECTORY QString("sensors")
 
-class TorcSensor : public QObject, public TorcHTTPService, public TorcDevice
+class TorcSensor : public TorcDevice, public TorcHTTPService
 {
     Q_OBJECT
     Q_ENUMS(Type)

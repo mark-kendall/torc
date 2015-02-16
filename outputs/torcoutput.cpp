@@ -46,9 +46,8 @@ TorcOutput::Type TorcOutput::StringToType(const QString &Type)
 }
 
 TorcOutput::TorcOutput(TorcOutput::Type Type, double Value, const QString &ModelId, const QString &UniqueId)
-  : QObject(),
-    TorcHTTPService(this, OUTPUTS_DIRECTORY + "/" + TypeToString(Type) + "/" + UniqueId, UniqueId, TorcOutput::staticMetaObject, BLACKLIST),
-    TorcDevice(true, Value, Value, ModelId, UniqueId)
+  : TorcDevice(true, Value, Value, ModelId, UniqueId),
+    TorcHTTPService(this, OUTPUTS_DIRECTORY + "/" + TypeToString(Type) + "/" + UniqueId, UniqueId, TorcOutput::staticMetaObject, BLACKLIST)
 {
     TorcOutputs::gOutputs->AddOutput(this);
 }

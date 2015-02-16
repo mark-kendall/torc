@@ -21,8 +21,8 @@
 #include "torclogging.h"
 #include "torcdevice.h"
 
-QHash<QString,void*>* TorcDevice::gDeviceList = new QHash<QString,void*>();
-QMutex*      TorcDevice::gDeviceListLock = new QMutex(QMutex::Recursive);
+QHash<QString,QObject*>* TorcDevice::gDeviceList = new QHash<QString,QObject*>();
+QMutex*      TorcDevice::gDeviceListLock         = new QMutex(QMutex::Recursive);
 
 bool TorcDevice::UniqueIdAvailable(const QString &UniqueId)
 {
@@ -31,7 +31,7 @@ bool TorcDevice::UniqueIdAvailable(const QString &UniqueId)
     return !UniqueId.isEmpty() && !gDeviceList->contains(UniqueId);
 }
 
-bool TorcDevice::RegisterUniqueId(const QString &UniqueId, void *Object)
+bool TorcDevice::RegisterUniqueId(const QString &UniqueId, QObject *Object)
 {
     QMutexLocker locker(gDeviceListLock);
 
@@ -53,7 +53,7 @@ void TorcDevice::UnregisterUniqueId(const QString &UniqueId)
     gDeviceList->remove(UniqueId);
 }
 
-void* TorcDevice::GetObjectforId(const QString &UniqueId)
+QObject* TorcDevice::GetObjectforId(const QString &UniqueId)
 {
     QMutexLocker locker(gDeviceListLock);
 

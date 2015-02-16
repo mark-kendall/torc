@@ -5,11 +5,12 @@
 #include <QHash>
 #include <QMutex>
 #include <QString>
+#include <QObject>
 
 // Torc
 #include "torcreferencecounted.h"
 
-class TorcDevice : public TorcReferenceCounter
+class TorcDevice : public QObject, public TorcReferenceCounter
 {
   public:
     TorcDevice(bool Valid, double Value, double Default,
@@ -28,12 +29,12 @@ class TorcDevice : public TorcReferenceCounter
     QMutex                *lock;
 
   public:
-    static QHash<QString,void*> *gDeviceList;
+    static QHash<QString,QObject*> *gDeviceList;
     static QMutex         *gDeviceListLock;
     static bool            UniqueIdAvailable  (const QString &UniqueId);
-    static bool            RegisterUniqueId   (const QString &UniqueId, void *Object);
+    static bool            RegisterUniqueId   (const QString &UniqueId, QObject *Object);
     static void            UnregisterUniqueId (const QString &UniqueId);
-    static void*           GetObjectforId     (const QString &UniqueId);
+    static QObject*        GetObjectforId     (const QString &UniqueId);
 };
 
 #endif // TORCDEVICE_H

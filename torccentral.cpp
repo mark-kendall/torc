@@ -30,6 +30,7 @@
 #include "torc/torcadminthread.h"
 #include "sensors/torcsensors.h"
 #include "outputs/torcoutputs.h"
+#include "control/torccontrols.h"
 #include "torccentral.h"
 
 TorcCentral::TorcCentral()
@@ -52,6 +53,7 @@ TorcCentral::TorcCentral()
         TorcDeviceHandler::Start(m_config);
         SensorsChanged();
         OutputsChanged();
+        TorcControls::gControls->Validate();
     }
 }
 
