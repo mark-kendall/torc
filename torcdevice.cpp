@@ -18,7 +18,49 @@
 */
 
 // Torc
+#include "torclogging.h"
 #include "torcdevice.h"
+
+QHash<QString,void*>* TorcDevice::gDeviceList = new QHash<QString,void*>();
+QMutex*      TorcDevice::gDeviceListLock = new QMutex(QMutex::Recursive);
+
+bool TorcDevice::UniqueIdAvailable(const QString &UniqueId)
+{
+    QMutexLocker locker(gDeviceListLock);
+
+    return !UniqueId.isEmpty() && !gDeviceList->contains(UniqueId);
+}
+
+bool TorcDevice::RegisterUniqueId(const QString &UniqueId, void *Object)
+{
+    QMutexLocker locker(gDeviceListLock);
+
+    if (UniqueIdAvailable(UniqueId) && Object)
+    {
+        gDeviceList->insert(UniqueId, Object);
+        LOG(VB_GENERAL, LOG_INFO, QString("New device id: %1").arg(UniqueId));
+        return true;
+    }
+
+    return false;
+}
+
+void TorcDevice::UnregisterUniqueId(const QString &UniqueId)
+{
+    QMutexLocker locker(gDeviceListLock);
+
+    LOG(VB_GENERAL, LOG_INFO, QString("Device id: %1 removed").arg(UniqueId));
+    gDeviceList->remove(UniqueId);
+}
+
+void* TorcDevice::GetObjectforId(const QString &UniqueId)
+{
+    QMutexLocker locker(gDeviceListLock);
+
+    if (gDeviceList->contains(UniqueId))
+        return gDeviceList->value(UniqueId);
+    return NULL;
+}
 
 TorcDevice::TorcDevice(bool Valid, double Value, double Default,
                        const QString &ModelId, const QString &UniqueId,
@@ -33,10 +75,13 @@ TorcDevice::TorcDevice(bool Valid, double Value, double Default,
     userDescription(userDescription),
     lock(new QMutex(QMutex::Recursive))
 {
+    if (!TorcDevice::RegisterUniqueId(uniqueId, this))
+        LOG(VB_GENERAL, LOG_ERR, QString("Device id '%1' already in use - THIS WILL NOT WORK").arg(uniqueId));
 }
 
 TorcDevice::~TorcDevice()
 {
+    TorcDevice::UnregisterUniqueId(uniqueId);
     delete lock;
     lock = NULL;
 }

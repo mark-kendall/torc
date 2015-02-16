@@ -30,8 +30,8 @@
 
 #define DEFAULT_VALUE 0
 
-TorcPiOutput::TorcPiOutput(int Pin)
-  : TorcSwitchOutput(DEFAULT_VALUE, "RaspberryPi", QString("GPIO_%1").arg(Pin)),
+TorcPiOutput::TorcPiOutput(int Pin, const QString &UniqueId)
+  : TorcSwitchOutput(DEFAULT_VALUE, "RaspberryPi", UniqueId),
     m_pin(Pin)
 {
     // setup and initialise pin for output

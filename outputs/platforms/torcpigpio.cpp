@@ -85,6 +85,13 @@ void TorcPiGPIO::Create(const QVariantMap &GPIO)
                     continue;
                 }
 
+                QString uniqueid = QString("GPIO_%1").arg(Pin);
+                if (!TorcDevice::UniqueIdAvailable(uniqueid))
+                {
+                    LOG(VB_GENERAL, LOG_ERR, QString("Device name %1 already in use - ignoring").arg(uniqueid));
+                    continue;
+                }
+
                 QString name  = details.value("userName").toString();
                 QString desc  = details.value("userDescription").toString();
                 QString state = details.value("state").toString();
@@ -92,7 +99,6 @@ void TorcPiGPIO::Create(const QVariantMap &GPIO)
                 if (state.toUpper() == "OUTPUT")
                 {
                     TorcPiOutput* output = new TorcPiOutput(pin);
-                    TorcOutputs::gOutputs->AddOutput(output);
                     m_outputs.insert(pin, output);
                     output->SetUserName(name);
                     output->SetUserDescription(desc);

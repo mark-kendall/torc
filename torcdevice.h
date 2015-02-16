@@ -2,8 +2,9 @@
 #define TORCDEVICE_H
 
 // Qt
-#include <QString>
+#include <QHash>
 #include <QMutex>
+#include <QString>
 
 // Torc
 #include "torcreferencecounted.h"
@@ -26,6 +27,13 @@ class TorcDevice : public TorcReferenceCounter
     QString                userDescription;
     QMutex                *lock;
 
+  public:
+    static QHash<QString,void*> *gDeviceList;
+    static QMutex         *gDeviceListLock;
+    static bool            UniqueIdAvailable  (const QString &UniqueId);
+    static bool            RegisterUniqueId   (const QString &UniqueId, void *Object);
+    static void            UnregisterUniqueId (const QString &UniqueId);
+    static void*           GetObjectforId     (const QString &UniqueId);
 };
 
 #endif // TORCDEVICE_H

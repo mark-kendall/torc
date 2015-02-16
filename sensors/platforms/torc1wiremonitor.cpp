@@ -135,6 +135,13 @@ void Torc1WireMonitor::DirectoryChanged(const QString&)
             // build the list of known devices.
             devices.append(name);
 
+            // check for unique id
+            if (!TorcDevice::UniqueIdAvailable(name))
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("Device id '%1' already in use - ignoring").arg(name));
+                continue;
+            }
+
             // is it new?
             if (!m_sensors.contains(name))
             {

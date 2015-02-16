@@ -21,6 +21,7 @@
 */
 
 // Torc
+#include "torcoutputs.h"
 #include "torcoutput.h"
 
 #define BLACKLIST QString("")
@@ -49,6 +50,7 @@ TorcOutput::TorcOutput(TorcOutput::Type Type, double Value, const QString &Model
     TorcHTTPService(this, OUTPUTS_DIRECTORY + "/" + TypeToString(Type) + "/" + UniqueId, UniqueId, TorcOutput::staticMetaObject, BLACKLIST),
     TorcDevice(true, Value, Value, ModelId, UniqueId)
 {
+    TorcOutputs::gOutputs->AddOutput(this);
 }
 
 void TorcOutput::SubscriberDeleted(QObject *Subscriber)

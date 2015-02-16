@@ -60,7 +60,7 @@ void TorcNetworkSensors::Create(const QVariantMap &Details)
                 {
                     QString uniqueid = NETWORK_SENSORS_STRING + "_" + it.key() + "_" + it2.key();
 
-                    if (m_sensors.contains(uniqueid))
+                    if (!TorcDevice::UniqueIdAvailable(uniqueid))
                     {
                         LOG(VB_GENERAL, LOG_WARNING, QString("Already have network sensor named '%1'").arg(uniqueid));
                         continue;
