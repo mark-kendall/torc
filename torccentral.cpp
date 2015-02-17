@@ -186,7 +186,7 @@ void TorcCentral::SensorsChanged(void)
             QVariantMap device = it.value().toMap();
             QString name = device.value("userName").toString();
             QString description = device.value("userDescription").toString();
-            TorcSensors::gSensors->UpdateSensor(it.key(), name, description);
+            TorcSensors::gSensors->UpdateSensor("1Wire_" + it.key(), name, description);
         }
     }
 }
