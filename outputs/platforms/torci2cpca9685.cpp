@@ -115,17 +115,17 @@ TorcI2CPCA9685::TorcI2CPCA9685(int Address, const QVariantMap &Details)
 
     for (int i = 0; i < 16; i++)
     {
-        QString id = QString("I2C_0x%1_PCA9685_%2").arg(Address, 0, 16).arg(i);
-
-        if (!TorcDevice::UniqueIdAvailable(id))
-        {
-            LOG(VB_GENERAL, LOG_ERR, QString("Device id %1 not available").arg(id));
-            continue;
-        }
-        m_outputs[i] = new TorcI2CPCA9685Channel(i, this, id);
-
         if (channels.contains(QString::number(i)))
         {
+            QString id = QString("I2C_0x%1_PCA9685_%2").arg(Address, 0, 16).arg(i);
+
+            if (!TorcDevice::UniqueIdAvailable(id))
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("Device id %1 not available").arg(id));
+                continue;
+            }
+            m_outputs[i] = new TorcI2CPCA9685Channel(i, this, id);
+
             QVariantMap details = channels.value(QString::number(i)).toMap();
             if (details.contains("userName"))
                 m_outputs[i]->SetUserName(details.value("userName").toString());
