@@ -55,6 +55,15 @@ linux-rasp-pi-g++ {
     SOURCES += outputs/platforms/torci2cpca9685.cpp
     SOURCES += outputs/platforms/torcpigpio.cpp
     SOURCES += outputs/platforms/torcpioutput.cpp
+
+    # install with suid permissions on Pi
+    # this allows access to I2C and GPIO
+    setpriv.target       = setpriv
+    setpriv.depends      = FORCE
+    setpriv.commands     = @echo set privileges for $$target.path/$$TARGET && chmod u+s $$target.path/$$TARGET
+    QMAKE_EXTRA_TARGETS += setpriv
+    setpriv.path         = .setpriv
+    INSTALLS            += setpriv
 }
 
 HEADERS += torc/torclogging.h
