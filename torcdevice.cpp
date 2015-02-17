@@ -78,8 +78,6 @@ TorcDevice::TorcDevice(bool Valid, double Value, double Default,
 {
     if (!TorcDevice::RegisterUniqueId(uniqueId, this))
         LOG(VB_GENERAL, LOG_ERR, QString("Device id '%1' already in use - THIS WILL NOT WORK").arg(uniqueId));
-
-    TorcCentral::gStateGraph->append("    \"" + uniqueId + "\";\r\n");
 }
 
 TorcDevice::~TorcDevice()

@@ -19,6 +19,7 @@
 
 // Qt
 #include <QFile>
+#include <QProcess>
 #include <QJsonDocument>
 #include <QCoreApplication>
 
@@ -68,6 +69,13 @@ TorcCentral::TorcCentral()
         TorcDeviceHandler::Start(m_config);
         SensorsChanged();
         OutputsChanged();
+
+        // start building the graph
+        TorcSensors::gSensors->Graph();
+        TorcOutputs::gOutputs->Graph();
+        TorcControls::gControls->Graph();
+
+        // connect controls to sensors/outputs/other controls
         TorcControls::gControls->Validate();
 
         // complete the state graph
@@ -79,6 +87,7 @@ TorcCentral::TorcCentral()
             if (file.open(QIODevice::ReadWrite))
             {
                 file.write(*gStateGraph);
+                file.flush();
                 file.close();
             }
             else
@@ -87,7 +96,18 @@ TorcCentral::TorcCentral()
             }
         }
 
+        // initialise the state machine
         TorcSensors::gSensors->Start();
+
+        // create a representation of the state graph
+        QProcess dot;
+        dot.setProcessChannelMode(QProcess::MergedChannels);
+        dot.start("dot", QStringList() << "-v" << "-o /usr/local/share/torc/html/test.svg" << "-Tsvg" << graph); 
+        LOG(VB_GENERAL, LOG_INFO, QString("Creating graph from '%1'").arg(graph));
+        if (!dot.waitForFinished())
+            LOG(VB_GENERAL, LOG_INFO, "Failed to create graph");
+        else
+            LOG(VB_GENERAL, LOG_INFO, dot.readAllStandardOutput());
     }
 }
 

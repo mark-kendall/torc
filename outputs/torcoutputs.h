@@ -23,6 +23,8 @@ class TorcOutputs : public QObject, public TorcHTTPService
     TorcOutputs();
     ~TorcOutputs();
 
+    void                Graph                     (void);
+
   public slots:
     // TorcHTTPService
     void                SubscriberDeleted         (QObject *Subscriber);

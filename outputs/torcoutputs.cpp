@@ -22,6 +22,7 @@
 
 // Torc
 #include "torclogging.h"
+#include "torccentral.h"
 #include "torcoutputs.h"
 
 #define BLACKLIST QString("")
@@ -38,6 +39,23 @@ TorcOutputs::TorcOutputs()
 TorcOutputs::~TorcOutputs()
 {
     delete m_lock;
+}
+
+void TorcOutputs::Graph(void)
+{
+    QMutexLocker locker(m_lock);
+    {
+        QMutexLocker locker(TorcCentral::gStateGraphLock);
+        TorcCentral::gStateGraph->append("subgraph cluster_2 {\r\nlabel = \"Outputs\";\r\nstyle=filled;\r\nfillcolor=\"grey95\";\r\n");
+
+        foreach(TorcOutput* output, outputList)
+        {
+            QString id = output->GetUserName().isEmpty() ? output->GetUniqueId() : output->GetUserName();
+            TorcCentral::gStateGraph->append("    \"" + id + "\";\r\n");
+        }
+
+        TorcCentral::gStateGraph->append("}\r\n");
+    }
 }
 
 void TorcOutputs::SubscriberDeleted(QObject *Subscriber)

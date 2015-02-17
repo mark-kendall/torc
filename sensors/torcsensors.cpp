@@ -23,6 +23,7 @@
 // Torc
 #include "torclogging.h"
 #include "torcadminthread.h"
+#include "torccentral.h"
 #include "torcsensors.h"
 
 #define BLACKLIST QString("")
@@ -58,6 +59,23 @@ void TorcSensors::Start(void)
 
     foreach (TorcSensor *sensor, sensorList)
         sensor->Start();
+}
+
+void TorcSensors::Graph(void)
+{
+    QMutexLocker locker(m_lock);
+    {
+        QMutexLocker locker(TorcCentral::gStateGraphLock);
+        TorcCentral::gStateGraph->append("subgraph cluster_0 {\r\nlabel = \"Sensors\";\r\nstyle=filled;\r\nfillcolor = \"grey95\";");
+
+        foreach(TorcSensor *sensor, sensorList)
+        {
+            QString id = sensor->GetUserName().isEmpty() ? sensor->GetUniqueId() : sensor->GetUserName();
+            TorcCentral::gStateGraph->append("    \"" + id + "\";\r\n");
+        }
+
+        TorcCentral::gStateGraph->append("}\r\n");
+    }
 }
 
 void TorcSensors::SubscriberDeleted(QObject *Subscriber)

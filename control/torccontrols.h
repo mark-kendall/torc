@@ -17,6 +17,7 @@ class TorcControls : public TorcDeviceHandler
     void Create   (const QVariantMap &Details);
     void Destroy  (void);
     void Validate (void);
+    void Graph    (void);
 
   private:
     QMap<QString,TorcControl*> m_controls;
