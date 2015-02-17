@@ -147,14 +147,14 @@ void TorcControl::Validate(void)
         {
             TorcOutput* output = qobject_cast<TorcOutput*>(it.key());
             TorcCentral::gStateGraph->append(QString("    \"%1\"->\"%2\"\r\n").arg(userName).arg(output->GetUserName()));
-            connect(this, SIGNAL(ValueChanged(double)), output, SLOT(SetValue(double)));
+            connect(this, SIGNAL(ValueChanged(double)), output, SLOT(SetValue(double)), Qt::UniqueConnection);
         }
         else
         {
             TorcControl* control = qobject_cast<TorcControl*>(it.key());
             TorcCentral::gStateGraph->append(QString("    \"%1\"->\"%2\"\r\n").arg(userName).arg(control->GetUserName()));
-            connect(this, SIGNAL(ValidChanged(bool)), control, SLOT(InputValidChanged(bool)));
-            connect(this, SIGNAL(ValueChanged(double)), control, SLOT(InputValueChanged(double)));
+            connect(this, SIGNAL(ValidChanged(bool)), control, SLOT(InputValidChanged(bool)), Qt::UniqueConnection);
+            connect(this, SIGNAL(ValueChanged(double)), control, SLOT(InputValueChanged(double)), Qt::UniqueConnection);
         }
     }
 
@@ -168,8 +168,8 @@ void TorcControl::Validate(void)
             inputid = qobject_cast<TorcSensor*>(it.key())->GetUserName();
 
         TorcCentral::gStateGraph->append(QString("    \"%1\"->\"%2\"\r\n").arg(inputid).arg(userName));
-        connect(it.key(), SIGNAL(ValidChanged(bool)), this, SLOT(InputValidChanged(bool)));
-        connect(it.key(), SIGNAL(ValueChanged(double)), this, SLOT(InputValueChanged(double)));
+        connect(it.key(), SIGNAL(ValidChanged(bool)), this, SLOT(InputValidChanged(bool)), Qt::UniqueConnection);
+        connect(it.key(), SIGNAL(ValueChanged(double)), this, SLOT(InputValueChanged(double)), Qt::UniqueConnection);
         m_inputValids.insert(it.key(), false);
     }
 
