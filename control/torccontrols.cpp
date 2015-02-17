@@ -54,6 +54,8 @@ void TorcControls::Create(const QVariantMap &Details)
             if (id.isEmpty())
                 continue;
 
+            id = "controls_" + id;
+
             if (!TorcDevice::UniqueIdAvailable(id))
             {
                 LOG(VB_GENERAL, LOG_ERR, QString("Device id '%1' already in use - ignoring").arg(id));
@@ -61,7 +63,7 @@ void TorcControls::Create(const QVariantMap &Details)
             }
 
             QVariantMap details = it2.value().toMap();
-            QString name  = details.value("username").toString();
+            QString name  = details.value("userName").toString();
             QString desc  = details.value("userDescription").toString();
             QString op    = details.value("operation").toString();
             QString val   = details.value("value").toString();
@@ -138,6 +140,8 @@ void TorcControls::Create(const QVariantMap &Details)
             }
 
             TorcControl* control = new TorcControl(id, inputs, outputs, operation, operationvalue);
+            control->SetUserName(name);
+            control->SetUserDescription(desc);
             m_controls.insert(id, control);
         }
     }
