@@ -47,7 +47,7 @@ TorcCentral::TorcCentral()
     {
         QMutexLocker locker(gStateGraphLock);
         gStateGraph->clear();
-        gStateGraph->append("digraph G {\r\n    rankdir=\"LR\";\r\n    node [shape=rect];\r\n");
+        gStateGraph->append("strict digraph G {\r\n    rankdir=\"LR\";\r\n    node [shape=rect];\r\n");
 
         if (QFile::exists(graph))
             QFile::remove(graph);
