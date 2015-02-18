@@ -12,6 +12,7 @@
 #include "torchtmlhandler.h"
 #include "torchtmlserviceshelp.h"
 #include "torchtmlstaticcontent.h"
+#include "torchtmldynamiccontent.h"
 #include "torcwebsocket.h"
 
 class TorcHTTPConnection;
@@ -76,6 +77,7 @@ class TorcHTTPServer : public QTcpServer
     TorcHTMLHandler                  *m_defaultHandler;
     TorcHTMLServicesHelp             *m_servicesHelpHandler;
     TorcHTMLStaticContent            *m_staticContent;
+    TorcHTMLDynamicContent           *m_dynamicContent;
 
     QThreadPool                       m_connectionPool;
     int                               m_abort;

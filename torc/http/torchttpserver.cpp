@@ -286,6 +286,7 @@ TorcHTTPServer::TorcHTTPServer()
     m_defaultHandler(NULL),
     m_servicesHelpHandler(NULL),
     m_staticContent(NULL),
+    m_dynamicContent(NULL),
     m_abort(0),
     m_httpBonjourReference(0),
     m_torcBonjourReference(0),
@@ -320,6 +321,10 @@ TorcHTTPServer::TorcHTTPServer()
     m_staticContent = new TorcHTMLStaticContent();
     RegisterHandler(m_staticContent);
 
+    // dynamic files (typically served from ~/.torc/content)
+    m_dynamicContent = new TorcHTMLDynamicContent();
+    RegisterHandler(m_dynamicContent);
+
     // set thread pool max size
     m_connectionPool.setMaxThreadCount(50);
 
@@ -339,6 +344,7 @@ TorcHTTPServer::~TorcHTTPServer()
     delete m_defaultHandler;
     delete m_servicesHelpHandler;
     delete m_staticContent;
+    delete m_dynamicContent;
 
     Close();
 
