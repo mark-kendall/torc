@@ -49,6 +49,8 @@ TorcCentral::TorcCentral()
     // content directory should already have been created by TorcHTMLDynamicContent
     QString graphdot = GetTorcConfigDir() + DYNAMIC_DIRECTORY + "stategraph.dot";
     QString graphsvg = GetTorcConfigDir() + DYNAMIC_DIRECTORY + "stategraph.svg";
+    QString config   = GetTorcConfigDir() + DYNAMIC_DIRECTORY + "torc.config";
+    QString current  = GetTorcConfigDir() + "/torc.config";
 
     {
         QMutexLocker locker(gStateGraphLock);
@@ -59,6 +61,12 @@ TorcCentral::TorcCentral()
             QFile::remove(graphdot);
         if (QFile::exists(graphsvg))
             QFile::remove(graphsvg);
+        if (QFile::exists(config))
+            QFile::remove(config);
+
+        QFile currentconfig(current);
+        if (!currentconfig.copy(config))
+            LOG(VB_GENERAL, LOG_WARNING, "Failed to copy current config file to content directory");
     }
 
     // listen for interesting events
