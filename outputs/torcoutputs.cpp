@@ -51,7 +51,7 @@ void TorcOutputs::Graph(void)
         foreach(TorcOutput* output, outputList)
         {
             QString id = output->GetUserName().isEmpty() ? output->GetUniqueId() : output->GetUserName();
-            TorcCentral::gStateGraph->append("    \"" + id + "\";\r\n");
+            TorcCentral::gStateGraph->append(QString("    \"" + id + "\" [URL=\"%1Help\"];\r\n").arg(output->Signature()));
         }
 
         TorcCentral::gStateGraph->append("}\r\n");

@@ -71,7 +71,7 @@ void TorcSensors::Graph(void)
         foreach(TorcSensor *sensor, sensorList)
         {
             QString id = sensor->GetUserName().isEmpty() ? sensor->GetUniqueId() : sensor->GetUserName();
-            TorcCentral::gStateGraph->append("    \"" + id + "\";\r\n");
+            TorcCentral::gStateGraph->append(QString("    \"" + id + "\" [URL=\"%1Help\"];\r\n").arg(sensor->Signature()));
         }
 
         TorcCentral::gStateGraph->append("}\r\n");
