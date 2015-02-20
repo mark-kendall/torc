@@ -57,7 +57,7 @@ void TorcOutputs::Graph(void)
             QString label = output->GetUserName();
             if (label.isEmpty())
                 label = id;
-            TorcCentral::gStateGraph->append(QString("        \"" + id + "\" [lable=\"%1\" URL=\"%2Help\"];\r\n")
+            TorcCentral::gStateGraph->append(QString("        \"" + id + "\" [label=\"%1\" URL=\"%2Help\"];\r\n")
                                              .arg(label).arg(output->Signature()));
         }
 

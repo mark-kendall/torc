@@ -160,7 +160,7 @@ void TorcControl::Validate(void)
         QMutexLocker locker(TorcCentral::gStateGraphLock);
 
         if (!passthrough)
-            TorcCentral::gStateGraph->append(QString("    \"%1\" [label=\"%2\"").arg(uniqueId).arg(userName));
+            TorcCentral::gStateGraph->append(QString("    \"%1\" [label=\"%2\"];\r\n").arg(uniqueId).arg(userName));
 
         QMap<QObject*,QString>::iterator it = m_outputs.begin();
         for ( ; it != m_outputs.end(); ++it)
