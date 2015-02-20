@@ -84,7 +84,15 @@ TorcControl::~TorcControl()
 
 /*! \fn Validate
  *
+ * If the control has one single sensor input (NOT another control), one or more outputs (NOT controls) and
+ * the operation is a straight pass through (Operation::None), then we do not present the control in the stategraph.
+ * This makes the graph clearer but the control is still required as Outputs have no understanding of invalid
+ * sensor outputs.
+ *
  * \note We always assume an object of a given type has the correct signals/slots
+ *
+ * \todo Validate input/output data types
+ * \todo Make Outputs 'valid' aware and handle their own defaults if any input/control is invalid.
 */
 void TorcControl::Validate(void)
 {
@@ -92,6 +100,8 @@ void TorcControl::Validate(void)
 
     if (m_validated)
         return;
+
+    bool passthrough = (m_operation == TorcControl::None) && (m_inputList.size() == 1);
 
     // we need one or more inputs for a regular control
     if (m_inputList.isEmpty())
@@ -113,6 +123,10 @@ void TorcControl::Validate(void)
         }
 
         m_inputs.insert(object, input);
+
+        // check for passthrough
+        if (!qobject_cast<TorcSensor*>(object))
+            passthrough = false;
     }
 
     // we always need one or more outputs
@@ -135,48 +149,54 @@ void TorcControl::Validate(void)
         }
 
         m_outputs.insert(object, output);
+
+        // check for passthrough
+        if (!qobject_cast<TorcOutput*>(object))
+            passthrough = false;
     }
 
     // if we get this far, everything is validated and we can 'join the dots'
-    TorcCentral::gStateGraphLock->lock();
-
-    QMap<QObject*,QString>::iterator it = m_outputs.begin();
-    for ( ; it != m_outputs.end(); ++it)
     {
-        if (qobject_cast<TorcOutput*>(it.key()))
-        {
-            TorcOutput* output = qobject_cast<TorcOutput*>(it.key());
-            TorcCentral::gStateGraph->append(QString("    \"%1\"->\"%2\"\r\n").arg(userName).arg(output->GetUserName()));
-            connect(this, SIGNAL(ValueChanged(double)), output, SLOT(SetValue(double)), Qt::UniqueConnection);
-        }
-        else
-        {
-            TorcControl* control = qobject_cast<TorcControl*>(it.key());
-            TorcCentral::gStateGraph->append(QString("    \"%1\"->\"%2\"\r\n").arg(userName).arg(control->GetUserName()));
-            connect(this, SIGNAL(ValidChanged(bool)), control, SLOT(InputValidChanged(bool)), Qt::UniqueConnection);
-            connect(this, SIGNAL(ValueChanged(double)), control, SLOT(InputValueChanged(double)), Qt::UniqueConnection);
-        }
-    }
+        QMutexLocker locker(TorcCentral::gStateGraphLock);
 
-    it = m_inputs.begin();
-    for ( ; it != m_inputs.end(); ++it)
-    {
-        QString inputid;
-        if (qobject_cast<TorcControl*>(it.key()))
-            inputid = qobject_cast<TorcControl*>(it.key())->GetUserName();
-        else if (qobject_cast<TorcSensor*>(it.key()))
-            inputid = qobject_cast<TorcSensor*>(it.key())->GetUserName();
+        QMap<QObject*,QString>::iterator it = m_outputs.begin();
+        for ( ; it != m_outputs.end(); ++it)
+        {
+            if (qobject_cast<TorcOutput*>(it.key()))
+            {
+                TorcOutput* output = qobject_cast<TorcOutput*>(it.key());
+                QString source = passthrough ? qobject_cast<TorcSensor*>(m_inputs.firstKey())->GetUserName() : userName;
+                TorcCentral::gStateGraph->append(QString("    \"%1\"->\"%2\"\r\n").arg(source).arg(output->GetUserName()));
+                connect(this, SIGNAL(ValueChanged(double)), output, SLOT(SetValue(double)), Qt::UniqueConnection);
+            }
+            else
+            {
+                TorcControl* control = qobject_cast<TorcControl*>(it.key());
+                TorcCentral::gStateGraph->append(QString("    \"%1\"->\"%2\"\r\n").arg(userName).arg(control->GetUserName()));
+                connect(this, SIGNAL(ValidChanged(bool)), control, SLOT(InputValidChanged(bool)), Qt::UniqueConnection);
+                connect(this, SIGNAL(ValueChanged(double)), control, SLOT(InputValueChanged(double)), Qt::UniqueConnection);
+            }
+        }
 
-        TorcCentral::gStateGraph->append(QString("    \"%1\"->\"%2\"\r\n").arg(inputid).arg(userName));
-        connect(it.key(), SIGNAL(ValidChanged(bool)), this, SLOT(InputValidChanged(bool)), Qt::UniqueConnection);
-        connect(it.key(), SIGNAL(ValueChanged(double)), this, SLOT(InputValueChanged(double)), Qt::UniqueConnection);
-        m_inputValids.insert(it.key(), false);
+        it = m_inputs.begin();
+        for ( ; it != m_inputs.end(); ++it)
+        {
+            QString inputid;
+            if (qobject_cast<TorcControl*>(it.key()))
+                inputid = qobject_cast<TorcControl*>(it.key())->GetUserName();
+            else if (qobject_cast<TorcSensor*>(it.key()))
+                inputid = qobject_cast<TorcSensor*>(it.key())->GetUserName();
+
+            if (!passthrough) // already handled in the outputs above s
+                TorcCentral::gStateGraph->append(QString("    \"%1\"->\"%2\"\r\n").arg(inputid).arg(userName));
+            connect(it.key(), SIGNAL(ValidChanged(bool)), this, SLOT(InputValidChanged(bool)), Qt::UniqueConnection);
+            connect(it.key(), SIGNAL(ValueChanged(double)), this, SLOT(InputValueChanged(double)), Qt::UniqueConnection);
+            m_inputValids.insert(it.key(), false);
+        }
     }
 
     LOG(VB_GENERAL, LOG_INFO, QString("%1: Ready").arg(uniqueId));
     m_validated = true;
-
-    TorcCentral::gStateGraphLock->unlock();
 }
 
 void TorcControl::InputValueChanged(double Value)
