@@ -90,7 +90,7 @@ void TorcHTMLDynamicContent::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHT
 
                 // set cache handling before we check for modification. This ensures the modification check is
                 // performed and the correct cache headers are re-sent with any 304 Not Modified response.
-                Request->SetCache(HTTPCacheLongLife | HTTPCacheLastModified, modified.toString(TorcHTTPRequest::DateFormat));
+                Request->SetCache(HTTPCacheNone, modified.toString(TorcHTTPRequest::DateFormat));
 
                 // Unmodified will handle the response
                 if (Request->Unmodified(modified))
