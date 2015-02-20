@@ -46,15 +46,22 @@ void TorcOutputs::Graph(void)
     QMutexLocker locker(m_lock);
     {
         QMutexLocker locker(TorcCentral::gStateGraphLock);
-        TorcCentral::gStateGraph->append("subgraph cluster_2 {\r\nlabel = \"Outputs\";\r\nstyle=filled;\r\nfillcolor=\"grey95\";\r\n");
+        TorcCentral::gStateGraph->append("    subgraph cluster_2 {\r\n"
+                                         "        label = \"Outputs\";\r\n"
+                                         "        style=filled;\r\n"
+                                         "        fillcolor=\"grey95\";\r\n");
 
         foreach(TorcOutput* output, outputList)
         {
-            QString id = output->GetUserName().isEmpty() ? output->GetUniqueId() : output->GetUserName();
-            TorcCentral::gStateGraph->append(QString("    \"" + id + "\" [URL=\"%1Help\"];\r\n").arg(output->Signature()));
+            QString id    = output->GetUniqueId();
+            QString label = output->GetUserName();
+            if (label.isEmpty())
+                label = id;
+            TorcCentral::gStateGraph->append(QString("        \"" + id + "\" [lable=\"%1\" URL=\"%2Help\"];\r\n")
+                                             .arg(label).arg(output->Signature()));
         }
 
-        TorcCentral::gStateGraph->append("}\r\n");
+        TorcCentral::gStateGraph->append("    }\r\n\r\n");
     }
 }
 

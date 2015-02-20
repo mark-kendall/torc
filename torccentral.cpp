@@ -55,7 +55,9 @@ TorcCentral::TorcCentral()
     {
         QMutexLocker locker(gStateGraphLock);
         gStateGraph->clear();
-        gStateGraph->append("strict digraph G {\r\n    rankdir=\"LR\";\r\n    node [shape=rect];\r\n");
+        gStateGraph->append("strict digraph G {\r\n"
+                            "    rankdir=\"LR\";\r\n"
+                            "    node [shape=rect];\r\n");
 
         if (QFile::exists(graphdot))
             QFile::remove(graphdot);
@@ -97,7 +99,10 @@ TorcCentral::TorcCentral()
         // complete the state graph
         {
             QMutexLocker locker(gStateGraphLock);
-            gStateGraph->append(QString("\r\n    label=\"%1\";\r\nlabelloc=\"t\";\r\nURL=\"/\";\r\n}\r\n").arg(QCoreApplication::applicationName()));
+            gStateGraph->append(QString("    label=\"%1\";\r\n"
+                                        "    labelloc=\"t\";\r\n"
+                                        "    URL=\"/\";\r\n"
+                                        "}\r\n").arg(QCoreApplication::applicationName()));
 
             QFile file(graphdot);
             if (file.open(QIODevice::ReadWrite))

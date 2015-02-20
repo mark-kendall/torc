@@ -66,15 +66,22 @@ void TorcSensors::Graph(void)
     QMutexLocker locker(m_lock);
     {
         QMutexLocker locker(TorcCentral::gStateGraphLock);
-        TorcCentral::gStateGraph->append("subgraph cluster_0 {\r\nlabel = \"Sensors\";\r\nstyle=filled;\r\nfillcolor = \"grey95\";");
+        TorcCentral::gStateGraph->append("    subgraph cluster_0 {\r\n"
+                                         "        label = \"Sensors\";\r\n"
+                                         "        style=filled;\r\n"
+                                         "        fillcolor = \"grey95\";\r\n");
 
         foreach(TorcSensor *sensor, sensorList)
         {
-            QString id = sensor->GetUserName().isEmpty() ? sensor->GetUniqueId() : sensor->GetUserName();
-            TorcCentral::gStateGraph->append(QString("    \"" + id + "\" [URL=\"%1Help\"];\r\n").arg(sensor->Signature()));
+            QString id    = sensor->GetUniqueId();
+            QString label = sensor->GetUserName();
+            if (label.isEmpty())
+                label = id;
+            TorcCentral::gStateGraph->append(QString("        \"" + id + "\" [label=\"%1\" URL=\"%2Help\"];\r\n")
+                                             .arg(label).arg(sensor->Signature()));
         }
 
-        TorcCentral::gStateGraph->append("}\r\n");
+        TorcCentral::gStateGraph->append("    }\r\n\r\n");
     }
 }
 

@@ -159,20 +159,23 @@ void TorcControl::Validate(void)
     {
         QMutexLocker locker(TorcCentral::gStateGraphLock);
 
+        if (!passthrough)
+            TorcCentral::gStateGraph->append(QString("    \"%1\" [label=\"%2\"").arg(uniqueId).arg(userName));
+
         QMap<QObject*,QString>::iterator it = m_outputs.begin();
         for ( ; it != m_outputs.end(); ++it)
         {
             if (qobject_cast<TorcOutput*>(it.key()))
             {
                 TorcOutput* output = qobject_cast<TorcOutput*>(it.key());
-                QString source = passthrough ? qobject_cast<TorcSensor*>(m_inputs.firstKey())->GetUserName() : userName;
-                TorcCentral::gStateGraph->append(QString("    \"%1\"->\"%2\"\r\n").arg(source).arg(output->GetUserName()));
+                QString source = passthrough ? qobject_cast<TorcSensor*>(m_inputs.firstKey())->GetUniqueId() : uniqueId;
+                TorcCentral::gStateGraph->append(QString("    \"%1\"->\"%2\"\r\n").arg(source).arg(output->GetUniqueId()));
                 connect(this, SIGNAL(ValueChanged(double)), output, SLOT(SetValue(double)), Qt::UniqueConnection);
             }
             else
             {
                 TorcControl* control = qobject_cast<TorcControl*>(it.key());
-                TorcCentral::gStateGraph->append(QString("    \"%1\"->\"%2\"\r\n").arg(userName).arg(control->GetUserName()));
+                TorcCentral::gStateGraph->append(QString("    \"%1\"->\"%2\"\r\n").arg(uniqueId).arg(control->GetUniqueId()));
                 connect(this, SIGNAL(ValidChanged(bool)), control, SLOT(InputValidChanged(bool)), Qt::UniqueConnection);
                 connect(this, SIGNAL(ValueChanged(double)), control, SLOT(InputValueChanged(double)), Qt::UniqueConnection);
             }
@@ -183,12 +186,12 @@ void TorcControl::Validate(void)
         {
             QString inputid;
             if (qobject_cast<TorcControl*>(it.key()))
-                inputid = qobject_cast<TorcControl*>(it.key())->GetUserName();
+                inputid = qobject_cast<TorcControl*>(it.key())->GetUniqueId();
             else if (qobject_cast<TorcSensor*>(it.key()))
-                inputid = qobject_cast<TorcSensor*>(it.key())->GetUserName();
+                inputid = qobject_cast<TorcSensor*>(it.key())->GetUniqueId();
 
             if (!passthrough) // already handled in the outputs above s
-                TorcCentral::gStateGraph->append(QString("    \"%1\"->\"%2\"\r\n").arg(inputid).arg(userName));
+                TorcCentral::gStateGraph->append(QString("    \"%1\"->\"%2\"\r\n").arg(inputid).arg(uniqueId));
             connect(it.key(), SIGNAL(ValidChanged(bool)), this, SLOT(InputValidChanged(bool)), Qt::UniqueConnection);
             connect(it.key(), SIGNAL(ValueChanged(double)), this, SLOT(InputValueChanged(double)), Qt::UniqueConnection);
             m_inputValids.insert(it.key(), false);
