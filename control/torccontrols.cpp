@@ -167,17 +167,6 @@ void TorcControls::Validate(void)
 
 void TorcControls::Graph(void)
 {
-    QMutexLocker locker(m_lock);
-    {
-        QMutexLocker locker(TorcCentral::gStateGraphLock);
-        TorcCentral::gStateGraph->append("subgraph cluster_1 {\r\nlabel = \"Controls\";\r\nstyle=filled;\r\nfillcolor=\"grey80\";\r\n");
-
-        foreach(TorcControl* control, m_controls)
-        {
-            QString id = control->GetUserName().isEmpty() ? control->GetUniqueId() : control->GetUserName();
-            TorcCentral::gStateGraph->append("    \"" + id + "\";\r\n");
-        } 
-
-        TorcCentral::gStateGraph->append("}\r\n");
-    }
+    // currently unused as not adding a control cluster helps dot draw the graph and hides
+    // 'passthrough' controls
 }
