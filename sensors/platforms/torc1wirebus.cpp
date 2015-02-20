@@ -30,6 +30,8 @@
 #include "torc1wirebus.h"
 #include "torc1wireds18b20.h"
 
+Torc1WireBus* Torc1WireBus::gTorc1WireBus = new Torc1WireBus();
+
 /*! \class Torc1WireBus
  *  \brief A class to handle the one wire files system (OWFS) for 1Wire devices.
  *
@@ -81,7 +83,7 @@ void Torc1WireBus::Create(const QVariantMap &Details)
         if (!it.key().startsWith("28-"))
             continue;
 
-        QString uniqueid = "1Wire" + it.key();
+        QString uniqueid = "1Wire_" + it.key();
 
         // check for uniqueid
         if (!TorcDevice::UniqueIdAvailable(uniqueid))
@@ -93,7 +95,7 @@ void Torc1WireBus::Create(const QVariantMap &Details)
 
         LOG(VB_GENERAL, LOG_INFO, QString("New 1Wire %1 digital thermometer: %2")
             .arg(DS18B20NAME).arg(uniqueid));
-        m_sensors.insert(uniqueid, new Torc1WireDS18B20(uniqueid, ONE_WIRE_DIRECTORY + it.key()));
+        m_sensors.insert(uniqueid, new Torc1WireDS18B20(uniqueid, it.key()));
     }
 }
 
