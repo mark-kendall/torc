@@ -97,7 +97,7 @@ TorcCentral::TorcCentral()
         // complete the state graph
         {
             QMutexLocker locker(gStateGraphLock);
-            gStateGraph->append("\r\n}\r\n");
+            gStateGraph->append(QString("\r\n    label=\"%1\";\r\nlabelloc=\"t\";\r\nURL=\"/\";\r\n}\r\n").arg(QCoreApplication::applicationName()));
 
             QFile file(graphdot);
             if (file.open(QIODevice::ReadWrite))
