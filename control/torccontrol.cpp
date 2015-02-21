@@ -155,6 +155,34 @@ void TorcControl::Validate(void)
             passthrough = false;
     }
 
+    // sanity check number of inputs for operation type
+    if (m_operation == TorcControl::Equal ||
+        m_operation == TorcControl::LessThan ||
+        m_operation == TorcControl::LessThanOrEqual ||
+        m_operation == TorcControl::GreaterThan ||
+        m_operation == TorcControl::GreaterThanOrEqual)
+    {
+        // can have only one input to compare against
+        if (m_inputs.size() > 1)
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("%1 has %2 inputs for operation '%3' (can have only 1) - ignoring.")
+                .arg(uniqueId).arg(m_inputs.size()).arg(OperationToString(m_operation)));
+            return;
+        }
+    }
+    else if (m_operation == TorcControl::Any ||
+             m_operation == TorcControl::All)
+    {
+        // ANY and ALL imply multiple inputs. Technically they will operate fine with just one
+        // but fail and warn - the user needs to know as their config may not be correct
+        if (m_inputs.size() < 2)
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("%1 has %2 inputs for operation '%3' (needs at least 2) - ignoring.")
+                .arg(uniqueId).arg(m_inputs.size()).arg(OperationToString(m_operation)));
+            return;
+        }
+    }
+
     // if we get this far, everything is validated and we can 'join the dots'
     {
         QMutexLocker locker(TorcCentral::gStateGraphLock);
