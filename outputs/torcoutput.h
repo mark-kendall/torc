@@ -41,6 +41,9 @@ class TorcOutput : public TorcDevice, public TorcHTTPService
 
     virtual TorcOutput::Type GetType (void) = 0;
 
+    bool             HasOwner               (void);
+    void             SetOwner               (QObject *Owner);
+
   public slots:
     // TorcHTTPService
     void             SubscriberDeleted         (QObject *Subscriber);
@@ -59,6 +62,9 @@ class TorcOutput : public TorcDevice, public TorcHTTPService
     void             ValueChanged           (double Value);
     void             UserNameChanged        (const QString &Name);
     void             UserDescriptionChanged (const QString &Description);
+
+  private:
+    QObject         *m_owner;
 };
 
 #endif // TORCOUTPUT_H

@@ -148,6 +148,14 @@ void TorcControl::Validate(void)
             return;
         }
 
+        // if TorcOutput, does it already have an owner
+        TorcOutput* out = qobject_cast<TorcOutput*>(object);
+        if (out && out->HasOwner())
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Output '%1' (for control '%2') already has an owner").arg(out->GetUniqueId()));
+            return;
+        }
+
         m_outputs.insert(object, output);
 
         // check for passthrough
@@ -196,10 +204,10 @@ void TorcControl::Validate(void)
             if (qobject_cast<TorcOutput*>(it.key()))
             {
                 TorcOutput* output = qobject_cast<TorcOutput*>(it.key());
+                (void)output->SetOwner(this);
                 QString source = passthrough ? qobject_cast<TorcSensor*>(m_inputs.firstKey())->GetUniqueId() : uniqueId;
                 TorcCentral::gStateGraph->append(QString("    \"%1\"->\"%2\"\r\n").arg(source).arg(output->GetUniqueId()));
                 connect(this, SIGNAL(ValueChanged(double)), output, SLOT(SetValue(double)), Qt::UniqueConnection);
-                output->DisableMethod("SetValue");
             }
             else
             {

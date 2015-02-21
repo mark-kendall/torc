@@ -47,9 +47,24 @@ TorcOutput::Type TorcOutput::StringToType(const QString &Type)
 
 TorcOutput::TorcOutput(TorcOutput::Type Type, double Value, const QString &ModelId, const QString &UniqueId)
   : TorcDevice(true, Value, Value, ModelId, UniqueId),
-    TorcHTTPService(this, OUTPUTS_DIRECTORY + "/" + TypeToString(Type) + "/" + UniqueId, UniqueId, TorcOutput::staticMetaObject, BLACKLIST)
+    TorcHTTPService(this, OUTPUTS_DIRECTORY + "/" + TypeToString(Type) + "/" + UniqueId, UniqueId, TorcOutput::staticMetaObject, BLACKLIST),
+    m_owner(NULL)
 {
     TorcOutputs::gOutputs->AddOutput(this);
+}
+
+bool TorcOutput::HasOwner(void)
+{
+    QMutexLocker locker(lock);
+    return m_owner != NULL;
+}
+
+void TorcOutput::SetOwner(QObject *Owner)
+{
+    QMutexLocker locker(lock);
+
+    m_owner = Owner;
+    DisableMethod("SetValue");
 }
 
 void TorcOutput::SubscriberDeleted(QObject *Subscriber)
