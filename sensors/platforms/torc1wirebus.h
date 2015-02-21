@@ -6,6 +6,7 @@
 #include <QObject>
 
 // Torc
+#include "torcsensor.h"
 #include "torccentral.h"
 
 #define ONE_WIRE_DIRECTORY QString("/sys/bus/w1/devices/")

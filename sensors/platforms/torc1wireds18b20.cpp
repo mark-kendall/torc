@@ -26,7 +26,7 @@
 
 // Torc
 #include "torclogging.h"
-#include "torc1wiremonitor.h"
+#include "torc1wirebus.h"
 #include "torc1wireds18b20.h"
 
 Torc1WireReadThread::Torc1WireReadThread(Torc1WireDS18B20 *Parent, const QString &Filename)
