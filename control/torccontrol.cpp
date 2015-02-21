@@ -199,6 +199,7 @@ void TorcControl::Validate(void)
                 QString source = passthrough ? qobject_cast<TorcSensor*>(m_inputs.firstKey())->GetUniqueId() : uniqueId;
                 TorcCentral::gStateGraph->append(QString("    \"%1\"->\"%2\"\r\n").arg(source).arg(output->GetUniqueId()));
                 connect(this, SIGNAL(ValueChanged(double)), output, SLOT(SetValue(double)), Qt::UniqueConnection);
+                output->DisableMethod("SetValue");
             }
             else
             {

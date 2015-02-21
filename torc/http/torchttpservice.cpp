@@ -215,6 +215,13 @@ class MethodParameters
         return false;
     }
 
+    /*! \brief Disable this method
+    */
+    void Disable(void)
+    {
+        m_allowedRequestTypes |= HTTPDisabled;
+    }
+
     bool                m_valid;
     int                 m_index;
     QVector<QByteArray> m_names;
@@ -403,7 +410,8 @@ void TorcHTTPService::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTTPConne
     if (it != m_methods.end())
     {
         // filter out invalid request types
-        if (!(type & (*it)->m_allowedRequestTypes))
+        if ((!(type & (*it)->m_allowedRequestTypes)) ||
+            (*it)->m_allowedRequestTypes & HTTPDisabled)
         {
             Request->SetStatus(HTTP_BadRequest);
             Request->SetResponseType(HTTPResponseDefault);
@@ -462,62 +470,66 @@ QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVarian
         QMap<QString,MethodParameters*>::iterator it = m_methods.find(method);
         if (it != m_methods.end())
         {
-            // invoke it
+            // ignore disabled methods
+            if (!(it.value()->m_allowedRequestTypes & HTTPDisabled))
+            {
+                // invoke it
 
-            // convert the parameters
-            QMap<QString,QString> params;
-            if (Parameters.type() == QVariant::Map)
-            {
-                QVariantMap map = Parameters.toMap();
-                QVariantMap::iterator it = map.begin();
-                for ( ; it != map.end(); ++it)
-                    params.insert(it.key(), it.value().toString());
-            }
-            else if (Parameters.type() == QVariant::List)
-            {
-                QVariantList list = Parameters.toList();
-                if (list.size() <= (*it)->m_names.size())
+                // convert the parameters
+                QMap<QString,QString> params;
+                if (Parameters.type() == QVariant::Map)
                 {
-                    for (int i = 0; i < list.size(); ++i)
-                        params.insert((*it)->m_names[i], list[i].toString());
+                    QVariantMap map = Parameters.toMap();
+                    QVariantMap::iterator it = map.begin();
+                    for ( ; it != map.end(); ++it)
+                        params.insert(it.key(), it.value().toString());
                 }
-                else
+                else if (Parameters.type() == QVariant::List)
                 {
-                    LOG(VB_GENERAL, LOG_ERR, "Too many parameters");
+                    QVariantList list = Parameters.toList();
+                    if (list.size() <= (*it)->m_names.size())
+                    {
+                        for (int i = 0; i < list.size(); ++i)
+                            params.insert((*it)->m_names[i], list[i].toString());
+                    }
+                    else
+                    {
+                        LOG(VB_GENERAL, LOG_ERR, "Too many parameters");
+                    }
                 }
-            }
-            else if (!Parameters.isNull())
-            {
-                LOG(VB_GENERAL, LOG_ERR, "Unknown parameter variant");
-            }
-
-            QString type;
-            bool    voidresult;
-            QVariant results = (*it)->Invoke(m_parent, params, type, voidresult);
-
-            // check result
-            if (!voidresult)
-            {
-                // check for invocation errors
-                if (results.type() != QVariant::Invalid)
+                else if (!Parameters.isNull())
                 {
+                    LOG(VB_GENERAL, LOG_ERR, "Unknown parameter variant");
+                }
+
+                QString type;
+                bool    voidresult;
+                QVariant results = (*it)->Invoke(m_parent, params, type, voidresult);
+
+                // check result
+                if (!voidresult)
+                {
+                    // check for invocation errors
+                    if (results.type() != QVariant::Invalid)
+                    {
+                        QVariantMap result;
+                        result.insert("result", results);
+                        return result;
+                    }
+
                     QVariantMap result;
-                    result.insert("result", results);
+                    QVariantMap error;
+                    error.insert("code", -32602);
+                    error.insert("message", "Invalid params");
+                    result.insert("error", error);
                     return result;
                 }
 
+                // JSON-RPC 2.0 specification makes no mention of void/null return types
                 QVariantMap result;
-                QVariantMap error;
-                error.insert("code", -32602);
-                error.insert("message", "Invalid params");
-                result.insert("error", error);
+                result.insert("result", "null");
                 return result;
             }
-
-            // JSON-RPC 2.0 specification makes no mention of void/null return types
-            QVariantMap result;
-            result.insert("result", "null");
-            return result;
         }
 
         // implicit 'GetServiceVersion' method
@@ -711,6 +723,25 @@ QVariant TorcHTTPService::GetProperty(int Index)
     return result;
 }
 
+/*! \brief Disable the given method.
+ *
+ * This is used to dynamically disable a 'setter' when an internal object has taken control
+ * of the service.
+*/
+void TorcHTTPService::DisableMethod(const QString &Method)
+{
+    QMap<QString,MethodParameters*>::iterator it = m_methods.find(Method);
+    if (it != m_methods.end())
+    {
+        it.value()->Disable();
+        LOG(VB_GENERAL, LOG_INFO, QString("Disabled method '%1' for service '%2'").arg(Method).arg(m_name));
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_INFO, QString("Unable to disable unknown method '%1' for service '%2'").arg(Method).arg(m_name));
+    }
+}
+
 void TorcHTTPService::HandleSubscriberDeleted(QObject *Subscriber)
 {
     QMutexLocker locker(m_subscriberLock);
@@ -745,6 +776,11 @@ void TorcHTTPService::UserHelp(TorcHTTPRequest *Request, TorcHTTPConnection *Con
     for ( ; it != m_methods.end(); ++it)
     {
         MethodParameters *params = it.value();
+
+        // ignore disabled methods
+        if (params->m_allowedRequestTypes & HTTPDisabled)
+            continue;
+
         int size = params->m_types.size();
         if (size > count)
         {

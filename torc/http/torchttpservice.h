@@ -30,6 +30,7 @@ class TorcHTTPService : public TorcHTTPHandler
     QVariantMap  ProcessRequest           (const QString &Method, const QVariant &Parameters, QObject *Connection);
     QString      GetMethod                (int Index);
     QVariant     GetProperty              (int Index);
+    void         DisableMethod            (const QString &Method);
 
     virtual QString GetUIName             (void);
 
