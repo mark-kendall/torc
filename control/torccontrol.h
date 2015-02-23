@@ -31,7 +31,8 @@ class TorcControl : public TorcDevice
         LessThanOrEqual,
         GreaterThanOrEqual,
         Any,
-        All
+        All,
+        Average
     };
 
     static TorcControl::Operation StringToOperation (const QString &Operation);

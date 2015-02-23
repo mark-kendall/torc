@@ -38,6 +38,7 @@ TorcControl::Operation TorcControl::StringToOperation(const QString &Operation)
     if ("GREATERTHANOREQUAL" == operation) return TorcControl::GreaterThanOrEqual;
     if ("ANY" == operation)                return TorcControl::Any;
     if ("ALL" == operation)                return TorcControl::All;
+    if ("AVERAGE" == operation)            return TorcControl::Average;
 
     return TorcControl::None;
 }
@@ -53,6 +54,7 @@ QString TorcControl::OperationToString(TorcControl::Operation Operation)
         case TorcControl::GreaterThanOrEqual: return QString("GreaterThanOrEqual");
         case TorcControl::Any:                return QString("Any");
         case TorcControl::All:                return QString("All");
+        case TorcControl::Average:            return QString("Average");
         case TorcControl::None:
         default: break;
     }
@@ -179,9 +181,10 @@ void TorcControl::Validate(void)
         }
     }
     else if (m_operation == TorcControl::Any ||
-             m_operation == TorcControl::All)
+             m_operation == TorcControl::All ||
+             m_operation == TorcControl::Average)
     {
-        // ANY and ALL imply multiple inputs. Technically they will operate fine with just one
+        // ANY, ALL and AVERAGE imply multiple inputs. Technically they will operate fine with just one
         // but fail and warn - the user needs to know as their config may not be correct
         if (m_inputs.size() < 2)
         {
@@ -331,6 +334,15 @@ void TorcControl::CheckInputValues(void)
                 foreach (double next, m_inputValues)
                     on |= !qFuzzyCompare(next + 1.0, 1.0);
                 newvalue = on ? 1 : 0;
+            }
+            break;
+        case TorcControl::Average:
+            {
+                // does exactly what is says on the tin
+                double average = 0;
+                foreach (double next, m_inputValues)
+                    average += next;
+                newvalue = average / m_inputValues.size();
             }
             break;
     }
