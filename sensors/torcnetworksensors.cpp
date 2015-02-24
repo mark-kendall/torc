@@ -45,53 +45,60 @@ void TorcNetworkSensors::Create(const QVariantMap &Details)
     if (!Details.contains(NETWORK_SENSORS_STRING))
         return;
 
-    QVariantMap details = Details.value(NETWORK_SENSORS_STRING).toMap();
-    QVariantMap::const_iterator it = details.begin();
-    for ( ; it != details.end(); ++it)
+    QVariantMap::const_iterator i = Details.begin();
+    for ( ; i != Details.end(); ++i)
     {
-        // iterate over known types
-        for (int type = TorcSensor::Unknown; type != TorcSensor::MaxType; type++)
+        if (i.key() != NETWORK_SENSORS_STRING)
+            continue;
+
+        QVariantMap details = i.value().toMap();
+        QVariantMap::const_iterator it = details.begin();
+        for ( ; it != details.end(); ++it)
         {
-            if (it.key() == TorcSensor::TypeToString(static_cast<TorcSensor::Type>(type)))
+            // iterate over known types
+            for (int type = TorcSensor::Unknown; type != TorcSensor::MaxType; type++)
             {
-                QVariantMap sensors = it.value().toMap();
-                QVariantMap::iterator it2 = sensors.begin();
-                for ( ; it2 != sensors.end(); ++it2)
+                if (it.key() == TorcSensor::TypeToString(static_cast<TorcSensor::Type>(type)))
                 {
-                    QString uniqueid = NETWORK_SENSORS_STRING + "_" + it.key() + "_" + it2.key();
-
-                    if (!TorcDevice::UniqueIdAvailable(uniqueid))
+                    QVariantMap sensors = it.value().toMap();
+                    QVariantMap::iterator it2 = sensors.begin();
+                    for ( ; it2 != sensors.end(); ++it2)
                     {
-                        LOG(VB_GENERAL, LOG_WARNING, QString("Already have network sensor named '%1'").arg(uniqueid));
-                        continue;
-                    }
+                        QString uniqueid = NETWORK_SENSORS_STRING + "_" + it.key() + "_" + it2.key();
 
-                    QVariantMap sensor   = it2.value().toMap();
-                    QString defaultvalue = sensor.value("default").toString();
-                    QString username     = sensor.value("userName").toString();
-                    QString userdesc     = sensor.value("userDescription").toString();
-                    bool ok = false;
-                    double defaultdouble = defaultvalue.toInt(&ok);
-                    if (!ok)
-                        defaultdouble = 0.0;
+                        if (!TorcDevice::UniqueIdAvailable(uniqueid))
+                        {
+                            LOG(VB_GENERAL, LOG_WARNING, QString("Already have network sensor named '%1'").arg(uniqueid));
+                            continue;
+                        }
 
-                    TorcSensor* newsensor = NULL;
-                    switch (type)
-                    {
-                        case TorcSensor::PWM:
-                            newsensor = new TorcNetworkPWMSensor(defaultdouble, uniqueid);
-                            break;
-                        case TorcSensor::Switch:
-                            newsensor = new TorcNetworkSwitchSensor(defaultdouble, uniqueid);
-                            break;
-                        default: break;
-                    }
+                        QVariantMap sensor   = it2.value().toMap();
+                        QString defaultvalue = sensor.value("default").toString();
+                        QString username     = sensor.value("userName").toString();
+                        QString userdesc     = sensor.value("userDescription").toString();
+                        bool ok = false;
+                        double defaultdouble = defaultvalue.toInt(&ok);
+                        if (!ok)
+                            defaultdouble = 0.0;
 
-                    if (newsensor)
-                    {
-                        newsensor->SetUserName(username);
-                        newsensor->SetUserDescription(userdesc);
-                        m_sensors.insert(uniqueid, newsensor);
+                        TorcSensor* newsensor = NULL;
+                        switch (type)
+                        {
+                            case TorcSensor::PWM:
+                                newsensor = new TorcNetworkPWMSensor(defaultdouble, uniqueid);
+                                break;
+                            case TorcSensor::Switch:
+                                newsensor = new TorcNetworkSwitchSensor(defaultdouble, uniqueid);
+                                break;
+                            default: break;
+                        }
+
+                        if (newsensor)
+                        {
+                            newsensor->SetUserName(username);
+                            newsensor->SetUserDescription(userdesc);
+                            m_sensors.insert(uniqueid, newsensor);
+                        }
                     }
                 }
             }
