@@ -64,9 +64,6 @@ void Torc1WireBus::Create(const QVariantMap &Details)
 {
     QMutexLocker locker(m_lock);
 
-    if (!Details.contains("1Wire"))
-        return;
-
     // check for the correct directory
     QDir dir(ONE_WIRE_DIRECTORY);
     if (!dir.exists(ONE_WIRE_DIRECTORY))
@@ -75,27 +72,34 @@ void Torc1WireBus::Create(const QVariantMap &Details)
         return;
     }
 
-    QVariantMap wire1 = Details.value("1Wire").toMap();
-    QVariantMap::iterator it = wire1.begin();
-    for ( ; it != wire1.end(); ++it)
+    QVariantMap::const_iterator i = Details.constBegin();
+    for ( ; i != Details.constEnd(); i++)
     {
-        // TODO move this to a device factory like the I2C bus
-        if (!it.key().startsWith("28-"))
+        if (i.key() != "1Wire")
             continue;
 
-        QString uniqueid = "1Wire_" + it.key();
-
-        // check for uniqueid
-        if (!TorcDevice::UniqueIdAvailable(uniqueid))
+        QVariantMap wire1 = i.value().toMap();
+        QVariantMap::iterator it = wire1.begin();
+        for ( ; it != wire1.end(); ++it)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Device id '%1' already in use - ignoring").arg(uniqueid));
-            continue;
+            // TODO move this to a device factory like the I2C bus
+            if (!it.key().startsWith("28-"))
+                continue;
+
+            QString uniqueid = "1Wire_" + it.key();
+
+            // check for uniqueid
+            if (!TorcDevice::UniqueIdAvailable(uniqueid))
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("Device id '%1' already in use - ignoring").arg(uniqueid));
+                continue;
+            }
+
+
+            LOG(VB_GENERAL, LOG_INFO, QString("New 1Wire %1 digital thermometer: %2")
+                .arg(DS18B20NAME).arg(uniqueid));
+            m_sensors.insert(uniqueid, new Torc1WireDS18B20(uniqueid, it.key()));
         }
-
-
-        LOG(VB_GENERAL, LOG_INFO, QString("New 1Wire %1 digital thermometer: %2")
-            .arg(DS18B20NAME).arg(uniqueid));
-        m_sensors.insert(uniqueid, new Torc1WireDS18B20(uniqueid, it.key()));
     }
 }
 
