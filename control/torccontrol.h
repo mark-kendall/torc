@@ -35,11 +35,21 @@ class TorcControl : public TorcDevice
         Average
     };
 
+    enum Type
+    {
+        UnknownType,
+        Logic,
+        Timer,
+        Transition
+    };
+
     static TorcControl::Operation StringToOperation (const QString &Operation, bool *Ok);
     static QString                OperationToString (TorcControl::Operation Operation);
+    static TorcControl::Type      StringToType      (const QString &Type);
+    static QString                TypeToString      (TorcControl::Type Type);
 
   protected:
-    TorcControl(const QString &UniqueId, const QVariantMap &Details);
+    TorcControl(TorcControl::Type Type, const QString &UniqueId, const QVariantMap &Details);
     virtual ~TorcControl();
 
   public:
@@ -72,6 +82,7 @@ class TorcControl : public TorcDevice
     void                   CalculateOutput        (void);
 
   private:
+    TorcControl::Type      m_type;
     bool                   m_parsed;
     bool                   m_validated;
     QStringList            m_inputList;

@@ -49,12 +49,12 @@ void TorcControls::Create(const QVariantMap &Details)
         QVariantMap::iterator it2 = control.begin();
         for ( ; it2 != control.end(); ++it2)
         {
-            QString type = it2.key().trimmed().toUpper();
+            TorcControl::Type type = TorcControl::StringToType(it2.key());
 
             // logic, timer or transition
-            if (type != "LOGIC" && type != "TIMER" && type != "TRANSITION")
+            if (type == TorcControl::UnknownType)
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("Unknown control type '%1'").arg(type));
+                LOG(VB_GENERAL, LOG_ERR, QString("Unknown control type '%1'").arg(it2.key()));
                 continue;
             }
 
@@ -62,7 +62,7 @@ void TorcControls::Create(const QVariantMap &Details)
             QVariantMap::iterator it3 = controls.begin();
             for ( ; it3 != controls.end(); ++it3)
             {
-                QString id = QString("control_%1_%2").arg(it2.key()).arg(it3.key());
+                QString id = QString("control_%1_%2").arg(TorcControl::TypeToString(type)).arg(it3.key());
 
                 if (!TorcDevice::UniqueIdAvailable(id))
                 {
@@ -71,7 +71,7 @@ void TorcControls::Create(const QVariantMap &Details)
                 }
 
                 QVariantMap details = it3.value().toMap();
-                TorcControl* control = new TorcControl(id, details);
+                TorcControl* control = new TorcControl(type, id, details);
                 m_controls.insert(id, control);
             }
         }

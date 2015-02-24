@@ -67,14 +67,39 @@ QString TorcControl::OperationToString(TorcControl::Operation Operation)
     return QString("None");
 }
 
+TorcControl::Type TorcControl::StringToType(const QString &Type)
+{
+    QString type = Type.trimmed().toUpper();
+
+    if (type == "LOGIC")      return TorcControl::Logic;
+    if (type == "TIMER")      return TorcControl::Timer;
+    if (type == "TRANSITION") return TorcControl::Transition;
+
+    return TorcControl::UnknownType;
+}
+
+QString TorcControl::TypeToString(TorcControl::Type Type)
+{
+    switch (Type)
+    {
+        case TorcControl::Logic:      return QString("Logic");
+        case TorcControl::Timer:      return QString("Timer");
+        case TorcControl::Transition: return QString("Transition");
+        default: break;
+    }
+
+    return QString("Unknown");
+}
+
 /*! \class TorcControl
  *
  * The control is 'valid' if all of its inputs are present, valid and have a known value.
  * It can then determine an output value.
  * If 'invalid' the output will be set to the default.
 */
-TorcControl::TorcControl(const QString &UniqueId, const QVariantMap &Details)
+TorcControl::TorcControl(TorcControl::Type Type, const QString &UniqueId, const QVariantMap &Details)
   : TorcDevice(false, 0, 0, QString("Control"), UniqueId),
+    m_type(Type),
     m_parsed(false),
     m_validated(false),
     m_inputList(),
