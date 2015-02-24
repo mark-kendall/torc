@@ -61,9 +61,13 @@ void TorcPiGPIO::Create(const QVariantMap &GPIO)
         }
     }
 
-    if (GPIO.contains("GPIO"))
+    QVariantMap::const_iterator i = GPIO.constBegin();
+    for ( ; i != GPIO.constEnd(); i++)
     {
-        QVariantMap gpio = GPIO.value("GPIO").toMap();
+        if (i.key() != "GPIO")
+            continue;
+
+        QVariantMap gpio = i.value().toMap();
         QVariantMap::const_iterator it = gpio.begin();
         for ( ; it != gpio.end(); ++it)
         {
