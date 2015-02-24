@@ -69,9 +69,13 @@ void TorcI2CBus::Create(const QVariantMap &Details)
 {
     QMutexLocker locker(m_lock);
 
-    if (Details.contains("I2C"))
+    QVariantMap::const_iterator i = Details.constBegin();
+    for ( ; i != Details.constEnd(); i++)
     {
-        QVariantMap i2c = Details.value("I2C").toMap();
+        if (i.key() != "I2C")
+            continue;
+
+        QVariantMap i2c = i.value().toMap();
         QVariantMap::iterator it = i2c.begin();
         for ( ; it != i2c.end(); ++it)
         {
