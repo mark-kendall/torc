@@ -40,12 +40,12 @@ TorcControl::Operation TorcControl::StringToOperation(const QString &Operation, 
     if ("ANY" == operation)                return TorcControl::Any;
     if ("ALL" == operation)                return TorcControl::All;
     if ("AVERAGE" == operation)            return TorcControl::Average;
-    if ("NONE" == operation)               return TorcControl::None;
-    if ("" == operation)                   return TorcControl::None;
+    if ("NONE" == operation)               return TorcControl::NoOperation;
+    if ("" == operation)                   return TorcControl::NoOperation;
 
     // fail for anything that isn't explicitly a known operation
     *Ok = false;
-    return TorcControl::None;
+    return TorcControl::NoOperation;
 }
 
 QString TorcControl::OperationToString(TorcControl::Operation Operation)
@@ -60,7 +60,7 @@ QString TorcControl::OperationToString(TorcControl::Operation Operation)
         case TorcControl::Any:                return QString("Any");
         case TorcControl::All:                return QString("All");
         case TorcControl::Average:            return QString("Average");
-        case TorcControl::None:
+        case TorcControl::NoOperation:
         default: break;
     }
 
@@ -79,7 +79,7 @@ TorcControl::TorcControl(const QString &UniqueId, const QVariantMap &Details)
     m_validated(false),
     m_inputList(),
     m_outputList(),
-    m_operation(TorcControl::None),
+    m_operation(TorcControl::NoOperation),
     m_operationValue(0),
     m_allInputsValid(false)
 {
@@ -145,7 +145,7 @@ TorcControl::~TorcControl()
 /*! \fn Validate
  *
  * If the control has one single sensor input (NOT another control), one or more outputs (NOT controls) and
- * the operation is a straight pass through (Operation::None), then we do not present the control in the stategraph.
+ * the operation is a straight pass through (Operation::NoOperation), then we do not present the control in the stategraph.
  * This makes the graph clearer but the control is still required as Outputs have no understanding of invalid
  * sensor outputs.
  *
@@ -164,7 +164,7 @@ bool TorcControl::Validate(void)
     if (m_validated)
         return true;
 
-    bool passthrough = (m_operation == TorcControl::None) && (m_inputList.size() == 1);
+    bool passthrough = (m_operation == TorcControl::NoOperation) && (m_inputList.size() == 1);
 
     // we need one or more inputs for a regular control
     if (m_inputList.isEmpty())
@@ -350,7 +350,7 @@ void TorcControl::CheckInputValues(void)
     double newvalue = value; // no change by default
     switch (m_operation)
     {
-        case TorcControl::None:
+        case TorcControl::NoOperation:
             if (m_inputs.size() == 1)
             {
                 // must be a single input just passed through to output(s)

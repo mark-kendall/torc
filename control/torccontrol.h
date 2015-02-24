@@ -24,7 +24,7 @@ class TorcControl : public TorcDevice
   public:
     enum Operation
     {
-        None,
+        NoOperation,
         Equal,
         LessThan,
         GreaterThan,
