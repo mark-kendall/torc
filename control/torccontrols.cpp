@@ -42,107 +42,38 @@ void TorcControls::Create(const QVariantMap &Details)
     QVariantMap::const_iterator it = Details.constBegin();
     for( ; it != Details.constEnd(); ++it)
     {
-        if (it.key() != "controls")
+        if (it.key() != "control")
             continue;
 
-        QVariantMap controls      = it.value().toMap();
-        QVariantMap::iterator it2 = controls.begin();
-        for ( ; it2 != controls.end(); ++it2)
+        QVariantMap control       = it.value().toMap();
+        QVariantMap::iterator it2 = control.begin();
+        for ( ; it2 != control.end(); ++it2)
         {
-            QString id = it2.key();
+            QString type = it2.key().trimmed().toUpper();
 
-            if (id.isEmpty())
-                continue;
-
-            id = "controls_" + id;
-
-            if (!TorcDevice::UniqueIdAvailable(id))
+            // logic, timer or transition
+            if (type != "LOGIC" && type != "TIMER" && type != "TRANSITION")
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("Device id '%1' already in use - ignoring").arg(id));
+                LOG(VB_GENERAL, LOG_ERR, QString("Unknown control type '%1'").arg(type));
                 continue;
             }
 
-            QVariantMap details = it2.value().toMap();
-            QString name  = details.value("userName").toString();
-            QString desc  = details.value("userDescription").toString();
-            QString op    = details.value("operation").toString();
-            QString val   = details.value("value").toString();
-
-            QStringList inputs = details.value("inputs").toStringList();
-            inputs.removeDuplicates();
-            inputs.removeAll("");
-
-            if (inputs.isEmpty())
+            QVariantMap controls = it2.value().toMap();
+            QVariantMap::iterator it3 = controls.begin();
+            for ( ; it3 != controls.end(); ++it3)
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("Control '%1' has no inputs - ignoring").arg(id));
-                continue;
-            }
+                QString id = QString("control_%1_%2").arg(it2.key()).arg(it3.key());
 
-            QStringList outputs = details.value("outputs").toStringList();
-            outputs.removeDuplicates();
-            outputs.removeAll("");
-
-            if (outputs.isEmpty())
-            {
-                LOG(VB_GENERAL, LOG_ERR, QString("Control '%1' has no outputs - ignoring").arg(id));
-                continue;
-            }
-
-            bool operational = false;
-            bool ok = false;
-            TorcControl::Operation operation = TorcControl::StringToOperation(op);
-            double operationvalue = val.toDouble(&ok);
-
-            if (operation == TorcControl::Equal ||
-                operation == TorcControl::LessThan ||
-                operation == TorcControl::LessThanOrEqual ||
-                operation == TorcControl::GreaterThan ||
-                operation == TorcControl::GreaterThanOrEqual)
-            {
-                // a control that makes a decision needs one input and a valid value to compare
-                // that input to
-                // TODO somewhere need to validate the value against the input type
-                // e.g. no point in having a value of 10 for a pwm input (0-1)
-                if (!details.contains("value"))
+                if (!TorcDevice::UniqueIdAvailable(id))
                 {
-                    LOG(VB_GENERAL, LOG_ERR, QString("Control '%1' has no value for operation - ignoring").arg(id));
+                    LOG(VB_GENERAL, LOG_ERR, QString("Device id '%1' already in use - ignoring").arg(id));
                     continue;
                 }
 
-                if (!ok)
-                {
-                    LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse value for control '%1' - ignoring").arg(id));
-                    continue;
-                }
-
-                if (inputs.size() > 1)
-                {
-                    LOG(VB_GENERAL, LOG_ERR, QString("Control '%1' has more than 1 input for operation - ignoring").arg(id));
-                    continue;
-                }
-
-                // all is good
-                operational = true;
+                QVariantMap details = it3.value().toMap();
+                TorcControl* control = new TorcControl(id, details);
+                m_controls.insert(id, control);
             }
-
-
-            LOG(VB_GENERAL, LOG_INFO, QString("%1 Inputs   : %2").arg(id).arg(inputs.join(",")));
-            LOG(VB_GENERAL, LOG_INFO, QString("%1 Outputs  : %2").arg(id).arg(outputs.join(",")));
-            if (operational)
-            {
-                LOG(VB_GENERAL, LOG_INFO, QString("%1 Operation: Input %2 - %3 - %4")
-                    .arg(id).arg(inputs[0]).arg(TorcControl::OperationToString(operation)).arg(operationvalue));
-            }
-            else
-            {
-                LOG(VB_GENERAL, LOG_INFO, QString("%1 Operation: %2")
-                    .arg(id).arg(TorcControl::OperationToString(operation)));
-            }
-
-            TorcControl* control = new TorcControl(id, inputs, outputs, operation, operationvalue);
-            control->SetUserName(name);
-            control->SetUserDescription(desc);
-            m_controls.insert(id, control);
         }
     }
 }
@@ -161,8 +92,17 @@ void TorcControls::Validate(void)
 {
     QMutexLocker locker(m_lock);
 
-    foreach(TorcControl* control, m_controls)
-        control->Validate();
+    QMutableMapIterator<QString,TorcControl*> it(m_controls);
+    while (it.hasNext())
+    {
+        it.next();
+        if (!it.value()->Validate())
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to complete device '%1' creation - deleting").arg(it.key()));
+            it.value()->DownRef();
+            m_controls.remove(it.key());
+        }
+    }
 }
 
 void TorcControls::Graph(void)

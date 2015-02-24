@@ -35,16 +35,15 @@ class TorcControl : public TorcDevice
         Average
     };
 
-    static TorcControl::Operation StringToOperation (const QString &Operation);
+    static TorcControl::Operation StringToOperation (const QString &Operation, bool *Ok);
     static QString                OperationToString (TorcControl::Operation Operation);
 
   protected:
-    TorcControl(const QString &UniqueId, const QStringList &Inputs, const QStringList &Outputs,
-                TorcControl::Operation Operation, double OperationValue);
+    TorcControl(const QString &UniqueId, const QVariantMap &Details);
     virtual ~TorcControl();
 
   public:
-    void                   Validate               (void);
+    bool                   Validate               (void);
 
   public slots:
     void                   InputValueChanged      (double Value);
@@ -73,6 +72,7 @@ class TorcControl : public TorcDevice
     void                   CalculateOutput        (void);
 
   private:
+    bool                   m_parsed;
     bool                   m_validated;
     QStringList            m_inputList;
     QStringList            m_outputList;

@@ -27,8 +27,9 @@
 #include "torcoutput.h"
 #include "torccontrol.h"
 
-TorcControl::Operation TorcControl::StringToOperation(const QString &Operation)
+TorcControl::Operation TorcControl::StringToOperation(const QString &Operation, bool *Ok)
 {
+    *Ok = true;
     QString operation = Operation.toUpper();
 
     if ("EQUAL" == operation)              return TorcControl::Equal;
@@ -39,7 +40,11 @@ TorcControl::Operation TorcControl::StringToOperation(const QString &Operation)
     if ("ANY" == operation)                return TorcControl::Any;
     if ("ALL" == operation)                return TorcControl::All;
     if ("AVERAGE" == operation)            return TorcControl::Average;
+    if ("NONE" == operation)               return TorcControl::None;
+    if ("" == operation)                   return TorcControl::None;
 
+    // fail for anything that isn't explicitly a known operation
+    *Ok = false;
     return TorcControl::None;
 }
 
@@ -68,16 +73,69 @@ QString TorcControl::OperationToString(TorcControl::Operation Operation)
  * It can then determine an output value.
  * If 'invalid' the output will be set to the default.
 */
-TorcControl::TorcControl(const QString &UniqueId, const QStringList &Inputs, const QStringList &Outputs,
-                         TorcControl::Operation Operation, double OperationValue)
+TorcControl::TorcControl(const QString &UniqueId, const QVariantMap &Details)
   : TorcDevice(false, 0, 0, QString("Control"), UniqueId),
+    m_parsed(false),
     m_validated(false),
-    m_inputList(Inputs),
-    m_outputList(Outputs),
-    m_operation(Operation),
-    m_operationValue(OperationValue),
+    m_inputList(),
+    m_outputList(),
+    m_operation(TorcControl::None),
+    m_operationValue(0),
     m_allInputsValid(false)
 {
+    // parse inputs
+    m_inputList = Details.value("inputs").toStringList();
+    m_inputList.removeDuplicates();
+    m_inputList.removeAll("");
+
+    // parse outputs
+    m_outputList = Details.value("outputs").toStringList();
+    m_outputList.removeDuplicates();
+    m_outputList.removeAll("");
+
+    // check operation and value parsing (an empty/non-existent operation is valid)
+    QString op       = Details.value("operation").toString();
+    bool operationok = false;
+    m_operation      = TorcControl::StringToOperation(op, &operationok);
+
+    if (!operationok)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Unrecognised control operation '%1' for device '%2'").arg(op).arg(uniqueId));
+        return;
+    }
+
+    // these operations require a valid value to operate against
+    if (m_operation == TorcControl::Equal ||
+        m_operation == TorcControl::LessThan ||
+        m_operation == TorcControl::LessThanOrEqual ||
+        m_operation == TorcControl::GreaterThan ||
+        m_operation == TorcControl::GreaterThanOrEqual)
+    {
+        // a value is explicitly required rather than defaulting to 0
+        if (!Details.contains("value"))
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Control '%1' has no value for operation").arg(uniqueId));
+            return;
+        }
+
+        QString val   = Details.value("value").toString();
+        bool valueok = false;
+        m_operationValue = val.toDouble(&valueok);
+
+        // failed to parse value
+        if (!valueok)
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse value '%1' for device '%2'").arg(val).arg(uniqueId));
+            return;
+        }
+    }
+
+    // parse other details
+    SetUserName(Details.value("userName").toString());
+    SetUserDescription(Details.value("userDescription").toString());
+
+    // everything appears to be valid at this stage
+    m_parsed = true;
 }
 
 TorcControl::~TorcControl()
@@ -96,12 +154,15 @@ TorcControl::~TorcControl()
  * \todo Validate input/output data types
  * \todo Make Outputs 'valid' aware and handle their own defaults if any input/control is invalid.
 */
-void TorcControl::Validate(void)
+bool TorcControl::Validate(void)
 {
     QMutexLocker locker(lock);
 
+    if (!m_parsed)
+        return false;
+
     if (m_validated)
-        return;
+        return true;
 
     bool passthrough = (m_operation == TorcControl::None) && (m_inputList.size() == 1);
 
@@ -109,7 +170,7 @@ void TorcControl::Validate(void)
     if (m_inputList.isEmpty())
     {
         LOG(VB_GENERAL, LOG_ERR, QString("%1 needs at least one input").arg(uniqueId));
-        return;
+        return false;
     }
 
     // validate inputs
@@ -121,7 +182,7 @@ void TorcControl::Validate(void)
         if (!object)
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Failed to find input '%1' for '%2'").arg(input).arg(uniqueId));
-            return;
+            return false;
         }
 
         m_inputs.insert(object, input);
@@ -135,7 +196,7 @@ void TorcControl::Validate(void)
     if (m_outputList.isEmpty())
     {
         LOG(VB_GENERAL, LOG_ERR, QString("%1 needs at least one output").arg(uniqueId));
-        return;
+        return false;
     }
 
     // validate outputs
@@ -147,7 +208,7 @@ void TorcControl::Validate(void)
         if (!object)
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Failed to find output '%1' for device %2").arg(output).arg(uniqueId));
-            return;
+            return false;
         }
 
         // if TorcOutput, does it already have an owner
@@ -155,7 +216,7 @@ void TorcControl::Validate(void)
         if (out && out->HasOwner())
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Output '%1' (for control '%2') already has an owner").arg(out->GetUniqueId()));
-            return;
+            return false;
         }
 
         m_outputs.insert(object, output);
@@ -177,7 +238,7 @@ void TorcControl::Validate(void)
         {
             LOG(VB_GENERAL, LOG_ERR, QString("%1 has %2 inputs for operation '%3' (can have only 1) - ignoring.")
                 .arg(uniqueId).arg(m_inputs.size()).arg(OperationToString(m_operation)));
-            return;
+            return false;
         }
     }
     else if (m_operation == TorcControl::Any ||
@@ -190,7 +251,7 @@ void TorcControl::Validate(void)
         {
             LOG(VB_GENERAL, LOG_ERR, QString("%1 has %2 inputs for operation '%3' (needs at least 2) - ignoring.")
                 .arg(uniqueId).arg(m_inputs.size()).arg(OperationToString(m_operation)));
-            return;
+            return false;
         }
     }
 
@@ -230,7 +291,7 @@ void TorcControl::Validate(void)
             else if (qobject_cast<TorcSensor*>(it.key()))
                 inputid = qobject_cast<TorcSensor*>(it.key())->GetUniqueId();
 
-            if (!passthrough) // already handled in the outputs above s
+            if (!passthrough) // already handled in the outputs above
                 TorcCentral::gStateGraph->append(QString("    \"%1\"->\"%2\"\r\n").arg(inputid).arg(uniqueId));
             connect(it.key(), SIGNAL(ValidChanged(bool)), this, SLOT(InputValidChanged(bool)), Qt::UniqueConnection);
             connect(it.key(), SIGNAL(ValueChanged(double)), this, SLOT(InputValueChanged(double)), Qt::UniqueConnection);
@@ -240,11 +301,15 @@ void TorcControl::Validate(void)
 
     LOG(VB_GENERAL, LOG_INFO, QString("%1: Ready").arg(uniqueId));
     m_validated = true;
+    return true;
 }
 
 void TorcControl::InputValueChanged(double Value)
 {
     QMutexLocker locker(lock);
+
+    if (!m_parsed || !m_validated)
+        return;
 
     QObject *input = sender();
 
@@ -271,6 +336,9 @@ void TorcControl::InputValueChanged(double Value)
 void TorcControl::CheckInputValues(void)
 {
     QMutexLocker locker(lock);
+
+    if (!m_parsed || !m_validated)
+        return;
 
     bool isvalid = m_validated && m_allInputsValid && (m_inputList.size() == m_inputValues.size());
 
@@ -353,6 +421,9 @@ void TorcControl::InputValidChanged(bool Valid)
 {
     QMutexLocker locker(lock);
 
+    if (!m_parsed || !m_validated)
+        return;
+
     QObject* input = sender();
     if (input)
     {
@@ -363,6 +434,9 @@ void TorcControl::InputValidChanged(bool Valid)
 
 void TorcControl::InputValidChangedPriv(QObject *Input, bool Valid)
 {
+    if (!m_parsed || !m_validated)
+        return;
+
     // a valid input
     if (!Input)
         return;
@@ -445,6 +519,9 @@ void TorcControl::SetValue(double Value)
 {
     QMutexLocker locker(lock);
 
+    if (!m_parsed || !m_validated)
+        return;
+
     if (qFuzzyCompare(Value + 1.0, value + 1.0))
         return;
 
@@ -455,6 +532,9 @@ void TorcControl::SetValue(double Value)
 void TorcControl::SetValid(bool Valid)
 {
     QMutexLocker locker(lock);
+
+    if (!m_parsed || !m_validated)
+        return;
 
     if (valid == Valid)
         return;
