@@ -6,9 +6,10 @@
 
 // Torc
 #include "torccentral.h"
+#include "torcoutput.h"
 #include "torcsensor.h"
 
-#define NETWORK_SENSORS_STRING QString("Network")
+#define NETWORK_SENSORS_STRING QString("network")
 
 class TorcNetworkSensors : public TorcDeviceHandler
 {
@@ -23,6 +24,7 @@ class TorcNetworkSensors : public TorcDeviceHandler
 
   private:
     QMap<QString,TorcSensor*>   m_sensors;
+    QMap<QString,TorcOutput*>   m_outputs;
 };
 
 #endif // TORCNETWORKSENSORS_H

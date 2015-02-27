@@ -27,46 +27,6 @@
 #include "torcoutput.h"
 #include "torccontrol.h"
 
-TorcControl::Operation TorcControl::StringToOperation(const QString &Operation, bool *Ok)
-{
-    *Ok = true;
-    QString operation = Operation.toUpper();
-
-    if ("EQUAL" == operation)              return TorcControl::Equal;
-    if ("LESSTHAN" == operation)           return TorcControl::LessThan;
-    if ("LESSTHANOREQUAL" == operation)    return TorcControl::LessThanOrEqual;
-    if ("GREATERTHAN" == operation)        return TorcControl::GreaterThan;
-    if ("GREATERTHANOREQUAL" == operation) return TorcControl::GreaterThanOrEqual;
-    if ("ANY" == operation)                return TorcControl::Any;
-    if ("ALL" == operation)                return TorcControl::All;
-    if ("AVERAGE" == operation)            return TorcControl::Average;
-    if ("NONE" == operation)               return TorcControl::NoOperation;
-    if ("" == operation)                   return TorcControl::NoOperation;
-
-    // fail for anything that isn't explicitly a known operation
-    *Ok = false;
-    return TorcControl::NoOperation;
-}
-
-QString TorcControl::OperationToString(TorcControl::Operation Operation)
-{
-    switch (Operation)
-    {
-        case TorcControl::Equal:              return QString("Equal");
-        case TorcControl::LessThan:           return QString("LessThan");
-        case TorcControl::LessThanOrEqual:    return QString("LessThanOrEqual");
-        case TorcControl::GreaterThan:        return QString("GreaterThan");
-        case TorcControl::GreaterThanOrEqual: return QString("GreaterThanOrEqual");
-        case TorcControl::Any:                return QString("Any");
-        case TorcControl::All:                return QString("All");
-        case TorcControl::Average:            return QString("Average");
-        case TorcControl::NoOperation:
-        default: break;
-    }
-
-    return QString("None");
-}
-
 TorcControl::Type TorcControl::StringToType(const QString &Type)
 {
     QString type = Type.trimmed().toUpper();
@@ -82,13 +42,123 @@ QString TorcControl::TypeToString(TorcControl::Type Type)
 {
     switch (Type)
     {
-        case TorcControl::Logic:      return QString("Logic");
-        case TorcControl::Timer:      return QString("Timer");
-        case TorcControl::Transition: return QString("Transition");
+        case TorcControl::Logic:      return QString("logic");
+        case TorcControl::Timer:      return QString("timer");
+        case TorcControl::Transition: return QString("transition");
         default: break;
     }
 
     return QString("Unknown");
+}
+
+/*! \brief Parse a Torc time string into days, hours, minutes and, if present, seconds.
+ *
+ * Valid times are of the format MM, HH:MM, DD:HH:MM with an optional trailing .SS for seconds.
+*/
+bool TorcControl::ParseTimeString(const QString &Time, int &Days, int &Hours,
+                                  int &Minutes, int &Seconds, quint64 &DurationInSeconds)
+{
+    bool ok      = false;
+    int  seconds = 0;
+    int  hours   = 0;
+    int  days    = 0;
+
+    // take seconds off the end if present
+    QStringList initialsplit = Time.split(".");
+
+    QString dayshoursminutes = initialsplit[0];
+    QString secondss = initialsplit.size() > 1 ? initialsplit[1] : QString("");
+
+    // parse seconds (seconds are optional)
+    if (!secondss.isEmpty())
+    {
+        int newseconds = secondss.toInt(&ok);
+        if (!ok)
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse seconds from '%1'").arg(secondss));
+            return false;
+        }
+
+        if (newseconds < 0 || newseconds > 59)
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Invalid seconds value '%1'").arg(newseconds));
+            return false;
+        }
+
+        seconds = newseconds;
+    }
+
+    // parse the remainder
+    QStringList secondsplit = dayshoursminutes.split(":");
+    int count = secondsplit.size();
+    if (count > 3)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Cannot parse time from '%1'").arg(dayshoursminutes));
+        return false;
+    }
+
+    // days - days are from 1 to 7 (Monday to Sunday), consistent with Qt
+    if (count == 3)
+    {
+        int newdays = secondsplit[0].toInt(&ok);
+        if (!ok)
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse days from '%1'").arg(secondsplit[2]));
+            return false;
+        }
+
+        if (newdays < 1 || newdays > 7)
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Invalid day value '%1'").arg(newdays));
+            return false;
+        }
+
+        days = newdays;
+    }
+
+    // hours 0-23
+    if (count > 1)
+    {
+        int newhours = secondsplit[count - 2].toInt(&ok);
+        if (!ok)
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse hours from '%1'").arg(secondsplit[1]));
+            return false;
+        }
+
+        if (newhours < 0 || newhours > 23)
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Invalid hour value '%1'").arg(newhours));
+            return false;
+        }
+
+        hours = newhours;
+    }
+
+    // minutes 0-59
+    int newminutes = secondsplit[count - 1].toInt(&ok);
+    if (!ok)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse minutes from '%1'").arg(secondsplit[0]));
+        return false;
+    }
+
+    if (newminutes < 0 || newminutes > 59)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Invalid minute values '%1'").arg(newminutes));
+        return false;
+    }
+
+    // all is good in the world
+    Days    = days;
+    Hours   = hours;
+    Minutes = newminutes;
+    Seconds = seconds;
+
+    // duration
+    DurationInSeconds = seconds + (newminutes * 60) + (hours * 60 * 60) + (days * 24 * 60 * 60);
+
+    return true;
 }
 
 /*! \class TorcControl
@@ -97,15 +167,12 @@ QString TorcControl::TypeToString(TorcControl::Type Type)
  * It can then determine an output value.
  * If 'invalid' the output will be set to the default.
 */
-TorcControl::TorcControl(TorcControl::Type Type, const QString &UniqueId, const QVariantMap &Details)
+TorcControl::TorcControl(const QString &UniqueId, const QVariantMap &Details)
   : TorcDevice(false, 0, 0, QString("Control"), UniqueId),
-    m_type(Type),
     m_parsed(false),
     m_validated(false),
     m_inputList(),
     m_outputList(),
-    m_operation(TorcControl::NoOperation),
-    m_operationValue(0),
     m_allInputsValid(false)
 {
     // parse inputs
@@ -118,49 +185,9 @@ TorcControl::TorcControl(TorcControl::Type Type, const QString &UniqueId, const 
     m_outputList.removeDuplicates();
     m_outputList.removeAll("");
 
-    // check operation and value parsing (an empty/non-existent operation is valid)
-    QString op       = Details.value("operation").toString();
-    bool operationok = false;
-    m_operation      = TorcControl::StringToOperation(op, &operationok);
-
-    if (!operationok)
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("Unrecognised control operation '%1' for device '%2'").arg(op).arg(uniqueId));
-        return;
-    }
-
-    // these operations require a valid value to operate against
-    if (m_operation == TorcControl::Equal ||
-        m_operation == TorcControl::LessThan ||
-        m_operation == TorcControl::LessThanOrEqual ||
-        m_operation == TorcControl::GreaterThan ||
-        m_operation == TorcControl::GreaterThanOrEqual)
-    {
-        // a value is explicitly required rather than defaulting to 0
-        if (!Details.contains("value"))
-        {
-            LOG(VB_GENERAL, LOG_ERR, QString("Control '%1' has no value for operation").arg(uniqueId));
-            return;
-        }
-
-        QString val   = Details.value("value").toString();
-        bool valueok = false;
-        m_operationValue = val.toDouble(&valueok);
-
-        // failed to parse value
-        if (!valueok)
-        {
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse value '%1' for device '%2'").arg(val).arg(uniqueId));
-            return;
-        }
-    }
-
-    // parse other details
+    // parse other common details
     SetUserName(Details.value("userName").toString());
     SetUserDescription(Details.value("userDescription").toString());
-
-    // everything appears to be valid at this stage
-    m_parsed = true;
 }
 
 TorcControl::~TorcControl()
@@ -168,16 +195,6 @@ TorcControl::~TorcControl()
 }
 
 /*! \fn Validate
- *
- * If the control has one single sensor input (NOT another control), one or more outputs (NOT controls) and
- * the operation is a straight pass through (Operation::NoOperation), then we do not present the control in the stategraph.
- * This makes the graph clearer but the control is still required as Outputs have no understanding of invalid
- * sensor outputs.
- *
- * \note We always assume an object of a given type has the correct signals/slots
- *
- * \todo Validate input/output data types
- * \todo Make Outputs 'valid' aware and handle their own defaults if any input/control is invalid.
 */
 bool TorcControl::Validate(void)
 {
@@ -185,18 +202,6 @@ bool TorcControl::Validate(void)
 
     if (!m_parsed)
         return false;
-
-    if (m_validated)
-        return true;
-
-    bool passthrough = (m_operation == TorcControl::NoOperation) && (m_inputList.size() == 1);
-
-    // we need one or more inputs for a regular control
-    if (m_inputList.isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("%1 needs at least one input").arg(uniqueId));
-        return false;
-    }
 
     // validate inputs
     foreach (QString input, m_inputList)
@@ -211,17 +216,6 @@ bool TorcControl::Validate(void)
         }
 
         m_inputs.insert(object, input);
-
-        // check for passthrough
-        if (!qobject_cast<TorcSensor*>(object))
-            passthrough = false;
-    }
-
-    // we always need one or more outputs
-    if (m_outputList.isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("%1 needs at least one output").arg(uniqueId));
-        return false;
     }
 
     // validate outputs
@@ -245,88 +239,77 @@ bool TorcControl::Validate(void)
         }
 
         m_outputs.insert(object, output);
-
-        // check for passthrough
-        if (!qobject_cast<TorcOutput*>(object))
-            passthrough = false;
     }
 
-    // sanity check number of inputs for operation type
-    if (m_operation == TorcControl::Equal ||
-        m_operation == TorcControl::LessThan ||
-        m_operation == TorcControl::LessThanOrEqual ||
-        m_operation == TorcControl::GreaterThan ||
-        m_operation == TorcControl::GreaterThanOrEqual)
+    return true;
+}
+
+/// The default start implementation does nothing (for logic control).
+void TorcControl::Start(void)
+{
+}
+
+/*! \fn Finish
+ * \brief Finish setup of the control
+ *
+ * Finish is only called once all other parsing and validation is complete.
+ * The control is connected to its input(s) and output(s), the state graph is completed
+ * and the device marked as validated.
+ *
+ * \note If a Logic control has one single sensor input (NOT another control), one or more outputs (NOT controls) and
+ *       the operation is a straight pass through (TorcLogicControl::NoOperation), then we do not present the control in the stategraph.
+ *       This makes the graph clearer but the control is still required as Outputs have no understanding of invalid
+ *       sensor outputs.
+ * \note We always assume an object of a given type has the correct signals/slots
+ *
+ * \todo Validate input/output data types
+ * \todo Make Outputs 'valid' aware and handle their own defaults if any input/control is invalid.
+*/
+void TorcControl::Finish(bool Passthrough)
+{
+    QMutexLocker locker(TorcCentral::gStateGraphLock);
+
+    if (!Passthrough)
+        TorcCentral::gStateGraph->append(QString("    \"%1\" [label=\"%2\"];\r\n").arg(uniqueId).arg(userName));
+
+    QMap<QObject*,QString>::iterator it = m_outputs.begin();
+    for ( ; it != m_outputs.end(); ++it)
     {
-        // can have only one input to compare against
-        if (m_inputs.size() > 1)
+        if (qobject_cast<TorcOutput*>(it.key()))
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("%1 has %2 inputs for operation '%3' (can have only 1) - ignoring.")
-                .arg(uniqueId).arg(m_inputs.size()).arg(OperationToString(m_operation)));
-            return false;
+            TorcOutput* output = qobject_cast<TorcOutput*>(it.key());
+            (void)output->SetOwner(this);
+            QString source = Passthrough ? qobject_cast<TorcSensor*>(m_inputs.firstKey())->GetUniqueId() : uniqueId;
+            TorcCentral::gStateGraph->append(QString("    \"%1\"->\"%2\"\r\n").arg(source).arg(output->GetUniqueId()));
+            connect(this, SIGNAL(ValueChanged(double)), output, SLOT(SetValue(double)), Qt::UniqueConnection);
+        }
+        else
+        {
+            TorcControl* control = qobject_cast<TorcControl*>(it.key());
+            TorcCentral::gStateGraph->append(QString("    \"%1\"->\"%2\"\r\n").arg(uniqueId).arg(control->GetUniqueId()));
+            connect(this, SIGNAL(ValidChanged(bool)), control, SLOT(InputValidChanged(bool)), Qt::UniqueConnection);
+            connect(this, SIGNAL(ValueChanged(double)), control, SLOT(InputValueChanged(double)), Qt::UniqueConnection);
         }
     }
-    else if (m_operation == TorcControl::Any ||
-             m_operation == TorcControl::All ||
-             m_operation == TorcControl::Average)
+
+    it = m_inputs.begin();
+    for ( ; it != m_inputs.end(); ++it)
     {
-        // ANY, ALL and AVERAGE imply multiple inputs. Technically they will operate fine with just one
-        // but fail and warn - the user needs to know as their config may not be correct
-        if (m_inputs.size() < 2)
-        {
-            LOG(VB_GENERAL, LOG_ERR, QString("%1 has %2 inputs for operation '%3' (needs at least 2) - ignoring.")
-                .arg(uniqueId).arg(m_inputs.size()).arg(OperationToString(m_operation)));
-            return false;
-        }
-    }
+        QString inputid;
+        if (qobject_cast<TorcControl*>(it.key()))
+            inputid = qobject_cast<TorcControl*>(it.key())->GetUniqueId();
+        else if (qobject_cast<TorcSensor*>(it.key()))
+            inputid = qobject_cast<TorcSensor*>(it.key())->GetUniqueId();
 
-    // if we get this far, everything is validated and we can 'join the dots'
-    {
-        QMutexLocker locker(TorcCentral::gStateGraphLock);
-
-        if (!passthrough)
-            TorcCentral::gStateGraph->append(QString("    \"%1\" [label=\"%2\"];\r\n").arg(uniqueId).arg(userName));
-
-        QMap<QObject*,QString>::iterator it = m_outputs.begin();
-        for ( ; it != m_outputs.end(); ++it)
-        {
-            if (qobject_cast<TorcOutput*>(it.key()))
-            {
-                TorcOutput* output = qobject_cast<TorcOutput*>(it.key());
-                (void)output->SetOwner(this);
-                QString source = passthrough ? qobject_cast<TorcSensor*>(m_inputs.firstKey())->GetUniqueId() : uniqueId;
-                TorcCentral::gStateGraph->append(QString("    \"%1\"->\"%2\"\r\n").arg(source).arg(output->GetUniqueId()));
-                connect(this, SIGNAL(ValueChanged(double)), output, SLOT(SetValue(double)), Qt::UniqueConnection);
-            }
-            else
-            {
-                TorcControl* control = qobject_cast<TorcControl*>(it.key());
-                TorcCentral::gStateGraph->append(QString("    \"%1\"->\"%2\"\r\n").arg(uniqueId).arg(control->GetUniqueId()));
-                connect(this, SIGNAL(ValidChanged(bool)), control, SLOT(InputValidChanged(bool)), Qt::UniqueConnection);
-                connect(this, SIGNAL(ValueChanged(double)), control, SLOT(InputValueChanged(double)), Qt::UniqueConnection);
-            }
-        }
-
-        it = m_inputs.begin();
-        for ( ; it != m_inputs.end(); ++it)
-        {
-            QString inputid;
-            if (qobject_cast<TorcControl*>(it.key()))
-                inputid = qobject_cast<TorcControl*>(it.key())->GetUniqueId();
-            else if (qobject_cast<TorcSensor*>(it.key()))
-                inputid = qobject_cast<TorcSensor*>(it.key())->GetUniqueId();
-
-            if (!passthrough) // already handled in the outputs above
-                TorcCentral::gStateGraph->append(QString("    \"%1\"->\"%2\"\r\n").arg(inputid).arg(uniqueId));
-            connect(it.key(), SIGNAL(ValidChanged(bool)), this, SLOT(InputValidChanged(bool)), Qt::UniqueConnection);
-            connect(it.key(), SIGNAL(ValueChanged(double)), this, SLOT(InputValueChanged(double)), Qt::UniqueConnection);
-            m_inputValids.insert(it.key(), false);
-        }
+        if (!Passthrough) // already handled in the outputs above
+            TorcCentral::gStateGraph->append(QString("    \"%1\"->\"%2\"\r\n").arg(inputid).arg(uniqueId));
+        connect(it.key(), SIGNAL(ValidChanged(bool)), this, SLOT(InputValidChanged(bool)), Qt::UniqueConnection);
+        connect(it.key(), SIGNAL(ValueChanged(double)), this, SLOT(InputValueChanged(double)), Qt::UniqueConnection);
+        m_inputValids.insert(it.key(), false);
     }
 
     LOG(VB_GENERAL, LOG_INFO, QString("%1: Ready").arg(uniqueId));
     m_validated = true;
-    return true;
 }
 
 void TorcControl::InputValueChanged(double Value)
@@ -372,74 +355,7 @@ void TorcControl::CheckInputValues(void)
         return;
 
     // the important bit
-    double newvalue = value; // no change by default
-    switch (m_operation)
-    {
-        case TorcControl::NoOperation:
-            if (m_inputs.size() == 1)
-            {
-                // must be a single input just passed through to output(s)
-                newvalue = m_inputValues.first();
-            }
-            else
-            {
-                // must be multiple range/pwm values that are combined
-                double start = 1.0;
-                foreach(double next, m_inputValues)
-                    start *= next;
-                newvalue = start;
-            }
-            break;
-        case TorcControl::Equal:
-            // single value ==
-            newvalue = qFuzzyCompare(m_inputValues.first() + 1.0, m_operationValue + 1.0) ? 1 : 0;
-            break;
-        case TorcControl::LessThan:
-            // single value <
-            newvalue = m_inputValues.first() < m_operationValue ? 1 : 0;
-            break;
-        case TorcControl::LessThanOrEqual:
-            // Use qFuzzyCompare for = ?
-            // single input <=
-            newvalue = m_inputValues.first() <= m_operationValue ? 1 : 0;
-            break;
-        case TorcControl::GreaterThan:
-            // single input >
-            newvalue = m_inputValues.first() > m_operationValue ? 1 : 0;
-            break;
-        case TorcControl::GreaterThanOrEqual:
-            // single input >=
-            newvalue = m_inputValues.first() >= m_operationValue ? 1 : 0;
-            break;
-        case TorcControl::All:
-            {
-                // multiple binary (on/off) inputs that must all be 1/On/non-zero
-                bool on = true;
-                foreach (double next, m_inputValues)
-                    on &= !qFuzzyCompare(next + 1.0, 1.0);
-                newvalue = on ? 1 : 0;
-            }
-            break;
-        case TorcControl::Any:
-            {
-                // multiple binary (on/off) inputs - one or more of which must be 1/On/non-zero
-                bool on = false;
-                foreach (double next, m_inputValues)
-                    on |= !qFuzzyCompare(next + 1.0, 1.0);
-                newvalue = on ? 1 : 0;
-            }
-            break;
-        case TorcControl::Average:
-            {
-                // does exactly what is says on the tin
-                double average = 0;
-                foreach (double next, m_inputValues)
-                    average += next;
-                newvalue = average / m_inputValues.size();
-            }
-            break;
-    }
-    SetValue(newvalue);
+    CalculateOutput();
 }
 
 void TorcControl::InputValidChanged(bool Valid)
@@ -552,6 +468,7 @@ void TorcControl::SetValue(double Value)
 
     value = Value;
     emit ValueChanged(value);
+    LOG(VB_GENERAL, LOG_INFO, QString("%1: new value '%2'").arg(uniqueId).arg(value));
 }
 
 void TorcControl::SetValid(bool Valid)

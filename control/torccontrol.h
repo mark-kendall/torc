@@ -22,19 +22,6 @@ class TorcControl : public TorcDevice
     Q_PROPERTY(QString userDescription READ GetUserDescription() WRITE SetUserDescription() NOTIFY UserDescriptionChanged())
 
   public:
-    enum Operation
-    {
-        NoOperation,
-        Equal,
-        LessThan,
-        GreaterThan,
-        LessThanOrEqual,
-        GreaterThanOrEqual,
-        Any,
-        All,
-        Average
-    };
-
     enum Type
     {
         UnknownType,
@@ -43,17 +30,19 @@ class TorcControl : public TorcDevice
         Transition
     };
 
-    static TorcControl::Operation StringToOperation (const QString &Operation, bool *Ok);
-    static QString                OperationToString (TorcControl::Operation Operation);
     static TorcControl::Type      StringToType      (const QString &Type);
     static QString                TypeToString      (TorcControl::Type Type);
+    static bool                   ParseTimeString   (const QString &Time, int &Days, int &Hours,
+                                                     int &Minutes, int &Seconds, quint64 &DurationInSeconds);
 
   protected:
-    TorcControl(TorcControl::Type Type, const QString &UniqueId, const QVariantMap &Details);
+    TorcControl(const QString &UniqueId, const QVariantMap &Details);
     virtual ~TorcControl();
 
   public:
-    bool                   Validate               (void);
+    virtual bool           Validate               (void);
+    virtual TorcControl::Type GetType             (void) = 0;
+    virtual void           Start                  (void);
 
   public slots:
     void                   InputValueChanged      (double Value);
@@ -74,15 +63,15 @@ class TorcControl : public TorcDevice
     void                   UserNameChanged        (const QString &Name);
     void                   UserDescriptionChanged (const QString &Description);
 
-  private:
+  protected:
+    void                   Finish                 (bool Passthrough);
     void                   InputValidChangedPriv  (QObject* Input, bool Valid);
     void                   CheckInputValues       (void);
     void                   SetValue               (double Value);
     void                   SetValid               (bool Valid);
-    void                   CalculateOutput        (void);
+    virtual void           CalculateOutput        (void) = 0;
 
-  private:
-    TorcControl::Type      m_type;
+  protected:
     bool                   m_parsed;
     bool                   m_validated;
     QStringList            m_inputList;
@@ -91,8 +80,6 @@ class TorcControl : public TorcDevice
     QMap<QObject*,QString> m_outputs;
     QMap<QObject*,double>  m_inputValues;
     QMap<QObject*,bool>    m_inputValids;
-    TorcControl::Operation m_operation;
-    double                 m_operationValue;
     bool                   m_allInputsValid;
 };
 

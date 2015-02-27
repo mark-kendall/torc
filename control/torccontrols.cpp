@@ -22,6 +22,9 @@
 
 // Torc
 #include "torclogging.h"
+#include "torclogiccontrol.h"
+#include "torctimercontrol.h"
+#include "torctransitioncontrol.h"
 #include "torccontrols.h"
 
 TorcControls* TorcControls::gControls = new TorcControls();
@@ -71,7 +74,13 @@ void TorcControls::Create(const QVariantMap &Details)
                 }
 
                 QVariantMap details = it3.value().toMap();
-                TorcControl* control = new TorcControl(type, id, details);
+                TorcControl* control = NULL;
+                if (type == TorcControl::Logic)
+                    control = new TorcLogicControl(id, details);
+                else if (type == TorcControl::Timer)
+                    control = new TorcTimerControl(id, details);
+                else
+                    control = new TorcTransitionControl(id, details);
                 m_controls.insert(id, control);
             }
         }
@@ -98,7 +107,7 @@ void TorcControls::Validate(void)
         it.next();
         if (!it.value()->Validate())
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed to complete device '%1' creation - deleting").arg(it.key()));
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to complete device '%1' - deleting").arg(it.key()));
             it.value()->DownRef();
             m_controls.remove(it.key());
         }
@@ -109,4 +118,16 @@ void TorcControls::Graph(void)
 {
     // currently unused as not adding a control cluster helps dot draw the graph and hides
     // 'passthrough' controls
+}
+
+void TorcControls::Start(void)
+{
+    QMutexLocker locker(m_lock);
+
+    QMutableMapIterator<QString,TorcControl*> it(m_controls);
+    while (it.hasNext())
+    {
+        it.next();
+        it.value()->Start();
+    }
 }

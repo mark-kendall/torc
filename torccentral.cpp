@@ -129,6 +129,7 @@ TorcCentral::TorcCentral()
 
         // initialise the state machine
         TorcSensors::gSensors->Start();
+        TorcControls::gControls->Start();
     }
 }
 

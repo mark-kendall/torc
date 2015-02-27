@@ -23,6 +23,9 @@
 // Torc
 #include "torclogging.h"
 #include "torcsensors.h"
+#include "torcnetworkpwmoutput.h"
+#include "torcnetworkswitchoutput.h"
+#include "torcoutputs.h"
 #include "torcnetworkpwmsensor.h"
 #include "torcnetworkswitchsensor.h"
 #include "torcnetworksensors.h"
@@ -68,7 +71,7 @@ void TorcNetworkSensors::Create(const QVariantMap &Details)
 
                         if (!TorcDevice::UniqueIdAvailable(uniqueid))
                         {
-                            LOG(VB_GENERAL, LOG_WARNING, QString("Already have network sensor named '%1'").arg(uniqueid));
+                            LOG(VB_GENERAL, LOG_ERR, QString("Already have network sensor named '%1'").arg(uniqueid));
                             continue;
                         }
 
@@ -76,19 +79,40 @@ void TorcNetworkSensors::Create(const QVariantMap &Details)
                         QString defaultvalue = sensor.value("default").toString();
                         QString username     = sensor.value("userName").toString();
                         QString userdesc     = sensor.value("userDescription").toString();
+                        QString state        = sensor.value("state").toString().toUpper();
+
+                        if (state != "INPUT" && state != "OUTPUT")
+                        {
+                            LOG(VB_GENERAL, LOG_ERR, QString("Unknown network device type '%1' for device '%2'")
+                                .arg(state).arg(uniqueid));
+                            continue;
+                        }
+
+                        bool issensor = (state == "INPUT");
                         bool ok = false;
                         double defaultdouble = defaultvalue.toInt(&ok);
                         if (!ok)
                             defaultdouble = 0.0;
 
                         TorcSensor* newsensor = NULL;
+                        TorcOutput* newoutput = NULL;
                         switch (type)
                         {
                             case TorcSensor::PWM:
-                                newsensor = new TorcNetworkPWMSensor(defaultdouble, uniqueid);
+                                {
+                                    if (issensor)
+                                        newsensor = new TorcNetworkPWMSensor(defaultdouble, uniqueid);
+                                    else
+                                        newoutput = new TorcNetworkPWMOutput(defaultdouble, uniqueid);
+                                }
                                 break;
                             case TorcSensor::Switch:
-                                newsensor = new TorcNetworkSwitchSensor(defaultdouble, uniqueid);
+                                {
+                                    if (issensor)
+                                        newsensor = new TorcNetworkSwitchSensor(defaultdouble, uniqueid);
+                                    else
+                                        newoutput = new TorcNetworkSwitchOutput(defaultdouble, uniqueid);
+                                }
                                 break;
                             default: break;
                         }
@@ -98,6 +122,13 @@ void TorcNetworkSensors::Create(const QVariantMap &Details)
                             newsensor->SetUserName(username);
                             newsensor->SetUserDescription(userdesc);
                             m_sensors.insert(uniqueid, newsensor);
+                        }
+
+                        if (newoutput)
+                        {
+                            newoutput->SetUserName(username);
+                            newoutput->SetUserDescription(userdesc);
+                            m_outputs.insert(uniqueid, newoutput);
                         }
                     }
                 }
@@ -117,4 +148,12 @@ void TorcNetworkSensors::Destroy(void)
         TorcSensors::gSensors->RemoveSensor(it.value());
     }
     m_sensors.clear();
+
+    QMap<QString,TorcOutput*>::iterator it2 = m_outputs.begin();
+    for ( ; it2 != m_outputs.end(); ++it2)
+    {
+        it2.value()->DownRef();
+        TorcOutputs::gOutputs->RemoveOutput(it2.value());
+    }
+    m_outputs.clear();
 }
