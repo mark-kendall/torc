@@ -177,9 +177,9 @@ bool TorcTransitionControl::Validate(void)
  * at startup to ensure we start with the correct value for the given time and the animation
  * is running in the correct direction.
  *
- * /note The output value is effectively disconnected from the input state. Hence we use
- * m_transitionState to track the input state and filter extra updates - which can happen at
- * startup. Additional events, if unfiltered, restart the animation.
+ * /note The output value is effectively disconnected from the input state and cannot be
+ * use to validate the input. Hence we use m_transitionState to track the input state and
+ * filter extra updates - which can happen at startup. Additional events, if unfiltered, restart the animation.
 */
 void TorcTransitionControl::CalculateOutput(void)
 {
