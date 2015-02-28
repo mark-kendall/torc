@@ -210,6 +210,10 @@ void TorcTransitionControl::CalculateOutput(void)
         TorcTimerControl *timerinput = qobject_cast<TorcTimerControl*>(m_inputs.firstKey());
         if (timerinput)
         {
+            // NB for a customer timer with transition, this will force the output to 'on' initially.
+            // While this may seem counterintuitive, it is the expected behaviour - as the output
+            // would normally be transitioning from the last 'on' to 'off' at time 0. Changing
+            // the custom timer behaviour would produce unexpected results for timers with no transition.
             timesincelasttransition = timerinput->TimeSinceLastTransition();
 
             if (timesincelasttransition > m_duration)
