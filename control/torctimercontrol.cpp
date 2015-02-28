@@ -369,6 +369,11 @@ void TorcTimerControl::TimerTimeout(void)
     LOG(VB_GENERAL, LOG_ERR, "Unknown timer state - SERIOUS ERROR");
 }
 
+TorcTimerControl::TimerType TorcTimerControl::GetTimerType(void)
+{
+    return m_timerType;
+}
+
 quint64 TorcTimerControl::TimeSinceLastTransition(void)
 {
     QMutexLocker locker(lock);

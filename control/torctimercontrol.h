@@ -34,6 +34,7 @@ class TorcTimerControl : public TorcControl
     bool              Validate        (void);
     void              Start           (void);
     quint64           TimeSinceLastTransition (void);
+    TorcTimerControl::TimerType GetTimerType  (void);
 
   public slots:
     void              TimerTimeout    (void);
