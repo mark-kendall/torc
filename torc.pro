@@ -30,6 +30,11 @@ DEPENDPATH  += ./torc ./torc/http ./torc/upnp ./sensors ./sensors/platforms
 DEPENDPATH  += ./outputs ./outputs/platforms
 INCLUDEPATH += $$DEPENDPATH
 
+# translations
+translations.path    = $${PREFIX}/share/torc/i18n/
+translations.files  += i18n/*.qm
+INSTALLS            += translations
+
 # HTML
 install.path   = $${PREFIX}/share/torc/html/
 install.files  = html/index.html
