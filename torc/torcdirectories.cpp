@@ -58,7 +58,7 @@ void InitialiseTorcDirectories(void)
     gPluginDir  = QString(PREFIX) + "/lib/torc/plugins";
     gShareDir   = QString(RUNPREFIX) + "/share/torc";
     gConfDir    = QDir::homePath() + "/.torc";
-    gTransDir   = gShareDir + "i18n/";
+    gTransDir   = gShareDir + "/i18n/";
 }
 
 /*! \brief Return the path to the application configuration directory
