@@ -56,7 +56,7 @@ QMap<QString,int> TorcLanguage::gLanguageMap;
 */
 TorcLanguage::TorcLanguage()
   : QObject(),
-    TorcHTTPService(this, "languages", "Languages", TorcLanguage::staticMetaObject, BLACKLIST),
+    TorcHTTPService(this, "languages", tr("Languages"), TorcLanguage::staticMetaObject, BLACKLIST),
     m_translator(new QTranslator()),
     m_lock(new QReadWriteLock(QReadWriteLock::Recursive))
 {

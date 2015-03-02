@@ -6,6 +6,8 @@
 
 class TorcPWMSensor : public TorcSensor
 {
+    Q_OBJECT
+
   public:
     TorcPWMSensor(double Value, const QString &ModelId, const QString &UniqueId);
     virtual ~TorcPWMSensor();

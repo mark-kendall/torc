@@ -43,7 +43,7 @@ TorcSensors* TorcSensors::gSensors = new TorcSensors();
 */
 TorcSensors::TorcSensors()
   : QObject(),
-    TorcHTTPService(this, SENSORS_DIRECTORY, "Sensors", TorcSensors::staticMetaObject, BLACKLIST),
+    TorcHTTPService(this, SENSORS_DIRECTORY, tr("Sensors"), TorcSensors::staticMetaObject, BLACKLIST),
     m_lock(new QMutex(QMutex::Recursive))
 {
 }
