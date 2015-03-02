@@ -468,7 +468,6 @@ void TorcControl::SetValue(double Value)
 
     value = Value;
     emit ValueChanged(value);
-    LOG(VB_GENERAL, LOG_INFO, QString("%1: new value '%2'").arg(uniqueId).arg(value));
 }
 
 void TorcControl::SetValid(bool Valid)
