@@ -35,7 +35,7 @@ var TorcSubscription = function (socket, serviceName, servicePath, subscribedCha
     function propertyChanged(name, params) {
         if (listeners[name] && typeof listeners[name] === 'function' &&
             typeof params === 'object' && params.hasOwnProperty('value')) {
-            listeners[name](name, params.value);
+            listeners[name](name, params.value, serviceName);
         }
     }
 

@@ -89,7 +89,7 @@ var TorcConnection = function ($, torc, statusChanged) {
 
         // and notifiy subscriber
         if (typeof subscriptions[name].subscriptionChanges === 'function') {
-            subscriptions[name].subscriptionChanges(version, methods, properties);
+            subscriptions[name].subscriptionChanges(version, methods, properties, name);
         }
     }
 
