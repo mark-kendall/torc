@@ -33,6 +33,7 @@
 #include "outputs/torcoutputs.h"
 #include "control/torccontrols.h"
 #include "http/torchttphandler.h"
+#include "torcxmlreader.h"
 #include "torccentral.h"
 
 // for system
@@ -49,8 +50,8 @@ TorcCentral::TorcCentral()
     // content directory should already have been created by TorcHTMLDynamicContent
     QString graphdot = GetTorcConfigDir() + DYNAMIC_DIRECTORY + "stategraph.dot";
     QString graphsvg = GetTorcConfigDir() + DYNAMIC_DIRECTORY + "stategraph.svg";
-    QString config   = GetTorcConfigDir() + DYNAMIC_DIRECTORY + "torc.config";
-    QString current  = GetTorcConfigDir() + "/torc.config";
+    QString config   = GetTorcConfigDir() + DYNAMIC_DIRECTORY + "torc.xml";
+    QString current  = GetTorcConfigDir() + "/torc.xml";
 
     {
         QMutexLocker locker(gStateGraphLock);
@@ -145,41 +146,26 @@ TorcCentral::~TorcCentral()
 bool TorcCentral::LoadConfig(void)
 {
     // load the config file
-    QString config = GetTorcConfigDir() + "/torc.config";
+    QString xml = GetTorcConfigDir() + "/torc.xml";
+    TorcXMLReader reader(xml);
+    QString error;
 
-    if (!QFile::exists(config))
+    if (!reader.IsValid(error))
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("%1 does not exist").arg(config));
+        LOG(VB_GENERAL, LOG_ERR, error);
         return false;
     }
 
-    QFile file(config);
-    if (!file.open(QIODevice::ReadOnly))
+    QVariantMap result = reader.GetResult();
+
+    // root object should be 'torc'
+    if (!result.contains("torc"))
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Cannot open %1 for reading").arg(config));
+        LOG(VB_GENERAL, LOG_ERR, QString("Failed to find 'torc' root element in '%1'").arg(xml));
         return false;
     }
 
-    QByteArray   data = file.readAll();
-    QJsonDocument doc = QJsonDocument::fromJson(data);
-    file.close();
-
-    if (doc.isNull())
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("%1 is not valid JSON").arg(config));
-        return false;
-    }
-
-    QVariant contents = doc.toVariant();
-
-    // check the type
-    if (QMetaType::QVariantMap != static_cast<QMetaType::Type>(contents.type()))
-    {
-        LOG(VB_GENERAL, LOG_ERR, "Config has unexpected JSON type");
-        return false;
-    }
-
-    m_config = contents.toMap();
+    m_config = result.value("torc").toMap();
 
     // update application name
     if (m_config.contains("name"))
@@ -192,7 +178,7 @@ bool TorcCentral::LoadConfig(void)
         }
     }
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Loaded config from %1").arg(config));
+    LOG(VB_GENERAL, LOG_INFO, QString("Loaded config from %1").arg(xml));
     return true;
 }
 

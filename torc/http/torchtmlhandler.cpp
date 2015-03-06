@@ -72,7 +72,7 @@ void TorcHTMLHandler::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTTPConne
     stream << "<p><a href='" << SERVICES_DIRECTORY << "'>" << tr("Services") << "</a>";
     stream << "<p><a href='" << STATIC_DIRECTORY << "index.html'>" << tr("Interface") << "</a>";
     stream << "<p><a href='" << DYNAMIC_DIRECTORY << "stategraph.svg'>" << tr("State graph") << "</a>";
-    stream << "<p><a href='" << DYNAMIC_DIRECTORY << "torc.config'>" << tr("Current config") << "</a>";
+    stream << "<p><a href='" << DYNAMIC_DIRECTORY << "torc.xml'>" << tr("Current config") << "</a>";
     stream << "</body></html>";
 
     Request->SetResponseContent(result);
