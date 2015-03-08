@@ -19,10 +19,6 @@ class TorcCentral : public QObject
     static      QByteArray    *gStateGraph;
     static      QMutex        *gStateGraphLock;
 
-  public slots:
-    void        SensorsChanged (void);
-    void        OutputsChanged (void);
-
   private:
     bool        LoadConfig     (void);
 

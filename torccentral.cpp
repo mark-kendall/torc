@@ -75,19 +75,9 @@ TorcCentral::TorcCentral()
     // listen for interesting events
     gLocalContext->AddObserver(this);
 
-    // listen for sensor and output updates
-    // currently will only be notified of 1Wire hotplugged temperature sensors
-    if (TorcSensors::gSensors)
-        connect(TorcSensors::gSensors, SIGNAL(SensorsChanged()), this, SLOT(SensorsChanged()));
-
-    if (TorcOutputs::gOutputs)
-        connect(TorcOutputs::gOutputs, SIGNAL(OutputsChanged()), this, SLOT(OutputsChanged()));
-
     if (LoadConfig())
     {
         TorcDeviceHandler::Start(m_config);
-        SensorsChanged();
-        OutputsChanged();
 
         // start building the graph
         TorcSensors::gSensors->Graph();
@@ -180,27 +170,6 @@ bool TorcCentral::LoadConfig(void)
 
     LOG(VB_GENERAL, LOG_INFO, QString("Loaded config from %1").arg(xml));
     return true;
-}
-
-void TorcCentral::SensorsChanged(void)
-{
-    // any 1Wire devices identified
-    if (m_config.contains("1Wire"))
-    {
-        QVariantMap wire = m_config.value("1Wire").toMap();
-        QVariantMap::Iterator it = wire.begin();
-        for ( ; it != wire.end(); ++it)
-        {
-            QVariantMap device = it.value().toMap();
-            QString name = device.value("userName").toString();
-            QString description = device.value("userDescription").toString();
-            TorcSensors::gSensors->UpdateSensor("1Wire_" + it.key(), name, description);
-        }
-    }
-}
-
-void TorcCentral::OutputsChanged(void)
-{
 }
 
 /// Handle Exit events
