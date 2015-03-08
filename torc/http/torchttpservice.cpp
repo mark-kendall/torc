@@ -327,23 +327,38 @@ TorcHTTPService::TorcHTTPService(QObject *Parent, const QString &Signature, cons
     }
 
     // analyse properties
-    int invalidindex = -1;
-    for (int i = m_metaObject.propertyOffset(); i < m_metaObject.propertyCount(); ++i)
-    {
-        QMetaProperty property = m_metaObject.property(i);
+    QList<const QMetaObject*> metas;
+    metas.append(&m_metaObject);
 
-        if (property.isReadable() && ((property.hasNotifySignal() && property.notifySignalIndex() > -1) || property.isConstant()))
+    // recursively search for superclass meta objects. This picks up QMetProperty's in the base classes.
+    const QMetaObject* super = m_metaObject.superClass();
+    while (super)
+    {
+        metas.append(super);
+        super = super->superClass();
+    }
+
+    int invalidindex = -1;
+    foreach (const QMetaObject* meta, metas)
+    {
+        for (int i = meta->propertyOffset(); i < meta->propertyCount(); ++i)
         {
-            // constant properties are given a signal index < 0
-            if (property.notifySignalIndex() > -1)
+            QMetaProperty property = meta->property(i);
+            QString   propertyname(property.name());
+
+            if (propertyname != "objectName" && property.isReadable() && ((property.hasNotifySignal() && property.notifySignalIndex() > -1) || property.isConstant()))
             {
-                m_properties.insert(property.notifySignalIndex(), property.propertyIndex());
-                LOG(VB_GENERAL, LOG_DEBUG, QString("Adding property '%1' with signal index %2").arg(property.name()).arg(property.notifySignalIndex()));
-            }
-            else
-            {
-                m_properties.insert(invalidindex--, property.propertyIndex());
-                LOG(VB_GENERAL, LOG_DEBUG, QString("Adding constant property '%1'").arg(property.name()));
+                // constant properties are given a signal index < 0
+                if (property.notifySignalIndex() > -1)
+                {
+                    m_properties.insert(property.notifySignalIndex(), property.propertyIndex());
+                    LOG(VB_GENERAL, LOG_DEBUG, QString("Adding property '%1' with signal index %2").arg(property.name()).arg(property.notifySignalIndex()));
+                }
+                else
+                {
+                    m_properties.insert(invalidindex--, property.propertyIndex());
+                    LOG(VB_GENERAL, LOG_DEBUG, QString("Adding constant property '%1'").arg(property.name()));
+                }
             }
         }
     }
