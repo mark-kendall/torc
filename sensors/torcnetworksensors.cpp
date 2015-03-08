@@ -77,8 +77,6 @@ void TorcNetworkSensors::Create(const QVariantMap &Details)
 
                         QVariantMap sensor   = it2.value().toMap();
                         QString defaultvalue = sensor.value("default").toString();
-                        QString username     = sensor.value("userName").toString();
-                        QString userdesc     = sensor.value("userDescription").toString();
                         QString state        = sensor.value("state").toString().toUpper();
 
                         if (state != "INPUT" && state != "OUTPUT")
@@ -101,35 +99,26 @@ void TorcNetworkSensors::Create(const QVariantMap &Details)
                             case TorcSensor::PWM:
                                 {
                                     if (issensor)
-                                        newsensor = new TorcNetworkPWMSensor(defaultdouble, uniqueid);
+                                        newsensor = new TorcNetworkPWMSensor(defaultdouble, uniqueid, sensor);
                                     else
-                                        newoutput = new TorcNetworkPWMOutput(defaultdouble, uniqueid);
+                                        newoutput = new TorcNetworkPWMOutput(defaultdouble, uniqueid, sensor);
                                 }
                                 break;
                             case TorcSensor::Switch:
                                 {
                                     if (issensor)
-                                        newsensor = new TorcNetworkSwitchSensor(defaultdouble, uniqueid);
+                                        newsensor = new TorcNetworkSwitchSensor(defaultdouble, uniqueid, sensor);
                                     else
-                                        newoutput = new TorcNetworkSwitchOutput(defaultdouble, uniqueid);
+                                        newoutput = new TorcNetworkSwitchOutput(defaultdouble, uniqueid, sensor);
                                 }
                                 break;
                             default: break;
                         }
 
                         if (newsensor)
-                        {
-                            newsensor->SetUserName(username);
-                            newsensor->SetUserDescription(userdesc);
                             m_sensors.insert(uniqueid, newsensor);
-                        }
-
                         if (newoutput)
-                        {
-                            newoutput->SetUserName(username);
-                            newoutput->SetUserDescription(userdesc);
                             m_outputs.insert(uniqueid, newoutput);
-                        }
                     }
                 }
             }

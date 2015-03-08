@@ -23,8 +23,8 @@
 // Torc
 #include "torcpwmoutput.h"
 
-TorcPWMOutput::TorcPWMOutput(double Value, const QString &ModelId, const QString &UniqueId)
-  : TorcOutput(TorcOutput::PWM, Value, ModelId, UniqueId)
+TorcPWMOutput::TorcPWMOutput(double Value, const QString &ModelId, const QString &UniqueId, const QVariantMap &Details)
+  : TorcOutput(TorcOutput::PWM, Value, ModelId, UniqueId, Details)
 {
 }
 

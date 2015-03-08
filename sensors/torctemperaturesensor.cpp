@@ -44,9 +44,10 @@ QString TorcTemperatureSensor::UnitsToLongString(TorcTemperatureSensor::Units Un
 
 TorcTemperatureSensor::TorcTemperatureSensor(TorcTemperatureSensor::Units Units,
                                              double Value, double RangeMinimum, double RangeMaximum,
-                                             const QString &ModelId, const QString &UniqueId)
+                                             const QString &ModelId, const QString &UniqueId,
+                                             const QVariantMap &Details)
   : TorcSensor(TorcSensor::Temperature, Value, RangeMinimum, RangeMaximum,
-               UnitsToShortString(Units), UnitsToLongString(Units), ModelId, UniqueId),
+               UnitsToShortString(Units), UnitsToLongString(Units), ModelId, UniqueId, Details),
     defaultUnits(Units),
     currentUnits(Units)
 {

@@ -168,7 +168,7 @@ bool TorcControl::ParseTimeString(const QString &Time, int &Days, int &Hours,
  * If 'invalid' the output will be set to the default.
 */
 TorcControl::TorcControl(const QString &UniqueId, const QVariantMap &Details)
-  : TorcDevice(false, 0, 0, QString("Control"), UniqueId),
+  : TorcDevice(false, 0, 0, QString("Control"), UniqueId, Details),
     m_parsed(false),
     m_validated(false),
     m_inputList(),
@@ -184,10 +184,6 @@ TorcControl::TorcControl(const QString &UniqueId, const QVariantMap &Details)
     m_outputList = Details.value("outputs").toStringList();
     m_outputList.removeDuplicates();
     m_outputList.removeAll("");
-
-    // parse other common details
-    SetUserName(Details.value("userName").toString());
-    SetUserDescription(Details.value("userDescription").toString());
 }
 
 TorcControl::~TorcControl()
@@ -404,86 +400,24 @@ void TorcControl::InputValidChangedPriv(QObject *Input, bool Valid)
     }
 }
 
-bool TorcControl::GetValid(void)
-{
-    QMutexLocker locker(lock);
-    return valid;
-}
-
-double TorcControl::GetValue(void)
-{
-    QMutexLocker locker(lock);
-    return value;
-}
-
-QString TorcControl::GetUniqueId(void)
-{
-    QMutexLocker locker(lock);
-    return uniqueId;
-}
-
-QString TorcControl::GetUserName(void)
-{
-    QMutexLocker locker(lock);
-    return userName;
-}
-
-QString TorcControl::GetUserDescription(void)
-{
-    QMutexLocker locker(lock);
-    return userDescription;
-}
-
-void TorcControl::SetUserName(const QString &Name)
-{
-    QMutexLocker locker(lock);
-
-    if (Name == userName)
-        return;
-
-    userName = Name;
-    emit UserNameChanged(userName);
-}
-
-void TorcControl::SetUserDescription(const QString &Description)
-{
-    QMutexLocker locker(lock);
-
-    if (Description == userDescription)
-        return;
-
-    userDescription = Description;
-    emit UserDescriptionChanged(userDescription);
-}
-
 void TorcControl::SetValue(double Value)
 {
     QMutexLocker locker(lock);
 
-    if (!m_parsed || !m_validated)
-        return;
-
-    if (qFuzzyCompare(Value + 1.0, value + 1.0))
-        return;
-
-    value = Value;
-    emit ValueChanged(value);
+    if (m_parsed && m_validated)
+        TorcDevice::SetValue(Value);
 }
 
 void TorcControl::SetValid(bool Valid)
 {
     QMutexLocker locker(lock);
 
-    if (!m_parsed || !m_validated)
-        return;
+    if (m_parsed && m_validated)
+    {
+        TorcDevice::SetValid(Valid);
 
-    if (valid == Valid)
-        return;
-
-    valid = Valid;
-    emit ValidChanged(valid);
-
-    // important!!
-    if (!valid)
-        SetValue(defaultValue);
+        // important!!
+        if (!valid)
+            SetValue(defaultValue);
+    }
 }

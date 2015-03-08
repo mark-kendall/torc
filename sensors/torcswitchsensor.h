@@ -6,7 +6,7 @@
 class TorcSwitchSensor : public TorcSensor
 {
   public:
-    TorcSwitchSensor(double Default, const QString &ModelId, const QString &UniqueId);
+    TorcSwitchSensor(double Default, const QString &ModelId, const QString &UniqueId, const QVariantMap &Details);
     virtual ~TorcSwitchSensor();
 
     TorcSensor::Type GetType    (void);

@@ -7,7 +7,7 @@
 class TorcNetworkSwitchSensor : public TorcSwitchSensor
 {
   public:
-    TorcNetworkSwitchSensor(double Default, const QString &UniqeId);
+    TorcNetworkSwitchSensor(double Default, const QString &UniqeId, const QVariantMap &Details);
    ~TorcNetworkSwitchSensor();
 };
 

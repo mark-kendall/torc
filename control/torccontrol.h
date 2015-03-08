@@ -15,11 +15,6 @@ class TorcControl : public TorcDevice
 
     Q_OBJECT
     Q_ENUMS(Operation)
-    Q_PROPERTY(bool    valid           READ GetValid()           NOTIFY ValidChanged())
-    Q_PROPERTY(double  value           READ GetValue()           NOTIFY ValueChanged())
-    Q_PROPERTY(QString uniqueId        READ GetUniqueId()        CONSTANT)
-    Q_PROPERTY(QString userName        READ GetUserName()        WRITE SetUserName()        NOTIFY UserNameChanged())
-    Q_PROPERTY(QString userDescription READ GetUserDescription() WRITE SetUserDescription() NOTIFY UserDescriptionChanged())
 
   public:
     enum Type
@@ -47,21 +42,6 @@ class TorcControl : public TorcDevice
   public slots:
     void                   InputValueChanged      (double Value);
     void                   InputValidChanged      (bool   Valid);
-
-    bool                   GetValid               (void);
-    double                 GetValue               (void);
-    QString                GetUniqueId            (void);
-    QString                GetUserName            (void);
-    QString                GetUserDescription     (void);
-
-    void                   SetUserName            (const QString &Name);
-    void                   SetUserDescription     (const QString &Description);
-
-  signals:
-    void                   ValidChanged           (bool  Valid);
-    void                   ValueChanged           (double Value);
-    void                   UserNameChanged        (const QString &Name);
-    void                   UserDescriptionChanged (const QString &Description);
 
   protected:
     void                   Finish                 (bool Passthrough);

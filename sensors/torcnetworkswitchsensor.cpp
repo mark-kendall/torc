@@ -23,8 +23,8 @@
 // Torc
 #include "torcnetworkswitchsensor.h"
 
-TorcNetworkSwitchSensor::TorcNetworkSwitchSensor(double Default, const QString &UniqueId)
-  : TorcSwitchSensor(Default, "NetworkSwitch", UniqueId)
+TorcNetworkSwitchSensor::TorcNetworkSwitchSensor(double Default, const QString &UniqueId, const QVariantMap &Details)
+  : TorcSwitchSensor(Default, "NetworkSwitch", UniqueId, Details)
 {
 }
 

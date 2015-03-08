@@ -6,6 +6,9 @@
 #include <QObject>
 #include <QVariant>
 
+// Torc
+#include "torcdevice.h"
+
 class TorcCentral : public QObject
 {
     Q_OBJECT
@@ -36,10 +39,10 @@ class TorcDeviceHandler
     static  void Stop    (void);
 
   protected:
-    virtual void                     Create  (const QVariantMap &Details) = 0;
-    virtual void                     Destroy (void) = 0;
+    virtual void                     Create           (const QVariantMap &Details) = 0;
+    virtual void                     Destroy          (void) = 0;
     static TorcDeviceHandler*        GetDeviceHandler (void);
-    TorcDeviceHandler*               GetNextHandler (void);
+    TorcDeviceHandler*               GetNextHandler   (void);
 
   protected:
     QMutex                          *m_lock;

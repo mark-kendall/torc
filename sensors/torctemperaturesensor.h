@@ -22,7 +22,8 @@ class TorcTemperatureSensor : public TorcSensor
 
     TorcTemperatureSensor(TorcTemperatureSensor::Units Units,
                           double Value, double RangeMinimum, double RangeMaximum,
-                          const QString &ModelId, const QString &UniqueId);
+                          const QString &ModelId, const QString &UniqueId,
+                          const QVariantMap &Details);
     virtual ~TorcTemperatureSensor();
 
     TorcSensor::Type GetType      (void);

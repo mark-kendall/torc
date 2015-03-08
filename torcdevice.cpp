@@ -65,19 +65,24 @@ QObject* TorcDevice::GetObjectforId(const QString &UniqueId)
 
 TorcDevice::TorcDevice(bool Valid, double Value, double Default,
                        const QString &ModelId, const QString &UniqueId,
-                       const QString &UserName, const QString &userDescription)
+                       const QVariantMap &Details)
   : TorcReferenceCounter(),
     valid(Valid),
     value(Value),
     defaultValue(Default),
     modelId(ModelId),
     uniqueId(UniqueId),
-    userName(UserName),
-    userDescription(userDescription),
+    userName(QString("")),
+    userDescription(QString("")),
     lock(new QMutex(QMutex::Recursive))
 {
     if (!TorcDevice::RegisterUniqueId(uniqueId, this))
         LOG(VB_GENERAL, LOG_ERR, QString("Device id '%1' already in use - THIS WILL NOT WORK").arg(uniqueId));
+
+    if (Details.contains("userName"))
+        SetUserName(Details.value("userName").toString());
+    if (Details.contains("userDescription"))
+        SetUserDescription(Details.value("userDescription").toString());
 }
 
 TorcDevice::~TorcDevice()
@@ -85,4 +90,89 @@ TorcDevice::~TorcDevice()
     TorcDevice::UnregisterUniqueId(uniqueId);
     delete lock;
     lock = NULL;
+}
+
+void TorcDevice::SetValid(bool Valid)
+{
+    QMutexLocker locker(lock);
+
+    if (Valid == valid)
+        return;
+
+    valid = Valid;
+    emit ValidChanged(valid);
+}
+
+void TorcDevice::SetValue(double Value)
+{
+    QMutexLocker locker(lock);
+
+    // ignore same value updates
+    if (qFuzzyCompare(Value + 1.0f, value + 1.0f))
+        return;
+
+    value = Value;
+    emit ValueChanged(value);
+}
+
+void TorcDevice::SetUserName(const QString &Name)
+{
+    QMutexLocker locker(lock);
+
+    if (Name == userName)
+        return;
+
+    userName = Name;
+    emit UserNameChanged(userName);
+}
+
+void TorcDevice::SetUserDescription(const QString &Description)
+{
+    QMutexLocker locker(lock);
+
+    if (Description == userDescription)
+        return;
+
+    userDescription = Description;
+    emit UserDescriptionChanged(userDescription);
+}
+
+bool TorcDevice::GetValid(void)
+{
+    QMutexLocker locker(lock);
+
+    return valid;
+}
+
+double TorcDevice::GetValue(void)
+{
+    QMutexLocker locker(lock);
+
+    return value;
+}
+
+QString TorcDevice::GetModelId(void)
+{
+    // no need to lock
+    return modelId;
+}
+
+QString TorcDevice::GetUniqueId(void)
+{
+    // no need to lock
+    return uniqueId;
+}
+
+QString TorcDevice::GetUserName(void)
+{
+    QMutexLocker locker(lock);
+
+    return userName;
+}
+
+QString TorcDevice::GetUserDescription(void)
+{
+    QMutexLocker locker(lock);
+
+    return userDescription;
 }

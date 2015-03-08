@@ -62,8 +62,9 @@ TorcSensor::Type TorcSensor::StringToType(const QString &Type)
 */
 TorcSensor::TorcSensor(TorcSensor::Type Type, double Value, double RangeMinimum, double RangeMaximum,
                        const QString &ShortUnits,    const QString &LongUnits,
-                       const QString &ModelId,       const QString &UniqueId)
-  : TorcDevice(false, Value, Value, ModelId, UniqueId),
+                       const QString &ModelId,       const QString &UniqueId,
+                       const QVariantMap &Details)
+  : TorcDevice(false, Value, Value, ModelId, UniqueId, Details),
     TorcHTTPService(this, SENSORS_DIRECTORY + "/" + TypeToString(Type) + "/" + UniqueId,
                     UniqueId, TorcSensor::staticMetaObject,
                     UniqueId.contains(NETWORK_SENSORS_STRING) ? QString("") : BLACKLIST),
@@ -102,21 +103,6 @@ void TorcSensor::Start(void)
 void TorcSensor::SubscriberDeleted(QObject *Subscriber)
 {
     TorcHTTPService::HandleSubscriberDeleted(Subscriber);
-}
-
-/*! \brief Update the validity of the sensor.
- *
- * A sensor may not provide a meaningful value on startup or may become unavailable due to an error.
-*/
-void TorcSensor::SetValid(bool Valid)
-{
-    QMutexLocker locker(lock);
-
-    if (Valid == valid)
-        return;
-
-    valid = Valid;
-    emit ValidChanged(valid);
 }
 
 /*! \brief Update the sensors value.
@@ -171,18 +157,6 @@ void TorcSensor::SetValue(double Value)
     }
 }
 
-/// userName is the identity given to this sensor by the end user e.g. Room, Tank
-void TorcSensor::SetUserName(const QString &Name)
-{
-    QMutexLocker locker(lock);
-
-    if (Name == userName)
-        return;
-
-    userName = Name;
-    emit UserNameChanged(userName);
-}
-
 /// shortUnits are the abbreviated, translated units shared with the user e.g. °C.
 void TorcSensor::SetShortUnits(const QString &Units)
 {
@@ -205,32 +179,6 @@ void TorcSensor::SetLongUnits(const QString &Units)
 
     longUnits = Units;
     emit LongUnitsChanged(longUnits);
-}
-
-/// userDescription gives a short description of the purpose of the sensor (e.g. monitor tank temperature).
-void TorcSensor::SetUserDescription(const QString &Description)
-{
-    QMutexLocker locker(lock);
-
-    if (Description == userDescription)
-        return;
-
-    userDescription = Description;
-    emit UserDescriptionChanged(userDescription);
-}
-
-bool TorcSensor::GetValid(void)
-{
-    QMutexLocker locker(lock);
-
-    return valid;
-}
-
-double TorcSensor::GetValue(void)
-{
-    QMutexLocker locker(lock);
-
-    return value;
 }
 
 double TorcSensor::GetValueScaled(void)
@@ -292,32 +240,4 @@ QString TorcSensor::GetLongUnits(void)
     QMutexLocker locker(lock);
 
     return longUnits;
-}
-
-/// modelId gives a hint as to the type and functionality of the sensor.
-QString TorcSensor::GetModelId(void)
-{
-    // no need to lock
-    return modelId;
-}
-
-/// uniqueId should provide an unambiguous identifier for the sensor.
-QString TorcSensor::GetUniqueId(void)
-{
-    // no need to lock
-    return uniqueId;
-}
-
-QString TorcSensor::GetUserName(void)
-{
-    QMutexLocker locker(lock);
-
-    return userName;
-}
-
-QString TorcSensor::GetUserDescription(void)
-{
-    QMutexLocker locker(lock);
-
-    return userDescription;
 }

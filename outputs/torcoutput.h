@@ -17,11 +17,6 @@ class TorcOutput : public TorcDevice, public TorcHTTPService
     Q_OBJECT
     Q_ENUMS(Type)
     Q_CLASSINFO("Version",        "1.0.0")
-    Q_PROPERTY(double   value             READ GetValue()              WRITE SetValue()              NOTIFY ValueChanged())
-    Q_PROPERTY(QString  modelId           READ GetModelId()            CONSTANT)
-    Q_PROPERTY(QString  uniqueId          READ GetUniqueId()           CONSTANT)
-    Q_PROPERTY(QString  userName          READ GetUserName()           WRITE    SetUserName()        NOTIFY UserNameChanged())
-    Q_PROPERTY(QString  userDescription   READ GetUserDescription()    WRITE    SetUserDescription() NOTIFY UserDescriptionChanged())
 
   public:
     enum Type
@@ -36,7 +31,7 @@ class TorcOutput : public TorcDevice, public TorcHTTPService
     static TorcOutput::Type StringToType(const QString &Type);
 
   public:
-    TorcOutput(TorcOutput::Type Type, double Value, const QString &ModelId, const QString &UniqueId);
+    TorcOutput(TorcOutput::Type Type, double Value, const QString &ModelId, const QString &UniqueId, const QVariantMap &Details);
     virtual ~TorcOutput();
 
     virtual TorcOutput::Type GetType (void) = 0;
@@ -47,21 +42,6 @@ class TorcOutput : public TorcDevice, public TorcHTTPService
   public slots:
     // TorcHTTPService
     void             SubscriberDeleted         (QObject *Subscriber);
-
-    double           GetValue               (void);
-    QString          GetModelId             (void);
-    QString          GetUniqueId            (void);
-    QString          GetUserName            (void);
-    QString          GetUserDescription     (void);
-
-    virtual void     SetValue               (double Value);
-    void             SetUserName            (const QString &Name);
-    void             SetUserDescription     (const QString &Description);
-
-  signals:
-    void             ValueChanged           (double Value);
-    void             UserNameChanged        (const QString &Name);
-    void             UserDescriptionChanged (const QString &Description);
 
   private:
     QObject         *m_owner;

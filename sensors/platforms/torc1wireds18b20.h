@@ -17,7 +17,7 @@ class Torc1WireDS18B20 : public TorcTemperatureSensor
     Q_OBJECT
 
   public:
-    Torc1WireDS18B20(const QString &UniqueId, const QString &Filename);
+    Torc1WireDS18B20(const QString &UniqueId, const QString &Filename, const QVariantMap &Details);
     ~Torc1WireDS18B20();
 
     void   Read  (double Value, bool Valid);

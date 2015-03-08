@@ -105,9 +105,9 @@ void Torc1WireReadThread::Read(void)
     m_parent->Read(0, false);
 }
 
-Torc1WireDS18B20::Torc1WireDS18B20(const QString &UniqueId, const QString &Filename)
+Torc1WireDS18B20::Torc1WireDS18B20(const QString &UniqueId, const QString &Filename, const QVariantMap &Details)
   : TorcTemperatureSensor(TorcTemperatureSensor::Celsius, 0, -55.0, 125.0,
-                          DS18B20NAME, UniqueId),
+                          DS18B20NAME, UniqueId, Details),
     m_readThread(new Torc1WireReadThread(this, Filename))
 {
     m_readThread->start();

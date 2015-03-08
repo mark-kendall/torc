@@ -7,7 +7,7 @@
 class TorcSwitchOutput : public TorcOutput
 {
   public:
-    TorcSwitchOutput(double Value, const QString &ModelId, const QString &UniqueId);
+    TorcSwitchOutput(double Value, const QString &ModelId, const QString &UniqueId, const QVariantMap &Details);
     virtual ~TorcSwitchOutput();
 
     TorcOutput::Type GetType (void);

@@ -23,8 +23,8 @@
 // Torc
 #include "torcswitchoutput.h"
 
-TorcSwitchOutput::TorcSwitchOutput(double Value, const QString &ModelId, const QString &UniqueId)
-  : TorcOutput(TorcOutput::Switch, Value, ModelId, UniqueId)
+TorcSwitchOutput::TorcSwitchOutput(double Value, const QString &ModelId, const QString &UniqueId, const QVariantMap &Details)
+  : TorcOutput(TorcOutput::Switch, Value, ModelId, UniqueId, Details)
 {
 }
 

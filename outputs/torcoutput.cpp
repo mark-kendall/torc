@@ -45,8 +45,8 @@ TorcOutput::Type TorcOutput::StringToType(const QString &Type)
     return TorcOutput::Unknown;
 }
 
-TorcOutput::TorcOutput(TorcOutput::Type Type, double Value, const QString &ModelId, const QString &UniqueId)
-  : TorcDevice(true, Value, Value, ModelId, UniqueId),
+TorcOutput::TorcOutput(TorcOutput::Type Type, double Value, const QString &ModelId, const QString &UniqueId, const QVariantMap &Details)
+  : TorcDevice(true, Value, Value, ModelId, UniqueId, Details),
     TorcHTTPService(this, OUTPUTS_DIRECTORY + "/" + TypeToString(Type) + "/" + UniqueId, UniqueId, TorcOutput::staticMetaObject, BLACKLIST),
     m_owner(NULL)
 {
@@ -65,6 +65,7 @@ void TorcOutput::SetOwner(QObject *Owner)
 
     m_owner = Owner;
     DisableMethod("SetValue");
+    DisableMethod("SetValid");
 }
 
 void TorcOutput::SubscriberDeleted(QObject *Subscriber)
@@ -74,66 +75,4 @@ void TorcOutput::SubscriberDeleted(QObject *Subscriber)
 
 TorcOutput::~TorcOutput()
 {
-}
-
-void TorcOutput::SetValue(double Value)
-{
-    QMutexLocker locker(lock);
-
-    // ignore same value updates
-    if (qFuzzyCompare(Value + 1.0f, value + 1.0f))
-        return;
-
-    value = Value;
-    emit ValueChanged(value);
-}
-
-void TorcOutput::SetUserName(const QString &Name)
-{
-    QMutexLocker locker(lock);
-     if (Name == userName)
-         return;
-
-     userName = Name;
-     emit UserNameChanged(userName);
-}
-
-void TorcOutput::SetUserDescription(const QString &Description)
-{
-    QMutexLocker locker(lock);
-    if (Description == userDescription)
-        return;
-
-    userDescription = Description;
-    emit UserDescriptionChanged(userDescription);
-}
-
-double TorcOutput::GetValue(void)
-{
-    QMutexLocker locker(lock);
-    return value;
-}
-
-QString TorcOutput::GetModelId(void)
-{
-    QMutexLocker locker(lock);
-    return modelId;
-}
-
-QString TorcOutput::GetUniqueId(void)
-{
-    QMutexLocker locker(lock);
-    return uniqueId;
-}
-
-QString TorcOutput::GetUserName(void)
-{
-    QMutexLocker locker(lock);
-    return userName;
-}
-
-QString TorcOutput::GetUserDescription(void)
-{
-    QMutexLocker locker(lock);
-    return userDescription;
 }

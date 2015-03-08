@@ -23,8 +23,8 @@
 // Torc
 #include "torcpwmsensor.h"
 
-TorcPWMSensor::TorcPWMSensor(double Value, const QString &ModelId, const QString &UniqueId)
-  : TorcSensor(TorcSensor::PWM, Value, 0.0, 1.0, tr("%"), tr("Percentage"), ModelId, UniqueId)
+TorcPWMSensor::TorcPWMSensor(double Value, const QString &ModelId, const QString &UniqueId, const QVariantMap &Details)
+  : TorcSensor(TorcSensor::PWM, Value, 0.0, 1.0, tr("%"), tr("Percentage"), ModelId, UniqueId, Details)
 {
 }
 

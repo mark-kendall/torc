@@ -9,7 +9,7 @@ class TorcPiOutput : public TorcSwitchOutput
   Q_OBJECT
 
   public:
-    TorcPiOutput(int Pin, const QString &UniqueId);
+    TorcPiOutput(int Pin, const QString &UniqueId, const QVariantMap &Details);
     ~TorcPiOutput();
 
     void SetValue (double Value);

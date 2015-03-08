@@ -7,7 +7,7 @@
 class TorcPWMOutput : public TorcOutput
 {
   public:
-    TorcPWMOutput(double Value, const QString &ModelId, const QString &UniqueId);
+    TorcPWMOutput(double Value, const QString &ModelId, const QString &UniqueId, const QVariantMap &Details);
     virtual ~TorcPWMOutput();
 
     TorcOutput::Type GetType (void);

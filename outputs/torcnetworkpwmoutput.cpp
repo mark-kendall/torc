@@ -23,8 +23,8 @@
 // Torc
 #include "torcnetworkpwmoutput.h"
 
-TorcNetworkPWMOutput::TorcNetworkPWMOutput(double Default, const QString &UniqueId)
-  : TorcPWMOutput(Default, "NetworkPWMOutput", UniqueId)
+TorcNetworkPWMOutput::TorcNetworkPWMOutput(double Default, const QString &UniqueId, const QVariantMap &Details)
+  : TorcPWMOutput(Default, "NetworkPWMOutput", UniqueId, Details)
 {
 }
 

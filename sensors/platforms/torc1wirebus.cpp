@@ -97,14 +97,8 @@ void Torc1WireBus::Create(const QVariantMap &Details)
 
             LOG(VB_GENERAL, LOG_INFO, QString("New 1Wire %1 digital thermometer: %2")
                 .arg(DS18B20NAME).arg(uniqueid));
-            TorcSensor* sensor = new Torc1WireDS18B20(uniqueid, it.key());
+            TorcSensor* sensor = new Torc1WireDS18B20(uniqueid, it.key(), it.value().toMap());
             m_sensors.insert(uniqueid, sensor);
-
-            QVariantMap details = it.value().toMap();
-            if (details.contains("userName"))
-                sensor->SetUserName(details.value("userName").toString());
-            if (details.contains("userDescription"))
-                sensor->SetUserDescription(details.value("userDescription").toString());
         }
     }
 }

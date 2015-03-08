@@ -150,20 +150,3 @@ void TorcSensors::RemoveSensor(TorcSensor *Sensor)
     LOG(VB_GENERAL, LOG_INFO, QString("Sensor %1 de-registered").arg(Sensor->GetUniqueId()));
     emit SensorsChanged();
 }
-
-
-void TorcSensors::UpdateSensor(const QString &Id, const QString &Name, const QString &Description)
-{
-    QMutexLocker locker(m_lock);
-
-    foreach(TorcSensor* sensor, sensorList)
-    {
-        if (sensor->GetUniqueId() == Id)
-        {
-            if (!Name.isEmpty())
-                sensor->SetUserName(Name);
-            if (!Description.isEmpty())
-                sensor->SetUserDescription(Description);
-        }
-    }
-}

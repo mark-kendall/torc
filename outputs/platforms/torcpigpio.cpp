@@ -96,16 +96,12 @@ void TorcPiGPIO::Create(const QVariantMap &GPIO)
                     continue;
                 }
 
-                QString name  = details.value("userName").toString();
-                QString desc  = details.value("userDescription").toString();
                 QString state = details.value("state").toString();
 
                 if (state.toUpper() == "OUTPUT")
                 {
-                    TorcPiOutput* output = new TorcPiOutput(pin, uniqueid);
+                    TorcPiOutput* output = new TorcPiOutput(pin, uniqueid, details);
                     m_outputs.insert(pin, output);
-                    output->SetUserName(name);
-                    output->SetUserDescription(desc);
                 }
                 else if (state.toUpper() == "INPUT")
                 {

@@ -263,5 +263,3 @@ void TorcDeviceHandler::Stop(void)
     for ( ; handler; handler = handler->GetNextHandler())
         handler->Destroy();
 }
-
-
