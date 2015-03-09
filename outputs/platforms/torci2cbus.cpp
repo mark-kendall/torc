@@ -83,10 +83,10 @@ void TorcI2CBus::Create(const QVariantMap &Details)
         for ( ; it != i2c.end(); ++it)
         {
             // look for <i2c>
-            if (!it.key() == I2C)
+            if (it.key() != I2C)
                 continue;
 
-            QVariantMap devices = it.key().toMap();
+            QVariantMap devices = it.value().toMap();
             QVariantMap::iterator it2 = devices.begin();
             for ( ; it2 != devices.end(); ++it2)
             {
@@ -101,7 +101,7 @@ void TorcI2CBus::Create(const QVariantMap &Details)
 
                 bool ok = false;
                 // N.B. assumes hexadecimal 0xXX
-                int address = details.value("address").toInt(&ok, 16);
+                int address = details.value("address").toString().toInt(&ok, 16);
                 if (!ok)
                 {
                     LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse I2C address from '%1' for device '%2'")
@@ -120,7 +120,7 @@ void TorcI2CBus::Create(const QVariantMap &Details)
                 TorcI2CDeviceFactory* factory = TorcI2CDeviceFactory::GetTorcI2CDeviceFactory();
                 for ( ; factory; factory = factory->NextFactory())
                 {
-                    device = factory->Create(address, it.key(), details);
+                    device = factory->Create(address, it2.key(), details);
                     if (device)
                         break;
                 }

@@ -10,7 +10,7 @@
 
 class TorcI2CPCA9685Channel;
 
-#define PCA9685 QString("PCA9685")
+#define PCA9685 QString("pca9685")
 
 class TorcI2CPCA9685 : public TorcI2CDevice
 {

@@ -111,8 +111,8 @@ TorcI2CPCA9685::TorcI2CPCA9685(int Address, const QVariantMap &Details)
 
     // create individual channel services
     // this will also reset each channel to the default value (0)
-    QVariantMap::iterator it = Details.begin();
-    for ( ; it != Details.end(); ++it)
+    QVariantMap::const_iterator it = Details.begin();
+    for ( ; it != Details.constEnd(); ++it)
     {
         if (it.key() == "channel")
         {
@@ -129,7 +129,7 @@ TorcI2CPCA9685::TorcI2CPCA9685(int Address, const QVariantMap &Details)
 
             if (!ok || channelnum < 0 || channelnum >= 16)
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse valid PCA9685 channel number from '%1'").arg(channel.value("number")));
+                LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse valid PCA9685 channel number from '%1'").arg(channel.value("number").toString()));
                 continue;
             }
 
