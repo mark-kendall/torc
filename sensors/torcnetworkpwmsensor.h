@@ -7,7 +7,7 @@
 class TorcNetworkPWMSensor : public TorcPWMSensor
 {
   public:
-    TorcNetworkPWMSensor(double Default, const QString &UniqueId, const QVariantMap &Details);
+    TorcNetworkPWMSensor(double Default, const QVariantMap &Details);
     ~TorcNetworkPWMSensor();
 };
 

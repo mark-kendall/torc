@@ -9,7 +9,7 @@ class TorcPWMSensor : public TorcSensor
     Q_OBJECT
 
   public:
-    TorcPWMSensor(double Value, const QString &ModelId, const QString &UniqueId, const QVariantMap &Details);
+    TorcPWMSensor(double Value, const QString &ModelId, const QVariantMap &Details);
     virtual ~TorcPWMSensor();
 
     TorcSensor::Type GetType    (void);

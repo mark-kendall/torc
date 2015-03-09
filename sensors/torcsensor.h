@@ -43,8 +43,7 @@ class TorcSensor : public TorcDevice, public TorcHTTPService
   public:
     TorcSensor(TorcSensor::Type Type, double Value, double RangeMinimum, double RangeMaximum,
                const QString &ShortUnits, const QString &LongUnits,
-               const QString &ModelId, const QString &UniqueId,
-               const QVariantMap &Details);
+               const QString &ModelId,    const QVariantMap &Details);
 
 
     virtual TorcSensor::Type GetType           (void) = 0;

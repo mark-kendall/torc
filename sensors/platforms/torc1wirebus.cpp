@@ -49,6 +49,21 @@ Torc1WireBus* Torc1WireBus::gTorc1WireBus = new Torc1WireBus();
  * \note The required kernel modules are not loaded by default on Raspbian. You will
  *       need to 'modprobe' for both w1_gpio and w1_therm and add these to /etc/modules
  *       to ensure they are loaded at each reboot.
+ *
+ * \code
+ * <torc>
+ *     <sensors>
+ *         <wire1>
+ *             <ds18b20>
+ *                 <id>28-XXXXXXX</id>
+ *                 <name>tanktemp</name>
+ *                 <userName>Tank temperature</userName>
+ *                 <userDescription>The temperature in the tank</userDescription>
+ *             </ds18b20>
+ *         </wire1>
+ *     </sensors>
+ * </torc>
+ * \endcode
 */
 Torc1WireBus::Torc1WireBus()
   : TorcDeviceHandler()
@@ -68,37 +83,64 @@ void Torc1WireBus::Create(const QVariantMap &Details)
     QDir dir(ONE_WIRE_DIRECTORY);
     if (!dir.exists(ONE_WIRE_DIRECTORY))
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Cannot find 1wire directory (%1) - have you loaded the correct kernel modules").arg(ONE_WIRE_DIRECTORY));
+        LOG(VB_GENERAL, LOG_ERR, QString("Cannot find 1Wire directory (%1) - have you loaded the correct kernel modules").arg(ONE_WIRE_DIRECTORY));
         return;
     }
 
     QVariantMap::const_iterator i = Details.constBegin();
     for ( ; i != Details.constEnd(); i++)
     {
-        if (i.key() != "1Wire")
+        // we look for 1Wire devices in <sensors>
+        if (i.key() != SENSORS_DIRECTORY)
             continue;
 
         QVariantMap wire1 = i.value().toMap();
         QVariantMap::iterator it = wire1.begin();
         for ( ; it != wire1.end(); ++it)
         {
-            // TODO move this to a device factory like the I2C bus
-            if (!it.key().startsWith("28-"))
-                continue;
+            // now we're looking for <wire1>
+            // N.B. XML doesn't allow element names to begin with numeric characters - hence wire1
 
-            QString uniqueid = "1Wire_" + it.key();
-
-            // check for uniqueid
-            if (!TorcDevice::UniqueIdAvailable(uniqueid))
+            if (it.key() == ONE_WIRE_NAME)
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("Device id '%1' already in use - ignoring").arg(uniqueid));
-                continue;
-            }
+                QVariantMap devices = it.value().toMap();
+                QVariantMap::iterator it2 = devices.begin();
+                for ( ; it2 != devices.end(); ++it2)
+                {
+                    QString devicetype  = it2.key();
+                    QVariantMap details = it2.value().toMap();
 
-            LOG(VB_GENERAL, LOG_INFO, QString("New 1Wire %1 digital thermometer: %2")
-                .arg(DS18B20NAME).arg(uniqueid));
-            TorcSensor* sensor = new Torc1WireDS18B20(uniqueid, it.key(), it.value().toMap());
-            m_sensors.insert(uniqueid, sensor);
+                    // a 1Wire device must have the <id> field
+                    if (!details.contains("id"))
+                    {
+                        LOG(VB_GENERAL, LOG_ERR, QString("Cannot create 1Wire device without unique 1Wire ID ('%1' '%2')")
+                            .arg(devicetype).arg(details.value("name").toString()));
+                    }
+                    else
+                    {
+                        TorcSensor* device = NULL;
+                        Torc1WireDeviceFactory* factory = Torc1WireDeviceFactory::GetTorc1WireDeviceFactory();
+                        for ( ; factory; factory = factory->NextFactory())
+                        {
+                            device = factory->Create(devicetype, details);
+                            if (device)
+                                break;
+                        }
+
+                        if (device)
+                        {
+                            QString deviceid = details.value("id").toString();
+                            LOG(VB_GENERAL, LOG_INFO, QString("New 1Wire device: %1").arg(deviceid));
+                            m_sensors.insert(deviceid, device);
+                        }
+                        else
+                        {
+                            LOG(VB_GENERAL, LOG_WARNING, QString("Unable to find handler for 1Wire device type '%1'").arg(devicetype));
+                        }
+                    }
+
+                }
+            }
         }
     }
 }
@@ -115,4 +157,26 @@ void Torc1WireBus::Destroy(void)
         it.value()->DownRef();
     }
     m_sensors.clear();
+}
+
+Torc1WireDeviceFactory* Torc1WireDeviceFactory::gTorc1WireDeviceFactory = NULL;
+
+Torc1WireDeviceFactory::Torc1WireDeviceFactory()
+{
+    nextTorc1WireDeviceFactory = gTorc1WireDeviceFactory;
+    gTorc1WireDeviceFactory = this;
+}
+
+Torc1WireDeviceFactory::~Torc1WireDeviceFactory()
+{
+}
+
+Torc1WireDeviceFactory* Torc1WireDeviceFactory::GetTorc1WireDeviceFactory(void)
+{
+    return gTorc1WireDeviceFactory;
+}
+
+Torc1WireDeviceFactory* Torc1WireDeviceFactory::NextFactory(void) const
+{
+    return nextTorc1WireDeviceFactory;
 }

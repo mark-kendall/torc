@@ -24,7 +24,7 @@ class TorcLogicControl : public TorcControl
     static QString                     OperationToString (TorcLogicControl::Operation Operation);
 
   public:
-    TorcLogicControl(const QString &UniqueId, const QVariantMap &Details);
+    TorcLogicControl(const QVariantMap &Details);
    ~TorcLogicControl();
 
     bool                        Validate         (void);

@@ -42,7 +42,7 @@
 class TorcI2CPCA9685Channel : public TorcPWMOutput
 {
   public:
-    TorcI2CPCA9685Channel(int Number, TorcI2CPCA9685 *Parent, const QString &UniqueId, const QVariantMap &Details);
+    TorcI2CPCA9685Channel(int Number, TorcI2CPCA9685 *Parent, const QVariantMap &Details);
     ~TorcI2CPCA9685Channel();
 
     void SetValue (double Value);
@@ -52,8 +52,8 @@ class TorcI2CPCA9685Channel : public TorcPWMOutput
     TorcI2CPCA9685 *m_parent;
 };
 
-TorcI2CPCA9685Channel::TorcI2CPCA9685Channel(int Number, TorcI2CPCA9685 *Parent, const QString &UniqueId, const QVariantMap &Details)
-  : TorcPWMOutput(0.0, PCA9685, UniqueId, Details),
+TorcI2CPCA9685Channel::TorcI2CPCA9685Channel(int Number, TorcI2CPCA9685 *Parent, const QVariantMap &Details)
+  : TorcPWMOutput(0.0, PCA9685, Details),
     m_channelNumber(Number),
     m_parent(Parent)
 {
@@ -115,18 +115,11 @@ TorcI2CPCA9685::TorcI2CPCA9685(int Address, const QVariantMap &Details)
 
     for (int i = 0; i < 16; i++)
     {
-        if (channels.contains(QString::number(i)))
+        QString channelident = QString("channel%1").arg(i);
+        if (channels.contains(channelident))
         {
-            QString id = QString("I2C_0x%1_PCA9685_%2").arg(Address, 0, 16).arg(i);
-
-            if (!TorcDevice::UniqueIdAvailable(id))
-            {
-                LOG(VB_GENERAL, LOG_ERR, QString("Device id %1 not available").arg(id));
-                continue;
-            }
-
-            QVariantMap details = channels.value(QString::number(i)).toMap();
-            m_outputs[i] = new TorcI2CPCA9685Channel(i, this, id, details);
+            QVariantMap details = channels.value(channelident).toMap();
+            m_outputs[i] = new TorcI2CPCA9685Channel(i, this, details);
         }
     }
 }

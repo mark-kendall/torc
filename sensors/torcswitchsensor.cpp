@@ -23,8 +23,8 @@
 // Torc
 #include "torcswitchsensor.h"
 
-TorcSwitchSensor::TorcSwitchSensor(double Default, const QString &ModelId, const QString &UniqueId, const QVariantMap &Details)
-  : TorcSensor(TorcSensor::Switch, Default, 0, 1, "", "", ModelId, UniqueId, Details)
+TorcSwitchSensor::TorcSwitchSensor(double Default, const QString &ModelId, const QVariantMap &Details)
+  : TorcSensor(TorcSensor::Switch, Default, 0, 1, "", "", ModelId, Details)
 {
 }
 

@@ -10,6 +10,7 @@
 #include "torccentral.h"
 
 #define ONE_WIRE_DIRECTORY QString("/sys/bus/w1/devices/")
+#define ONE_WIRE_NAME      QString("wire1")
 
 class Torc1WireBus : public TorcDeviceHandler
 {
@@ -24,6 +25,21 @@ class Torc1WireBus : public TorcDeviceHandler
 
   private:
     QHash<QString, TorcSensor*> m_sensors;
+};
+
+class Torc1WireDeviceFactory
+{
+  public:
+    Torc1WireDeviceFactory();
+    virtual ~Torc1WireDeviceFactory();
+
+    static Torc1WireDeviceFactory*   GetTorc1WireDeviceFactory (void);
+    Torc1WireDeviceFactory*          NextFactory             (void) const;
+    virtual TorcSensor*              Create                  (const QString &DeviceType, const QVariantMap &Details) = 0;
+
+  protected:
+    static Torc1WireDeviceFactory*   gTorc1WireDeviceFactory;
+    Torc1WireDeviceFactory*          nextTorc1WireDeviceFactory;
 };
 
 #endif // TORC1WIREBUS_H

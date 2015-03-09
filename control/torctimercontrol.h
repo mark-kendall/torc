@@ -27,7 +27,7 @@ class TorcTimerControl : public TorcControl
     static TorcTimerControl::TimerType StringToTimerType (const QString &Type);
 
   public:
-    TorcTimerControl(const QString &UniqueId, const QVariantMap &Details);
+    TorcTimerControl(const QVariantMap &Details);
    ~TorcTimerControl();
 
     TorcControl::Type GetType         (void);

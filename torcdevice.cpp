@@ -64,20 +64,27 @@ QObject* TorcDevice::GetObjectforId(const QString &UniqueId)
 }
 
 TorcDevice::TorcDevice(bool Valid, double Value, double Default,
-                       const QString &ModelId, const QString &UniqueId,
-                       const QVariantMap &Details)
+                       const QString &ModelId,   const QVariantMap &Details)
   : TorcReferenceCounter(),
     valid(Valid),
     value(Value),
     defaultValue(Default),
     modelId(ModelId),
-    uniqueId(UniqueId),
+    uniqueId(QString("")),
     userName(QString("")),
     userDescription(QString("")),
     lock(new QMutex(QMutex::Recursive))
 {
-    if (!TorcDevice::RegisterUniqueId(uniqueId, this))
-        LOG(VB_GENERAL, LOG_ERR, QString("Device id '%1' already in use - THIS WILL NOT WORK").arg(uniqueId));
+    if (!Details.contains("name"))
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Device has no <name> - THIS WILL NOT WORK"));
+    }
+    else
+    {
+        uniqueId = Details.value("name").toString();
+        if (!TorcDevice::RegisterUniqueId(uniqueId, this))
+            LOG(VB_GENERAL, LOG_ERR, QString("Device id '%1' already in use - THIS WILL NOT WORK").arg(uniqueId));
+    }
 
     if (Details.contains("userName"))
         SetUserName(Details.value("userName").toString());

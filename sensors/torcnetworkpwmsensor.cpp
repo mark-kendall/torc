@@ -23,8 +23,8 @@
 // Torc
 #include "torcnetworkpwmsensor.h"
 
-TorcNetworkPWMSensor::TorcNetworkPWMSensor(double Default, const QString &UniqueId, const QVariantMap &Details)
-  : TorcPWMSensor(Default, "NetworkPWM", UniqueId, Details)
+TorcNetworkPWMSensor::TorcNetworkPWMSensor(double Default, const QVariantMap &Details)
+  : TorcPWMSensor(Default, "NetworkPWM", Details)
 {
 }
 

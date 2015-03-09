@@ -62,12 +62,11 @@ TorcSensor::Type TorcSensor::StringToType(const QString &Type)
 */
 TorcSensor::TorcSensor(TorcSensor::Type Type, double Value, double RangeMinimum, double RangeMaximum,
                        const QString &ShortUnits,    const QString &LongUnits,
-                       const QString &ModelId,       const QString &UniqueId,
-                       const QVariantMap &Details)
-  : TorcDevice(false, Value, Value, ModelId, UniqueId, Details),
-    TorcHTTPService(this, SENSORS_DIRECTORY + "/" + TypeToString(Type) + "/" + UniqueId,
-                    UniqueId, TorcSensor::staticMetaObject,
-                    UniqueId.contains(NETWORK_SENSORS_STRING) ? QString("") : BLACKLIST),
+                       const QString &ModelId,       const QVariantMap &Details)
+  : TorcDevice(false, Value, Value, ModelId, Details),
+    TorcHTTPService(this, SENSORS_DIRECTORY + "/" + TypeToString(Type) + "/" + Details.value("name").toString(),
+                    Details.value("name").toString(), TorcSensor::staticMetaObject,
+                    Details.value("name").toString().contains(NETWORK_SENSORS_STRING) ? QString("") : BLACKLIST),
     valueScaled(Value),
     operatingRangeMin(RangeMinimum),
     operatingRangeMax(RangeMaximum),
@@ -87,7 +86,8 @@ TorcSensor::TorcSensor(TorcSensor::Type Type, double Value, double RangeMinimum,
 
     // register this sensor - the owner must DownRef AND call RemoveSensor to ensure it is deleted.
     // N.B. gSensors is a static class
-    TorcSensors::gSensors->AddSensor(this);
+    if (!uniqueId.isEmpty())
+        TorcSensors::gSensors->AddSensor(this);
 }
 
 TorcSensor::~TorcSensor()

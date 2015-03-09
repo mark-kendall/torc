@@ -105,11 +105,12 @@ void Torc1WireReadThread::Read(void)
     m_parent->Read(0, false);
 }
 
-Torc1WireDS18B20::Torc1WireDS18B20(const QString &UniqueId, const QString &Filename, const QVariantMap &Details)
-  : TorcTemperatureSensor(TorcTemperatureSensor::Celsius, 0, -55.0, 125.0,
-                          DS18B20NAME, UniqueId, Details),
-    m_readThread(new Torc1WireReadThread(this, Filename))
+Torc1WireDS18B20::Torc1WireDS18B20(const QVariantMap &Details)
+  : TorcTemperatureSensor(TorcTemperatureSensor::Celsius, 0, -55.0, 125.0, DS18B20NAME, Details),
+    m_readThread(NULL)
 {
+    QString deviceid = Details.value("id").toString();
+    m_readThread = new Torc1WireReadThread(this, deviceid);
     m_readThread->start();
 }
 
@@ -128,4 +129,15 @@ void Torc1WireDS18B20::Read(double Value, bool Valid)
     else
         SetValid(false);
 }
+
+class Torc1WireDS18B20Factory : public Torc1WireDeviceFactory
+{
+    TorcSensor* Create(const QString &DeviceType, const QVariantMap &Details)
+    {
+        if (DeviceType == DS18B20NAME)
+            return new Torc1WireDS18B20(Details);
+        return NULL;
+    }
+} Torc1WireDS18B20Factory;
+
           

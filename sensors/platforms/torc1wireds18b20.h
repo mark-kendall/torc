@@ -6,9 +6,10 @@
 
 // Torc
 #include "torcqthread.h"
-#include "../torctemperaturesensor.h"
+#include "torctemperaturesensor.h"
+#include "torc1wirebus.h"
 
-#define DS18B20NAME QString("DS18B20")
+#define DS18B20NAME QString("ds18b20")
 
 class Torc1WireReadThread;
 
@@ -17,7 +18,7 @@ class Torc1WireDS18B20 : public TorcTemperatureSensor
     Q_OBJECT
 
   public:
-    Torc1WireDS18B20(const QString &UniqueId, const QString &Filename, const QVariantMap &Details);
+    Torc1WireDS18B20(const QVariantMap &Details);
     ~Torc1WireDS18B20();
 
     void   Read  (double Value, bool Valid);

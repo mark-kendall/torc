@@ -7,7 +7,7 @@
 class TorcNetworkSwitchOutput : public TorcSwitchOutput
 {
   public:
-    TorcNetworkSwitchOutput(double Default, const QString &UniqueId, const QVariantMap &Details);
+    TorcNetworkSwitchOutput(double Default, const QVariantMap &Details);
    ~TorcNetworkSwitchOutput();
 };
 

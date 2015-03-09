@@ -65,22 +65,23 @@ void TorcControls::Create(const QVariantMap &Details)
             QVariantMap::iterator it3 = controls.begin();
             for ( ; it3 != controls.end(); ++it3)
             {
-                QString id = QString("control_%1_%2").arg(TorcControl::TypeToString(type)).arg(it3.key());
+                QVariantMap details = it3.value().toMap();
 
-                if (!TorcDevice::UniqueIdAvailable(id))
+                if (!details.contains("name"))
                 {
-                    LOG(VB_GENERAL, LOG_ERR, QString("Device id '%1' already in use - ignoring").arg(id));
+                    LOG(VB_GENERAL, LOG_ERR, QString("Ignoring control type '%1' with no <name>").arg(TorcControl::TypeToString(type)));
                     continue;
                 }
 
-                QVariantMap details = it3.value().toMap();
+                QString id = details.value("name").toString();
+
                 TorcControl* control = NULL;
                 if (type == TorcControl::Logic)
-                    control = new TorcLogicControl(id, details);
+                    control = new TorcLogicControl(details);
                 else if (type == TorcControl::Timer)
-                    control = new TorcTimerControl(id, details);
+                    control = new TorcTimerControl(details);
                 else
-                    control = new TorcTransitionControl(id, details);
+                    control = new TorcTransitionControl(details);
                 m_controls.insert(id, control);
             }
         }

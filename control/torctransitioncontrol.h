@@ -14,7 +14,7 @@ class TorcTransitionControl : public TorcControl
     Q_PROPERTY(double animationValue READ GetAnimationValue() WRITE SetAnimationValue())
 
   public:
-    TorcTransitionControl(const QString &UniqueId, const QVariantMap &Details);
+    TorcTransitionControl(const QVariantMap &Details);
    ~TorcTransitionControl();
 
     static QEasingCurve::Type EasingCurveFromString (const QString &Curve);

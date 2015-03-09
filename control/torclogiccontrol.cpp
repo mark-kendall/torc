@@ -63,8 +63,8 @@ QString TorcLogicControl::OperationToString(TorcLogicControl::Operation Operatio
     return QString("None");
 }
 
-TorcLogicControl::TorcLogicControl(const QString &UniqueId, const QVariantMap &Details)
-  : TorcControl(UniqueId, Details),
+TorcLogicControl::TorcLogicControl(const QVariantMap &Details)
+  : TorcControl(Details),
     m_operation(TorcLogicControl::NoOperation),
     m_operationValue(0.0)
 {

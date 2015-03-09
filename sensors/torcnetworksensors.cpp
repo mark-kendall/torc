@@ -67,22 +67,14 @@ void TorcNetworkSensors::Create(const QVariantMap &Details)
                     QVariantMap::iterator it2 = sensors.begin();
                     for ( ; it2 != sensors.end(); ++it2)
                     {
-                        QString uniqueid = NETWORK_SENSORS_STRING + "_" + it.key() + "_" + it2.key();
-
-                        if (!TorcDevice::UniqueIdAvailable(uniqueid))
-                        {
-                            LOG(VB_GENERAL, LOG_ERR, QString("Already have network sensor named '%1'").arg(uniqueid));
-                            continue;
-                        }
-
                         QVariantMap sensor   = it2.value().toMap();
                         QString defaultvalue = sensor.value("default").toString();
                         QString state        = sensor.value("state").toString().toUpper();
+                        QString uniqueid     = sensors.value("name").toString(); // ugly... assumes it is present
 
                         if (state != "INPUT" && state != "OUTPUT")
                         {
-                            LOG(VB_GENERAL, LOG_ERR, QString("Unknown network device type '%1' for device '%2'")
-                                .arg(state).arg(uniqueid));
+                            LOG(VB_GENERAL, LOG_ERR, QString("Unknown network device type '%1' for device '%2'").arg(state).arg(uniqueid));
                             continue;
                         }
 
@@ -99,17 +91,17 @@ void TorcNetworkSensors::Create(const QVariantMap &Details)
                             case TorcSensor::PWM:
                                 {
                                     if (issensor)
-                                        newsensor = new TorcNetworkPWMSensor(defaultdouble, uniqueid, sensor);
+                                        newsensor = new TorcNetworkPWMSensor(defaultdouble, sensor);
                                     else
-                                        newoutput = new TorcNetworkPWMOutput(defaultdouble, uniqueid, sensor);
+                                        newoutput = new TorcNetworkPWMOutput(defaultdouble, sensor);
                                 }
                                 break;
                             case TorcSensor::Switch:
                                 {
                                     if (issensor)
-                                        newsensor = new TorcNetworkSwitchSensor(defaultdouble, uniqueid, sensor);
+                                        newsensor = new TorcNetworkSwitchSensor(defaultdouble, sensor);
                                     else
-                                        newoutput = new TorcNetworkSwitchOutput(defaultdouble, uniqueid, sensor);
+                                        newoutput = new TorcNetworkSwitchOutput(defaultdouble, sensor);
                                 }
                                 break;
                             default: break;

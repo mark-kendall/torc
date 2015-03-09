@@ -31,7 +31,7 @@ class TorcControl : public TorcDevice
                                                      int &Minutes, int &Seconds, quint64 &DurationInSeconds);
 
   protected:
-    TorcControl(const QString &UniqueId, const QVariantMap &Details);
+    TorcControl(const QVariantMap &Details);
     virtual ~TorcControl();
 
   public:

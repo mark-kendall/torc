@@ -23,8 +23,8 @@
 // Torc
 #include "torcnetworkswitchoutput.h"
 
-TorcNetworkSwitchOutput::TorcNetworkSwitchOutput(double Default, const QString &UniqueId, const QVariantMap &Details)
-  : TorcSwitchOutput(Default, "NetworkSwitchOutput", UniqueId, Details)
+TorcNetworkSwitchOutput::TorcNetworkSwitchOutput(double Default, const QVariantMap &Details)
+  : TorcSwitchOutput(Default, "NetworkSwitchOutput", Details)
 {
 }
 

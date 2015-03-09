@@ -45,12 +45,14 @@ TorcOutput::Type TorcOutput::StringToType(const QString &Type)
     return TorcOutput::Unknown;
 }
 
-TorcOutput::TorcOutput(TorcOutput::Type Type, double Value, const QString &ModelId, const QString &UniqueId, const QVariantMap &Details)
-  : TorcDevice(true, Value, Value, ModelId, UniqueId, Details),
-    TorcHTTPService(this, OUTPUTS_DIRECTORY + "/" + TypeToString(Type) + "/" + UniqueId, UniqueId, TorcOutput::staticMetaObject, BLACKLIST),
+TorcOutput::TorcOutput(TorcOutput::Type Type, double Value, const QString &ModelId, const QVariantMap &Details)
+  : TorcDevice(true, Value, Value, ModelId, Details),
+    TorcHTTPService(this, OUTPUTS_DIRECTORY + "/" + TypeToString(Type) + "/" + Details.value("name").toString(),
+                    Details.value("name").toString(), TorcOutput::staticMetaObject, BLACKLIST),
     m_owner(NULL)
 {
-    TorcOutputs::gOutputs->AddOutput(this);
+    if (!uniqueId.isEmpty())
+        TorcOutputs::gOutputs->AddOutput(this);
 }
 
 bool TorcOutput::HasOwner(void)

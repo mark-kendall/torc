@@ -167,8 +167,8 @@ bool TorcControl::ParseTimeString(const QString &Time, int &Days, int &Hours,
  * It can then determine an output value.
  * If 'invalid' the output will be set to the default.
 */
-TorcControl::TorcControl(const QString &UniqueId, const QVariantMap &Details)
-  : TorcDevice(false, 0, 0, QString("Control"), UniqueId, Details),
+TorcControl::TorcControl(const QVariantMap &Details)
+  : TorcDevice(false, 0, 0, QString("Control"), Details),
     m_parsed(false),
     m_validated(false),
     m_inputList(),
