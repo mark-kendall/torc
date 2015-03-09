@@ -30,8 +30,8 @@
 
 #define DEFAULT_VALUE 0
 
-TorcPiOutput::TorcPiOutput(int Pin, const QString &UniqueId, const QVariantMap &Details)
-  : TorcSwitchOutput(DEFAULT_VALUE, "RaspberryPi", UniqueId, Details),
+TorcPiOutput::TorcPiOutput(int Pin, const QVariantMap &Details)
+  : TorcSwitchOutput(DEFAULT_VALUE, "RaspberryPi", Details),
     m_pin(Pin)
 {
     // setup and initialise pin for output

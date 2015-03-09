@@ -89,28 +89,27 @@ void TorcPiGPIO::Create(const QVariantMap &GPIO)
                     continue;
                 }
 
-                QString uniqueid = QString("GPIO_%1").arg(pin);
-                if (!TorcDevice::UniqueIdAvailable(uniqueid))
+                if (details.contains("name"))
                 {
-                    LOG(VB_GENERAL, LOG_ERR, QString("Device name %1 already in use - ignoring").arg(uniqueid));
-                    continue;
-                }
+                    QString state = details.value("state").toString();
 
-                QString state = details.value("state").toString();
-
-                if (state.toUpper() == "OUTPUT")
-                {
-                    TorcPiOutput* output = new TorcPiOutput(pin, uniqueid, details);
-                    m_outputs.insert(pin, output);
-                }
-                else if (state.toUpper() == "INPUT")
-                {
-                    LOG(VB_GENERAL, LOG_INFO, "GPIO inputs not implemented - yet");
+                    if (state.toUpper() == "OUTPUT")
+                    {
+                        TorcPiOutput* output = new TorcPiOutput(pin, details);
+                        m_outputs.insert(pin, output);
+                    }
+                    else if (state.toUpper() == "INPUT")
+                    {
+                        LOG(VB_GENERAL, LOG_INFO, "GPIO inputs not implemented - yet");
+                    }
+                    else
+                    {
+                        LOG(VB_GENERAL, LOG_ERR, QString("GPIO Pin #%1 unknown state '%2'").arg(pin).arg(state));
+                    }
                 }
                 else
                 {
-                    LOG(VB_GENERAL, LOG_ERR, QString("GPIO Pin #%1 unknown state '%2'").arg(pin).arg(state));
-                    continue;
+                    LOG(VB_GENERAL, LOG_ERR, QString("GPIO Pin#%1 has no <name> - ignoring").arg(pin));
                 }
             }
         }
