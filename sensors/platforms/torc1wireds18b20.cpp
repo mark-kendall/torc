@@ -33,7 +33,7 @@ Torc1WireReadThread::Torc1WireReadThread(Torc1WireDS18B20 *Parent, const QString
   : TorcQThread("1Wire"),
     m_parent(Parent),
     m_timer(NULL),
-    m_file(ONE_WIRE_DIRECTORY + "/" + Filename + "/w1_slave") 
+    m_file(ONE_WIRE_DIRECTORY + Filename + "/w1_slave") 
 {   
 }   
 
