@@ -23,6 +23,7 @@
 // Torc
 #include "torclogging.h"
 #include "torcpigpio.h"
+#include "torcsensor.h"
 #include "torcoutputs.h"
 
 // wiringPi
@@ -64,22 +65,32 @@ void TorcPiGPIO::Create(const QVariantMap &GPIO)
     QVariantMap::const_iterator i = GPIO.constBegin();
     for ( ; i != GPIO.constEnd(); i++)
     {
-        if (i.key() != "GPIO")
+        // GPIO can be under <sensors> or <outputs>
+        if (i.key() != SENSORS_DIRECTORY && i.key() != OUTPUTS_DIRECTORY)
             continue;
+
+        bool output = i.key() == OUTPUTS_DIRECTORY;
 
         QVariantMap gpio = i.value().toMap();
         QVariantMap::const_iterator it = gpio.begin();
         for ( ; it != gpio.end(); ++it)
         {
-            bool ok = false;
-            int pin = it.key().toInt(&ok);
-            if (ok && pin >= 0 and pin < NUMBER_PINS)
+            // and find gpio
+            if (it.key() == PI_GPIO)
             {
-                QVariantMap details = it.value().toMap();
+                QVariantMap device = it.value().toMap();
 
-                if (!details.contains("state"))
+                if (!device.contains("pin"))
                 {
-                    LOG(VB_GENERAL, LOG_ERR, QString("GPIO Pin #%1 has no state - specify input or output").arg(pin));
+                    LOG(VB_GENERAL, LOG_ERR, QString("GPIO device '%1' does not specify <pin>").arg(device.value("name").toString()));
+                    continue;
+                }
+
+                bool ok = false;
+                int pin = device.value("pin").toInt(&ok);
+                if (!ok || pin < 0 || pin >= NUMBER_PINS)
+                {
+                    LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse valid pin from '%1'").arg(device.value("pin").toString()));
                     continue;
                 }
 
@@ -89,27 +100,14 @@ void TorcPiGPIO::Create(const QVariantMap &GPIO)
                     continue;
                 }
 
-                if (details.contains("name"))
+                if (output)
                 {
-                    QString state = details.value("state").toString();
-
-                    if (state.toUpper() == "OUTPUT")
-                    {
-                        TorcPiOutput* output = new TorcPiOutput(pin, details);
-                        m_outputs.insert(pin, output);
-                    }
-                    else if (state.toUpper() == "INPUT")
-                    {
-                        LOG(VB_GENERAL, LOG_INFO, "GPIO inputs not implemented - yet");
-                    }
-                    else
-                    {
-                        LOG(VB_GENERAL, LOG_ERR, QString("GPIO Pin #%1 unknown state '%2'").arg(pin).arg(state));
-                    }
+                    TorcPiOutput* output = new TorcPiOutput(pin, device);
+                    m_outputs.insert(pin, output);
                 }
                 else
                 {
-                    LOG(VB_GENERAL, LOG_ERR, QString("GPIO Pin#%1 has no <name> - ignoring").arg(pin));
+                    LOG(VB_GENERAL, LOG_INFO, "GPIO inputs not implemented - yet");
                 }
             }
         }
