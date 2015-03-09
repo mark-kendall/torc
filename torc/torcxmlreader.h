@@ -3,7 +3,10 @@
 
 // Qt
 #include <QVariant>
+#include <QMultiMap>
 #include <QXmlStreamReader>
+
+typedef QMultiMap<QString,QVariant> QVariantMultiMap;
 
 class TorcXMLReader
 {
@@ -12,15 +15,15 @@ class TorcXMLReader
    ~TorcXMLReader();
 
     bool              IsValid     (QString &Message);
-    QVariantMap       GetResult   (void);
+    QVariantMultiMap  GetResult   (void);
 
   private:
     bool              ReadXML     (void);
-    bool              ReadElement (QVariantMap *Map);
+    bool              ReadElement (QVariantMultiMap *Map);
 
   private:
     QXmlStreamReader *m_reader;
-    QVariantMap       m_map;
+    QVariantMultiMap  m_map;
     bool              m_valid;
     QString           m_message;
 };

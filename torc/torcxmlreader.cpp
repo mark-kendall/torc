@@ -72,7 +72,7 @@ bool TorcXMLReader::IsValid(QString &Message)
     return m_valid;
 }
 
-QVariantMap TorcXMLReader::GetResult(void)
+QVariantMultiMap TorcXMLReader::GetResult(void)
 {
     return m_map;
 }
@@ -86,7 +86,7 @@ bool TorcXMLReader::ReadXML(void)
         return false;
 
     QString root = m_reader->name().toString();
-    QVariantMap objects;
+    QVariantMultiMap objects;
     while (m_reader->readNextStartElement())
         if (!ReadElement(&objects))
             return false;
@@ -97,13 +97,13 @@ bool TorcXMLReader::ReadXML(void)
 /*! \note As noted in the class documentation, there is no support here for mixed elements.
  *        Any text will be overwritten when the child elements are saved.
 */
-bool TorcXMLReader::ReadElement(QVariantMap *Map)
+bool TorcXMLReader::ReadElement(QVariantMultiMap *Map)
 {
     if (!m_reader)
         return false;
 
     QString     name = m_reader->name().toString();
-    QVariantMap element;
+    QVariantMultiMap element;
 
     bool done = false;
     while (!done)
