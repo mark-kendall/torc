@@ -176,3 +176,46 @@ QString TorcDevice::GetUserDescription(void)
 
     return userDescription;
 }
+
+QList<TorcDeviceHandler*> TorcDeviceHandler::gTorcDeviceHandlers;
+TorcDeviceHandler* TorcDeviceHandler::gTorcDeviceHandler = NULL;
+QMutex* TorcDeviceHandler::gTorcDeviceHandlersLock = new QMutex(QMutex::Recursive);
+
+TorcDeviceHandler::TorcDeviceHandler()
+  : m_lock(new QMutex(QMutex::Recursive))
+{
+    QMutexLocker lock(gTorcDeviceHandlersLock);
+    m_nextTorcDeviceHandler = gTorcDeviceHandler;
+    gTorcDeviceHandler = this;
+}
+
+TorcDeviceHandler::~TorcDeviceHandler()
+{
+    delete m_lock;
+    m_lock = NULL;
+}
+
+TorcDeviceHandler* TorcDeviceHandler::GetNextHandler(void)
+{
+    return m_nextTorcDeviceHandler;
+}
+
+TorcDeviceHandler* TorcDeviceHandler::GetDeviceHandler(void)
+{
+    return gTorcDeviceHandler;
+}
+
+void TorcDeviceHandler::Start(const QVariantMap &Details)
+{
+    TorcDeviceHandler* handler = TorcDeviceHandler::GetDeviceHandler();
+    for ( ; handler; handler = handler->GetNextHandler())
+        handler->Create(Details);
+}
+
+void TorcDeviceHandler::Stop(void)
+{
+    TorcDeviceHandler* handler = TorcDeviceHandler::GetDeviceHandler();
+    for ( ; handler; handler = handler->GetNextHandler())
+        handler->Destroy();
+}
+
