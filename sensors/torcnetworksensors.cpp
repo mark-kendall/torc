@@ -30,6 +30,27 @@
 #include "torcnetworkswitchsensor.h"
 #include "torcnetworksensors.h"
 
+/*! \class TorcNetworkSensors
+ *
+ * Creates and manages known sensors.
+ *
+ * \code
+ *
+ * <torc>
+ *     <sensors or outputs>
+ *         <network>
+ *             <switch or pwm or ph etc>
+ *                 <name></name>
+ *                 <default></default>
+ *                 <userName></userName>
+ *                 <userDescription></userDescription>
+ *             </switch etc>
+ *         </network>
+ *     </sensors>
+ * </torc>
+ *
+ * \endcode
+*/
 TorcNetworkSensors* TorcNetworkSensors::gNetworkSensors = new TorcNetworkSensors();
 
 TorcNetworkSensors::TorcNetworkSensors()
@@ -45,40 +66,36 @@ void TorcNetworkSensors::Create(const QVariantMap &Details)
 {
     QMutexLocker locker(m_lock);
 
-    if (!Details.contains(NETWORK_SENSORS_STRING))
-        return;
-
     QVariantMap::const_iterator i = Details.begin();
     for ( ; i != Details.end(); ++i)
     {
-        if (i.key() != NETWORK_SENSORS_STRING)
+        // network devices can be <sensors> or <outputs>
+        if ((i.key() != SENSORS_DIRECTORY) && (i.key() != OUTPUTS_DIRECTORY))
             continue;
 
-        QVariantMap details = i.value().toMap();
-        QVariantMap::const_iterator it = details.begin();
-        for ( ; it != details.end(); ++it)
+        bool issensor = (i.key() == SENSORS_DIRECTORY);
+
+        QVariantMap devices = i.value().toMap();
+        QVariantMap::const_iterator j = devices.constBegin();
+        for ( ; j != devices.constEnd(); j++)
         {
-            // iterate over known types
-            for (int type = TorcSensor::Unknown; type != TorcSensor::MaxType; type++)
+            // look for <network>
+            if (j.key() != NETWORK_SENSORS_STRING)
+                continue;
+
+            QVariantMap details = j.value().toMap();
+            QVariantMap::const_iterator it = details.constBegin();
+            for ( ; it != details.constEnd(); ++it)
             {
-                if (it.key() == TorcSensor::TypeToString(static_cast<TorcSensor::Type>(type)))
+                // iterate over known types <pwm>, <switch> etc
+                for (int type = TorcSensor::Unknown; type != TorcSensor::MaxType; type++)
                 {
-                    QVariantMap sensors = it.value().toMap();
-                    QVariantMap::iterator it2 = sensors.begin();
-                    for ( ; it2 != sensors.end(); ++it2)
+                    if (it.key() == TorcSensor::TypeToString(static_cast<TorcSensor::Type>(type)))
                     {
-                        QVariantMap sensor   = it2.value().toMap();
+                        QVariantMap sensor   = it.value().toMap();
                         QString defaultvalue = sensor.value("default").toString();
-                        QString state        = sensor.value("state").toString().toUpper();
-                        QString uniqueid     = sensors.value("name").toString(); // ugly... assumes it is present
+                        QString uniqueid     = sensor.value("name").toString(); // ugly... assumes it is present
 
-                        if (state != "INPUT" && state != "OUTPUT")
-                        {
-                            LOG(VB_GENERAL, LOG_ERR, QString("Unknown network device type '%1' for device '%2'").arg(state).arg(uniqueid));
-                            continue;
-                        }
-
-                        bool issensor = (state == "INPUT");
                         bool ok = false;
                         double defaultdouble = defaultvalue.toInt(&ok);
                         if (!ok)
