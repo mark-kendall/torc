@@ -176,12 +176,12 @@ TorcControl::TorcControl(const QVariantMap &Details)
     m_allInputsValid(false)
 {
     // parse inputs
-    m_inputList = Details.value("inputs").toStringList();
+    m_inputList = Details.value("inputs").toString().split(",");
     m_inputList.removeDuplicates();
     m_inputList.removeAll("");
 
     // parse outputs
-    m_outputList = Details.value("outputs").toStringList();
+    m_outputList = Details.value("outputs").toString().split(",");
     m_outputList.removeDuplicates();
     m_outputList.removeAll("");
 }
