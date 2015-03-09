@@ -19,6 +19,8 @@
 
 // Torc
 #include "torclogging.h"
+#include "torcsensor.h"
+#include "torcoutput.h"
 #include "torci2cbus.h"
 
 TorcI2CDevice::TorcI2CDevice(int Address)
@@ -72,49 +74,62 @@ void TorcI2CBus::Create(const QVariantMap &Details)
     QVariantMap::const_iterator i = Details.constBegin();
     for ( ; i != Details.constEnd(); i++)
     {
-        if (i.key() != "I2C")
+        // I2C devices can be <sensors> or <outputs> (and both at the same time)
+        if (i.key() != SENSORS_DIRECTORY && i.key() != OUTPUTS_DIRECTORY)
             continue;
 
         QVariantMap i2c = i.value().toMap();
         QVariantMap::iterator it = i2c.begin();
         for ( ; it != i2c.end(); ++it)
         {
-            bool ok = false;
-            // N.B. assumes hexadecimal 0xXX
-            int address = it.key().toInt(&ok, 16);
-            if (!ok)
-            {
-                LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse I2C address '%1'").arg(it.key()));
+            // look for <i2c>
+            if (!it.key() == I2C)
                 continue;
-            }
 
-            if (m_devices.contains(address))
+            QVariantMap devices = it.key().toMap();
+            QVariantMap::iterator it2 = devices.begin();
+            for ( ; it2 != devices.end(); ++it2)
             {
-                LOG(VB_GENERAL, LOG_WARNING, QString("I2C bus already contains device at 0x%1 - ignoring").arg(address, 0, 16));
-                continue;
-            }
+                QVariantMap details = it2.value().toMap();
 
-            QVariantMap details = it.value().toMap();
-            if (!details.contains("model"))
-            {
-                LOG(VB_GENERAL, LOG_WARNING, QString("I2C device at 0x%1 does not give model - ignoring").arg(address, 0, 16));
-                continue;
-            }
+                // device needs an address
+                if (!details.contains("address"))
+                {
+                    LOG(VB_GENERAL, LOG_ERR, QString("I2C device '%1' needs <address>").arg(it2.key()));
+                    continue;
+                }
 
-            QString model = details.value("model").toString();
-            TorcI2CDevice* device = NULL;
-            TorcI2CDeviceFactory* factory = TorcI2CDeviceFactory::GetTorcI2CDeviceFactory();
-            for ( ; factory; factory = factory->NextFactory())
-            {
-                device = factory->Create(address, model, details);
+                bool ok = false;
+                // N.B. assumes hexadecimal 0xXX
+                int address = details.value("address").toInt(&ok, 16);
+                if (!ok)
+                {
+                    LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse I2C address from '%1' for device '%2'")
+                        .arg(details.value("address").toString()).arg(it2.key()));
+                    continue;
+                }
+
+                // TODO - handle defining the same device in sensors and outputs
+                if (m_devices.contains(address))
+                {
+                    LOG(VB_GENERAL, LOG_WARNING, QString("I2C bus already contains device at 0x%1 - ignoring").arg(address, 0, 16));
+                    continue;
+                }
+
+                TorcI2CDevice* device = NULL;
+                TorcI2CDeviceFactory* factory = TorcI2CDeviceFactory::GetTorcI2CDeviceFactory();
+                for ( ; factory; factory = factory->NextFactory())
+                {
+                    device = factory->Create(address, it.key(), details);
+                    if (device)
+                        break;
+                }
+
                 if (device)
-                    break;
+                    m_devices.insert(address, device);
+                else
+                    LOG(VB_GENERAL, LOG_WARNING, QString("Unable to find handler for I2C device '%1'").arg(it2.key()));
             }
-
-            if (device)
-                m_devices.insert(address, device);
-            else
-                LOG(VB_GENERAL, LOG_WARNING, QString("Unable to find handler for I2C device '%1'").arg(model));
         }
     }
 }

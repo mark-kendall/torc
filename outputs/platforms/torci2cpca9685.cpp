@@ -111,15 +111,35 @@ TorcI2CPCA9685::TorcI2CPCA9685(int Address, const QVariantMap &Details)
 
     // create individual channel services
     // this will also reset each channel to the default value (0)
-    QVariantMap channels = Details.value("channels").toMap();
-
-    for (int i = 0; i < 16; i++)
+    QVariantMap::iterator it = Details.begin();
+    for ( ; it != Details.end(); ++it)
     {
-        QString channelident = QString("channel%1").arg(i);
-        if (channels.contains(channelident))
+        if (it.key() == "channel")
         {
-            QVariantMap details = channels.value(channelident).toMap();
-            m_outputs[i] = new TorcI2CPCA9685Channel(i, this, details);
+            // channel needs a <number>
+            QVariantMap channel = it.value().toMap();
+            if (!channel.contains("number"))
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("PCA9685 channel has no number"));
+                continue;
+            }
+
+            bool ok = false;
+            int channelnum = channel.value("number").toInt(&ok);
+
+            if (!ok || channelnum < 0 || channelnum >= 16)
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse valid PCA9685 channel number from '%1'").arg(channel.value("number")));
+                continue;
+            }
+
+            if (m_outputs[channelnum])
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("PCA9685 channel '%1' is already in use").arg(channelnum));
+                continue;
+            }
+
+            m_outputs[channelnum] = new TorcI2CPCA9685Channel(channelnum, this, channel);
         }
     }
 }

@@ -9,6 +9,8 @@
 // Torc
 #include "torccentral.h"
 
+#define I2C QString("i2c")
+
 class TorcI2CDevice
 {
   public:
@@ -16,8 +18,8 @@ class TorcI2CDevice
     virtual ~TorcI2CDevice();
 
   protected:
-    int m_address;
-    int m_fd;
+    int  m_address;
+    int  m_fd;
 };
 
 class TorcI2CDeviceFactory
