@@ -44,10 +44,11 @@ QString TorcSensor::TypeToString(TorcSensor::Type Type)
 
 TorcSensor::Type TorcSensor::StringToType(const QString &Type)
 {
-    if ("temperature" == Type) return TorcSensor::Temperature;
-    if ("pH" == Type)          return TorcSensor::pH;
-    if ("switch" == Type)      return TorcSensor::Switch;
-    if ("pwm" == Type)         return TorcSensor::PWM;
+    QString type = Type.toLower();
+    if ("temperature" == type) return TorcSensor::Temperature;
+    if ("ph"          == type) return TorcSensor::pH;
+    if ("switch"      == type) return TorcSensor::Switch;
+    if ("pwm"         == type) return TorcSensor::PWM;
     return TorcSensor::Unknown;
 }
 
