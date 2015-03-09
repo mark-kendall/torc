@@ -37,7 +37,7 @@ TorcLogicControl::Operation TorcLogicControl::StringToOperation(const QString &O
     if ("ALL" == operation)                return TorcLogicControl::All;
     if ("AVERAGE" == operation)            return TorcLogicControl::Average;
     if ("NONE" == operation)               return TorcLogicControl::NoOperation;
-    if ("" == operation)                   return TorcLogicControl::NoOperation;
+    if ("PASSTHROUGH" == operation)        return TorcLogicControl::NoOperation;
 
     // fail for anything that isn't explicitly a known operation
     *Ok = false;
@@ -63,19 +63,17 @@ QString TorcLogicControl::OperationToString(TorcLogicControl::Operation Operatio
     return QString("None");
 }
 
-TorcLogicControl::TorcLogicControl(const QVariantMap &Details)
+TorcLogicControl::TorcLogicControl(const QString &Type, const QVariantMap &Details)
   : TorcControl(Details),
     m_operation(TorcLogicControl::NoOperation),
     m_operationValue(0.0)
 {
-    // check operation and value parsing (an empty/non-existent operation is valid)
-    QString op       = Details.value("operation").toString();
     bool operationok = false;
-    m_operation      = TorcLogicControl::StringToOperation(op, &operationok);
+    m_operation      = TorcLogicControl::StringToOperation(Type, &operationok);
 
     if (!operationok)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Unrecognised control operation '%1' for device '%2'").arg(op).arg(uniqueId));
+        LOG(VB_GENERAL, LOG_ERR, QString("Unrecognised control operation '%1' for device '%2'").arg(Type).arg(uniqueId));
         return;
     }
 

@@ -77,11 +77,11 @@ void TorcControls::Create(const QVariantMap &Details)
 
                 TorcControl* control = NULL;
                 if (type == TorcControl::Logic)
-                    control = new TorcLogicControl(details);
+                    control = new TorcLogicControl(it3.key(), details);
                 else if (type == TorcControl::Timer)
-                    control = new TorcTimerControl(details);
+                    control = new TorcTimerControl(it3.key(), details);
                 else
-                    control = new TorcTransitionControl(details);
+                    control = new TorcTransitionControl(it3.key(), details);
                 m_controls.insert(id, control);
             }
         }

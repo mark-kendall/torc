@@ -72,11 +72,11 @@ QEasingCurve::Type TorcTransitionControl::EasingCurveFromString(const QString &C
     if ("INOUTBOUNCE"  == curve) return QEasingCurve::InOutBounce;
     if ("OUTINBOUNCE"  == curve) return QEasingCurve::OutInBounce;
 
-    LOG(VB_GENERAL, LOG_WARNING, QString("Failed to parse transition type from '%1' - defaulting to Linear").arg(Curve));
-    return QEasingCurve::Linear;
+    LOG(VB_GENERAL, LOG_WARNING, QString("Failed to parse transition type from '%1'").arg(Curve));
+    return QEasingCurve::Custom; // invalid
 }
 
-TorcTransitionControl::TorcTransitionControl(const QVariantMap &Details)
+TorcTransitionControl::TorcTransitionControl(const QString &Type, const QVariantMap &Details)
   : TorcControl(Details),
     m_duration(0),
     m_type(QEasingCurve::Linear),
@@ -85,6 +85,14 @@ TorcTransitionControl::TorcTransitionControl(const QVariantMap &Details)
     m_firstTrigger(true),
     m_transitionValue(0)
 {
+    // determine curve
+    m_type = EasingCurveFromString(Type);
+    if (m_type == QEasingCurve::Custom /*invalid*/)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Unknown transition type '%1' for device '%2'").arg(Type).arg(uniqueId));
+        return;
+    }
+
     // check duration
     if (!Details.contains("duration"))
     {
@@ -108,10 +116,6 @@ TorcTransitionControl::TorcTransitionControl(const QVariantMap &Details)
         return;
     }
     m_duration = duration;
-
-    // determine curve - default to linear if none specified.
-    if (Details.contains("type"))
-        m_type = EasingCurveFromString(Details.value("type").toString());
 
     // so far so good
     m_parsed = true;
