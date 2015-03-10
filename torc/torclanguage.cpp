@@ -56,7 +56,7 @@ QMap<QString,int> TorcLanguage::gLanguageMap;
 */
 TorcLanguage::TorcLanguage()
   : QObject(),
-    TorcHTTPService(this, "languages", tr("Languages"), TorcLanguage::staticMetaObject, BLACKLIST),
+    TorcHTTPService(this, "languages", "languages", TorcLanguage::staticMetaObject, BLACKLIST),
     m_translator(new QTranslator()),
     m_lock(new QReadWriteLock(QReadWriteLock::Recursive))
 {
@@ -79,6 +79,11 @@ TorcLanguage::~TorcLanguage()
     }
 
     delete m_lock;
+}
+
+QString TorcLanguage::GetUIName(void)
+{
+    return tr("Languages");
 }
 
 /*! \brief Set the current language for this application.

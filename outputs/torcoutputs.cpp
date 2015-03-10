@@ -31,7 +31,7 @@ TorcOutputs* TorcOutputs::gOutputs = new TorcOutputs();
 
 TorcOutputs::TorcOutputs()
   : QObject(),
-    TorcHTTPService(this, OUTPUTS_DIRECTORY, tr("Outputs"), TorcOutputs::staticMetaObject, BLACKLIST),
+    TorcHTTPService(this, OUTPUTS_DIRECTORY, "outputs", TorcOutputs::staticMetaObject, BLACKLIST),
     m_lock(new QMutex(QMutex::Recursive))
 {
 }
@@ -39,6 +39,11 @@ TorcOutputs::TorcOutputs()
 TorcOutputs::~TorcOutputs()
 {
     delete m_lock;
+}
+
+QString TorcOutputs::GetUIName(void)
+{
+    return tr("Outputs");
 }
 
 void TorcOutputs::Graph(void)

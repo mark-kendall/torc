@@ -25,6 +25,7 @@ class TorcSensors : public QObject, public TorcHTTPService
 
     void                Start                     (void);
     void                Graph                     (void);
+    QString             GetUIName                 (void);
 
   public slots:
     // TorcHTTPService

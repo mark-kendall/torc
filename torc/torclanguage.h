@@ -35,6 +35,7 @@ class TorcLanguage : public QObject, public TorcHTTPService
 
     void                     LoadPreferences       (void);
     QLocale                  GetLocale             (void);
+    QString                  GetUIName             (void);
 
   signals:
     void                     LanguageCodeChanged   (QString Language);
