@@ -207,6 +207,7 @@ void TorcLogicControl::CalculateOutput(void)
             else
             {
                 // must be multiple range/pwm values that are combined
+                // if binary inputs are used, this will equate to the opposite of Any.
                 double start = 1.0;
                 foreach(double next, m_inputValues)
                     start *= next;
