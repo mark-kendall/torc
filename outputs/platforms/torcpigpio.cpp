@@ -78,36 +78,48 @@ void TorcPiGPIO::Create(const QVariantMap &GPIO)
             // and find gpio
             if (it.key() == PI_GPIO)
             {
-                QVariantMap device = it.value().toMap();
+                // and find pins
+                QVariantMap pins = it.value().toMap();
+                QVariantMap::const_iterator it2 = pins.constBegin();
+                for ( ; it2 != pins.constEnd(); ++it2)
+                {
+                    QVariantMap pin = it2.value().toMap();
 
-                if (!device.contains("pin"))
-                {
-                    LOG(VB_GENERAL, LOG_ERR, QString("GPIO device '%1' does not specify <pin>").arg(device.value("name").toString()));
-                    continue;
-                }
+                    if (!pin.contains("number"))
+                    {
+                        LOG(VB_GENERAL, LOG_ERR, QString("GPIO device '%1' does not specify pin <number>").arg(pin.value("name").toString()));
+                        continue;
+                    }
 
-                bool ok = false;
-                int pin = device.value("pin").toInt(&ok);
-                if (!ok || pin < 0 || pin >= NUMBER_PINS)
-                {
-                    LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse valid pin from '%1'").arg(device.value("pin").toString()));
-                    continue;
-                }
+                    if (!pin.contains("default"))
+                    {
+                        LOG(VB_GENERAL, LOG_ERR, QString("GPIO device '%1' does not specify <default> value").arg(pin.value("name").toString()));
+                        continue;
+                    }
 
-                if (m_inputs.contains(pin) || m_outputs.contains(pin))
-                {
-                    LOG(VB_GENERAL, LOG_ERR, QString("GPIO Pin #%1 is already in use").arg(pin));
-                    continue;
-                }
+                    bool ok = false;
+                    int number = pin.value("number").toInt(&ok);
+                    if (!ok || number < 0 || number >= NUMBER_PINS)
+                    {
+                        LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse valid pin from '%1'").arg(pin.value("pin").toString()));
+                        continue;
+                    }
 
-                if (output)
-                {
-                    TorcPiOutput* output = new TorcPiOutput(pin, device);
-                    m_outputs.insert(pin, output);
-                }
-                else
-                {
-                    LOG(VB_GENERAL, LOG_INFO, "GPIO inputs not implemented - yet");
+                    if (m_inputs.contains(number) || m_outputs.contains(number))
+                    {
+                        LOG(VB_GENERAL, LOG_ERR, QString("GPIO Pin #%1 is already in use").arg(number));
+                        continue;
+                    }
+
+                    if (output)
+                    {
+                        TorcPiOutput* out = new TorcPiOutput(number, pin);
+                        m_outputs.insert(number, out);
+                    }
+                    else
+                    {
+                        LOG(VB_GENERAL, LOG_INFO, "GPIO inputs not implemented - yet");
+                    }
                 }
             }
         }
