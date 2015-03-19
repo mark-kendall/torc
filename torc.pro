@@ -38,8 +38,18 @@ INSTALLS            += translations
 # HTML
 install.path   = $${PREFIX}/share/torc/html/
 install.files  = html/index.html
+install.files += html/torc.xsd
 install.files += html/css html/fonts html/img html/js
 INSTALLS      += install
+
+# xmlpatterns module for xml validation
+qtHaveModule(xmlpatterns) {
+    QT += xmlpatterns
+    DEFINES += USING_XMLPATTERNS
+    HEADERS += torc/torcxmlvalidator.h
+    SOURCES += torc/torcxmlvalidator.cpp
+    message("QtXmlPatterns available")
+}
 
 # linux power support
 unix:qtHaveModule(dbus) {
@@ -47,6 +57,7 @@ unix:qtHaveModule(dbus) {
     HEADERS += torc/platforms/torcpowerunixdbus.h
     SOURCES += torc/platforms/torcpowerunixdbus.cpp
     DEFINES += USING_QTDBUS
+    message("QtDBus available")
 }
 
 # I2c on the Raspberry Pi
@@ -69,6 +80,8 @@ linux-rasp-pi-g++ {
     QMAKE_EXTRA_TARGETS += setpriv
     setpriv.path         = .setpriv
     INSTALLS            += setpriv
+
+    message("Building for Raspberry Pi")
 }
 
 HEADERS += torc/torclogging.h

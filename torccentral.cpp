@@ -36,6 +36,10 @@
 #include "torcxmlreader.h"
 #include "torccentral.h"
 
+#ifdef USING_XMLPATTERNS
+#include "torcxmlvalidator.h"
+#endif
+
 // for system
 #include <stdlib.h>
 
@@ -137,6 +141,22 @@ bool TorcCentral::LoadConfig(void)
 {
     // load the config file
     QString xml = GetTorcConfigDir() + "/torc.xml";
+
+#ifdef USING_XMLPATTERNS
+    {
+        QString xsd = GetTorcShareDir() + "/html/torc.xsd";
+
+        TorcXmlValidator validator(xml, xsd);
+        if (!validator.Validated())
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Config file '%1' failed validation").arg(xml));
+            return false;
+        }
+
+        LOG(VB_GENERAL, LOG_INFO, "Config successfully validated");
+    }
+#endif
+
     TorcXMLReader reader(xml);
     QString error;
 

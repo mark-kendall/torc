@@ -1,0 +1,297 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="xs3p.xsl"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+<!-- general device types -->
+<!-- use xs:all to define required types without ordering - but it cannot be inherited, so just repeat
+     the device name, userName and userDescription for each device type to ensure completeness without
+     imposing ordering (via xs:sequence) or relaxing repetition (via xs:choice) -->
+
+<xs:simpleType name="validStringType">
+  <xs:restriction base="xs:string">
+    <xs:whiteSpace value="collapse"/>
+    <xs:minLength  value="1"/>
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="nameType">
+  <xs:restriction base="validStringType"/>
+</xs:simpleType>
+
+<xs:simpleType name="userNameType">
+  <xs:restriction base="validStringType"/>
+</xs:simpleType>
+
+<xs:simpleType name="userDescriptionType">
+  <xs:restriction base="validStringType"/>
+</xs:simpleType>
+
+<xs:simpleType name="switchNumberType">
+  <xs:restriction base="xs:integer">
+    <xs:enumeration value="0"/>
+    <xs:enumeration value="1"/>
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="pwmNumberType">
+  <xs:restriction base="xs:decimal">
+    <xs:minInclusive value="0.0"/>
+    <xs:maxInclusive value="1.0"/>
+  </xs:restriction>
+</xs:simpleType>
+
+<!-- sensor definitions -->
+<xs:complexType name="ds18b20Type">
+  <!-- a device must have 1 name and 0 or 1 userName and userDescription - in any order-->
+  <xs:all>
+    <!-- start of base types -->
+    <xs:element name="name"     type="nameType"/>
+    <xs:element name="userName" type="userNameType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="userDescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+    <!-- end of base types -->
+    <xs:element name="id"       type="validStringType"/>
+  </xs:all>
+</xs:complexType>
+
+<xs:complexType name="wire1Type">
+  <xs:choice minOccurs="1" maxOccurs="unbounded">
+    <xs:element name="ds18b20" type="ds18b20Type"/>
+  </xs:choice>
+</xs:complexType>
+
+<xs:complexType name="networkSwitchType">
+  <xs:all>
+    <xs:element name="name"     type="nameType"/>
+    <xs:element name="userName" type="userNameType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="userDescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="default"  type="switchNumberType"/>
+  </xs:all>
+</xs:complexType>
+
+<xs:complexType name="networkPWMType">
+  <xs:all>
+    <xs:element name="name"     type="nameType"/>
+    <xs:element name="userName" type="userNameType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="userDescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="default"  type="pwmNumberType"/>
+  </xs:all>
+</xs:complexType>
+
+<xs:complexType name="networkType">
+  <xs:choice minOccurs="1" maxOccurs="unbounded">
+    <xs:element name="switch" type="networkSwitchType"/>
+    <xs:element name="pwm"    type="networkPWMType"/>
+  </xs:choice>
+</xs:complexType>
+
+<xs:complexType name="sensorsType">
+  <xs:all>
+    <!-- 0 or 1 instances of each of these types in any order-->
+    <xs:element minOccurs="0" maxOccurs="1" name="wire1"   type="wire1Type"/>
+    <xs:element minOccurs="0" maxOccurs="1" name="network" type="networkType"/>
+  </xs:all>
+</xs:complexType>
+
+<!-- control definition -->
+<xs:complexType name="simpleLogicType">
+  <xs:all>
+    <xs:element name="name"     type="nameType"/>
+    <xs:element name="userName" type="userNameType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="userDescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="inputs"   type="validStringType"/>
+    <xs:element name="outputs"  type="validStringType"/>
+  </xs:all>
+</xs:complexType>
+
+<xs:complexType name="complexLogicType">
+  <xs:all>
+    <xs:element name="name"     type="nameType"/>
+    <xs:element name="userName" type="userNameType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="userDescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="inputs"   type="validStringType"/>
+    <xs:element name="outputs"  type="validStringType"/>
+    <xs:element name="value"    type="xs:decimal"/>
+  </xs:all>
+</xs:complexType>
+
+<xs:complexType name="logicType">
+  <xs:choice minOccurs="1" maxOccurs="unbounded">
+    <xs:element name="none"               type="simpleLogicType"/>
+    <xs:element name="passthrough"        type="simpleLogicType"/>
+    <xs:element name="equal"              type="complexLogicType"/>
+    <xs:element name="lessthan"           type="complexLogicType"/>
+    <xs:element name="greaterthan"        type="complexLogicType"/>
+    <xs:element name="lessthanorequal"    type="complexLogicType"/>
+    <xs:element name="greaterthanorequal" type="complexLogicType"/>
+    <xs:element name="any"                type="simpleLogicType"/>
+    <xs:element name="all"                type="simpleLogicType"/>
+    <xs:element name="average"            type="simpleLogicType"/>
+  </xs:choice>
+</xs:complexType>
+
+<xs:complexType name="timerType">
+  <xs:all>
+    <xs:element name="name"     type="nameType"/>
+    <xs:element name="userName" type="userNameType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="userDescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="outputs"  type="validStringType"/>
+    <xs:element name="start"    type="validStringType"/> <!-- TODO can we do better than string? -->
+    <xs:element name="duration" type="validStringType"/> <!-- TODO can we do better than string? -->
+  </xs:all>
+</xs:complexType>
+
+<xs:complexType name="timersType">
+  <xs:choice minOccurs="1" maxOccurs="unbounded">
+    <xs:element name="custom"   type="timerType"/>
+    <xs:element name="minutely" type="timerType"/>
+    <xs:element name="hourly"   type="timerType"/>
+    <xs:element name="daily"    type="timerType"/>
+    <xs:element name="weekly"   type="timerType"/>
+  </xs:choice>
+</xs:complexType>
+
+<xs:complexType name="transitionType">
+  <xs:all>
+    <xs:element name="name"     type="nameType"/>
+    <xs:element name="userName" type="userNameType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="userDescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="inputs"   type="validStringType"/>
+    <xs:element name="outputs"  type="validStringType"/>
+    <xs:element name="duration" type="validStringType"/> <!-- TODO can we do better than string? -->
+  </xs:all>
+</xs:complexType>
+
+<xs:complexType name="transitionsType">
+  <xs:choice minOccurs="1" maxOccurs="unbounded">
+    <xs:element name="linear"       type="transitionType"/>
+    <xs:element name="inquad"       type="transitionType"/>
+    <xs:element name="outquad"      type="transitionType"/>
+    <xs:element name="inoutquad"    type="transitionType"/>
+    <xs:element name="outInquad"    type="transitionType"/>
+    <xs:element name="incubic"      type="transitionType"/>
+    <xs:element name="outcubic"     type="transitionType"/>
+    <xs:element name="inoutcubic"   type="transitionType"/>
+    <xs:element name="outIncubic"   type="transitionType"/>
+    <xs:element name="inquart"      type="transitionType"/>
+    <xs:element name="outquart"     type="transitionType"/>
+    <xs:element name="inoutquart"   type="transitionType"/>
+    <xs:element name="outInquart"   type="transitionType"/>
+    <xs:element name="inquint"      type="transitionType"/>
+    <xs:element name="outquint"     type="transitionType"/>
+    <xs:element name="inoutquint"   type="transitionType"/>
+    <xs:element name="outinquint"   type="transitionType"/>
+    <xs:element name="insine"       type="transitionType"/>
+    <xs:element name="outsine"      type="transitionType"/>
+    <xs:element name="inoutsine"    type="transitionType"/>
+    <xs:element name="outinsine"    type="transitionType"/>
+    <xs:element name="inexpo"       type="transitionType"/>
+    <xs:element name="outexpo"      type="transitionType"/>
+    <xs:element name="inoutexpo"    type="transitionType"/>
+    <xs:element name="outinexpo"    type="transitionType"/>
+    <xs:element name="incirc"       type="transitionType"/>
+    <xs:element name="outcirc"      type="transitionType"/>
+    <xs:element name="inoutcirc"    type="transitionType"/>
+    <xs:element name="outincirc"    type="transitionType"/>
+    <xs:element name="inelastic"    type="transitionType"/>
+    <xs:element name="outelastic"   type="transitionType"/>
+    <xs:element name="inoutelastic" type="transitionType"/>
+    <xs:element name="outinelastic" type="transitionType"/>
+    <xs:element name="inback"       type="transitionType"/>
+    <xs:element name="outback"      type="transitionType"/>
+    <xs:element name="inoutback"    type="transitionType"/>
+    <xs:element name="outinback"    type="transitionType"/>
+    <xs:element name="inbounce"     type="transitionType"/>
+    <xs:element name="outbounce"    type="transitionType"/>
+    <xs:element name="inoutbounce"  type="transitionType"/>
+    <xs:element name="outinbounce"  type="transitionType"/>
+  </xs:choice>
+</xs:complexType>
+
+<xs:complexType name="controlType">
+  <xs:all>
+    <!-- 0 or 1 instances of logic, timer and transition -->
+    <xs:element minOccurs="0" maxOccurs="1" name="logic"      type="logicType"/>
+    <xs:element minOccurs="0" maxOccurs="1" name="timer"      type="timersType"/>
+    <xs:element minOccurs="0" maxOccurs="1" name="transition" type="transitionsType"/>
+  </xs:all>
+</xs:complexType>
+
+<!-- outputs definitions -->
+<xs:simpleType name="pca9685ChannelNumberType">
+  <xs:restriction base="xs:integer">
+    <xs:minInclusive value="0"/>
+    <xs:maxInclusive value="15"/>
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:complexType name="pca9685ChannelType">
+  <xs:all>
+    <xs:element name="name"     type="nameType"/>
+    <xs:element name="userName" type="userNameType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="userDescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="inputs"   type="validStringType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="number"   type="pca9685ChannelNumberType"/>
+  </xs:all>
+</xs:complexType>
+
+<xs:complexType name="pca9685Type">
+  <xs:all>
+    <xs:element name="address"  type="validStringType"/> <!-- TODO can we do better than this? -->
+    <xs:element name="channel"  type="pca9685ChannelType" minOccurs="1" maxOccurs="1"/> <!-- FIXME - need 1 to 16 -->
+  </xs:all>
+</xs:complexType>
+
+<xs:complexType name="i2cType">
+  <xs:choice minOccurs="1" maxOccurs="unbounded">
+    <xs:element name="pca9685" type="pca9685Type"/>
+  </xs:choice>
+</xs:complexType>
+
+<xs:simpleType name="gpioPinNumberType">
+  <xs:restriction base="xs:integer">
+    <!-- max pin number is currently defined in TorcPiGPIO -->
+    <xs:minInclusive value="0"/>
+    <xs:maxInclusive value="6"/>
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:complexType name="gpioPinType">
+  <xs:all>
+    <xs:element name="name"     type="nameType"/>
+    <xs:element name="userName" type="userNameType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="userDescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="inputs"   type="validStringType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="number"   type="gpioPinNumberType"/>
+    <xs:element name="default"  type="switchNumberType"/>
+  </xs:all>
+</xs:complexType>
+
+<xs:complexType name="gpioType">
+  <xs:all>
+    <xs:element name="pin"      type="gpioPinType"/>
+  </xs:all>
+</xs:complexType>
+
+<xs:complexType name="outputsType">
+  <xs:all>
+    <!-- 0 or 1 instances of these types -->
+    <xs:element minOccurs="0" maxOccurs="1" name="network" type="networkType"/>
+    <xs:element minOccurs="0" maxOccurs="1" name="i2c"     type="i2cType"/>
+    <xs:element minOccurs="0" maxOccurs="1" name="gpio"    type="gpioType"/>
+  </xs:all>
+</xs:complexType>
+
+<!-- Single root element 'torc' -->
+<xs:complexType name="rootType">
+  <xs:all>
+    <!-- 0 or 1 instances of each of these types in any order-->
+    <xs:element name="name"    minOccurs="0" maxOccurs="1" type="nameType" />
+    <xs:element name="sensors" minOccurs="0" maxOccurs="1" type="sensorsType"/>
+    <xs:element name="control" minOccurs="0" maxOccurs="1" type="controlType"/>
+    <xs:element name="outputs" minOccurs="0" maxOccurs="1" type="outputsType"/>
+  </xs:all>
+</xs:complexType>
+
+<xs:element name="torc" type="rootType"/>
+
+</xs:schema>
