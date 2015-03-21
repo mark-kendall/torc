@@ -291,10 +291,10 @@
 <xs:complexType name="rootType">
   <xs:all>
     <!-- 0 or 1 instances of each of these types in any order-->
-    <xs:element name="name"    minOccurs="0" maxOccurs="1" type="nameType" />
-    <xs:element name="sensors" minOccurs="0" maxOccurs="1" type="sensorsType"/>
-    <xs:element name="control" minOccurs="0" maxOccurs="1" type="controlType"/>
-    <xs:element name="outputs" minOccurs="0" maxOccurs="1" type="outputsType"/>
+    <xs:element name="applicationname" minOccurs="0" maxOccurs="1" type="nameType" />
+    <xs:element name="sensors"         minOccurs="0" maxOccurs="1" type="sensorsType"/>
+    <xs:element name="control"         minOccurs="0" maxOccurs="1" type="controlType"/>
+    <xs:element name="outputs"         minOccurs="0" maxOccurs="1" type="outputsType"/>
   </xs:all>
 </xs:complexType>
 
