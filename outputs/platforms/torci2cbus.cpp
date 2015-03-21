@@ -93,15 +93,15 @@ void TorcI2CBus::Create(const QVariantMap &Details)
                 QVariantMap details = it2.value().toMap();
 
                 // device needs an address
-                if (!details.contains("address"))
+                if (!details.contains("i2caddress"))
                 {
-                    LOG(VB_GENERAL, LOG_ERR, QString("I2C device '%1' needs <address>").arg(it2.key()));
+                    LOG(VB_GENERAL, LOG_ERR, QString("I2C device '%1' needs <i2caddress>").arg(it2.key()));
                     continue;
                 }
 
                 bool ok = false;
                 // N.B. assumes hexadecimal 0xXX
-                int address = details.value("address").toString().toInt(&ok, 16);
+                int address = details.value("i2caddress").toString().toInt(&ok, 16);
                 if (!ok)
                 {
                     LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse I2C address from '%1' for device '%2'")

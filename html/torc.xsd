@@ -242,8 +242,8 @@
 <xs:complexType name="pca9685Type">
   <xs:sequence>
     <!-- NB this enforces the address first -->
-    <xs:element name="address" type="hexType" minOccurs="1" maxOccurs="1"/>
-    <xs:element name="channel" type="pca9685ChannelType" minOccurs="1" maxOccurs="16"/>
+    <xs:element name="i2caddress" type="hexType" minOccurs="1" maxOccurs="1"/>
+    <xs:element name="channel"    type="pca9685ChannelType" minOccurs="1" maxOccurs="16"/>
   </xs:sequence>
 </xs:complexType>
 
@@ -302,6 +302,11 @@
   <!-- enforce unique device names -->
   <xs:unique name="uniqueDeviceName">
     <xs:selector xpath=".//name" />
+    <xs:field xpath="." />
+  </xs:unique>
+  <!-- enforce unique i2c addresses -->
+  <xs:unique name="uniqueI2CAddress">
+    <xs:selector xpath=".//i2caddress" />
     <xs:field xpath="." />
   </xs:unique>
 </xs:element>
