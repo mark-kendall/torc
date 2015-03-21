@@ -1,5 +1,4 @@
-<?xml version="1.0"?>
-<?xml-stylesheet type="text/xsl" href="xs3p.xsl"?>
+<?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
 <!-- general device types -->
@@ -37,6 +36,12 @@
   <xs:restriction base="xs:decimal">
     <xs:minInclusive value="0.0"/>
     <xs:maxInclusive value="1.0"/>
+  </xs:restriction>
+</xs:simpleType>
+
+ <xs:simpleType name="hexType">
+  <xs:restriction base="xs:string">
+    <xs:pattern value="0x[0-9a-fA-F]+"/>
   </xs:restriction>
 </xs:simpleType>
 
@@ -235,10 +240,11 @@
 </xs:complexType>
 
 <xs:complexType name="pca9685Type">
-  <xs:all>
-    <xs:element name="address"  type="validStringType"/> <!-- TODO can we do better than this? -->
-    <xs:element name="channel"  type="pca9685ChannelType" minOccurs="1" maxOccurs="1"/> <!-- FIXME - need 1 to 16 -->
-  </xs:all>
+  <xs:sequence>
+    <!-- NB this enforces the address first -->
+    <xs:element name="address" type="hexType" minOccurs="1" maxOccurs="1"/>
+    <xs:element name="channel" type="pca9685ChannelType" minOccurs="1" maxOccurs="16"/>
+  </xs:sequence>
 </xs:complexType>
 
 <xs:complexType name="i2cType">
@@ -292,6 +298,13 @@
   </xs:all>
 </xs:complexType>
 
-<xs:element name="torc" type="rootType"/>
+<xs:element name="torc" type="rootType">
+  <!-- enforce unique device names -->
+  <xs:unique name="uniqueDeviceName">
+    <xs:selector xpath=".//name" />
+    <xs:field xpath="." />
+  </xs:unique>
+</xs:element>
+
 
 </xs:schema>
