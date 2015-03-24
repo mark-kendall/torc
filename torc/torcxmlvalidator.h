@@ -2,7 +2,7 @@
 #define TORCXMLVALIDATOR_H
 
 // Qt
-#include <QAbstractMessagehandler>
+#include <QAbstractMessageHandler>
 
 class TorcXmlValidator : public QAbstractMessageHandler
 {
