@@ -273,9 +273,9 @@
 </xs:complexType>
 
 <xs:complexType name="gpioType">
-  <xs:all>
-    <xs:element name="pin"      type="gpioPinType"/>
-  </xs:all>
+  <xs:sequence>
+    <xs:element minOccurs="1" maxOccurs="unbounded" name="pin" type="gpioPinType"/>
+  </xs:sequence>
 </xs:complexType>
 
 <xs:complexType name="outputsType">
