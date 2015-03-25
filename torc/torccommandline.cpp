@@ -126,8 +126,6 @@ TorcCommandLinePriv::TorcCommandLinePriv(TorcCommandLine::Options Flags)
         Add("v,verbose,verbosity", QString("info"), "Set the logging type.", TorcCommandLine::None);
     if (options.testFlag(TorcCommandLine::Version))
         Add("version", QVariant(), "Display version information.", TorcCommandLine::Version, true);
-    if (options.testFlag(TorcCommandLine::URI))
-        Add("f,file,uri", QString(""), "URI pointing to the file/resource to be used.", TorcCommandLine::None);
     if (options.testFlag(TorcCommandLine::Database))
         Add("db,database", QString(""), "Use a custom database location. If the file does not exist, it will be created.");
     if (options.testFlag(TorcCommandLine::LogFile))

@@ -22,9 +22,8 @@ class TorcCommandLine
         Version  = (1 << 1),
         LogLevel = (1 << 2),
         LogType  = (1 << 3),
-        URI      = (1 << 4),
-        Database = (1 << 5),
-        LogFile  = (1 << 6)
+        Database = (1 << 4),
+        LogFile  = (1 << 5)
     };
 
     Q_DECLARE_FLAGS(Options, Option);
