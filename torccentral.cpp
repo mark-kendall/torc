@@ -214,6 +214,17 @@ bool TorcCentral::event(QEvent *Event)
                 TorcReferenceCounter::EventLoopEnding(true);
                 QCoreApplication::quit();
                 break;
+            case Torc::ShuttingDown:
+            case Torc::Suspending:
+            case Torc::Restarting:
+            case Torc::Hibernating:
+                // NB this just ensures outputs (e.g. PWM drivers) are set to sensible
+                // defaults if we shut down. There is currently no handling of waking, which
+                // would need more thought about resetting state etc.
+                TorcSensors::gSensors->Reset();
+                TorcControls::gControls->Reset();
+                TorcOutputs::gOutputs->Reset();
+                break;
             default: break;
         }
     }

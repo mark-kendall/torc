@@ -25,6 +25,7 @@ class TorcOutputs : public QObject, public TorcHTTPService
 
     void                Graph                     (void);
     QString             GetUIName                 (void);
+    void                Reset                     (void);
 
   public slots:
     // TorcHTTPService

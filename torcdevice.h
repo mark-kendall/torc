@@ -33,6 +33,7 @@ class TorcDevice : public QObject, public TorcReferenceCounter
 
     bool                   GetValid               (void);
     double                 GetValue               (void);
+    double                 GetDefaultValue        (void);
     QString                GetModelId             (void);
     QString                GetUniqueId            (void);
     QString                GetUserName            (void);
@@ -61,6 +62,8 @@ class TorcDevice : public QObject, public TorcReferenceCounter
     static bool            RegisterUniqueId   (const QString &UniqueId, QObject *Object);
     static void            UnregisterUniqueId (const QString &UniqueId);
     static QObject*        GetObjectforId     (const QString &UniqueId);
+
+    void                   Reset              (void);
 };
 
 class TorcDeviceHandler

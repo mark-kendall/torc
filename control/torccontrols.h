@@ -19,6 +19,7 @@ class TorcControls : public TorcDeviceHandler
     void Validate (void);
     void Graph    (void);
     void Start    (void);
+    void Reset    (void);
 
   private:
     QMap<QString,TorcControl*> m_controls;

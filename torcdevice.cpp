@@ -99,6 +99,12 @@ TorcDevice::~TorcDevice()
     lock = NULL;
 }
 
+void TorcDevice::Reset(void)
+{
+    SetValue(defaultValue);
+    SetValid(false);
+}
+
 void TorcDevice::SetValid(bool Valid)
 {
     QMutexLocker locker(lock);
@@ -156,6 +162,13 @@ double TorcDevice::GetValue(void)
     QMutexLocker locker(lock);
 
     return value;
+}
+
+double TorcDevice::GetDefaultValue(void)
+{
+    QMutexLocker locker(lock);
+
+    return defaultValue;
 }
 
 QString TorcDevice::GetModelId(void)

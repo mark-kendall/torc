@@ -66,6 +66,15 @@ void TorcSensors::Start(void)
         sensor->Start();
 }
 
+void TorcSensors::Reset(void)
+{
+    QMutexLocker locker(m_lock);
+
+    foreach (TorcSensor *sensor, sensorList)
+        sensor->Reset();
+}
+
+
 void TorcSensors::Graph(void)
 {
     QMutexLocker locker(m_lock);

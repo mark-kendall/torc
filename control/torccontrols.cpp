@@ -132,3 +132,15 @@ void TorcControls::Start(void)
         it.value()->Start();
     }
 }
+
+void TorcControls::Reset(void)
+{
+    QMutexLocker locker(m_lock);
+
+    QMutableMapIterator<QString,TorcControl*> it(m_controls);
+    while (it.hasNext())
+    {
+        it.next();
+        it.value()->Reset();
+    }
+}
