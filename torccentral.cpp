@@ -143,18 +143,27 @@ bool TorcCentral::LoadConfig(void)
     QString xml = GetTorcConfigDir() + "/torc.xml";
 
 #ifdef USING_XMLPATTERNS
+    if (!qgetenv("TORC_NO_VALIDATION").isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_INFO, "Skipping configuration file validation.");
+    }
+    else
     {
         QString xsd = GetTorcShareDir() + "/html/torc.xsd";
+
+        LOG(VB_GENERAL, LOG_INFO, "Starting validation of configuration file");
 
         TorcXmlValidator validator(xml, xsd);
         if (!validator.Validated())
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Config file '%1' failed validation").arg(xml));
+            LOG(VB_GENERAL, LOG_ERR, QString("Configuration file '%1' failed validation").arg(xml));
             return false;
         }
 
-        LOG(VB_GENERAL, LOG_INFO, "Config successfully validated");
+        LOG(VB_GENERAL, LOG_INFO, "Configuration successfully validated");
     }
+#else
+    LOG(VB_GENERAL, LOG_INFO, "QXmlPatterns unavailable - not validating configuration file.");
 #endif
 
     TorcXMLReader reader(xml);
@@ -220,6 +229,7 @@ class TorcCentralObject : public TorcAdminObject
       : TorcAdminObject(TORC_ADMIN_LOW_PRIORITY - 5), // start last
         m_object(NULL)
     {
+        TorcCommandLine::RegisterEnvironmentVariable("TORC_NO_VALIDATION", "Disable validation of configuration file. This may speed up start times.");
     }
 
     ~TorcCentralObject()
