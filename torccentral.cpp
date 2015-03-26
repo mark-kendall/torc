@@ -221,6 +221,7 @@ bool TorcCentral::event(QEvent *Event)
                 // NB this just ensures outputs (e.g. PWM drivers) are set to sensible
                 // defaults if we shut down. There is currently no handling of waking, which
                 // would need more thought about resetting state etc.
+                LOG(VB_GENERAL, LOG_INFO, "Resetting devices to defaults.");
                 TorcSensors::gSensors->Reset();
                 TorcControls::gControls->Reset();
                 TorcOutputs::gOutputs->Reset();
