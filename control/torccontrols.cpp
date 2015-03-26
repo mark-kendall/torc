@@ -73,8 +73,6 @@ void TorcControls::Create(const QVariantMap &Details)
                     continue;
                 }
 
-                QString id = details.value("name").toString();
-
                 TorcControl* control = NULL;
                 if (type == TorcControl::Logic)
                     control = new TorcLogicControl(it3.key(), details);
@@ -82,7 +80,7 @@ void TorcControls::Create(const QVariantMap &Details)
                     control = new TorcTimerControl(it3.key(), details);
                 else
                     control = new TorcTransitionControl(it3.key(), details);
-                m_controls.insert(id, control);
+                m_controls.append(control);
             }
         }
     }
@@ -92,9 +90,8 @@ void TorcControls::Destroy(void)
 {
     QMutexLocker locker(m_lock);
 
-    QMap<QString, TorcControl*>::iterator it = m_controls.begin();
-    for ( ; it != m_controls.end(); ++it)
-        it.value()->DownRef();
+    foreach (TorcControl *control, m_controls)
+        control->DownRef();
     m_controls.clear();
 }
 
@@ -102,15 +99,15 @@ void TorcControls::Validate(void)
 {
     QMutexLocker locker(m_lock);
 
-    QMutableMapIterator<QString,TorcControl*> it(m_controls);
+    QMutableListIterator<TorcControl*> it(m_controls);
     while (it.hasNext())
     {
-        it.next();
-        if (!it.value()->Validate())
+        TorcControl* control = it.next();
+        if (!control->Validate())
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed to complete device '%1' - deleting").arg(it.key()));
-            it.value()->DownRef();
-            m_controls.remove(it.key());
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to complete device '%1' - deleting").arg(control->GetUniqueId()));
+            control->DownRef();
+            it.remove();
         }
     }
 }
@@ -125,22 +122,14 @@ void TorcControls::Start(void)
 {
     QMutexLocker locker(m_lock);
 
-    QMutableMapIterator<QString,TorcControl*> it(m_controls);
-    while (it.hasNext())
-    {
-        it.next();
-        it.value()->Start();
-    }
+    foreach (TorcControl *control, m_controls)
+        control->Start();
 }
 
 void TorcControls::Reset(void)
 {
     QMutexLocker locker(m_lock);
 
-    QMutableMapIterator<QString,TorcControl*> it(m_controls);
-    while (it.hasNext())
-    {
-        it.next();
-        it.value()->Reset();
-    }
+    foreach (TorcControl *control, m_controls)
+        control->Reset();
 }

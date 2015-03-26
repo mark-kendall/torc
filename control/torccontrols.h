@@ -22,7 +22,7 @@ class TorcControls : public TorcDeviceHandler
     void Reset    (void);
 
   private:
-    QMap<QString,TorcControl*> m_controls;
+    QList<TorcControl*> m_controls;
 };
 
 #endif // TORCCONTROLS_H
