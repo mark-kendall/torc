@@ -62,7 +62,8 @@ void Torc1WireReadThread::Read(void)
     // open
     if (!file.open(QIODevice::ReadOnly))
     {   
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to read device %1").arg(m_file));
+        LOG(VB_GENERAL, LOG_ERR, QString("Failed to read device '%1' (Error #%2: '%3')")
+                                 .arg(m_file).arg(file.error()).arg(file.errorString()));
     }
     else
     {   
