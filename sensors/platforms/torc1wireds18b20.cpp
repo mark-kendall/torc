@@ -22,12 +22,15 @@
 
 // Qt
 #include <QFile>
+#include <QtGlobal>
 #include <QTextStream>
 
 // Torc
 #include "torclogging.h"
 #include "torc1wirebus.h"
 #include "torc1wireds18b20.h"
+
+#define MIN_READ_INTERVAL 10000
 
 Torc1WireReadThread::Torc1WireReadThread(Torc1WireDS18B20 *Parent, const QString &Filename)
   : TorcQThread("1Wire"),
@@ -42,7 +45,13 @@ void Torc1WireReadThread::Start(void)
     // create and setup timer in correct thread
     m_timer = new QTimer();
     m_timer->setTimerType(Qt::CoarseTimer);
-    m_timer->setInterval(5000);
+
+    // restart the timer each time to handle periods of load/delay
+    m_timer->setSingleShot(true);
+
+    // randomise start time for each sensor
+    m_timer->setInterval(qrand() % MIN_READ_INTERVAL);
+
     // 'this' is in the parent's thread and connect will by default use an indirect connection,
     // so force a direct connection to ensure Read operates in the 1Wire thread.
     connect(m_timer, SIGNAL(timeout()), this, SLOT(Read()), Qt::DirectConnection);
@@ -58,7 +67,7 @@ void Torc1WireReadThread::Finish(void)
 void Torc1WireReadThread::Read(void)
 {
     QFile file(m_file);
-    
+
     // open
     if (!file.open(QIODevice::ReadOnly))
     {   
@@ -94,6 +103,7 @@ void Torc1WireReadThread::Read(void)
                 {
                     file.close();
                     m_parent->Read(temp / 1000.0, true);
+                    m_timer->start(MIN_READ_INTERVAL);
                     return;
                 }   
                 
@@ -104,6 +114,8 @@ void Torc1WireReadThread::Read(void)
     
     file.close();
     m_parent->Read(0, false);
+
+    m_timer->start(MIN_READ_INTERVAL);
 }
 
 Torc1WireDS18B20::Torc1WireDS18B20(const QVariantMap &Details)
