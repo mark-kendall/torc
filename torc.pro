@@ -21,6 +21,9 @@ DEFINES    += __STDC_LIMIT_MACROS
 QT         += sql network
 QT         -= gui
 
+# debug builds
+#CONFIG     += debug
+
 # libraries
 LIBS       += -lz
 !mac:LIBS  += -ldns_sd
