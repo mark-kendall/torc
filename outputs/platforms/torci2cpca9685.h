@@ -21,7 +21,7 @@ class TorcI2CPCA9685 : public TorcI2CDevice
     ~TorcI2CPCA9685();
 
   protected:
-    bool                   SetPWM (int Channel, double Value);
+    bool                   SetPWM (int Channel, int Value);
 
   private:
     TorcI2CPCA9685Channel *m_outputs[16];

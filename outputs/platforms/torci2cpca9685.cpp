@@ -49,32 +49,42 @@ class TorcI2CPCA9685Channel : public TorcPWMOutput
 
   private:
     int             m_channelNumber;
+    int             m_channelValue;
     TorcI2CPCA9685 *m_parent;
 };
 
 TorcI2CPCA9685Channel::TorcI2CPCA9685Channel(int Number, TorcI2CPCA9685 *Parent, const QVariantMap &Details)
   : TorcPWMOutput(0.0, PCA9685, Details),
     m_channelNumber(Number),
+    m_channelValue(0),
     m_parent(Parent)
 {
-    m_parent->SetPWM(m_channelNumber, value);
+    m_parent->SetPWM(m_channelNumber, m_channelValue);
 }
 
 TorcI2CPCA9685Channel::~TorcI2CPCA9685Channel()
 {
     // always turn the output off completely on exit
-    m_parent->SetPWM(m_channelNumber, 0.0);
+    m_parent->SetPWM(m_channelNumber, 0);
 }
 
 void TorcI2CPCA9685Channel::SetValue(double Value)
 {
     QMutexLocker locker(lock);
 
-    // ignore same value updates
-    if (qFuzzyCompare(Value + 1.0f, value + 1.0f))
+    // anything that doesn't change the range sent to the device is just noise, so
+    // calculate now and filter early
+    double newvalue = Value;
+    if (newvalue < 0.0) newvalue = 0.0;
+    if (newvalue > 1.0) newvalue = 1.0;
+
+    // convert 0.0 to 1.0 to 0 to 4095
+    int channelvalue = (int)((newvalue * 4095.0) + 0.5);
+    if (channelvalue == m_channelValue)
         return;
 
-    m_parent->SetPWM(m_channelNumber, Value);
+    m_channelValue = channelvalue;
+    m_parent->SetPWM(m_channelNumber, m_channelValue);
     TorcPWMOutput::SetValue(Value);
 }
     
@@ -167,26 +177,29 @@ TorcI2CPCA9685::~TorcI2CPCA9685()
  * \todo Randomise on time?
  * \todo check return values
  */
-bool TorcI2CPCA9685::SetPWM(int Channel, double Value)
+bool TorcI2CPCA9685::SetPWM(int Channel, int Value)
 {
     if (m_fd < 0 || Channel < 0 || Channel > 15)
         return false;
 
-    // sanity check range
-    double value = Value;
-    if (value < 0.0) value = 0.0;
-    if (value > 1.0) value = 1.0;
-
-    // convert 0.0 to 1.0 to 0 to 4095
-    int offtime = (int)((value * 4095.0) + 0.5);
+    int offtime = Value;
     int ontime  = 0;
+
+    if (offtime < 0)    offtime = 0;
+    if (offtime > 4095) offtime = 4095;
 
     // turn completely on or off if required
     // 'off' supercedes 'on' per spec
     if (offtime < 1)
+    {
+        LOG(VB_GENERAL, LOG_INFO, QString("Channel %1 turned completely OFF").arg(Channel));
         offtime |= 0x1000;
+    }
     else if (offtime > 4094)
+    {
+        LOG(VB_GENERAL, LOG_INFO, QString("Channel %1 turned completely ON").arg(Channel));
         ontime |= 0x1000;
+    }
 
     (int)wiringPiI2CWriteReg8(m_fd, LED0_ON_LOW   + (4 * Channel), ontime & 0xFF);
     (int)wiringPiI2CWriteReg8(m_fd, LED0_ON_HIGH  + (4 * Channel), ontime >> 8);
