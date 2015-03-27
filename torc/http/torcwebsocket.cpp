@@ -222,10 +222,11 @@ bool TorcWebSocket::ProcessUpgradeRequest(TorcHTTPConnection *Connection, TorcHT
         valid = false;
     }
 
-    // N.B. we should always be using non-default ports, so port must be present
+    // default ports (e.g. 80) are not listed in host, so don't check in this case
     QUrl host("http://" + Request->Headers()->value("Host"));
+    int localport = Connection->GetSocket()->localPort();
 
-    if (valid && host.port() != Connection->GetSocket()->localPort())
+    if (valid && localport != 80 && host.port() != localport)
     {
         error = "Invalid Host port";
         valid = false;
