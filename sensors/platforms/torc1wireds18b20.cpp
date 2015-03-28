@@ -49,13 +49,12 @@ void Torc1WireReadThread::Start(void)
     // restart the timer each time to handle periods of load/delay
     m_timer->setSingleShot(true);
 
-    // randomise start time for each sensor
-    m_timer->setInterval(qrand() % MIN_READ_INTERVAL);
-
     // 'this' is in the parent's thread and connect will by default use an indirect connection,
     // so force a direct connection to ensure Read operates in the 1Wire thread.
     connect(m_timer, SIGNAL(timeout()), this, SLOT(Read()), Qt::DirectConnection);
-    m_timer->start();
+
+    // randomise start time for each sensor
+    m_timer->start(qrand() % MIN_READ_INTERVAL);
 }
 
 void Torc1WireReadThread::Finish(void)
