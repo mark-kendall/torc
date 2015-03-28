@@ -263,11 +263,14 @@ void TorcTransitionControl::CalculateOutput(void)
 */
 void TorcTransitionControl::SetAnimationValue(double Value)
 {
+    QMutexLocker locker(lock);
+
     animationValue = Value;
     SetValue(Value);
 }
 
 double TorcTransitionControl::GetAnimationValue(void)
 {
+    QMutexLocker locker(lock);
     return animationValue;
 }
