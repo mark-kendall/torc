@@ -224,14 +224,12 @@ void TorcTransitionControl::CalculateOutput(void)
             {
                 LOG(VB_GENERAL, LOG_INFO, QString("Transition '%1' is initially inactive (value '%2')").arg(uniqueId).arg(newvalue));
                 SetValue(newvalue);
-                animationValue = newvalue;
                 return;
             }
 
             // if we are part way through the transition, the animation will expect the value to have started
             // from the previous transition value !:)
             SetValue(newvalue > 0 ? 0 : 1);
-            animationValue = newvalue > 0 ? 0 : 1;
             LOG(VB_GENERAL, LOG_INFO, QString("Forcing transition '%1' time to %2% complete").arg(uniqueId)
                 .arg(((double)timesincelasttransition / (double)m_duration) * 100.0));
 
@@ -265,6 +263,7 @@ void TorcTransitionControl::CalculateOutput(void)
 */
 void TorcTransitionControl::SetAnimationValue(double Value)
 {
+    animationValue = Value;
     SetValue(Value);
 }
 
