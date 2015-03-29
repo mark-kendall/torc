@@ -230,6 +230,16 @@ void TorcHTTPConnection::run(void)
         {
         }
 
+        // ensure we have a complete line if still waiting for complete headers.
+        // This ensures we do not loop endlessly and at full load waiting for data that
+        // never arrives.
+        while (!reader->m_headersComplete &&
+               m_socket->state() == QAbstractSocket::ConnectedState && !(*m_abort) &&
+               count++ < 300 && !m_socket->canReadLine())
+        {
+            QThread::msleep(100);
+        }
+
         // timed out
         if (count >= 300)
         {
