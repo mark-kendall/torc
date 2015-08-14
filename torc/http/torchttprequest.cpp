@@ -326,6 +326,22 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket, int *Abort)
     if (!Socket)
         return;
 
+    // this is not the file you are looking for...
+    if ((m_responseType == HTTPResponseUnknown && !m_responseFile)|| m_responseStatus == HTTP_NotFound)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("'%1' not found").arg(m_fullUrl));
+        m_responseStatus  = HTTP_NotFound;
+
+        QByteArray *result = new QByteArray();
+        QTextStream stream(result);
+        stream << "<html><head><title>" << QCoreApplication::applicationName() << "</title></head>";
+        stream << "<body><h1><a href='/'>" << QCoreApplication::applicationName() << "</a></h1>";
+        stream << "<p>File not found";
+        stream << "</body></html>";
+        this->SetResponseContent(result);
+        this->SetResponseType(HTTPResponseHTML);
+    }
+
     QString contenttype = ResponseTypeToString(m_responseType);
 
     // set the response type based upon file
@@ -336,13 +352,6 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket, int *Abort)
     }
 
     QByteArray contentheader = QString("Content-Type: %1\r\n").arg(contenttype).toLatin1();
-
-    if (m_responseType == HTTPResponseUnknown)
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("'%1' not found").arg(m_fullUrl));
-        m_responseStatus = HTTP_NotFound;
-        contentheader    = "";
-    }
 
     // process byte range requests
     qint64 totalsize  = m_responseContent ? m_responseContent->size() : m_responseFile ? m_responseFile->size() : 0;
