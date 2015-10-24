@@ -97,7 +97,7 @@ void TorcNetworkSensors::Create(const QVariantMap &Details)
                         QString uniqueid     = sensor.value("name").toString(); // ugly... assumes it is present
 
                         bool ok = false;
-                        double defaultdouble = defaultvalue.toInt(&ok);
+                        double defaultdouble = defaultvalue.toDouble(&ok);
                         if (!ok)
                             defaultdouble = 0.0;
 
