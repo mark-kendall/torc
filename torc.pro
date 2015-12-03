@@ -5,7 +5,7 @@ lessThan(QT_MAJOR_VERSION, 5) {
 
 TEMPLATE    = app
 CONFIG     += thread console
-CONFIG     -=app_bundle
+CONFIG     -= app_bundle
 TARGET      = torc-server
 PREFIX      = /usr/local
 RUNPREFIX   = $$PREFIX
