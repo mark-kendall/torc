@@ -150,7 +150,7 @@ QByteArray* TorcCoreUtils::GZipCompress(QByteArray *Source)
         return result;
 
     // initialise zlib (see zlib usage examples)
-    static int chunksize = 16384;
+    static const int chunksize = 16384;
     char outputbuffer[chunksize];
 
     z_stream stream;
@@ -203,7 +203,7 @@ QByteArray* TorcCoreUtils::GZipCompressFile(QFile *Source)
         return result;
 
     // initialise zlib (see zlib usage examples)
-    static int chunksize = 32768;
+    static const int chunksize = 32768;
     char inputbuffer[chunksize];
     char outputbuffer[chunksize];
 
