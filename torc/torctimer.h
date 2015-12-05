@@ -14,7 +14,6 @@ class TorcTimer
     int  Elapsed(void);
     void Stop(void);
     bool IsRunning(void) const;
-    void AddMSecs(int Ms);
 
   private:
     QTime m_timer;

@@ -33,8 +33,3 @@ bool TorcTimer::IsRunning(void) const
 {
     return m_running;
 }
-
-void TorcTimer::AddMSecs(int Ms)
-{
-    m_timer.addMSecs(Ms);
-}
