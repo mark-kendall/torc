@@ -34,7 +34,11 @@
 #include "torccoreutils.h"
 
 // zlib
+#ifdef _WIN32
+#include <QtZlib/zlib.h>
+#else
 #include "zlib.h"
+#endif
 
 /// \brief Parse a QDataTime from the given QString
 QDateTime TorcCoreUtils::DateTimeFromString(const QString &String)
