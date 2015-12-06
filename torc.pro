@@ -87,6 +87,15 @@ linux-rasp-pi-g++ {
     message("Building for Raspberry Pi")
 }
 
+# Bonjour is not available on windows
+win {
+    SOURCES += torc/platforms/torcbonjourwindows.cpp
+    message("Bonjour NOT available")
+} else {
+    SOURCES += torc/torcbonjour.cpp
+    message("Bonjour available")
+}
+
 HEADERS += torc/torclogging.h
 HEADERS += torc/torcloggingdefs.h
 HEADERS += torc/torcqthread.h
@@ -179,7 +188,6 @@ SOURCES += torc/torcsetting.cpp
 SOURCES += torc/torcrpcrequest.cpp
 SOURCES += torc/torcdirectories.cpp
 SOURCES += torc/torcmime.cpp
-SOURCES += torc/torcbonjour.cpp
 SOURCES += torc/torcxmlreader.cpp
 SOURCES += torc/http/torchttprequest.cpp
 SOURCES += torc/http/torchttpserver.cpp
