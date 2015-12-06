@@ -55,7 +55,7 @@ qtHaveModule(xmlpatterns) {
 }
 
 # linux power support
-unix:qtHaveModule(dbus) {
+linux:qtHaveModule(dbus) {
     QT += dbus
     HEADERS += torc/platforms/torcpowerunixdbus.h
     SOURCES += torc/platforms/torcpowerunixdbus.cpp
