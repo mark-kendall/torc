@@ -58,12 +58,6 @@ TorcCentral::TorcCentral()
     QString current  = GetTorcConfigDir() + "/torc.xml";
 
     {
-        QMutexLocker locker(gStateGraphLock);
-        gStateGraph->clear();
-        gStateGraph->append("strict digraph G {\r\n"
-                            "    rankdir=\"LR\";\r\n"
-                            "    node [shape=rect];\r\n");
-
         if (QFile::exists(graphdot))
             QFile::remove(graphdot);
         if (QFile::exists(graphsvg))
@@ -81,9 +75,19 @@ TorcCentral::TorcCentral()
 
     if (LoadConfig())
     {
+        // start the graph
+        {
+            QMutexLocker locker(gStateGraphLock);
+            gStateGraph->clear();
+            gStateGraph->append(QString("strict digraph \"%1\" {\r\n"
+                                        "    rankdir=\"LR\";\r\n"
+                                        "    node [shape=rect];\r\n")
+                                .arg(QCoreApplication::applicationName()));
+        }
+
         TorcDeviceHandler::Start(m_config);
 
-        // start building the graph
+        // start building the graph contents
         TorcSensors::gSensors->Graph();
         TorcOutputs::gOutputs->Graph();
         TorcControls::gControls->Graph();
