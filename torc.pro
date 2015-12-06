@@ -63,6 +63,20 @@ linux:qtHaveModule(dbus) {
     message("QtDBus available")
 }
 
+# OS X power support
+macx {
+    QMAKE_OBJECTIVE_CXXFLAGS += $$QMAKE_CXXFLAGS
+    LIBS += -framework Cocoa -framework IOkit
+    OBJECTIVE_HEADERS += torc/platforms/torccocoa.h
+    OBJECTIVE_SOURCES += torc/platforms/torccocoa.mm
+    HEADERS += torc/platforms/torcosxutils.h
+    HEADERS += torc/platforms/torcpowerosx.h
+    HEADERS += torc/platforms/torcrunlooposx.h
+    SOURCES += torc/platforms/torcosxutils.cpp
+    SOURCES += torc/platforms/torcpowerosx.cpp
+    SOURCES += torc/platforms/torcrunlooposx.cpp
+}
+
 # I2c on the Raspberry Pi
 linux-rasp-pi-g++ {
     LIBS += -lwiringPi
