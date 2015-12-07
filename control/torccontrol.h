@@ -50,6 +50,7 @@ class TorcControl : public TorcDevice
     void                   SetValue               (double Value);
     void                   SetValid               (bool Valid);
     virtual void           CalculateOutput        (void) = 0;
+    bool                   CheckForCircularReferences (const QString &UniqueId, QString Path);
 
   protected:
     bool                   m_parsed;

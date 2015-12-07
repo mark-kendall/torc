@@ -202,6 +202,12 @@ bool TorcControl::Validate(void)
     // validate inputs
     foreach (QString input, m_inputList)
     {
+        if (input == uniqueId)
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Control '%1' cannot have itself as input").arg(input));
+            return false;
+        }
+
         QObject *object = TorcDevice::GetObjectforId(input);
 
         // valid object
@@ -217,6 +223,12 @@ bool TorcControl::Validate(void)
     // validate outputs
     foreach (QString output, m_outputList)
     {
+        if (output == uniqueId)
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Control '%1' cannot have itself as output").arg(output));
+            return false;
+        }
+
         QObject *object = TorcDevice::GetObjectforId(output);
 
         // valid object?
@@ -230,7 +242,8 @@ bool TorcControl::Validate(void)
         TorcOutput* out = qobject_cast<TorcOutput*>(object);
         if (out && out->HasOwner())
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Output '%1' (for control '%2') already has an owner").arg(out->GetUniqueId()));
+            LOG(VB_GENERAL, LOG_ERR, QString("Output '%1' (for control '%2') already has an owner")
+                .arg(out->GetUniqueId()).arg(out->GetUniqueId()));
             return false;
         }
 
@@ -420,4 +433,38 @@ void TorcControl::SetValid(bool Valid)
         if (!valid)
             SetValue(defaultValue);
     }
+}
+
+bool TorcControl::CheckForCircularReferences(const QString &UniqueId, QString Path)
+{
+    if (UniqueId.isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Invalid UniqueId");
+        return false;
+    }
+
+    QString path = Path;
+    if (!path.isEmpty())
+        path += "->";
+    path += uniqueId;
+
+    // iterate over the outputs list
+    QMap<QObject*,QString>::const_iterator it = m_outputs.constBegin();
+    for ( ; it != m_outputs.constEnd(); ++it)
+    {
+        // check first for a direct match with the output
+        if (it.value() == UniqueId)
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Circular reference found: %1->%2").arg(path).arg(UniqueId));
+            return false;
+        }
+
+        // and then ask each output to check
+        TorcControl *control = dynamic_cast<TorcControl*>(it.key());
+        if (control)
+            if (!control->CheckForCircularReferences(UniqueId, path))
+                return false;
+    }
+
+    return true;
 }

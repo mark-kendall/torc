@@ -99,6 +99,13 @@ void TorcControls::Validate(void)
 {
     QMutexLocker locker(m_lock);
 
+    // We first validate each control.
+
+    // At this point all sensors, controls and outputs have been parsed successfully and
+    // the objects created.
+    // Validation checks each control has the correct number of valid inputs and outputs and then
+    // connects the appropriate signal/slot pairs. At this point no signals should be triggered.
+
     QMutableListIterator<TorcControl*> it(m_controls);
     while (it.hasNext())
     {
@@ -109,6 +116,20 @@ void TorcControls::Validate(void)
             control->DownRef();
             it.remove();
         }
+    }
+
+    LOG(VB_GENERAL, LOG_INFO, "Controls validated");
+
+    // Each control now has a complete list of inputs and outputs so we can now check for circular references.
+    // N.B. Only controls are aware of other devices (i.e. they are created with the expectation that they are
+    // connected to sensors/outputs/other controls. Sensors and outputs are notionally standalone.
+
+    // Iterate over the controls list and recursively check for circular references.
+    foreach (TorcControl* control, m_controls)
+    {
+        QString id = control->GetUniqueId();
+        QString path("");
+        (void)control->CheckForCircularReferences(id, path);
     }
 }
 
