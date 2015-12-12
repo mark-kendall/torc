@@ -133,7 +133,11 @@ void TorcCoreUtils::QtMessage(QtMsgType Type, const QMessageLogContext &Context,
 ///\brief Return true if zlib support is available.
 bool TorcCoreUtils::HasZlib(void)
 {
+#ifdef USING_ZLIB
     return true;
+#else
+    return false;
+#endif
 }
 
 /*! \brief Compress the supplied data using GZip.
@@ -145,6 +149,9 @@ QByteArray* TorcCoreUtils::GZipCompress(QByteArray *Source)
 {
     QByteArray *result = NULL;
 
+#ifdef USING_ZLIB
+    return result;
+#else
     // this shouldn't happen
     if (!Source || (Source && Source->size() < 0))
         return result;
@@ -187,6 +194,7 @@ QByteArray* TorcCoreUtils::GZipCompress(QByteArray *Source)
 
     deflateEnd(&stream);
     return result;
+#endif
 }
 
 /*! \brief Compress the given file using GZip.
@@ -198,6 +206,9 @@ QByteArray* TorcCoreUtils::GZipCompressFile(QFile *Source)
 {
     QByteArray *result = NULL;
 
+#ifdef USING_ZLIB
+    return result;
+#else
     // this shouldn't happen
     if (!Source || (Source && Source->size() < 0))
         return result;
@@ -252,4 +263,5 @@ QByteArray* TorcCoreUtils::GZipCompressFile(QFile *Source)
 
     deflateEnd(&stream);
     return result;
+#endif
 }

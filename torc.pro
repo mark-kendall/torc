@@ -25,9 +25,17 @@ QT         -= gui
 #CONFIG     += debug
 
 # libraries
-LIBS       += -lz
-!mac:LIBS  += -ldns_sd
-!mac:LIBS  += -lrt
+# zlib on windows is too much like hard work
+!win32 {
+    DEFINES += USING_ZLIB
+    LIBS    += -lz
+}
+else
+{
+    message("Zlib support NOT available")
+}
+!mac:!win32:LIBS += -ldns_sd
+!mac:!win32:LIBS += -lrt
 
 DEPENDPATH  += ./torc ./torc/http ./torc/upnp ./sensors ./sensors/platforms
 DEPENDPATH  += ./outputs ./outputs/platforms
