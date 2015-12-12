@@ -149,7 +149,7 @@ class TorcPower : public QObject, public TorcHTTPService
     bool                  canSuspend;   // dummy
     bool                  canHibernate; // dummy
     bool                  canRestart;   // dummy
-    bool                  batteryLevel; // dummy
+    int                   batteryLevel; // dummy
 };
 
 extern TorcPower *gPower;
