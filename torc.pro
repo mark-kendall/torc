@@ -102,7 +102,7 @@ linux-rasp-pi-g++ {
 }
 
 # Bonjour is not available on windows
-win {
+win32 {
     SOURCES += torc/platforms/torcbonjourwindows.cpp
     message("Bonjour NOT available")
 } else {
