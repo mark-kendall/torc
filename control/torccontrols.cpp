@@ -135,8 +135,9 @@ void TorcControls::Validate(void)
 
 void TorcControls::Graph(void)
 {
-    // currently unused as not adding a control cluster helps dot draw the graph and hides
-    // 'passthrough' controls
+    QMutexLocker locker(m_lock);
+    foreach(TorcControl *control, m_controls)
+        control->Graph();
 }
 
 void TorcControls::Start(void)

@@ -44,25 +44,6 @@ TorcLogicControl::Operation TorcLogicControl::StringToOperation(const QString &O
     return TorcLogicControl::NoOperation;
 }
 
-QString TorcLogicControl::OperationToString(TorcLogicControl::Operation Operation)
-{
-    switch (Operation)
-    {
-        case TorcLogicControl::Equal:              return QString("Equal");
-        case TorcLogicControl::LessThan:           return QString("LessThan");
-        case TorcLogicControl::LessThanOrEqual:    return QString("LessThanOrEqual");
-        case TorcLogicControl::GreaterThan:        return QString("GreaterThan");
-        case TorcLogicControl::GreaterThanOrEqual: return QString("GreaterThanOrEqual");
-        case TorcLogicControl::Any:                return QString("Any");
-        case TorcLogicControl::All:                return QString("All");
-        case TorcLogicControl::Average:            return QString("Average");
-        case TorcLogicControl::NoOperation:
-        default: break;
-    }
-
-    return QString("None");
-}
-
 TorcLogicControl::TorcLogicControl(const QString &Type, const QVariantMap &Details)
   : TorcControl(Details),
     m_operation(TorcLogicControl::NoOperation),
@@ -116,6 +97,66 @@ TorcControl::Type TorcLogicControl::GetType(void)
     return TorcControl::Logic;
 }
 
+QStringList TorcLogicControl::GetDescription(void)
+{
+    QStringList result;
+
+    switch (m_operation)
+    {
+        case TorcLogicControl::Equal:
+            result.append(tr("Equal to %1").arg(m_operationValue));
+            break;
+        case TorcLogicControl::LessThan:
+            result.append(tr("Less than %1").arg(m_operationValue));
+            break;
+        case TorcLogicControl::LessThanOrEqual:
+            result.append(tr("Less than or equal to %1").arg(m_operationValue));
+            break;
+        case TorcLogicControl::GreaterThan:
+            result.append(tr("Greater than %1").arg(m_operationValue));
+            break;
+        case TorcLogicControl::GreaterThanOrEqual:
+            result.append(tr("Greater than or equal to %1").arg(m_operationValue));
+            break;
+        case TorcLogicControl::Any:
+            result.append(tr("Any"));
+            break;
+        case TorcLogicControl::All:
+            result.append(tr("All"));
+            break;
+        case TorcLogicControl::Average:
+            result.append(tr("Average"));
+            break;
+        case TorcLogicControl::NoOperation:
+        default:
+            result.append(tr("Passthrough"));
+            break;
+    }
+
+    return result;
+}
+
+bool TorcLogicControl::IsPassthrough(void)
+{
+    QMutexLocker locker(lock);
+
+    bool passthrough = false;
+    if ((m_operation == TorcLogicControl::NoOperation) && (m_inputs.size() == 1))
+    {
+        // check the input
+        if (qobject_cast<TorcSensor*>(m_inputs.firstKey()))
+        {
+            // and the outputs
+            passthrough = true;
+            QMap<QObject*,QString>::const_iterator it = m_outputs.constBegin();
+            for ( ; it != m_outputs.constEnd(); ++it)
+                passthrough &= (bool)qobject_cast<TorcOutput*>(it.key());
+        }
+    }
+
+    return passthrough;
+}
+
 bool TorcLogicControl::Validate(void)
 {
     QMutexLocker locker(lock);
@@ -142,21 +183,6 @@ bool TorcLogicControl::Validate(void)
         return false;
     }
 
-    // passthrough validation
-    bool passthrough = false;
-    if ((m_operation == TorcLogicControl::NoOperation) && (m_inputs.size() == 1))
-    {
-        // check the input
-        if (qobject_cast<TorcSensor*>(m_inputs.firstKey()))
-        {
-            // and the outputs
-            passthrough = true;
-            QMap<QObject*,QString>::const_iterator it = m_outputs.constBegin();
-            for ( ; it != m_outputs.constEnd(); ++it)
-                passthrough &= (bool)qobject_cast<TorcOutput*>(it.key());
-        }
-    }
-
     // sanity check number of inputs for operation type
     if (m_operation == TorcLogicControl::Equal ||
         m_operation == TorcLogicControl::LessThan ||
@@ -168,7 +194,7 @@ bool TorcLogicControl::Validate(void)
         if (m_inputs.size() > 1)
         {
             LOG(VB_GENERAL, LOG_ERR, QString("%1 has %2 inputs for operation '%3' (can have only 1) - ignoring.")
-                .arg(uniqueId).arg(m_inputs.size()).arg(OperationToString(m_operation)));
+                .arg(uniqueId).arg(m_inputs.size()).arg(GetDescription().join(",")));
             return false;
         }
     }
@@ -181,13 +207,13 @@ bool TorcLogicControl::Validate(void)
         if (m_inputs.size() < 2)
         {
             LOG(VB_GENERAL, LOG_ERR, QString("%1 has %2 inputs for operation '%3' (needs at least 2) - ignoring.")
-                .arg(uniqueId).arg(m_inputs.size()).arg(OperationToString(m_operation)));
+                .arg(uniqueId).arg(m_inputs.size()).arg(GetDescription().join(",")));
             return false;
         }
     }
 
     // if we get this far, we can finish the device
-    Finish(passthrough);
+    Finish();
     return true;
 }
 

@@ -150,6 +150,56 @@ TorcControl::Type TorcTimerControl::GetType(void)
     return TorcControl::Timer;
 }
 
+QStringList TorcTimerControl::GetDescription(void)
+{
+    QStringList result;
+
+    if (TorcTimerControl::Custom == m_timerType)
+    {
+        QString frequency = m_startDay > 0 ? QString("%1days %2").arg(m_startDay).arg(m_startTime.toString(QString("hh:mm.ss"))) :
+                                             QString("%2").arg(m_startTime.toString(QString("hh:mm.ss")));
+        QString length   = TorcControl::DurationToString(m_durationDay, m_duration);
+
+        result.append(tr("Custom Timer"));
+        result.append(tr("Frequency %1").arg(frequency));
+        result.append(tr("Duration %2").arg(length));
+    }
+    else if (TorcTimerControl::Minutely == m_timerType)
+    {
+        result.append(tr("Minutely Timer"));
+        result.append(tr("Start %1").arg(m_startTime.toString(QString("ss"))));
+        result.append(tr("Duration %2").arg(QTime(0, 0).addSecs(m_duration).toString(QString("ss"))));
+    }
+    else if (TorcTimerControl::Hourly == m_timerType)
+    {
+        result.append(tr("Hourly Timer"));
+        result.append(tr("Start %1").arg(m_startTime.toString(QString("mm.ss"))));
+        result.append(tr("Duration %2").arg(QTime(0, 0).addSecs(m_duration).toString(QString("mm.ss"))));
+    }
+    else if (TorcTimerControl::Daily == m_timerType)
+    {
+        result.append(tr("Daily Timer"));
+        result.append(tr("Start %1").arg(m_startTime.toString(QString("hh:mm.ss"))));
+        result.append(tr("Duration %2").arg(QTime(0, 0).addSecs(m_duration).toString(QString("hh:mm.ss"))));
+    }
+    else if (TorcTimerControl::Weekly == m_timerType)
+    {
+        result.append(tr("Weekly Timer"));
+        result.append(tr("Start %1 %2")
+                      .arg(gLocalContext->GetLocale().dayName(m_startDay))
+                      .arg(m_startTime.toString(QString("hh:mm.ss"))));
+        result.append(tr("Duration %3days %4")
+                      .arg(m_durationDay)
+                      .arg(QTime(0, 0).addSecs(m_duration).toString(QString("hh:mm.ss"))));
+    }
+    else
+    {
+        result.append(tr("Unknown"));
+    }
+
+    return result;
+}
+
 bool TorcTimerControl::Validate(void)
 {
     QMutexLocker locker(lock);
@@ -177,47 +227,10 @@ bool TorcTimerControl::Validate(void)
     }
 
     // if we get this far, we can finish the device
-    Finish(false);
+    Finish();
 
     // debug
-    if (m_timerType == TorcTimerControl::Custom)
-    {
-        QString frequency = m_startDay > 0 ? QString("%1days %2").arg(m_startDay).arg(m_startTime.toString(QString("hh:mm.ss"))) :
-                                             QString("%2").arg(m_startTime.toString(QString("hh:mm.ss")));
-        QString length   = m_durationDay > 0 ? QString("%1days %2").arg(m_durationDay).arg(QTime(0, 0).addSecs(m_duration).toString(QString("hh:mm.ss"))) :
-                                               QString("%2").arg(QTime(0, 0).addSecs(m_duration).toString(QString("hh:mm.ss")));
-
-        LOG(VB_GENERAL, LOG_INFO, QString("Custom timer: Freqency %1, Duration %2").arg(frequency).arg(length));
-    }
-    else if (m_timerType == TorcTimerControl::Minutely)
-    {
-        LOG(VB_GENERAL, LOG_INFO, QString("%1: %2 timer, Start: %3 Duration %4")
-            .arg(uniqueId).arg(TorcTimerControl::TimerTypeToString(m_timerType))
-            .arg(m_startTime.toString(QString("ss")))
-            .arg(QTime(0, 0).addSecs(m_duration).toString(QString("ss"))));
-    }
-    else if (m_timerType == TorcTimerControl::Hourly)
-    {
-        LOG(VB_GENERAL, LOG_INFO, QString("%1: %2 timer, Start: %3 Duration %4")
-            .arg(uniqueId).arg(TorcTimerControl::TimerTypeToString(m_timerType))
-            .arg(m_startTime.toString(QString("mm.ss")))
-            .arg(QTime(0, 0).addSecs(m_duration).toString(QString("mm.ss"))));
-    }
-    else if (m_timerType == TorcTimerControl::Daily)
-    {
-        LOG(VB_GENERAL, LOG_INFO, QString("%1: %2 timer, Start: %3 Duration %4")
-            .arg(uniqueId).arg(TorcTimerControl::TimerTypeToString(m_timerType))
-            .arg(m_startTime.toString(QString("hh:mm.ss")))
-            .arg(QTime(0, 0).addSecs(m_duration).toString(QString("hh:mm.ss"))));
-    }
-    else
-    {
-        LOG(VB_GENERAL, LOG_INFO, QString("%1: %2 timer, Start: %3 %4 Duration %5days %6")
-            .arg(uniqueId).arg(TorcTimerControl::TimerTypeToString(m_timerType))
-            .arg(gLocalContext->GetLocale().dayName(m_startDay))
-            .arg(m_startTime.toString(QString("hh:mm.ss")))
-            .arg(m_durationDay).arg(QTime(0, 0).addSecs(m_duration).toString(QString("hh:mm.ss"))));
-    }
+    LOG(VB_GENERAL, LOG_INFO, QString("Timer '%1': %2").arg(uniqueId).arg(GetDescription().join(",")));
 
     // this is probably overkill - but we shouldn't have that many timers and most will
     // have relatively long durations

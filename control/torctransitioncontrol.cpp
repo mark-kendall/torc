@@ -76,6 +76,58 @@ QEasingCurve::Type TorcTransitionControl::EasingCurveFromString(const QString &C
     return QEasingCurve::Custom; // invalid
 }
 
+QString TorcTransitionControl::StringFromEasingCurve(QEasingCurve::Type Type)
+{
+    switch (Type)
+    {
+        case QEasingCurve::Linear:       return tr("Linear");
+        case QEasingCurve::InQuad:       return tr("InQuad");
+        case QEasingCurve::OutQuad:      return tr("OutQuad");
+        case QEasingCurve::InOutQuad:    return tr("InOutQuad");
+        case QEasingCurve::OutInQuad:    return tr("OutInQuad");
+        case QEasingCurve::InCubic:      return tr("InCubic");
+        case QEasingCurve::OutCubic:     return tr("OutCubic");
+        case QEasingCurve::InOutCubic:   return tr("InOutCubic");
+        case QEasingCurve::OutInCubic:   return tr("OutInCubic");
+        case QEasingCurve::InQuart:      return tr("InQuart");
+        case QEasingCurve::OutQuart:     return tr("OutQuart");
+        case QEasingCurve::InOutQuart:   return tr("InOutQuart");
+        case QEasingCurve::OutInQuart:   return tr("OutInQuart");
+        case QEasingCurve::InQuint:      return tr("InQuint");
+        case QEasingCurve::OutQuint:     return tr("OutQuint");
+        case QEasingCurve::InOutQuint:   return tr("InOutQuint");
+        case QEasingCurve::OutInQuint:   return tr("OutInQuint");
+        case QEasingCurve::InSine:       return tr("InSine");
+        case QEasingCurve::OutSine:      return tr("OutSine");
+        case QEasingCurve::InOutSine:    return tr("InOutSine");
+        case QEasingCurve::OutInSine:    return tr("OutInSine");
+        case QEasingCurve::InExpo:       return tr("InExpo");
+        case QEasingCurve::OutExpo:      return tr("OutExpo");
+        case QEasingCurve::InOutExpo:    return tr("InOutExpo");
+        case QEasingCurve::OutInExpo:    return tr("OutInExpo");
+        case QEasingCurve::InCirc:       return tr("InCirc");
+        case QEasingCurve::OutCirc:      return tr("OutCirc");
+        case QEasingCurve::InOutCirc:    return tr("InOutCirc");
+        case QEasingCurve::OutInCirc:    return tr("OutInCirc");
+        case QEasingCurve::InElastic:    return tr("InElastic");
+        case QEasingCurve::OutElastic:   return tr("OutElastic");
+        case QEasingCurve::InOutElastic: return tr("InOutElastic");
+        case QEasingCurve::OutInElastic: return tr("OutInElastic");
+        case QEasingCurve::InBack:       return tr("InBack");
+        case QEasingCurve::OutBack:      return tr("OutBack");
+        case QEasingCurve::InOutBack:    return tr("InOutBack");
+        case QEasingCurve::OutInBack:    return tr("OutInBack");
+        case QEasingCurve::InBounce:     return tr("InBounce");
+        case QEasingCurve::OutBounce:    return tr("OutBounce");
+        case QEasingCurve::InOutBounce:  return tr("InOutBounce");
+        case QEasingCurve::OutInBounce:  return tr("OutInBounce");
+        default:
+            break;
+    }
+
+    return tr("Unknown");
+}
+
 TorcTransitionControl::TorcTransitionControl(const QString &Type, const QVariantMap &Details)
   : TorcControl(Details),
     m_duration(0),
@@ -131,6 +183,18 @@ TorcControl::Type TorcTransitionControl::GetType(void)
     return TorcControl::Transition;
 }
 
+QStringList TorcTransitionControl::GetDescription(void)
+{
+    static const quint64 secondsinday = 60 * 60 * 24;
+    int     daysduration = m_duration / secondsinday;
+    quint64 timeduration = m_duration % secondsinday;
+
+    QStringList result;
+    result.append(tr("%1 transition").arg(StringFromEasingCurve(m_type)));
+    result.append(tr("Duration %1").arg(TorcControl::DurationToString(daysduration, timeduration)));
+    return result;
+}
+
 bool TorcTransitionControl::Validate(void)
 {
     QMutexLocker locker(lock);
@@ -158,7 +222,7 @@ bool TorcTransitionControl::Validate(void)
     }
 
     // if we get this far, we can finish the device
-    Finish(false);
+    Finish();
 
     // setup the animation now
     QEasingCurve easingcurve(m_type);
@@ -168,7 +232,7 @@ bool TorcTransitionControl::Validate(void)
     m_animation->setDuration(m_duration * 1000);
 
     // debug
-    LOG(VB_GENERAL, LOG_INFO, QString("%1 transition: Duration %2").arg(uniqueId).arg(m_duration));
+    LOG(VB_GENERAL, LOG_INFO, QString("%1: %2").arg(uniqueId).arg(GetDescription().join(",")));
 
     return true;
 }

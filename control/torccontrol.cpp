@@ -161,6 +161,12 @@ bool TorcControl::ParseTimeString(const QString &Time, int &Days, int &Hours,
     return true;
 }
 
+QString TorcControl::DurationToString(int Days, quint64 Duration)
+{
+    return Days > 0 ? QString("%1days %2").arg(Days).arg(QTime(0, 0).addSecs(Duration).toString(QString("hh:mm.ss"))) :
+                      QString("%1").arg(QTime(0, 0).addSecs(Duration).toString(QString("hh:mm.ss")));
+}
+
 /*! \class TorcControl
  *
  * The control is 'valid' if all of its inputs are present, valid and have a known value.
@@ -258,60 +264,129 @@ void TorcControl::Start(void)
 {
 }
 
-/*! \fn Finish
- * \brief Finish setup of the control
- *
- * Finish is only called once all other parsing and validation is complete.
- * The control is connected to its input(s) and output(s), the state graph is completed
- * and the device marked as validated.
- *
- * \note If a Logic control has one single sensor input (NOT another control), one or more outputs (NOT controls) and
- *       the operation is a straight pass through (TorcLogicControl::NoOperation), then we do not present the control in the stategraph.
- *       This makes the graph clearer but the control is still required as Outputs have no understanding of invalid
- *       sensor outputs.
- * \note We always assume an object of a given type has the correct signals/slots
- *
- * \todo Validate input/output data types
- * \todo Make Outputs 'valid' aware and handle their own defaults if any input/control is invalid.
-*/
-void TorcControl::Finish(bool Passthrough)
+/// Only certain logic controls can be passthrough
+bool TorcControl::IsPassthrough(void)
+{
+    return false;
+}
+
+/*! \fn Graph
+* \brief Add this control to the state graph
+*
+* \note If a Logic control has one single sensor input (NOT another control), one or more outputs (NOT controls) and
+*       the operation is a straight pass through (TorcLogicControl::NoOperation), then we do not present the control in the stategraph.
+*       This makes the graph clearer but the control is still required as Outputs have no understanding of invalid
+*       sensor outputs.
+* */
+void TorcControl::Graph(void)
 {
     QMutexLocker locker(TorcCentral::gStateGraphLock);
+    QMutexLocker locker2(lock);
 
-    if (!Passthrough)
-        TorcCentral::gStateGraph->append(QString("    \"%1\" [label=\"%2\"];\r\n").arg(uniqueId).arg(userName));
+    bool passthrough = IsPassthrough();
 
-    QMap<QObject*,QString>::iterator it = m_outputs.begin();
-    for ( ; it != m_outputs.end(); ++it)
+    if (!passthrough)
+    {
+        QString desc;
+        bool first = true;
+        QStringList source = GetDescription();
+        foreach (QString item, source)
+        {
+            if (!first)
+                desc.append("|");
+            else
+                first = false;
+            desc.append(QString("<FONT POINT-SIZE=\"10\">%1</FONT>").arg(item));
+        }
+
+        TorcCentral::gStateGraph->append(QString("    \"%1\" [shape=record label=<<B>%2</B>|%3>];\r\n")
+                                         .arg(uniqueId).arg(userName).arg(desc));
+    }
+
+    QMap<QObject*,QString>::const_iterator it = m_outputs.constBegin();
+    for ( ; it != m_outputs.constEnd(); ++it)
     {
         if (qobject_cast<TorcOutput*>(it.key()))
         {
             TorcOutput* output = qobject_cast<TorcOutput*>(it.key());
-            (void)output->SetOwner(this);
-            QString source = Passthrough ? qobject_cast<TorcSensor*>(m_inputs.firstKey())->GetUniqueId() : uniqueId;
+            QString source = passthrough ? qobject_cast<TorcSensor*>(m_inputs.firstKey())->GetUniqueId() : uniqueId;
             TorcCentral::gStateGraph->append(QString("    \"%1\"->\"%2\"\r\n").arg(source).arg(output->GetUniqueId()));
-            connect(this, SIGNAL(ValueChanged(double)), output, SLOT(SetValue(double)), Qt::UniqueConnection);
         }
-        else
+        else if (qobject_cast<TorcControl*>(it.key()))
         {
             TorcControl* control = qobject_cast<TorcControl*>(it.key());
             TorcCentral::gStateGraph->append(QString("    \"%1\"->\"%2\"\r\n").arg(uniqueId).arg(control->GetUniqueId()));
-            connect(this, SIGNAL(ValidChanged(bool)), control, SLOT(InputValidChanged(bool)), Qt::UniqueConnection);
-            connect(this, SIGNAL(ValueChanged(double)), control, SLOT(InputValueChanged(double)), Qt::UniqueConnection);
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_ERR, "Unknown output type");
         }
     }
 
-    it = m_inputs.begin();
-    for ( ; it != m_inputs.end(); ++it)
+    it = m_inputs.constBegin();
+    for ( ; it != m_inputs.constEnd(); ++it)
     {
+        if (passthrough)
+            continue;
+
         QString inputid;
         if (qobject_cast<TorcControl*>(it.key()))
             inputid = qobject_cast<TorcControl*>(it.key())->GetUniqueId();
         else if (qobject_cast<TorcSensor*>(it.key()))
             inputid = qobject_cast<TorcSensor*>(it.key())->GetUniqueId();
+        else
+            LOG(VB_GENERAL, LOG_ERR, "Unknown input type");
 
-        if (!Passthrough) // already handled in the outputs above
-            TorcCentral::gStateGraph->append(QString("    \"%1\"->\"%2\"\r\n").arg(inputid).arg(uniqueId));
+        TorcCentral::gStateGraph->append(QString("    \"%1\"->\"%2\"\r\n").arg(inputid).arg(uniqueId));
+    }
+
+}
+
+/*! \fn Finish
+ * \brief Finish setup of the control
+ *
+ * Finish is only called once all other parsing and validation is complete.
+ * The control is connected to its input(s) and output(s) and the device marked as validated.
+ *
+ * \note We always assume an object of a given type has the correct signals/slots
+ *
+ * \todo Validate input/output data types
+ * \todo Make Outputs 'valid' aware and handle their own defaults if any input/control is invalid.
+*/
+void TorcControl::Finish(void)
+{
+    QMutexLocker locker(lock);
+
+    QMap<QObject*,QString>::const_iterator it = m_outputs.constBegin();
+    for ( ; it != m_outputs.constEnd(); ++it)
+    {
+        if (qobject_cast<TorcOutput*>(it.key()))
+        {
+            TorcOutput* output = qobject_cast<TorcOutput*>(it.key());
+            (void)output->SetOwner(this);
+            connect(this, SIGNAL(ValueChanged(double)), output, SLOT(SetValue(double)), Qt::UniqueConnection);
+        }
+        else if (qobject_cast<TorcControl*>(it.key()))
+        {
+            TorcControl* control = qobject_cast<TorcControl*>(it.key());
+            connect(this, SIGNAL(ValidChanged(bool)), control, SLOT(InputValidChanged(bool)), Qt::UniqueConnection);
+            connect(this, SIGNAL(ValueChanged(double)), control, SLOT(InputValueChanged(double)), Qt::UniqueConnection);
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_ERR, "Unknown output type");
+        }
+    }
+
+    it = m_inputs.constBegin();
+    for ( ; it != m_inputs.constEnd(); ++it)
+    {
+        if (!qobject_cast<TorcSensor*>(it.key()) && !qobject_cast<TorcControl*>(it.key()))
+        {
+            LOG(VB_GENERAL, LOG_ERR, "Unknown input type");
+            continue;
+        }
+
         connect(it.key(), SIGNAL(ValidChanged(bool)), this, SLOT(InputValidChanged(bool)), Qt::UniqueConnection);
         connect(it.key(), SIGNAL(ValueChanged(double)), this, SLOT(InputValueChanged(double)), Qt::UniqueConnection);
         m_inputValids.insert(it.key(), false);

@@ -18,8 +18,10 @@ class TorcTransitionControl : public TorcControl
    ~TorcTransitionControl();
 
     static QEasingCurve::Type EasingCurveFromString (const QString &Curve);
+    static QString            StringFromEasingCurve (QEasingCurve::Type Type);
     bool                      Validate              (void);
     TorcControl::Type         GetType               (void);
+    QStringList               GetDescription        (void);
 
   public slots:
     void                      SetAnimationValue    (double Value);

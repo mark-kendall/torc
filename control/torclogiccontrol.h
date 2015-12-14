@@ -21,7 +21,6 @@ class TorcLogicControl : public TorcControl
     };
 
     static TorcLogicControl::Operation StringToOperation (const QString &Operation, bool *Ok);
-    static QString                     OperationToString (TorcLogicControl::Operation Operation);
 
   public:
     TorcLogicControl(const QString &Type, const QVariantMap &Details);
@@ -29,6 +28,8 @@ class TorcLogicControl : public TorcControl
 
     bool                        Validate         (void);
     TorcControl::Type           GetType          (void);
+    QStringList                 GetDescription   (void);
+    bool                        IsPassthrough    (void);
 
   private:
     void                        CalculateOutput  (void);

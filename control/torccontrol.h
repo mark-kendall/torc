@@ -29,6 +29,7 @@ class TorcControl : public TorcDevice
     static QString                TypeToString      (TorcControl::Type Type);
     static bool                   ParseTimeString   (const QString &Time, int &Days, int &Hours,
                                                      int &Minutes, int &Seconds, quint64 &DurationInSeconds);
+    static QString                DurationToString  (int Days, quint64 Duration);
 
   protected:
     TorcControl(const QVariantMap &Details);
@@ -37,14 +38,17 @@ class TorcControl : public TorcDevice
   public:
     virtual bool           Validate               (void);
     virtual TorcControl::Type GetType             (void) = 0;
+    virtual QStringList    GetDescription         (void) = 0;
     virtual void           Start                  (void);
+    virtual bool           IsPassthrough          (void);
 
   public slots:
     void                   InputValueChanged      (double Value);
     void                   InputValidChanged      (bool   Valid);
 
   protected:
-    void                   Finish                 (bool Passthrough);
+    void                   Graph                  (void);
+    void                   Finish                 (void);
     void                   InputValidChangedPriv  (QObject* Input, bool Valid);
     void                   CheckInputValues       (void);
     void                   SetValue               (double Value);
