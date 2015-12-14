@@ -26,14 +26,16 @@ QT         -= gui
 
 # libraries
 # zlib on windows is too much like hard work
-!win32 {
-    DEFINES += USING_ZLIB
-    LIBS    += -lz
+win32 {
+    message("Zlib support NOT available")
 }
 else
 {
-    message("Zlib support NOT available")
+    message("Zlib support available")
+    DEFINES += USING_ZLIB
+    LIBS    += -lz
 }
+
 !mac:!win32:LIBS += -ldns_sd
 !mac:!win32:LIBS += -lrt
 

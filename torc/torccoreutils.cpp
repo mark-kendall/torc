@@ -149,7 +149,8 @@ QByteArray* TorcCoreUtils::GZipCompress(QByteArray *Source)
 {
     QByteArray *result = NULL;
 
-#ifdef USING_ZLIB
+#ifndef USING_ZLIB
+    (void) Source;
     return result;
 #else
     // this shouldn't happen
@@ -206,7 +207,8 @@ QByteArray* TorcCoreUtils::GZipCompressFile(QFile *Source)
 {
     QByteArray *result = NULL;
 
-#ifdef USING_ZLIB
+#ifndef USING_ZLIB
+    (void) Source;
     return result;
 #else
     // this shouldn't happen
