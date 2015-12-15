@@ -94,7 +94,7 @@ void TorcXmlValidator::handleMessage(QtMsgType Type, const QString &Description,
     (void)Identifier;
     QString desc = Description;
     desc.remove(QRegExp("<[^>]*>"));
-    LOG(VB_GENERAL, Type == QtFatalMsg ? LOG_ERR : LOG_WARNING, QString("XSDError in file '%1' at line %2: '%3'")
+    LOG(VB_GENERAL, (Type == QtFatalMsg) ? LOG_ERR : LOG_WARNING, QString("XSDError in file '%1' at line %2: '%3'")
         .arg(m_xmlFile).arg(SourceLocation.line()).arg(desc));
 }
 
