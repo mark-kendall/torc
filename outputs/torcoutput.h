@@ -22,6 +22,8 @@ class TorcOutput : public TorcDevice, public TorcHTTPService
     enum Type
     {
         Unknown    = 0,
+        Temperature,
+        pH,
         Switch,
         PWM,
         MaxType
