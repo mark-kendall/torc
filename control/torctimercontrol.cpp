@@ -227,7 +227,8 @@ bool TorcTimerControl::Validate(void)
     }
 
     // if we get this far, we can finish the device
-    Finish();
+    if (!Finish())
+        return false;
 
     // debug
     LOG(VB_GENERAL, LOG_INFO, QString("Timer '%1': %2").arg(uniqueId).arg(GetDescription().join(",")));
@@ -269,6 +270,12 @@ void TorcTimerControl::Start(void)
     // ensure state is communicated
     SetValid(true);
     emit ValueChanged(value);
+}
+
+/// Timers cannot have inputs
+bool TorcTimerControl::AllowInputs(void)
+{
+    return false;
 }
 
 void TorcTimerControl::TimerTimeout(void)

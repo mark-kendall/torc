@@ -222,7 +222,8 @@ bool TorcTransitionControl::Validate(void)
     }
 
     // if we get this far, we can finish the device
-    Finish();
+    if (!Finish())
+        return false;
 
     // setup the animation now
     QEasingCurve easingcurve(m_type);

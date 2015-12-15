@@ -213,7 +213,9 @@ bool TorcLogicControl::Validate(void)
     }
 
     // if we get this far, we can finish the device
-    Finish();
+    if (!Finish())
+        return false;
+
     return true;
 }
 

@@ -41,6 +41,9 @@ class TorcControl : public TorcDevice
     virtual QStringList    GetDescription         (void) = 0;
     virtual void           Start                  (void);
     virtual bool           IsPassthrough          (void);
+    virtual bool           AllowInputs            (void);
+    bool                   IsKnownInput           (const QString &Input);
+    bool                   IsKnownOutput          (const QString &Output);
 
   public slots:
     void                   InputValueChanged      (double Value);
@@ -48,7 +51,7 @@ class TorcControl : public TorcDevice
 
   protected:
     void                   Graph                  (void);
-    void                   Finish                 (void);
+    bool                   Finish                 (void);
     void                   InputValidChangedPriv  (QObject* Input, bool Valid);
     void                   CheckInputValues       (void);
     void                   SetValue               (double Value);

@@ -34,6 +34,7 @@ class TorcTimerControl : public TorcControl
     QStringList       GetDescription  (void);
     bool              Validate        (void);
     void              Start           (void);
+    bool              AllowInputs     (void);
     quint64           TimeSinceLastTransition (void);
     TorcTimerControl::TimerType GetTimerType  (void);
 

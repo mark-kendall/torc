@@ -182,14 +182,16 @@ TorcControl::TorcControl(const QVariantMap &Details)
     m_allInputsValid(false)
 {
     // parse inputs
-    m_inputList = Details.value("inputs").toString().split(",");
-    m_inputList.removeDuplicates();
-    m_inputList.removeAll("");
+    QStringList inputs = Details.value("inputs").toString().split(",", QString::SkipEmptyParts);
+    inputs.removeDuplicates();
+    foreach (QString input, inputs)
+        m_inputList.append(input.trimmed());
 
     // parse outputs
-    m_outputList = Details.value("outputs").toString().split(",");
-    m_outputList.removeDuplicates();
-    m_outputList.removeAll("");
+    QStringList outputs = Details.value("outputs").toString().split(",", QString::SkipEmptyParts);
+    outputs.removeDuplicates();
+    foreach (QString output, outputs)
+        m_outputList.append(output.trimmed());
 }
 
 TorcControl::~TorcControl()
@@ -223,6 +225,15 @@ bool TorcControl::Validate(void)
             return false;
         }
 
+        // if input is a control device, it MUST expect this device as an output
+        TorcControl *control = qobject_cast<TorcControl*>(object);
+        if (control && !control->IsKnownOutput(uniqueId))
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Device '%1' does not recognise '%2' as an output")
+                .arg(input).arg(uniqueId));
+            return false;
+        }
+
         m_inputs.insert(object, input);
     }
 
@@ -253,6 +264,15 @@ bool TorcControl::Validate(void)
             return false;
         }
 
+        // if output is a control device, it MUST expect this as an input
+        TorcControl* control = qobject_cast<TorcControl*>(object);
+        if (control && !control->IsKnownInput(uniqueId))
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Device '%1' does not recognise '%2' as an input")
+                .arg(output).arg(uniqueId));
+            return false;
+        }
+
         m_outputs.insert(object, output);
     }
 
@@ -268,6 +288,28 @@ void TorcControl::Start(void)
 bool TorcControl::IsPassthrough(void)
 {
     return false;
+}
+
+/// Most controls have an input side.
+bool TorcControl::AllowInputs(void)
+{
+    return true;
+}
+
+bool TorcControl::IsKnownInput(const QString &Input)
+{
+    if (Input.isEmpty() || !AllowInputs())
+        return false;
+
+    return m_inputList.contains(Input);
+}
+
+bool TorcControl::IsKnownOutput(const QString &Output)
+{
+    if (Output.isEmpty())
+        return false;
+
+    return m_outputList.contains(Output);
 }
 
 /*! \fn Graph
@@ -347,44 +389,79 @@ void TorcControl::Graph(void)
  *
  * Finish is only called once all other parsing and validation is complete.
  * The control is connected to its input(s) and output(s) and the device marked as validated.
+ * Qt::UniqueConnection prevents multiple slot triggering if 'paired' devices identify the same
+ * connection.
  *
- * \note We always assume an object of a given type has the correct signals/slots
+ * \note An output can have only one input/owner.
+ * \note For outputs, we only connect to TorcOutput objects or TorcControl objects that have inputs. So
+ *       no connection to TorcTimerControl or any TorcSensor.
+ * \note For inputs, any sensor or control type is valid.
+ * \note We always assume an object of a given type has the correct signals/slots.
  *
- * \todo Validate input/output data types
  * \todo Make Outputs 'valid' aware and handle their own defaults if any input/control is invalid.
 */
-void TorcControl::Finish(void)
+bool TorcControl::Finish(void)
 {
     QMutexLocker locker(lock);
 
     QMap<QObject*,QString>::const_iterator it = m_outputs.constBegin();
     for ( ; it != m_outputs.constEnd(); ++it)
     {
+        // an output must be a type that accepts inputs
+        // i.e. a TorcOutput or most TorcControl types
         if (qobject_cast<TorcOutput*>(it.key()))
         {
             TorcOutput* output = qobject_cast<TorcOutput*>(it.key());
-            (void)output->SetOwner(this);
+            // there can be only one owner... though this is already checked in Validate
+            if (!output->SetOwner(this))
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("Cannot set control '%1' as owner of output '%2'")
+                    .arg(uniqueId).arg(output->GetUniqueId()));
+                return false;
+            }
+
             connect(this, SIGNAL(ValueChanged(double)), output, SLOT(SetValue(double)), Qt::UniqueConnection);
         }
         else if (qobject_cast<TorcControl*>(it.key()))
         {
             TorcControl* control = qobject_cast<TorcControl*>(it.key());
+
+            // this will also check whether the control allows inputs
+            if (!control->IsKnownInput(uniqueId))
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("Control '%1' does not recognise '%2' as an input")
+                    .arg(control->GetUniqueId()).arg(uniqueId));
+                return false;
+            }
+
             connect(this, SIGNAL(ValidChanged(bool)), control, SLOT(InputValidChanged(bool)), Qt::UniqueConnection);
             connect(this, SIGNAL(ValueChanged(double)), control, SLOT(InputValueChanged(double)), Qt::UniqueConnection);
         }
         else
         {
             LOG(VB_GENERAL, LOG_ERR, "Unknown output type");
+            return false;
         }
     }
 
     it = m_inputs.constBegin();
     for ( ; it != m_inputs.constEnd(); ++it)
     {
-        if (!qobject_cast<TorcSensor*>(it.key()) && !qobject_cast<TorcControl*>(it.key()))
+        TorcControl *control = qobject_cast<TorcControl*>(it.key());
+
+        // an input must be a sensor or control
+        if (!qobject_cast<TorcSensor*>(it.key()) && !control)
         {
             LOG(VB_GENERAL, LOG_ERR, "Unknown input type");
-            continue;
+            return false;
+        }
+
+        // if input is a control, it must recognise this control as an output
+        if (control && !control->IsKnownOutput(uniqueId))
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Control '%1' does not recognise control '%2' as an output")
+                .arg(control->GetUniqueId()).arg(uniqueId));
+            return false;
         }
 
         connect(it.key(), SIGNAL(ValidChanged(bool)), this, SLOT(InputValidChanged(bool)), Qt::UniqueConnection);
@@ -394,6 +471,7 @@ void TorcControl::Finish(void)
 
     LOG(VB_GENERAL, LOG_INFO, QString("%1: Ready").arg(uniqueId));
     m_validated = true;
+    return true;
 }
 
 void TorcControl::InputValueChanged(double Value)
