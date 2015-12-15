@@ -260,7 +260,7 @@ bool TorcControl::Validate(void)
         if (out && out->HasOwner())
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Output '%1' (for control '%2') already has an owner")
-                .arg(out->GetUniqueId()).arg(out->GetUniqueId()));
+                .arg(out->GetUniqueId()).arg(uniqueId));
             return false;
         }
 
