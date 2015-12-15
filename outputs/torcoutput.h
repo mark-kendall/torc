@@ -37,7 +37,7 @@ class TorcOutput : public TorcDevice, public TorcHTTPService
     virtual TorcOutput::Type GetType (void) = 0;
 
     bool             HasOwner               (void);
-    void             SetOwner               (QObject *Owner);
+    bool             SetOwner               (QObject *Owner);
 
   public slots:
     // TorcHTTPService

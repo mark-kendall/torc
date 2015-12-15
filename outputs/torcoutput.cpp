@@ -21,6 +21,7 @@
 */
 
 // Torc
+#include "torclogging.h"
 #include "torcoutputs.h"
 #include "torcoutput.h"
 
@@ -61,13 +62,27 @@ bool TorcOutput::HasOwner(void)
     return m_owner != NULL;
 }
 
-void TorcOutput::SetOwner(QObject *Owner)
+bool TorcOutput::SetOwner(QObject *Owner)
 {
     QMutexLocker locker(lock);
+
+    if (!Owner)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Cannot set NULL output owner for %1").arg(uniqueId));
+        return false;
+    }
+
+    if (m_owner && m_owner != Owner)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Cannot set different output owner for %1").arg(uniqueId));
+        return false;
+    }
 
     m_owner = Owner;
     DisableMethod("SetValue");
     DisableMethod("SetValid");
+
+    return true;
 }
 
 void TorcOutput::SubscriberDeleted(QObject *Subscriber)
