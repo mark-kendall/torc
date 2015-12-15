@@ -17,7 +17,7 @@ class TorcControls : public TorcDeviceHandler
     void Create   (const QVariantMap &Details);
     void Destroy  (void);
     void Validate (void);
-    void Graph    (void);
+    void Graph    (QByteArray* Data);
     void Start    (void);
     void Reset    (void);
 

@@ -54,28 +54,27 @@ void TorcOutputs::Reset(void)
         output->Reset();
 }
 
-void TorcOutputs::Graph(void)
+void TorcOutputs::Graph(QByteArray* Data)
 {
-    QMutexLocker locker(m_lock);
+    if (!Data)
+        return;
+
+    Data->append("    subgraph cluster_2 {\r\n"
+                 "        label = \"Outputs\";\r\n"
+                 "        style=filled;\r\n"
+                 "        fillcolor=\"grey95\";\r\n");
+
+    foreach(TorcOutput* output, outputList)
     {
-        QMutexLocker locker(TorcCentral::gStateGraphLock);
-        TorcCentral::gStateGraph->append("    subgraph cluster_2 {\r\n"
-                                         "        label = \"Outputs\";\r\n"
-                                         "        style=filled;\r\n"
-                                         "        fillcolor=\"grey95\";\r\n");
-
-        foreach(TorcOutput* output, outputList)
-        {
-            QString id    = output->GetUniqueId();
-            QString label = output->GetUserName();
-            if (label.isEmpty())
-                label = id;
-            TorcCentral::gStateGraph->append(QString("        \"" + id + "\" [label=\"%1\" URL=\"%2Help\"];\r\n")
-                                             .arg(label).arg(output->Signature()));
-        }
-
-        TorcCentral::gStateGraph->append("    }\r\n\r\n");
+        QString id    = output->GetUniqueId();
+        QString label = output->GetUserName();
+        if (label.isEmpty())
+            label = id;
+        Data->append(QString("        \"" + id + "\" [label=\"%1\" URL=\"%2Help\"];\r\n")
+                                         .arg(label).arg(output->Signature()));
     }
+
+    Data->append("    }\r\n\r\n");
 }
 
 void TorcOutputs::SubscriberDeleted(QObject *Subscriber)

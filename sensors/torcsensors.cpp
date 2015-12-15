@@ -75,28 +75,27 @@ void TorcSensors::Reset(void)
 }
 
 
-void TorcSensors::Graph(void)
+void TorcSensors::Graph(QByteArray *Data)
 {
-    QMutexLocker locker(m_lock);
+    if (!Data)
+        return;
+
+    Data->append("    subgraph cluster_0 {\r\n"
+                 "        label = \"Sensors\";\r\n"
+                 "        style=filled;\r\n"
+                 "        fillcolor = \"grey95\";\r\n");
+
+    foreach(TorcSensor *sensor, sensorList)
     {
-        QMutexLocker locker(TorcCentral::gStateGraphLock);
-        TorcCentral::gStateGraph->append("    subgraph cluster_0 {\r\n"
-                                         "        label = \"Sensors\";\r\n"
-                                         "        style=filled;\r\n"
-                                         "        fillcolor = \"grey95\";\r\n");
-
-        foreach(TorcSensor *sensor, sensorList)
-        {
-            QString id    = sensor->GetUniqueId();
-            QString label = sensor->GetUserName();
-            if (label.isEmpty())
-                label = id;
-            TorcCentral::gStateGraph->append(QString("        \"" + id + "\" [label=\"%1\" URL=\"%2Help\"];\r\n")
-                                             .arg(label).arg(sensor->Signature()));
-        }
-
-        TorcCentral::gStateGraph->append("    }\r\n\r\n");
+        QString id    = sensor->GetUniqueId();
+        QString label = sensor->GetUserName();
+        if (label.isEmpty())
+            label = id;
+        Data->append(QString("        \"" + id + "\" [label=\"%1\" URL=\"%2Help\"];\r\n")
+                     .arg(label).arg(sensor->Signature()));
     }
+
+    Data->append("    }\r\n\r\n");
 }
 
 void TorcSensors::SubscriberDeleted(QObject *Subscriber)

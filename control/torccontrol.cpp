@@ -320,10 +320,12 @@ bool TorcControl::IsKnownOutput(const QString &Output)
 *       This makes the graph clearer but the control is still required as Outputs have no understanding of invalid
 *       sensor outputs.
 * */
-void TorcControl::Graph(void)
+void TorcControl::Graph(QByteArray* Data)
 {
-    QMutexLocker locker(TorcCentral::gStateGraphLock);
-    QMutexLocker locker2(lock);
+    if (!Data)
+        return;
+
+    QMutexLocker locker(lock);
 
     bool passthrough = IsPassthrough();
 
@@ -341,8 +343,8 @@ void TorcControl::Graph(void)
             desc.append(QString("<FONT POINT-SIZE=\"10\">%1</FONT>").arg(item));
         }
 
-        TorcCentral::gStateGraph->append(QString("    \"%1\" [shape=record label=<<B>%2</B>|%3>];\r\n")
-                                         .arg(uniqueId).arg(userName).arg(desc));
+        Data->append(QString("    \"%1\" [shape=record label=<<B>%2</B>|%3>];\r\n")
+                             .arg(uniqueId).arg(userName).arg(desc));
     }
 
     QMap<QObject*,QString>::const_iterator it = m_outputs.constBegin();
@@ -352,12 +354,12 @@ void TorcControl::Graph(void)
         {
             TorcOutput* output = qobject_cast<TorcOutput*>(it.key());
             QString source = passthrough ? qobject_cast<TorcSensor*>(m_inputs.firstKey())->GetUniqueId() : uniqueId;
-            TorcCentral::gStateGraph->append(QString("    \"%1\"->\"%2\"\r\n").arg(source).arg(output->GetUniqueId()));
+            Data->append(QString("    \"%1\"->\"%2\"\r\n").arg(source).arg(output->GetUniqueId()));
         }
         else if (qobject_cast<TorcControl*>(it.key()))
         {
             TorcControl* control = qobject_cast<TorcControl*>(it.key());
-            TorcCentral::gStateGraph->append(QString("    \"%1\"->\"%2\"\r\n").arg(uniqueId).arg(control->GetUniqueId()));
+            Data->append(QString("    \"%1\"->\"%2\"\r\n").arg(uniqueId).arg(control->GetUniqueId()));
         }
         else
         {
@@ -379,9 +381,8 @@ void TorcControl::Graph(void)
         else
             LOG(VB_GENERAL, LOG_ERR, "Unknown input type");
 
-        TorcCentral::gStateGraph->append(QString("    \"%1\"->\"%2\"\r\n").arg(inputid).arg(uniqueId));
+        Data->append(QString("    \"%1\"->\"%2\"\r\n").arg(inputid).arg(uniqueId));
     }
-
 }
 
 /*! \fn Finish

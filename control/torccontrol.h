@@ -50,7 +50,7 @@ class TorcControl : public TorcDevice
     void                   InputValidChanged      (bool   Valid);
 
   protected:
-    void                   Graph                  (void);
+    void                   Graph                  (QByteArray* Data);
     bool                   Finish                 (void);
     void                   InputValidChangedPriv  (QObject* Input, bool Valid);
     void                   CheckInputValues       (void);

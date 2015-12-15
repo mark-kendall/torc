@@ -43,12 +43,10 @@
 // for system
 #include <stdlib.h>
 
-QByteArray* TorcCentral::gStateGraph = new QByteArray();
-QMutex*     TorcCentral::gStateGraphLock = new QMutex(QMutex::Recursive);
-
 TorcCentral::TorcCentral()
   : QObject(),
-    m_config(QVariantMap())
+    m_config(QVariantMap()),
+    m_graph(new QByteArray())
 {
     // reset state graph and clear out old files
     // content directory should already have been created by TorcHTMLDynamicContent
@@ -68,11 +66,6 @@ TorcCentral::TorcCentral()
     if (!currentconfig.copy(config))
         LOG(VB_GENERAL, LOG_WARNING, "Failed to copy current config file to content directory");
 
-    {
-        QMutexLocker locker(gStateGraphLock);
-        gStateGraph->clear();
-    }
-
     // listen for interesting events
     gLocalContext->AddObserver(this);
 
@@ -90,50 +83,47 @@ TorcCentral::TorcCentral()
 
         // iff we have got this far, then create the graph
         // start the graph
-        {
-            QMutexLocker locker(gStateGraphLock);
-            gStateGraph->append(QString("strict digraph \"%1\" {\r\n"
-                                        "    rankdir=\"LR\";\r\n"
-                                        "    node [shape=rect];\r\n")
-                                .arg(QCoreApplication::applicationName()));
-        }
+        m_graph->append(QString("strict digraph \"%1\" {\r\n"
+                                    "    rankdir=\"LR\";\r\n"
+                                    "    node [shape=rect];\r\n")
+                            .arg(QCoreApplication::applicationName()));
 
         // build the graph contents
-        TorcSensors::gSensors->Graph();
-        TorcOutputs::gOutputs->Graph();
-        TorcControls::gControls->Graph();
+        TorcSensors::gSensors->Graph(m_graph);
+        TorcOutputs::gOutputs->Graph(m_graph);
+        TorcControls::gControls->Graph(m_graph);
 
         // complete the graph
+        m_graph->append(QString("    label=\"%1\";\r\n"
+                                    "    labelloc=\"t\";\r\n"
+                                    "    URL=\"/\";\r\n"
+                                    "}\r\n").arg(QCoreApplication::applicationName()));
+
+        QFile file(graphdot);
+        if (file.open(QIODevice::ReadWrite))
         {
-            QMutexLocker locker(gStateGraphLock);
-            gStateGraph->append(QString("    label=\"%1\";\r\n"
-                                        "    labelloc=\"t\";\r\n"
-                                        "    URL=\"/\";\r\n"
-                                        "}\r\n").arg(QCoreApplication::applicationName()));
+            file.write(*m_graph);
+            file.flush();
+            file.close();
+            LOG(VB_GENERAL, LOG_INFO, QString("Saved state graph as %1").arg(graphsvg));
 
-            QFile file(graphdot);
-            if (file.open(QIODevice::ReadWrite))
-            {
-                file.write(*gStateGraph);
-                file.flush();
-                file.close();
-                LOG(VB_GENERAL, LOG_INFO, QString("Saved state graph as %1").arg(graphsvg));
-
-                // create a representation of the state graph
-                // NB QProcess appears to be fatally broken. Just use system instead
-                QString command = QString("dot -Tsvg -o %1 %2").arg(graphsvg).arg(graphdot);
-                int err = system(command.toLocal8Bit());
-                if (err < 0)
-                    LOG(VB_GENERAL, LOG_WARNING, QString("Failed to create stategraph representation (err: %1)").arg(strerror(err)));
-                else
-                    LOG(VB_GENERAL, LOG_INFO, QString("Saved state graph representation as %1").arg(graphsvg));
-            }
+            // create a representation of the state graph
+            // NB QProcess appears to be fatally broken. Just use system instead
+            QString command = QString("dot -Tsvg -o %1 %2").arg(graphsvg).arg(graphdot);
+            int err = system(command.toLocal8Bit());
+            if (err < 0)
+                LOG(VB_GENERAL, LOG_WARNING, QString("Failed to create stategraph representation (err: %1)").arg(strerror(err)));
             else
-            {
-                LOG(VB_GENERAL, LOG_ERR, QString("Failed to open '%1' to write state graph").arg(graphdot));
-            }
+                LOG(VB_GENERAL, LOG_INFO, QString("Saved state graph representation as %1").arg(graphsvg));
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to open '%1' to write state graph").arg(graphdot));
         }
     }
+
+    // no need for the graph data from here
+    m_graph->clear();
 }
 
 TorcCentral::~TorcCentral()
@@ -143,6 +133,9 @@ TorcCentral::~TorcCentral()
 
     // cleanup any devices
     TorcDeviceHandler::Stop();
+
+    // cleanup graph
+    delete m_graph;
 }
 
 bool TorcCentral::LoadConfig(void)

@@ -8,6 +8,7 @@
 // Torc
 #include "torchttpservice.h"
 #include "torcsensor.h"
+#include "torccentral.h"
 
 class TorcSensors : public QObject, public TorcHTTPService
 {
@@ -24,7 +25,7 @@ class TorcSensors : public QObject, public TorcHTTPService
     ~TorcSensors();
 
     void                Start                     (void);
-    void                Graph                     (void);
+    void                Graph                     (QByteArray* Data);
     QString             GetUIName                 (void);
     void                Reset                     (void);
 

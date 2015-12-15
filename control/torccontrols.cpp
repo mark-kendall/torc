@@ -133,11 +133,11 @@ void TorcControls::Validate(void)
     }
 }
 
-void TorcControls::Graph(void)
+void TorcControls::Graph(QByteArray* Data)
 {
-    QMutexLocker locker(m_lock);
-    foreach(TorcControl *control, m_controls)
-        control->Graph();
+    if (Data)
+        foreach(TorcControl *control, m_controls)
+            control->Graph(Data);
 }
 
 void TorcControls::Start(void)

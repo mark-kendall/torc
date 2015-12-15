@@ -17,15 +17,13 @@ class TorcCentral : public QObject
     TorcCentral();
     ~TorcCentral();
 
-    bool        event          (QEvent *Event);
-
-    static      QByteArray    *gStateGraph;
-    static      QMutex        *gStateGraphLock;
+    bool            event      (QEvent *Event);
 
   private:
-    bool        LoadConfig     (void);
+    bool            LoadConfig (void);
 
   private:
-    QVariantMap m_config;
+    QVariantMap     m_config;
+    QByteArray     *m_graph;
 };
 #endif // TORCCENTRAL_H
