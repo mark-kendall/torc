@@ -829,7 +829,7 @@ int ParseVerboseArgument(QString arg)
     if (arg.startsWith('-'))
     {
         cerr << "Invalid or missing argument to -v/--verbose option\n";
-        return GENERIC_EXIT_INVALID_CMDLINE;
+        return TORC_EXIT_INVALID_CMDLINE;
     }
 
     QStringList verboseOpts = arg.split(QRegExp("\\W+"));
@@ -848,7 +848,7 @@ int ParseVerboseArgument(QString arg)
         if (option == "help")
         {
             VerboseHelp();
-            return GENERIC_EXIT_INVALID_CMDLINE;
+            return TORC_EXIT_INVALID_CMDLINE;
         }
         else if (option == "important")
         {
@@ -904,7 +904,7 @@ int ParseVerboseArgument(QString arg)
             {
                 cerr << "Unknown argument for -v/--verbose: " <<
                         option.toLocal8Bit().constData() << endl;;
-                return GENERIC_EXIT_INVALID_CMDLINE;
+                return TORC_EXIT_INVALID_CMDLINE;
             }
         }
     }
@@ -916,7 +916,7 @@ int ParseVerboseArgument(QString arg)
         gUserDefaultValueStr   = gVerboseString;
     }
 
-    return GENERIC_EXIT_OK;
+    return TORC_EXIT_OK;
 }
 
 QString LogErrorToString(int errnum)

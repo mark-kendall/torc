@@ -288,14 +288,14 @@ int Torc::StringToAction(const QString &Action)
 qint16 TorcLocalContext::Create(TorcCommandLine* CommandLine)
 {
     if (gLocalContext)
-        return GENERIC_EXIT_OK;
+        return TORC_EXIT_OK;
 
     gLocalContext = new TorcLocalContext(CommandLine);
     if (gLocalContext && gLocalContext->Init())
-        return GENERIC_EXIT_OK;
+        return TORC_EXIT_OK;
 
     TearDown();
-    return GENERIC_EXIT_NO_CONTEXT;
+    return TORC_EXIT_NO_CONTEXT;
 }
 
 void TorcLocalContext::TearDown(void)

@@ -200,7 +200,7 @@ int TorcCommandLinePriv::Evaluate(int argc, const char * const *argv, bool &Exit
 {
     QString error;
     bool parserror    = false;
-    int  result       = GENERIC_EXIT_OK;
+    int  result       = TORC_EXIT_OK;
     bool printhelp    = false;
     bool printversion = false;
 
@@ -304,7 +304,7 @@ int TorcCommandLinePriv::Evaluate(int argc, const char * const *argv, bool &Exit
 
     if (parserror)
     {
-        result = GENERIC_EXIT_INVALID_CMDLINE;
+        result = TORC_EXIT_INVALID_CMDLINE;
         Exit = true;
         printhelp = true;
         std::cout << error.toLocal8Bit().constData() << std::endl << std::endl;
