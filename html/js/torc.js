@@ -148,6 +148,36 @@ $(document).ready(function() {
         removeNavbarDropdown('torc-power-dropdown');
     }
 
+    function centralChanged(name, value) {
+        var translatedName, translatedConfirmation, method;
+
+        if (name === 'canRestartTorc') {
+            translatedName = '<i class=\'fa fa-refresh\'>&nbsp</i>' + torc.RestartTorcTr;
+            translatedConfirmation = torc.ConfirmRestartTorc;
+            method = 'RestartTorc';
+        } else { return; }
+
+        if (value === false || value === undefined) {
+            $('.torc-' + name).remove();
+        } else {
+            addDropdownMenuItem('torc-central-menu', 'torc-' + name, '#', translatedName,
+                                function () {
+                                    bootbox.confirm(translatedConfirmation, function(result) {
+                                    if (result === true) { torcconnection.call('central', method); }
+                                }); });
+        }
+    }
+
+    function centralSubscriptionChanged(version, methods, properties) {
+        if (version !== undefined && typeof properties === 'object') {
+            addNavbarDropdown('torc-central-dropdown', 'fa-cog', 'torc-central-menu');
+            centralChanged('canRestartTorc', properties.canRestartTorc.value);
+            return;
+        }
+
+        removeNavbarDropdown('torc-central-dropdown');
+    }
+
     function statusChanged (status) {
         if (status === torc.SocketNotConnected) {
             $(".torc-socket-status-icon").removeClass("fa-check fa-check-circle-o-circle-o fa-question-circle").addClass("fa-exclamation-circle");
@@ -162,6 +192,7 @@ $(document).ready(function() {
             torcconnection.subscribe('languages', ['languageString', 'languages'], languageChanged, languageSubscriptionChanged);
             torcconnection.subscribe('peers', ['peers'], peerListChanged, peerSubscriptionChanged);
             torcconnection.subscribe('power', ['canShutdown', 'canSuspend', 'canRestart', 'canHibernate', 'batteryLevel'], powerChanged, powerSubscriptionChanged);
+            torcconnection.subscribe('central', ['canRestartTorc'], centralChanged, centralSubscriptionChanged);
         }
     }
 

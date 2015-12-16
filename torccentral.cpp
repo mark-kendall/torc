@@ -24,9 +24,11 @@
 #include <QCoreApplication>
 
 // Torc
+#include "torcexitcodes.h"
 #include "torcevent.h"
 #include "torclogging.h"
 #include "torcdirectories.h"
+#include "torclanguage.h"
 #include "torclocalcontext.h"
 #include "torc/torcadminthread.h"
 #include "sensors/torcsensors.h"
@@ -45,8 +47,11 @@
 
 TorcCentral::TorcCentral()
   : QObject(),
+    TorcHTTPService(this, "central", "central", TorcCentral::staticMetaObject, ""),
+    m_lock(new QMutex(QMutex::Recursive)),
     m_config(QVariantMap()),
-    m_graph(new QByteArray())
+    m_graph(new QByteArray()),
+    canRestartTorc(true)
 {
     // reset state graph and clear out old files
     // content directory should already have been created by TorcHTMLDynamicContent
@@ -136,6 +141,31 @@ TorcCentral::~TorcCentral()
 
     // cleanup graph
     delete m_graph;
+
+    delete m_lock;
+}
+
+QString TorcCentral::GetUIName(void)
+{
+    return tr("Central");
+}
+
+bool TorcCentral::RestartTorc(void)
+{
+    // NB could be called from any thread
+    gLocalContext->NotifyEvent(Torc::RestartTorc);
+    return true;
+}
+
+bool TorcCentral::GetCanRestartTorc(void)
+{
+    QMutexLocker locker(m_lock);
+    return canRestartTorc;
+}
+
+void TorcCentral::SubscriberDeleted(QObject *Subscriber)
+{
+    TorcHTTPService::HandleSubscriberDeleted(Subscriber);
 }
 
 bool TorcCentral::LoadConfig(void)
@@ -211,6 +241,11 @@ bool TorcCentral::event(QEvent *Event)
         int event = torcevent->GetEvent();
         switch (event)
         {
+            case Torc::RestartTorc:
+                LOG(VB_GENERAL, LOG_INFO, "Restarting application");
+                TorcReferenceCounter::EventLoopEnding(true);
+                QCoreApplication::exit(TORC_EXIT_RESTART);
+                break;
             case Torc::Exit:
                 TorcReferenceCounter::EventLoopEnding(true);
                 QCoreApplication::quit();
@@ -235,8 +270,10 @@ bool TorcCentral::event(QEvent *Event)
 }
 
 /// Create the central controller object
-class TorcCentralObject : public TorcAdminObject
+class TorcCentralObject : public TorcAdminObject, public TorcStringFactory
 {
+    Q_DECLARE_TR_FUNCTIONS(TorcPowerObject)
+
   public:
     TorcCentralObject()
       : TorcAdminObject(TORC_ADMIN_LOW_PRIORITY - 5), // start last
@@ -247,6 +284,12 @@ class TorcCentralObject : public TorcAdminObject
 
     ~TorcCentralObject()
     {
+    }
+
+    void GetStrings(QVariantMap &Strings)
+    {
+        Strings.insert("RestartTorcTr",      QCoreApplication::translate("TorcCentral", "Restart Torc"));
+        Strings.insert("ConfirmRestartTorc", QCoreApplication::translate("TorcCentral", "Are you sure you want to restart Torc?"));
     }
 
     void Create(void)

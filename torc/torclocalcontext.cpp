@@ -407,6 +407,9 @@ TorcLocalContext::~TorcLocalContext()
     m_priv = NULL;
 
     StopLogging();
+
+    // revert to the default message handler
+    qInstallMessageHandler(0);
 }
 
 bool TorcLocalContext::Init(void)

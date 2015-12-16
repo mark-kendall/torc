@@ -57,6 +57,7 @@ class Torc
         Custom,
         Exit,
         Message,
+        RestartTorc,
         // Power management
         Shutdown = 1000,
         Suspend,

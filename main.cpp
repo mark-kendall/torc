@@ -9,33 +9,38 @@
 
 int main(int argc, char **argv)
 {
-    new QCoreApplication(argc, argv);
-    QCoreApplication::setApplicationName("torc");
-    QThread::currentThread()->setObjectName(TORC_MAIN_THREAD);
-
     int ret = TORC_EXIT_OK;
 
+    do
     {
-        bool justexit = false;
-        QScopedPointer<TorcCommandLine> cmdline(new TorcCommandLine(TorcCommandLine::Database | TorcCommandLine::LogFile));
+        QCoreApplication torc(argc, argv);
+        QCoreApplication::setApplicationName("torc");
+        QThread::currentThread()->setObjectName(TORC_MAIN_THREAD);
 
-        if (!cmdline.data())
-            return TORC_EXIT_UNKOWN_ERROR;
+        {
+            bool justexit = false;
+            QScopedPointer<TorcCommandLine> cmdline(new TorcCommandLine(TorcCommandLine::Database | TorcCommandLine::LogFile));
 
-        ret = cmdline->Evaluate(argc, argv, justexit);
+            if (!cmdline.data())
+                return TORC_EXIT_UNKOWN_ERROR;
 
-        if (ret != TORC_EXIT_OK)
-            return ret;
+            ret = cmdline->Evaluate(argc, argv, justexit);
 
-        if (justexit)
-            return ret;
+            if (ret != TORC_EXIT_OK)
+                return ret;
 
-        if (int error = TorcLocalContext::Create(cmdline.data()))
-            return error;
-    }
+            if (justexit)
+                return ret;
 
-    ret = qApp->exec();
-    TorcLocalContext::TearDown();
+            if (int error = TorcLocalContext::Create(cmdline.data()))
+                return error;
+        }
+
+        ret = qApp->exec();
+        TorcLocalContext::TearDown();
+
+    } while (ret == TORC_EXIT_RESTART);
+
     return ret;
 }
 
