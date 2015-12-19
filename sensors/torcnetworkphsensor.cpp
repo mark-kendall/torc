@@ -32,3 +32,8 @@ TorcNetworkpHSensor::~TorcNetworkpHSensor()
 {
 }
 
+QStringList TorcNetworkpHSensor::GetDescription(void)
+{
+    return QStringList() << tr("Network pH");
+}
+

@@ -31,3 +31,9 @@ TorcNetworkPWMSensor::TorcNetworkPWMSensor(double Default, const QVariantMap &De
 TorcNetworkPWMSensor::~TorcNetworkPWMSensor()
 {
 }
+
+
+QStringList TorcNetworkPWMSensor::GetDescription(void)
+{
+    return QStringList() << tr("Network PWM");
+}

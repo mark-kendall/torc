@@ -21,9 +21,11 @@ class Torc1WireDS18B20 : public TorcTemperatureSensor
     Torc1WireDS18B20(const QVariantMap &Details);
     ~Torc1WireDS18B20();
 
-    void   Read  (double Value, bool Valid);
+    QStringList GetDescription (void);
+    void        Read           (double Value, bool Valid);
 
   private:
+    QString              m_deviceId;
     Torc1WireReadThread *m_readThread;
 };
 

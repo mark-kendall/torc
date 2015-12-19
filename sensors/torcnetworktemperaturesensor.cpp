@@ -33,3 +33,9 @@ TorcNetworkTemperatureSensor::~TorcNetworkTemperatureSensor()
 {
 }
 
+QStringList TorcNetworkTemperatureSensor::GetDescription(void)
+{
+    return QStringList() << tr("Network temperature");
+}
+
+

@@ -31,3 +31,9 @@ TorcNetworkSwitchSensor::TorcNetworkSwitchSensor(double Default, const QVariantM
 TorcNetworkSwitchSensor::~TorcNetworkSwitchSensor()
 {
 }
+
+QStringList TorcNetworkSwitchSensor::GetDescription(void)
+{
+    return QStringList() << tr("Network switch");
+}
+

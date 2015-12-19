@@ -9,6 +9,8 @@ class TorcNetworkTemperatureSensor : public TorcTemperatureSensor
   public:
     TorcNetworkTemperatureSensor(double Default, const QVariantMap &Details);
     ~TorcNetworkTemperatureSensor();
+
+    QStringList GetDescription(void);
 };
 
 #endif // TORCNETWORKTEMPERATURESENSOR_H
