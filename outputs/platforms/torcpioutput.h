@@ -12,10 +12,13 @@ class TorcPiOutput : public TorcSwitchOutput
     TorcPiOutput(int Pin, const QVariantMap &Details);
     ~TorcPiOutput();
 
-    void SetValue (double Value);
+    QStringList GetDescription(void);
+
+  public slots:
+    void        SetValue (double Value);
 
   private:
-    int   m_pin;
+    int         m_pin;
 };
 
 #endif

@@ -45,6 +45,9 @@ class TorcI2CPCA9685Channel : public TorcPWMOutput
     TorcI2CPCA9685Channel(int Number, TorcI2CPCA9685 *Parent, const QVariantMap &Details);
     ~TorcI2CPCA9685Channel();
 
+    QStringList GetDescription(void);
+
+  public slots:
     void SetValue (double Value);
 
   private:
@@ -66,6 +69,11 @@ TorcI2CPCA9685Channel::~TorcI2CPCA9685Channel()
 {
     // always turn the output off completely on exit
     m_parent->SetPWM(m_channelNumber, 0);
+}
+
+QStringList TorcI2CPCA9685Channel::GetDescription(void)
+{
+    QStringList() << tr("I2C") << tr("PCA9685 16 Channel PWM") << tr("Channel %1").arg(m_channelNumber);
 }
 
 void TorcI2CPCA9685Channel::SetValue(double Value)

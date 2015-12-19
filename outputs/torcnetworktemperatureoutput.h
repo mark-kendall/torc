@@ -9,6 +9,8 @@ class TorcNetworkTemperatureOutput : public TorcTemperatureOutput
   public:
     TorcNetworkTemperatureOutput(double Default, const QVariantMap &Details);
     ~TorcNetworkTemperatureOutput();
+
+    QStringList GetDescription(void);
 };
 
 #endif // TORCNETWORKTEMPERATUREOUTPUT_H

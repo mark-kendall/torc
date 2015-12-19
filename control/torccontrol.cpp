@@ -332,18 +332,11 @@ void TorcControl::Graph(QByteArray* Data)
     if (!passthrough)
     {
         QString desc;
-        bool first = true;
         QStringList source = GetDescription();
         foreach (QString item, source)
-        {
-            if (!first)
-                desc.append("|");
-            else
-                first = false;
-            desc.append(QString("<FONT POINT-SIZE=\"10\">%1</FONT>").arg(item));
-        }
+            desc.append(QString("|<FONT POINT-SIZE=\"10\">%1</FONT>").arg(item));
 
-        Data->append(QString("    \"%1\" [shape=record label=<<B>%2</B>|%3>];\r\n")
+        Data->append(QString("    \"%1\" [shape=record label=<<B>%2</B>%3>];\r\n")
                              .arg(uniqueId).arg(userName).arg(desc));
     }
 

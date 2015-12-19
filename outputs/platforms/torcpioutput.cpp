@@ -46,6 +46,11 @@ TorcPiOutput::~TorcPiOutput()
     SetValue(defaultValue);
 }
 
+QStringList TorcPiOutput::GetDescription(void)
+{
+    return QStringList() << tr("Pin %1").arg(m_pin);
+}
+
 void TorcPiOutput::SetValue(double Value)
 {
     QMutexLocker locker(lock);

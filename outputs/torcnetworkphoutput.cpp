@@ -32,3 +32,7 @@ TorcNetworkpHOutput::~TorcNetworkpHOutput()
 {
 }
 
+QStringList TorcNetworkpHOutput::GetDescription(void)
+{
+    return QStringList() << tr("Network ph");
+}

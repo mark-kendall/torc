@@ -68,10 +68,15 @@ void TorcOutputs::Graph(QByteArray* Data)
     {
         QString id    = output->GetUniqueId();
         QString label = output->GetUserName();
+        QString desc;
+        QStringList source = output->GetDescription();
+        foreach (QString item, source)
+            desc.append(QString("|<FONT POINT-SIZE=\"10\">%1</FONT>").arg(item));
+
         if (label.isEmpty())
             label = id;
-        Data->append(QString("        \"" + id + "\" [label=\"%1\" URL=\"%2Help\"];\r\n")
-                                         .arg(label).arg(output->Signature()));
+        Data->append(QString("        \"%1\" [shape=record label=<<B>%2</B>%3> URL=\"%4Help\"];\r\n")
+            .arg(id).arg(label).arg(desc).arg(output->Signature()));
     }
 
     Data->append("    }\r\n\r\n");

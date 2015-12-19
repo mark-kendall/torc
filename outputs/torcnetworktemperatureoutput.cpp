@@ -31,3 +31,8 @@ TorcNetworkTemperatureOutput::TorcNetworkTemperatureOutput(double Default, const
 TorcNetworkTemperatureOutput::~TorcNetworkTemperatureOutput()
 {
 }
+
+QStringList TorcNetworkTemperatureOutput::GetDescription(void)
+{
+    return QStringList() << tr("Network temperature");
+}

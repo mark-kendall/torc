@@ -25,6 +25,8 @@ class TorcDevice : public QObject, public TorcReferenceCounter
                const QString &ModelId,   const QVariantMap &Details);
     virtual ~TorcDevice();
 
+    virtual QStringList    GetDescription         (void);
+
   public slots:
     virtual void           SetValue               (double Value);
     virtual void           SetValid               (bool   Valid);

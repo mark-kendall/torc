@@ -99,6 +99,11 @@ TorcDevice::~TorcDevice()
     lock = NULL;
 }
 
+QStringList TorcDevice::GetDescription(void)
+{
+    return QStringList();
+}
+
 void TorcDevice::Reset(void)
 {
     SetValue(defaultValue);
