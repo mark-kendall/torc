@@ -92,7 +92,10 @@ void TorcSensors::Graph(QByteArray *Data)
         QString desc;
         QStringList source = sensor->GetDescription();
         foreach (QString item, source)
-            desc.append(QString("|<FONT POINT-SIZE=\"10\">%1</FONT>").arg(item));
+            desc.append(QString(DEVICE_LINE_ITEM).arg(item));
+        desc.append(QString(DEVICE_LINE_ITEM).arg(tr("Default %1").arg(sensor->GetDefaultValue())));
+        desc.append(QString(DEVICE_LINE_ITEM).arg(tr("Valid %1").arg(sensor->GetValid())));
+        desc.append(QString(DEVICE_LINE_ITEM).arg(tr("Value %1").arg(sensor->GetValue())));
 
         if (label.isEmpty())
             label = id;

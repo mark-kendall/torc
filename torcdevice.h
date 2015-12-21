@@ -10,6 +10,8 @@
 // Torc
 #include "torcreferencecounted.h"
 
+#define DEVICE_LINE_ITEM "|<FONT POINT-SIZE=\"10\">%1</FONT>"
+
 class TorcDevice : public QObject, public TorcReferenceCounter
 {
     Q_OBJECT

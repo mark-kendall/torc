@@ -334,7 +334,8 @@ void TorcControl::Graph(QByteArray* Data)
         QString desc;
         QStringList source = GetDescription();
         foreach (QString item, source)
-            desc.append(QString("|<FONT POINT-SIZE=\"10\">%1</FONT>").arg(item));
+            desc.append(QString(DEVICE_LINE_ITEM).arg(item));
+        desc.append(QString(DEVICE_LINE_ITEM).arg(tr("Value %1").arg(GetValue())));
 
         Data->append(QString("    \"%1\" [shape=record label=<<B>%2</B>%3>];\r\n")
                              .arg(uniqueId).arg(userName).arg(desc));
