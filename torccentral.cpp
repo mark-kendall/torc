@@ -42,6 +42,10 @@
 #include "torcxmlvalidator.h"
 #endif
 
+#ifdef USING_GRAPHVIZ_LIBS
+#include <gvc.h>
+#endif
+
 // for system
 #include <stdlib.h>
 
@@ -110,8 +114,26 @@ TorcCentral::TorcCentral()
             file.write(*m_graph);
             file.flush();
             file.close();
-            LOG(VB_GENERAL, LOG_INFO, QString("Saved state graph as %1").arg(graphsvg));
+            LOG(VB_GENERAL, LOG_INFO, QString("Saved state graph as %1").arg(graphdot));
 
+#ifdef USING_GRAPHVIZ_LIBS
+            FILE *handle = fopen(graphsvg.toLocal8Bit().data(), "r+");
+            if (handle)
+            {
+                GVC_t *gvc  = gvContext();
+                Agraph_t *g = agmemread(m_graph->constData());
+                gvLayout(gvc, g, "dot");
+                gvRender(gvc, g, "svg", handle);
+                gvFreeLayout(gvc,g);
+                agclose(g);
+                gvFreeContext(gvc);
+                fclose(handle);
+            }
+            else
+            {
+                LOG(VB_GENERAL, LOG_WARNING, QString("Failed to open '%1' for writing (err: %2)").arg(graphsvg).arg(strerror(errno)));
+            }
+#else
             // create a representation of the state graph
             // NB QProcess appears to be fatally broken. Just use system instead
             QString command = QString("dot -Tsvg -o %1 %2").arg(graphsvg).arg(graphdot);
@@ -120,6 +142,7 @@ TorcCentral::TorcCentral()
                 LOG(VB_GENERAL, LOG_WARNING, QString("Failed to create stategraph representation (err: %1)").arg(strerror(err)));
             else
                 LOG(VB_GENERAL, LOG_INFO, QString("Saved state graph representation as %1").arg(graphsvg));
+#endif
         }
         else
         {

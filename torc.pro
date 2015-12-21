@@ -43,6 +43,15 @@ DEPENDPATH  += ./torc ./torc/http ./torc/upnp ./sensors ./sensors/platforms
 DEPENDPATH  += ./outputs ./outputs/platforms
 INCLUDEPATH += $$DEPENDPATH
 
+# use graphviz via library or executable?
+eval (GRAPHVIZ) {
+    DEFINES += USING_GRAPHVIZ_LIBS
+    LIBS += -lgvc -lcgraph
+    message("Linking to graphviz libraries")
+} else {
+    message("Using external graphviz binary (if available)")
+}
+
 # translations
 translations.path    = $${PREFIX}/share/torc/i18n/
 translations.files  += i18n/*.qm
