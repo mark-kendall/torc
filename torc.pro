@@ -44,9 +44,9 @@ DEPENDPATH  += ./outputs ./outputs/platforms
 INCLUDEPATH += $$DEPENDPATH
 
 # use graphviz via library or executable?
-eval (GRAPHVIZ) {
+packagesExist(libgvc) {
     DEFINES += USING_GRAPHVIZ_LIBS
-    LIBS += -lgvc -lcgraph
+    LIBS    += `pkg-config --libs libgvc`
     message("Linking to graphviz libraries")
 } else {
     message("Using external graphviz binary (if available)")

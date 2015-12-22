@@ -43,7 +43,7 @@
 #endif
 
 #ifdef USING_GRAPHVIZ_LIBS
-#include <gvc.h>
+#include <graphviz/gvc.h>
 #endif
 
 // for system
@@ -117,11 +117,11 @@ TorcCentral::TorcCentral()
             LOG(VB_GENERAL, LOG_INFO, QString("Saved state graph as %1").arg(graphdot));
 
 #ifdef USING_GRAPHVIZ_LIBS
-            FILE *handle = fopen(graphsvg.toLocal8Bit().data(), "r+");
+            FILE *handle = fopen(graphsvg.toLocal8Bit().data(), "w");
             if (handle)
             {
                 GVC_t *gvc  = gvContext();
-                Agraph_t *g = agmemread(m_graph->constData());
+                Agraph_t *g = agmemread(m_graph->data());
                 gvLayout(gvc, g, "dot");
                 gvRender(gvc, g, "svg", handle);
                 gvFreeLayout(gvc,g);
