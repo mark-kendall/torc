@@ -89,11 +89,35 @@
   </xs:choice>
 </xs:complexType>
 
+<xs:simpleType name="gpioPinNumberType">
+  <xs:restriction base="xs:integer">
+    <!-- max pin number is currently defined in TorcPiGPIO -->
+    <xs:minInclusive value="0"/>
+    <xs:maxInclusive value="6"/>
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:complexType name="gpioInputPinType">
+  <xs:all>
+    <xs:element name="name"     type="nameType"/>
+    <xs:element name="userName" type="userNameType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="userDescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="number"   type="gpioPinNumberType"/>
+  </xs:all>
+</xs:complexType>
+
+<xs:complexType name="gpioInputType">
+  <xs:sequence>
+    <xs:element minOccurs="1" maxOccurs="unbounded" name="pin" type="gpioInputPinType"/>
+  </xs:sequence>
+</xs:complexType>
+
 <xs:complexType name="sensorsType">
   <xs:all>
     <!-- 0 or 1 instances of each of these types in any order-->
     <xs:element minOccurs="0" maxOccurs="1" name="wire1"   type="wire1Type"/>
     <xs:element minOccurs="0" maxOccurs="1" name="network" type="networkType"/>
+    <xs:element minOccurs="0" maxOccurs="1" name="gpio"    type="gpioInputType"/>
   </xs:all>
 </xs:complexType>
 
@@ -253,15 +277,7 @@
   </xs:choice>
 </xs:complexType>
 
-<xs:simpleType name="gpioPinNumberType">
-  <xs:restriction base="xs:integer">
-    <!-- max pin number is currently defined in TorcPiGPIO -->
-    <xs:minInclusive value="0"/>
-    <xs:maxInclusive value="6"/>
-  </xs:restriction>
-</xs:simpleType>
-
-<xs:complexType name="gpioPinType">
+<xs:complexType name="gpioOutputPinType">
   <xs:all>
     <xs:element name="name"     type="nameType"/>
     <xs:element name="userName" type="userNameType" minOccurs="0" maxOccurs="1"/>
@@ -272,9 +288,9 @@
   </xs:all>
 </xs:complexType>
 
-<xs:complexType name="gpioType">
+<xs:complexType name="gpioOutputType">
   <xs:sequence>
-    <xs:element minOccurs="1" maxOccurs="unbounded" name="pin" type="gpioPinType"/>
+    <xs:element minOccurs="1" maxOccurs="unbounded" name="pin" type="gpioOutputPinType"/>
   </xs:sequence>
 </xs:complexType>
 
@@ -283,7 +299,7 @@
     <!-- 0 or 1 instances of these types -->
     <xs:element minOccurs="0" maxOccurs="1" name="network" type="networkType"/>
     <xs:element minOccurs="0" maxOccurs="1" name="i2c"     type="i2cType"/>
-    <xs:element minOccurs="0" maxOccurs="1" name="gpio"    type="gpioType"/>
+    <xs:element minOccurs="0" maxOccurs="1" name="gpio"    type="gpioOutputType"/>
   </xs:all>
 </xs:complexType>
 
@@ -310,6 +326,5 @@
     <xs:field xpath="." />
   </xs:unique>
 </xs:element>
-
 
 </xs:schema>

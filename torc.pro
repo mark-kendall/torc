@@ -104,9 +104,11 @@ linux-rasp-pi-g++ {
     HEADERS += outputs/platforms/torci2cpca9685.h
     HEADERS += outputs/platforms/torcpigpio.h
     HEADERS += outputs/platforms/torcpioutput.h
+    HEADERS += sensors/platforms/torcpiinput.h
     SOURCES += outputs/platforms/torci2cpca9685.cpp
     SOURCES += outputs/platforms/torcpigpio.cpp
     SOURCES += outputs/platforms/torcpioutput.cpp
+    SOURCES += sensors/platforms/torcpiinput.cpp
 
     # install with suid permissions on Pi
     # this allows access to I2C and GPIO

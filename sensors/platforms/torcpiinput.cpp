@@ -1,4 +1,4 @@
-/* Class TorcPWMOutput
+/* Class TorcPiInput
 *
 * This file is part of the Torc project.
 *
@@ -23,45 +23,40 @@
 // Torc
 #include "torclogging.h"
 #include "torcpigpio.h"
-#include "torcpioutput.h"
+#include "torcpiinput.h"
 
 // wiringPi
 #include "wiringPi.h"
 
 #define DEFAULT_VALUE 0
 
-TorcPiOutput::TorcPiOutput(int Pin, const QVariantMap &Details)
-  : TorcSwitchOutput(DEFAULT_VALUE, "PiGPIOOutput", Details),
+TorcPiInput::TorcPiInput(int Pin, const QVariantMap &Details)
+  : TorcSwitchSensor(DEFAULT_VALUE, "PiGPIOInput", Details),
     m_pin(Pin)
 {
-    // setup and initialise pin for output
-    pinMode(m_pin, OUTPUT);
-    digitalWrite(m_pin, DEFAULT_VALUE);
+    // setup pin for input
+    pinMode(m_pin, INPUT);
+
+    // for now, just assume pull up/down resistors have been added externally and disable
+    // the internals
+    pullUpDnControl(m_pin, PUD_OFF);
 }
 
-TorcPiOutput::~TorcPiOutput()
+TorcPiInput::~TorcPiInput()
 {
-    // always return the pin to its default state.
-    // we must do this here to trigger the correct SetValue implementation
-    SetValue(defaultValue);
 }
 
-QStringList TorcPiOutput::GetDescription(void)
+void TorcPiInput::Start(void)
+{
+    // start listening for interrupts here...
+
+    // and call the default implementation
+    TorcSwitchSensor::Start();
+}
+
+QStringList TorcPiInput::GetDescription(void)
 {
     return QStringList() << tr("Pin %1").arg(m_pin);
 }
 
-void TorcPiOutput::SetValue(double Value)
-{
-    QMutexLocker locker(lock);
 
-    // as in TorcSwithcOutput::SetValue
-    double newvalue = Value == 0.0 ? 0 : 1;
-
-    // ignore same value updates
-    if (qFuzzyCompare(newvalue + 1.0f, value + 1.0f))
-        return;
-
-    digitalWrite(m_pin, newvalue);
-    TorcSwitchOutput::SetValue(newvalue);
-}

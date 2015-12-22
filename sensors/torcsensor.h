@@ -47,7 +47,7 @@ class TorcSensor : public TorcDevice, public TorcHTTPService
 
 
     virtual TorcSensor::Type GetType           (void) = 0;
-    void             Start                     (void);
+    virtual void             Start             (void);
 
   protected:
     virtual ~TorcSensor();

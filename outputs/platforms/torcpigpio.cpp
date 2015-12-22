@@ -1,4 +1,4 @@
-/* Class TorcPWMOutput
+/* Class TorcPiGPIO
 *
 * This file is part of the Torc project.
 *

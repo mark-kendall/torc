@@ -1,6 +1,9 @@
 #ifndef TORCPIGPIO_H
 #define TORCPIGPIO_H
 
+// this is wiringPi pins 0-6
+// TODO why did I exclude pin 7 (GPIO 7, BCM GPIO 4)
+// TODO detect presence of extra pins (rev2)
 #define NUMBER_PINS 7
 
 // Qt
@@ -10,7 +13,7 @@
 // Torc
 #include "torccentral.h"
 #include "torcpioutput.h"
-class TorcPiInput;
+#include "torcpiinput.h"
 
 #define PI_GPIO QString("gpio")
 
