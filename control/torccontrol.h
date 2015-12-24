@@ -66,6 +66,7 @@ class TorcControl : public TorcDevice
     QMap<QObject*,QString> m_inputs;
     QMap<QObject*,QString> m_outputs;
     QMap<QObject*,double>  m_inputValues;
+    QMap<QObject*,double>  m_lastInputValues;
     QMap<QObject*,bool>    m_inputValids;
     bool                   m_allInputsValid;
 };

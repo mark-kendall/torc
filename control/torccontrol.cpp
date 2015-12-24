@@ -490,7 +490,12 @@ void TorcControl::InputValueChanged(double Value)
     if (m_inputValues.contains(input) && qFuzzyCompare(m_inputValues.value(input) + 1.0, Value + 1.0))
         return;
 
-    m_inputValues[input] = Value;
+    // set the last value if known. Otherwise set to new which will not trigger any change.
+    double lastvalue = m_inputValues.contains(input) ? m_inputValues.value(input) : Value;
+
+    m_inputValues[input]     = Value;
+    m_lastInputValues[input] = lastvalue;
+
     // as for sensors, setting an input value is assumed to make the input valid
     InputValidChangedPriv(input, true);
 
@@ -553,6 +558,7 @@ void TorcControl::InputValidChangedPriv(QObject *Input, bool Valid)
     if (!Valid)
     {
         m_inputValues.remove(Input);
+        m_lastInputValues.remove(Input);
     }
     else
     {
