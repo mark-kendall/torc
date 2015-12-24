@@ -152,11 +152,11 @@ void TorcPiInputThread::run(void)
         int count;
         quint8 c;
 
-        // clear any pending interrupts
-    
+        // clear any pending interrupts    
         ioctl(m_file.handle(), FIONREAD, &count);
         for (int i = 0; i < count; i++)
             read(m_file.handle(), &c, 1);
+        lseek(m_file.handle(), 0, SEEK_SET);
 
         // read the initial state
         Update();
@@ -188,6 +188,10 @@ void TorcPiInputThread::run(void)
 
                 // read the value
                 Update();
+
+                // crude debounce handling
+                // wait 20ms before polling again
+                msleep(20);
             }    
         }
     }
