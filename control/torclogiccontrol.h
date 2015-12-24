@@ -17,7 +17,8 @@ class TorcLogicControl : public TorcControl
         GreaterThanOrEqual,
         Any,
         All,
-        Average
+        Average,
+        Toggle
     };
 
     static TorcLogicControl::Operation StringToOperation (const QString &Operation, bool *Ok);

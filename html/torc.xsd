@@ -155,6 +155,7 @@
     <xs:element name="any"                type="simpleLogicType"/>
     <xs:element name="all"                type="simpleLogicType"/>
     <xs:element name="average"            type="simpleLogicType"/>
+    <xs:element name="toggle"             type="simpleLogicType"/>
   </xs:choice>
 </xs:complexType>
 
