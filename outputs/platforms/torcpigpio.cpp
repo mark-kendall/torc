@@ -23,7 +23,7 @@
 // Torc
 #include "torclogging.h"
 #include "torcpigpio.h"
-#include "torcsensor.h"
+#include "torcsensors.h"
 #include "torcoutputs.h"
 
 // wiringPi
@@ -91,7 +91,7 @@ void TorcPiGPIO::Create(const QVariantMap &GPIO)
                         continue;
                     }
 
-                    if (!pin.contains("default"))
+                    if (!pin.contains("default") && output)
                     {
                         LOG(VB_GENERAL, LOG_ERR, QString("GPIO device '%1' does not specify <default> value").arg(pin.value("name").toString()));
                         continue;
@@ -118,7 +118,8 @@ void TorcPiGPIO::Create(const QVariantMap &GPIO)
                     }
                     else
                     {
-                        LOG(VB_GENERAL, LOG_INFO, "GPIO inputs not implemented - yet");
+                        TorcPiInput* in   = new TorcPiInput(number, pin);
+                        m_inputs.insert(number, in);
                     }
                 }
             }
@@ -130,11 +131,14 @@ void TorcPiGPIO::Destroy(void)
 {
     QMutexLocker locker(m_lock);
 
-/*(    QMap<int,TorcPiInput*>::iterator it = m_inputs.begin();
+    QMap<int,TorcPiInput*>::iterator it = m_inputs.begin();
     for ( ; it != m_inputs.end(); ++it)
-         it.value().DownRef();
-    m_inputs.clear
-*/
+    {
+         TorcSensors::gSensors->RemoveSensor(it.value());
+         it.value()->DownRef();
+    }
+    m_inputs.clear();
+
     QMap<int,TorcPiOutput*>::iterator it2 = m_outputs.begin();
     for ( ; it2 != m_outputs.end(); ++it2)
     {
