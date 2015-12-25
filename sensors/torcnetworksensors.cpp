@@ -132,6 +132,7 @@ void TorcNetworkSensors::Create(const QVariantMap &Details)
                                     else
                                         newoutput = new TorcNetworkTemperatureOutput(defaultdouble, sensor);
                                 }
+                                break;
                             case TorcSensor::pH:
                                 {
                                     if (issensor)
