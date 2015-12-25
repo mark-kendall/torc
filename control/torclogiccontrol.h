@@ -18,7 +18,8 @@ class TorcLogicControl : public TorcControl
         Any,
         All,
         Average,
-        Toggle
+        Toggle,
+        Invert
     };
 
     static TorcLogicControl::Operation StringToOperation (const QString &Operation, bool *Ok);

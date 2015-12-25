@@ -39,6 +39,7 @@ TorcLogicControl::Operation TorcLogicControl::StringToOperation(const QString &O
     if ("NONE" == operation)               return TorcLogicControl::NoOperation;
     if ("PASSTHROUGH" == operation)        return TorcLogicControl::NoOperation;
     if ("TOGGLE" == operation)             return TorcLogicControl::Toggle;
+    if ("INVERT" == operation)             return TorcLogicControl::Invert;
 
     // fail for anything that isn't explicitly a known operation
     *Ok = false;
@@ -131,6 +132,9 @@ QStringList TorcLogicControl::GetDescription(void)
         case TorcLogicControl::Toggle:
             result.append(tr("Toggle"));
             break;
+        case TorcLogicControl::Invert:
+            result.append(tr("Invert"));
+            break;
         case TorcLogicControl::NoOperation:
         default:
             result.append(tr("Passthrough"));
@@ -193,7 +197,8 @@ bool TorcLogicControl::Validate(void)
         m_operation == TorcLogicControl::LessThanOrEqual ||
         m_operation == TorcLogicControl::GreaterThan ||
         m_operation == TorcLogicControl::GreaterThanOrEqual ||
-        m_operation == TorcLogicControl::Toggle)
+        m_operation == TorcLogicControl::Toggle ||
+        m_operation == TorcLogicControl::Invert)
     {
         // can have only one input to compare against
         if (m_inputs.size() > 1)
@@ -301,6 +306,11 @@ void TorcLogicControl::CalculateOutput(void)
                 // a value that is less than 1 to a value that is greater than or equal to 1
                 if (m_lastInputValues.first() < 1.0 && m_inputValues.first() >= 1.0)
                     newvalue = value >= 1.0 ? 0.0 : 1.0;
+            }
+            break;
+        case TorcLogicControl::Invert:
+            {
+                newvalue = m_inputValues.first() < 1.0 ? 1.0 : 0.0;
             }
     }
     SetValue(newvalue);
