@@ -39,7 +39,21 @@
   </xs:restriction>
 </xs:simpleType>
 
- <xs:simpleType name="hexType">
+<xs:simpleType name="tempNumberType">
+  <xs:restriction base="xs:decimal">
+    <xs:minInclusive value="-100.0"/>
+    <xs:maxInclusive value="200.0"/>
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="pHNumberType">
+  <xs:restriction base="xs:decimal">
+    <xs:minInclusive value="0.0"/>
+    <xs:maxInclusive value="14.0"/>
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="hexType">
   <xs:restriction base="xs:string">
     <xs:pattern value="0x[0-9a-fA-F]+"/>
   </xs:restriction>
@@ -82,10 +96,30 @@
   </xs:all>
 </xs:complexType>
 
+<xs:complexType name="networkTempType">
+  <xs:all>
+    <xs:element name="name"     type="nameType"/>
+    <xs:element name="userName" type="userNameType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="userDescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="default"  type="tempNumberType"/>
+  </xs:all>
+</xs:complexType>
+
+<xs:complexType name="networkpHType">
+  <xs:all>
+    <xs:element name="name"     type="nameType"/>
+    <xs:element name="userName" type="userNameType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="userDescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="default"  type="pHNumberType"/>
+  </xs:all>
+</xs:complexType>
+
 <xs:complexType name="networkType">
   <xs:choice minOccurs="1" maxOccurs="unbounded">
-    <xs:element name="switch" type="networkSwitchType"/>
-    <xs:element name="pwm"    type="networkPWMType"/>
+    <xs:element name="switch"      type="networkSwitchType"/>
+    <xs:element name="pwm"         type="networkPWMType"/>
+    <xs:element name="temperature" type="networkTempType"/>
+    <xs:element name="ph"          type="networkpHType"/>
   </xs:choice>
 </xs:complexType>
 
