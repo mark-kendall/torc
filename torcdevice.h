@@ -9,6 +9,7 @@
 
 // Torc
 #include "torcreferencecounted.h"
+#include "torcdevicehandler.h"
 
 #define DEVICE_LINE_ITEM "|<FONT POINT-SIZE=\"10\">%1</FONT>"
 
@@ -64,28 +65,4 @@ class TorcDevice : public QObject, public TorcReferenceCounter
     static QMutex         *gDeviceListLock;
 };
 
-class TorcDeviceHandler
-{
-  public:
-    TorcDeviceHandler();
-   ~TorcDeviceHandler();
-
-    static  void Start   (const QVariantMap &Details);
-    static  void Stop    (void);
-
-  protected:
-    virtual void                     Create           (const QVariantMap &Details) = 0;
-    virtual void                     Destroy          (void) = 0;
-    static TorcDeviceHandler*        GetDeviceHandler (void);
-    TorcDeviceHandler*               GetNextHandler   (void);
-
-  protected:
-    QMutex                          *m_lock;
-
-  private:
-    static QList<TorcDeviceHandler*> gTorcDeviceHandlers;
-    static TorcDeviceHandler        *gTorcDeviceHandler;
-    static QMutex                   *gTorcDeviceHandlersLock;
-    TorcDeviceHandler               *m_nextTorcDeviceHandler;
-};
 #endif // TORCDEVICE_H

@@ -281,8 +281,10 @@ SOURCES += control/torctransitioncontrol.cpp
 
 HEADERS += torccentral.h
 HEADERS += torcdevice.h
+HEADERS += torcdevicehandler.h
 SOURCES += main.cpp
 SOURCES += torccentral.cpp
 SOURCES += torcdevice.cpp
+SOURCES += torcdevicehandler.cpp
 
 QMAKE_CLEAN += $(TARGET)
