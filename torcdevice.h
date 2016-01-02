@@ -27,6 +27,7 @@ class TorcDevice : public QObject, public TorcReferenceCounter
                const QString &ModelId,   const QVariantMap &Details);
     virtual ~TorcDevice();
 
+    void                   Reset                  (void);
     virtual QStringList    GetDescription         (void);
 
   public slots:
@@ -59,15 +60,8 @@ class TorcDevice : public QObject, public TorcReferenceCounter
     QString                userDescription;
     QMutex                *lock;
 
-  public:
     static QHash<QString,QObject*> *gDeviceList;
     static QMutex         *gDeviceListLock;
-    static bool            UniqueIdAvailable  (const QString &UniqueId);
-    static bool            RegisterUniqueId   (const QString &UniqueId, QObject *Object);
-    static void            UnregisterUniqueId (const QString &UniqueId);
-    static QObject*        GetObjectforId     (const QString &UniqueId);
-
-    void                   Reset              (void);
 };
 
 class TorcDeviceHandler

@@ -203,6 +203,8 @@ TorcControl::~TorcControl()
 bool TorcControl::Validate(void)
 {
     QMutexLocker locker(lock);
+    // lock the device list as well to ensure device aren't deleted while we're using them
+    QMutexLocker locke2(gDeviceListLock);
 
     if (!m_parsed)
         return false;
@@ -216,14 +218,14 @@ bool TorcControl::Validate(void)
             return false;
         }
 
-        QObject *object = TorcDevice::GetObjectforId(input);
-
         // valid object
-        if (!object)
+        if (!gDeviceList->contains(input))
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Failed to find input '%1' for '%2'").arg(input).arg(uniqueId));
             return false;
         }
+
+        QObject *object = gDeviceList->value(input);
 
         // if input is a control device, it MUST expect this device as an output
         TorcControl *control = qobject_cast<TorcControl*>(object);
@@ -246,14 +248,14 @@ bool TorcControl::Validate(void)
             return false;
         }
 
-        QObject *object = TorcDevice::GetObjectforId(output);
-
         // valid object?
-        if (!object)
+        if (!gDeviceList->contains(output))
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Failed to find output '%1' for device %2").arg(output).arg(uniqueId));
             return false;
         }
+
+        QObject *object = gDeviceList->value(output);
 
         // if TorcOutput, does it already have an owner
         TorcOutput* out = qobject_cast<TorcOutput*>(object);
