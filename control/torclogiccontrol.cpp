@@ -47,7 +47,7 @@ TorcLogicControl::Operation TorcLogicControl::StringToOperation(const QString &O
 }
 
 TorcLogicControl::TorcLogicControl(const QString &Type, const QVariantMap &Details)
-  : TorcControl(Details),
+  : TorcControl(TorcControl::Logic, Details),
     m_operation(TorcLogicControl::NoOperation),
     m_operationValue(0.0)
 {

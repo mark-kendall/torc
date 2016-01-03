@@ -55,7 +55,7 @@ TorcTimerControl::TimerType TorcTimerControl::StringToTimerType(const QString &T
 }
 
 TorcTimerControl::TorcTimerControl(const QString &Type, const QVariantMap &Details)
-  : TorcControl(Details),
+  : TorcControl(TorcControl::Timer, Details),
     m_timerType(TorcTimerControl::UnknownTimerType),
     m_startTime(QTime()),
     m_startDay(0),

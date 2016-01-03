@@ -167,14 +167,18 @@ QString TorcControl::DurationToString(int Days, quint64 Duration)
                       QString("%1").arg(QTime(0, 0).addSecs(Duration).toString(QString("hh:mm.ss")));
 }
 
+#define BLACKLIST QString("SetValue,SetValid")
+
 /*! \class TorcControl
  *
  * The control is 'valid' if all of its inputs are present, valid and have a known value.
  * It can then determine an output value.
  * If 'invalid' the output will be set to the default.
 */
-TorcControl::TorcControl(const QVariantMap &Details)
+TorcControl::TorcControl(TorcControl::Type Type, const QVariantMap &Details)
   : TorcDevice(false, 0, 0, QString("Control"), Details),
+    TorcHTTPService(this, CONTROLS_DIRECTORY + "/" + TypeToString(Type) + "/" + Details.value("name").toString(),
+                    Details.value("name").toString(), TorcControl::staticMetaObject, BLACKLIST),
     m_parsed(false),
     m_validated(false),
     m_inputList(),
@@ -469,6 +473,11 @@ bool TorcControl::Finish(void)
     LOG(VB_GENERAL, LOG_INFO, QString("%1: Ready").arg(uniqueId));
     m_validated = true;
     return true;
+}
+
+void TorcControl::SubscriberDeleted(QObject *Subscriber)
+{
+    TorcHTTPService::HandleSubscriberDeleted(Subscriber);
 }
 
 void TorcControl::InputValueChanged(double Value)

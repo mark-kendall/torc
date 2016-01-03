@@ -129,7 +129,7 @@ QString TorcTransitionControl::StringFromEasingCurve(QEasingCurve::Type Type)
 }
 
 TorcTransitionControl::TorcTransitionControl(const QString &Type, const QVariantMap &Details)
-  : TorcControl(Details),
+  : TorcControl(TorcControl::Transition, Details),
     m_duration(0),
     m_type(QEasingCurve::Linear),
     m_animation(new QPropertyAnimation(this, "animationValue")),

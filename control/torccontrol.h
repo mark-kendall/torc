@@ -7,13 +7,17 @@
 #include <QStringList>
 
 // Torc
+#include "torchttpservice.h"
 #include "torcdevice.h"
 
-class TorcControl : public TorcDevice
+#define CONTROLS_DIRECTORY QString("controls")
+
+class TorcControl : public TorcDevice, public TorcHTTPService
 {
     friend class TorcControls;
 
     Q_OBJECT
+    Q_CLASSINFO("Version", "1.0.0")
     Q_ENUMS(Operation)
 
   public:
@@ -32,7 +36,7 @@ class TorcControl : public TorcDevice
     static QString                DurationToString  (int Days, quint64 Duration);
 
   protected:
-    TorcControl(const QVariantMap &Details);
+    TorcControl(TorcControl::Type Type, const QVariantMap &Details);
     virtual ~TorcControl();
 
   public:
@@ -45,6 +49,9 @@ class TorcControl : public TorcDevice
     bool                   IsKnownOutput          (const QString &Output);
 
   public slots:
+    // TorcHTTPService
+    void                   SubscriberDeleted      (QObject *Subscriber);
+
     void                   InputValueChanged      (double Value);
     void                   InputValidChanged      (bool   Valid);
 
