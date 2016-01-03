@@ -103,7 +103,7 @@ TorcCentral::TorcCentral()
         TorcControls::gControls->Graph(m_graph);
 
         // complete the graph
-        m_graph->append(QString("}\r\n").arg(QCoreApplication::applicationName()));
+        m_graph->append("}\r\n");
 
         QFile file(graphdot);
         if (file.open(QIODevice::ReadWrite))
