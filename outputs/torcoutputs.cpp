@@ -59,10 +59,12 @@ void TorcOutputs::Graph(QByteArray* Data)
     if (!Data)
         return;
 
-    Data->append("    subgraph cluster_2 {\r\n"
-                 "        label = \"Outputs\";\r\n"
+    QString start =
+         QString("    subgraph cluster_2 {\r\n"
+                 "        label = \"%1\";\r\n"
                  "        style=filled;\r\n"
-                 "        fillcolor=\"grey95\";\r\n");
+                 "        fillcolor=\"grey95\";\r\n").arg(tr("Outputs"));
+    Data->append(start);
 
     foreach(TorcOutput* output, outputList)
     {

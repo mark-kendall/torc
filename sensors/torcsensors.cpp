@@ -80,10 +80,12 @@ void TorcSensors::Graph(QByteArray *Data)
     if (!Data)
         return;
 
-    Data->append("    subgraph cluster_0 {\r\n"
-                 "        label = \"Sensors\";\r\n"
-                 "        style=filled;\r\n"
-                 "        fillcolor = \"grey95\";\r\n");
+    QString start =
+          QString("    subgraph cluster_0 {\r\n"
+                  "        label = \"%1\";\r\n"
+                  "        style=filled;\r\n"
+                  "        fillcolor = \"grey95\";\r\n").arg(tr("Sensors"));
+    Data->append(start);
 
     foreach(TorcSensor *sensor, sensorList)
     {
