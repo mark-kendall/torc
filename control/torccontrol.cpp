@@ -339,7 +339,7 @@ void TorcControl::Graph(QByteArray* Data)
             desc.append(QString(DEVICE_LINE_ITEM).arg(item));
         desc.append(QString(DEVICE_LINE_ITEM).arg(tr("Value %1").arg(GetValue())));
 
-        Data->append(QString("    \"%1\" [shape=record label=<<B>%2</B>%3>];\r\n")
+        Data->append(QString("    \"%1\" [shape=record id=\"%1\" label=<<B>%2</B>%3>];\r\n")
                              .arg(uniqueId).arg(userName).arg(desc));
     }
 

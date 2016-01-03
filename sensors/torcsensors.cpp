@@ -99,8 +99,8 @@ void TorcSensors::Graph(QByteArray *Data)
 
         if (label.isEmpty())
             label = id;
-        Data->append(QString("        \"%1\" [shape=record label=<<B>%2</B>%3> URL=\"%4Help\"];\r\n")
-            .arg(id).arg(label).arg(desc).arg(sensor->Signature()));
+        Data->append(QString("        \"%1\" [shape=record id=\"%1\" label=<<B>%2</B>%3>];\r\n")
+            .arg(id).arg(label).arg(desc));
     }
 
     Data->append("    }\r\n\r\n");

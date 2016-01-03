@@ -103,10 +103,7 @@ TorcCentral::TorcCentral()
         TorcControls::gControls->Graph(m_graph);
 
         // complete the graph
-        m_graph->append(QString("    label=\"%1\";\r\n"
-                                    "    labelloc=\"t\";\r\n"
-                                    "    URL=\"/\";\r\n"
-                                    "}\r\n").arg(QCoreApplication::applicationName()));
+        m_graph->append(QString("}\r\n").arg(QCoreApplication::applicationName()));
 
         QFile file(graphdot);
         if (file.open(QIODevice::ReadWrite))
