@@ -167,7 +167,7 @@ QString TorcControl::DurationToString(int Days, quint64 Duration)
                       QString("%1").arg(QTime(0, 0).addSecs(Duration).toString(QString("hh:mm.ss")));
 }
 
-#define BLACKLIST QString("SetValue,SetValid")
+#define BLACKLIST QString("SetValue,SetValid,InputValueChanged,InputValidChanged")
 
 /*! \class TorcControl
  *
