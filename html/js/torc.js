@@ -4,6 +4,7 @@
 $(document).ready(function() {
     "use strict";
 
+    var language       = undefined;
     var torcconnection = undefined;
     var torcstategraph = new TorcStateGraph($, torc);
 
@@ -81,8 +82,18 @@ $(document).ready(function() {
     }
 
     function languageChanged(name, value) {
-        if (name === 'languageString') {
-            console.log('Language changed to ' + value);
+        if (name === 'languageCode') {
+            if (language === undefined) {
+                console.log('Using language: ' + value);
+                language = value;
+            } else {
+                if (language !== value) {
+                    // simple, unambiguous strings are listed in the torc var. This needs to be
+                    // reloaded if the language changes.
+                    console.log("Language changed - reloading");
+                    location.reload();
+                }
+            }
         }
     }
 
@@ -203,7 +214,7 @@ $(document).ready(function() {
             $(".torc-socket-status-icon").removeClass("fa-exclamation-circle fa-check-circle-o fa-question-circle").addClass("fa-check");
         } else if (status === torc.SocketReady) {
             $(".torc-socket-status-icon").removeClass("fa-check fa-exclamation-circle fa-question-circle").addClass("fa-check-circle-o");
-            torcconnection.subscribe('languages', ['languageString', 'languages'], languageChanged, languageSubscriptionChanged);
+            torcconnection.subscribe('languages', ['languageString', 'languageCode', 'languages'], languageChanged, languageSubscriptionChanged);
             torcconnection.subscribe('peers', ['peers'], peerListChanged, peerSubscriptionChanged);
             torcconnection.subscribe('power', ['canShutdown', 'canSuspend', 'canRestart', 'canHibernate', 'batteryLevel'], powerChanged, powerSubscriptionChanged);
             torcconnection.subscribe('central', ['canRestartTorc'], centralChanged, centralSubscriptionChanged);
