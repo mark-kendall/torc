@@ -20,6 +20,9 @@
 * USA.
 */
 
+/*jslint browser,devel,white,for,this */
+/*global window,MozWebSocket,WebSocket */
+
 var TorcWebsocket = function ($, torc, socketStatusChanged) {
     "use strict";
 

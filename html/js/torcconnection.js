@@ -20,6 +20,9 @@
 * USA.
 */
 
+/*jslint browser,devel,white,this */
+/*global TorcSubscription,TorcWebsocket */
+
 var TorcConnection = function ($, torc, statusChanged) {
     "use strict";
 
@@ -93,13 +96,13 @@ var TorcConnection = function ($, torc, statusChanged) {
         }
     }
 
-    function serviceListChanged(name, value) {
+    function serviceListChanged(ignore, value) {
         // there is currently no service that starts or stops other than at startup/shutdown. So this list
         // shouldn't currently change and the subscriber list will be updated if a new socket is used.
         serviceList = value;
     }
 
-    function serviceSubscriptionChanged(version, methods, properties) {
+    function serviceSubscriptionChanged(version, ignore, properties) {
         if (version !== undefined && typeof properties === 'object' && properties.hasOwnProperty('serviceList') &&
             properties.serviceList.hasOwnProperty('value')) {
             serviceListChanged('serviceList', properties.serviceList.value);

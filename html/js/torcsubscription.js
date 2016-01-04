@@ -20,6 +20,8 @@
 * USA.
 */
 
+/*jslint browser,devel,white,this */
+
 var TorcSubscription = function (socket, serviceName, servicePath, subscribedChanged) {
     "use strict";
 

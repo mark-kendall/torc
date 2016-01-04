@@ -1,5 +1,10 @@
+/*jslint browser,devel,white */
+/*global window,$,bootbox,torc,TorcConnection */
+
 $(document).ready(function() {
     "use strict";
+
+    var torcconnection = undefined;
 
     function qsTranslate(context, string, disambiguation, plural, callback) {
         if (disambiguation === undefined) { disambiguation = ''; }
@@ -61,11 +66,12 @@ $(document).ready(function() {
         }
     }
 
-    function peerSubscriptionChanged(version, methods, properties) {
+    function peerSubscriptionChanged(version, ignore, properties) {
         if (version !== undefined && typeof properties === 'object' && properties.hasOwnProperty('peers') &&
             properties.peers.hasOwnProperty('value') && $.isArray(properties.peers.value)) {
             addNavbarDropdown('torc-peer-dropdown', 'fa-link', 'torc-peer-menu');
-            peerListChanged('peers', properties.peers.value);
+            $.each(properties, function (key, value) {
+                peerListChanged(key, value.value); });
             return;
         }
 
@@ -74,14 +80,19 @@ $(document).ready(function() {
     }
 
     function languageChanged(name, value) {
+        if (name === 'languageString') {
+            console.log('Language changed to ' + value);
+        }
     }
 
-    function languageSubscriptionChanged(version, methods, properties) {
+    function languageSubscriptionChanged(version, ignore, properties) {
         if (version !== undefined && typeof properties === 'object') {
             // this should happen when the socket status transitions to Connected but we don't have the
             // translation service at that point
             qsTranslate('TorcNetworkedContext', 'Connected to %1', '', 0,
                         function (result) { $(".torc-socket-status-text a").html(result.replace('%1', window.location.host)); });
+            $.each(properties, function (key, value) {
+                languageChanged(key, value.value); });
         }
     }
 
@@ -103,7 +114,9 @@ $(document).ready(function() {
 
             $('.torc-power-status a').html(translatedName);
             return;
-        } else if (name === 'canSuspend') {
+        }
+
+        if (name === 'canSuspend') {
             translatedName = '<i class=\'fa fa-times\'>&nbsp</i>' + torc.Suspend;
             translatedConfirmation = torc.ConfirmSuspend;
             method = 'Suspend';
@@ -132,16 +145,13 @@ $(document).ready(function() {
         }
     }
 
-    function powerSubscriptionChanged(version, methods, properties) {
+    function powerSubscriptionChanged(version, ignore, properties) {
         if (version !== undefined && typeof properties === 'object') {
             addNavbarDropdown('torc-power-dropdown', 'fa-power-off', 'torc-power-menu');
             addDropdownMenuItem('torc-power-menu', 'torc-power-status', '#', '');
             addDropdownMenuDivider('torc-power-menu', '');
-            powerChanged('canSuspend', properties.canSuspend.value);
-            powerChanged('canShutdown', properties.canShutdown.value);
-            powerChanged('canHibernate', properties.canHibernate.value);
-            powerChanged('canRestart', properties.canRestart.value);
-            powerChanged('batteryLevel', properties.batteryLevel.value);
+            $.each(properties, function (key, value) {
+                powerChanged(key, value.value); });
             return;
         }
 
@@ -168,10 +178,11 @@ $(document).ready(function() {
         }
     }
 
-    function centralSubscriptionChanged(version, methods, properties) {
+    function centralSubscriptionChanged(version, ignore, properties) {
         if (version !== undefined && typeof properties === 'object') {
             addNavbarDropdown('torc-central-dropdown', 'fa-cog', 'torc-central-menu');
-            centralChanged('canRestartTorc', properties.canRestartTorc.value);
+            $.each(properties, function (key, value) {
+                centralChanged(key, value.value); });
             return;
         }
 
@@ -183,7 +194,7 @@ $(document).ready(function() {
         $(".torc-central").svg("destroy");
         $(".torc-central").empty();
         // NB we have no translation service when disconnected, so don't display text!
-        $(".torc-central").append("<div class='row text-center'><i class='fa fa-5x fa-exclamation-circle'></i></div>");
+        $(".torc-central").append("<div class='row text-center'><i class='fa fa-5x fa-exclamation-circle'></i>&nbsp;" + torc.SocketNotConnected + "</div>");
     }
 
     function connected() {
@@ -225,5 +236,5 @@ $(document).ready(function() {
 
     // connect
     statusChanged(torc.SocketNotConnected);
-    var torcconnection = new TorcConnection($, torc, statusChanged);
+    torcconnection = new TorcConnection($, torc, statusChanged);
 });
