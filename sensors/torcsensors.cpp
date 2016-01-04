@@ -130,11 +130,19 @@ QVariantMap TorcSensors::GetSensorList(void)
         QStringList sensorsfortype;
         foreach (TorcSensor *sensor, sensorList)
             if (sensor->GetType() == type)
-                sensorsfortype.append(TorcSensor::TypeToString(sensor->GetType()) + "/" + sensor->GetUniqueId());
+                sensorsfortype.append(sensor->GetUniqueId());
 
         if (!sensorsfortype.isEmpty())
             result.insert(TorcSensor::TypeToString(static_cast<TorcSensor::Type>(type)), sensorsfortype);
     }
+    return result;
+}
+
+QStringList TorcSensors::GetSensorTypes(void)
+{
+    QStringList result;
+        for (int i = 0; i < TorcSensor::MaxType; ++i)
+            result << TorcSensor::TypeToString((TorcSensor::Type)i);
     return result;
 }
 

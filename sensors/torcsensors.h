@@ -16,6 +16,7 @@ class TorcSensors : public QObject, public TorcHTTPService
     Q_CLASSINFO("Version",        "1.0.0")
     Q_CLASSINFO("GetSensorList",  "type=sensors")
     Q_PROPERTY(QVariantMap sensorList   READ GetSensorList() NOTIFY SensorsChanged())
+    Q_PROPERTY(QStringList sensorTypes  READ GetSensorTypes() CONSTANT)
 
   public:
     static TorcSensors* gSensors;
@@ -34,6 +35,7 @@ class TorcSensors : public QObject, public TorcHTTPService
     void                SubscriberDeleted         (QObject *Subscriber);
 
     QVariantMap         GetSensorList             (void);
+    QStringList         GetSensorTypes            (void);
 
   signals:
     void                SensorsChanged            (void);
@@ -44,6 +46,7 @@ class TorcSensors : public QObject, public TorcHTTPService
 
   private:
     QList<TorcSensor*>  sensorList;
+    QStringList         sensorTypes;
     QMutex             *m_lock;
 };
 
