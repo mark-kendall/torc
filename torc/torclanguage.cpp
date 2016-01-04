@@ -88,8 +88,6 @@ QString TorcLanguage::GetUIName(void)
 
 /*! \brief Set the current language for this application.
  *
- * \note We let QTranslator provide the heuristics around fallback translations (e.g. en_GB to en) and hence
- *       do not validate the new language/locale against known/available translations.
 */
 void TorcLanguage::SetLanguageCode(const QString &Language)
 {
@@ -100,6 +98,13 @@ void TorcLanguage::SetLanguageCode(const QString &Language)
     if (m_locale == locale)
     {
         LOG(VB_GENERAL, LOG_INFO, "Requested language already set - ignoring");
+        return;
+    }
+
+    // ignore unknown
+    if (!m_languages.contains(locale))
+    {
+        LOG(VB_GENERAL, LOG_INFO, "Requested language not available - ignoring");
         return;
     }
 
