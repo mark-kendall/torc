@@ -1,10 +1,11 @@
 /*jslint browser,devel,white */
-/*global window,$,bootbox,torc,TorcConnection */
+/*global window,$,bootbox,torc,TorcConnection,TorcStateGraph */
 
 $(document).ready(function() {
     "use strict";
 
     var torcconnection = undefined;
+    var torcstategraph = new TorcStateGraph($, torc);
 
     function qsTranslate(context, string, disambiguation, plural, callback) {
         if (disambiguation === undefined) { disambiguation = ''; }
@@ -189,27 +190,12 @@ $(document).ready(function() {
         removeNavbarDropdown('torc-central-dropdown');
     }
 
-    function connectionLost() {
-        // we need to explicitly destroy the svg
-        $(".torc-central").svg("destroy");
-        $(".torc-central").empty();
-        // NB we have no translation service when disconnected, so don't display text!
-        $(".torc-central").append("<div class='row text-center'><i class='fa fa-5x fa-exclamation-circle'></i>&nbsp;" + torc.SocketNotConnected + "</div>");
-    }
-
-    function connected() {
-        $(".torc-central").empty();
-        $(".torc-central").svg({loadURL: "../content/stategraph.svg",
-                         onLoad: function (svg) {
-                             svg.configure({width: '100%', height: '100%'}, false);
-                         }});
-    }
-
     function statusChanged (status) {
         if (status === torc.SocketNotConnected) {
             $(".torc-socket-status-icon").removeClass("fa-check fa-check-circle-o-circle-o fa-question-circle").addClass("fa-exclamation-circle");
             $(".torc-socket-status-text a").html(torc.SocketNotConnected);
-            connectionLost();
+
+            torcstategraph.cleanup();
         } else if (status === torc.SocketConnecting) {
             $(".torc-socket-status-icon").removeClass("fa-check fa-check-circle-o fa-exclamation-circle").addClass("fa-question-circle");
             $(".torc-socket-status-text a").html(torc.SocketConnecting);
@@ -221,7 +207,8 @@ $(document).ready(function() {
             torcconnection.subscribe('peers', ['peers'], peerListChanged, peerSubscriptionChanged);
             torcconnection.subscribe('power', ['canShutdown', 'canSuspend', 'canRestart', 'canHibernate', 'batteryLevel'], powerChanged, powerSubscriptionChanged);
             torcconnection.subscribe('central', ['canRestartTorc'], centralChanged, centralSubscriptionChanged);
-            connected();
+
+            torcstategraph.setup(torcconnection);
         }
     }
 
