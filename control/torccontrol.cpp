@@ -35,7 +35,7 @@ TorcControl::Type TorcControl::StringToType(const QString &Type)
     if (type == "TIMER")      return TorcControl::Timer;
     if (type == "TRANSITION") return TorcControl::Transition;
 
-    return TorcControl::UnknownType;
+    return TorcControl::Unknown;
 }
 
 QString TorcControl::TypeToString(TorcControl::Type Type)
@@ -341,6 +341,8 @@ void TorcControl::Graph(QByteArray* Data)
         QStringList source = GetDescription();
         foreach (QString item, source)
             desc.append(QString(DEVICE_LINE_ITEM).arg(item));
+        desc.append(QString(DEVICE_LINE_ITEM).arg(tr("Default %1").arg(GetDefaultValue())));
+        desc.append(QString(DEVICE_LINE_ITEM).arg(tr("Valid %1").arg(GetValid())));
         desc.append(QString(DEVICE_LINE_ITEM).arg(tr("Value %1").arg(GetValue())));
 
         Data->append(QString("    \"%1\" [shape=record id=\"%1\" label=<<B>%2</B>%3>];\r\n")
@@ -422,6 +424,7 @@ bool TorcControl::Finish(void)
             }
 
             connect(this, SIGNAL(ValueChanged(double)), output, SLOT(SetValue(double)), Qt::UniqueConnection);
+            connect(this, SIGNAL(ValidChanged(bool)),   output, SLOT(SetValid(bool)),   Qt::UniqueConnection);
         }
         else if (qobject_cast<TorcControl*>(it.key()))
         {
@@ -498,8 +501,9 @@ void TorcControl::InputValueChanged(double Value)
         return;
 
     // ignore known values
-    if (m_inputValues.contains(input) && qFuzzyCompare(m_inputValues.value(input) + 1.0, Value + 1.0))
-        return;
+    if (m_inputValids.contains(input) && m_inputValids.value(input) == true)
+        if (m_inputValues.contains(input) && qFuzzyCompare(m_inputValues.value(input) + 1.0, Value + 1.0))
+            return;
 
     // set the last value if known. Otherwise set to new which will not trigger any change.
     double lastvalue = m_inputValues.contains(input) ? m_inputValues.value(input) : Value;
@@ -564,7 +568,7 @@ void TorcControl::InputValidChangedPriv(QObject *Input, bool Valid)
         return;
 
     m_inputValids[Input] = Valid;
-    m_allInputsValid = Valid;
+    m_allInputsValid     = Valid;
 
     if (!Valid)
     {
@@ -592,11 +596,12 @@ void TorcControl::SetValid(bool Valid)
 
     if (m_parsed && m_validated)
     {
-        TorcDevice::SetValid(Valid);
-
         // important!!
-        if (!valid)
+        // do this before SetValid as setting a value automatically sets validity.
+        if (!Valid)
             SetValue(defaultValue);
+
+        TorcDevice::SetValid(Valid);
     }
 }
 

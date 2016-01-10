@@ -23,10 +23,11 @@ class TorcControl : public TorcDevice, public TorcHTTPService
   public:
     enum Type
     {
-        UnknownType,
+        Unknown,
         Logic,
         Timer,
-        Transition
+        Transition,
+        MaxType
     };
 
     static TorcControl::Type      StringToType      (const QString &Type);
