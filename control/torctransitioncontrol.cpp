@@ -269,7 +269,7 @@ void TorcTransitionControl::CalculateOutput(void)
     // could also be 'smoothed' with a seperate transition.
 
     double newvalue = m_inputValues.constBegin().value();
-    LOG(VB_GENERAL, LOG_INFO, QString("Transition value: %1").arg(newvalue));
+    LOG(VB_GENERAL, LOG_DEBUG, QString("Transition value: %1").arg(newvalue));
 
     if (m_firstTrigger)
     {
