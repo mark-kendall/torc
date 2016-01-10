@@ -105,11 +105,19 @@ QVariantMap TorcOutputs::GetOutputList(void)
         QStringList outputsfortype;
         foreach (TorcOutput *output, outputList)
             if (output->GetType() == type)
-                outputsfortype.append(TorcOutput::TypeToString(output->GetType()) + "/" + output->GetUniqueId());
+                outputsfortype.append(output->GetUniqueId());
 
         if (!outputsfortype.isEmpty())
             result.insert(TorcOutput::TypeToString(static_cast<TorcOutput::Type>(type)), outputsfortype);
     }
+    return result;
+}
+
+QStringList TorcOutputs::GetOutputTypes(void)
+{
+    QStringList result;
+        for (int i = 0; i < TorcOutput::MaxType; ++i)
+            result << TorcOutput::TypeToString((TorcOutput::Type)i);
     return result;
 }
 
