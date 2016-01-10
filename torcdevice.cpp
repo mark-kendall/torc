@@ -45,6 +45,7 @@ TorcDevice::TorcDevice(bool Valid, double Value, double Default,
     {
         QMutexLocker locker(gDeviceListLock);
         uniqueId = Details.value("name").toString();
+        setObjectName(uniqueId);
 
         if (!uniqueId.isEmpty() && !gDeviceList->contains(uniqueId))
         {
