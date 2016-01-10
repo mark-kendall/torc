@@ -29,8 +29,12 @@
 
 TorcControls* TorcControls::gControls = new TorcControls();
 
+#define BLACKLIST QString("")
+
 TorcControls::TorcControls()
-  : TorcDeviceHandler()
+  : QObject(),
+    TorcHTTPService(this, CONTROLS_DIRECTORY, "controls", TorcControls::staticMetaObject, BLACKLIST),
+    TorcDeviceHandler()
 {
 }
 
@@ -55,7 +59,7 @@ void TorcControls::Create(const QVariantMap &Details)
             TorcControl::Type type = TorcControl::StringToType(it2.key());
 
             // logic, timer or transition
-            if (type == TorcControl::UnknownType)
+            if (type == TorcControl::Unknown)
             {
                 LOG(VB_GENERAL, LOG_ERR, QString("Unknown control type '%1'").arg(it2.key()));
                 continue;
@@ -80,7 +84,7 @@ void TorcControls::Create(const QVariantMap &Details)
                     control = new TorcTimerControl(it3.key(), details);
                 else
                     control = new TorcTransitionControl(it3.key(), details);
-                m_controls.append(control);
+                controlList.append(control);
             }
         }
     }
@@ -90,9 +94,9 @@ void TorcControls::Destroy(void)
 {
     QMutexLocker locker(m_lock);
 
-    foreach (TorcControl *control, m_controls)
+    foreach (TorcControl *control, controlList)
         control->DownRef();
-    m_controls.clear();
+    controlList.clear();
 }
 
 void TorcControls::Validate(void)
@@ -106,7 +110,7 @@ void TorcControls::Validate(void)
     // Validation checks each control has the correct number of valid inputs and outputs and then
     // connects the appropriate signal/slot pairs. At this point no signals should be triggered.
 
-    QMutableListIterator<TorcControl*> it(m_controls);
+    QMutableListIterator<TorcControl*> it(controlList);
     while (it.hasNext())
     {
         TorcControl* control = it.next();
@@ -125,7 +129,7 @@ void TorcControls::Validate(void)
     // connected to sensors/outputs/other controls. Sensors and outputs are notionally standalone.
 
     // Iterate over the controls list and recursively check for circular references.
-    foreach (TorcControl* control, m_controls)
+    foreach (TorcControl* control, controlList)
     {
         QString id = control->GetUniqueId();
         QString path("");
@@ -136,7 +140,7 @@ void TorcControls::Validate(void)
 void TorcControls::Graph(QByteArray* Data)
 {
     if (Data)
-        foreach(TorcControl *control, m_controls)
+        foreach(TorcControl *control, controlList)
             control->Graph(Data);
 }
 
@@ -144,7 +148,7 @@ void TorcControls::Start(void)
 {
     QMutexLocker locker(m_lock);
 
-    foreach (TorcControl *control, m_controls)
+    foreach (TorcControl *control, controlList)
         control->Start();
 }
 
@@ -152,6 +156,46 @@ void TorcControls::Reset(void)
 {
     QMutexLocker locker(m_lock);
 
-    foreach (TorcControl *control, m_controls)
+    foreach (TorcControl *control, controlList)
         control->Reset();
 }
+
+QString TorcControls::GetUIName(void)
+{
+    return tr("Controls");
+}
+
+void TorcControls::SubscriberDeleted(QObject *Subscriber)
+{
+    TorcHTTPService::HandleSubscriberDeleted(Subscriber);
+}
+
+QVariantMap TorcControls::GetControlList(void)
+{
+    QVariantMap result;
+    QMutexLocker locker(m_lock);
+
+    // iterate over our list for each control type
+    for (int type = TorcControl::Unknown; type < TorcControl::MaxType; type++)
+    {
+        QStringList controlsfortype;
+        foreach (TorcControl *control, controlList)
+            if (control->GetType() == type)
+                controlsfortype.append(control->GetUniqueId());
+
+        if (!controlsfortype.isEmpty())
+            result.insert(TorcControl::TypeToString(static_cast<TorcControl::Type>(type)), controlsfortype);
+    }
+    return result;
+
+}
+
+QStringList TorcControls::GetControlTypes(void)
+{
+    QStringList result;
+        for (int i = 0; i < TorcControl::MaxType; ++i)
+            result << TorcControl::TypeToString((TorcControl::Type)i);
+    return result;
+
+}
+
