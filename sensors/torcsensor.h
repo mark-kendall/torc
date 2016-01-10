@@ -66,6 +66,7 @@ class TorcSensor : public TorcDevice, public TorcHTTPService
     void             SubscriberDeleted         (QObject *Subscriber);
 
     void             SetValue                  (double Value);
+    void             SetValid                  (bool Valid);
 
     double           GetValueScaled            (void);
     double           GetOperatingRangeMin      (void);

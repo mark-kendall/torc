@@ -90,6 +90,15 @@ void TorcOutput::SubscriberDeleted(QObject *Subscriber)
     TorcHTTPService::HandleSubscriberDeleted(Subscriber);
 }
 
+void TorcOutput::SetValid(bool Valid)
+{
+    QMutexLocker locker(lock);
+
+    if (!Valid)
+        SetValue(defaultValue);
+    TorcDevice::SetValid(Valid);
+}
+
 TorcOutput::~TorcOutput()
 {
 }

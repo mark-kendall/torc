@@ -97,8 +97,10 @@ TorcSensor::~TorcSensor()
 
 void TorcSensor::Start(void)
 {
-    emit ValidChanged(valid);
+    // emit value first, as this will indicate a valid value.
+    // then emit valid to force its state.
     emit ValueChanged(value);
+    emit ValidChanged(valid);
 }
 
 void TorcSensor::SubscriberDeleted(QObject *Subscriber)
@@ -156,6 +158,16 @@ void TorcSensor::SetValue(double Value)
             emit OutOfRangeLowChanged(true);
         outOfRangeLow  = true;
     }
+}
+
+void TorcSensor::SetValid(bool Valid)
+{
+    QMutexLocker locker(lock);
+
+    if (!Valid)
+        SetValue(defaultValue);
+
+    TorcDevice::SetValid(Valid);
 }
 
 /// shortUnits are the abbreviated, translated units shared with the user e.g. °C.

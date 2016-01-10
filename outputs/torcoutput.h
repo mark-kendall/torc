@@ -45,6 +45,8 @@ class TorcOutput : public TorcDevice, public TorcHTTPService
     // TorcHTTPService
     void             SubscriberDeleted         (QObject *Subscriber);
 
+    void             SetValid                  (bool Valid);
+
   private:
     QObject         *m_owner;
 };
