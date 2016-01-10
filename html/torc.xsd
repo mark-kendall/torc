@@ -136,7 +136,7 @@
     <xs:element name="name"     type="nameType"/>
     <xs:element name="userName" type="userNameType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="userDescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
-    <xs:element name="number"   type="gpioPinNumberType"/>
+    <xs:element name="gpiopinnumber"   type="gpioPinNumberType"/>
   </xs:all>
 </xs:complexType>
 
@@ -319,7 +319,7 @@
     <xs:element name="userName" type="userNameType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="userDescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="inputs"   type="validStringType" minOccurs="0" maxOccurs="1"/>
-    <xs:element name="number"   type="gpioPinNumberType"/>
+    <xs:element name="gpiopinnumber" type="gpioPinNumberType"/>
     <xs:element name="default"  type="switchNumberType"/>
   </xs:all>
 </xs:complexType>
@@ -364,6 +364,11 @@
   <!-- enforce unique 1Wire serial numbers -->
   <xs:unique name="uniqueWire1Serial">
     <xs:selector xpath=".//wire1serial" />
+    <xs:field xpath="." />
+  </xs:unique>
+  <!-- enforce unique GPIO pin numbers -->
+  <xs:unique name="uniqueGPIOPinNumber">
+    <xs:selector xpath=".//gpiopinnumber" />
     <xs:field xpath="." />
   </xs:unique>
 </xs:element>
