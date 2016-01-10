@@ -66,6 +66,8 @@ class TorcDevice : public QObject, public TorcReferenceCounter
 
     static QHash<QString,TorcDevice*> *gDeviceList;
     static QMutex         *gDeviceListLock;
+
+    bool                   wasInvalid;
 };
 
 #endif // TORCDEVICE_H

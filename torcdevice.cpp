@@ -35,7 +35,8 @@ TorcDevice::TorcDevice(bool Valid, double Value, double Default,
     uniqueId(QString("")),
     userName(QString("")),
     userDescription(QString("")),
-    lock(new QMutex(QMutex::Recursive))
+    lock(new QMutex(QMutex::Recursive)),
+    wasInvalid(true)
 {
     if (!Details.contains("name"))
     {
@@ -106,6 +107,9 @@ void TorcDevice::SetValid(bool Valid)
     if (Valid == valid)
         return;
 
+    if (Valid)
+        wasInvalid = true;
+
     valid = Valid;
     emit ValidChanged(valid);
 }
@@ -114,9 +118,17 @@ void TorcDevice::SetValue(double Value)
 {
     QMutexLocker locker(lock);
 
-    // ignore same value updates
-    if (qFuzzyCompare(Value + 1.0f, value + 1.0f))
-        return;
+    // force an update if the last value was 'invalid'
+    if (wasInvalid)
+    {
+        wasInvalid = false;
+    }
+    else
+    {
+        // filter out unnecessary changes
+        if (qFuzzyCompare(Value + 1.0f, value + 1.0f))
+            return;
+    }
 
     value = Value;
     emit ValueChanged(value);

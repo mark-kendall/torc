@@ -124,8 +124,15 @@ void TorcSensor::SetValue(double Value)
     else
     {
         // ignore status quo if already valid
-        if (qFuzzyCompare(Value + 1.0f, value + 1.0f))
-            return;
+        if (wasInvalid)
+        {
+            wasInvalid = false;
+        }
+        else
+        {
+            if (qFuzzyCompare(Value + 1.0f, value + 1.0f))
+                return;
+        }
     }
 
     // update value and valueScaled
