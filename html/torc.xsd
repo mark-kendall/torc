@@ -294,7 +294,6 @@
     <xs:element name="name"     type="nameType"/>
     <xs:element name="userName" type="userNameType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="userDescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
-    <xs:element name="inputs"   type="validStringType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="number"   type="pca9685ChannelNumberType"/>
   </xs:all>
 </xs:complexType>
@@ -318,7 +317,6 @@
     <xs:element name="name"     type="nameType"/>
     <xs:element name="userName" type="userNameType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="userDescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
-    <xs:element name="inputs"   type="validStringType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="gpiopinnumber" type="gpioPinNumberType"/>
     <xs:element name="default"  type="switchNumberType"/>
   </xs:all>
