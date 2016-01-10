@@ -285,11 +285,6 @@ bool TorcControl::Validate(void)
     return true;
 }
 
-/// The default start implementation does nothing (for logic control).
-void TorcControl::Start(void)
-{
-}
-
 /// Only certain logic controls can be passthrough
 bool TorcControl::IsPassthrough(void)
 {

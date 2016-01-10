@@ -144,22 +144,6 @@ void TorcControls::Graph(QByteArray* Data)
             control->Graph(Data);
 }
 
-void TorcControls::Start(void)
-{
-    QMutexLocker locker(m_lock);
-
-    foreach (TorcControl *control, controlList)
-        control->Start();
-}
-
-void TorcControls::Reset(void)
-{
-    QMutexLocker locker(m_lock);
-
-    foreach (TorcControl *control, controlList)
-        control->Reset();
-}
-
 QString TorcControls::GetUIName(void)
 {
     return tr("Controls");

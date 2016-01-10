@@ -25,8 +25,6 @@ class TorcControls : public QObject, public TorcHTTPService, public TorcDeviceHa
     void                Destroy                   (void);
     void                Validate                  (void);
     void                Graph                     (QByteArray* Data);
-    void                Start                     (void);
-    void                Reset                     (void);
     QString             GetUIName                 (void);
 
   public slots:

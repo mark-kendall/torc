@@ -58,23 +58,6 @@ QString TorcSensors::GetUIName(void)
     return tr("Sensors");
 }
 
-void TorcSensors::Start(void)
-{
-    QMutexLocker locker(m_lock);
-
-    foreach (TorcSensor *sensor, sensorList)
-        sensor->Start();
-}
-
-void TorcSensors::Reset(void)
-{
-    QMutexLocker locker(m_lock);
-
-    foreach (TorcSensor *sensor, sensorList)
-        sensor->Reset();
-}
-
-
 void TorcSensors::Graph(QByteArray *Data)
 {
     if (!Data)

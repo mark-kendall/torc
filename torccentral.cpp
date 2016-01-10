@@ -87,8 +87,13 @@ TorcCentral::TorcCentral()
         TorcControls::gControls->Validate();
 
         // initialise the state machine
-        TorcSensors::gSensors->Start();
-        TorcControls::gControls->Start();
+        {
+            QMutexLocker lock(TorcDevice::gDeviceListLock);
+
+            QHash<QString,TorcDevice*>::const_iterator it = TorcDevice::gDeviceList->constBegin();
+            for( ; it != TorcDevice::gDeviceList->constEnd(); ++it)
+                it.value()->Start();
+        }
 
         // iff we have got this far, then create the graph
         // start the graph
@@ -278,9 +283,14 @@ bool TorcCentral::event(QEvent *Event)
                 // defaults if we shut down. There is currently no handling of waking, which
                 // would need more thought about resetting state etc.
                 LOG(VB_GENERAL, LOG_INFO, "Resetting devices to defaults.");
-                TorcSensors::gSensors->Reset();
-                TorcControls::gControls->Reset();
-                TorcOutputs::gOutputs->Reset();
+                {
+                    QMutexLocker lock(TorcDevice::gDeviceListLock);
+
+                    QHash<QString,TorcDevice*>::const_iterator it = TorcDevice::gDeviceList->constBegin();
+                    for( ; it != TorcDevice::gDeviceList->constEnd(); ++it)
+                        it.value()->Stop();
+                }
+
                 break;
             default: break;
         }

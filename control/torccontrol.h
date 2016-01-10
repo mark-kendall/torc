@@ -43,7 +43,6 @@ class TorcControl : public TorcDevice, public TorcHTTPService
   public:
     virtual bool           Validate               (void);
     virtual TorcControl::Type GetType             (void) = 0;
-    virtual void           Start                  (void);
     virtual bool           IsPassthrough          (void);
     virtual bool           AllowInputs            (void);
     bool                   IsKnownInput           (const QString &Input);

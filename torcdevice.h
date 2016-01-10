@@ -15,6 +15,8 @@
 
 class TorcDevice : public QObject, public TorcReferenceCounter
 {
+    friend class TorcCentral;
+
     Q_OBJECT
     Q_PROPERTY(bool     valid                   READ GetValid()                   NOTIFY   ValidChanged())
     Q_PROPERTY(double   value                   READ GetValue()                   NOTIFY   ValueChanged())
@@ -28,7 +30,8 @@ class TorcDevice : public QObject, public TorcReferenceCounter
                const QString &ModelId,   const QVariantMap &Details);
     virtual ~TorcDevice();
 
-    void                   Reset                  (void);
+    virtual void           Start                  (void);
+    virtual void           Stop                   (void);
     virtual QStringList    GetDescription         (void);
 
   public slots:
@@ -61,7 +64,7 @@ class TorcDevice : public QObject, public TorcReferenceCounter
     QString                userDescription;
     QMutex                *lock;
 
-    static QHash<QString,QObject*> *gDeviceList;
+    static QHash<QString,TorcDevice*> *gDeviceList;
     static QMutex         *gDeviceListLock;
 };
 

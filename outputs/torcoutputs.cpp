@@ -46,14 +46,6 @@ QString TorcOutputs::GetUIName(void)
     return tr("Outputs");
 }
 
-void TorcOutputs::Reset(void)
-{
-    QMutexLocker locker(m_lock);
-
-    foreach (TorcOutput *output, outputList)
-        output->Reset();
-}
-
 void TorcOutputs::Graph(QByteArray* Data)
 {
     if (!Data)

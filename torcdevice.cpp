@@ -22,7 +22,7 @@
 #include "torccentral.h"
 #include "torcdevice.h"
 
-QHash<QString,QObject*>* TorcDevice::gDeviceList = new QHash<QString,QObject*>();
+QHash<QString,TorcDevice*>* TorcDevice::gDeviceList = new QHash<QString,TorcDevice*>();
 QMutex*      TorcDevice::gDeviceListLock         = new QMutex(QMutex::Recursive);
 
 TorcDevice::TorcDevice(bool Valid, double Value, double Default,
@@ -82,9 +82,20 @@ QStringList TorcDevice::GetDescription(void)
     return QStringList();
 }
 
-void TorcDevice::Reset(void)
+/*! \brief Start the device.
+ *
+ * The default implementation does nothing.
+*/
+void TorcDevice::Start(void)
 {
-    SetValue(defaultValue);
+}
+
+/*! \brief Stop the device.
+ *
+ * Invalidate the device, which will also set its value to defaultValue.
+*/
+void TorcDevice::Stop(void)
+{
     SetValid(false);
 }
 
