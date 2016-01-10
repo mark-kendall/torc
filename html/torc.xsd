@@ -64,11 +64,11 @@
   <!-- a device must have 1 name and 0 or 1 userName and userDescription - in any order-->
   <xs:all>
     <!-- start of base types -->
-    <xs:element name="name"     type="nameType"/>
-    <xs:element name="userName" type="userNameType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="name"            type="nameType"/>
+    <xs:element name="userName"        type="userNameType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="userDescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
     <!-- end of base types -->
-    <xs:element name="id"       type="validStringType"/>
+    <xs:element name="wire1serial"     type="validStringType"/>
   </xs:all>
 </xs:complexType>
 
@@ -359,6 +359,11 @@
   <!-- enforce unique i2c addresses -->
   <xs:unique name="uniqueI2CAddress">
     <xs:selector xpath=".//i2caddress" />
+    <xs:field xpath="." />
+  </xs:unique>
+  <!-- enforce unique 1Wire serial numbers -->
+  <xs:unique name="uniqueWire1Serial">
+    <xs:selector xpath=".//wire1serial" />
     <xs:field xpath="." />
   </xs:unique>
 </xs:element>
