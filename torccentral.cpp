@@ -200,8 +200,10 @@ bool TorcCentral::LoadConfig(void)
     QString xml = GetTorcConfigDir() + "/torc.xml";
 
 #ifdef USING_XMLPATTERNS
+    QString xsd = GetTorcShareDir() + "/html/torc.xsd";
     bool skipvalidation = false;
     QFileInfo config(xml);
+    QFileInfo xsdfile(xsd);
 
     if (!qgetenv("TORC_NO_VALIDATION").isEmpty())
     {
@@ -222,11 +224,17 @@ bool TorcCentral::LoadConfig(void)
         QString lastvalidated = gLocalContext->GetSetting("configLastValidated", QString("never"));
         if (lastvalidated != "never")
         {
+            QDateTime xsdmodified  = xsdfile.exists() ? xsdfile.lastModified() : QDateTime::currentDateTime();
             QDateTime validated    = QDateTime::fromString(lastvalidated);
             QDateTime lastmodified = config.lastModified();
 
             LOG(VB_GENERAL, LOG_INFO, QString("Last validated: %1 Last modified: %2").arg(validated.toString()).arg(lastmodified.toString()));
-            if (lastmodified < validated)
+
+            if (xsdmodified >= validated)
+            {
+                LOG(VB_GENERAL, LOG_INFO, QString("XSD file modified since last validation - forcing validation"));
+            }
+            else if (lastmodified < validated)
             {
                 LOG(VB_GENERAL, LOG_INFO, QString("Configuration file not modified since last validation - skipping XSD check"));
                 skipvalidation = true;
@@ -236,8 +244,6 @@ bool TorcCentral::LoadConfig(void)
 
     if (!skipvalidation)
     {
-        QString xsd = GetTorcShareDir() + "/html/torc.xsd";
-
         LOG(VB_GENERAL, LOG_INFO, "Starting validation of configuration file");
 
         TorcXmlValidator validator(xml, xsd);
