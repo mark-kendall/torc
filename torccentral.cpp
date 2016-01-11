@@ -19,6 +19,7 @@
 
 // Qt
 #include <QFile>
+#include <QFileInfo>
 #include <QProcess>
 #include <QJsonDocument>
 #include <QCoreApplication>
@@ -199,11 +200,41 @@ bool TorcCentral::LoadConfig(void)
     QString xml = GetTorcConfigDir() + "/torc.xml";
 
 #ifdef USING_XMLPATTERNS
+    bool skipvalidation = false;
+    QFileInfo config(xml);
+
     if (!qgetenv("TORC_NO_VALIDATION").isEmpty())
     {
-        LOG(VB_GENERAL, LOG_INFO, "Skipping configuration file validation.");
+        LOG(VB_GENERAL, LOG_INFO, "Skipping configuration file validation (command line).");
+        skipvalidation = true;
     }
-    else
+
+    if (!skipvalidation && !config.exists())
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Failed to find configuration file '%1'").arg(xml));
+        skipvalidation = true;
+    }
+
+    if (!skipvalidation)
+    {
+        // validation can take a while on slower machines (e.g. single core raspberry pi).
+        // try and skip if the config has not been modified
+        QString lastvalidated = gLocalContext->GetSetting("configLastValidated", QString("never"));
+        if (lastvalidated != "never")
+        {
+            QDateTime validated    = QDateTime::fromString(lastvalidated);
+            QDateTime lastmodified = config.lastModified();
+
+            LOG(VB_GENERAL, LOG_INFO, QString("Last validated: %1 Last modified: %2").arg(validated.toString()).arg(lastmodified.toString()));
+            if (lastmodified < validated)
+            {
+                LOG(VB_GENERAL, LOG_INFO, QString("Configuration file not modified since last validation - skipping XSD check"));
+                skipvalidation = true;
+            }
+        }
+    }
+
+    if (!skipvalidation)
     {
         QString xsd = GetTorcShareDir() + "/html/torc.xsd";
 
@@ -213,10 +244,13 @@ bool TorcCentral::LoadConfig(void)
         if (!validator.Validated())
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Configuration file '%1' failed validation").arg(xml));
+            // make sure we re-validate
+            gLocalContext->SetSetting("configLastValidated", QString("never"));
             return false;
         }
 
         LOG(VB_GENERAL, LOG_INFO, "Configuration successfully validated");
+        gLocalContext->SetSetting("configLastValidated", QDateTime::currentDateTime().toString());
     }
 #else
     LOG(VB_GENERAL, LOG_INFO, "QXmlPatterns unavailable - not validating configuration file.");
