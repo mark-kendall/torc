@@ -67,8 +67,8 @@ TorcI2CPCA9685Channel::TorcI2CPCA9685Channel(int Number, TorcI2CPCA9685 *Parent,
 
 TorcI2CPCA9685Channel::~TorcI2CPCA9685Channel()
 {
-    // always turn the output off completely on exit
-    m_parent->SetPWM(m_channelNumber, 0);
+    // NB we don't turn the channel off, we set it to its default (which is probably off)
+    SetValue(defaultValue);
 }
 
 QStringList TorcI2CPCA9685Channel::GetDescription(void)
