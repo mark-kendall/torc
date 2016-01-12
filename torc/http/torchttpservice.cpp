@@ -222,6 +222,14 @@ class MethodParameters
         m_allowedRequestTypes |= HTTPDisabled;
     }
 
+    /*! \brief Enable this method
+    */
+    void Enable(void)
+    {
+        if (m_allowedRequestTypes & HTTPDisabled)
+            m_allowedRequestTypes -= HTTPDisabled;
+    }
+
     bool                m_valid;
     int                 m_index;
     QVector<QByteArray> m_names;
@@ -568,7 +576,7 @@ QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVarian
 
                 if (!m_subscribers.contains(Connection))
                 {
-                    LOG(VB_GENERAL, LOG_INFO, QString("New subscription for '%1'").arg(m_signature));
+                    LOG(VB_GENERAL, LOG_DEBUG, QString("New subscription for '%1'").arg(m_signature));
                     m_subscribers.append(Connection);
 
                     // notify success and provide appropriate details about properties, notifications, get'ers etc
@@ -738,22 +746,43 @@ QVariant TorcHTTPService::GetProperty(int Index)
     return result;
 }
 
+/*! \brief Enable the given method.
+ *
+ *  Used to enable a method previously disabled with DisableMethod.
+ */
+void TorcHTTPService::EnableMethod(const QString &Method)
+{
+    QMap<QString,MethodParameters*>::const_iterator it = m_methods.constFind(Method);
+    if (it != m_methods.constEnd())
+    {
+        it.value()->Enable();
+        LOG(VB_GENERAL, LOG_DEBUG, QString("Enabled method '%1' for service '%2'").arg(Method).arg(m_name));
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Unable to enable unknown method '%1' for service '%2'").arg(Method).arg(m_name));
+    }
+
+}
+
 /*! \brief Disable the given method.
  *
  * This is used to dynamically disable a 'setter' when an internal object has taken control
  * of the service.
+ *
+ * Methods can be re-enabled with EnableMethod.
 */
 void TorcHTTPService::DisableMethod(const QString &Method)
 {
-    QMap<QString,MethodParameters*>::iterator it = m_methods.find(Method);
-    if (it != m_methods.end())
+    QMap<QString,MethodParameters*>::const_iterator it = m_methods.constFind(Method);
+    if (it != m_methods.constEnd())
     {
         it.value()->Disable();
-        LOG(VB_GENERAL, LOG_INFO, QString("Disabled method '%1' for service '%2'").arg(Method).arg(m_name));
+        LOG(VB_GENERAL, LOG_DEBUG, QString("Disabled method '%1' for service '%2'").arg(Method).arg(m_name));
     }
     else
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Unable to disable unknown method '%1' for service '%2'").arg(Method).arg(m_name));
+        LOG(VB_GENERAL, LOG_ERR, QString("Unable to disable unknown method '%1' for service '%2'").arg(Method).arg(m_name));
     }
 }
 
