@@ -468,7 +468,7 @@ bool TorcControl::Finish(void)
         m_inputValids.insert(it.key(), false);
     }
 
-    LOG(VB_GENERAL, LOG_INFO, QString("%1: Ready").arg(uniqueId));
+    LOG(VB_GENERAL, LOG_DEBUG, QString("%1: Ready").arg(uniqueId));
     m_validated = true;
     return true;
 }

@@ -112,7 +112,7 @@ void TorcI2CBus::Create(const QVariantMap &Details)
                 // TODO - handle defining the same device in sensors and outputs
                 if (m_devices.contains(address))
                 {
-                    LOG(VB_GENERAL, LOG_WARNING, QString("I2C bus already contains device at 0x%1 - ignoring").arg(address, 0, 16));
+                    LOG(VB_GENERAL, LOG_ERR, QString("I2C bus already contains device at 0x%1 - ignoring").arg(address, 0, 16));
                     continue;
                 }
 
@@ -128,7 +128,7 @@ void TorcI2CBus::Create(const QVariantMap &Details)
                 if (device)
                     m_devices.insert(address, device);
                 else
-                    LOG(VB_GENERAL, LOG_WARNING, QString("Unable to find handler for I2C device '%1'").arg(it2.key()));
+                    LOG(VB_GENERAL, LOG_ERR, QString("Unable to find handler for I2C device '%1'").arg(it2.key()));
             }
         }
     }

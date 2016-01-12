@@ -120,9 +120,13 @@ void TorcControls::Validate(void)
             control->DownRef();
             it.remove();
         }
+        else
+        {
+            LOG(VB_GENERAL, LOG_INFO, QString("Registered control '%1'").arg(control->Name()));
+        }
     }
 
-    LOG(VB_GENERAL, LOG_INFO, "Controls validated");
+    LOG(VB_GENERAL, LOG_DEBUG, "Controls validated");
 
     // Each control now has a complete list of inputs and outputs so we can now check for circular references.
     // N.B. Only controls are aware of other devices (i.e. they are created with the expectation that they are

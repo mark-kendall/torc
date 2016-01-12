@@ -233,7 +233,7 @@ bool TorcTransitionControl::Validate(void)
     m_animation->setDuration(m_duration * 1000);
 
     // debug
-    LOG(VB_GENERAL, LOG_INFO, QString("%1: %2").arg(uniqueId).arg(GetDescription().join(",")));
+    LOG(VB_GENERAL, LOG_DEBUG, QString("%1: %2").arg(uniqueId).arg(GetDescription().join(",")));
 
     return true;
 }
@@ -287,7 +287,7 @@ void TorcTransitionControl::CalculateOutput(void)
 
             if (timesincelasttransition > m_duration)
             {
-                LOG(VB_GENERAL, LOG_INFO, QString("Transition '%1' is initially inactive (value '%2')").arg(uniqueId).arg(newvalue));
+                LOG(VB_GENERAL, LOG_DEBUG, QString("Transition '%1' is initially inactive (value '%2')").arg(uniqueId).arg(newvalue));
                 SetValue(newvalue);
                 return;
             }
@@ -295,7 +295,7 @@ void TorcTransitionControl::CalculateOutput(void)
             // if we are part way through the transition, the animation will expect the value to have started
             // from the previous transition value !:)
             SetValue(newvalue > 0 ? 0 : 1);
-            LOG(VB_GENERAL, LOG_INFO, QString("Forcing transition '%1' time to %2% complete").arg(uniqueId)
+            LOG(VB_GENERAL, LOG_DEBUG, QString("Forcing transition '%1' time to %2% complete").arg(uniqueId)
                 .arg(((double)timesincelasttransition / (double)m_duration) * 100.0));
 
             if (newvalue < 1) // time can run backwards :)

@@ -231,7 +231,7 @@ bool TorcTimerControl::Validate(void)
         return false;
 
     // debug
-    LOG(VB_GENERAL, LOG_INFO, QString("Timer '%1': %2").arg(uniqueId).arg(GetDescription().join(",")));
+    LOG(VB_GENERAL, LOG_DEBUG, QString("Timer '%1': %2").arg(uniqueId).arg(GetDescription().join(",")));
 
     // this is probably overkill - but we shouldn't have that many timers and most will
     // have relatively long durations

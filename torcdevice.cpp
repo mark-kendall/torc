@@ -51,7 +51,7 @@ TorcDevice::TorcDevice(bool Valid, double Value, double Default,
         if (!uniqueId.isEmpty() && !gDeviceList->contains(uniqueId))
         {
             gDeviceList->insert(uniqueId, this);
-            LOG(VB_GENERAL, LOG_INFO, QString("New device id: %1").arg(uniqueId));
+            LOG(VB_GENERAL, LOG_DEBUG, QString("New device id: %1").arg(uniqueId));
         }
         else
         {

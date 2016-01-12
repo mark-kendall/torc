@@ -793,7 +793,7 @@ void TorcWebSocket::ReadyRead(void)
                 return;
             }
 
-            LOG(VB_GENERAL, LOG_INFO, "Received valid upgrade response - switching to frame protocol");
+            LOG(VB_GENERAL, LOG_DEBUG, "Received valid upgrade response - switching to frame protocol");
             m_handShaking = false;
             emit ConnectionEstablished();
         }
@@ -1177,7 +1177,7 @@ void TorcWebSocket::Connected(void)
         return;
     }
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Client WebSocket connected to '%1' (SubProtocol: %2)")
+    LOG(VB_GENERAL, LOG_DEBUG, QString("Client WebSocket connected to '%1' (SubProtocol: %2)")
         .arg(TorcNetwork::IPAddressToLiteral(m_address, (m_port))).arg(SubProtocolsToString(m_subProtocol)));
 
     LOG(VB_NETWORK, LOG_DEBUG, QString("Data...\r\n%1").arg(upgrade->data()));

@@ -129,7 +129,7 @@ TorcRPCRequest::TorcRPCRequest(TorcWebSocket::WSSubProtocol Protocol, const QByt
             return;
         }
 
-        LOG(VB_GENERAL, LOG_INFO, Data);
+        LOG(VB_GENERAL, LOG_DEBUG, Data);
 
         // single request, one JSON object
         if (doc.isObject())
