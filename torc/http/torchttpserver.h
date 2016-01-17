@@ -68,7 +68,7 @@ class TorcHTTPServer : public QTcpServer
 
   private:
     static void    ExpireWebSocketTokens (void);
-    bool           AuthenticateUser   (const QString &Header, QString &UserName);
+    bool           AuthenticateUser      (TorcHTTPRequest *Request, QString &Username, bool &Stale);
     void           UpdateOriginWhitelist (void);
 
   private:
