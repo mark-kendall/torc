@@ -91,6 +91,7 @@ class TorcHTTPRequest
 {
   public:
     static HTTPRequestType RequestTypeFromString    (const QString &Type);
+    static QString         RequestTypeToString      (HTTPRequestType Type);
     static HTTPProtocol    ProtocolFromString       (const QString &Protocol);
     static HTTPStatus      StatusFromString         (const QString &Status);
     static QString         ProtocolToString         (HTTPProtocol Protocol);

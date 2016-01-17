@@ -769,6 +769,24 @@ HTTPRequestType TorcHTTPRequest::RequestTypeFromString(const QString &Type)
     return HTTPUnknownType;
 }
 
+QString TorcHTTPRequest::RequestTypeToString(HTTPRequestType Type)
+{
+    switch (Type)
+    {
+        case HTTPHead:     return QString("HEAD");
+        case HTTPGet:      return QString("GET");
+        case HTTPPost:     return QString("POST");
+        case HTTPPut:      return QString("PUT");
+        case HTTPDelete:   return QString("DELETE");
+        case HTTPOptions:  return QString("OPTIONS");
+        case HTTPDisabled: return QString("DISABLED"); // for completeness
+        default:
+            break;
+    }
+
+    return QString("UNKNOWN");
+}
+
 HTTPProtocol TorcHTTPRequest::ProtocolFromString(const QString &Protocol)
 {
     if (Protocol.startsWith("HTTP"))
