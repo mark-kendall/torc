@@ -167,6 +167,18 @@ class TorcHTTPServerNonce
             return false;
         }
 
+        bool md5 = false;
+        QString algo = params.value("algorithm");
+        if (algo == "MD5")
+        {
+            md5 = true;
+        }
+        else if (algo != "SHA-256")
+        {
+            LOG(VB_NETWORK, LOG_DEBUG, "Unknown hash type");
+            return false;
+        }
+
         // we check the digest early, even though it is an expensive operation, as it will automatically
         // confirm a number of the params are correct and if the respone is calculated correctly but the nonce
         // is not recognised (i.e. stale), we can respond with stale="true', as per the spec, and the client
@@ -176,10 +188,10 @@ class TorcHTTPServerNonce
         QString    ncstr  = params.value("nc");
         QString    first  = QString("%1:%2:%3").arg(Username).arg(TORC_REALM).arg(Password);
         QString    second = QString("%1:%2").arg(Method).arg(URI);
-        QByteArray hash1  = QCryptographicHash::hash(first.toLatin1(), QCryptographicHash::Md5).toHex();
-        QByteArray hash2  = QCryptographicHash::hash(second.toLatin1(), QCryptographicHash::Md5).toHex();
+        QByteArray hash1  = QCryptographicHash::hash(first.toLatin1(), md5 ? QCryptographicHash::Md5 : QCryptographicHash::Sha256).toHex();
+        QByteArray hash2  = QCryptographicHash::hash(second.toLatin1(), md5 ? QCryptographicHash::Md5 : QCryptographicHash::Sha256).toHex();
         QString    third  = QString("%1:%2:%3:%4:%5:%6").arg(QString(hash1)).arg(noncestr).arg(ncstr).arg(params.value("cnonce")).arg("auth").arg(QString(hash2));
-        QByteArray hash3  = QCryptographicHash::hash(third.toLatin1(), QCryptographicHash::Md5).toHex();
+        QByteArray hash3  = QCryptographicHash::hash(third.toLatin1(), md5 ? QCryptographicHash::Md5 : QCryptographicHash::Sha256).toHex();
 
         bool digestcorrect = false;
         if (hash3 == params.value("response"))
@@ -740,7 +752,10 @@ bool TorcHTTPServer::Authenticated(TorcHTTPConnection *Connection, TorcHTTPReque
         if (Request->GetHTTPProtocol() > HTTPOneDotZero)
         {
             TorcHTTPServerNonce *nonce = new TorcHTTPServerNonce();
-            QString auth = QString("Digest realm=\"%1\", qop=\"auth\", algorithm=MD5, nonce=\"%2\", opaque=\"%3\"%4")
+            // offer both SHA-256 and MD5 as a fallback
+            // should probably use insertMulti for SetResponseHeader
+            QString auth = QString("Digest realm=\"%1\", qop=\"auth\", algorithm=SHA-256, nonce=\"%2\", opaque=\"%3\"%4"
+                                   "\r\nWWW-Authenticate: Digest realm=\"%1\", qop=\"auth\", algorithm=MD5, nonce=\"%2\", opaque=\"%3\"%4")
                     .arg(TORC_REALM)
                     .arg(nonce->GetNonce())
                     .arg(nonce->GetOpaque())
