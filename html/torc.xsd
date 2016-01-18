@@ -87,6 +87,15 @@
   </xs:all>
 </xs:complexType>
 
+<xs:complexType name="networkButtonType">
+  <xs:all>
+    <xs:element name="name"     type="nameType"/>
+    <xs:element name="userName" type="userNameType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="userDescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="default"  type="switchNumberType"/>
+  </xs:all>
+</xs:complexType>
+
 <xs:complexType name="networkPWMType">
   <xs:all>
     <xs:element name="name"     type="nameType"/>
@@ -120,6 +129,7 @@
     <xs:element name="pwm"         type="networkPWMType"/>
     <xs:element name="temperature" type="networkTempType"/>
     <xs:element name="ph"          type="networkpHType"/>
+    <xs:element name="button"      type="networkButtonType"/>
   </xs:choice>
 </xs:complexType>
 

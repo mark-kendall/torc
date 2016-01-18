@@ -36,6 +36,7 @@ QString TorcSensor::TypeToString(TorcSensor::Type Type)
         case TorcSensor::pH:          return QString("pH");
         case TorcSensor::Switch:      return QString("switch");
         case TorcSensor::PWM:         return QString("pwm");
+        case TorcSensor::Button:      return QString("button");
         default: break;
     }
 

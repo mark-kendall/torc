@@ -27,11 +27,13 @@
 #include "torcnetworkswitchoutput.h"
 #include "torcnetworktemperatureoutput.h"
 #include "torcnetworkphoutput.h"
+#include "torcnetworkbuttonoutput.h"
 #include "torcoutputs.h"
 #include "torcnetworkpwmsensor.h"
 #include "torcnetworkswitchsensor.h"
 #include "torcnetworktemperaturesensor.h"
 #include "torcnetworkphsensor.h"
+#include "torcnetworkbuttonsensor.h"
 #include "torcnetworksensors.h"
 
 /*! \class TorcNetworkSensors
@@ -139,6 +141,15 @@ void TorcNetworkSensors::Create(const QVariantMap &Details)
                                         newsensor = new TorcNetworkpHSensor(defaultdouble, sensor);
                                     else
                                         newoutput = new TorcNetworkpHOutput(defaultdouble, sensor);
+                                }
+                            case TorcSensor::Button:
+                                {
+                                    if (issensor)
+                                        newsensor = new TorcNetworkButtonSensor(defaultdouble, sensor);
+                                    else
+                                    {
+                                        newoutput = new TorcNetworkButtonOutput(defaultdouble, sensor);
+                                    }
                                 }
                             default: break;
                         }

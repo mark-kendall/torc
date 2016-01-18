@@ -34,6 +34,7 @@ class TorcSensor : public TorcDevice, public TorcHTTPService
         pH,
         Switch,
         PWM,
+        Button,
         MaxType
     };
 
