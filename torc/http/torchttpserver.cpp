@@ -808,10 +808,20 @@ bool TorcHTTPServer::AuthenticateUser(TorcHTTPRequest *Request, QString &Usernam
     }
     else if (header.startsWith("Basic", Qt::CaseInsensitive))
     {
-        // remove leading 'Basic' and split off token
-        QString authentication = header.mid(5).trimmed();
-        QStringList userinfo   = QString(QByteArray::fromBase64(authentication.toUtf8())).split(':');
-        authorised = (userinfo.size() == 2) && (userinfo[0] == username) && (userinfo[1] == password);
+        /* enable this once Digest authentication is enabled for Torc to Torc websocket connections (TorcNetworkedContext)
+
+        // only accept Basic authentication if using < HTTP 1.1
+        if (Request->GetHTTPProtocol() > HTTPOneDotZero)
+        {
+            LOG(VB_GENERAL, LOG_WARNING, "Disallowing basic authentication for HTTP 1.1 client");
+        }
+        else */
+        {
+            // remove leading 'Basic' and split off token
+            QString authentication = header.mid(5).trimmed();
+            QStringList userinfo   = QString(QByteArray::fromBase64(authentication.toUtf8())).split(':');
+            authorised = (userinfo.size() == 2) && (userinfo[0] == username) && (userinfo[1] == password);
+        }
     }
 
     if (authorised)
