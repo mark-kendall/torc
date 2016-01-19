@@ -41,17 +41,18 @@ TorcHTMLDynamicContent::TorcHTMLDynamicContent()
     m_recursive = true;
 
     // Create the content directory if needed
-    // TorcLocalContext should already have created the content directory
+    // TorcLocalContext should already have created the config directory
     QString configdir = GetTorcConfigDir();
     if (configdir.endsWith("/"))
         configdir.chop(1);
+    m_pathToContent = configdir;
     configdir.append(DYNAMIC_DIRECTORY);
 
     QDir dir(configdir);
     if (!dir.exists())
         if (!dir.mkdir(configdir))
             LOG(VB_GENERAL, LOG_ERR, QString("Failed to create content directory ('%1')").arg(configdir));
-}
+    }
 
 void TorcHTMLDynamicContent::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTTPConnection*)
 {
@@ -68,13 +69,7 @@ void TorcHTMLDynamicContent::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHT
     }
 
     // get the requested file subpath
-    QString subpath = Request->GetUrl();
-
-    // get the local path to dynamic content
-    QString path = GetTorcConfigDir();
-    if (path.endsWith("/"))
-        path.chop(1);
-    path += subpath;
+    QString path = m_pathToContent + Request->GetUrl();
 
     // file
     QFile *file = new QFile(path);
