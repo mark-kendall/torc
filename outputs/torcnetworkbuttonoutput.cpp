@@ -23,7 +23,8 @@
 // Torc
 #include "torcnetworkbuttonoutput.h"
 
-/*! \class A network output that mimics the behaviour of a mechanical push button.
+/*! \class TorcNetworkButtonOutput
+ *  \brief A network output that mimics the behaviour of a mechanical push button.
  *
  * A traditional push button will toggle from low to high to low (or high to low to high)
  * as it is pressed and released. This behaviour is mimicked.
