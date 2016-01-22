@@ -360,6 +360,12 @@ class TorcCentralObject : public TorcAdminObject, public TorcStringFactory
     {
         Strings.insert("RestartTorcTr",      QCoreApplication::translate("TorcCentral", "Restart Torc"));
         Strings.insert("ConfirmRestartTorc", QCoreApplication::translate("TorcCentral", "Are you sure you want to restart Torc?"));
+        Strings.insert("ViewConfigTr",       QCoreApplication::translate("TorcCentral", "View configuration"));
+        Strings.insert("ViewConfigTitleTr",  QCoreApplication::translate("TorcCentral", "Current configuration"));
+        Strings.insert("ViewDOTTr",          QCoreApplication::translate("TorcCentral", "View DOT"));
+        Strings.insert("ViewDOTTitleTr",     QCoreApplication::translate("TorcCentral", "Stategraph Description"));
+        Strings.insert("ViewXSDTr",          QCoreApplication::translate("TorcCentral", "View XSD"));
+        Strings.insert("ViewXSDTitleTr",     QCoreApplication::translate("TorcCentral", "Configuration schema"));
     }
 
     void Create(void)

@@ -190,11 +190,35 @@ $(document).ready(function() {
         }
     }
 
+    function addFileModal(name, title, menu, contentSource, contentType) {
+        var modalid     = name    + 'torcmodal';
+        var contentid   = modalid + 'content';
+        var menuid      = modalid + 'menu';
+        $('.navbar-fixed-top').after(template(DisplayFileModal, { "id": modalid, "title": title, "contentid": contentid }));
+
+        $.ajax({ url: contentSource,
+                 dataType: contentType,
+                 xhrFields: { withCredentials: true }
+               })
+               .done(function (result, ignore, xhr) {
+                    $('#' + contentid).text(xhr.responseText);
+                   addDropdownMenuItem('torc-central-menu', menuid, '#' + modalid,
+                                       '<i class=\'fa fa-file-text-o\'>&nbsp</i>' + menu);
+                   $('.' + menuid + ' > a').attr('data-toggle', 'modal');
+               });
+    }
+
     function centralSubscriptionChanged(version, ignore, properties) {
         if (version !== undefined && typeof properties === 'object') {
             addNavbarDropdown('torc-central-dropdown', 'fa-cog', 'torc-central-menu');
             $.each(properties, function (key, value) {
                 centralChanged(key, value.value); });
+
+            // we need the central menu before adding other options
+            // NB centralSubscriptionChanged should only ever be called once...
+            addFileModal('config', torc.ViewConfigTitleTr, torc.ViewConfigTr, '/content/torc.xml', 'xml');
+            addFileModal('xsd',    torc.ViewXSDTitleTr,    torc.ViewXSDTr,    '/torc.xsd', 'xml');
+            addFileModal('dot',    torc.ViewDOTTitleTr,    torc.ViewDOTTr,    '/content/stategraph.dot', 'text');
             return;
         }
 
