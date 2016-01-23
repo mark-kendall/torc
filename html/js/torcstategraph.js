@@ -171,21 +171,18 @@ var TorcStateGraph = function ($, torc) {
     this.cleanup = function () {
         torcconnection = undefined;
         clearStateGraph();
-        $("#torc-central").append("<div class='row text-center'><i class='fa fa-5x fa-exclamation-circle'></i>&nbsp;" + torc.SocketNotConnected + "</div>");
+        $("#torc-central").append(template(TorcCentralNoConnection, { "text": torc.SocketNotConnected }));
     };
 
     this.setup = function (connection) {
         torcconnection = connection;
+        if ($("#torc-central").length < 1) {
+            $('.torc-navbar').after(template(TorcCentralDiv, { }));
+        }
         clearStateGraph();
         $("#torc-central").svg({loadURL: "../content/stategraph.svg", onLoad: initStateGraph});
     };
 };
-
-// add the central element
-$(document).ready(function() {
-    "use strict";
-    $('.navbar-fixed-top').after($('<div/>').attr('id', 'torc-central'));
-});
 
 
 

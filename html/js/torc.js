@@ -1,5 +1,5 @@
 /*jslint browser,devel,white */
-/*global window,$,bootbox,torc,TorcConnection,TorcStateGraph */
+/*global window,$,bootbox,torc,TorcConnection,TorcStateGraph,template */
 
 $(document).ready(function() {
     "use strict";
@@ -17,18 +17,8 @@ $(document).ready(function() {
                             function () { if (typeof callback === 'function') { callback(); }});
     }
 
-    function addNavbarDropdown(dropdownClass, toggleClass, listClass) {
-        $('<li/>', { class: 'dropdown ' + dropdownClass})
-          .append($('<a/>', {
-            class: 'dropdown-toggle',
-            href:  '#'})
-            .attr('data-toggle', 'dropdown')
-                  .append($('<i/>', { class: 'fa ' + toggleClass + ' fa-lg'})))
-          .append($('<ul/>', {
-            class: 'dropdown-menu ' + listClass,
-            role: 'menu'
-          }))
-          .appendTo('.navbar-nav');
+    function addNavbarDropdown(dropdownClass, toggleClass, menuClass) {
+        $('.navbar-nav').append(template(MainNavBarDropdown, { "ddclass": dropdownClass, "icon": toggleClass, "menuclass": menuClass} ));
     }
 
     function removeNavbarDropdown(dropdownClass) {
@@ -36,13 +26,12 @@ $(document).ready(function() {
     }
 
     function addDropdownMenuDivider(menu, identifier) {
-        $('.' + menu).append($('<li/>', { class: 'divider ' + identifier} ));
+        $('.' + menu).append(template(MainNavBarDropdownDivider, { "id": identifier }));
     }
 
     function addDropdownMenuItem(menu, identifier, link, text, click) {
-        var item = $('<li/>', { class: identifier }).append($('<a/>', { href: link, html: text } ));
-        if (typeof click === 'function') { item.click(click); }
-        item.appendTo($('.' + menu));
+        $('.' + menu).append(template(MainNavBarDropdownItem, {"id": identifier, "link": link, "text": text }));
+        if (typeof click === 'function') { $('.' + identifier).click(click); }
     }
 
     function peerListChanged(name, value) {
@@ -60,7 +49,7 @@ $(document).ready(function() {
                 value.forEach( function (element, index) {
                     addDropdownMenuItem('torc-peer-menu', 'torc-peer torc-peer' + index, 'http://' + element.address + ':' + element.port + '/html/index.html', '');
                     qsTranslate('TorcNetworkedContext', 'Connect to %1', '', 0,
-                                function(result) { $(".torc-peer" + index + " a").html('<i class=\'fa fa-external-link-square\'>&nbsp</i>' + result.replace("%1", element.name)); });
+                                function(result) { $(".torc-peer" + index + " a").html(template(DropdownItemWithIcon, { "icon": "external-link-square", "text": result.replace("%1", element.name) })); });
                 });
             } else {
                 addDropdownMenuItem('torc-peer-menu', 'torc-peer-status', '#', torc.NoPeers);
@@ -71,7 +60,7 @@ $(document).ready(function() {
     function peerSubscriptionChanged(version, ignore, properties) {
         if (version !== undefined && typeof properties === 'object' && properties.hasOwnProperty('peers') &&
             properties.peers.hasOwnProperty('value') && $.isArray(properties.peers.value)) {
-            addNavbarDropdown('torc-peer-dropdown', 'fa-link', 'torc-peer-menu');
+            addNavbarDropdown('torc-peer-dropdown', 'link', 'torc-peer-menu');
             $.each(properties, function (key, value) {
                 peerListChanged(key, value.value); });
             return;
@@ -109,19 +98,21 @@ $(document).ready(function() {
     }
 
     function powerChanged(name, value) {
-        var translatedName, translatedConfirmation, method;
+        var translatedName;
+        var translatedConfirmation;
+        var method;
 
         if (name === 'batteryLevel') {
             if (value === undefined) {
                 translatedName = '';
             } else if (value === torc.ACPower) {
-                translatedName = '<i class=\'fa fa-bolt\'>&nbsp</i>' + torc.ACPowerTr;
+                translatedName = template(DropdownItemWithIcon, { "icon": "bolt", "text": torc.ACPowerTr });
             } else if (value === torc.UnknownPower) {
                 translatedName = torc.UnknownPowerTr;
             } else {
-                translatedName = '<i class=\'fa fa-tachometer\'>&nbsp</i>' + value + '%';
+                translatedName = template(DropdownItemWithIcon, { "icon": "tachometer", "text": value + '%' });
                 qsTranslate('TorcPower', 'Battery %n%', '', value,
-                            function (result) { $('.torc-power-status a').html('<i class=\'fa fa-tachometer\'>&nbsp</i>' + result); });
+                            function (result) { $('.torc-power-status a').html(template(DropdownItemWithIcon, { "icon": "tachometer", "text": result })); });
             }
 
             $('.torc-power-status a').html(translatedName);
@@ -129,19 +120,19 @@ $(document).ready(function() {
         }
 
         if (name === 'canSuspend') {
-            translatedName = '<i class=\'fa fa-times\'>&nbsp</i>' + torc.Suspend;
+            translatedName = template(DropdownItemWithIcon, { "icon": "times", "text": torc.Suspend });
             translatedConfirmation = torc.ConfirmSuspend;
             method = 'Suspend';
         } else if (name === 'canShutdown') {
-            translatedName = '<i class=\'fa fa-times-circle\'>&nbsp</i>' + torc.Shutdown;
+            translatedName = template(DropdownItemWithIcon, { "icon": "times-circle", "text": torc.Shutdown });
             translatedConfirmation = torc.ConfirmShutdown;
             method = 'Shutdown';
         } else if (name === 'canHibernate') {
-            translatedName = '<i class=\'fa fa-moon-o\'>&nbsp</i>' + torc.Hibernate;
+            translatedName = template(DropdownItemWithIcon, { "icon": "moon-o", "text": torc.Hibernate });
             translatedConfirmation = torc.ConfirmHibernate;
             method = 'Hibernate';
         } else if (name === 'canRestart') {
-            translatedName = '<i class=\'fa fa-refresh\'>&nbsp</i>' + torc.Restart;
+            translatedName = template(DropdownItemWithIcon, { "icon": "refresh", "text": torc.Restart });
             translatedConfirmation = torc.ConfirmRestart;
             method = 'Restart';
         } else { return; }
@@ -159,7 +150,7 @@ $(document).ready(function() {
 
     function powerSubscriptionChanged(version, ignore, properties) {
         if (version !== undefined && typeof properties === 'object') {
-            addNavbarDropdown('torc-power-dropdown', 'fa-power-off', 'torc-power-menu');
+            addNavbarDropdown('torc-power-dropdown', 'power-off', 'torc-power-menu');
             addDropdownMenuItem('torc-power-menu', 'torc-power-status', '#', '');
             addDropdownMenuDivider('torc-power-menu', '');
             $.each(properties, function (key, value) {
@@ -171,10 +162,12 @@ $(document).ready(function() {
     }
 
     function centralChanged(name, value) {
-        var translatedName, translatedConfirmation, method;
+        var translatedName;
+        var translatedConfirmation;
+        var method;
 
         if (name === 'canRestartTorc') {
-            translatedName = '<i class=\'fa fa-refresh\'>&nbsp</i>' + torc.RestartTorcTr;
+            translatedName = template(DropdownItemWithIcon, { "icon": "refresh", "text": torc.RestartTorcTr });
             translatedConfirmation = torc.ConfirmRestartTorc;
             method = 'RestartTorc';
         } else { return; }
@@ -200,17 +193,17 @@ $(document).ready(function() {
                  dataType: contentType,
                  xhrFields: { withCredentials: true }
                })
-               .done(function (result, ignore, xhr) {
+               .done(function (ignore, ignore2, xhr) {
                     $('#' + contentid).text(xhr.responseText);
-                   addDropdownMenuItem('torc-central-menu', menuid, '#' + modalid,
-                                       '<i class=\'fa fa-file-text-o\'>&nbsp</i>' + menu);
+                   var item = template(DropdownItemWithIcon, { "icon": "file-text-o", "text": menu });
+                   addDropdownMenuItem('torc-central-menu', menuid, '#' + modalid, item);
                    $('.' + menuid + ' > a').attr('data-toggle', 'modal');
                });
     }
 
     function centralSubscriptionChanged(version, ignore, properties) {
         if (version !== undefined && typeof properties === 'object') {
-            addNavbarDropdown('torc-central-dropdown', 'fa-cog', 'torc-central-menu');
+            addNavbarDropdown('torc-central-dropdown', 'cog', 'torc-central-menu');
             $.each(properties, function (key, value) {
                 centralChanged(key, value.value); });
 
@@ -229,7 +222,11 @@ $(document).ready(function() {
         if (status === torc.SocketNotConnected) {
             $(".torc-socket-status-icon").removeClass("fa-check fa-check-circle-o-circle-o fa-question-circle").addClass("fa-exclamation-circle");
             $(".torc-socket-status-text a").html(torc.SocketNotConnected);
-
+            // remove modals
+            $("#xsdtorcmodal").remove();
+            $("#configtorcmodal").remove();
+            $("#dottorcmodal").remove();
+            // remove state graph
             torcstategraph.cleanup();
         } else if (status === torc.SocketConnecting) {
             $(".torc-socket-status-icon").removeClass("fa-check fa-check-circle-o fa-exclamation-circle").addClass("fa-question-circle");
@@ -247,11 +244,11 @@ $(document).ready(function() {
         }
     }
 
-    // set 'brand'
-    $(".navbar-brand").html(torc.ServerApplication);
+    // add the nav bar
+    $('body').prepend(template(MainNavBar, {"torc": torc.ServerApplication }));
 
     // add a socket status/connection dropdown with icon
-    addNavbarDropdown('', 'torc-socket-status-icon', 'torc-socket-menu');
+    addNavbarDropdown('', 'check torc-socket-status-icon', 'torc-socket-menu');
 
     // add the connection text item
     addDropdownMenuItem('torc-socket-menu', 'torc-socket-status-text', '#', '');

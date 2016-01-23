@@ -1,3 +1,46 @@
+var MainNavBar =
+'<div class="navbar navbar-inverse navbar-fixed-top torc-navbar" role="navigation">' +
+'  <div class="container">' +
+'    <div class="navbar-header">' +
+'      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">' +
+'        <span class="icon-bar"></span>' +
+'        <span class="icon-bar"></span>' +
+'        <span class="icon-bar"></span>' +
+'      </button>' +
+'      <a class="navbar-brand torc-application-name" href="#"><%=torc%></a>' +
+'    </div>' +
+'    <div class="collapse navbar-collapse navbar-right">' +
+'      <ul class="nav navbar-nav">' +
+'      </ul>' +
+'    </div>' +
+'  </div>' +
+'</div>';
+
+var MainNavBarDropdown =
+'<li class="dropdown <%=ddclass%>">' +
+'  <a class="dropdown-toggle" href="#" data-toggle="dropdown">' +
+'    <i class="fa fa-<%=icon%> fa-lg"></i>' +
+'  </a>' +
+'  <ul class="dropdown-menu <%=menuclass%>" role="menu"></ul>' +
+'</li>';
+
+var MainNavBarDropdownDivider =
+'<li class="divider <%=id%>"></li>';
+
+var MainNavBarDropdownItem =
+'<li class="<%=id%>">' +
+'  <a href="<%=link%>"><%=text%></a>' +
+'</li>';
+
+var DropdownItemWithIcon =
+'<i class="fa fa-<%=icon%>">&nbsp;</i><%=text%>';
+
+var TorcCentralDiv =
+'<div id="torc-central"></div>';
+
+var TorcCentralNoConnection =
+'<div class="row text-center"><i class="fa fa-5x fa-exclamation-circle"></i>&nbsp;<%=text%></div>';
+
 var DisplayFileModal =
 '<div id="<%=id%>" class="modal fade" role="dialog">' +
 '  <div class="modal-dialog modal-lg">' +
