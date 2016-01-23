@@ -28,6 +28,10 @@
   translated strings for value, valid etd
 */
 
+// declare vars to aid syntax highlighter and keep JSLint happy
+var theme;
+var template;
+
 var TorcStateGraph = function ($, torc) {
     "use strict";
 
@@ -171,13 +175,13 @@ var TorcStateGraph = function ($, torc) {
     this.cleanup = function () {
         torcconnection = undefined;
         clearStateGraph();
-        $("#torc-central").append(template(TorcCentralNoConnection, { "text": torc.SocketNotConnected }));
+        $("#torc-central").append(template(theme.StategraphNoConnection, { "text": torc.SocketNotConnected }));
     };
 
     this.setup = function (connection) {
         torcconnection = connection;
         if ($("#torc-central").length < 1) {
-            $('.torc-navbar').after(template(TorcCentralDiv, { }));
+            $('.torc-navbar').after(template(theme.StategraphContainer, { }));
         }
         clearStateGraph();
         $("#torc-central").svg({loadURL: "../content/stategraph.svg", onLoad: initStateGraph});
