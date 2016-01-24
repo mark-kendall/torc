@@ -16,6 +16,8 @@ class TorcHTTPRequest;
 class TorcHTTPReader;
 class TorcRPCRequest;
 
+#define TORC_JSON_RPC QString("torc.json-rpc")
+
 class TorcWebSocket : public QObject
 {
     Q_OBJECT
@@ -93,6 +95,7 @@ class TorcWebSocket : public QObject
     static QString  SubProtocolsToString  (WSSubProtocols Protocols);
     static WSSubProtocols       SubProtocolsFromString            (const QString &Protocols);
     static QList<WSSubProtocol> SubProtocolsFromPrioritisedString (const QString &Protocols);
+    static QVariantList         GetSupportedSubProtocols (void);
 
   signals:
     void            ConnectionEstablished (void);

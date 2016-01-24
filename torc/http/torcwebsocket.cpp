@@ -437,7 +437,7 @@ QString TorcWebSocket::SubProtocolsToString(WSSubProtocols Protocols)
 {
     QStringList list;
 
-    if (Protocols.testFlag(SubProtocolJSONRPC)) list.append(QLatin1String("torc.json-rpc"));
+    if (Protocols.testFlag(SubProtocolJSONRPC)) list.append(TORC_JSON_RPC.toLatin1());
 
     return list.join(",");
 }
@@ -447,7 +447,7 @@ TorcWebSocket::WSSubProtocols TorcWebSocket::SubProtocolsFromString(const QStrin
 {
     WSSubProtocols protocols = SubProtocolNone;
 
-    if (Protocols.contains(QLatin1String("torc.json-rpc"), Qt::CaseInsensitive)) protocols |= SubProtocolJSONRPC;
+    if (Protocols.contains(TORC_JSON_RPC.toLatin1(), Qt::CaseInsensitive)) protocols |= SubProtocolJSONRPC;
 
     return protocols;
 }
@@ -462,10 +462,21 @@ QList<TorcWebSocket::WSSubProtocol> TorcWebSocket::SubProtocolsFromPrioritisedSt
     {
         QString protocol = protocols[i].trimmed();
 
-        if (!QString::compare(protocol, QLatin1String("torc.json-rpc"), Qt::CaseInsensitive)) results.append(SubProtocolJSONRPC);
+        if (!QString::compare(protocol, TORC_JSON_RPC.toLatin1(), Qt::CaseInsensitive)) results.append(SubProtocolJSONRPC);
     }
 
     return results;
+}
+
+///\brief Return a list of supported WebSocket sub-protocols
+QVariantList TorcWebSocket::GetSupportedSubProtocols(void)
+{
+    QVariantList result;
+    QVariantMap proto;
+    proto.insert("name",TORC_JSON_RPC);
+    proto.insert("description", "I can't remember how this differs from straight JSON-RPC:) The overall mechanism is very similar to WAMP.");
+    result.append(proto);
+    return result;
 }
 
 ///\brief Initialise the websocket once its parent thread is ready.
