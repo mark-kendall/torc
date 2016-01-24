@@ -23,7 +23,8 @@ class TorcHTMLServicesHelp : public QObject, public TorcHTTPService
     Q_CLASSINFO("GetDetails",        "type=details")
     Q_CLASSINFO("GetWebSocketToken", "type=accesstoken")
 
-    Q_PROPERTY(QMap serviceList READ GetServiceList NOTIFY ServiceListChanged)
+    Q_PROPERTY(QMap serviceList READ GetServiceList   NOTIFY ServiceListChanged)
+    Q_PROPERTY(QVariantList returnFormats READ GetReturnFormats CONSTANT)
 
   public:
     TorcHTMLServicesHelp(TorcHTTPServer *Server);
@@ -39,6 +40,8 @@ class TorcHTMLServicesHelp : public QObject, public TorcHTTPService
     void           SubscriberDeleted    (QObject *Subscriber);
     QVariantMap    GetDetails           (void);
     QVariantMap    GetServiceList       (void);
+    QVariantList   GetReturnFormats     (void);
+    QVariantList   GetWebSocketProtocols (void);
     qint64         GetStartTime         (void);
     int            GetPriority          (void);
     QString        GetUuid              (void);
@@ -46,7 +49,8 @@ class TorcHTMLServicesHelp : public QObject, public TorcHTTPService
     void           HandlersChanged      (void);
 
   private:
-    QVariantMap    serviceList; // dummy
+    QVariantMap    serviceList;   // dummy
+    QVariantList   returnFormats;
 };
 
 #endif // TORCHTMLSERVICESHELP_H

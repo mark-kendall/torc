@@ -35,11 +35,29 @@
 #include "torchttpconnection.h"
 #include "torchtmlserviceshelp.h"
 
+/*! \class TorcHTMLServicesHelp
+ *  \brief Top level interface into services.
+ *
+ * A helper service that provides details to clients on the available services, return types, WebSocket
+ * protocols etc. It also acts as the entry point for clients wishing to authenticate for a WebSocket connection
+ * - who need to call GetWebSocketToken.
+ *
+ * \note This service no longer serves up any HTML, or help, so needs to be renamed to TorcHTTPServices
+*/
 TorcHTMLServicesHelp::TorcHTMLServicesHelp(TorcHTTPServer *Server)
   : QObject(),
     TorcHTTPService(this, "", "services", TorcHTMLServicesHelp::staticMetaObject, QString("HandlersChanged"))
 {
     connect(Server, SIGNAL(HandlersChanged()), this, SLOT(HandlersChanged()));
+
+    TorcSerialiserFactory *factory = TorcSerialiserFactory::GetTorcSerialiserFactory();
+    for ( int i = 0; factory; factory = factory->NextTorcSerialiserFactory(), i++)
+    {
+        QVariantMap item;
+        item.insert("name", factory->Description());
+        item.insert("type", factory->Accepts());
+        returnFormats.append(item);
+    }
 }
 
 TorcHTMLServicesHelp::~TorcHTMLServicesHelp()
@@ -100,40 +118,8 @@ void TorcHTMLServicesHelp::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTTP
         return;
     }
 
-    QByteArray *result = new QByteArray();
-    QTextStream stream(result);
-
-    QVariantMap services = TorcHTTPServer::GetServiceHandlers();
-
-    stream << "<html><head><title>" << QCoreApplication::applicationName() << "</title></head>";
-    stream << "<body><h1><a href='/'>" << QCoreApplication::applicationName();
-    stream << "<a> " << GetUIName() << "</a></h1>";
-
-    if (services.isEmpty())
-    {
-        stream << "<h3>" << tr("No services are registered") << "</h3>";
-    }
-    else
-    {
-        stream << "<h3>" << tr("Available services") << "</h3>";
-        QVariantMap::iterator it = services.begin();
-        for ( ; it != services.end(); ++it)
-        {
-            QVariantMap map = it.value().toMap();
-            stream << map.value("name").toString() << " <a href='" << map.value("path").toString() + "Help" << "'>" << map.value("path").toString() << "</a><br>";
-        }
-    }
-
-    stream << "<h3>" << tr("Supported return formats") << ":</h3>";
-    TorcSerialiserFactory *factory = TorcSerialiserFactory::GetTorcSerialiserFactory();
-    for ( ; factory; factory = factory->NextTorcSerialiserFactory())
-        stream << factory->Description() << " (" << factory->Accepts() << ")</br>";
-
-    stream << "</body></html>";
-    stream.flush();
-    Request->SetStatus(HTTP_OK);
-    Request->SetResponseType(HTTPResponseHTML);
-    Request->SetResponseContent(result);
+    Request->SetStatus(HTTP_NotFound);
+    Request->SetResponseType(HTTPResponseDefault);
 }
 
 void TorcHTMLServicesHelp::SubscriberDeleted(QObject *Subscriber)
@@ -164,6 +150,16 @@ QVariantMap TorcHTMLServicesHelp::GetDetails(void)
 QVariantMap TorcHTMLServicesHelp::GetServiceList(void)
 {
     return TorcHTTPServer::GetServiceHandlers();
+}
+
+QVariantList TorcHTMLServicesHelp::GetReturnFormats(void)
+{
+    return returnFormats;
+}
+
+QVariantList TorcHTMLServicesHelp::GetWebSocketProtocols(void)
+{
+    return TorcWebSocket::GetSupportedSubProtocols();
 }
 
 qint64 TorcHTMLServicesHelp::GetStartTime(void)
