@@ -338,7 +338,7 @@ TorcHTTPService::TorcHTTPService(QObject *Parent, const QString &Signature, cons
     QList<const QMetaObject*> metas;
     metas.append(&m_metaObject);
 
-    // recursively search for superclass meta objects. This picks up QMetProperty's in the base classes.
+    // recursively search for superclass meta objects. This picks up QMetaProperty's in the base classes.
     const QMetaObject* super = m_metaObject.superClass();
     while (super)
     {
