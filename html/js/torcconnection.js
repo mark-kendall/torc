@@ -30,6 +30,8 @@ var TorcConnection = function ($, torc, statusChanged) {
     subscriptions = {},
     defaultServiceList = { services: { path: torc.ServicesPath } },
     serviceList = defaultServiceList,
+    returnFormats = undefined,
+    websocketprotocols = undefined,
     that = this;
 
     this.call = function(serviceName, method, params, success, failure) {
@@ -64,6 +66,18 @@ var TorcConnection = function ($, torc, statusChanged) {
             subscription: new TorcSubscription(socket, serviceName, serviceList[serviceName].path, subscriptionChanged)
         };
     };
+
+    this.getServiceList = function () {
+        return serviceList;
+    }
+
+    this.getReturnFormats = function () {
+        return returnFormats;
+    }
+
+    this.getWebSocketProtocols = function () {
+        return websocketprotocols;
+    }
 
     function subscriptionChanged(name, version, methods, properties) {
         // is this a known service subscription
@@ -106,6 +120,8 @@ var TorcConnection = function ($, torc, statusChanged) {
         if (version !== undefined && typeof properties === 'object' && properties.hasOwnProperty('serviceList') &&
             properties.serviceList.hasOwnProperty('value')) {
             serviceListChanged('serviceList', properties.serviceList.value);
+            returnFormats = properties.returnFormats.value;
+            websocketprotocols = properties.webSocketProtocols.value;
             statusChanged(torc.SocketReady);
             return;
         }
