@@ -25,6 +25,7 @@ class TorcHTMLServicesHelp : public QObject, public TorcHTTPService
 
     Q_PROPERTY(QMap serviceList READ GetServiceList   NOTIFY ServiceListChanged)
     Q_PROPERTY(QVariantList returnFormats READ GetReturnFormats CONSTANT)
+    Q_PROPERTY(QVariantList webSocketProtocols READ GetWebSocketProtocols CONSTANT)
 
   public:
     TorcHTMLServicesHelp(TorcHTTPServer *Server);
@@ -51,6 +52,7 @@ class TorcHTMLServicesHelp : public QObject, public TorcHTTPService
   private:
     QVariantMap    serviceList;   // dummy
     QVariantList   returnFormats;
+    QVariantList   webSocketProtocols; // dummy
 };
 
 #endif // TORCHTMLSERVICESHELP_H
