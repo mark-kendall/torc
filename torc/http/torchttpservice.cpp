@@ -580,11 +580,6 @@ QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVarian
                     m_subscribers.append(Connection);
 
                     // notify success and provide appropriate details about properties, notifications, get'ers etc
-                    QVariantMap result;
-                    QVariantMap details;
-                    QVariantMap properties;
-                    QVariantMap methods;
-
                     QMap<int,int>::const_iterator it = m_properties.begin();
                     for ( ; it != m_properties.end(); ++it)
                     {
@@ -595,85 +590,10 @@ QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVarian
 
                         // clean up subscriptions if the subscriber is deleted
                         QObject::connect(Connection, SIGNAL(destroyed(QObject*)), m_parent, SLOT(SubscriberDeleted(QObject*)));
-
-                        // NB for some reason, QMetaProperty doesn't provide the QMetaMethod for the read and write
-                        // slots, so try to infer them (and check the result)
-                        QMetaProperty property = m_parent->metaObject()->property(it.value());
-                        QVariantMap description;
-                        QString name = QString::fromLatin1(property.name());
-
-                        description.insert("notification", QString::fromLatin1(m_parent->metaObject()->method(it.key()).name()));
-
-                        // a property is always readable
-                        QString read = QString("Get") + name.left(1).toUpper() + name.mid(1);
-
-                        if (m_parent->metaObject()->indexOfSlot(QMetaObject::normalizedSignature(QString(read + "()").toLatin1())) > -1)
-                            description.insert("read", read);
-                        else
-                            LOG(VB_GENERAL, LOG_ERR, QString("Failed to deduce 'read' slot for property '%1' in service '%2'").arg(name).arg(m_signature));
-
-                        // for writable properties, we need to infer the signature including the type
-                        if (property.isWritable())
-                        {
-                            QString write = QString("Set%1%2").arg(name.left(1).toUpper()).arg(name.mid(1));
-
-                            if (m_parent->metaObject()->indexOfSlot(QMetaObject::normalizedSignature(QString("%1(%2)").arg(write).arg(property.typeName()).toLatin1())) > -1)
-                                description.insert("write", write);
-                            else
-                                LOG(VB_GENERAL, LOG_ERR, QString("Failed to deduce 'write' slot for property '%1' in service '%2'").arg(name).arg(m_signature));
-                        }
-
-                        // and add the initial value
-                        description.insert("value", property.read(m_parent));
-
-                        properties.insert(name, description);
                     }
 
-                    QMap<QString,MethodParameters*>::const_iterator it2 = m_methods.begin();
-                    for ( ; it2 != m_methods.end(); ++it2)
-                    {
-                        QVariantMap map;
-                        QVariantList params;
-
-                        MethodParameters *parameters = it2.value();
-                        for (int i = 1; i < parameters->m_types.size(); ++i)
-                            params.append(parameters->m_names[i].data());
-                        map.insert("params", params);
-                        map.insert("returns", TorcJSONRPC::QMetaTypetoJavascriptType(parameters->m_types[0]));
-                        methods.insert(it2.key(), map);
-                    }
-
-                    // and implicit Subscribe/Unsubscribe/GetServiceVersion
-                    // NB these aren't implemented as public slots and property (for serviceVersion)
-                    // as TorcHTTPService is not a QObject. Not ideal as the full API is not
-                    // visible in the code.
-                    QVariantList params;
-                    QVariant returns("object");
-
-                    QVariantMap subscribe;
-                    subscribe.insert("params", params);
-                    subscribe.insert("returns", returns);
-                    methods.insert("Subscribe", subscribe);
-
-                    QVariantMap unsubscribe;
-                    unsubscribe.insert("params", params);
-                    unsubscribe.insert("returns", returns);
-                    methods.insert("Unsubscribe", unsubscribe);
-
-                    QVariantMap serviceversion;
-                    serviceversion.insert("params", params);
-                    serviceversion.insert("returns", TorcJSONRPC::QMetaTypetoJavascriptType(QMetaType::QString));
-                    methods.insert("GetServiceVersion", serviceversion);
-
-                    // and the implicit version property
-                    QVariantMap description;
-                    description.insert("read", "GetServiceVersion");
-                    description.insert("value", m_version);
-                    properties.insert("serviceVersion", description);
-
-                    details.insert("properties", properties);
-                    details.insert("methods", methods);
-                    result.insert("result", details);
+                    QVariantMap result;
+                    result.insert("result", GetServiceDetails());
                     return result;
                 }
                 else
@@ -733,6 +653,106 @@ QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVarian
     error.insert("message", "Method not found");
     result.insert("error", error);
     return result;
+}
+
+/*! \brief Return a QVariantMap describing the services methods and properties.
+ *
+ * This is sent to new subscribers immediately after a successful subscription
+ * to provide them with the full 'API' and current state.
+ *
+ * It is also used by the TorcHTMLServicesHelp object to retrieve a service description
+ * (as used by the API helper screen on the web frontend).
+ */
+QVariantMap TorcHTTPService::GetServiceDetails(void)
+{
+    // this method is not thread-safe and is called from multiple threads so lock the subscribers
+    QMutexLocker locker(m_subscriberLock);
+
+    QVariantMap details;
+    QVariantMap properties;
+    QVariantMap methods;
+
+    QMap<int,int>::const_iterator it = m_properties.begin();
+    for ( ; it != m_properties.end(); ++it)
+    {
+        // NB for some reason, QMetaProperty doesn't provide the QMetaMethod for the read and write
+        // slots, so try to infer them (and check the result)
+        QMetaProperty property = m_parent->metaObject()->property(it.value());
+        QVariantMap description;
+        QString name = QString::fromLatin1(property.name());
+
+        description.insert("notification", QString::fromLatin1(m_parent->metaObject()->method(it.key()).name()));
+
+        // a property is always readable
+        QString read = QString("Get") + name.left(1).toUpper() + name.mid(1);
+
+        if (m_parent->metaObject()->indexOfSlot(QMetaObject::normalizedSignature(QString(read + "()").toLatin1())) > -1)
+            description.insert("read", read);
+        else
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to deduce 'read' slot for property '%1' in service '%2'").arg(name).arg(m_signature));
+
+        // for writable properties, we need to infer the signature including the type
+        if (property.isWritable())
+        {
+            QString write = QString("Set%1%2").arg(name.left(1).toUpper()).arg(name.mid(1));
+
+            if (m_parent->metaObject()->indexOfSlot(QMetaObject::normalizedSignature(QString("%1(%2)").arg(write).arg(property.typeName()).toLatin1())) > -1)
+                description.insert("write", write);
+            else
+                LOG(VB_GENERAL, LOG_ERR, QString("Failed to deduce 'write' slot for property '%1' in service '%2'").arg(name).arg(m_signature));
+        }
+
+        // and add the initial value
+        description.insert("value", property.read(m_parent));
+
+        properties.insert(name, description);
+    }
+
+    QMap<QString,MethodParameters*>::const_iterator it2 = m_methods.begin();
+    for ( ; it2 != m_methods.end(); ++it2)
+    {
+        QVariantMap map;
+        QVariantList params;
+
+        MethodParameters *parameters = it2.value();
+        for (int i = 1; i < parameters->m_types.size(); ++i)
+            params.append(parameters->m_names[i].data());
+        map.insert("params", params);
+        map.insert("returns", TorcJSONRPC::QMetaTypetoJavascriptType(parameters->m_types[0]));
+        methods.insert(it2.key(), map);
+    }
+
+    // and implicit Subscribe/Unsubscribe/GetServiceVersion
+    // NB these aren't implemented as public slots and property (for serviceVersion)
+    // as TorcHTTPService is not a QObject. Not ideal as the full API is not
+    // visible in the code.
+    QVariantList params;
+    QVariant returns("object");
+
+    QVariantMap subscribe;
+    subscribe.insert("params", params);
+    subscribe.insert("returns", returns);
+    methods.insert("Subscribe", subscribe);
+
+    QVariantMap unsubscribe;
+    unsubscribe.insert("params", params);
+    unsubscribe.insert("returns", returns);
+    methods.insert("Unsubscribe", unsubscribe);
+
+    QVariantMap serviceversion;
+    serviceversion.insert("params", params);
+    serviceversion.insert("returns", TorcJSONRPC::QMetaTypetoJavascriptType(QMetaType::QString));
+    methods.insert("GetServiceVersion", serviceversion);
+
+    // and the implicit version property
+    QVariantMap description;
+    description.insert("read", "GetServiceVersion");
+    description.insert("value", m_version);
+    properties.insert("serviceVersion", description);
+
+    details.insert("properties", properties);
+    details.insert("methods", methods);
+    return details;
 }
 
 QString TorcHTTPService::GetMethod(int Index)

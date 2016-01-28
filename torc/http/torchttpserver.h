@@ -31,6 +31,7 @@ class TorcHTTPServer : public QTcpServer
     static void    HandleRequest      (TorcHTTPConnection *Connection, TorcHTTPRequest *Request);
     static QVariantMap HandleRequest  (const QString &Method, const QVariant &Parameters, QObject *Connection);
     static QVariantMap GetServiceHandlers (void);
+    static QVariantMap GetServiceDescription(const QString &Service);
 
     // WebSockets
     static void    UpgradeSocket      (TorcHTTPRequest *Request, QTcpSocket *Socket);

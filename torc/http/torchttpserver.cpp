@@ -502,6 +502,24 @@ QVariantMap TorcHTTPServer::GetServiceHandlers(void)
     return result;
 }
 
+QVariantMap TorcHTTPServer::GetServiceDescription(const QString &Service)
+{
+    QReadLocker locker(gHandlersLock);
+
+    QMap<QString,TorcHTTPHandler*>::const_iterator it = gHandlers.begin();
+    for ( ; it != gHandlers.end(); ++it)
+    {
+        if (it.value()->Name() == Service)
+        {
+            TorcHTTPService *service = dynamic_cast<TorcHTTPService*>(it.value());
+            if (service)
+                return service->GetServiceDetails();
+        }
+    }
+
+    return QVariantMap();
+}
+
 void TorcHTTPServer::UpgradeSocket(TorcHTTPRequest *Request, QTcpSocket *Socket)
 {
     QMutexLocker locker(gWebServerLock);

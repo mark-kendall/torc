@@ -41,6 +41,7 @@ class TorcHTMLServicesHelp : public QObject, public TorcHTTPService
     void           SubscriberDeleted    (QObject *Subscriber);
     QVariantMap    GetDetails           (void);
     QVariantMap    GetServiceList       (void);
+    QVariantMap    GetServiceDescription(const QString &Service);
     QVariantList   GetReturnFormats     (void);
     QVariantList   GetWebSocketProtocols (void);
     qint64         GetStartTime         (void);

@@ -152,6 +152,12 @@ QVariantMap TorcHTMLServicesHelp::GetServiceList(void)
     return TorcHTTPServer::GetServiceHandlers();
 }
 
+QVariantMap TorcHTMLServicesHelp::GetServiceDescription(const QString &Service)
+{
+    // the server has the services - and can lock the list
+    return TorcHTTPServer::GetServiceDescription(Service);
+}
+
 QVariantList TorcHTMLServicesHelp::GetReturnFormats(void)
 {
     return returnFormats;
