@@ -643,7 +643,10 @@ QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVarian
                         methods.insert(it2.key(), map);
                     }
 
-                    // and implicit Subscribe/Unsubscribe
+                    // and implicit Subscribe/Unsubscribe/GetServiceVersion
+                    // NB these aren't implemented as public slots and property (for serviceVersion)
+                    // as TorcHTTPService is not a QObject. Not ideal as the full API is not
+                    // visible in the code.
                     QVariantList params;
                     QVariant returns("object");
 
@@ -657,7 +660,17 @@ QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVarian
                     unsubscribe.insert("returns", returns);
                     methods.insert("Unsubscribe", unsubscribe);
 
-                    details.insert("version", m_version);
+                    QVariantMap serviceversion;
+                    serviceversion.insert("params", params);
+                    serviceversion.insert("returns", TorcJSONRPC::QMetaTypetoJavascriptType(QMetaType::QString));
+                    methods.insert("GetServiceVersion", serviceversion);
+
+                    // and the implicit version property
+                    QVariantMap description;
+                    description.insert("read", "GetServiceVersion");
+                    description.insert("value", m_version);
+                    properties.insert("serviceVersion", description);
+
                     details.insert("properties", properties);
                     details.insert("methods", methods);
                     result.insert("result", details);

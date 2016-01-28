@@ -41,13 +41,17 @@ var TorcSubscription = function (socket, serviceName, servicePath, subscribedCha
         }
     }
 
+    // return the known properties for this subscription. Use for API help.
+    this.getProperties = function () {
+        return properties;
+    }
+
     // callback to notify successful subscription
     function subscribed(data) {
         // pre-validate the subscription return for the subscriber
         if (typeof data === 'object' && data.hasOwnProperty('methods') &&
-            data.hasOwnProperty('version') && data.hasOwnProperty('properties') &&
-            typeof data.properties === 'object') {
-            version = data.version;
+            data.hasOwnProperty('properties') && typeof data.properties === 'object') {
+            version = data.properties.serviceVersion.value;
             methods = data.methods;
             properties = data.properties;
 
