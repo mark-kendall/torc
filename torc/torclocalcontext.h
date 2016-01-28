@@ -11,7 +11,7 @@
 #include "torcobservable.h"
 #include "torccommandline.h"
 
-#if HAVE_UNISTD_H
+#ifdef Q_OS_LINUX
 #include <unistd.h>
 #endif
 

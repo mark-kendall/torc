@@ -43,7 +43,7 @@
 // NB Do not call this twice on the same data
 static void convert_float(quint8 *p, quint8 s)
 {
-#if HAVE_BIGENDIAN && !defined (__VFP_FP__)
+#if Q_BYTE_ORDER == Q_BIG_ENDIAN && !defined (__VFP_FP__)
     return;
 #else
     for (quint8 i = 0; i < (s / 2); i++)
@@ -290,7 +290,7 @@ quint64 TorcPList::GetBinaryUInt(quint8 *Data, quint64 Size)
 
     if (Size == 3)
     {
-#if HAVE_BIGENDIAN
+#if Q_BYTE_ORDER == Q_BIG_ENDIAN
         return (quint64)(((*Data) << 16) + (*(Data + 1) << 8) + (*(Data + 2)));
 #else
         return (quint64)((*Data) + (*(Data + 1) << 8) + ((*(Data + 2)) << 16));

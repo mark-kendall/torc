@@ -233,7 +233,7 @@ quint64 TorcBinaryPListSerialiser::BinaryFromVariant(const QString &Name, const 
             START_OBJECT
             double value = Value.toDouble();
             m_content->append((quint8)0x23);
-#if HAVE_BIGENDIAN && !defined (__VFP_FP__)
+#if Q_BYTE_ORDER == Q_BIG_ENDIAN && !defined (__VFP_FP__)
             m_content->append(*((char*)&value));
             m_content->append(*((char*)&value + 1));
             m_content->append(*((char*)&value + 2));
@@ -268,7 +268,7 @@ quint64 TorcBinaryPListSerialiser::BinaryFromVariant(const QString &Name, const 
             START_OBJECT
             m_content->append(0x33);
             double value = (double)Value.toDateTime().toTime_t();
-#if HAVE_BIGENDIAN && !defined (__VFP_FP__)
+#if Q_BYTE_ORDER == Q_BIG_ENDIAN && !defined (__VFP_FP__)
             m_content->append(*((char*)&value));
             m_content->append(*((char*)&value + 1));
             m_content->append(*((char*)&value + 2));

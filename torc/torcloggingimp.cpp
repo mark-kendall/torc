@@ -27,11 +27,9 @@
 #include "torcloggingimp.h"
 
 // Various ways to get to thread's tid
-#if defined(linux)
-#include <sys/syscall.h>
-#if HAVE_UNISTD_H
+#ifdef Q_OS_LINUX
 #include <unistd.h>
-#endif
+#include <sys/syscall.h>
 #elif defined(__FreeBSD__)
 extern "C" {
 #include <sys/ucontext.h>
@@ -132,7 +130,7 @@ class LogItem
         {
             int64_t tid = 0;
 
-#if defined(linux)
+#ifdef Q_OS_LINUX
             tid = (int64_t)syscall(SYS_gettid);
 #elif defined(__FreeBSD__)
             long lwpid;
