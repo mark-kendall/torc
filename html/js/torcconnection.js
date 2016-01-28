@@ -69,15 +69,31 @@ var TorcConnection = function ($, torc, statusChanged) {
 
     this.getServiceList = function () {
         return serviceList;
-    }
+    };
 
     this.getReturnFormats = function () {
         return returnFormats;
-    }
+    };
 
     this.getWebSocketProtocols = function () {
         return websocketprotocols;
-    }
+    };
+
+    this.getServiceMethods = function (service) {
+        if (subscriptions.hasOwnProperty(service) && typeof subscriptions[service] === 'object') {
+            if (subscriptions[service].hasOwnProperty('methods') && typeof subscriptions[service].methods === 'object') {
+                return subscriptions[service].methods; } }
+        return undefined;
+    };
+
+    // N.B. this.properties is the list of properties the subcsciber is interested in.
+    // the subscription has the complete list
+    this.getServiceProperties = function (service) {
+        if (subscriptions.hasOwnProperty(service) && typeof subscriptions[service] === 'object') {
+            return subscriptions[service].subscription.getProperties();
+        }
+        return undefined;
+    };
 
     function subscriptionChanged(name, version, methods, properties) {
         // is this a known service subscription
