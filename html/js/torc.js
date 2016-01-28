@@ -1,5 +1,5 @@
 /*jslint browser,devel,white */
-/*global window,$,bootbox,torc,TorcConnection,TorcStateGraph,template */
+/*global window,$,bootbox,torc,TorcConnection,TorcStateGraph,TorcAPI, template */
 
 // declare theme to keep JSLint happy and aid syntax highlighter
 var theme;
@@ -10,6 +10,7 @@ $(document).ready(function() {
     var language       = undefined;
     var torcconnection = undefined;
     var torcstategraph = new TorcStateGraph($, torc);
+    var torcapi        = new TorcAPI($, torc);
 
     function qsTranslate(context, string, disambiguation, plural, callback) {
         if (disambiguation === undefined) { disambiguation = ''; }
@@ -215,6 +216,8 @@ $(document).ready(function() {
             addFileModal('config', torc.ViewConfigTitleTr, torc.ViewConfigTr, '/content/torc.xml', 'xml');
             addFileModal('xsd',    torc.ViewXSDTitleTr,    torc.ViewXSDTr,    '/torc.xsd', 'xml');
             addFileModal('dot',    torc.ViewDOTTitleTr,    torc.ViewDOTTr,    '/content/stategraph.dot', 'text');
+
+            torcapi.setup(torcconnection);
             return;
         }
 
@@ -231,6 +234,9 @@ $(document).ready(function() {
             $("#dottorcmodal").remove();
             // remove state graph
             torcstategraph.cleanup();
+            torcapi.cleanup();
+            // NB this should remove the backdrop for all modals...
+            $('.modal-backdrop').remove();
         } else if (status === torc.SocketConnecting) {
             $(".torc-socket-status-icon").removeClass("fa-check fa-check-circle-o fa-exclamation-circle").addClass("fa-question-circle");
             $(".torc-socket-status-text a").html(torc.SocketConnecting);

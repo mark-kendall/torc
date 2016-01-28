@@ -366,6 +366,8 @@ class TorcCentralObject : public TorcAdminObject, public TorcStringFactory
         Strings.insert("ViewDOTTitleTr",     QCoreApplication::translate("TorcCentral", "Stategraph Description"));
         Strings.insert("ViewXSDTr",          QCoreApplication::translate("TorcCentral", "View XSD"));
         Strings.insert("ViewXSDTitleTr",     QCoreApplication::translate("TorcCentral", "Configuration schema"));
+        Strings.insert("ViewAPITr",          QCoreApplication::translate("TorcCentral", "View API"));
+        Strings.insert("ViewAPITitleTr",     QCoreApplication::translate("TorcCentral", "API reference"));
     }
 
     void Create(void)
