@@ -238,7 +238,7 @@ bool TorcTransitionControl::Validate(void)
     return true;
 }
 
-/*! \fn CalculateOutput
+/*! \brief Calculate the current output value.
  *
  * This function is called when the input is valid and the input validity and/or the value
  * have just changed. We need to decide whether it is a rising or falling transition and
@@ -322,10 +322,7 @@ void TorcTransitionControl::CalculateOutput(void)
         m_animation->setCurrentTime(timesincelasttransition * 1000);
 }
 
-/*! \fn SetAnimationValue
- *
- * Our main output, value, is read only. So the animation operates on a proxy, animationValue.
-*/
+/// Our main output, value, is read only. So the animation operates on a proxy, animationValue.
 void TorcTransitionControl::SetAnimationValue(double Value)
 {
     QMutexLocker locker(lock);
