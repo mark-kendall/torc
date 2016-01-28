@@ -47,6 +47,7 @@ class TorcControl : public TorcDevice, public TorcHTTPService
     virtual bool           AllowInputs            (void);
     bool                   IsKnownInput           (const QString &Input);
     bool                   IsKnownOutput          (const QString &Output);
+    QString                GetUIName              (void);
 
   public slots:
     // TorcHTTPService

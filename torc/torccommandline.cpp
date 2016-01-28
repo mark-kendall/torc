@@ -383,6 +383,8 @@ void TorcCommandLine::Add(const QString Keys, const QVariant &Default, const QSt
 
 /*! \brief Evaluate the command line options.
  *
+ * \param argc As passed to the main application at startup.
+ * \param argv As passed to the main application at startup.
  * \param Exit Will be set to true if the application should exit after command line processing.
 */
 int TorcCommandLine::Evaluate(int argc, const char * const *argv, bool &Exit)

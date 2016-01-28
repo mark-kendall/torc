@@ -15,8 +15,8 @@ class TorcOutputs : public QObject, public TorcHTTPService
     Q_OBJECT
     Q_CLASSINFO("Version",        "1.0.0")
     Q_CLASSINFO("GetOutputList",  "type=outputs")
-    Q_PROPERTY(QVariantMap outputList  READ GetOutputList() NOTIFY OutputsChanged())
-    Q_PROPERTY(QStringList outputTypes READ GetOutputTypes() CONSTANT)
+    Q_PROPERTY(QVariantMap outputList  READ GetOutputList() NOTIFY OutputsChanged());
+    Q_PROPERTY(QStringList outputTypes READ GetOutputTypes() CONSTANT);
 
   public:
     static TorcOutputs* gOutputs;

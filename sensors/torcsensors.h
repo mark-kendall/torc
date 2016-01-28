@@ -15,8 +15,8 @@ class TorcSensors : public QObject, public TorcHTTPService
     Q_OBJECT
     Q_CLASSINFO("Version",        "1.0.0")
     Q_CLASSINFO("GetSensorList",  "type=sensors")
-    Q_PROPERTY(QVariantMap sensorList   READ GetSensorList() NOTIFY SensorsChanged())
-    Q_PROPERTY(QStringList sensorTypes  READ GetSensorTypes() CONSTANT)
+    Q_PROPERTY(QVariantMap sensorList   READ GetSensorList() NOTIFY SensorsChanged());
+    Q_PROPERTY(QStringList sensorTypes  READ GetSensorTypes() CONSTANT);
 
   public:
     static TorcSensors* gSensors;

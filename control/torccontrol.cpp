@@ -202,8 +202,6 @@ TorcControl::~TorcControl()
 {
 }
 
-/*! \fn Validate
-*/
 bool TorcControl::Validate(void)
 {
     QMutexLocker locker(lock);
@@ -297,6 +295,14 @@ bool TorcControl::AllowInputs(void)
     return true;
 }
 
+QString TorcControl::GetUIName(void)
+{
+    QMutexLocker locker(lock);
+    if (userName.isEmpty())
+        return uniqueId;
+    return userName;
+}
+
 bool TorcControl::IsKnownInput(const QString &Input)
 {
     if (Input.isEmpty() || !AllowInputs())
@@ -313,8 +319,7 @@ bool TorcControl::IsKnownOutput(const QString &Output)
     return m_outputList.contains(Output);
 }
 
-/*! \fn Graph
-* \brief Add this control to the state graph
+/*! \brief Add this control to the state graph
 *
 * \note If a Logic control has one single sensor input (NOT another control), one or more outputs (NOT controls) and
 *       the operation is a straight pass through (TorcLogicControl::NoOperation), then we do not present the control in the stategraph.
@@ -382,8 +387,7 @@ void TorcControl::Graph(QByteArray* Data)
     }
 }
 
-/*! \fn Finish
- * \brief Finish setup of the control
+/*! \brief Finish setup of the control
  *
  * Finish is only called once all other parsing and validation is complete.
  * The control is connected to its input(s) and output(s) and the device marked as validated.

@@ -28,14 +28,14 @@ class TorcSetting : public QObject, public TorcReferenceCounter
                 Type SettingType, bool Persistent, const QVariant &Default);
 
   public:
-    Q_PROPERTY (QVariant m_value       READ GetValue()       NOTIFY ValueChanged()       )
-    Q_PROPERTY (QString  m_uiName      READ GetName()        CONSTANT                    )
-    Q_PROPERTY (QString  m_description READ GetDescription() CONSTANT                    )
-    Q_PROPERTY (QString  m_helpText    READ GetHelpText()    CONSTANT                    )
-    Q_PROPERTY (QVariant m_default     READ GetDefault()     CONSTANT                    )
-    Q_PROPERTY (bool     m_persistent  READ GetPersistent()  CONSTANT                    )
-    Q_PROPERTY (int      m_isActive    READ IsActive()       NOTIFY ActiveChanged()      )
-    Q_PROPERTY (Type     m_type        READ GetSettingType   CONSTANT                    )
+    Q_PROPERTY (QVariant m_value       READ GetValue()       NOTIFY ValueChanged()       );
+    Q_PROPERTY (QString  m_uiName      READ GetName()        CONSTANT                    );
+    Q_PROPERTY (QString  m_description READ GetDescription() CONSTANT                    );
+    Q_PROPERTY (QString  m_helpText    READ GetHelpText()    CONSTANT                    );
+    Q_PROPERTY (QVariant m_default     READ GetDefault()     CONSTANT                    );
+    Q_PROPERTY (bool     m_persistent  READ GetPersistent()  CONSTANT                    );
+    Q_PROPERTY (int      m_isActive    READ IsActive()       NOTIFY ActiveChanged()      );
+    Q_PROPERTY (Type     m_type        READ GetSettingType   CONSTANT                    );
 
   public:
     QVariant::Type         GetStorageType       (void);

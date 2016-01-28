@@ -104,6 +104,14 @@ void TorcSensor::Start(void)
     emit ValidChanged(valid);
 }
 
+QString TorcSensor::GetUIName(void)
+{
+    QMutexLocker locker(lock);
+    if (userName.isEmpty())
+        return uniqueId;
+    return userName;
+}
+
 void TorcSensor::SubscriberDeleted(QObject *Subscriber)
 {
     TorcHTTPService::HandleSubscriberDeleted(Subscriber);

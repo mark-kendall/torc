@@ -62,6 +62,14 @@ bool TorcOutput::HasOwner(void)
     return m_owner != NULL;
 }
 
+QString TorcOutput::GetUIName(void)
+{
+    QMutexLocker locker(lock);
+    if (userName.isEmpty())
+        return uniqueId;
+    return userName;
+}
+
 bool TorcOutput::SetOwner(QObject *Owner)
 {
     QMutexLocker locker(lock);

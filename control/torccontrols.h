@@ -12,8 +12,8 @@ class TorcControls : public QObject, public TorcHTTPService, public TorcDeviceHa
     Q_OBJECT
     Q_CLASSINFO("Version",        "1.0.0")
     Q_CLASSINFO("GetControlList", "type=controls")
-    Q_PROPERTY(QVariantMap controlList  READ GetControlList() NOTIFY ControlsChanged())
-    Q_PROPERTY(QStringList controlTypes READ GetControlTypes() CONSTANT)
+    Q_PROPERTY(QVariantMap controlList  READ GetControlList() NOTIFY ControlsChanged());
+    Q_PROPERTY(QStringList controlTypes READ GetControlTypes() CONSTANT);
 
   public:
     TorcControls();

@@ -16,15 +16,15 @@ class TorcSensor : public TorcDevice, public TorcHTTPService
     Q_OBJECT
     Q_ENUMS(Type)
     Q_CLASSINFO("Version", "1.0.0")
-    Q_PROPERTY(double   valueScaled             READ GetValueScaled()             NOTIFY   ValueScaledChanged())
-    Q_PROPERTY(double   operatingRangeMin       READ GetOperatingRangeMin()       CONSTANT)
-    Q_PROPERTY(double   operatingRangeMax       READ GetOperatingRangeMax()       CONSTANT)
-    Q_PROPERTY(double   operatingRangeMinScaled READ GetOperatingRangeMinScaled() NOTIFY   OperatingRangeMinScaledChanged())
-    Q_PROPERTY(double   operatingRangeMaxScaled READ GetOperatingRangeMaxScaled() NOTIFY   OperatingRangeMaxScaledChanged())
-    Q_PROPERTY(bool     outOfRangeLow           READ GetOutOfRangeLow()           NOTIFY   OutOfRangeLowChanged())
-    Q_PROPERTY(bool     outOfRangeHigh          READ GetOutOfRangeHigh()          NOTIFY   OutOfRangeHighChanged())
-    Q_PROPERTY(QString  shortUnits              READ GetShortUnits()              NOTIFY   ShortUnitsChanged())
-    Q_PROPERTY(QString  longUnits               READ GetLongUnits()               NOTIFY   LongUnitsChanged())
+    Q_PROPERTY(double   valueScaled             READ GetValueScaled()             NOTIFY   ValueScaledChanged());
+    Q_PROPERTY(double   operatingRangeMin       READ GetOperatingRangeMin()       CONSTANT);
+    Q_PROPERTY(double   operatingRangeMax       READ GetOperatingRangeMax()       CONSTANT);
+    Q_PROPERTY(double   operatingRangeMinScaled READ GetOperatingRangeMinScaled() NOTIFY   OperatingRangeMinScaledChanged());
+    Q_PROPERTY(double   operatingRangeMaxScaled READ GetOperatingRangeMaxScaled() NOTIFY   OperatingRangeMaxScaledChanged());
+    Q_PROPERTY(bool     outOfRangeLow           READ GetOutOfRangeLow()           NOTIFY   OutOfRangeLowChanged());
+    Q_PROPERTY(bool     outOfRangeHigh          READ GetOutOfRangeHigh()          NOTIFY   OutOfRangeHighChanged());
+    Q_PROPERTY(QString  shortUnits              READ GetShortUnits()              NOTIFY   ShortUnitsChanged());
+    Q_PROPERTY(QString  longUnits               READ GetLongUnits()               NOTIFY   LongUnitsChanged());
 
   public:
     enum Type
@@ -49,6 +49,7 @@ class TorcSensor : public TorcDevice, public TorcHTTPService
 
     virtual TorcSensor::Type GetType           (void) = 0;
     virtual void             Start             (void);
+    QString                  GetUIName         (void);
 
   protected:
     virtual ~TorcSensor();
