@@ -21,18 +21,18 @@
 */
 
 /*jslint browser,devel,white,this */
-/*global TorcSubscription,TorcWebsocket */
+/*global window,TorcSubscription,TorcWebsocket */
 
 var TorcConnection = function ($, torc, statusChanged) {
     "use strict";
 
-    var socket,
-    subscriptions = {},
-    defaultServiceList = { services: { path: torc.ServicesPath } },
-    serviceList = defaultServiceList,
-    returnFormats = undefined,
-    websocketprotocols = undefined,
-    that = this;
+    var socket = undefined;
+    var subscriptions = {};
+    var defaultServiceList = { services: { path: torc.ServicesPath } };
+    var serviceList = defaultServiceList;
+    var returnFormats = undefined;
+    var websocketprotocols = undefined;
+    var that = this;
 
     this.call = function(serviceName, method, params, success, failure) {
         if (socket !== undefined && subscriptions[serviceName] && subscriptions[serviceName].methods[method]) {
@@ -164,7 +164,7 @@ var TorcConnection = function ($, torc, statusChanged) {
         // clear state and schedule reconnect
         socket = undefined;
         serviceList = defaultServiceList;
-        setTimeout(connect, torc.SocketReconnectAfterMs);
+        window.setTimeout(connect, torc.SocketReconnectAfterMs);
     }
 
     function socketStatusChanged (status) {
