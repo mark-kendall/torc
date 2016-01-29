@@ -13,6 +13,9 @@ class TorcHTMLStaticContent : public TorcHTTPHandler
 
   protected:
     void GetJavascriptConfiguration  (TorcHTTPRequest *Request, TorcHTTPConnection* Connection);
+
+  private:
+    QString m_pathToContent;
 };
 
 #endif // TORCHTMLSTATICCONTENT_H

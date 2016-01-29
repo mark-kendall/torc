@@ -2,7 +2,7 @@
 *
 * This file is part of the Torc project.
 *
-* Copyright (C) Mark Kendall 2013
+* Copyright (C) Mark Kendall 2013-16
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -39,8 +39,14 @@
 */
 
 TorcHTMLStaticContent::TorcHTMLStaticContent()
-  : TorcHTTPHandler(STATIC_DIRECTORY, "static")
+  : TorcHTTPHandler(STATIC_DIRECTORY, "static"),
+    m_pathToContent("")
 {
+    m_pathToContent = GetTorcShareDir();
+    if (m_pathToContent.endsWith("/"))
+        m_pathToContent.chop(1);
+    m_pathToContent += "/html";
+
     m_recursive = true;
 }
 
@@ -64,7 +70,7 @@ void TorcHTMLStaticContent::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTT
     // request for Torc configuration. This is used to add some appropriate Javascript globals
     // and translated strings
 
-    if (subpath == STATIC_DIRECTORY + "js/torcconfiguration.js")
+    if (subpath == "/js/torcconfiguration.js")
     {
         GetJavascriptConfiguration(Request, Connection);
         Request->SetAllowGZip(true);
@@ -72,10 +78,7 @@ void TorcHTMLStaticContent::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTT
     }
 
     // get the local path to static content
-    QString path = GetTorcShareDir();
-    if (path.endsWith("/"))
-        path.chop(1);
-    path += subpath;
+    QString path = m_pathToContent + subpath;
 
     // file
     QFile *file = new QFile(path);

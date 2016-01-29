@@ -18,6 +18,10 @@ class TorcHTMLHandler : public TorcHTTPHandler
   public:
     TorcHTMLHandler(const QString &Path, const QString &Name);
     virtual void ProcessHTTPRequest (TorcHTTPRequest *Request, TorcHTTPConnection*);
+
+  private:
+    QString     m_pathToContent;
+    QStringList m_allowedFiles;
 };
 
 #endif // TORCHTMLHANDLER_H

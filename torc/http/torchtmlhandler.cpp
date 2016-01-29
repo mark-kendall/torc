@@ -2,7 +2,7 @@
 *
 * This file is part of the Torc project.
 *
-* Copyright (C) Mark Kendall 2012-13
+* Copyright (C) Mark Kendall 2012-16
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -21,9 +21,13 @@
 */
 
 // Qt
+#include <QFile>
 #include <QObject>
+#include <QFileInfo>
 
 // Torc
+#include "torclogging.h"
+#include "torcdirectories.h"
 #include "torchttpserver.h"
 #include "torchttprequest.h"
 #include "torchttpservice.h"
@@ -42,6 +46,12 @@
 TorcHTMLHandler::TorcHTMLHandler(const QString &Path, const QString &Name)
   : TorcHTTPHandler(Path, Name)
 {
+    m_pathToContent = GetTorcShareDir();
+    if (m_pathToContent.endsWith("/"))
+        m_pathToContent.chop(1);
+    m_pathToContent += "/html";
+
+    m_allowedFiles << "/" << "/index.html" << "/torc.xsd" << "/browserconfig.xml" << "/manifest.json";
 }
 
 void TorcHTMLHandler::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTTPConnection*)
@@ -64,19 +74,49 @@ void TorcHTMLHandler::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTTPConne
         return;
     }
 
-    QByteArray *result = new QByteArray();
-    QTextStream stream(result);
+    // allowed file?
+    QString url = Request->GetUrl();
+    if (m_allowedFiles.contains(url))
+    {
+        if (url == "/")
+            url = "/index.html";
 
-    stream << "<html><head><title>" << QCoreApplication::applicationName() << "</title></head>";
-    stream << "<body><h1>" << QCoreApplication::applicationName() << "</h1>";
-    stream << "<p><a href='" << SERVICES_DIRECTORY << "'>" << tr("Services") << "</a>";
-    stream << "<p><a href='" << STATIC_DIRECTORY << "index.html'>" << tr("Interface") << "</a>";
-    stream << "<p><a href='" << DYNAMIC_DIRECTORY << "stategraph.svg'>" << tr("State graph") << "</a>";
-    stream << "<p><a href='" << DYNAMIC_DIRECTORY << "torc.xml'>" << tr("Current config") << "</a>";
-    stream << "</body></html>";
+        url = m_pathToContent + url;
 
-    Request->SetResponseContent(result);
-    Request->SetResponseType(HTTPResponseHTML);
-    Request->SetAllowGZip(true);
-    Request->SetStatus(HTTP_OK);
+        // file
+        QFile *file = new QFile(url);
+
+        // sanity checks
+        if (file->exists())
+        {
+            if ((file->permissions() & QFile::ReadOther))
+            {
+                if (file->size() > 0)
+                {
+                    QDateTime modified = QFileInfo(*file).lastModified();
+
+                    // set cache handling before we check for modification. This ensures the modification check is
+                    // performed and the correct cache headers are re-sent with any 304 Not Modified response.
+                    Request->SetCache(HTTPCacheNone, modified.toString(TorcHTTPRequest::DateFormat));
+
+                    // Unmodified will handle the response
+                    if (Request->Unmodified(modified))
+                    {
+                        delete file;
+                        return;
+                    }
+
+                    Request->SetResponseFile(file);
+                    Request->SetStatus(HTTP_OK);
+                    Request->SetAllowGZip(true);
+                    return;
+                }
+            }
+        }
+
+        delete file;
+    }
+
+    Request->SetResponseType(HTTPResponseNone);
+    Request->SetStatus(HTTP_NotFound);
 }

@@ -9,7 +9,7 @@ class TorcHTTPServer;
 class TorcHTTPConnection;
 class TorcHTTPRequest;
 
-#define STATIC_DIRECTORY QString("/html/")
+#define STATIC_DIRECTORY QString("/css,/img,/fonts,/js")
 #define DYNAMIC_DIRECTORY QString("/content/")
 
 class TorcHTTPHandler
