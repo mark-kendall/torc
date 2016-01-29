@@ -369,16 +369,18 @@ void TorcHTTPServer::RegisterHandler(TorcHTTPHandler *Handler)
     {
         QWriteLocker locker(gHandlersLock);
 
-        QString signature = Handler->Signature();
-        if (gHandlers.contains(signature))
+        foreach (QString signature, Handler->Signature().split(","))
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Handler '%1' for '%2' already registered - ignoring").arg(Handler->Name()).arg(signature));
-        }
-        else if (!signature.isEmpty())
-        {
-            LOG(VB_GENERAL, LOG_DEBUG, QString("Added handler '%1' for %2").arg(Handler->Name()).arg(signature));
-            gHandlers.insert(signature, Handler);
-            changed = true;
+            if (gHandlers.contains(signature))
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("Handler '%1' for '%2' already registered - ignoring").arg(Handler->Name()).arg(signature));
+            }
+            else if (!signature.isEmpty())
+            {
+                LOG(VB_GENERAL, LOG_DEBUG, QString("Added handler '%1' for %2").arg(Handler->Name()).arg(signature));
+                gHandlers.insert(signature, Handler);
+                changed = true;
+            }
         }
     }
 
@@ -396,11 +398,14 @@ void TorcHTTPServer::DeregisterHandler(TorcHTTPHandler *Handler)
     {
         QWriteLocker locker(gHandlersLock);
 
-        QMap<QString,TorcHTTPHandler*>::iterator it = gHandlers.find(Handler->Signature());
-        if (it != gHandlers.end())
+        foreach (QString signature, Handler->Signature().split(","))
         {
-            gHandlers.erase(it);
-            changed = true;
+            QMap<QString,TorcHTTPHandler*>::iterator it = gHandlers.find(signature);
+            if (it != gHandlers.end())
+            {
+                gHandlers.erase(it);
+                changed = true;
+            }
         }
     }
 
@@ -622,14 +627,14 @@ TorcHTTPServer::TorcHTTPServer()
     m_defaultHandler = new TorcHTMLHandler("", QCoreApplication::applicationName());
     RegisterHandler(m_defaultHandler);
 
-    // services 'helper' service
+    // services 'helper' service for '/services'
     m_servicesHandler = new TorcHTTPServices(this);
 
-    // static files
+    // static files - for /css /fonts /js /img etc
     m_staticContent = new TorcHTMLStaticContent();
     RegisterHandler(m_staticContent);
 
-    // dynamic files (typically served from ~/.torc/content)
+    // dynamic files - for config files etc (typically served from ~/.torc/content)
     m_dynamicContent = new TorcHTMLDynamicContent();
     RegisterHandler(m_dynamicContent);
 
