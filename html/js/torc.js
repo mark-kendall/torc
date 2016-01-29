@@ -51,7 +51,7 @@ $(document).ready(function() {
                             function(result) { $(".torc-peer-status a").html(result); });
                 addDropdownMenuDivider('torc-peer-menu', 'torc-peer');
                 value.forEach( function (element, index) {
-                    addDropdownMenuItem('torc-peer-menu', 'torc-peer torc-peer' + index, 'http://' + element.address + ':' + element.port + '/html/index.html', '');
+                    addDropdownMenuItem('torc-peer-menu', 'torc-peer torc-peer' + index, 'http://' + element.address + ':' + element.port + '/index.html', '');
                     qsTranslate('TorcNetworkedContext', 'Connect to %1', '', 0,
                                 function(result) { $(".torc-peer" + index + " a").html(template(theme.DropdownItemWithIcon, { "icon": "external-link-square", "text": result.replace("%1", element.name) })); });
                 });
