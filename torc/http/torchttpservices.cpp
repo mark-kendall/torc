@@ -109,10 +109,7 @@ void TorcHTTPServices::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTTPConn
     // handle options request
     if (Request->GetHTTPRequestType() == HTTPOptions)
     {
-        Request->SetAllowed(HTTPHead | HTTPGet | HTTPOptions);
-        Request->SetStatus(HTTP_OK);
-        Request->SetResponseType(HTTPResponseDefault);
-        Request->SetResponseContent(NULL);
+        HandleOptions(Request, HTTPHead | HTTPGet | HTTPOptions);
         return;
     }
 

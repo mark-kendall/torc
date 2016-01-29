@@ -64,13 +64,9 @@ void TorcHTMLHandler::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTTPConne
     {
         // this is the 'global' options - return everything possible
         if (Request->GetUrl() == "/*")
-            Request->SetAllowed(HTTPHead | HTTPGet | HTTPPost | HTTPPut | HTTPDelete | HTTPOptions);
+            HandleOptions(Request, HTTPHead | HTTPGet | HTTPPost | HTTPPut | HTTPDelete | HTTPOptions);
         else
-            Request->SetAllowed(HTTPHead | HTTPGet | HTTPOptions);
-
-        Request->SetStatus(HTTP_OK);
-        Request->SetResponseType(HTTPResponseNone);
-        Request->SetResponseContent(NULL);
+            HandleOptions(Request, HTTPHead | HTTPGet | HTTPOptions);
         return;
     }
 

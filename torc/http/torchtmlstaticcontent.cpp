@@ -58,9 +58,7 @@ void TorcHTMLStaticContent::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTT
     // handle options request
     if (Request->GetHTTPRequestType() == HTTPOptions)
     {
-        Request->SetAllowed(HTTPHead | HTTPGet | HTTPOptions);
-        Request->SetStatus(HTTP_OK);
-        Request->SetResponseType(HTTPResponseNone);
+        HandleOptions(Request, HTTPHead | HTTPGet | HTTPOptions);
         return;
     }
 

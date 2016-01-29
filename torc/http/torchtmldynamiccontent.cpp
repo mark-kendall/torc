@@ -62,9 +62,7 @@ void TorcHTMLDynamicContent::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHT
     // handle options request
     if (Request->GetHTTPRequestType() == HTTPOptions)
     {
-        Request->SetAllowed(HTTPHead | HTTPGet | HTTPOptions);
-        Request->SetStatus(HTTP_OK);
-        Request->SetResponseType(HTTPResponseNone);
+        HandleOptions(Request, HTTPHead | HTTPGet | HTTPOptions);
         return;
     }
 

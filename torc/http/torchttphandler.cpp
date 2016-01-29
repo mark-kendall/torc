@@ -74,3 +74,11 @@ QVariantMap TorcHTTPHandler::ProcessRequest(const QString &Method, const QVarian
 
     return QVariantMap();
 }
+
+void TorcHTTPHandler::HandleOptions(TorcHTTPRequest *Request, int Allowed)
+{
+    Request->SetAllowed(Allowed);
+    Request->SetStatus(HTTP_OK);
+    Request->SetResponseType(HTTPResponseNone);
+    Request->SetResponseContent(NULL);
+}

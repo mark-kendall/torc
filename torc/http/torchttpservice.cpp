@@ -436,9 +436,7 @@ void TorcHTTPService::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTTPConne
         // handle OPTIONS
         if (type == HTTPOptions)
         {
-            Request->SetStatus(HTTP_OK);
-            Request->SetResponseType(HTTPResponseDefault);
-            Request->SetAllowed((*it)->m_allowedRequestTypes);
+            HandleOptions(Request, (*it)->m_allowedRequestTypes);
             return;
         }
 

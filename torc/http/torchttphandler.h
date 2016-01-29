@@ -5,9 +5,11 @@
 #include <QString>
 #include <QVariantMap>
 
+// Torc
+#include "torchttprequest.h"
+
 class TorcHTTPServer;
 class TorcHTTPConnection;
-class TorcHTTPRequest;
 
 #define STATIC_DIRECTORY QString("/css,/img,/fonts,/js")
 #define DYNAMIC_DIRECTORY QString("/content/")
@@ -23,6 +25,9 @@ class TorcHTTPHandler
     QString             Name               (void);
     virtual void        ProcessHTTPRequest (TorcHTTPRequest *Request, TorcHTTPConnection *Connection) = 0;
     virtual QVariantMap ProcessRequest     (const QString &Method, const QVariant &Parameters, QObject *Connection);
+
+  protected:
+    void                HandleOptions      (TorcHTTPRequest *Request, int Allowed);
 
   protected:
     QString             m_signature;
