@@ -592,7 +592,7 @@ TorcHTTPServer::TorcHTTPServer()
     m_port(NULL),
     m_requiresAuthentication(true),
     m_defaultHandler(NULL),
-    m_servicesHelpHandler(NULL),
+    m_servicesHandler(NULL),
     m_staticContent(NULL),
     m_dynamicContent(NULL),
     m_abort(0),
@@ -622,8 +622,8 @@ TorcHTTPServer::TorcHTTPServer()
     m_defaultHandler = new TorcHTMLHandler("", QCoreApplication::applicationName());
     RegisterHandler(m_defaultHandler);
 
-    // services help
-    m_servicesHelpHandler = new TorcHTMLServicesHelp(this);
+    // services 'helper' service
+    m_servicesHandler = new TorcHTTPServices(this);
 
     // static files
     m_staticContent = new TorcHTMLStaticContent();
@@ -650,7 +650,7 @@ TorcHTTPServer::~TorcHTTPServer()
     gLocalContext->RemoveObserver(this);
 
     delete m_defaultHandler;
-    delete m_servicesHelpHandler;
+    delete m_servicesHandler;
     delete m_staticContent;
     delete m_dynamicContent;
 
@@ -917,11 +917,11 @@ bool TorcHTTPServer::Open(void)
     if (!m_httpBonjourReference || !m_torcBonjourReference)
     {
         // add the 'root' apiversion, as would be returned by '/services/GetServiceVersion'
-        int index = TorcHTMLServicesHelp::staticMetaObject.indexOfClassInfo("Version");
+        int index = TorcHTTPServices::staticMetaObject.indexOfClassInfo("Version");
 
         QMap<QByteArray,QByteArray> map;
         map.insert("uuid", gLocalContext->GetUuid().toLatin1());
-        map.insert("apiversion", (index > -1) ? TorcHTMLServicesHelp::staticMetaObject.classInfo(index).value() : "unknown");
+        map.insert("apiversion", (index > -1) ? TorcHTTPServices::staticMetaObject.classInfo(index).value() : "unknown");
         map.insert("priority",   QByteArray::number(gLocalContext->GetPriority()));
         map.insert("starttime",  QByteArray::number(gLocalContext->GetStartTime()));
 

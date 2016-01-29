@@ -10,7 +10,7 @@
 // Torc
 #include "torcsetting.h"
 #include "torchtmlhandler.h"
-#include "torchtmlserviceshelp.h"
+#include "torchttpservices.h"
 #include "torchtmlstaticcontent.h"
 #include "torchtmldynamiccontent.h"
 #include "torcwebsocket.h"
@@ -76,7 +76,7 @@ class TorcHTTPServer : public QTcpServer
     TorcSetting                      *m_port;
     bool                              m_requiresAuthentication;
     TorcHTMLHandler                  *m_defaultHandler;
-    TorcHTMLServicesHelp             *m_servicesHelpHandler;
+    TorcHTTPServices                 *m_servicesHandler;
     TorcHTMLStaticContent            *m_staticContent;
     TorcHTMLDynamicContent           *m_dynamicContent;
 

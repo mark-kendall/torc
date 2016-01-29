@@ -1,8 +1,8 @@
-/* Class TorcHTMLServicesHelp
+/* Class TorcHTTPServices
 *
 * This file is part of the Torc project.
 *
-* Copyright (C) Mark Kendall 2013
+* Copyright (C) Mark Kendall 2015-16
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -33,20 +33,18 @@
 #include "torchttprequest.h"
 #include "torchttpservice.h"
 #include "torchttpconnection.h"
-#include "torchtmlserviceshelp.h"
+#include "torchttpservices.h"
 
-/*! \class TorcHTMLServicesHelp
+/*! \class TorcHTTPServices
  *  \brief Top level interface into services.
  *
  * A helper service that provides details to clients on the available services, return types, WebSocket
  * protocols etc. It also acts as the entry point for clients wishing to authenticate for a WebSocket connection
  * - who need to call GetWebSocketToken.
- *
- * \note This service no longer serves up any HTML, or help, so needs to be renamed to TorcHTTPServices
 */
-TorcHTMLServicesHelp::TorcHTMLServicesHelp(TorcHTTPServer *Server)
+TorcHTTPServices::TorcHTTPServices(TorcHTTPServer *Server)
   : QObject(),
-    TorcHTTPService(this, "", "services", TorcHTMLServicesHelp::staticMetaObject, QString("HandlersChanged"))
+    TorcHTTPService(this, "", "services", TorcHTTPServices::staticMetaObject, QString("HandlersChanged"))
 {
     connect(Server, SIGNAL(HandlersChanged()), this, SLOT(HandlersChanged()));
 
@@ -60,16 +58,16 @@ TorcHTMLServicesHelp::TorcHTMLServicesHelp(TorcHTTPServer *Server)
     }
 }
 
-TorcHTMLServicesHelp::~TorcHTMLServicesHelp()
+TorcHTTPServices::~TorcHTTPServices()
 {
 }
 
-QString TorcHTMLServicesHelp::GetUIName(void)
+QString TorcHTTPServices::GetUIName(void)
 {
     return tr("Services");
 }
 
-void TorcHTMLServicesHelp::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTTPConnection* Connection)
+void TorcHTTPServices::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTTPConnection* Connection)
 {
     if (!Request)
         return;
@@ -122,7 +120,7 @@ void TorcHTMLServicesHelp::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTTP
     Request->SetResponseType(HTTPResponseDefault);
 }
 
-void TorcHTMLServicesHelp::SubscriberDeleted(QObject *Subscriber)
+void TorcHTTPServices::SubscriberDeleted(QObject *Subscriber)
 {
     TorcHTTPService::HandleSubscriberDeleted(Subscriber);
 }
@@ -132,13 +130,13 @@ void TorcHTMLServicesHelp::SubscriberDeleted(QObject *Subscriber)
  * This acts as a convenience method for peers to retrieve pertinant application
  * information with one remote call.
 */
-QVariantMap TorcHTMLServicesHelp::GetDetails(void)
+QVariantMap TorcHTTPServices::GetDetails(void)
 {
     // NB keys here match those of the relevant stand alone methods. Take care not to break them.
     QVariantMap results;
 
-    int index = TorcHTMLServicesHelp::staticMetaObject.indexOfClassInfo("Version");
-    results.insert("version",   index > -1 ? TorcHTMLServicesHelp::staticMetaObject.classInfo(index).value() : "unknown");
+    int index = TorcHTTPServices::staticMetaObject.indexOfClassInfo("Version");
+    results.insert("version",   index > -1 ? TorcHTTPServices::staticMetaObject.classInfo(index).value() : "unknown");
     results.insert("services",  GetServiceList());
     results.insert("starttime", GetStartTime());
     results.insert("priority",  GetPriority());
@@ -147,38 +145,38 @@ QVariantMap TorcHTMLServicesHelp::GetDetails(void)
     return results;
 }
 
-QVariantMap TorcHTMLServicesHelp::GetServiceList(void)
+QVariantMap TorcHTTPServices::GetServiceList(void)
 {
     return TorcHTTPServer::GetServiceHandlers();
 }
 
-QVariantMap TorcHTMLServicesHelp::GetServiceDescription(const QString &Service)
+QVariantMap TorcHTTPServices::GetServiceDescription(const QString &Service)
 {
     // the server has the services - and can lock the list
     return TorcHTTPServer::GetServiceDescription(Service);
 }
 
-QVariantList TorcHTMLServicesHelp::GetReturnFormats(void)
+QVariantList TorcHTTPServices::GetReturnFormats(void)
 {
     return returnFormats;
 }
 
-QVariantList TorcHTMLServicesHelp::GetWebSocketProtocols(void)
+QVariantList TorcHTTPServices::GetWebSocketProtocols(void)
 {
     return TorcWebSocket::GetSupportedSubProtocols();
 }
 
-qint64 TorcHTMLServicesHelp::GetStartTime(void)
+qint64 TorcHTTPServices::GetStartTime(void)
 {
     return gLocalContext->GetStartTime();
 }
 
-int TorcHTMLServicesHelp::GetPriority(void)
+int TorcHTTPServices::GetPriority(void)
 {
     return gLocalContext->GetPriority();
 }
 
-QString TorcHTMLServicesHelp::GetUuid(void)
+QString TorcHTTPServices::GetUuid(void)
 {
     return gLocalContext->GetUuid();
 }
@@ -188,12 +186,12 @@ QString TorcHTMLServicesHelp::GetUuid(void)
  * \note This is a dummy method as there is no point in calling it internally. The actual implementation
  *       is captured in ProcessHTTPRequest as it requires access to the underlying HTTP headers to authenticate.
 */
-QString TorcHTMLServicesHelp::GetWebSocketToken(void)
+QString TorcHTTPServices::GetWebSocketToken(void)
 {
     return QString("");
 }
 
-void TorcHTMLServicesHelp::HandlersChanged(void)
+void TorcHTTPServices::HandlersChanged(void)
 {
     emit ServiceListChanged();
 }

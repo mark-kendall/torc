@@ -1,5 +1,5 @@
-#ifndef TORCHTMLSERVICESHELP_H
-#define TORCHTMLSERVICESHELP_H
+#ifndef TORCHTTPSERVICES_H
+#define TORCHTTPSERVICES_H
 
 // Qt
 #include <QObject>
@@ -12,7 +12,7 @@ class TorcHTTPServer;
 class TorcHTTPRequest;
 class TorcHTTPConnection;
 
-class TorcHTMLServicesHelp : public QObject, public TorcHTTPService
+class TorcHTTPServices : public QObject, public TorcHTTPService
 {
     Q_OBJECT
     Q_CLASSINFO("Version",           "1.0.0")
@@ -28,8 +28,8 @@ class TorcHTMLServicesHelp : public QObject, public TorcHTTPService
     Q_PROPERTY(QVariantList webSocketProtocols READ GetWebSocketProtocols CONSTANT)
 
   public:
-    TorcHTMLServicesHelp(TorcHTTPServer *Server);
-    virtual ~TorcHTMLServicesHelp();
+    TorcHTTPServices(TorcHTTPServer *Server);
+    virtual ~TorcHTTPServices();
 
     void           ProcessHTTPRequest   (TorcHTTPRequest *Request, TorcHTTPConnection* Connection);
     QString        GetUIName            (void);
@@ -56,4 +56,4 @@ class TorcHTMLServicesHelp : public QObject, public TorcHTTPService
     QVariantList   webSocketProtocols; // dummy
 };
 
-#endif // TORCHTMLSERVICESHELP_H
+#endif // TORCHTTPSERVICES_H
