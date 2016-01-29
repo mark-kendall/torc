@@ -21,9 +21,7 @@
 */
 
 // Qt
-#include <QFile>
 #include <QObject>
-#include <QFileInfo>
 
 // Torc
 #include "torclogging.h"
@@ -77,42 +75,11 @@ void TorcHTMLHandler::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTTPConne
         if (url == "/")
             url = "/index.html";
 
-        url = m_pathToContent + url;
-
-        // file
-        QFile *file = new QFile(url);
-
-        // sanity checks
-        if (file->exists())
-        {
-            if ((file->permissions() & QFile::ReadOther))
-            {
-                if (file->size() > 0)
-                {
-                    QDateTime modified = QFileInfo(*file).lastModified();
-
-                    // set cache handling before we check for modification. This ensures the modification check is
-                    // performed and the correct cache headers are re-sent with any 304 Not Modified response.
-                    Request->SetCache(HTTPCacheNone, modified.toString(TorcHTTPRequest::DateFormat));
-
-                    // Unmodified will handle the response
-                    if (Request->Unmodified(modified))
-                    {
-                        delete file;
-                        return;
-                    }
-
-                    Request->SetResponseFile(file);
-                    Request->SetStatus(HTTP_OK);
-                    Request->SetAllowGZip(true);
-                    return;
-                }
-            }
-        }
-
-        delete file;
+        HandleFile(Request, m_pathToContent + url, HTTPCacheNone);
     }
-
-    Request->SetResponseType(HTTPResponseNone);
-    Request->SetStatus(HTTP_NotFound);
+    else
+    {
+        Request->SetResponseType(HTTPResponseNone);
+        Request->SetStatus(HTTP_NotFound);
+    }
 }

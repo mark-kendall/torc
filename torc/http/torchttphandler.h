@@ -28,6 +28,7 @@ class TorcHTTPHandler
 
   protected:
     void                HandleOptions      (TorcHTTPRequest *Request, int Allowed);
+    void                HandleFile         (TorcHTTPRequest *Request, const QString &Filename, int Cache);
 
   protected:
     QString             m_signature;

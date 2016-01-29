@@ -22,8 +22,6 @@
 
 // Qt
 #include <QDir>
-#include <QFile>
-#include <QFileInfo>
 
 // Torc
 #include "torclogging.h"
@@ -67,54 +65,5 @@ void TorcHTMLDynamicContent::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHT
     }
 
     // get the requested file subpath
-    QString path = m_pathToContent + Request->GetUrl();
-
-    // file
-    QFile *file = new QFile(path);
-
-    // sanity checks
-    if (file->exists())
-    {
-        if ((file->permissions() & QFile::ReadOther))
-        {
-            if (file->size() > 0)
-            {
-                QDateTime modified = QFileInfo(*file).lastModified();
-
-                // set cache handling before we check for modification. This ensures the modification check is
-                // performed and the correct cache headers are re-sent with any 304 Not Modified response.
-                Request->SetCache(HTTPCacheNone, modified.toString(TorcHTTPRequest::DateFormat));
-
-                // Unmodified will handle the response
-                if (Request->Unmodified(modified))
-                {
-                    delete file;
-                    return;
-                }
-
-                Request->SetResponseFile(file);
-                Request->SetStatus(HTTP_OK);
-                Request->SetAllowGZip(true);
-                return;
-            }
-            else
-            {
-                LOG(VB_GENERAL, LOG_ERR, QString("'%1' is empty - ignoring").arg(path));
-                Request->SetStatus(HTTP_NotFound);
-            }
-        }
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR, QString("'%1' is not readable").arg(path));
-            Request->SetStatus(HTTP_Forbidden);
-        }
-    }
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to find '%1'").arg(path));
-        Request->SetStatus(HTTP_NotFound);
-    }
-
-    Request->SetResponseType(HTTPResponseNone);
-    delete file;
+    HandleFile(Request, m_pathToContent + Request->GetUrl(), HTTPCacheNone);
 }

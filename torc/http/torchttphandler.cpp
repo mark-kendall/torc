@@ -20,7 +20,12 @@
 * USA.
 */
 
+// Qt
+#include <QFile>
+#include <QFileInfo>
+
 // Torc
+#include "torclogging.h"
 #include "torchttphandler.h"
 
 /*! \class TorcHTTPHandler
@@ -81,4 +86,55 @@ void TorcHTTPHandler::HandleOptions(TorcHTTPRequest *Request, int Allowed)
     Request->SetStatus(HTTP_OK);
     Request->SetResponseType(HTTPResponseNone);
     Request->SetResponseContent(NULL);
+}
+
+void TorcHTTPHandler::HandleFile(TorcHTTPRequest *Request, const QString &Filename, int Cache)
+{
+    QFile *file = new QFile(Filename);
+
+    // sanity checks
+    if (file->exists())
+    {
+        if ((file->permissions() & QFile::ReadOther))
+        {
+            if (file->size() > 0)
+            {
+                QDateTime modified = QFileInfo(*file).lastModified();
+
+                // set cache handling before we check for modification. This ensures the modification check is
+                // performed and the correct cache headers are re-sent with any 304 Not Modified response.
+                Request->SetCache(Cache, modified.toString(TorcHTTPRequest::DateFormat));
+
+                // Unmodified will handle the response
+                if (Request->Unmodified(modified))
+                {
+                    delete file;
+                    return;
+                }
+
+                Request->SetResponseFile(file);
+                Request->SetStatus(HTTP_OK);
+                Request->SetAllowGZip(true);
+                return;
+            }
+            else
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("'%1' is empty - ignoring").arg(Filename));
+                Request->SetStatus(HTTP_NotFound);
+            }
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("'%1' is not readable").arg(Filename));
+            Request->SetStatus(HTTP_Forbidden);
+        }
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Failed to find '%1'").arg(Filename));
+        Request->SetStatus(HTTP_NotFound);
+    }
+
+    Request->SetResponseType(HTTPResponseNone);
+    delete file;
 }
