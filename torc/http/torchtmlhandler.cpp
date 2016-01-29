@@ -26,6 +26,7 @@
 // Torc
 #include "torclogging.h"
 #include "torcdirectories.h"
+#include "torcmime.h"
 #include "torchttpserver.h"
 #include "torchttprequest.h"
 #include "torchttpservice.h"
@@ -34,7 +35,15 @@
 /*! \class TorcHTMLHandler
  *  \brief Base HTML handler
  *
- * Serves up the top level Torc HTTP interface.
+ * Serves up the top level HTTP directory (i.e. "/").
+ *
+ * As the interface is predominantly Javascript created and driven, the only HTML file is 'index.html'.
+ *
+ * Other files present here are 'torc.xsd' (the configuration schema description) and 'manifest.json' and 'browserconfig.xml',
+ * both of which are used by clients for web app purposes. Certain clients also expect icons and web app images
+ * to be located in the root directort, so any request for 'png' or 'ico' files are 'redirected' to the '/img' directory.
+ *
+ * All other files are blocked - purely to keep the root directory clean and enforce use of the directory structure.
  *
  * \sa TorcHTTPServer
  * \sa TorcHTTPHandler
@@ -76,6 +85,10 @@ void TorcHTMLHandler::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTTPConne
             url = "/index.html";
 
         HandleFile(Request, m_pathToContent + url, HTTPCacheNone);
+    }
+    else if (url.endsWith(".png", Qt::CaseInsensitive) || url.endsWith(".ico", Qt::CaseInsensitive))
+    {
+        HandleFile(Request, m_pathToContent + "/img" + url, HTTPCacheLongLife | HTTPCacheLastModified);
     }
     else
     {

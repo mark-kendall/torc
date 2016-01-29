@@ -61,6 +61,8 @@ INSTALLS            += translations
 install.path   = $${PREFIX}/share/torc/html/
 install.files  = html/index.html
 install.files += html/torc.xsd
+install.files += html/manifest.json
+install.files += browserconfig.xml
 install.files += html/css html/fonts html/img html/js
 INSTALLS      += install
 
