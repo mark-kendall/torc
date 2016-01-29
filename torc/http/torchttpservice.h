@@ -37,7 +37,6 @@ class TorcHTTPService : public TorcHTTPHandler
   protected:
     void         EnableMethod             (const QString &Method);
     void         DisableMethod            (const QString &Method);
-    void         UserHelp                 (TorcHTTPRequest *Request, TorcHTTPConnection *Connection);
     void         HandleSubscriberDeleted  (QObject* Subscriber);
 
   private:

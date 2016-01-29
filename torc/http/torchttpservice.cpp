@@ -390,13 +390,12 @@ QString TorcHTTPService::GetUIName(void)
 
 void TorcHTTPService::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTTPConnection *Connection)
 {
+    (void)Connection;
+
     QString method = Request->GetMethod();
     HTTPRequestType type = Request->GetHTTPRequestType();
 
-    bool helprequest    = method.compare("Help") == 0;
-    bool versionrequest = method.compare("GetServiceVersion") == 0;
-
-    if (helprequest || versionrequest)
+    if (method.compare("GetServiceVersion") == 0)
     {
         if (type == HTTPOptions)
         {
@@ -413,18 +412,11 @@ void TorcHTTPService::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTTPConne
             return;
         }
 
-        if (helprequest)
-        {
-            UserHelp(Request, Connection);
-        }
-        else
-        {
-            Request->SetStatus(HTTP_OK);
-            TorcSerialiser *serialiser = Request->GetSerialiser();
-            Request->SetResponseType(serialiser->ResponseType());
-            Request->SetResponseContent(serialiser->Serialise(m_version, "version"));
-            delete serialiser;
-        }
+        Request->SetStatus(HTTP_OK);
+        TorcSerialiser *serialiser = Request->GetSerialiser();
+        Request->SetResponseType(serialiser->ResponseType());
+        Request->SetResponseContent(serialiser->Serialise(m_version, "version"));
+        delete serialiser;
 
         return;
     }
@@ -828,96 +820,4 @@ void TorcHTTPService::HandleSubscriberDeleted(QObject *Subscriber)
         LOG(VB_GENERAL, LOG_INFO, "Subscriber deleted - cancelling subscription");
         m_subscribers.removeAll(Subscriber);
     }
-}
-
-void TorcHTTPService::UserHelp(TorcHTTPRequest *Request, TorcHTTPConnection *Connection)
-{
-    if (!Request)
-        return;
-
-    QByteArray *result = new QByteArray();
-    QTextStream stream(result);
-
-    stream << "<html><head><title>" << QCoreApplication::applicationName() << "</title></head>";
-    stream << "<body><h1><a href='/'>" << QCoreApplication::applicationName() << "</a> ";
-    stream << "<a href='" << SERVICES_DIRECTORY << "'>" << tr("Services") << "</a> " << GetUIName() << "</h1>";
-
-    stream << "<h3>" << tr("Method list for ") << m_signature << " (Version: " << m_version << ")</h3>";
-    stream << "QString GetServiceVersion() (HEAD,GET,OPTIONS)<br>";
-
-    int count   = 0;
-
-    QMap<QString,MethodParameters*>::const_iterator it = m_methods.begin();
-    QMap<QString,MethodParameters*>::const_iterator example = m_methods.end();
-
-    for ( ; it != m_methods.end(); ++it)
-    {
-        MethodParameters *params = it.value();
-
-        // ignore disabled methods
-        if (params->m_allowedRequestTypes & HTTPDisabled)
-            continue;
-
-        int size = params->m_types.size();
-        if (size > count)
-        {
-            example = it;
-            count = size;
-        }
-
-        QString method = QString("%1 %2(").arg(QMetaType::typeName(params->m_types[0])).arg(it.key());
-
-        bool first = true;
-        for (int i = 1; i < size; ++i)
-        {
-            if (!first)
-                method += ", ";
-            method += QString("%1 %2").arg(QMetaType::typeName(params->m_types[i])).arg(params->m_names[i].data());
-            first = false;
-        }
-
-        stream << method << ") (" << TorcHTTPRequest::AllowedToString(params->m_allowedRequestTypes) << ")<br>";
-    }
-
-    QString url = Connection->GetSocket() ? QString("http://") + TorcNetwork::IPAddressToLiteral(Connection->GetSocket()->localAddress(), Connection->GetSocket()->localPort()) : tr("Error");
-
-    if (example != m_methods.end())
-    {
-        QString usage = url + m_signature + example.key();
-
-        if (example.value()->m_types.size() > 1)
-        {
-            usage += "?";
-            for (int i = 1; i < example.value()->m_types.size(); ++i)
-                usage += QString("%1%2=Value%3").arg(i == 1 ? "" : "&").arg(example.value()->m_names[i].data()).arg(i);
-        }
-        stream << "<p><h3>" << tr("Example usage") << ":</h3><p>" << usage;
-    }
-
-    stream << "<h3>" << tr("Websocket methods") << "</h3>";
-    stream << "Subscribe()</br>";
-    stream << "Unsubscribe()</br>";
-
-    if (!m_properties.isEmpty())
-    {
-        stream << "<h3>" << tr("Properties") << "</h3>";
-
-        QMap<int,int>::const_iterator it = m_properties.begin();
-        for ( ; it != m_properties.end(); ++it)
-        {
-            QMetaProperty property = m_parent->metaObject()->property(it.value());
-            stream << property.name() << "&nbsp(" << property.typeName() << ")";
-
-            if (property.hasNotifySignal())
-                stream << "&nbsp" << tr("Signal") << ":&nbsp" << property.notifySignal().name() << "</br>";
-            else
-                stream << "&nbsp(" << tr("Constant") << ")</br>";
-        }
-    }
-
-    stream << "</body></html>";
-    stream.flush();
-    Request->SetStatus(HTTP_OK);
-    Request->SetResponseType(HTTPResponseHTML);
-    Request->SetResponseContent(result);
 }
