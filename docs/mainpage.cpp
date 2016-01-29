@@ -52,7 +52,7 @@
  *
  * From the command line. run:
  * \code
- * sudo apt-get install libgraphviz-dev libavahi-compat-libdnssd-dev qt5-default git-core
+ * sudo apt-get install libgraphviz-dev libavahi-compat-libdnssd-dev qt5-default git-core libqt5xmlpatterns5-dev upower
  * \endcode
  *
  * \subsection piwiringpi Install wiringPi.
@@ -75,7 +75,17 @@
  * git clone https://github.com/mark-kendall/torc.git
  * cd torc
  * qmake
- * make
+ * make -j2
  * sudo make install
  * \endcode
+ *
+ * \subsection pi1wire Enable 1Wire interface
+ * The 1Wire interface is primarily used for communicating with MAXIM DS18B20 1Wire digital thermometers - which
+ * are also available as a waterproof module.
+ *
+ * Add the following line to the end of '/boot/config.txt' file
+ * \code
+ * dtoverlay=w1-gpio
+ * \endcode
+ *
  */
