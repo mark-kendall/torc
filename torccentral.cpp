@@ -285,7 +285,7 @@ bool TorcCentral::LoadConfig(void)
     // update application name
     if (m_config.contains("applicationname"))
     {
-        QString name = m_config.value("applicationname").toString();
+        QString name = m_config.value("applicationname").toString().trimmed();
         if (!name.isEmpty())
         {
             QCoreApplication::setApplicationName(name);
