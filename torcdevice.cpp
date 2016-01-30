@@ -59,10 +59,10 @@ TorcDevice::TorcDevice(bool Valid, double Value, double Default,
         }
     }
 
-    if (Details.contains("userName"))
-        SetUserName(Details.value("userName").toString());
-    if (Details.contains("userDescription"))
-        SetUserDescription(Details.value("userDescription").toString());
+    if (Details.contains("username"))
+        SetUserName(Details.value("username").toString());
+    if (Details.contains("userdescription"))
+        SetUserDescription(Details.value("userdescription").toString());
 }
 
 TorcDevice::~TorcDevice()

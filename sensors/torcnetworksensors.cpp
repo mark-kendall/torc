@@ -48,8 +48,8 @@
  *             <switch or pwm or ph etc>
  *                 <name></name>
  *                 <default></default>
- *                 <userName></userName>
- *                 <userDescription></userDescription>
+ *                 <username></username>
+ *                 <userdescription></userdescription>
  *             </switch etc>
  *         </network>
  *     </sensors>

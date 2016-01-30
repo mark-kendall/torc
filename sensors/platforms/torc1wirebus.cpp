@@ -57,8 +57,8 @@ Torc1WireBus* Torc1WireBus::gTorc1WireBus = new Torc1WireBus();
  *             <ds18b20>
  *                 <id>28-XXXXXXX</id>
  *                 <name>tanktemp</name>
- *                 <userName>Tank temperature</userName>
- *                 <userDescription>The temperature in the tank</userDescription>
+ *                 <username>Tank temperature</username>
+ *                 <userdescription>The temperature in the tank</userdescription>
  *             </ds18b20>
  *         </wire1>
  *     </sensors>
