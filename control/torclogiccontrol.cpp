@@ -1,6 +1,6 @@
 /* Class TorcLogicControl
 *
-* Copyright (C) Mark Kendall 2015
+* Copyright (C) Mark Kendall 2015-16
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 
 // Torc
 #include "torclogging.h"
-#include "torcsensor.h"
+#include "torcinput.h"
 #include "torcoutput.h"
 #include "torclogiccontrol.h"
 
@@ -152,7 +152,7 @@ bool TorcLogicControl::IsPassthrough(void)
     if ((m_operation == TorcLogicControl::NoOperation) && (m_inputs.size() == 1))
     {
         // check the input
-        if (qobject_cast<TorcSensor*>(m_inputs.firstKey()))
+        if (qobject_cast<TorcInput*>(m_inputs.firstKey()))
         {
             // and the outputs
             passthrough = true;

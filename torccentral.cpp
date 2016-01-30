@@ -32,7 +32,7 @@
 #include "torclanguage.h"
 #include "torclocalcontext.h"
 #include "torc/torcadminthread.h"
-#include "sensors/torcsensors.h"
+#include "inputs/torcinputs.h"
 #include "outputs/torcoutputs.h"
 #include "control/torccontrols.h"
 #include "http/torchttphandler.h"
@@ -104,7 +104,7 @@ TorcCentral::TorcCentral()
                             .arg(QCoreApplication::applicationName()));
 
         // build the graph contents
-        TorcSensors::gSensors->Graph(m_graph);
+        TorcInputs::gInputs->Graph(m_graph);
         TorcOutputs::gOutputs->Graph(m_graph);
         TorcControls::gControls->Graph(m_graph);
 

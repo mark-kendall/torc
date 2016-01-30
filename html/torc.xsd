@@ -63,7 +63,7 @@
   </xs:restriction>
 </xs:simpleType>
 
-<!-- sensor definitions -->
+<!-- input definitions -->
 <xs:complexType name="ds18b20Type">
   <!-- a device must have 1 name and 0 or 1 username and userdescription - in any order-->
   <xs:all>
@@ -160,7 +160,7 @@
   </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="sensorsType">
+<xs:complexType name="inputsType">
   <xs:all>
     <!-- 0 or 1 instances of each of these types in any order-->
     <xs:element minOccurs="0" maxOccurs="1" name="wire1"   type="wire1Type"/>
@@ -356,7 +356,7 @@
   <xs:all>
     <!-- 0 or 1 instances of each of these types in any order-->
     <xs:element name="applicationname" minOccurs="0" maxOccurs="1" type="userNameType" />
-    <xs:element name="sensors"         minOccurs="0" maxOccurs="1" type="sensorsType"/>
+    <xs:element name="inputs"          minOccurs="0" maxOccurs="1" type="inputsType"/>
     <xs:element name="control"         minOccurs="0" maxOccurs="1" type="controlType"/>
     <xs:element name="outputs"         minOccurs="0" maxOccurs="1" type="outputsType"/>
   </xs:all>

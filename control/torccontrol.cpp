@@ -23,7 +23,7 @@
 // Torc
 #include "torclogging.h"
 #include "torccentral.h"
-#include "torcsensor.h"
+#include "torcinput.h"
 #include "torcoutput.h"
 #include "torccontrol.h"
 
@@ -355,7 +355,7 @@ void TorcControl::Graph(QByteArray* Data)
         if (qobject_cast<TorcOutput*>(it.key()))
         {
             TorcOutput* output = qobject_cast<TorcOutput*>(it.key());
-            QString source = passthrough ? qobject_cast<TorcSensor*>(m_inputs.firstKey())->GetUniqueId() : uniqueId;
+            QString source = passthrough ? qobject_cast<TorcInput*>(m_inputs.firstKey())->GetUniqueId() : uniqueId;
             Data->append(QString("    \"%1\"->\"%2\"\r\n").arg(source).arg(output->GetUniqueId()));
         }
         else if (qobject_cast<TorcControl*>(it.key()))
@@ -378,8 +378,8 @@ void TorcControl::Graph(QByteArray* Data)
         QString inputid;
         if (qobject_cast<TorcControl*>(it.key()))
             inputid = qobject_cast<TorcControl*>(it.key())->GetUniqueId();
-        else if (qobject_cast<TorcSensor*>(it.key()))
-            inputid = qobject_cast<TorcSensor*>(it.key())->GetUniqueId();
+        else if (qobject_cast<TorcInput*>(it.key()))
+            inputid = qobject_cast<TorcInput*>(it.key())->GetUniqueId();
         else
             LOG(VB_GENERAL, LOG_ERR, "Unknown input type");
 
@@ -396,7 +396,7 @@ void TorcControl::Graph(QByteArray* Data)
  *
  * \note An output can have only one input/owner.
  * \note For outputs, we only connect to TorcOutput objects or TorcControl objects that have inputs. So
- *       no connection to TorcTimerControl or any TorcSensor.
+ *       no connection to TorcTimerControl or any TorcInput.
  * \note For inputs, any sensor or control type is valid.
  * \note We always assume an object of a given type has the correct signals/slots.
  *
@@ -453,7 +453,7 @@ bool TorcControl::Finish(void)
         TorcControl *control = qobject_cast<TorcControl*>(it.key());
 
         // an input must be a sensor or control
-        if (!qobject_cast<TorcSensor*>(it.key()) && !control)
+        if (!qobject_cast<TorcInput*>(it.key()) && !control)
         {
             LOG(VB_GENERAL, LOG_ERR, "Unknown input type");
             return false;

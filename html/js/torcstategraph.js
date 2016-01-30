@@ -36,7 +36,7 @@ var TorcStateGraph = function ($, torc) {
     "use strict";
 
     var torcconnection = undefined;
-    var sensorTypes    = undefined;
+    var inputTypes     = undefined;
     var controlTypes   = undefined;
     var outputTypes    = undefined;
     var stategraph     = undefined;
@@ -72,16 +72,16 @@ var TorcStateGraph = function ($, torc) {
         torcconnection.subscribe(name, ['value', 'valid'], deviceChanged, deviceSubscriptionChanged);
     }
 
-    function sensorsChanged (name, value) {
-        if (name === 'sensorTypes' && $.isArray(value)) {
-            sensorTypes = value;
-        } else if (name === 'sensorList' && typeof value === 'object') {
-            if ($.isArray(sensorTypes) && sensorTypes.length > 0) {
-                $.each(sensorTypes, function (ignore, type) {
-                    $.each(value, function (key, sensors) {
-                        if (key === type && $.isArray(sensors)) {
-                            $.each(sensors, function (ignore, sensor) {
-                                setupDevice(sensor);
+    function inputsChanged (name, value) {
+        if (name === 'inputTypes' && $.isArray(value)) {
+            inputTypes = value;
+        } else if (name === 'inputList' && typeof value === 'object') {
+            if ($.isArray(inputTypes) && inputTypes.length > 0) {
+                $.each(inputTypes, function (ignore, type) {
+                    $.each(value, function (key, inputs) {
+                        if (key === type && $.isArray(inputs)) {
+                            $.each(inputs, function (ignore, input) {
+                                setupDevice(input);
                             });
                         }
                     });
@@ -90,12 +90,12 @@ var TorcStateGraph = function ($, torc) {
         }
     }
 
-    function sensorSubscriptionChanged(version, ignore, properties) {
+    function inputSubscriptionChanged(version, ignore, properties) {
         if (version !== undefined && typeof properties === 'object') {
-            // NB update sensorTypes first so that we can iterate over sensorList meaningfully
-            sensorsChanged('sensorTypes', properties.sensorTypes.value);
+            // NB update inputTypes first so that we can iterate over inputList meaningfully
+            inputsChanged('inputTypes', properties.inputTypes.value);
             $.each(properties, function (key, value) {
-                sensorsChanged(key, value.value); });
+                inputsChanged(key, value.value); });
             return;
         }
     }
@@ -159,8 +159,8 @@ var TorcStateGraph = function ($, torc) {
     function initStateGraph (svg) {
         stategraph = svg;
         stategraph.configure({width: '100%', height: '100%'}, false);
-        // NB neither sensorList nor sensorTypes should actually change, so don't ask for updates
-        torcconnection.subscribe('sensors',  [], sensorsChanged,  sensorSubscriptionChanged);
+        // NB neither inputList nor inputTypes should actually change, so don't ask for updates
+        torcconnection.subscribe('inputs',  [], inputsChanged,  inputSubscriptionChanged);
         torcconnection.subscribe('controls', [], controlsChanged, controlSubscriptionChanged);
         torcconnection.subscribe('outputs',  [], outputsChanged,  outputSubscriptionChanged);
     }

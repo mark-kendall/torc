@@ -19,7 +19,7 @@
 
 // Torc
 #include "torclogging.h"
-#include "torcsensor.h"
+#include "torcinput.h"
 #include "torcoutput.h"
 #include "torci2cbus.h"
 
