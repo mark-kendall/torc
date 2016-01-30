@@ -6,15 +6,19 @@
      the device name, userName and userDescription for each device type to ensure completeness without
      imposing ordering (via xs:sequence) or relaxing repetition (via xs:choice) -->
 
+<!-- device names are used extensively within Javascript, xml and html. Restrict them to alphanumerics only
+     and '-'or '_' as a delimiter. -->
+<xs:simpleType name="deviceNameType">
+  <xs:restriction base="xs:string">
+    <xs:pattern value="[(0-9a-zA-Z)|(-_)]+"/>
+  </xs:restriction>
+</xs:simpleType>
+
 <xs:simpleType name="validStringType">
   <xs:restriction base="xs:string">
     <xs:whiteSpace value="collapse"/>
     <xs:minLength  value="1"/>
   </xs:restriction>
-</xs:simpleType>
-
-<xs:simpleType name="nameType">
-  <xs:restriction base="validStringType"/>
 </xs:simpleType>
 
 <xs:simpleType name="userNameType">
@@ -64,7 +68,7 @@
   <!-- a device must have 1 name and 0 or 1 userName and userDescription - in any order-->
   <xs:all>
     <!-- start of base types -->
-    <xs:element name="name"            type="nameType"/>
+    <xs:element name="name"            type="deviceNameType"/>
     <xs:element name="userName"        type="userNameType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="userDescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
     <!-- end of base types -->
@@ -80,7 +84,7 @@
 
 <xs:complexType name="networkSwitchType">
   <xs:all>
-    <xs:element name="name"     type="nameType"/>
+    <xs:element name="name"     type="deviceNameType"/>
     <xs:element name="userName" type="userNameType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="userDescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="default"  type="switchNumberType"/>
@@ -89,7 +93,7 @@
 
 <xs:complexType name="networkButtonType">
   <xs:all>
-    <xs:element name="name"     type="nameType"/>
+    <xs:element name="name"     type="deviceNameType"/>
     <xs:element name="userName" type="userNameType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="userDescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="default"  type="switchNumberType"/>
@@ -98,7 +102,7 @@
 
 <xs:complexType name="networkPWMType">
   <xs:all>
-    <xs:element name="name"     type="nameType"/>
+    <xs:element name="name"     type="deviceNameType"/>
     <xs:element name="userName" type="userNameType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="userDescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="default"  type="pwmNumberType"/>
@@ -107,7 +111,7 @@
 
 <xs:complexType name="networkTempType">
   <xs:all>
-    <xs:element name="name"     type="nameType"/>
+    <xs:element name="name"     type="deviceNameType"/>
     <xs:element name="userName" type="userNameType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="userDescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="default"  type="tempNumberType"/>
@@ -116,7 +120,7 @@
 
 <xs:complexType name="networkpHType">
   <xs:all>
-    <xs:element name="name"     type="nameType"/>
+    <xs:element name="name"     type="deviceNameType"/>
     <xs:element name="userName" type="userNameType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="userDescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="default"  type="pHNumberType"/>
@@ -143,7 +147,7 @@
 
 <xs:complexType name="gpioInputPinType">
   <xs:all>
-    <xs:element name="name"     type="nameType"/>
+    <xs:element name="name"     type="deviceNameType"/>
     <xs:element name="userName" type="userNameType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="userDescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="gpiopinnumber"   type="gpioPinNumberType"/>
@@ -168,7 +172,7 @@
 <!-- control definition -->
 <xs:complexType name="simpleLogicType">
   <xs:all>
-    <xs:element name="name"     type="nameType"/>
+    <xs:element name="name"     type="deviceNameType"/>
     <xs:element name="userName" type="userNameType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="userDescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="inputs"   type="validStringType"/>
@@ -178,7 +182,7 @@
 
 <xs:complexType name="complexLogicType">
   <xs:all>
-    <xs:element name="name"     type="nameType"/>
+    <xs:element name="name"     type="deviceNameType"/>
     <xs:element name="userName" type="userNameType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="userDescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="inputs"   type="validStringType"/>
@@ -206,7 +210,7 @@
 
 <xs:complexType name="timerType">
   <xs:all>
-    <xs:element name="name"     type="nameType"/>
+    <xs:element name="name"     type="deviceNameType"/>
     <xs:element name="userName" type="userNameType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="userDescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="outputs"  type="validStringType"/>
@@ -227,7 +231,7 @@
 
 <xs:complexType name="transitionType">
   <xs:all>
-    <xs:element name="name"     type="nameType"/>
+    <xs:element name="name"     type="deviceNameType"/>
     <xs:element name="userName" type="userNameType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="userDescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="inputs"   type="validStringType"/>
@@ -301,7 +305,7 @@
 
 <xs:complexType name="pca9685ChannelType">
   <xs:all>
-    <xs:element name="name"     type="nameType"/>
+    <xs:element name="name"     type="deviceNameType"/>
     <xs:element name="userName" type="userNameType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="userDescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="number"   type="pca9685ChannelNumberType"/>
@@ -324,7 +328,7 @@
 
 <xs:complexType name="gpioOutputPinType">
   <xs:all>
-    <xs:element name="name"     type="nameType"/>
+    <xs:element name="name"     type="deviceNameType"/>
     <xs:element name="userName" type="userNameType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="userDescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="gpiopinnumber" type="gpioPinNumberType"/>
@@ -351,7 +355,7 @@
 <xs:complexType name="rootType">
   <xs:all>
     <!-- 0 or 1 instances of each of these types in any order-->
-    <xs:element name="applicationname" minOccurs="0" maxOccurs="1" type="nameType" />
+    <xs:element name="applicationname" minOccurs="0" maxOccurs="1" type="userNameType" />
     <xs:element name="sensors"         minOccurs="0" maxOccurs="1" type="sensorsType"/>
     <xs:element name="control"         minOccurs="0" maxOccurs="1" type="controlType"/>
     <xs:element name="outputs"         minOccurs="0" maxOccurs="1" type="outputsType"/>
