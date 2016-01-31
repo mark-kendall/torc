@@ -74,7 +74,6 @@ var TorcAPI = function ($, torc) {
                 } else {
                 // need to ask for details
                     torcconnection.call('services', 'GetServiceDescription', { "Service": service }, function (result) {
-                        console.log(result);
                         setServiceDetail(service, result.methods, result.properties); });
                 }
             });
