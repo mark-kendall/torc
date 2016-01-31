@@ -2,7 +2,7 @@
 *
 * This file is part of the Torc project.
 *
-* Copyright (C) Mark Kendall 2013
+* Copyright (C) Mark Kendall 2013-16
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -30,20 +30,21 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
     if (typeof socketStatusChanged === 'function') { socketStatusChanged(torc.SocketConnecting); }
 
     // current JSON-RPC Id
-    var currentRpcId = 1,
+    var currentRpcId = 1;
     // current calls
-    currentCalls = [],
+    var currentCalls = [];
     // event handlers for notifications
-    eventHandlers = [],
+    var eventHandlers = [];
     // interval timer to check for call expiry/failure
-    expireTimer,
+    var expireTimer;
     // socket
-    socket;
+    var socket;
 
     // clear out any old remote calls (over 60 seconds) for which we did not receive a response
     function expireCalls() {
-        var i, callback,
-        timenow = new Date().getTime();
+        var i;
+        var callback;
+        var timenow = new Date().getTime();
 
         for (i = currentCalls.length - 1; i >= 0; i -= 1) {
             if ((currentCalls[i].sent + 60000) < timenow) {
@@ -100,7 +101,10 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
 
     // handle individual responses
     function processResult(data) {
-        var i, id, callback, method;
+        var i;
+        var id;
+        var callback;
+        var method;
 
         // we only understand JSON-RPC 2.0
         if (!(data.hasOwnProperty('jsonrpc') && data.jsonrpc === '2.0')) {
@@ -181,10 +185,12 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
 
         // socket message
         socket.onmessage = function (event) {
-            var i, result, batchresult,
+            var i;
+            var result;
+            var batchresult;
 
             // parse the JSON result
-            data = $.parseJSON(event.data);
+            var data = $.parseJSON(event.data);
 
             if ($.isArray(data)) {
                 // array of objects (batch)
