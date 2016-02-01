@@ -1,6 +1,6 @@
 /* Class TorcXmlValidator
 *
-* Copyright (C) Mark Kendall 2015
+* Copyright (C) Mark Kendall 2015-16
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -30,39 +30,74 @@
 TorcXmlValidator::TorcXmlValidator(const QString &XmlFile, const QString &XSDFile)
   : m_xmlFile(XmlFile),
     m_xsdFile(XSDFile),
+    m_xsdData(QByteArray()),
     m_valid(false)
 {
-    // initial sense checks
+    Validate();
+}
+
+TorcXmlValidator::TorcXmlValidator(const QString &XmlFile, const QByteArray &XSDData)
+  : m_xmlFile(XmlFile),
+    m_xsdFile(QString("")),
+    m_xsdData(XSDData),
+    m_valid(false)
+{
+    Validate();
+}
+
+TorcXmlValidator::~TorcXmlValidator()
+{
+}
+
+void TorcXmlValidator::Validate(void)
+{
+    // sense check xml
     if (!QFile::exists(m_xmlFile))
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Xml file '%1' does not exist").arg(m_xmlFile));
         return;
     }
 
-    if (!QFile::exists(m_xsdFile))
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("XSD file '%1' does not exist").arg(m_xsdFile));
-        return;
-    }
-
     QFile xml(m_xmlFile);
-    QFile xsd(m_xsdFile);
-
     if (!xml.open(QIODevice::ReadOnly))
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Failed to open Xml file '%1'").arg(m_xmlFile));
         return;
     }
 
-    if (!xsd.open(QIODevice::ReadOnly))
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to open XSD file '%1'").arg(m_xsdFile));
-        return;
-    }
-
+    bool xsdvalid = false;
     QXmlSchema schema;
     schema.setMessageHandler(this);
-    if (!schema.load(&xsd))
+
+    // sense check xsd
+    if (!m_xsdFile.isEmpty())
+    {
+        if (!QFile::exists(m_xsdFile))
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("XSD file '%1' does not exist").arg(m_xsdFile));
+            return;
+        }
+
+        QFile xsd(m_xsdFile);
+        if (!xsd.open(QIODevice::ReadOnly))
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to open XSD file '%1'").arg(m_xsdFile));
+            return;
+        }
+
+        xsdvalid = schema.load(&xsd);
+        xsd.close();
+    }
+    else if (!m_xsdData.isEmpty())
+    {
+        xsdvalid = schema.load(m_xsdData);
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, "No XSD file or data specified");
+    }
+
+    if (!xsdvalid)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("XSD schema '%1' is not valid").arg(m_xsdFile));
         return;
@@ -77,10 +112,6 @@ TorcXmlValidator::TorcXmlValidator(const QString &XmlFile, const QString &XSDFil
     }
 
     m_valid = true;
-}
-
-TorcXmlValidator::~TorcXmlValidator()
-{
 }
 
 bool TorcXmlValidator::Validated(void)
