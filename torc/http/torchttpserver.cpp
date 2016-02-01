@@ -1081,6 +1081,7 @@ class TorcHTTPServerObject : public TorcAdminObject, public TorcStringFactory
         Strings.insert("SocketConnecting",        QCoreApplication::translate("TorcHTTPServer", "Connecting"));
         Strings.insert("SocketConnected",         QCoreApplication::translate("TorcHTTPServer", "Connected"));
         Strings.insert("SocketReady",             QCoreApplication::translate("TorcHTTPServer", "Ready"));
+        Strings.insert("SocketDisconnecting",     QCoreApplication::translate("TorcHTTPServer", "Disconnecting"));
         Strings.insert("ConnectedTo",             QCoreApplication::translate("TorcHTTPServer", "Connected to"));
         Strings.insert("ConnectTo",               QCoreApplication::translate("TorcHTTPServer", "Connect to"));
 

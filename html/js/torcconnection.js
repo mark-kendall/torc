@@ -21,7 +21,7 @@
 */
 
 /*jslint browser,devel,white,this */
-/*global window,TorcSubscription,TorcWebsocket */
+/*global TorcSubscription,TorcWebsocket,Visibility */
 
 var TorcConnection = function ($, torc, statusChanged) {
     "use strict";
@@ -154,7 +154,6 @@ var TorcConnection = function ($, torc, statusChanged) {
     }
 
     function disconnected() {
-        console.log('Disconnected');
         // notify subscribers that they have been disconnected and delete subscription
         Object.getOwnPropertyNames(subscriptions).forEach(function (element) {
             if (typeof subscriptions[element].subscriptionChanges === 'function') { subscriptions[element].subscriptionChanges(); }
@@ -164,11 +163,9 @@ var TorcConnection = function ($, torc, statusChanged) {
         // clear state and schedule reconnect
         socket = undefined;
         serviceList = defaultServiceList;
-        window.setTimeout(connect, torc.SocketReconnectAfterMs);
     }
 
     function socketStatusChanged (status) {
-        console.log(status);
         // notify the ui
         statusChanged(status);
 
@@ -180,4 +177,16 @@ var TorcConnection = function ($, torc, statusChanged) {
     }
 
     connect();
+
+    // continually try to reconnect if the window is visible
+    Visibility.every(2000, function () {
+        if (socket === undefined) {
+            connect();
+        }});
+    // and disconnect every time it is hidden
+    Visibility.change(function (ignore, state) {
+        if (state === 'hidden' && socket !== undefined) {
+                socket.stop();
+            }
+        });
 };

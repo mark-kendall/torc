@@ -26,9 +26,6 @@
 var TorcWebsocket = function ($, torc, socketStatusChanged) {
     "use strict";
 
-    // initial socket state
-    if (typeof socketStatusChanged === 'function') { socketStatusChanged(torc.SocketConnecting); }
-
     // current JSON-RPC Id
     var currentRpcId = 1;
     // current calls
@@ -37,8 +34,19 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
     var eventHandlers = [];
     // interval timer to check for call expiry/failure
     var expireTimer;
+    // current status
+    var socketStatus = torc.SocketNotConnected;
     // socket
     var socket;
+
+    // update status and notify owner
+    function setSocketStatus (Status, Silent) {
+        console.log(Status);
+        if (Silent === undefined && typeof socketStatusChanged === 'function') {
+            socketStatusChanged(Status);
+        }
+        socketStatus = Status;
+    }
 
     // clear out any old remote calls (over 60 seconds) for which we did not receive a response
     function expireCalls() {
@@ -174,13 +182,13 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
 
         // socket closed
         socket.onclose = function () {
-            if (typeof socketStatusChanged === 'function') { socketStatusChanged(torc.SocketNotConnected); }
+            setSocketStatus(torc.SocketNotConnected);
         };
 
         // socket opened
         socket.onopen = function () {
             // connected
-            if (typeof socketStatusChanged === 'function') { socketStatusChanged(torc.SocketConnected); }
+            setSocketStatus(torc.SocketConnected);
         };
 
         // socket message
@@ -214,13 +222,27 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
         };
     }
 
-    // start the connection by requesting a token. If authentication is not required, it will be silently ignored.
-    $.ajax({ url: torc.ServicesPath + 'GetWebSocketToken',
-             dataType: "json",
-             xhrFields: { withCredentials: true },
-             success: function(result) { connect(result.accesstoken); },
-             error: function() {
-                 if (typeof socketStatusChanged === 'function') { socketStatusChanged(torc.SocketNotConnected); }
-             }
-           });
+    function start () {
+        if (socketStatus === torc.SocketConnecting || socketStatus === torc.SocketConnected) { return; }
+
+        setSocketStatus(torc.SocketConnecting);
+        // start the connection by requesting a token. If authentication is not required, it will be silently ignored.
+        $.ajax({ url: torc.ServicesPath + 'GetWebSocketToken',
+                 dataType: "json",
+                 xhrFields: { withCredentials: true },
+                 success: function(result) { connect(result.accesstoken); },
+                 error: function() { setSocketStatus(torc.SocketNotConnected); }
+               });
+    }
+
+    this.stop = function () {
+        if (socketStatus === torc.SocketConnected || socketStatus === torc.SocketConnecting) {
+            setSocketStatus(torc.SocketDisconnecting);
+            socket.close();
+        }
+    };
+
+    // set the initial socket state
+    setSocketStatus(socketStatus, false /*don't notify status*/);
+    start();
 };
