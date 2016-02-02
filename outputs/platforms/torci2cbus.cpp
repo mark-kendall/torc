@@ -188,8 +188,8 @@ class TorcI2CXSDFactory : public TorcXSDFactory
 {
   public:
     void GetXSD(QMultiMap<QString,QString> &XSD) {
-        XSD.insert(XSD_INPUTS, i2cOutputTypes);
-        XSD.insert(XSD_INPUTS, i2cOutputs);
-        XSD.insert(XSD_INPUTS, i2cUnique);
+        XSD.insert(XSD_OUTPUTTYPES, i2cOutputTypes);
+        XSD.insert(XSD_OUTPUTS, i2cOutputs);
+        XSD.insert(XSD_UNIQUE, i2cUnique);
     }
 } TorcI2CXSDFactory;

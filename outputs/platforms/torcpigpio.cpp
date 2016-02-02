@@ -209,9 +209,9 @@ class TorcPiGPIOXSDFactory : public TorcXSDFactory
     void GetXSD(QMultiMap<QString,QString> &XSD) {
         XSD.insert(XSD_INPUTTYPES, pigpioInputTypes);
         XSD.insert(XSD_INPUTS, pigpioInputs);
-        XSD.insert(XSD_INPUTS, pigpioOutputTypes);
-        XSD.insert(XSD_INPUTS, pigpioOutputs);
-        XSD.insert(XSD_INPUTS, pigpioUnique);
+        XSD.insert(XSD_OUTPUTTYPES, pigpioOutputTypes);
+        XSD.insert(XSD_OUTPUTS, pigpioOutputs);
+        XSD.insert(XSD_UNIQUE, pigpioUnique);
     }
 } TorcPiGPIOXSDFactory;
 

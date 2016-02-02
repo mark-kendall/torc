@@ -212,6 +212,7 @@ class Torc1WireXSDFactory : public TorcXSDFactory
     void GetXSD(QMultiMap<QString,QString> &XSD) {
         XSD.insert(XSD_INPUTTYPES, wire1InputTypes);
         XSD.insert(XSD_INPUTS, wire1Inputs);
+        XSD.insert(XSD_UNIQUE, wire1Unique);
     }
 
 } Torc1WireXSDFactory;
