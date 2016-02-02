@@ -63,6 +63,7 @@ TorcCentral::TorcCentral()
     QString graphdot = GetTorcConfigDir() + DYNAMIC_DIRECTORY + "stategraph.dot";
     QString graphsvg = GetTorcConfigDir() + DYNAMIC_DIRECTORY + "stategraph.svg";
     QString config   = GetTorcConfigDir() + DYNAMIC_DIRECTORY + "torc.xml";
+    QString xsd      = GetTorcConfigDir() + DYNAMIC_DIRECTORY + "torc.xsd";
     QString current  = GetTorcConfigDir() + "/torc.xml";
 
     if (QFile::exists(graphdot))
@@ -71,6 +72,8 @@ TorcCentral::TorcCentral()
         QFile::remove(graphsvg);
     if (QFile::exists(config))
         QFile::remove(config);
+    if (QFile::exists(xsd))
+        QFile::remove(xsd);
 
     QFile currentconfig(current);
     if (!currentconfig.copy(config))
@@ -246,17 +249,36 @@ bool TorcCentral::LoadConfig(void)
     {
         LOG(VB_GENERAL, LOG_INFO, "Starting validation of configuration file");
 
-        TorcXmlValidator validator(xml, xsd);
-        if (!validator.Validated())
+        QByteArray xsddata = GetCustomisedXSD(xsd);
+        if (!xsddata.isEmpty())
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Configuration file '%1' failed validation").arg(xml));
-            // make sure we re-validate
-            gLocalContext->SetSetting("configLastValidated", QString("never"));
-            return false;
-        }
+            // save the XSD for the user to inspect if necessary
+            QString customxsd = GetTorcConfigDir() + DYNAMIC_DIRECTORY + "torc.xsd";
+            QFile customxsdfile(customxsd);
+            if (customxsdfile.open(QIODevice::ReadWrite))
+            {
+                customxsdfile.write(xsddata);
+                customxsdfile.flush();
+                customxsdfile.close();
+                LOG(VB_GENERAL, LOG_INFO, QString("Saved current XSD as '%1'").arg(customxsd));
+            }
+            else
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("Failed to open '%1' for writing").arg(customxsd));
+            }
 
-        LOG(VB_GENERAL, LOG_INFO, "Configuration successfully validated");
-        gLocalContext->SetSetting("configLastValidated", QDateTime::currentDateTime().toString());
+            TorcXmlValidator validator(xml, xsddata);
+            if (!validator.Validated())
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("Configuration file '%1' failed validation").arg(xml));
+                // make sure we re-validate
+                gLocalContext->SetSetting("configLastValidated", QString("never"));
+                return false;
+            }
+
+            LOG(VB_GENERAL, LOG_INFO, "Configuration successfully validated");
+            gLocalContext->SetSetting("configLastValidated", QDateTime::currentDateTime().toString());
+        }
     }
 #else
     LOG(VB_GENERAL, LOG_INFO, "QXmlPatterns unavailable - not validating configuration file.");
@@ -295,6 +317,28 @@ bool TorcCentral::LoadConfig(void)
 
     LOG(VB_GENERAL, LOG_INFO, QString("Loaded config from %1").arg(xml));
     return true;
+}
+
+QByteArray TorcCentral::GetCustomisedXSD(const QString &BaseXSDFile)
+{
+    QByteArray result;
+    if (!QFile::exists(BaseXSDFile))
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Base XSD file '%1' does not exist").arg(BaseXSDFile));
+        return result;
+    }
+
+    QFile xsd(BaseXSDFile);
+    if (!xsd.open(QIODevice::ReadOnly))
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Failed to open base XSD file '%1'").arg(BaseXSDFile));
+        return result;
+    }
+
+    result = xsd.readAll();
+    xsd.close();
+    TorcXSDFactory::CustomiseXSD(result);
+    return result;
 }
 
 /// Handle Exit events
@@ -385,3 +429,49 @@ class TorcCentralObject : public TorcAdminObject, public TorcStringFactory
   private:
     TorcCentral *m_object;
 } TorcCentralObject;
+
+TorcXSDFactory* TorcXSDFactory::gTorcXSDFactory = NULL;
+
+TorcXSDFactory::TorcXSDFactory()
+{
+    nextTorcXSDFactory = gTorcXSDFactory;
+    gTorcXSDFactory = this;
+}
+
+TorcXSDFactory::~TorcXSDFactory()
+{
+}
+
+TorcXSDFactory* TorcXSDFactory::GetTorcXSDFactory(void)
+{
+    return gTorcXSDFactory;
+}
+
+TorcXSDFactory* TorcXSDFactory::NextFactory(void) const
+{
+    return nextTorcXSDFactory;
+}
+
+/*! \brief Customise the given base XSD with additional elements
+*/
+void TorcXSDFactory::CustomiseXSD(QByteArray &XSD)
+{
+    QStringList identifiers;
+    identifiers << XSD_TYPES << XSD_INPUTTYPES << XSD_INPUTS << XSD_CONTROLTYPES << XSD_CONTROLS;
+    identifiers << XSD_OUTPUTTYPES << XSD_OUTPUTS << XSD_UNIQUE;
+
+    QMultiMap<QString,QString> xsds;
+    TorcXSDFactory* factory = TorcXSDFactory::GetTorcXSDFactory();
+    for ( ; factory; factory = factory->NextFactory())
+        factory->GetXSD(xsds);
+
+    foreach (QString ident, identifiers)
+    {
+        QString replacewith;
+        QMultiMap<QString,QString>::const_iterator it = xsds.constBegin();
+        for ( ; it != xsds.constEnd(); ++it)
+            if (it.key() == ident)
+                replacewith += it.value();
+        XSD.replace(ident, replacewith.toLatin1());
+    }
+}

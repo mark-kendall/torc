@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
+<!-- This is the base XSD for the configuration file. It may be modified at run time if optional
+     components are enabled that require additional schema definitions. This ensures the XSD does
+     not become unnecessarily cluttered - which can drastically reduce start up times -->
+
 <!-- general device types -->
 <!-- use xs:all to define required types without ordering - but it cannot be inherited, so just repeat
      the device name, username and userdescription for each device type to ensure completeness without
@@ -63,25 +67,9 @@
   </xs:restriction>
 </xs:simpleType>
 
+<!--TORC_XSD_TYPES-->
+
 <!-- input definitions -->
-<xs:complexType name="ds18b20Type">
-  <!-- a device must have 1 name and 0 or 1 username and userdescription - in any order-->
-  <xs:all>
-    <!-- start of base types -->
-    <xs:element name="name"            type="deviceNameType"/>
-    <xs:element name="username"        type="userNameType" minOccurs="0" maxOccurs="1"/>
-    <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
-    <!-- end of base types -->
-    <xs:element name="wire1serial"     type="validStringType"/>
-  </xs:all>
-</xs:complexType>
-
-<xs:complexType name="wire1Type">
-  <xs:choice minOccurs="1" maxOccurs="unbounded">
-    <xs:element name="ds18b20" type="ds18b20Type"/>
-  </xs:choice>
-</xs:complexType>
-
 <xs:complexType name="networkSwitchType">
   <xs:all>
     <xs:element name="name"     type="deviceNameType"/>
@@ -160,12 +148,14 @@
   </xs:sequence>
 </xs:complexType>
 
+<!--TORC_XSD_INPUTTYPES-->
+
 <xs:complexType name="inputsType">
   <xs:all>
     <!-- 0 or 1 instances of each of these types in any order-->
-    <xs:element minOccurs="0" maxOccurs="1" name="wire1"   type="wire1Type"/>
     <xs:element minOccurs="0" maxOccurs="1" name="network" type="networkType"/>
     <xs:element minOccurs="0" maxOccurs="1" name="gpio"    type="gpioInputType"/>
+<!--TORC_XSD_INPUTS-->
   </xs:all>
 </xs:complexType>
 
@@ -286,12 +276,15 @@
   </xs:choice>
 </xs:complexType>
 
+<!--TORC_XSD_CONTROLTYPES-->
+
 <xs:complexType name="controlType">
   <xs:all>
     <!-- 0 or 1 instances of logic, timer and transition -->
     <xs:element minOccurs="0" maxOccurs="1" name="logic"      type="logicType"/>
     <xs:element minOccurs="0" maxOccurs="1" name="timer"      type="timersType"/>
     <xs:element minOccurs="0" maxOccurs="1" name="transition" type="transitionsType"/>
+<!--TORC_XSD_CONTROLS-->
   </xs:all>
 </xs:complexType>
 
@@ -342,12 +335,15 @@
   </xs:sequence>
 </xs:complexType>
 
+<!--TORC_XSD_OUTPUTTYPES-->
+
 <xs:complexType name="outputsType">
   <xs:all>
     <!-- 0 or 1 instances of these types -->
     <xs:element minOccurs="0" maxOccurs="1" name="network" type="networkType"/>
     <xs:element minOccurs="0" maxOccurs="1" name="i2c"     type="i2cType"/>
     <xs:element minOccurs="0" maxOccurs="1" name="gpio"    type="gpioOutputType"/>
+<!--TORC_XSD_OUTPUTS-->
   </xs:all>
 </xs:complexType>
 
@@ -373,16 +369,12 @@
     <xs:selector xpath=".//i2caddress" />
     <xs:field xpath="." />
   </xs:unique>
-  <!-- enforce unique 1Wire serial numbers -->
-  <xs:unique name="uniqueWire1Serial">
-    <xs:selector xpath=".//wire1serial" />
-    <xs:field xpath="." />
-  </xs:unique>
   <!-- enforce unique GPIO pin numbers -->
   <xs:unique name="uniqueGPIOPinNumber">
     <xs:selector xpath=".//gpiopinnumber" />
     <xs:field xpath="." />
   </xs:unique>
+<!--TORC_XSD_UNIQUE-->
 </xs:element>
 
 </xs:schema>

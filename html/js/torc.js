@@ -214,7 +214,7 @@ $(document).ready(function() {
             // we need the central menu before adding other options
             // NB centralSubscriptionChanged should only ever be called once...
             addFileModal('config', torc.ViewConfigTitleTr, torc.ViewConfigTr, '/content/torc.xml', 'xml');
-            addFileModal('xsd',    torc.ViewXSDTitleTr,    torc.ViewXSDTr,    '/torc.xsd', 'xml');
+            addFileModal('xsd',    torc.ViewXSDTitleTr,    torc.ViewXSDTr,    '/content/torc.xsd', 'xml');
             addFileModal('dot',    torc.ViewDOTTitleTr,    torc.ViewDOTTr,    '/content/stategraph.dot', 'text');
 
             torcapi.setup(torcconnection);

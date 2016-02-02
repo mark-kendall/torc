@@ -180,3 +180,38 @@ Torc1WireDeviceFactory* Torc1WireDeviceFactory::NextFactory(void) const
 {
     return nextTorc1WireDeviceFactory;
 }
+
+static const QString wire1InputTypes =
+"<xs:complexType name='ds18b20Type'>\r\n"
+"  <xs:all>\r\n"
+"    <xs:element name='name'            type='deviceNameType'/>\r\n"
+"    <xs:element name='username'        type='userNameType' minOccurs='0' maxOccurs='1'/>\r\n"
+"    <xs:element name='userdescription' type='userDescriptionType' minOccurs='0' maxOccurs='1'/>\r\n"
+"    <xs:element name='wire1serial'     type='validStringType'/>\r\n"
+"  </xs:all>\r\n"
+"</xs:complexType>\r\n\r\n"
+"<xs:complexType name='wire1Type'>\r\n"
+"  <xs:choice minOccurs='1' maxOccurs='unbounded'>\r\n"
+"    <xs:element name='ds18b20' type='ds18b20Type'/>\r\n"
+"  </xs:choice>\r\n"
+"</xs:complexType>\r\n";
+
+static const QString wire1Inputs =
+"    <xs:element minOccurs='0' maxOccurs='1' name='wire1'   type='wire1Type'/>\r\n";
+
+static const QString wire1Unique =
+"<!-- enforce unique 1Wire serial numbers -->\r\n"
+"<xs:unique name='uniqueWire1Serial'>\r\n"
+"<xs:selector xpath='.//wire1serial' />\r\n"
+"  <xs:field xpath='.' />\r\n"
+"</xs:unique>\r\n";
+
+class Torc1WireXSDFactory : public TorcXSDFactory
+{
+  public:
+    void GetXSD(QMultiMap<QString,QString> &XSD) {
+        XSD.insert(XSD_INPUTTYPES, wire1InputTypes);
+        XSD.insert(XSD_INPUTS, wire1Inputs);
+    }
+
+} Torc1WireXSDFactory;
