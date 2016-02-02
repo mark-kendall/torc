@@ -2,7 +2,7 @@
 *
 * This file is part of the Torc project.
 *
-* Copyright (C) Mark Kendall 2015
+* Copyright (C) Mark Kendall 2015-16
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 
 // Torc
 #include "torclogging.h"
+#include "torccentral.h"
 #include "torcpigpio.h"
 #include "torcinputs.h"
 #include "torcoutputs.h"
@@ -147,3 +148,70 @@ void TorcPiGPIO::Destroy(void)
     }
     m_outputs.clear();
 }
+
+static const QString pigpioInputTypes =
+"<xs:simpleType name='gpioPinNumberType'>\r\n"
+"  <xs:restriction base='xs:integer'>\r\n"
+"    <!-- max pin number is currently defined in TorcPiGPIO -->\r\n"
+"    <xs:minInclusive value='0'/>\r\n"
+"    <xs:maxInclusive value='6'/>\r\n"
+"  </xs:restriction>\r\n"
+"</xs:simpleType>\r\n"
+"\r\n"
+"<xs:complexType name='gpioInputPinType'>\r\n"
+"  <xs:all>\r\n"
+"    <xs:element name='name'     type='deviceNameType'/>\r\n"
+"    <xs:element name='username' type='userNameType' minOccurs='0' maxOccurs='1'/>\r\n"
+"    <xs:element name='userdescription' type='userDescriptionType' minOccurs='0' maxOccurs='1'/>\r\n"
+"    <xs:element name='gpiopinnumber'   type='gpioPinNumberType'/>\r\n"
+"  </xs:all>\r\n"
+"</xs:complexType>\r\n"
+"\r\n"
+"<xs:complexType name='gpioInputType'>\r\n"
+"  <xs:sequence>\r\n"
+"    <xs:element minOccurs='1' maxOccurs='unbounded' name='pin' type='gpioInputPinType'/>\r\n"
+"  </xs:sequence>\r\n"
+"</xs:complexType>\r\n";
+
+static const QString pigpioInputs =
+"    <xs:element minOccurs='0' maxOccurs='1' name='gpio'    type='gpioInputType'/>\r\n";
+
+static const QString pigpioOutputTypes =
+"<xs:complexType name='gpioOutputPinType'>\r\n"
+"  <xs:all>\r\n"
+"    <xs:element name='name'     type='deviceNameType'/>\r\n"
+"    <xs:element name='username' type='userNameType' minOccurs='0' maxOccurs='1'/>\r\n"
+"    <xs:element name='userdescription' type='userDescriptionType' minOccurs='0' maxOccurs='1'/>\r\n"
+"    <xs:element name='gpiopinnumber' type='gpioPinNumberType'/>\r\n"
+"    <xs:element name='default'  type='switchNumberType'/>\r\n"
+"  </xs:all>\r\n"
+"</xs:complexType>\r\n"
+"\r\n"
+"<xs:complexType name='gpioOutputType'>\r\n"
+"  <xs:sequence>\r\n"
+"    <xs:element minOccurs='1' maxOccurs='unbounded' name='pin' type='gpioOutputPinType'/>\r\n"
+"  </xs:sequence>\r\n"
+"</xs:complexType>\r\n";
+
+static const QString pigpioOutputs =
+"    <xs:element minOccurs='0' maxOccurs='1' name='gpio'    type='gpioOutputType'/>\r\n";
+
+static const QString pigpioUnique =
+"  <!-- enforce unique GPIO pin numbers -->\r\n"
+"  <xs:unique name='uniqueGPIOPinNumber'>\r\n"
+"    <xs:selector xpath='.//gpiopinnumber' />\r\n"
+"    <xs:field xpath='.' />\r\n"
+"  </xs:unique>\r\n";
+
+class TorcPiGPIOXSDFactory : public TorcXSDFactory
+{
+  public:
+    void GetXSD(QMultiMap<QString,QString> &XSD) {
+        XSD.insert(XSD_INPUTTYPES, pigpioInputTypes);
+        XSD.insert(XSD_INPUTS, pigpioInputs);
+        XSD.insert(XSD_INPUTS, pigpioOutputTypes);
+        XSD.insert(XSD_INPUTS, pigpioOutputs);
+        XSD.insert(XSD_INPUTS, pigpioUnique);
+    }
+} TorcPiGPIOXSDFactory;
+

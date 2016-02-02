@@ -66,9 +66,7 @@
     <xs:pattern value="0x[0-9a-fA-F]+"/>
   </xs:restriction>
 </xs:simpleType>
-
 <!--TORC_XSD_TYPES-->
-
 <!-- input definitions -->
 <xs:complexType name="networkSwitchType">
   <xs:all>
@@ -124,37 +122,11 @@
     <xs:element name="button"      type="networkButtonType"/>
   </xs:choice>
 </xs:complexType>
-
-<xs:simpleType name="gpioPinNumberType">
-  <xs:restriction base="xs:integer">
-    <!-- max pin number is currently defined in TorcPiGPIO -->
-    <xs:minInclusive value="0"/>
-    <xs:maxInclusive value="6"/>
-  </xs:restriction>
-</xs:simpleType>
-
-<xs:complexType name="gpioInputPinType">
-  <xs:all>
-    <xs:element name="name"     type="deviceNameType"/>
-    <xs:element name="username" type="userNameType" minOccurs="0" maxOccurs="1"/>
-    <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
-    <xs:element name="gpiopinnumber"   type="gpioPinNumberType"/>
-  </xs:all>
-</xs:complexType>
-
-<xs:complexType name="gpioInputType">
-  <xs:sequence>
-    <xs:element minOccurs="1" maxOccurs="unbounded" name="pin" type="gpioInputPinType"/>
-  </xs:sequence>
-</xs:complexType>
-
 <!--TORC_XSD_INPUTTYPES-->
-
 <xs:complexType name="inputsType">
   <xs:all>
     <!-- 0 or 1 instances of each of these types in any order-->
     <xs:element minOccurs="0" maxOccurs="1" name="network" type="networkType"/>
-    <xs:element minOccurs="0" maxOccurs="1" name="gpio"    type="gpioInputType"/>
 <!--TORC_XSD_INPUTS-->
   </xs:all>
 </xs:complexType>
@@ -275,9 +247,7 @@
     <xs:element name="outinbounce"  type="transitionType"/>
   </xs:choice>
 </xs:complexType>
-
 <!--TORC_XSD_CONTROLTYPES-->
-
 <xs:complexType name="controlType">
   <xs:all>
     <!-- 0 or 1 instances of logic, timer and transition -->
@@ -289,60 +259,11 @@
 </xs:complexType>
 
 <!-- outputs definitions -->
-<xs:simpleType name="pca9685ChannelNumberType">
-  <xs:restriction base="xs:integer">
-    <xs:minInclusive value="0"/>
-    <xs:maxInclusive value="15"/>
-  </xs:restriction>
-</xs:simpleType>
-
-<xs:complexType name="pca9685ChannelType">
-  <xs:all>
-    <xs:element name="name"     type="deviceNameType"/>
-    <xs:element name="username" type="userNameType" minOccurs="0" maxOccurs="1"/>
-    <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
-    <xs:element name="number"   type="pca9685ChannelNumberType"/>
-  </xs:all>
-</xs:complexType>
-
-<xs:complexType name="pca9685Type">
-  <xs:sequence>
-    <!-- NB this enforces the address first -->
-    <xs:element name="i2caddress" type="hexType" minOccurs="1" maxOccurs="1"/>
-    <xs:element name="channel"    type="pca9685ChannelType" minOccurs="1" maxOccurs="16"/>
-  </xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="i2cType">
-  <xs:choice minOccurs="1" maxOccurs="unbounded">
-    <xs:element name="pca9685" type="pca9685Type"/>
-  </xs:choice>
-</xs:complexType>
-
-<xs:complexType name="gpioOutputPinType">
-  <xs:all>
-    <xs:element name="name"     type="deviceNameType"/>
-    <xs:element name="username" type="userNameType" minOccurs="0" maxOccurs="1"/>
-    <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
-    <xs:element name="gpiopinnumber" type="gpioPinNumberType"/>
-    <xs:element name="default"  type="switchNumberType"/>
-  </xs:all>
-</xs:complexType>
-
-<xs:complexType name="gpioOutputType">
-  <xs:sequence>
-    <xs:element minOccurs="1" maxOccurs="unbounded" name="pin" type="gpioOutputPinType"/>
-  </xs:sequence>
-</xs:complexType>
-
 <!--TORC_XSD_OUTPUTTYPES-->
-
 <xs:complexType name="outputsType">
   <xs:all>
     <!-- 0 or 1 instances of these types -->
     <xs:element minOccurs="0" maxOccurs="1" name="network" type="networkType"/>
-    <xs:element minOccurs="0" maxOccurs="1" name="i2c"     type="i2cType"/>
-    <xs:element minOccurs="0" maxOccurs="1" name="gpio"    type="gpioOutputType"/>
 <!--TORC_XSD_OUTPUTS-->
   </xs:all>
 </xs:complexType>
@@ -362,16 +283,6 @@
   <!-- enforce unique device names -->
   <xs:unique name="uniqueDeviceName">
     <xs:selector xpath=".//name" />
-    <xs:field xpath="." />
-  </xs:unique>
-  <!-- enforce unique i2c addresses -->
-  <xs:unique name="uniqueI2CAddress">
-    <xs:selector xpath=".//i2caddress" />
-    <xs:field xpath="." />
-  </xs:unique>
-  <!-- enforce unique GPIO pin numbers -->
-  <xs:unique name="uniqueGPIOPinNumber">
-    <xs:selector xpath=".//gpiopinnumber" />
     <xs:field xpath="." />
   </xs:unique>
 <!--TORC_XSD_UNIQUE-->

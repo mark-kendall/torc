@@ -19,6 +19,7 @@
 
 // Torc
 #include "torclogging.h"
+#include "torccentral.h"
 #include "torcinput.h"
 #include "torcoutput.h"
 #include "torci2cbus.h"
@@ -141,3 +142,54 @@ void TorcI2CBus::Destroy(void)
     qDeleteAll(m_devices);
     m_devices.clear();
 }
+static const QString i2cOutputTypes =
+"<xs:simpleType name='pca9685ChannelNumberType'>\r\n"
+"  <xs:restriction base='xs:integer'>\r\n"
+"    <xs:minInclusive value='0'/>\r\n"
+"    <xs:maxInclusive value='15'/>\r\n"
+"  </xs:restriction>\r\n"
+"</xs:simpleType>\r\n"
+"\r\n"
+"<xs:complexType name='pca9685ChannelType'>\r\n"
+"  <xs:all>\r\n"
+"    <xs:element name='name'     type='deviceNameType'/>\r\n"
+"    <xs:element name='username' type='userNameType' minOccurs='0' maxOccurs='1'/>\r\n"
+"    <xs:element name='userdescription' type='userDescriptionType' minOccurs='0' maxOccurs='1'/>\r\n"
+"    <xs:element name='number'   type='pca9685ChannelNumberType'/>\r\n"
+"  </xs:all>\r\n"
+"</xs:complexType>\r\n"
+"\r\n"
+"<xs:complexType name='pca9685Type'>\r\n"
+"  <xs:sequence>\r\n"
+"    <!-- NB this enforces the address first -->\r\n"
+"    <xs:element name='i2caddress' type='hexType' minOccurs='1' maxOccurs='1'/>\r\n"
+"    <xs:element name='channel'    type='pca9685ChannelType' minOccurs='1' maxOccurs='16'/>\r\n"
+"  </xs:sequence>\r\n"
+"</xs:complexType>\r\n"
+"\r\n"
+"<xs:complexType name='i2cType'>\r\n"
+"  <xs:choice minOccurs='1' maxOccurs='unbounded'>\r\n"
+"    <xs:element name='pca9685' type='pca9685Type'/>\r\n"
+"  </xs:choice>\r\n"
+"</xs:complexType>\r\n";
+
+static const QString i2cOutputs =
+"    <xs:element minOccurs='0' maxOccurs='1' name='i2c'     type='i2cType'/>\r\n";
+
+static const QString i2cUnique =
+"    <!-- enforce unique i2c addresses -->\r\n"
+"    <xs:unique name='uniqueI2CAddress'>\r\n"
+"      <xs:selector xpath='.//i2caddress' />\r\n"
+"      <xs:field xpath='.' />\r\n"
+"    </xs:unique>\r\n";
+
+
+class TorcI2CXSDFactory : public TorcXSDFactory
+{
+  public:
+    void GetXSD(QMultiMap<QString,QString> &XSD) {
+        XSD.insert(XSD_INPUTS, i2cOutputTypes);
+        XSD.insert(XSD_INPUTS, i2cOutputs);
+        XSD.insert(XSD_INPUTS, i2cUnique);
+    }
+} TorcI2CXSDFactory;
