@@ -37,7 +37,7 @@ class TorcPiInputThread : public TorcQThread
     QFile        m_file;
 };
 
-class TorcPiInput : public TorcSwitchSensor
+class TorcPiInput : public TorcSwitchInput
 {
     Q_OBJECT
 

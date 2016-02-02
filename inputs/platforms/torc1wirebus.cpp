@@ -111,7 +111,7 @@ void Torc1WireBus::Create(const QVariantMap &Details)
                     QVariantMap details = it2.value().toMap();
 
                     // a 1Wire device must have the <id> field
-                    if (!details.contains("id"))
+                    if (!details.contains("wire1serial"))
                     {
                         LOG(VB_GENERAL, LOG_ERR, QString("Cannot create 1Wire device without unique 1Wire ID ('%1' '%2')")
                             .arg(devicetype).arg(details.value("name").toString()));
@@ -129,7 +129,7 @@ void Torc1WireBus::Create(const QVariantMap &Details)
 
                         if (device)
                         {
-                            QString deviceid = details.value("id").toString();
+                            QString deviceid = details.value("wire1serial").toString();
                             LOG(VB_GENERAL, LOG_INFO, QString("New 1Wire device: %1").arg(deviceid));
                             m_inputs.insert(deviceid, device);
                         }

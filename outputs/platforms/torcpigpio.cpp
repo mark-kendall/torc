@@ -23,7 +23,7 @@
 // Torc
 #include "torclogging.h"
 #include "torcpigpio.h"
-#include "torcsensors.h"
+#include "torcinputs.h"
 #include "torcoutputs.h"
 
 // wiringPi
@@ -85,7 +85,7 @@ void TorcPiGPIO::Create(const QVariantMap &GPIO)
                 {
                     QVariantMap pin = it2.value().toMap();
 
-                    if (!pin.contains("number"))
+                    if (!pin.contains("gpiopinnumber"))
                     {
                         LOG(VB_GENERAL, LOG_ERR, QString("GPIO device '%1' does not specify pin <number>").arg(pin.value("name").toString()));
                         continue;
@@ -98,7 +98,7 @@ void TorcPiGPIO::Create(const QVariantMap &GPIO)
                     }
 
                     bool ok = false;
-                    int number = pin.value("number").toInt(&ok);
+                    int number = pin.value("gpiopinnumber").toInt(&ok);
                     if (!ok || number < 0 || number >= NUMBER_PINS)
                     {
                         LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse valid pin from '%1'").arg(pin.value("pin").toString()));
@@ -134,7 +134,7 @@ void TorcPiGPIO::Destroy(void)
     QMap<int,TorcPiInput*>::iterator it = m_inputs.begin();
     for ( ; it != m_inputs.end(); ++it)
     {
-         TorcSensors::gSensors->RemoveSensor(it.value());
+         TorcInputs::gInputs->RemoveInput(it.value());
          it.value()->DownRef();
     }
     m_inputs.clear();

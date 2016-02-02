@@ -122,7 +122,7 @@ Torc1WireDS18B20::Torc1WireDS18B20(const QVariantMap &Details)
     m_deviceId(""),
     m_readThread(NULL)
 {
-    m_deviceId = Details.value("id").toString();
+    m_deviceId = Details.value("wire1serial").toString();
     m_readThread = new Torc1WireReadThread(this, m_deviceId);
     m_readThread->start();
 }
