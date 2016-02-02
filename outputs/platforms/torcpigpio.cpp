@@ -59,7 +59,13 @@ void TorcPiGPIO::Create(const QVariantMap &GPIO)
         }
         else
         {
-            LOG(VB_GENERAL, LOG_INFO, QString("%1 GPIO pins available").arg(NUMBER_PINS));
+            int revision = piBoardRev();
+            if (revision == 1)
+                LOG(VB_GENERAL, LOG_INFO, "Revision 1 board - 7 pins available (0-6)");
+            else if (revision == 2)
+                LOG(VB_GENERAL, LOG_INFO, "Revision 2 board - 22 pins available (0-6 and 17-31");
+            else
+                LOG(VB_GENERAL, LOG_INFO, "Unknown board revision...");
         }
     }
 
@@ -100,7 +106,7 @@ void TorcPiGPIO::Create(const QVariantMap &GPIO)
 
                     bool ok = false;
                     int number = pin.value("gpiopinnumber").toInt(&ok);
-                    if (!ok || number < 0 || number >= NUMBER_PINS)
+                    if (!ok || (ok && (wpiPinToGpio(number) < 0)))
                     {
                         LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse valid pin from '%1'").arg(pin.value("pin").toString()));
                         continue;
@@ -149,14 +155,52 @@ void TorcPiGPIO::Destroy(void)
     m_outputs.clear();
 }
 
-static const QString pigpioInputTypes =
+/* For revision 1 (original Pi Model b) boards, allow wiringPi pins 0 to 6.
+ * Pin 7 is used by the kernel for the 1Wire bus.
+ * Pins 8 and 9 are for I2C.
+ * Pins 10-14 are for SPI.
+ * Pins 15 and 16 are for UART by default.
+*/
+static const QString gpioPinNumberTypeRev1 =
 "<xs:simpleType name='gpioPinNumberType'>\r\n"
 "  <xs:restriction base='xs:integer'>\r\n"
-"    <!-- max pin number is currently defined in TorcPiGPIO -->\r\n"
 "    <xs:minInclusive value='0'/>\r\n"
 "    <xs:maxInclusive value='6'/>\r\n"
 "  </xs:restriction>\r\n"
-"</xs:simpleType>\r\n"
+"</xs:simpleType>\r\n";
+
+/* For revision 2 boards and beyond, we have the Rev 1 pins as above, plus
+ * pins 17-20 on Model B Rev 2 boards only and 21-31 for B+...
+*/
+static const QString gpioPinNumberTypeRev2 =
+"<xs:simpleType name='gpioPinNumberType'>\r\n"
+"  <xs:restriction base='xs:integer'>\r\n"
+"    <xs:enumeration value='0'/>\r\n"
+"    <xs:enumeration value='1'/>\r\n"
+"    <xs:enumeration value='2'/>\r\n"
+"    <xs:enumeration value='3'/>\r\n"
+"    <xs:enumeration value='4'/>\r\n"
+"    <xs:enumeration value='5'/>\r\n"
+"    <xs:enumeration value='6'/>\r\n"
+"    <xs:enumeration value='17'/>\r\n"
+"    <xs:enumeration value='18'/>\r\n"
+"    <xs:enumeration value='19'/>\r\n"
+"    <xs:enumeration value='20'/>\r\n"
+"    <xs:enumeration value='21'/>\r\n"
+"    <xs:enumeration value='22'/>\r\n"
+"    <xs:enumeration value='23'/>\r\n"
+"    <xs:enumeration value='24'/>\r\n"
+"    <xs:enumeration value='25'/>\r\n"
+"    <xs:enumeration value='26'/>\r\n"
+"    <xs:enumeration value='27'/>\r\n"
+"    <xs:enumeration value='28'/>\r\n"
+"    <xs:enumeration value='29'/>\r\n"
+"    <xs:enumeration value='30'/>\r\n"
+"    <xs:enumeration value='31'/>\r\n"
+"  </xs:restriction>\r\n"
+"</xs:simpleType>\r\n";
+
+static const QString pigpioInputTypes =
 "\r\n"
 "<xs:complexType name='gpioInputPinType'>\r\n"
 "  <xs:all>\r\n"
@@ -207,7 +251,8 @@ class TorcPiGPIOXSDFactory : public TorcXSDFactory
 {
   public:
     void GetXSD(QMultiMap<QString,QString> &XSD) {
-        XSD.insert(XSD_INPUTTYPES, pigpioInputTypes);
+        bool rev1 = piBoardRev() == 1;
+        XSD.insert(XSD_INPUTTYPES, (rev1 ? gpioPinNumberTypeRev1 : gpioPinNumberTypeRev2) + pigpioInputTypes);
         XSD.insert(XSD_INPUTS, pigpioInputs);
         XSD.insert(XSD_OUTPUTTYPES, pigpioOutputTypes);
         XSD.insert(XSD_OUTPUTS, pigpioOutputs);
