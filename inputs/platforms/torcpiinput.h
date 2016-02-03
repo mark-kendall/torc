@@ -1,5 +1,5 @@
-#ifndef TORCPIINPUT_H
-#define TORCPIINPUT_H
+#ifndef TORCPISWITCHINPUT_H
+#define TORCPISWITCHINPUT_H
 
 // Qt
 #include <QFile>
@@ -8,16 +8,16 @@
 #include "torcqthread.h"
 #include "torcswitchinput.h"
 
-class TorcPiInput;
+class TorcPiSwitchInput;
 
 // this has to be declared here as we cannot have a Q_OBJECT class declared privately
-class TorcPiInputThread : public TorcQThread
+class TorcPiSwitchInputThread : public TorcQThread
 {
     Q_OBJECT
 
   public:
-    TorcPiInputThread(TorcPiInput* Parent, int Pin);
-    virtual ~TorcPiInputThread();
+    TorcPiSwitchInputThread(TorcPiSwitchInput* Parent, int Pin);
+    virtual ~TorcPiSwitchInputThread();
 
     void         Start    (void);
     void         Finish   (void);
@@ -31,26 +31,26 @@ class TorcPiInputThread : public TorcQThread
     void         Update   (void);
  
   private:
-    TorcPiInput *m_parent;
-    int          m_pin;
-    bool         m_aborted;
-    QFile        m_file;
+    TorcPiSwitchInput *m_parent;
+    int                m_pin;
+    bool               m_aborted;
+    QFile              m_file;
 };
 
-class TorcPiInput : public TorcSwitchInput
+class TorcPiSwitchInput : public TorcSwitchInput
 {
     Q_OBJECT
 
   public:
-    TorcPiInput(int Pin, const QVariantMap &Details);
-    virtual ~TorcPiInput();
+    TorcPiSwitchInput(int Pin, const QVariantMap &Details);
+    virtual ~TorcPiSwitchInput();
 
     void               Start          (void);
     QStringList        GetDescription (void);
 
   private:
-    int                m_pin;
-    TorcPiInputThread *m_inputThread;
+    int                      m_pin;
+    TorcPiSwitchInputThread *m_inputThread;
 };
 
-#endif // TORCPIINPUT_H
+#endif // TORCPISWITCHINPUT_H

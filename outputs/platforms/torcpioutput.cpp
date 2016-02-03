@@ -1,8 +1,8 @@
-/* Class TorcPWMOutput
+/* Class TorcPiSwitchOutput
 *
 * This file is part of the Torc project.
 *
-* Copyright (C) Mark Kendall 2015
+* Copyright (C) Mark Kendall 2015-16
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 
 #define DEFAULT_VALUE 0
 
-TorcPiOutput::TorcPiOutput(int Pin, const QVariantMap &Details)
+TorcPiSwitchOutput::TorcPiSwitchOutput(int Pin, const QVariantMap &Details)
   : TorcSwitchOutput(DEFAULT_VALUE, "PiGPIOOutput", Details),
     m_pin(Pin)
 {
@@ -39,23 +39,23 @@ TorcPiOutput::TorcPiOutput(int Pin, const QVariantMap &Details)
     digitalWrite(m_pin, DEFAULT_VALUE);
 }
 
-TorcPiOutput::~TorcPiOutput()
+TorcPiSwitchOutput::~TorcPiSwitchOutput()
 {
     // always return the pin to its default state.
     // we must do this here to trigger the correct SetValue implementation
     SetValue(defaultValue);
 }
 
-QStringList TorcPiOutput::GetDescription(void)
+QStringList TorcPiSwitchOutput::GetDescription(void)
 {
     return QStringList() << tr("Pin %1").arg(m_pin);
 }
 
-void TorcPiOutput::SetValue(double Value)
+void TorcPiSwitchOutput::SetValue(double Value)
 {
     QMutexLocker locker(lock);
 
-    // as in TorcSwithcOutput::SetValue
+    // as in TorcSwitchOutput::SetValue
     double newvalue = Value == 0.0 ? 0 : 1;
 
     // ignore same value updates

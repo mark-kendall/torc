@@ -1,8 +1,8 @@
-/* Class TorcPiInput
+/* Class TorcPiSwitchInput
 *
 * This file is part of the Torc project.
 *
-* Copyright (C) Mark Kendall 2015
+* Copyright (C) Mark Kendall 2015-16
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@
 
 #define DEFAULT_VALUE 0
 
-TorcPiInputThread::TorcPiInputThread(TorcPiInput *Parent, int Pin)
+TorcPiSwitchInputThread::TorcPiSwitchInputThread(TorcPiSwitchInput *Parent, int Pin)
   : TorcQThread(QString("GPIOInput%1").arg(Pin)),
     m_parent(Parent),
     m_pin(Pin),
@@ -44,11 +44,11 @@ TorcPiInputThread::TorcPiInputThread(TorcPiInput *Parent, int Pin)
    connect(this, SIGNAL(Changed(double)), m_parent, SLOT(SetValue(double)));
 }
 
-TorcPiInputThread::~TorcPiInputThread()
+TorcPiSwitchInputThread::~TorcPiSwitchInputThread()
 {
 }
 
-void TorcPiInputThread::Finish(void)
+void TorcPiSwitchInputThread::Finish(void)
 {
     // close input file
     m_file.close();
@@ -66,14 +66,14 @@ void TorcPiInputThread::Finish(void)
     }
 }
 
-void TorcPiInputThread::Update(void)
+void TorcPiSwitchInputThread::Update(void)
 {
     int value = digitalRead(m_pin);
     emit Changed((double)value);
     LOG(VB_GENERAL, LOG_INFO, QString::number(value));
 }
 
-void TorcPiInputThread::Start(void)
+void TorcPiSwitchInputThread::Start(void)
 {
     // disable any internall pull up/down resistors
     pullUpDnControl(m_pin, PUD_OFF);
@@ -143,7 +143,7 @@ void TorcPiInputThread::Start(void)
     }
 }
 
-void TorcPiInputThread::run(void)
+void TorcPiSwitchInputThread::run(void)
 {
     Initialise();
 
@@ -199,19 +199,19 @@ void TorcPiInputThread::run(void)
     Deinitialise();
 }
 
-void TorcPiInputThread::Stop(void)
+void TorcPiSwitchInputThread::Stop(void)
 {
     m_aborted = true;
 }
 
-TorcPiInput::TorcPiInput(int Pin, const QVariantMap &Details)
+TorcPiSwitchInput::TorcPiSwitchInput(int Pin, const QVariantMap &Details)
   : TorcSwitchInput(DEFAULT_VALUE, "PiGPIOInput", Details),
     m_pin(Pin),
-    m_inputThread(new TorcPiInputThread(this, m_pin))
+    m_inputThread(new TorcPiSwitchInputThread(this, m_pin))
 {
 }
 
-TorcPiInput::~TorcPiInput()
+TorcPiSwitchInput::~TorcPiSwitchInput()
 {
     m_inputThread->Stop();
     m_inputThread->quit();
@@ -219,7 +219,7 @@ TorcPiInput::~TorcPiInput()
     delete m_inputThread;
 }
 
-void TorcPiInput::Start(void)
+void TorcPiSwitchInput::Start(void)
 {
     // start listening for interrupts here...
     m_inputThread->start();
@@ -228,7 +228,7 @@ void TorcPiInput::Start(void)
     TorcSwitchInput::Start();
 }
 
-QStringList TorcPiInput::GetDescription(void)
+QStringList TorcPiSwitchInput::GetDescription(void)
 {
     return QStringList() << tr("Pin %1").arg(m_pin);
 }

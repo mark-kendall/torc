@@ -120,12 +120,12 @@ void TorcPiGPIO::Create(const QVariantMap &GPIO)
 
                     if (output)
                     {
-                        TorcPiOutput* out = new TorcPiOutput(number, pin);
+                        TorcPiSwitchOutput* out = new TorcPiSwitchOutput(number, pin);
                         m_outputs.insert(number, out);
                     }
                     else
                     {
-                        TorcPiInput* in   = new TorcPiInput(number, pin);
+                        TorcPiSwitchInput* in   = new TorcPiSwitchInput(number, pin);
                         m_inputs.insert(number, in);
                     }
                 }
@@ -138,7 +138,7 @@ void TorcPiGPIO::Destroy(void)
 {
     QMutexLocker locker(m_lock);
 
-    QMap<int,TorcPiInput*>::iterator it = m_inputs.begin();
+    QMap<int,TorcPiSwitchInput*>::iterator it = m_inputs.begin();
     for ( ; it != m_inputs.end(); ++it)
     {
          TorcInputs::gInputs->RemoveInput(it.value());
@@ -146,7 +146,7 @@ void TorcPiGPIO::Destroy(void)
     }
     m_inputs.clear();
 
-    QMap<int,TorcPiOutput*>::iterator it2 = m_outputs.begin();
+    QMap<int,TorcPiSwitchOutput*>::iterator it2 = m_outputs.begin();
     for ( ; it2 != m_outputs.end(); ++it2)
     {
          TorcOutputs::gOutputs->RemoveOutput(it2.value());

@@ -1,16 +1,16 @@
-#ifndef TORCPIOUTPUT
-#define TORCPIOUTPUT
+#ifndef TORCPISWITCHOUTPUT_H
+#define TORCPISWITCHOUTPUT_H
 
 // Torc
 #include "torcswitchoutput.h"
 
-class TorcPiOutput : public TorcSwitchOutput
+class TorcPiSwitchOutput : public TorcSwitchOutput
 {
   Q_OBJECT
 
   public:
-    TorcPiOutput(int Pin, const QVariantMap &Details);
-    ~TorcPiOutput();
+    TorcPiSwitchOutput(int Pin, const QVariantMap &Details);
+    ~TorcPiSwitchOutput();
 
     QStringList GetDescription(void);
 
@@ -21,4 +21,4 @@ class TorcPiOutput : public TorcSwitchOutput
     int         m_pin;
 };
 
-#endif
+#endif // TORCPISWITCHOUTPUT_H

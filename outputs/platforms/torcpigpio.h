@@ -1,11 +1,6 @@
 #ifndef TORCPIGPIO_H
 #define TORCPIGPIO_H
 
-// this is wiringPi pins 0-6
-// TODO why did I exclude pin 7 (GPIO 7, BCM GPIO 4)
-// TODO detect presence of extra pins (rev2)
-#define NUMBER_PINS 7
-
 // Qt
 #include <QMap>
 #include <QMutex>
@@ -29,9 +24,9 @@ class TorcPiGPIO : public TorcDeviceHandler
     void                       Destroy     (void);
 
   private:
-    QMap<int,TorcPiInput*>     m_inputs;
-    QMap<int,TorcPiOutput*>    m_outputs;
-    bool                       m_setup;
+    QMap<int,TorcPiSwitchInput*>  m_inputs;
+    QMap<int,TorcPiSwitchOutput*> m_outputs;
+    bool                          m_setup;
 };
 
 #endif // TORCPIGPIO_H
