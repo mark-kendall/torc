@@ -23,7 +23,7 @@
 // Torc
 #include "torclogging.h"
 #include "torcpigpio.h"
-#include "torcpioutput.h"
+#include "torcpiswitchoutput.h"
 
 // wiringPi
 #include "wiringPi.h"

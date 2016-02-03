@@ -7,8 +7,8 @@
 
 // Torc
 #include "torccentral.h"
-#include "torcpioutput.h"
-#include "torcpiinput.h"
+#include "torcpiswitchoutput.h"
+#include "torcpiswitchinput.h"
 
 #define PI_GPIO QString("gpio")
 
