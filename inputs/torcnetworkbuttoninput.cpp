@@ -38,7 +38,7 @@
  * \sa TorcNetworkButtonOutput
 */
 TorcNetworkButtonInput::TorcNetworkButtonInput(double Default, const QVariantMap &Details)
-  : TorcSwitchInput(Default, "NetworkSwitch", Details)
+  : TorcNetworkSwitchInput(Default, Details)
 {
     // timers cannot be started from other threads, so use some signalling
     connect(this, SIGNAL(Pushed()), this, SLOT(StartTimer()));

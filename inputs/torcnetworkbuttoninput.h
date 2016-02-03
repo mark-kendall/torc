@@ -5,9 +5,9 @@
 #include <QTimer>
 
 // Torc
-#include "torcswitchinput.h"
+#include "torcnetworkswitchinput.h"
 
-class TorcNetworkButtonInput : public TorcSwitchInput
+class TorcNetworkButtonInput : public TorcNetworkSwitchInput
 {
     Q_OBJECT
 

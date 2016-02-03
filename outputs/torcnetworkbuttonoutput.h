@@ -10,6 +10,7 @@
 class TorcNetworkButtonOutput : public TorcNetworkSwitchOutput
 {
     Q_OBJECT
+
   public:
     TorcNetworkButtonOutput(double Default, const QVariantMap &Details);
    ~TorcNetworkButtonOutput();
