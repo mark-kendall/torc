@@ -113,7 +113,7 @@ void TorcPiGPIO::Create(const QVariantMap &GPIO)
                         continue;
                     }
 
-                    if (m_inputs.contains(number) || m_outputs.contains(number))
+                    if (m_inputs.contains(number) || m_outputs.contains(number) || m_pwmOutputs.contains(number))
                     {
                         LOG(VB_GENERAL, LOG_ERR, QString("GPIO Pin #%1 is already in use").arg(number));
                         continue;
@@ -132,9 +132,10 @@ void TorcPiGPIO::Create(const QVariantMap &GPIO)
                             m_inputs.insert(number, in);
                         }
                     }
-                    else if (type == "pwm")
+                    else if (type == "pwm" && output)
                     {
-                        // TODO
+                        TorcPiPWMOutput* out = new TorcPiPWMOutput(number, pin);
+                        m_pwmOutputs.insert(number, out);
                     }
                     else
                     {
@@ -165,6 +166,14 @@ void TorcPiGPIO::Destroy(void)
          it2.value()->DownRef();
     }
     m_outputs.clear();
+
+    QMap<int,TorcPiPWMOutput*>::iterator it2 = m_pwmOutputs.begin();
+    for ( ; it2 != m_outputs.end(); ++it2)
+    {
+         TorcOutputs::gOutputs->RemoveOutput(it2.value());
+         it2.value()->DownRef();
+    }
+    m_pwmOutputs.clear();
 }
 
 /* For revision 1 (original Pi Model b) boards, allow wiringPi pins 0 to 6.

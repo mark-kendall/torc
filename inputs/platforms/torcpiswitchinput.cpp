@@ -205,7 +205,7 @@ void TorcPiSwitchInputThread::Stop(void)
 }
 
 TorcPiSwitchInput::TorcPiSwitchInput(int Pin, const QVariantMap &Details)
-  : TorcSwitchInput(DEFAULT_VALUE, "PiGPIOInput", Details),
+  : TorcSwitchInput(DEFAULT_VALUE, "PiGPIOSwitchInput", Details),
     m_pin(Pin),
     m_inputThread(new TorcPiSwitchInputThread(this, m_pin))
 {
@@ -230,7 +230,7 @@ void TorcPiSwitchInput::Start(void)
 
 QStringList TorcPiSwitchInput::GetDescription(void)
 {
-    return QStringList() << tr("Pin %1").arg(m_pin);
+    return QStringList() << tr("Pin %1 Switch").arg(m_pin);
 }
 
 

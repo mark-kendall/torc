@@ -8,6 +8,7 @@
 // Torc
 #include "torccentral.h"
 #include "torcpiswitchoutput.h"
+#include "torcpipwmoutput.h"
 #include "torcpiswitchinput.h"
 
 #define PI_GPIO QString("gpio")
@@ -26,6 +27,7 @@ class TorcPiGPIO : public TorcDeviceHandler
   private:
     QMap<int,TorcPiSwitchInput*>  m_inputs;
     QMap<int,TorcPiSwitchOutput*> m_outputs;
+    QMap<int,TorcPiPWMOutput*>    m_pwmOutputs;
     bool                          m_setup;
 };
 

@@ -106,10 +106,12 @@ linux-rasp-pi-g++ {
     HEADERS += outputs/platforms/torci2cpca9685.h
     HEADERS += outputs/platforms/torcpigpio.h
     HEADERS += outputs/platforms/torcpiswitchoutput.h
+    HEADERS += outputs/platforms/torcpipwmoutput.h
     HEADERS += inputs/platforms/torcpiswitchinput.h
     SOURCES += outputs/platforms/torci2cpca9685.cpp
     SOURCES += outputs/platforms/torcpigpio.cpp
     SOURCES += outputs/platforms/torcpiswitchoutput.cpp
+    SOURCES += outputs/platforms/torcpipwmoutput.cpp
     SOURCES += inputs/platforms/torcpiswitchinput.cpp
 
     # install with suid permissions on Pi
