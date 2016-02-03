@@ -90,6 +90,7 @@ void TorcPiGPIO::Create(const QVariantMap &GPIO)
                 QVariantMap::const_iterator it2 = pins.constBegin();
                 for ( ; it2 != pins.constEnd(); ++it2)
                 {
+                    QString    type = it2.key();
                     QVariantMap pin = it2.value().toMap();
 
                     if (!pin.contains("gpiopinnumber"))
@@ -118,15 +119,26 @@ void TorcPiGPIO::Create(const QVariantMap &GPIO)
                         continue;
                     }
 
-                    if (output)
+                    if (type == "switch")
                     {
-                        TorcPiSwitchOutput* out = new TorcPiSwitchOutput(number, pin);
-                        m_outputs.insert(number, out);
+                        if (output)
+                        {
+                            TorcPiSwitchOutput* out = new TorcPiSwitchOutput(number, pin);
+                            m_outputs.insert(number, out);
+                        }
+                        else
+                        {
+                            TorcPiSwitchInput* in   = new TorcPiSwitchInput(number, pin);
+                            m_inputs.insert(number, in);
+                        }
+                    }
+                    else if (type == "pwm")
+                    {
+                        // TODO
                     }
                     else
                     {
-                        TorcPiSwitchInput* in   = new TorcPiSwitchInput(number, pin);
-                        m_inputs.insert(number, in);
+                        LOG(VB_GENERAL, LOG_ERR, "Unknown GPIO device type");
                     }
                 }
             }
@@ -202,7 +214,7 @@ static const QString gpioPinNumberTypeRev2 =
 
 static const QString pigpioInputTypes =
 "\r\n"
-"<xs:complexType name='gpioInputPinType'>\r\n"
+"<xs:complexType name='gpioInputSwitchType'>\r\n"
 "  <xs:all>\r\n"
 "    <xs:element name='name'     type='deviceNameType'/>\r\n"
 "    <xs:element name='username' type='userNameType' minOccurs='0' maxOccurs='1'/>\r\n"
@@ -213,7 +225,7 @@ static const QString pigpioInputTypes =
 "\r\n"
 "<xs:complexType name='gpioInputType'>\r\n"
 "  <xs:sequence>\r\n"
-"    <xs:element minOccurs='1' maxOccurs='unbounded' name='pin' type='gpioInputPinType'/>\r\n"
+"    <xs:element minOccurs='1' maxOccurs='unbounded' name='switch' type='gpioInputSwitchType'/>\r\n"
 "  </xs:sequence>\r\n"
 "</xs:complexType>\r\n";
 
@@ -221,7 +233,7 @@ static const QString pigpioInputs =
 "    <xs:element minOccurs='0' maxOccurs='1' name='gpio'    type='gpioInputType'/>\r\n";
 
 static const QString pigpioOutputTypes =
-"<xs:complexType name='gpioOutputPinType'>\r\n"
+"<xs:complexType name='gpioOutputSwitchType'>\r\n"
 "  <xs:all>\r\n"
 "    <xs:element name='name'     type='deviceNameType'/>\r\n"
 "    <xs:element name='username' type='userNameType' minOccurs='0' maxOccurs='1'/>\r\n"
@@ -231,10 +243,21 @@ static const QString pigpioOutputTypes =
 "  </xs:all>\r\n"
 "</xs:complexType>\r\n"
 "\r\n"
+"<xs:complexType name='gpioOutputPWMType'>\r\n"
+"  <xs:all>\r\n"
+"    <xs:element name='name'     type='deviceNameType'/>\r\n"
+"    <xs:element name='username' type='userNameType' minOccurs='0' maxOccurs='1'/>\r\n"
+"    <xs:element name='userdescription' type='userDescriptionType' minOccurs='0' maxOccurs='1'/>\r\n"
+"    <xs:element name='gpiopinnumber' type='gpioPinNumberType'/>\r\n"
+"    <xs:element name='default'  type='pwmNumberType'/>\r\n"
+"  </xs:all>\r\n"
+"</xs:complexType>\r\n"
+"\r\n"
 "<xs:complexType name='gpioOutputType'>\r\n"
-"  <xs:sequence>\r\n"
-"    <xs:element minOccurs='1' maxOccurs='unbounded' name='pin' type='gpioOutputPinType'/>\r\n"
-"  </xs:sequence>\r\n"
+"  <xs:choice minOccurs='1' maxOccurs='unbounded'>\r\n"
+"    <xs:element name='switch' type='gpioOutputSwitchType'/>\r\n"
+"    <xs:element name='pwm'    type='gpioOutputPWMType'/>\r\n"
+"  </xs:choice>\r\n"
 "</xs:complexType>\r\n";
 
 static const QString pigpioOutputs =
