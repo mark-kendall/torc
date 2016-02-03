@@ -167,11 +167,11 @@ void TorcPiGPIO::Destroy(void)
     }
     m_outputs.clear();
 
-    QMap<int,TorcPiPWMOutput*>::iterator it2 = m_pwmOutputs.begin();
-    for ( ; it2 != m_outputs.end(); ++it2)
+    QMap<int,TorcPiPWMOutput*>::iterator it3 = m_pwmOutputs.begin();
+    for ( ; it3 != m_pwmOutputs.end(); ++it3)
     {
-         TorcOutputs::gOutputs->RemoveOutput(it2.value());
-         it2.value()->DownRef();
+         TorcOutputs::gOutputs->RemoveOutput(it3.value());
+         it3.value()->DownRef();
     }
     m_pwmOutputs.clear();
 }

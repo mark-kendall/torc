@@ -99,6 +99,6 @@ void TorcPiPWMOutput::SetValue(double Value)
         softPwmWrite(m_pin, value);
     }
 
-    TorcSwitchOutput::SetValue(Value);
+    TorcPWMOutput::SetValue(Value);
 }
 
