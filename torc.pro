@@ -105,12 +105,12 @@ linux-rasp-pi-g++ {
     DEFINES += USING_PIGPIO
     HEADERS += outputs/platforms/torci2cpca9685.h
     HEADERS += outputs/platforms/torcpigpio.h
-    HEADERS += outputs/platforms/torcpioutput.h
-    HEADERS += inputs/platforms/torcpiinput.h
+    HEADERS += outputs/platforms/torcpiswitchoutput.h
+    HEADERS += inputs/platforms/torcpiswitchinput.h
     SOURCES += outputs/platforms/torci2cpca9685.cpp
     SOURCES += outputs/platforms/torcpigpio.cpp
-    SOURCES += outputs/platforms/torcpioutput.cpp
-    SOURCES += inputs/platforms/torcpiinput.cpp
+    SOURCES += outputs/platforms/torcpiswitchoutput.cpp
+    SOURCES += inputs/platforms/torcpiswitchinput.cpp
 
     # install with suid permissions on Pi
     # this allows access to I2C and GPIO
