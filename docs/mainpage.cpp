@@ -50,7 +50,7 @@
  *
  * \subsection pidev Install software dependencies.
  *
- * From the command line. run:
+ * From the command line run:
  * \code
  * sudo apt-get install libgraphviz-dev libavahi-compat-libdnssd-dev qt5-default git-core libqt5xmlpatterns5-dev upower
  * \endcode
@@ -79,13 +79,29 @@
  * sudo make install
  * \endcode
  *
- * \subsection pi1wire Enable 1Wire interface
+ * \subsection pi1wire Enable 1Wire interface.
  * The 1Wire interface is primarily used for communicating with MAXIM DS18B20 1Wire digital thermometers - which
  * are also available as a waterproof module.
  *
- * Add the following line to the end of '/boot/config.txt' file
+ * Add the following line to the end of '/boot/config.txt' file (sudo nano /boot/config.txt)
  * \code
  * dtoverlay=w1-gpio
  * \endcode
  *
+ * and these 2 lines to /etc/modules (sudo nano /etc/modules)
+ * \code
+ * w1-gpio
+ * w1-therm
+ * \endcode
+ *
+ * \note If you enable w1-gpio support without adding the appropriate external hardware (i.e. a pull up
+ * resister), you may find the kernel tries to recognise a number of phantom 1Wire devices. Don't panic.
+ *
+ * \subsection piPower Allow Torc to poweroff/restart your device.
+ *
+ * \subsection pii2c Enable I2C bus.
+ *
+ * \subsection pitime Set time and timezone.
+ *
+ * \subsection pistart Run Torc at startup.
  */
