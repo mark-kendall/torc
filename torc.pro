@@ -98,8 +98,11 @@ macx {
     SOURCES += torc/platforms/torcrunlooposx.cpp
 }
 
-# I2c on the Raspberry Pi
-linux-rasp-pi-g++ {
+# Raspberry Pi build
+# Qt5 distributed with Raspbian Jessie uses the generic linux-g++ makespec, not linux-rasp-pi-g++
+# so force it with an environment variable if necessary (i.e. TORC_PI=1 qmake).
+pi = $$(TORC_PI)
+linux-rasp-pi-g++ | !isEmpty(pi) {
     LIBS += -lwiringPi
     DEFINES += USING_I2C
     DEFINES += USING_PIGPIO
