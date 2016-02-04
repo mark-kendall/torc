@@ -39,6 +39,8 @@
 #define PRESCALE      0xFE
 #define CLOCKFREQ     25000000.0
 
+#include <unistd.h>
+
 class TorcI2CPCA9685Channel : public TorcPWMOutput
 {
   public:

@@ -28,6 +28,7 @@
 // wiringPi
 #include "wiringPi.h"
 
+#include <unistd.h>
 #include <poll.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
