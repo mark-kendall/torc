@@ -63,7 +63,6 @@ TorcCentral::TorcCentral()
     QString graphdot = GetTorcConfigDir() + DYNAMIC_DIRECTORY + "stategraph.dot";
     QString graphsvg = GetTorcConfigDir() + DYNAMIC_DIRECTORY + "stategraph.svg";
     QString config   = GetTorcConfigDir() + DYNAMIC_DIRECTORY + "torc.xml";
-    QString xsd      = GetTorcConfigDir() + DYNAMIC_DIRECTORY + "torc.xsd";
     QString current  = GetTorcConfigDir() + "/torc.xml";
 
     if (QFile::exists(graphdot))
@@ -72,8 +71,6 @@ TorcCentral::TorcCentral()
         QFile::remove(graphsvg);
     if (QFile::exists(config))
         QFile::remove(config);
-    if (QFile::exists(xsd))
-        QFile::remove(xsd);
 
     QFile currentconfig(current);
     if (!currentconfig.copy(config))
@@ -199,14 +196,8 @@ void TorcCentral::SubscriberDeleted(QObject *Subscriber)
 
 bool TorcCentral::LoadConfig(void)
 {
-    // load the config file
-    QString xml = GetTorcConfigDir() + "/torc.xml";
-
 #ifdef USING_XMLPATTERNS
-    QString xsd = GetTorcShareDir() + "/html/torc.xsd";
     bool skipvalidation = false;
-    QFileInfo config(xml);
-    QFileInfo xsdfile(xsd);
 
     if (!qgetenv("TORC_NO_VALIDATION").isEmpty())
     {
@@ -214,71 +205,104 @@ bool TorcCentral::LoadConfig(void)
         skipvalidation = true;
     }
 
+    QString xml = GetTorcConfigDir() + "/torc.xml";
+    QFileInfo config(xml);
     if (!skipvalidation && !config.exists())
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Failed to find configuration file '%1'").arg(xml));
-        skipvalidation = true;
+        return false;
     }
 
-    if (!skipvalidation)
+    QString customxsd = GetTorcConfigDir() + DYNAMIC_DIRECTORY + "torc.xsd";
+    // we always want to delete the old xsd - if it isn't present, it wasn't used!
+    // so retrieve now and then delete
+    QByteArray oldxsd;
+    if (QFile::exists(customxsd))
     {
-        // validation can take a while on slower machines (e.g. single core raspberry pi).
-        // try and skip if the config has not been modified
-        QString lastvalidated = gLocalContext->GetSetting("configLastValidated", QString("never"));
-        if (lastvalidated != "never")
+        QFile customxsdfile(customxsd);
+        if (customxsdfile.open(QIODevice::ReadOnly))
         {
-            QDateTime xsdmodified  = xsdfile.exists() ? xsdfile.lastModified() : QDateTime::currentDateTime();
-            QDateTime validated    = QDateTime::fromString(lastvalidated);
-            QDateTime lastmodified = config.lastModified();
-
-            LOG(VB_GENERAL, LOG_INFO, QString("Last validated: %1 Last modified: %2").arg(validated.toString()).arg(lastmodified.toString()));
-
-            if (xsdmodified >= validated)
-            {
-                LOG(VB_GENERAL, LOG_INFO, QString("XSD file modified since last validation - forcing validation"));
-            }
-            else if (lastmodified < validated)
-            {
-                LOG(VB_GENERAL, LOG_INFO, QString("Configuration file not modified since last validation - skipping XSD check"));
-                skipvalidation = true;
-            }
+            oldxsd = customxsdfile.readAll();
+            customxsdfile.close();
         }
+        QFile::remove(customxsd);
     }
 
+    QString basexsd = GetTorcShareDir() + "/html/torc.xsd";
+    if (!QFile::exists(basexsd))
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Failed to find base XSD file '%1'").arg(basexsd));
+        return false;
+    }
+
+    QByteArray newxsd;
     if (!skipvalidation)
     {
-        LOG(VB_GENERAL, LOG_INFO, "Starting validation of configuration file");
-
-        QByteArray xsddata = GetCustomisedXSD(xsd);
-        if (!xsddata.isEmpty())
+        // customise and save the xsd now - even if validation is skipped from here, we need the
+        // xsd for reference
+        newxsd = GetCustomisedXSD(basexsd);
+        if (!newxsd.isEmpty())
         {
             // save the XSD for the user to inspect if necessary
-            QString customxsd = GetTorcConfigDir() + DYNAMIC_DIRECTORY + "torc.xsd";
             QFile customxsdfile(customxsd);
             if (customxsdfile.open(QIODevice::ReadWrite))
             {
-                customxsdfile.write(xsddata);
+                customxsdfile.write(newxsd);
                 customxsdfile.flush();
                 customxsdfile.close();
                 LOG(VB_GENERAL, LOG_INFO, QString("Saved current XSD as '%1'").arg(customxsd));
             }
             else
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("Failed to open '%1' for writing").arg(customxsd));
+                LOG(VB_GENERAL, LOG_WARNING, QString("Failed to open '%1' for writing").arg(customxsd));
             }
-
-            TorcXmlValidator validator(xml, xsddata);
-            if (!validator.Validated())
-            {
-                LOG(VB_GENERAL, LOG_ERR, QString("Configuration file '%1' failed validation").arg(xml));
-                // make sure we re-validate
-                gLocalContext->SetSetting("configLastValidated", QString("never"));
-                return false;
-            }
-
-            LOG(VB_GENERAL, LOG_INFO, "Configuration successfully validated");
-            gLocalContext->SetSetting("configLastValidated", QDateTime::currentDateTime().toString());
         }
+        else
+        {
+            LOG(VB_GENERAL, LOG_ERR, "Strange - empty xsd...");
+            return false;
+        }
+    }
+
+    // validation can take a while on slower machines (e.g. single core raspberry pi).
+    // try and skip if the config has not been modified
+    QString lastvalidated = gLocalContext->GetSetting("configLastValidated", QString("never"));
+    if (!skipvalidation && lastvalidated != "never")
+    {
+        bool xsdmodified    = qstrcmp(oldxsd.constData(), newxsd.constData()) != 0;
+        bool configmodified = config.lastModified() >= QDateTime::fromString(lastvalidated);
+
+        if (xsdmodified)
+            LOG(VB_GENERAL, LOG_INFO, QString("XSD file changed since last validation"));
+        else
+            LOG(VB_GENERAL, LOG_INFO, QString("XSD unchanged since last validation"));
+
+        if (configmodified)
+            LOG(VB_GENERAL, LOG_INFO, QString("Configuration file changed since last validation"));
+        else
+            LOG(VB_GENERAL, LOG_INFO, QString("Configuration file unchanged since last validation:"));
+
+        skipvalidation = !xsdmodified && !configmodified;
+    }
+
+    if (!skipvalidation)
+    {
+        LOG(VB_GENERAL, LOG_INFO, "Starting validation of configuration file");
+        TorcXmlValidator validator(xml, newxsd);
+        if (!validator.Validated())
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Configuration file '%1' failed validation").arg(xml));
+            // make sure we re-validate
+            gLocalContext->SetSetting("configLastValidated", QString("never"));
+            return false;
+        }
+
+        LOG(VB_GENERAL, LOG_INFO, "Configuration successfully validated");
+        gLocalContext->SetSetting("configLastValidated", QDateTime::currentDateTime().toString());
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_INFO, "Skipping validation of configuration file");
     }
 #else
     LOG(VB_GENERAL, LOG_INFO, "QXmlPatterns unavailable - not validating configuration file.");
