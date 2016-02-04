@@ -63,7 +63,7 @@ void TorcPiGPIO::Create(const QVariantMap &GPIO)
             if (revision == 1)
                 LOG(VB_GENERAL, LOG_INFO, "Revision 1 board - 7 pins available (0-6)");
             else if (revision == 2)
-                LOG(VB_GENERAL, LOG_INFO, "Revision 2 board - 22 pins available (0-6 and 17-31");
+                LOG(VB_GENERAL, LOG_INFO, "Revision 2 board - 22 pins available (0-6 and 17-31)");
             else
                 LOG(VB_GENERAL, LOG_INFO, "Unknown board revision...");
         }
