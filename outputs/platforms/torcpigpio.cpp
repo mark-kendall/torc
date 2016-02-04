@@ -282,6 +282,13 @@ static const QString pigpioUnique =
 class TorcPiGPIOXSDFactory : public TorcXSDFactory
 {
   public:
+    TorcPiGPIOXSDFactory() : TorcXSDFactory()
+    {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 3, 0))
+        QCoreApplication::setSetuidAllowed(true);
+#endif
+    }
+
     void GetXSD(QMultiMap<QString,QString> &XSD) {
         bool rev1 = piBoardRev() == 1;
         XSD.insert(XSD_INPUTTYPES, (rev1 ? gpioPinNumberTypeRev1 : gpioPinNumberTypeRev2) + pigpioInputTypes);
