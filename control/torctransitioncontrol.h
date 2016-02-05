@@ -23,6 +23,8 @@ class TorcTransitionControl : public TorcControl
     TorcControl::Type         GetType               (void);
     QStringList               GetDescription        (void);
 
+    static qreal              LinearLEDFunction     (qreal progress);
+
   public slots:
     void                      SetAnimationValue    (double Value);
     double                    GetAnimationValue    (void);

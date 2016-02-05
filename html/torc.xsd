@@ -245,6 +245,7 @@
     <xs:element name="outbounce"    type="transitionType"/>
     <xs:element name="inoutbounce"  type="transitionType"/>
     <xs:element name="outinbounce"  type="transitionType"/>
+    <xs:element name="linearled"    type="transitionType"/>
   </xs:choice>
 </xs:complexType>
 <!--TORC_XSD_CONTROLTYPES-->

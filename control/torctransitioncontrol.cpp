@@ -1,6 +1,6 @@
 /* Class TorcTransitionControl
 *
-* Copyright (C) Mark Kendall 2015
+* Copyright (C) Mark Kendall 2015-16
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -71,9 +71,10 @@ QEasingCurve::Type TorcTransitionControl::EasingCurveFromString(const QString &C
     if ("OUTBOUNCE"    == curve) return QEasingCurve::OutBounce;
     if ("INOUTBOUNCE"  == curve) return QEasingCurve::InOutBounce;
     if ("OUTINBOUNCE"  == curve) return QEasingCurve::OutInBounce;
+    if ("LINEARLED"    == curve) return QEasingCurve::Custom;
 
     LOG(VB_GENERAL, LOG_WARNING, QString("Failed to parse transition type from '%1'").arg(Curve));
-    return QEasingCurve::Custom; // invalid
+    return QEasingCurve::TCBSpline; // invalid
 }
 
 QString TorcTransitionControl::StringFromEasingCurve(QEasingCurve::Type Type)
@@ -121,6 +122,7 @@ QString TorcTransitionControl::StringFromEasingCurve(QEasingCurve::Type Type)
         case QEasingCurve::OutBounce:    return tr("OutBounce");
         case QEasingCurve::InOutBounce:  return tr("InOutBounce");
         case QEasingCurve::OutInBounce:  return tr("OutInBounce");
+        case QEasingCurve::Custom:       return tr("LinearLED");
         default:
             break;
     }
@@ -128,6 +130,16 @@ QString TorcTransitionControl::StringFromEasingCurve(QEasingCurve::Type Type)
     return tr("Unknown");
 }
 
+/*! \class TorcTransitionControl
+ *
+ * A control to transition an output between 2 levels over a period of time. A variety of
+ * transition types are available (for a complete reference see the Qt documentation).
+ * A linear transition will move smoothly between the 2 levels and other transitions may mimic more
+ * natural fluctuations (such as solunar intensity).
+ *
+ * The custom 'LinearLED' transition implements the CIE 1931 formula for adjusting an output for
+ * perceived brightness.
+*/
 TorcTransitionControl::TorcTransitionControl(const QString &Type, const QVariantMap &Details)
   : TorcControl(TorcControl::Transition, Details),
     m_duration(0),
@@ -139,7 +151,7 @@ TorcTransitionControl::TorcTransitionControl(const QString &Type, const QVariant
 {
     // determine curve
     m_type = EasingCurveFromString(Type);
-    if (m_type == QEasingCurve::Custom /*invalid*/)
+    if (m_type == QEasingCurve::TCBSpline /*invalid*/)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Unknown transition type '%1' for device '%2'").arg(Type).arg(uniqueId));
         return;
@@ -226,7 +238,11 @@ bool TorcTransitionControl::Validate(void)
         return false;
 
     // setup the animation now
-    QEasingCurve easingcurve(m_type);
+    QEasingCurve easingcurve;
+    if (m_type == QEasingCurve::Custom)
+        easingcurve.setCustomType(TorcTransitionControl::LinearLEDFunction);
+    else
+        easingcurve.setType(m_type);
     m_animation->setEasingCurve(easingcurve);
     m_animation->setStartValue(0);
     m_animation->setEndValue(1);
@@ -236,6 +252,21 @@ bool TorcTransitionControl::Validate(void)
     LOG(VB_GENERAL, LOG_DEBUG, QString("%1: %2").arg(uniqueId).arg(GetDescription().join(",")));
 
     return true;
+}
+
+/*! \brief A custom easing curve for linear perceived brightness.
+ *
+ * The perceived brightness of light sources does not vary linearly with actual luminance and a linear change in
+ * LED duty cycle (via a PWM signal) will produce a disproportionately large change at the low end of the cycle.
+ *
+ * This custom easing curve implements the CIE 1931 lightness formula for a more 'natural' brightness transition.
+*/
+qreal TorcTransitionControl::LinearLEDFunction(qreal progress)
+{
+    if (progress <= 0.08)
+        return progress / 9.033;
+    qreal val = (progress + 0.16) / 1.16;
+    return val * val * val;
 }
 
 /*! \brief Calculate the current output value.
@@ -279,7 +310,7 @@ void TorcTransitionControl::CalculateOutput(void)
         TorcTimerControl *timerinput = qobject_cast<TorcTimerControl*>(m_inputs.firstKey());
         if (timerinput)
         {
-            // NB for a customer timer with transition, this will force the output to 'on' initially.
+            // NB for a custom timer with transition, this will force the output to 'on' initially.
             // While this may seem counterintuitive, it is the expected behaviour - as the output
             // would normally be transitioning from the last 'on' to 'off' at time 0. Changing
             // the custom timer behaviour would produce unexpected results for timers with no transition.
