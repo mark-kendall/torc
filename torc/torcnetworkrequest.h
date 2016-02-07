@@ -13,6 +13,7 @@ class TorcNetworkRequest : public TorcReferenceCounter
 
   public:
     TorcNetworkRequest(const QNetworkRequest Request, QNetworkAccessManager::Operation Type, int BufferSize, int *Abort);
+    TorcNetworkRequest(const QNetworkRequest Request, const QByteArray &PostData, int *Abort);
 
     bool            WaitForStart      (int Timeout);
     int             Peek              (char* Buffer, qint32 BufferSize, int Timeout);
@@ -55,6 +56,9 @@ class TorcNetworkRequest : public TorcReferenceCounter
     int             m_redirectionCount;
     TorcTimer      *m_readTimer;
     TorcTimer      *m_writeTimer;
+
+    // for POST/PUT requests
+    QByteArray     *m_postData;
 
     // QNetworkReply state
     bool            m_replyFinished;

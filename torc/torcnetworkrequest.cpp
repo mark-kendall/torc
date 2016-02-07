@@ -67,6 +67,7 @@ TorcNetworkRequest::TorcNetworkRequest(const QNetworkRequest Request, QNetworkAc
     m_redirectionCount(0),
     m_readTimer(new TorcTimer()),
     m_writeTimer(new TorcTimer()),
+    m_postData(NULL),
     m_replyFinished(false),
     m_replyBytesAvailable(0),
     m_bytesReceived(0),
@@ -83,11 +84,43 @@ TorcNetworkRequest::TorcNetworkRequest(const QNetworkRequest Request, QNetworkAc
         LOG(VB_GENERAL, LOG_INFO, QString("Request buffer size %1bytes (%2 reserved)").arg(m_bufferSize).arg(m_bufferSize - m_writeBufferSize));
 }
 
+TorcNetworkRequest::TorcNetworkRequest(const QNetworkRequest Request, const QByteArray &PostData, int *Abort)
+  : m_type(QNetworkAccessManager::PostOperation),
+    m_abort(Abort),
+    m_started(false),
+    m_positionInFile(0),
+    m_rewindPositionInFile(0),
+    m_readPosition(0),
+    m_writePosition(0),
+    m_bufferSize(0),
+    m_reserveBufferSize(0),
+    m_writeBufferSize(0),
+    m_buffer(),
+    m_readSize(DEFAULT_STREAMED_READ_SIZE),
+    m_redirectionCount(0),
+    m_readTimer(new TorcTimer()),
+    m_writeTimer(new TorcTimer()),
+    m_postData(new QByteArray(PostData)),
+    m_replyFinished(false),
+    m_replyBytesAvailable(0),
+    m_bytesReceived(0),
+    m_bytesTotal(0),
+    m_request(Request),
+    m_rangeStart(0),
+    m_rangeEnd(0),
+    m_httpStatus(HTTP_BadRequest),
+    m_contentLength(0),
+    m_byteServingAvailable(false)
+{
+}
+
 TorcNetworkRequest::~TorcNetworkRequest()
 {
+    delete m_postData;
     delete m_readTimer;
     delete m_writeTimer;
-    m_readTimer = NULL;
+    m_postData   = NULL;
+    m_readTimer  = NULL;
     m_writeTimer = NULL;
 }
 
