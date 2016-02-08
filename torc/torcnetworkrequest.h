@@ -30,6 +30,7 @@ class TorcNetworkRequest : public TorcReferenceCounter
     bool            CanByteServe      (void);
     QUrl            GetFinalURL       (void);
     QString         GetContentType    (void);
+    int             GetStatus         (void);
 
   protected:
     virtual ~TorcNetworkRequest();

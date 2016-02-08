@@ -368,6 +368,11 @@ QString TorcNetworkRequest::GetContentType(void)
     return m_contentType;
 }
 
+int TorcNetworkRequest::GetStatus(void)
+{
+    return m_httpStatus;
+}
+
 QByteArray& TorcNetworkRequest::GetBuffer(void)
 {
     return m_buffer;
