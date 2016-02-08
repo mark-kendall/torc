@@ -60,8 +60,7 @@ void TorcObservable::AddObserver(QObject *Observer)
 void TorcObservable::RemoveObserver(QObject *Observer)
 {
     QMutexLocker locker(m_observerLock);
-    while (m_observers.contains(Observer))
-        m_observers.removeOne(Observer);
+    m_observers.removeAll(Observer);
 }
 
 ///Brief Send the given event to each registered listener/observer.
