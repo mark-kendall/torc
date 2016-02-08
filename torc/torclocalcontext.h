@@ -22,41 +22,13 @@ class Torc
 {
     Q_GADGET
     Q_ENUMS(Actions)
-    Q_ENUMS(MessageTypes)
-    Q_ENUMS(MessageDestinations)
-    Q_ENUMS(MessageTimeouts)
 
   public:
-    enum MessageTypes
-    {
-        GenericError,
-        CriticalError,
-        GenericWarning,
-        ExternalMessage,
-        InternalMessage
-    };
-
-    enum MessageDestinations
-    {
-        Internal  = 0x01,
-        Local     = 0x02,
-        Broadcast = 0x04
-    };
-
-    enum MessageTimeouts
-    {
-        DefaultTimeout,
-        ShortTimeout,
-        LongTimeout,
-        Acknowledge
-    };
-
     enum Actions
     {
         None = 0,
-        Custom,
-        Exit,
-        Message,
+        Start,
+        Stop,
         RestartTorc,
         // Power management
         Shutdown = 1000,
@@ -100,9 +72,6 @@ class TorcLocalContext : public QObject, public TorcObservable
     static void   TearDown    (void);
 
     Q_INVOKABLE static void  NotifyEvent   (int Event);
-    Q_INVOKABLE static void  UserMessage   (int Type, int Destination, int Timeout,
-                                            const QString &Header, const QString &Body,
-                                            QString Uuid = QString());
     Q_INVOKABLE   QString    GetSetting    (const QString &Name, const QString &DefaultValue);
     Q_INVOKABLE   bool       GetSetting    (const QString &Name, const bool    &DefaultValue);
     Q_INVOKABLE   int        GetSetting    (const QString &Name, const int     &DefaultValue);

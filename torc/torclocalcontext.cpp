@@ -58,7 +58,7 @@ static void ExitHandler(int Sig)
     LOG(VB_GENERAL, LOG_INFO, QString("Received %1")
         .arg(Sig == SIGINT ? "SIGINT" : "SIGTERM"));
 
-    TorcLocalContext::NotifyEvent(Torc::Exit);
+    TorcLocalContext::NotifyEvent(Torc::Stop);
 }
 
 class TorcLocalContextPriv
@@ -309,50 +309,6 @@ void TorcLocalContext::NotifyEvent(int Event)
     TorcEvent event(Event);
     if (gLocalContext)
         gLocalContext->Notify(event);
-}
-
-#define MESSAGE_TIMEOUT_DEFAULT 3000
-#define MESSAGE_TIMEOUT_SHORT   1000
-#define MESSAGE_TIMEOUT_LONG    10000
-
-void TorcLocalContext::UserMessage(int Type, int Destination, int Timeout,
-                                   const QString &Header, const QString &Body,
-                                   QString Uuid)
-{
-    if (Body.isEmpty())
-        return;
-
-    int timeout = -1;
-    switch (Timeout)
-    {
-        case Torc::DefaultTimeout:
-            timeout = MESSAGE_TIMEOUT_DEFAULT;
-            break;
-        case Torc::ShortTimeout:
-            timeout = MESSAGE_TIMEOUT_SHORT;
-            break;
-        case Torc::LongTimeout:
-            timeout = MESSAGE_TIMEOUT_LONG;
-            break;
-        default:
-            break;
-    }
-
-    if (Uuid.isEmpty())
-    {
-        QUuid dummy = QUuid::createUuid();
-        Uuid = dummy.toString();
-    }
-
-    QVariantMap data;
-    data.insert("type", Type);
-    data.insert("destination", Destination);
-    data.insert("timeout", timeout);
-    data.insert("uuid", Uuid);
-    data.insert("header", Header);
-    data.insert("body", Body);
-    TorcEvent event(Torc::Message, data);
-    gLocalContext->Notify(event);
 }
 
 /*! \class TorcLocalContext
