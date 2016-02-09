@@ -4,7 +4,7 @@
 // Torc
 #include "torclocalcontext.h"
 
-#define TORC_ROOT_UPNP_DEVICE QString("urn:schemas-torcdvr-org:device:TorcClient:1")
+#define TORC_ROOT_UPNP_DEVICE QString("urn:schemas-torcapp-org:device:TorcClient:1")
 
 class TorcUPNPDescription
 {
