@@ -812,6 +812,7 @@ HTTPStatus TorcHTTPRequest::StatusFromString(const QString &Status)
     if (Status.startsWith("404")) return HTTP_NotFound;
     if (Status.startsWith("405")) return HTTP_MethodNotAllowed;
     if (Status.startsWith("416")) return HTTP_RequestedRangeNotSatisfiable;
+    if (Status.startsWith("429")) return HTTP_TooManyRequests;
     if (Status.startsWith("500")) return HTTP_InternalServerError;
 
     return HTTP_BadRequest;
@@ -845,6 +846,7 @@ QString TorcHTTPRequest::StatusToString(HTTPStatus Status)
         case HTTP_NotFound:            return QString("404 Not Found");
         case HTTP_MethodNotAllowed:    return QString("405 Method Not Allowed");
         case HTTP_RequestedRangeNotSatisfiable: return QString("416 Requested Range Not Satisfiable");
+        case HTTP_TooManyRequests:     return QString("429 Too Many Requests");
         case HTTP_InternalServerError: return QString("500 Internal Server Error");
     }
 

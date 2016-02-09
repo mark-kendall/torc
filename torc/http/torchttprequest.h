@@ -66,6 +66,7 @@ typedef enum
     HTTP_NotFound            = 404,
     HTTP_MethodNotAllowed    = 405,
     HTTP_RequestedRangeNotSatisfiable = 416,
+    HTTP_TooManyRequests     = 429,
     HTTP_InternalServerError = 500
 } HTTPStatus;
 
