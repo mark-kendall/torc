@@ -696,31 +696,54 @@ bool TorcNetworkedContext::event(QEvent *Event)
                         }
                         else
                         {
-                            QByteArray name       = event->Data().value("name").toByteArray();
                             QStringList addresses = event->Data().value("addresses").toStringList();
-                            QByteArray txtrecords = event->Data().value("txtrecords").toByteArray();
-                            QMap<QByteArray,QByteArray> map = TorcBonjour::TxtRecordToMap(txtrecords);
-                            QString version       = QString(map.value("apiversion"));
-                            qint64 starttime      = map.value("starttime").toULongLong();
-                            int priority          = map.value("priority").toInt();
-                            QString host          = event->Data().value("host").toString();
 
                             QList<QHostAddress> hosts;
                             foreach (QString address, addresses)
-                                hosts.append(QHostAddress(address));
-                            // create the new peer
-                            TorcNetworkService *service = new TorcNetworkService(name, uuid, event->Data().value("port").toInt(), hosts);
-                            service->SetAPIVersion(version);
-                            service->SetPriority(priority);
-                            service->SetStartTime(starttime);
-                            service->SetHost(host);
-                            service->SetSource(TorcNetworkService::Bonjour);
+                            {
+                                // filter out link local addresses for external peers that have network problems...
+                                // but allow loopback addresses for other Torc instances running on the same device...
+                                QHostAddress hostaddress(address);
+                                if (!TorcNetwork::IsExternal(hostaddress) && !hostaddress.isLoopback())
+                                {
+                                    LOG(VB_GENERAL, LOG_INFO, QString("Ignoring peer address '%1' - address is unreachable").arg(address));
+                                }
+                                else
+                                {
+                                    hosts.append(QHostAddress(address));
+                                }
+                            }
 
-                            // and insert into the list model
-                            Add(service);
+                            QString host = event->Data().value("host").toString();
 
-                            // try and connect - the txt records should have given us everything we need to know
-                            service->Connect();
+                            if (hosts.isEmpty())
+                            {
+                                LOG(VB_GENERAL, LOG_WARNING, QString("Ignoring peer '%1' - no useable network addresses.").arg(host));
+                            }
+                            else
+                            {
+                                QByteArray name = event->Data().value("name").toByteArray();
+                                QByteArray txtrecords = event->Data().value("txtrecords").toByteArray();
+                                QMap<QByteArray,QByteArray> map = TorcBonjour::TxtRecordToMap(txtrecords);
+                                QString version       = QString(map.value("apiversion"));
+                                qint64 starttime      = map.value("starttime").toULongLong();
+                                int priority          = map.value("priority").toInt();
+
+
+                                // create the new peer
+                                TorcNetworkService *service = new TorcNetworkService(name, uuid, event->Data().value("port").toInt(), hosts);
+                                service->SetAPIVersion(version);
+                                service->SetPriority(priority);
+                                service->SetStartTime(starttime);
+                                service->SetHost(host);
+                                service->SetSource(TorcNetworkService::Bonjour);
+
+                                // and insert into the list model
+                                Add(service);
+
+                                // try and connect - the txt records should have given us everything we need to know
+                                service->Connect();
+                            }
                         }
                     }
                     else if (event->GetEvent() == Torc::ServiceWentAway)
