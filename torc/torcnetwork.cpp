@@ -303,6 +303,7 @@ TorcNetwork::TorcNetwork()
     m_manager(new QNetworkConfigurationManager(this))
 {
     LOG(VB_GENERAL, LOG_INFO, "Opening network access manager");
+    LOG(VB_GENERAL, LOG_INFO, QString("SSL support is %1available").arg(QSslSocket::supportsSsl() ? "" : "not "));
 
     connect(m_manager, SIGNAL(configurationAdded(const QNetworkConfiguration&)),
             this,      SLOT(ConfigurationAdded(const QNetworkConfiguration&)));
@@ -393,6 +394,7 @@ void TorcNetwork::CancelSafe(TorcNetworkRequest *Request)
     if (m_reverseRequests.contains(Request))
     {
         QNetworkReply* reply = m_reverseRequests.take(Request);
+        Request->m_rawHeaders = reply->rawHeaderPairs();
         m_requests.remove(reply);
         LOG(VB_NETWORK, LOG_INFO, QString("Cancelling '%1'").arg(reply->request().url().toString()));
         reply->abort();

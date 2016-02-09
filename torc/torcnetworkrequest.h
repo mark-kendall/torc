@@ -31,6 +31,7 @@ class TorcNetworkRequest : public TorcReferenceCounter
     QUrl            GetFinalURL       (void);
     QString         GetContentType    (void);
     int             GetStatus         (void);
+    QByteArray      GetHeader         (const QByteArray &Header);
 
   protected:
     virtual ~TorcNetworkRequest();
@@ -66,6 +67,7 @@ class TorcNetworkRequest : public TorcReferenceCounter
     int             m_replyBytesAvailable;
     qint64          m_bytesReceived;
     qint64          m_bytesTotal;
+    QList<QNetworkReply::RawHeaderPair> m_rawHeaders;
 
     // request/reply details
     QNetworkRequest m_request;

@@ -373,6 +373,20 @@ int TorcNetworkRequest::GetStatus(void)
     return m_httpStatus;
 }
 
+/*! \brief Return the value of the given header, if present.
+ *
+ * \todo This is not very efficient. May be better for TorcNetworkRequest to retrieve pre-specified
+ * headers that are of interest to the caller.
+ * \todo An empty return value could signify an empty header or no header...
+*/
+QByteArray TorcNetworkRequest::GetHeader(const QByteArray &Header)
+{
+    foreach (QNetworkReply::RawHeaderPair header, m_rawHeaders)
+        if (header.first == Header)
+            return header.second;
+    return QByteArray();
+}
+
 QByteArray& TorcNetworkRequest::GetBuffer(void)
 {
     return m_buffer;
