@@ -28,7 +28,6 @@ class TorcDevice : public QObject, public TorcReferenceCounter
   public:
     TorcDevice(bool Valid, double Value, double Default,
                const QString &ModelId,   const QVariantMap &Details);
-    virtual ~TorcDevice();
 
     virtual void           Start                  (void);
     virtual void           Stop                   (void);
@@ -53,6 +52,9 @@ class TorcDevice : public QObject, public TorcReferenceCounter
     void                   ValueChanged           (double Value);
     void                   UserNameChanged        (const QString &Name);
     void                   UserDescriptionChanged (const QString &Description);
+
+  protected:
+    virtual ~TorcDevice();
 
   protected:
     bool                   valid;
