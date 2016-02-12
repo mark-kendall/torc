@@ -362,7 +362,6 @@
     <xs:element name="name"            type="deviceNameType"/>
     <xs:element name="username"        type="userNameType"        minOccurs="0" maxOccurs="1"/>
     <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
-    <!-- TODO can this be restricted to input/control/output device types -->
     <xs:element name="inputs"          type="deviceInputOutputType"/>
     <xs:element name="outputs"         type="deviceInputsOutputsType"/>
     <xs:element name="message"         type="notificationMessageType"/>
@@ -395,7 +394,17 @@
     <xs:element name="inputs"          minOccurs="0" maxOccurs="1" type="inputsType"/>
     <xs:element name="control"         minOccurs="0" maxOccurs="1" type="controlType"/>
     <xs:element name="outputs"         minOccurs="0" maxOccurs="1" type="outputsType"/>
-    <xs:element name="notify"          minOccurs="0" maxOccurs="1" type="notifyType"/>
+    <xs:element name="notify"          minOccurs="0" maxOccurs="1" type="notifyType">
+      <!-- restrict notification outputs to notifiers -->
+      <xs:key name="notifierNames">
+        <xs:selector xpath='.//notifiers//name' />
+        <xs:field xpath="." />
+      </xs:key>
+      <xs:keyref name="notifierRef" refer="notifierNames">
+        <xs:selector xpath=".//notifications//outputs/device" />
+        <xs:field xpath="." />
+      </xs:keyref>
+    </xs:element>
   </xs:all>
 </xs:complexType>
 
@@ -409,6 +418,16 @@
   <xs:keyref name="deviceRef" refer="uniqueDeviceName">
       <xs:selector xpath=".//device" />
       <xs:field xpath="." />
+  </xs:keyref>
+  <!-- list of inputs/control/outputs devices -->
+  <xs:key name="realDeviceNames">
+    <xs:selector xpath="./inputs//name|./outputs//name|./control//name" />
+    <xs:field xpath="." />
+  </xs:key>
+  <!-- restrict notification device inputs to inputs/control/outputs devices-->
+  <xs:keyref name="notificationInputRef" refer="realDeviceNames">
+    <xs:selector xpath=".//notifications//inputs/device" />
+    <xs:field xpath="." />
   </xs:keyref>
 <!--TORC_XSD_UNIQUE-->
 </xs:element>
