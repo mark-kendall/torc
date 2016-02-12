@@ -37,7 +37,10 @@
  *   <notifications>
  *     <system>
  *       <name>systemtest</name>
- *       <inputs>start,stop</inputs>
+ *       <inputs>
+ *         <event>start</event>
+ *         <event>stop</event>
+ *       </inputs>
  *       <outputs>testnotifier,testnotifier2</outputs>
  *       <message>
  *         <!-- title is optional -->
@@ -58,10 +61,15 @@ TorcSystemNotification::TorcSystemNotification(const QVariantMap &Details)
     if (uniqueId.isEmpty() || m_notifierNames.isEmpty() || m_body.isEmpty())
         return;
 
-    // todo - need some way of validating (NB Torc::ActionToString is case sensitive...)
+    // NB individual event strings are validated by the xsd.
     if (Details.contains("inputs"))
-        foreach (QString event, Details.value("inputs").toString().split(",", QString::SkipEmptyParts))
-            m_events.append(event.trimmed().toLower());
+    {
+        QVariantMap inputs = Details.value("inputs").toMap();
+        QVariantMap::const_iterator it = inputs.constBegin();
+        for ( ; it != inputs.constEnd(); ++it)
+            if (it.key() == "event")
+                m_events.append(it.value().toString().trimmed().toLower());
+    }
 
     if (m_events.isEmpty())
     {

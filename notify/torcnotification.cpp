@@ -44,9 +44,11 @@ TorcNotification::TorcNotification(const QVariantMap &Details)
             if (message.contains("title"))
                 m_title = message.value("title").toString();
 
-            QStringList list = Details.value("outputs").toString().split(",", QString::SkipEmptyParts);
-            foreach (QString notifier, list)
-                m_notifierNames.append(notifier.trimmed());
+            QVariantMap outputs = Details.value("outputs").toMap();
+            QVariantMap::const_iterator it = outputs.constBegin();
+            for (; it != outputs.constEnd(); ++it)
+                if (it.key() == "device")
+                    m_notifierNames.append(it.value().toString().trimmed());
         }
     }
 

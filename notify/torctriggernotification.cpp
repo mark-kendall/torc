@@ -44,11 +44,20 @@ TorcTriggerNotification::TorcTriggerNotification(const QVariantMap &Details)
     if (uniqueId.isEmpty() || m_notifierNames.isEmpty() || m_body.isEmpty())
         return;
 
-    if (Details.contains("inputs") && !Details.value("inputs").toString().trimmed().isEmpty())
+    if (Details.contains("inputs"))
     {
-        m_inputName = Details.value("inputs").toString().trimmed();
-        m_customData.insert("inputname", m_inputName);
-        m_customData.insert("name", userName);
+        QVariantMap inputs = Details.value("inputs").toMap();
+        QVariantMap::const_iterator it = inputs.constBegin();
+        for ( ; it != inputs.constEnd(); ++it)
+        {
+            if (it.key() == "device")
+            {
+                m_inputName = it.value().toString().trimmed();
+                m_customData.insert("inputname", m_inputName);
+                m_customData.insert("name", userName);
+                break;
+            }
+        }
     }
 
     if (Details.contains("triggerlow"))

@@ -18,6 +18,20 @@
   </xs:restriction>
 </xs:simpleType>
 
+<!-- multiple devices for input or output -->
+<xs:complexType name="deviceInputsOutputsType">
+  <xs:choice>
+    <xs:element name="device" type="deviceNameType" minOccurs="1" maxOccurs="unbounded"/>
+  </xs:choice>
+</xs:complexType>
+
+<!-- single device for input or output -->
+<xs:complexType name="deviceInputOutputType">
+  <xs:choice>
+    <xs:element name="device" type="deviceNameType"  minOccurs="1" maxOccurs="1"/>
+  </xs:choice>
+</xs:complexType>
+
 <xs:simpleType name="validStringType">
   <xs:restriction base="xs:string">
     <xs:whiteSpace value="collapse"/>
@@ -307,9 +321,40 @@
     <xs:element name="name"            type="deviceNameType"/>
     <xs:element name="username"        type="userNameType"        minOccurs="0" maxOccurs="1"/>
     <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
-    <xs:element name="inputs"          type="validStringType"/>
-    <xs:element name="outputs"         type="validStringType"/>
+    <!-- TODO can this be restricted to notifier devices -->
+    <xs:element name="outputs"         type="deviceInputsOutputsType"/>
     <xs:element name="message"         type="notificationMessageType"/>
+    <xs:element name="inputs">
+      <xs:complexType>
+        <xs:choice>
+          <xs:element name="event" minOccurs="1" maxOccurs="unbounded">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="start"/>
+                <xs:enumeration value="stop"/>
+                <xs:enumeration value="restarttorc"/>
+                <xs:enumeration value="shutdown"/>
+                <xs:enumeration value="suspend"/>
+                <xs:enumeration value="hibernate"/>
+                <xs:enumeration value="restart"/>
+                <xs:enumeration value="shuttinddown"/>
+                <xs:enumeration value="suspending"/>
+                <xs:enumeration value="hibernating"/>
+                <xs:enumeration value="restarting"/>
+                <xs:enumeration value="wokeup"/>
+                <xs:enumeration value="lowbattery"/>
+                <xs:enumeration value="networkavailable"/>
+                <xs:enumeration value="networkunavailalbe"/>
+                <xs:enumeration value="networkchanged"/>
+                <xs:enumeration value="networkhostnameschanged"/>
+                <xs:enumeration value="servicediscovered"/>
+                <xs:enumeration value="servicewentaway"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
   </xs:all>
 </xs:complexType>
 <xs:complexType name="triggerType">
@@ -317,8 +362,10 @@
     <xs:element name="name"            type="deviceNameType"/>
     <xs:element name="username"        type="userNameType"        minOccurs="0" maxOccurs="1"/>
     <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
-    <xs:element name="inputs"          type="deviceNameType"/>
-    <xs:element name="outputs"         type="validStringType"/>
+    <!-- TODO can this be restricted to input/control/output device types -->
+    <xs:element name="inputs"          type="deviceInputOutputType"/>
+    <!-- TODO can this be restricted to notifier devices -->
+    <xs:element name="outputs"         type="deviceInputsOutputsType"/>
     <xs:element name="message"         type="notificationMessageType"/>
     <!-- trigger is normally activated with low to high transition. set triggerlow to activate high to low -->
     <xs:element name="triggerlow"      type="validStringType"     minOccurs="0" maxOccurs="1"/>
