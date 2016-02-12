@@ -11,12 +11,12 @@ class TorcXmlValidator : public QAbstractMessageHandler
     TorcXmlValidator(const QString &XmlFile, const QByteArray &XSDData);
    ~TorcXmlValidator();
 
-    bool Validated  (void);
+    bool       Validated     (void);
 
   protected:
-    void Validate   (void);
-    void    handleMessage(QtMsgType Type, const QString &Description,
-                          const QUrl &Identifier, const QSourceLocation &SourceLocation);
+    void       Validate      (void);
+    void       handleMessage (QtMsgType Type, const QString &Description,
+                             const QUrl &Identifier, const QSourceLocation &SourceLocation);
 
   private:
     QString    m_xmlFile;
