@@ -151,8 +151,8 @@
     <xs:element name="name"     type="deviceNameType"/>
     <xs:element name="username" type="userNameType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
-    <xs:element name="inputs"   type="validStringType"/>
-    <xs:element name="outputs"  type="validStringType"/>
+    <xs:element name="inputs"   type="deviceInputsOutputsType"/>
+    <xs:element name="outputs"  type="deviceInputsOutputsType"/>
   </xs:all>
 </xs:complexType>
 
@@ -161,8 +161,8 @@
     <xs:element name="name"     type="deviceNameType"/>
     <xs:element name="username" type="userNameType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
-    <xs:element name="inputs"   type="validStringType"/>
-    <xs:element name="outputs"  type="validStringType"/>
+    <xs:element name="inputs"   type="deviceInputsOutputsType"/>
+    <xs:element name="outputs"  type="deviceInputsOutputsType"/>
     <xs:element name="value"    type="xs:decimal"/>
   </xs:all>
 </xs:complexType>
@@ -189,7 +189,7 @@
     <xs:element name="name"     type="deviceNameType"/>
     <xs:element name="username" type="userNameType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
-    <xs:element name="outputs"  type="validStringType"/>
+    <xs:element name="outputs"  type="deviceInputsOutputsType"/>
     <xs:element name="start"    type="validStringType"/> <!-- TODO can we do better than string? -->
     <xs:element name="duration" type="validStringType"/> <!-- TODO can we do better than string? -->
   </xs:all>
@@ -210,8 +210,8 @@
     <xs:element name="name"     type="deviceNameType"/>
     <xs:element name="username" type="userNameType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
-    <xs:element name="inputs"   type="validStringType"/>
-    <xs:element name="outputs"  type="validStringType"/>
+    <xs:element name="inputs"   type="deviceInputOutputType"/>
+    <xs:element name="outputs"  type="deviceInputsOutputsType"/>
     <xs:element name="duration" type="validStringType"/> <!-- TODO can we do better than string? -->
   </xs:all>
 </xs:complexType>
@@ -364,7 +364,6 @@
     <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
     <!-- TODO can this be restricted to input/control/output device types -->
     <xs:element name="inputs"          type="deviceInputOutputType"/>
-    <!-- TODO can this be restricted to notifier devices -->
     <xs:element name="outputs"         type="deviceInputsOutputsType"/>
     <xs:element name="message"         type="notificationMessageType"/>
     <!-- trigger is normally activated with low to high transition. set triggerlow to activate high to low -->
@@ -401,11 +400,16 @@
 </xs:complexType>
 
 <xs:element name="torc" type="rootType">
-  <!-- enforce unique device names -->
-  <xs:unique name="uniqueDeviceName">
+  <!-- enforce globally unique device names -->
+  <xs:key name="uniqueDeviceName">
     <xs:selector xpath=".//name" />
     <xs:field xpath="." />
-  </xs:unique>
+  </xs:key>
+  <!-- and always refer to a valid device name -->
+  <xs:keyref name="deviceRef" refer="uniqueDeviceName">
+      <xs:selector xpath=".//device" />
+      <xs:field xpath="." />
+  </xs:keyref>
 <!--TORC_XSD_UNIQUE-->
 </xs:element>
 

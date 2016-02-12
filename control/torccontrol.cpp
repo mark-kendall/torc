@@ -186,16 +186,20 @@ TorcControl::TorcControl(TorcControl::Type Type, const QVariantMap &Details)
     m_allInputsValid(false)
 {
     // parse inputs
-    QStringList inputs = Details.value("inputs").toString().split(",", QString::SkipEmptyParts);
-    inputs.removeDuplicates();
-    foreach (QString input, inputs)
-        m_inputList.append(input.trimmed());
+    QVariantMap inputs = Details.value("inputs").toMap();
+    QVariantMap::const_iterator it = inputs.constBegin();
+    for ( ; it != inputs.constEnd(); ++it)
+        if (it.key() == "device")
+            m_inputList.append(it.value().toString().trimmed());
+    m_inputList.removeDuplicates();
 
     // parse outputs
-    QStringList outputs = Details.value("outputs").toString().split(",", QString::SkipEmptyParts);
-    outputs.removeDuplicates();
-    foreach (QString output, outputs)
-        m_outputList.append(output.trimmed());
+    QVariantMap outputs = Details.value("outputs").toMap();
+    it = outputs.constBegin();
+    for (; it != outputs.constEnd(); ++it)
+        if (it.key() == "device")
+            m_outputList.append(it.value().toString().trimmed());
+    m_outputList.removeDuplicates();
 }
 
 TorcControl::~TorcControl()
