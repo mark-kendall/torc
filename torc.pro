@@ -216,6 +216,13 @@ HEADERS += control/torccontrols.h
 HEADERS += control/torclogiccontrol.h
 HEADERS += control/torctimercontrol.h
 HEADERS += control/torctransitioncontrol.h
+HEADERS += notify/torcnotify.h
+HEADERS += notify/torcnotifier.h
+HEADERS += notify/torclognotifier.h
+HEADERS += notify/torcpushbulletnotifier.h
+HEADERS += notify/torcnotification.h
+HEADERS += notify/torcsystemnotification.h
+HEADERS += notify/torctriggernotification.h
 
 SOURCES += torc/torcloggingimp.cpp
 SOURCES += torc/torcplist.cpp
@@ -289,6 +296,13 @@ SOURCES += control/torccontrols.cpp
 SOURCES += control/torclogiccontrol.cpp
 SOURCES += control/torctimercontrol.cpp
 SOURCES += control/torctransitioncontrol.cpp
+SOURCES += notify/torcnotify.cpp
+SOURCES += notify/torcnotifier.cpp
+SOURCES += notify/torclognotifier.cpp
+SOURCES += notify/torcpushbulletnotifier.cpp
+SOURCES += notify/torcnotification.cpp
+SOURCES += notify/torcsystemnotification.cpp
+SOURCES += notify/torctriggernotification.cpp
 
 HEADERS += torccentral.h
 HEADERS += torcdevice.h

@@ -1,6 +1,6 @@
 /* Class TorcCentral
 *
-* Copyright (C) Mark Kendall 2015
+* Copyright (C) Mark Kendall 2015-16
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@
 #include "inputs/torcinputs.h"
 #include "outputs/torcoutputs.h"
 #include "control/torccontrols.h"
+#include "notify/torcnotify.h"
 #include "http/torchttphandler.h"
 #include "torcxmlreader.h"
 #include "torccentral.h"
@@ -87,6 +88,9 @@ TorcCentral::TorcCentral()
         // connect controls to sensors/outputs/other controls
         TorcControls::gControls->Validate();
 
+        // setup notifications/notifiers
+        (void)TorcNotify::gNotify->Validate();
+
         // initialise the state machine
         {
             QMutexLocker lock(TorcDevice::gDeviceListLock);
@@ -95,6 +99,8 @@ TorcCentral::TorcCentral()
             for( ; it != TorcDevice::gDeviceList->constEnd(); ++it)
                 it.value()->Start();
         }
+
+        gLocalContext->NotifyEvent(Torc::Start);
 
         // iff we have got this far, then create the graph
         // start the graph
@@ -379,7 +385,7 @@ bool TorcCentral::event(QEvent *Event)
                 TorcReferenceCounter::EventLoopEnding(true);
                 QCoreApplication::exit(TORC_EXIT_RESTART);
                 break;
-            case Torc::Exit:
+            case Torc::Stop:
                 TorcReferenceCounter::EventLoopEnding(true);
                 QCoreApplication::quit();
                 break;
@@ -482,7 +488,8 @@ void TorcXSDFactory::CustomiseXSD(QByteArray &XSD)
 {
     QStringList identifiers;
     identifiers << XSD_TYPES << XSD_INPUTTYPES << XSD_INPUTS << XSD_CONTROLTYPES << XSD_CONTROLS;
-    identifiers << XSD_OUTPUTTYPES << XSD_OUTPUTS << XSD_UNIQUE;
+    identifiers << XSD_OUTPUTTYPES << XSD_OUTPUTS << XSD_NOTIFIERTYPES << XSD_NOTIFIERS;
+    identifiers << XSD_NOTIFICATIONTYPES << XSD_NOTIFICATIONS << XSD_UNIQUE;
 
     QMultiMap<QString,QString> xsds;
     TorcXSDFactory* factory = TorcXSDFactory::GetTorcXSDFactory();

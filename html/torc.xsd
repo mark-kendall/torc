@@ -269,6 +269,78 @@
   </xs:all>
 </xs:complexType>
 
+<!-- notifier definitions -->
+<xs:complexType name="logType">
+  <xs:all>
+    <xs:element name="name"            type="deviceNameType"/>
+    <xs:element name="username"        type="userNameType"        minOccurs="0" maxOccurs="1"/>
+    <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+  </xs:all>
+</xs:complexType>
+<xs:complexType name="pushbulletType">
+  <xs:all>
+    <xs:element name="name"            type="deviceNameType"/>
+    <xs:element name="username"        type="userNameType"        minOccurs="0" maxOccurs="1"/>
+    <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="accesstoken"     type="validStringType"/>
+  </xs:all>
+</xs:complexType>
+<!--TORC_XSD_NOTIFIERTYPES-->
+<xs:complexType name="notifierType">
+  <xs:choice minOccurs="1" maxOccurs="unbounded">
+    <!-- 0 or more instances - though generally only one of each will be needed -->
+    <xs:element minOccurs="0" maxOccurs="unbounded" name="log"        type="logType"/>
+    <xs:element minOccurs="0" maxOccurs="unbounded" name="pushbullet" type="pushbulletType"/>
+<!--TORC_XSD_NOTIFIERS-->
+  </xs:choice>
+</xs:complexType>
+
+<!-- notification definitions -->
+<xs:complexType name="notificationMessageType">
+  <xs:all>
+    <xs:element name="title" type="validStringType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="body"  type="validStringType"/>
+  </xs:all>
+</xs:complexType>
+<xs:complexType name="systemType">
+  <xs:all>
+    <xs:element name="name"            type="deviceNameType"/>
+    <xs:element name="username"        type="userNameType"        minOccurs="0" maxOccurs="1"/>
+    <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="inputs"          type="validStringType"/>
+    <xs:element name="outputs"         type="validStringType"/>
+    <xs:element name="message"         type="notificationMessageType"/>
+  </xs:all>
+</xs:complexType>
+<xs:complexType name="triggerType">
+  <xs:all>
+    <xs:element name="name"            type="deviceNameType"/>
+    <xs:element name="username"        type="userNameType"        minOccurs="0" maxOccurs="1"/>
+    <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="inputs"          type="deviceNameType"/>
+    <xs:element name="outputs"         type="validStringType"/>
+    <xs:element name="message"         type="notificationMessageType"/>
+    <!-- trigger is normally activated with low to high transition. set triggerlow to activate high to low -->
+    <xs:element name="triggerlow"      type="validStringType"     minOccurs="0" maxOccurs="1"/>
+  </xs:all>
+</xs:complexType>
+<!--TORC_XSD_NOTIFICATIONTYPES-->
+<xs:complexType name="notificationType">
+  <xs:choice minOccurs="1" maxOccurs="unbounded">
+    <xs:element minOccurs="0" maxOccurs="unbounded" name="system"  type="systemType"/>
+    <xs:element minOccurs="0" maxOccurs="unbounded" name="trigger" type="triggerType"/>
+<!--TORC_XSD_NOTIFIERS-->
+  </xs:choice>
+</xs:complexType>
+
+<xs:complexType name="notifyType">
+  <xs:all>
+    <xs:element minOccurs="0" maxOccurs="1" name="notifiers"     type="notifierType"/>
+    <xs:element minOccurs="0" maxOccurs="1" name="notifications" type="notificationType"/>
+<!--TORC_XSD_NOTIFIERS-->
+  </xs:all>
+</xs:complexType>
+
 <!-- Single root element 'torc' -->
 <xs:complexType name="rootType">
   <xs:all>
@@ -277,6 +349,7 @@
     <xs:element name="inputs"          minOccurs="0" maxOccurs="1" type="inputsType"/>
     <xs:element name="control"         minOccurs="0" maxOccurs="1" type="controlType"/>
     <xs:element name="outputs"         minOccurs="0" maxOccurs="1" type="outputsType"/>
+    <xs:element name="notify"          minOccurs="0" maxOccurs="1" type="notifyType"/>
   </xs:all>
 </xs:complexType>
 

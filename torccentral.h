@@ -45,14 +45,18 @@ class TorcCentral : public QObject, public TorcHTTPService
     bool            canRestartTorc;
 };
 
-#define XSD_TYPES        QString("<!--TORC_XSD_TYPES-->")
-#define XSD_INPUTTYPES   QString("<!--TORC_XSD_INPUTTYPES-->")
-#define XSD_INPUTS       QString("<!--TORC_XSD_INPUTS-->")
-#define XSD_CONTROLTYPES QString("<!--TORC_XSD_CONTROLTYPES-->")
-#define XSD_CONTROLS     QString("<!--TORC_XSD_CONTROLS-->")
-#define XSD_OUTPUTTYPES  QString("<!--TORC_XSD_OUTPUTTYPES-->")
-#define XSD_OUTPUTS      QString("<!--TORC_XSD_OUTPUTS-->")
-#define XSD_UNIQUE       QString("<!--TORC_XSD_UNIQUE-->")
+#define XSD_TYPES             QString("<!--TORC_XSD_TYPES-->")
+#define XSD_INPUTTYPES        QString("<!--TORC_XSD_INPUTTYPES-->")
+#define XSD_INPUTS            QString("<!--TORC_XSD_INPUTS-->")
+#define XSD_CONTROLTYPES      QString("<!--TORC_XSD_CONTROLTYPES-->")
+#define XSD_CONTROLS          QString("<!--TORC_XSD_CONTROLS-->")
+#define XSD_OUTPUTTYPES       QString("<!--TORC_XSD_OUTPUTTYPES-->")
+#define XSD_OUTPUTS           QString("<!--TORC_XSD_OUTPUTS-->")
+#define XSD_NOTIFIERTYPES     QString("<!--TORC_XSD_NOTIFIERTYPES-->")
+#define XSD_NOTIFIERS         QString("<!--TORC_XSD_NOTIFIERS-->")
+#define XSD_NOTIFICATIONTYPES QString("<!--TORC_XSD_NOTIFICATIONYPES-->")
+#define XSD_NOTIFICATIONS     QString("<!--TORC_XSD_NOTIFICATIONS-->")
+#define XSD_UNIQUE            QString("<!--TORC_XSD_UNIQUE-->")
 
 class TorcXSDFactory
 {
