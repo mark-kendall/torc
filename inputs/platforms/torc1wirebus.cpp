@@ -182,12 +182,17 @@ Torc1WireDeviceFactory* Torc1WireDeviceFactory::NextFactory(void) const
 }
 
 static const QString wire1InputTypes =
+"<xs:simpleType name='ds18b20SerialType'>\r\n"
+"  <xs:restriction base='xs:string'>\r\n"
+"    <xs:pattern value='28-[0-9a-fA-F]{12}'/>\r\n"
+"  </xs:restriction>\r\n"
+"</xs:simpleType>\r\n"
 "<xs:complexType name='ds18b20Type'>\r\n"
 "  <xs:all>\r\n"
 "    <xs:element name='name'            type='deviceNameType'/>\r\n"
 "    <xs:element name='username'        type='userNameType' minOccurs='0' maxOccurs='1'/>\r\n"
 "    <xs:element name='userdescription' type='userDescriptionType' minOccurs='0' maxOccurs='1'/>\r\n"
-"    <xs:element name='wire1serial'     type='validStringType'/>\r\n"
+"    <xs:element name='wire1serial'     type='ds18b20SerialType'/>\r\n"
 "  </xs:all>\r\n"
 "</xs:complexType>\r\n\r\n"
 "<xs:complexType name='wire1Type'>\r\n"
