@@ -36,6 +36,8 @@
  *
  * There is no support for mixed elements or any attributes - as these cannot be represented
  * within a QVariantMap.
+ *
+ * \note TorcXMLReader does not support empty elements.
 */
 TorcXMLReader::TorcXMLReader(const QString &File)
   : m_reader(new QXmlStreamReader()),
