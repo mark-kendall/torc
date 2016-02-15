@@ -68,7 +68,7 @@ class TorcLocalContext : public QObject, public TorcObservable
     Q_OBJECT
 
   public:
-    static qint16 Create      (TorcCommandLine* CommandLine);
+    static qint16 Create      (TorcCommandLine* CommandLine, bool Init = true);
     static void   TearDown    (void);
 
     Q_INVOKABLE static void  NotifyEvent   (int Event);

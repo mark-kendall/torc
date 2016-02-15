@@ -285,14 +285,18 @@ int Torc::StringToAction(const QString &Action)
     return metaEnum.keyToValue(Action.toLatin1());
 }
 
-qint16 TorcLocalContext::Create(TorcCommandLine* CommandLine)
+qint16 TorcLocalContext::Create(TorcCommandLine* CommandLine, bool Init /*=true*/)
 {
     if (gLocalContext)
         return TORC_EXIT_OK;
 
     gLocalContext = new TorcLocalContext(CommandLine);
-    if (gLocalContext && gLocalContext->Init())
+    if (gLocalContext)
+    {
+        if (Init)
+            return gLocalContext->Init();
         return TORC_EXIT_OK;
+    }
 
     TearDown();
     return TORC_EXIT_NO_CONTEXT;
