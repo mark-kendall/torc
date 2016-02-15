@@ -27,11 +27,14 @@
 #include "torclogging.h"
 #include "torcxmlvalidator.h"
 
+bool TorcXmlValidator::gSilent = false;
+
 TorcXmlValidator::TorcXmlValidator(const QString &XmlFile, const QString &XSDFile)
   : m_xmlFile(XmlFile),
     m_xsdFile(XSDFile),
     m_xsdData(QByteArray()),
-    m_valid(false)
+    m_valid(false),
+    m_xsdDone(false)
 {
     Validate();
 }
@@ -40,7 +43,8 @@ TorcXmlValidator::TorcXmlValidator(const QString &XmlFile, const QByteArray &XSD
   : m_xmlFile(XmlFile),
     m_xsdFile(QString("")),
     m_xsdData(XSDData),
-    m_valid(false)
+    m_valid(false),
+    m_xsdDone(false)
 {
     Validate();
 }
@@ -103,11 +107,14 @@ void TorcXmlValidator::Validate(void)
         return;
     }
 
+    m_xsdDone = true;
+
     QXmlSchemaValidator validator(schema);
     validator.setMessageHandler(this);
     if (!validator.validate(&xml))
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to validate Xml from '%1'").arg(m_xmlFile));
+        if (!gSilent)
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to validate Xml from '%1'").arg(m_xmlFile));
         return;
     }
 
@@ -122,10 +129,22 @@ bool TorcXmlValidator::Validated(void)
 void TorcXmlValidator::handleMessage(QtMsgType Type, const QString &Description,
                                      const QUrl &Identifier, const QSourceLocation &SourceLocation)
 {
+    if (gSilent)
+        return;
+
     (void)Identifier;
     QString desc = Description;
     desc.remove(QRegExp("<[^>]*>"));
-    LOG(VB_GENERAL, (Type == QtFatalMsg) ? LOG_ERR : LOG_WARNING, QString("XSDError in file '%1' at line %2: '%3'")
-        .arg(m_xmlFile).arg(SourceLocation.line()).arg(desc));
+    if (!m_xsdDone && m_xsdFile.isEmpty())
+    {
+        LOG(VB_GENERAL, (Type == QtFatalMsg) ? LOG_ERR : LOG_WARNING, QString("Error in XSD at line %1: '%2'")
+            .arg(SourceLocation.line()).arg(desc));
+    }
+    else
+    {
+        QString file = m_xsdDone ? m_xsdFile : m_xmlFile;
+        LOG(VB_GENERAL, (Type == QtFatalMsg) ? LOG_ERR : LOG_WARNING, QString("Error in file '%1' at line %2: '%3'")
+            .arg(file).arg(SourceLocation.line()).arg(desc));
+    }
 }
 
