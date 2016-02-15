@@ -45,7 +45,7 @@ bool TorcNotify::Validate(void) const
 {
     // there isn't always an app object when gNotify is created, so connect the dots here but ensure
     // connections are unique to account for multiple runs.
-    connect(qApp, SIGNAL(applicationNameChanged()), gNotify, SLOT(ApplicationNameChanged()), Qt::AutoConnection | Qt::UniqueConnection);
+    connect(qApp, SIGNAL(applicationNameChanged()), gNotify, SLOT(ApplicationNameChanged()), Qt::UniqueConnection);
 
     QMutexLocker locker(m_lock);
 
