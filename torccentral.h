@@ -23,6 +23,7 @@ class TorcCentral : public QObject, public TorcHTTPService
 
     QString         GetUIName             (void);
     bool            event                 (QEvent *Event);
+    static QByteArray GetCustomisedXSD    (const QString &BaseXSDFile);
 
   signals:
     void            CanRestartTorcChanged (bool CanRestartTorc);
@@ -36,7 +37,6 @@ class TorcCentral : public QObject, public TorcHTTPService
 
   private:
     bool            LoadConfig            (void);
-    QByteArray      GetCustomisedXSD      (const QString &BaseXSDFile);
 
   private:
     QMutex         *m_lock;
