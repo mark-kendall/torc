@@ -23,7 +23,8 @@ class TorcCommandLine
         LogLevel = (1 << 2),
         LogType  = (1 << 3),
         Database = (1 << 4),
-        LogFile  = (1 << 5)
+        LogFile  = (1 << 5),
+        XSDTest  = (1 << 6)
     };
 
     Q_DECLARE_FLAGS(Options, Option);

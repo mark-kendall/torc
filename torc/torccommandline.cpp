@@ -130,6 +130,8 @@ TorcCommandLinePriv::TorcCommandLinePriv(TorcCommandLine::Options Flags)
         Add("db,database", QString(""), "Use a custom database location. If the file does not exist, it will be created.");
     if (options.testFlag(TorcCommandLine::LogFile))
         Add("logfile", QString(""), "Override the logfile location.");
+    if (options.testFlag(TorcCommandLine::XSDTest))
+        Add("xsdtest", QString(""), "Run validation of test configuration XML files found in the given directory.", TorcCommandLine::XSDTest);
 }
 
 /// \brief Add a command line option
