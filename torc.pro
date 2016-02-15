@@ -307,9 +307,11 @@ SOURCES += notify/torctriggernotification.cpp
 HEADERS += torccentral.h
 HEADERS += torcdevice.h
 HEADERS += torcdevicehandler.h
+HEADERS += torcxsdtest.h
 SOURCES += main.cpp
 SOURCES += torccentral.cpp
 SOURCES += torcdevice.cpp
 SOURCES += torcdevicehandler.cpp
+SOURCES += torcxsdtest.cpp
 
 QMAKE_CLEAN += $(TARGET)

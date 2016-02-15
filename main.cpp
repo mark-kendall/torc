@@ -6,6 +6,7 @@
 #include "torclocalcontext.h"
 #include "torcexitcodes.h"
 #include "torccommandline.h"
+#include "torcxsdtest.h"
 
 int main(int argc, char **argv)
 {
@@ -19,7 +20,7 @@ int main(int argc, char **argv)
 
         {
             bool justexit = false;
-            QScopedPointer<TorcCommandLine> cmdline(new TorcCommandLine(TorcCommandLine::Database | TorcCommandLine::LogFile));
+            QScopedPointer<TorcCommandLine> cmdline(new TorcCommandLine(TorcCommandLine::Database | TorcCommandLine::LogFile | TorcCommandLine::XSDTest));
 
             if (!cmdline.data())
                 return TORC_EXIT_UNKOWN_ERROR;
@@ -31,6 +32,9 @@ int main(int argc, char **argv)
 
             if (justexit)
                 return ret;
+
+            if (!(cmdline.data()->GetValue("xsdtest").toString().isEmpty()))
+                return TorcXSDTest::RunXSDTestSuite(cmdline.data());
 
             if (int error = TorcLocalContext::Create(cmdline.data()))
                 return error;
