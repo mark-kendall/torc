@@ -7,11 +7,8 @@
 class TorcXmlValidator : public QAbstractMessageHandler
 {
   public:
-    static bool gSilent;
-
-  public:
-    TorcXmlValidator(const QString &XmlFile, const QString &XSDFile);
-    TorcXmlValidator(const QString &XmlFile, const QByteArray &XSDData);
+    TorcXmlValidator(const QString &XmlFile, const QString &XSDFile, bool Silent = false);
+    TorcXmlValidator(const QString &XmlFile, const QByteArray &XSDData, bool Silent = false);
    ~TorcXmlValidator();
 
     bool       Validated     (void);
@@ -27,6 +24,7 @@ class TorcXmlValidator : public QAbstractMessageHandler
     QByteArray m_xsdData;
     bool       m_valid;
     bool       m_xsdDone;
+    bool       m_silent;
 };
 
 #endif // TORCXMLVALIDATOR_H

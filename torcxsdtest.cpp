@@ -78,13 +78,12 @@ int TorcXSDTest::RunXSDTestSuite(TorcCommandLine *CommandLine)
     }
 
     LOG(VB_GENERAL, LOG_INFO, QString("Found %1 files.").arg(testfiles.size()));
-    TorcXmlValidator::gSilent = true;
     bool allfailed = true;
     foreach (QString file, testfiles)
     {
         // these should all FAIL!
         QString path = directory + "/" + file;
-        TorcXmlValidator validator(path, fullxsd);
+        TorcXmlValidator validator(path, fullxsd, true);
         if (validator.Validated())
         {
             LOG(VB_GENERAL, LOG_INFO, QString("Unexpected pass: %1").arg(path));

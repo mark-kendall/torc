@@ -27,24 +27,24 @@
 #include "torclogging.h"
 #include "torcxmlvalidator.h"
 
-bool TorcXmlValidator::gSilent = false;
-
-TorcXmlValidator::TorcXmlValidator(const QString &XmlFile, const QString &XSDFile)
+TorcXmlValidator::TorcXmlValidator(const QString &XmlFile, const QString &XSDFile, bool Silent/*=false*/)
   : m_xmlFile(XmlFile),
     m_xsdFile(XSDFile),
     m_xsdData(QByteArray()),
     m_valid(false),
-    m_xsdDone(false)
+    m_xsdDone(false),
+    m_silent(Silent)
 {
     Validate();
 }
 
-TorcXmlValidator::TorcXmlValidator(const QString &XmlFile, const QByteArray &XSDData)
+TorcXmlValidator::TorcXmlValidator(const QString &XmlFile, const QByteArray &XSDData, bool Silent/*=false*/)
   : m_xmlFile(XmlFile),
     m_xsdFile(QString("")),
     m_xsdData(XSDData),
     m_valid(false),
-    m_xsdDone(false)
+    m_xsdDone(false),
+    m_silent(Silent)
 {
     Validate();
 }
@@ -113,7 +113,7 @@ void TorcXmlValidator::Validate(void)
     validator.setMessageHandler(this);
     if (!validator.validate(&xml))
     {
-        if (!gSilent)
+        if (!m_silent)
             LOG(VB_GENERAL, LOG_ERR, QString("Failed to validate Xml from '%1'").arg(m_xmlFile));
         return;
     }
@@ -129,7 +129,7 @@ bool TorcXmlValidator::Validated(void)
 void TorcXmlValidator::handleMessage(QtMsgType Type, const QString &Description,
                                      const QUrl &Identifier, const QSourceLocation &SourceLocation)
 {
-    if (gSilent)
+    if (m_silent)
         return;
 
     (void)Identifier;
