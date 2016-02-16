@@ -80,6 +80,12 @@
     <xs:pattern value="0x[0-9a-fA-F]+"/>
   </xs:restriction>
 </xs:simpleType>
+<xs:simpleType name="durationType">
+  <xs:restriction base="xs:string">
+    <!-- this is hh:mm:ss - need to expand to d:hh:mm:ss or d:hh:mm.ss -->
+    <xs:pattern value="^(?:(?:([01]?\d|2[0-3]):)?([0-5]?\d):)?([0-5]?\d)$"/>
+  </xs:restriction>
+</xs:simpleType>
 <!--TORC_XSD_TYPES-->
 <!-- input definitions -->
 <xs:complexType name="networkSwitchType">
@@ -263,7 +269,7 @@
   </xs:choice>
 </xs:complexType>
 <!--TORC_XSD_CONTROLTYPES-->
-<xs:complexType name="controlsType">
+<xs:complexType name="controlType">
   <xs:all>
     <!-- 0 or 1 instances of logic, timer and transition -->
     <xs:element minOccurs="0" maxOccurs="1" name="logic"      type="logicType"/>
@@ -391,7 +397,7 @@
     <!-- 0 or 1 instances of each of these types in any order-->
     <xs:element name="applicationname" minOccurs="0" maxOccurs="1" type="userNameType" />
     <xs:element name="inputs"          minOccurs="0" maxOccurs="1" type="inputsType"/>
-    <xs:element name="controls"        minOccurs="0" maxOccurs="1" type="controlsType"/>
+    <xs:element name="control"         minOccurs="0" maxOccurs="1" type="controlType"/>
     <xs:element name="outputs"         minOccurs="0" maxOccurs="1" type="outputsType"/>
     <xs:element name="notify"          minOccurs="0" maxOccurs="1" type="notifyType">
       <!-- restrict notification outputs to notifiers -->
@@ -418,12 +424,12 @@
       <xs:selector xpath=".//device" />
       <xs:field xpath="." />
   </xs:keyref>
-  <!-- list of inputs/controls/outputs devices -->
+  <!-- list of inputs/control/outputs devices -->
   <xs:key name="realDeviceNames">
-    <xs:selector xpath="./inputs//name|./outputs//name|./controls//name" />
+    <xs:selector xpath="./inputs//name|./outputs//name|./control//name" />
     <xs:field xpath="." />
   </xs:key>
-  <!-- restrict notification device inputs to inputs/controls/outputs devices-->
+  <!-- restrict notification device inputs to inputs/control/outputs devices-->
   <xs:keyref name="notificationInputRef" refer="realDeviceNames">
     <xs:selector xpath=".//notifications//inputs/device" />
     <xs:field xpath="." />

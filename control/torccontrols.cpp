@@ -1,6 +1,6 @@
 /* Class TorcControls
 *
-* Copyright (C) Mark Kendall 2015
+* Copyright (C) Mark Kendall 2015-16
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ void TorcControls::Create(const QVariantMap &Details)
     QVariantMap::const_iterator it = Details.constBegin();
     for( ; it != Details.constEnd(); ++it)
     {
-        if (it.key() != "control")
+        if (it.key() != "controls")
             continue;
 
         QVariantMap control       = it.value().toMap();
