@@ -292,11 +292,8 @@ qint16 TorcLocalContext::Create(TorcCommandLine* CommandLine, bool Init /*=true*
 
     gLocalContext = new TorcLocalContext(CommandLine);
     if (gLocalContext)
-    {
-        if (Init)
-            return gLocalContext->Init();
-        return TORC_EXIT_OK;
-    }
+        if ((Init && gLocalContext->Init()) || !Init)
+            return TORC_EXIT_OK;
 
     TearDown();
     return TORC_EXIT_NO_CONTEXT;
