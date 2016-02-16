@@ -34,7 +34,7 @@
 #include "torc/torcadminthread.h"
 #include "inputs/torcinputs.h"
 #include "outputs/torcoutputs.h"
-#include "control/torccontrols.h"
+#include "controls/torccontrols.h"
 #include "notify/torcnotify.h"
 #include "http/torchttphandler.h"
 #include "torcxmlreader.h"
