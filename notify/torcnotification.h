@@ -11,10 +11,11 @@ class TorcNotification : public TorcDevice
 
   public:
     TorcNotification(const QVariantMap &Details);
-    virtual bool         Setup   (void);
+    virtual bool         Setup        (void);
+    virtual bool         IsKnownInput (const QString &UniqueId) const;
 
   signals:
-    void                 Notify  (const QVariantMap &Message);
+    void                 Notify       (const QVariantMap &Message);
 
   protected:
     virtual ~TorcNotification();

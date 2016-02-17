@@ -71,6 +71,12 @@ TorcTriggerNotification::~TorcTriggerNotification()
 {
 }
 
+bool TorcTriggerNotification::IsKnownInput(const QString &UniqueId) const
+{
+    QMutexLocker locker(lock);
+    return UniqueId == m_inputName;
+}
+
 void TorcTriggerNotification::InputValueChanged(double Value)
 {
     TorcDevice* input = qobject_cast<TorcDevice*>(sender());

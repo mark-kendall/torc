@@ -13,6 +13,7 @@ class TorcTriggerNotification : public TorcNotification
   public:
     TorcTriggerNotification(const QVariantMap &Details);
     ~TorcTriggerNotification();
+    bool         IsKnownInput      (const QString &UniqueId) const;
 
   public slots:
     void         InputValueChanged (double Value);

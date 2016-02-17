@@ -83,6 +83,12 @@ bool TorcNotification::Setup(void)
     return true;
 }
 
+bool TorcNotification::IsKnownInput(const QString &UniqueId) const
+{
+    (void)UniqueId;
+    return false;
+}
+
 TorcNotificationFactory* TorcNotificationFactory::gTorcNotificationFactory = NULL;
 
 TorcNotificationFactory::TorcNotificationFactory()
