@@ -9,7 +9,7 @@ class TorcLogicControl : public TorcControl
   public:
     enum Operation
     {
-        NoOperation,
+        Passthrough, // no op
         Equal,
         LessThan,
         GreaterThan,
@@ -19,7 +19,10 @@ class TorcLogicControl : public TorcControl
         All,
         Average,
         Toggle,
-        Invert
+        Invert,
+        Maximum,
+        Minimum,
+        Multiply
     };
 
     static TorcLogicControl::Operation StringToOperation (const QString &Operation, bool *Ok);

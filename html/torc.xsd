@@ -169,18 +169,20 @@
 
 <xs:complexType name="logicType">
   <xs:choice minOccurs="1" maxOccurs="unbounded">
-    <xs:element name="none"               type="simpleLogicType"/>
     <xs:element name="passthrough"        type="simpleLogicType"/>
-    <xs:element name="equal"              type="complexLogicType"/>
-    <xs:element name="lessthan"           type="complexLogicType"/>
-    <xs:element name="greaterthan"        type="complexLogicType"/>
-    <xs:element name="lessthanorequal"    type="complexLogicType"/>
-    <xs:element name="greaterthanorequal" type="complexLogicType"/>
     <xs:element name="any"                type="simpleLogicType"/>
     <xs:element name="all"                type="simpleLogicType"/>
     <xs:element name="average"            type="simpleLogicType"/>
     <xs:element name="toggle"             type="simpleLogicType"/>
     <xs:element name="invert"             type="simpleLogicType"/>
+    <xs:element name="maximum"            type="simpleLogicType"/>
+    <xs:element name="minimum"            type="simpleLogicType"/>
+    <xs:element name="multiply"           type="simpleLogicType"/>
+    <xs:element name="equal"              type="complexLogicType"/>
+    <xs:element name="lessthan"           type="complexLogicType"/>
+    <xs:element name="greaterthan"        type="complexLogicType"/>
+    <xs:element name="lessthanorequal"    type="complexLogicType"/>
+    <xs:element name="greaterthanorequal" type="complexLogicType"/>
   </xs:choice>
 </xs:complexType>
 

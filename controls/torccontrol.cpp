@@ -25,6 +25,7 @@
 #include "torccentral.h"
 #include "torcinput.h"
 #include "torcoutput.h"
+#include "../notify/torcnotification.h"
 #include "torccontrol.h"
 
 TorcControl::Type TorcControl::StringToType(const QString &Type)
@@ -414,7 +415,7 @@ bool TorcControl::Finish(void)
     for ( ; it != m_outputs.constEnd(); ++it)
     {
         // an output must be a type that accepts inputs
-        // i.e. a TorcOutput or most TorcControl types
+        // i.e. a TorcOutput, most TorcControl types and some TorcNotification types
         if (qobject_cast<TorcOutput*>(it.key()))
         {
             TorcOutput* output = qobject_cast<TorcOutput*>(it.key());
@@ -444,9 +445,22 @@ bool TorcControl::Finish(void)
             connect(this, SIGNAL(ValidChanged(bool)), control, SLOT(InputValidChanged(bool)), Qt::UniqueConnection);
             connect(this, SIGNAL(ValueChanged(double)), control, SLOT(InputValueChanged(double)), Qt::UniqueConnection);
         }
+        else if (qobject_cast<TorcNotification*>(it.key()))
+        {
+            // NB TorcNotification connects itself to the control. We only really check this
+            // to ensure all control outputs are valid and a control may only exist to trigger
+            // a notification.
+            TorcNotification* notification = qobject_cast<TorcNotification*>(it.key());
+            if (!notification->IsKnownInput(uniqueId))
+            {
+                LOG(VB_GENERAL, LOG_INFO, QString("Notification '%1' does not recognise '%2' as an input")
+                    .arg(notification->GetUniqueId()).arg(uniqueId));
+                return false;
+            }
+        }
         else
         {
-            LOG(VB_GENERAL, LOG_ERR, "Unknown output type");
+            LOG(VB_GENERAL, LOG_ERR, QString("Unknown output type for '%1'").arg(uniqueId));
             return false;
         }
     }

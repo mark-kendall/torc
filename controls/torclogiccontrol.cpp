@@ -36,19 +36,21 @@ TorcLogicControl::Operation TorcLogicControl::StringToOperation(const QString &O
     if ("ANY" == operation)                return TorcLogicControl::Any;
     if ("ALL" == operation)                return TorcLogicControl::All;
     if ("AVERAGE" == operation)            return TorcLogicControl::Average;
-    if ("NONE" == operation)               return TorcLogicControl::NoOperation;
-    if ("PASSTHROUGH" == operation)        return TorcLogicControl::NoOperation;
+    if ("PASSTHROUGH" == operation)        return TorcLogicControl::Passthrough;
     if ("TOGGLE" == operation)             return TorcLogicControl::Toggle;
     if ("INVERT" == operation)             return TorcLogicControl::Invert;
+    if ("MAXIMUM" == operation)            return TorcLogicControl::Maximum;
+    if ("MINIMUM" == operation)            return TorcLogicControl::Minimum;
+    if ("MULTIPLY" == operation)           return TorcLogicControl::Multiply;
 
     // fail for anything that isn't explicitly a known operation
     *Ok = false;
-    return TorcLogicControl::NoOperation;
+    return TorcLogicControl::Passthrough;
 }
 
 TorcLogicControl::TorcLogicControl(const QString &Type, const QVariantMap &Details)
   : TorcControl(TorcControl::Logic, Details),
-    m_operation(TorcLogicControl::NoOperation),
+    m_operation(TorcLogicControl::Passthrough),
     m_operationValue(0.0)
 {
     bool operationok = false;
@@ -135,9 +137,17 @@ QStringList TorcLogicControl::GetDescription(void)
         case TorcLogicControl::Invert:
             result.append(tr("Invert"));
             break;
-        case TorcLogicControl::NoOperation:
-        default:
+        case TorcLogicControl::Passthrough:
             result.append(tr("Passthrough"));
+            break;
+        case TorcLogicControl::Maximum:
+            result.append(tr("Maximum"));
+            break;
+        case TorcLogicControl::Minimum:
+            result.append(tr("Minimum"));
+            break;
+        case TorcLogicControl::Multiply:
+            result.append(tr("Multiply"));
             break;
     }
 
@@ -149,7 +159,7 @@ bool TorcLogicControl::IsPassthrough(void)
     QMutexLocker locker(lock);
 
     bool passthrough = false;
-    if ((m_operation == TorcLogicControl::NoOperation) && (m_inputs.size() == 1))
+    if ((m_operation == TorcLogicControl::Passthrough) && (m_inputs.size() == 1))
     {
         // check the input
         if (qobject_cast<TorcInput*>(m_inputs.firstKey()))
@@ -177,13 +187,6 @@ bool TorcLogicControl::Validate(void)
     if (!TorcControl::Validate())
         return false;
 
-    // we need one or more inputs for a logic control
-    if (m_inputs.isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("Device '%1' needs at least one input").arg(uniqueId));
-        return false;
-    }
-
     // we always need one or more outputs
     if (m_outputs.isEmpty())
     {
@@ -191,35 +194,40 @@ bool TorcLogicControl::Validate(void)
         return false;
     }
 
-    // sanity check number of inputs for operation type
-    if (m_operation == TorcLogicControl::Equal ||
-        m_operation == TorcLogicControl::LessThan ||
-        m_operation == TorcLogicControl::LessThanOrEqual ||
-        m_operation == TorcLogicControl::GreaterThan ||
-        m_operation == TorcLogicControl::GreaterThanOrEqual ||
-        m_operation == TorcLogicControl::Toggle ||
-        m_operation == TorcLogicControl::Invert)
+    switch (m_operation)
     {
-        // can have only one input to compare against
-        if (m_inputs.size() > 1)
-        {
-            LOG(VB_GENERAL, LOG_ERR, QString("%1 has %2 inputs for operation '%3' (can have only 1) - ignoring.")
-                .arg(uniqueId).arg(m_inputs.size()).arg(GetDescription().join(",")));
-            return false;
-        }
-    }
-    else if (m_operation == TorcLogicControl::Any ||
-             m_operation == TorcLogicControl::All ||
-             m_operation == TorcLogicControl::Average)
-    {
-        // ANY, ALL and AVERAGE imply multiple inputs. Technically they will operate fine with just one
-        // but fail and warn - the user needs to know as their config may not be correct
-        if (m_inputs.size() < 2)
-        {
-            LOG(VB_GENERAL, LOG_ERR, QString("%1 has %2 inputs for operation '%3' (needs at least 2) - ignoring.")
-                .arg(uniqueId).arg(m_inputs.size()).arg(GetDescription().join(",")));
-            return false;
-        }
+        case TorcLogicControl::Any:
+        case TorcLogicControl::All:
+        case TorcLogicControl::Average:
+        case TorcLogicControl::Maximum:
+        case TorcLogicControl::Minimum:
+        case TorcLogicControl::Multiply:
+            {
+                if (m_inputs.size() < 2)
+                {
+                    LOG(VB_GENERAL, LOG_ERR, QString("%1 has %2 inputs for operation '%3' (needs at least 2) - ignoring.")
+                        .arg(uniqueId).arg(m_inputs.size()).arg(GetDescription().join(",")));
+                    return false;
+                }
+            }
+            break;
+        case TorcLogicControl::Passthrough:
+        case TorcLogicControl::Equal:
+        case TorcLogicControl::LessThan:
+        case TorcLogicControl::LessThanOrEqual:
+        case TorcLogicControl::GreaterThan:
+        case TorcLogicControl::GreaterThanOrEqual:
+        case TorcLogicControl::Toggle:
+        case TorcLogicControl::Invert:
+            {
+                if (m_inputs.size() != 1)
+                {
+                    LOG(VB_GENERAL, LOG_ERR, QString("%1 has %2 inputs for operation '%3' (must have 1) - ignoring.")
+                        .arg(uniqueId).arg(m_inputs.size()).arg(GetDescription().join(",")));
+                    return false;
+                }
+            }
+            break;
     }
 
     // if we get this far, we can finish the device
@@ -236,13 +244,10 @@ void TorcLogicControl::CalculateOutput(void)
     double newvalue = value; // no change by default
     switch (m_operation)
     {
-        case TorcLogicControl::NoOperation:
-            if (m_inputs.size() == 1)
-            {
-                // must be a single input just passed through to output(s)
-                newvalue = m_inputValues.first();
-            }
-            else
+        case TorcLogicControl::Passthrough:
+            newvalue = m_inputValues.first();
+            break;
+        case TorcLogicControl::Multiply:
             {
                 // must be multiple range/pwm values that are combined
                 // if binary inputs are used, this will equate to the opposite of Any.
@@ -312,6 +317,25 @@ void TorcLogicControl::CalculateOutput(void)
             {
                 newvalue = m_inputValues.first() < 1.0 ? 1.0 : 0.0;
             }
+            break;
+        case TorcLogicControl::Maximum:
+            {
+                double max = 0;
+                foreach (double next, m_inputValues)
+                    if (next > max)
+                        max = next;
+                newvalue = max;
+            }
+            break;
+        case TorcLogicControl::Minimum:
+            {
+                double min = qInf();
+                foreach (double next, m_inputValues)
+                    if (next < min)
+                        min = next;
+                newvalue = min;
+            }
+            break;
     }
     SetValue(newvalue);
 }
