@@ -30,6 +30,51 @@
 #include "torccentral.h"
 #include "torcxsdtest.h"
 
+/*! \page xsd Configuration file format
+ * \section xsdintro Introduction
+ * Torc is configured via an XML file. By design, the structure and format of this file is highly specific
+ * - this is to ensure that it operates exactly as the user intended. Subtle (and not so subtle) errors should
+ * not lead to unexpected behaviour.
+ *
+ * \section xsdgeneral General XML notes
+ * -# All XML definitions are case sensitive.
+ *
+ * \section xsdxsd Device specification
+ * All devices require a '<name>' that uniquely identifies that device.
+ * To that end, a name must be unique, must not be empty and for internal purposes can only contain
+ * alphanumeric characters (a-z, A-Z and 0-9) as well as '_' and '-',
+ *
+ * Devices may also have '<username>' and '<userdescription>' tags. These do not affect the operation of
+ * the device and are used purely for a user friendly interface.
+ *
+ * \section xsdinputs Input devices
+ * As well as the default device specifications, an input device <b>must</b> specify a default value and
+ * any type specific values (e.g. gpiopinnumber for a GPIO input).
+ *
+ * \section xsdcontrols Control devices
+ *
+ * Control devices provide the 'intelligence' to Torc's behaviour. They generally take one or more input values (from input
+ * devices or other control devices) and generate a different output value. Control devices can output to one or more other control devices
+ * , some notification devices and output devices.
+ *
+ * -# Timer devices
+ *
+ * Timer devices <b>must</b> have no inputs.
+ *
+ * -# Transition devices
+ *
+ * Transition devices <b>must</b> have exactly one input and <b>must</b> also specifiy a duration for the transition.
+ *
+ * -# Logic devices
+ *
+ *
+ *
+ * \section xsdlimits Configuration errors not (currently) identified by XSD validation.
+ * -# Circular device references.
+ * -# Self reference (i.e. a direct circular reference).
+ * -# Multiple inputs to an output.
+ * -# Reciprocal outputs/inputs (i.e. matched)
+*/
 TorcXSDTest::TorcXSDTest()
 {
 }
