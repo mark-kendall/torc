@@ -1,0 +1,7 @@
+<torc>
+  <!-- NOTE a completely empty element is ignored by TorcXMLReader. So <inputs></inputs> or <inputs/>
+       actually produces a valid configuration as an empty torc element is valid. -->
+  <inputs>
+    <network/>
+  </inputs>
+</torc>

@@ -1,0 +1,7 @@
+<torc>
+  <notify>
+    <notifiers>
+      <log/>
+    </notifiers>
+  </notify>
+</torc>

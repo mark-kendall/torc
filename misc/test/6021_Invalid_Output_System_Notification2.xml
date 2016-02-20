@@ -1,0 +1,29 @@
+<torc>
+  <inputs>
+    <network>
+      <switch>
+        <name>test</name>
+        <default>0</default>
+      </switch>
+    </network>
+  </inputs>
+  <notify>
+    <notifiers>
+      <log>
+        <name>log</name>
+      </log>
+    </notifiers>
+    <notifications>
+      <system>
+        <name>system</name>
+        <inputs>
+          <event>start</event>
+        </inputs>
+        <outputs>
+          <notifier></notifier>
+        </outputs>
+        <message><body>hello</body></message>
+      </system>
+    </notifications>
+  </notify>
+</torc>
