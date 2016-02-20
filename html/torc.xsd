@@ -212,7 +212,7 @@
     <xs:element name="name"     type="deviceNameType"/>
     <xs:element name="username" type="userNameType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
-    <xs:element name="inputs"   type="deviceInputOutputType"/>
+    <xs:element name="inputs"   type="deviceInputOutputType"/><!-- single input -->
     <xs:element name="outputs"  type="deviceInputsOutputsType"/>
     <xs:element name="duration" type="validStringType"/> <!-- TODO can we do better than string? -->
   </xs:all>
@@ -286,6 +286,12 @@
 </xs:complexType>
 
 <!-- notifier definitions -->
+<xs:complexType name="notifierOutputsType">
+  <xs:choice>
+    <xs:element name="notifier" type="deviceNameType" minOccurs="1" maxOccurs="unbounded"/>
+  </xs:choice>
+</xs:complexType>
+
 <xs:complexType name="logType">
   <xs:all>
     <xs:element name="name"            type="deviceNameType"/>
@@ -323,7 +329,7 @@
     <xs:element name="name"            type="deviceNameType"/>
     <xs:element name="username"        type="userNameType"        minOccurs="0" maxOccurs="1"/>
     <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
-    <xs:element name="outputs"         type="deviceInputsOutputsType"/>
+    <xs:element name="outputs"         type="notifierOutputsType"/>
     <xs:element name="message"         type="notificationMessageType"/>
     <xs:element name="inputs">
       <xs:complexType>
@@ -364,7 +370,7 @@
     <xs:element name="username"        type="userNameType"        minOccurs="0" maxOccurs="1"/>
     <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="inputs"          type="deviceInputOutputType"/>
-    <xs:element name="outputs"         type="deviceInputsOutputsType"/>
+    <xs:element name="outputs"         type="notifierOutputsType"/>
     <xs:element name="message"         type="notificationMessageType"/>
     <!-- trigger is normally activated with low to high transition. set triggerlow to activate high to low -->
     <xs:element name="triggerlow"      type="validStringType"     minOccurs="0" maxOccurs="1"/>
@@ -402,7 +408,7 @@
         <xs:field xpath="." />
       </xs:key>
       <xs:keyref name="notifierRef" refer="notifierNames">
-        <xs:selector xpath=".//notifications//outputs/device" />
+        <xs:selector xpath=".//notifications//outputs/notifier" />
         <xs:field xpath="." />
       </xs:keyref>
     </xs:element>
@@ -425,6 +431,16 @@
     <xs:selector xpath="./inputs//name|./outputs//name|./controls//name" />
     <xs:field xpath="." />
   </xs:key>
+  <!-- list of devices that accept inputs (i.e. are valid output targets) -->
+  <xs:key name="validOutputTargetDevices">
+    <xs:selector xpath="./outputs//name|./notifications/trigger/name|./controls/transition//name|./controls/logic//name" />
+    <xs:field xpath="."/>
+  </xs:key>
+  <!-- restrict outputs to valid output targets -->
+  <xs:keyref name="validOutputRef" refer="validOutputTargetDevices">
+    <xs:selector xpath=".//outputs/device"/>
+    <xs:field xpath="."/>
+  </xs:keyref>
   <!-- restrict notification device inputs to inputs/controls/outputs devices-->
   <xs:keyref name="notificationInputRef" refer="realDeviceNames">
     <xs:selector xpath=".//notifications//inputs/device" />
