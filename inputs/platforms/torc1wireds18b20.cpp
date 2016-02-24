@@ -27,6 +27,7 @@
 
 // Torc
 #include "torclogging.h"
+#include "torccentral.h"
 #include "torc1wirebus.h"
 #include "torc1wireds18b20.h"
 
@@ -118,7 +119,10 @@ void Torc1WireReadThread::Read(void)
 }
 
 Torc1WireDS18B20::Torc1WireDS18B20(const QVariantMap &Details)
-  : TorcTemperatureInput(TorcTemperatureInput::Celsius, 0, -55.0, 125.0, DS18B20NAME, Details),
+  : TorcTemperatureInput(TorcCentral::GetGlobalTemperatureUnits() == TorcCentral::Celsius ? 0.0 : 32.0,
+                         TorcCentral::GetGlobalTemperatureUnits() == TorcCentral::Celsius ? -55.0 : -67.0,
+                         TorcCentral::GetGlobalTemperatureUnits() == TorcCentral::Celsius ? 125.0 : 257.0,
+                         DS18B20NAME, Details),
     m_deviceId(""),
     m_readThread(NULL)
 {
@@ -143,9 +147,17 @@ QStringList Torc1WireDS18B20::GetDescription(void)
 void Torc1WireDS18B20::Read(double Value, bool Valid)
 {
     if (Valid)
-        SetValue(Value);
+    {
+        // readings are in celsius - convert if needed
+        double value = Value;
+        if (TorcCentral::GetGlobalTemperatureUnits() == TorcCentral::Fahrenheit)
+            value = TorcTemperatureInput::CelsiusToFahrenheit(Value);
+        SetValue(value);
+    }
     else
+    {
         SetValid(false);
+    }
 }
 
 class Torc1WireDS18B20Factory : public Torc1WireDeviceFactory

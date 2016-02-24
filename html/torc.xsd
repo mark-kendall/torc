@@ -394,10 +394,26 @@
 </xs:complexType>
 
 <!-- Single root element 'torc' -->
+<xs:simpleType name="temperatureUnitsType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="metric"/>
+      <xs:enumeration value="imperial"/>
+      <!-- synonyms -->
+      <xs:enumeration value="celsius"/>
+      <xs:enumeration value="fahrenheit"/>
+    </xs:restriction>
+</xs:simpleType>
+<xs:complexType name="settingsType">
+  <xs:all>
+    <xs:element minOccurs="0" maxOccurs="1" name="applicationname" type="userNameType" />
+    <xs:element minOccurs="0" maxOccurs="1" name="temperatureunits" type="temperatureUnitsType" />
+  </xs:all>
+</xs:complexType>
+
 <xs:complexType name="rootType">
   <xs:all>
     <!-- 0 or 1 instances of each of these types in any order-->
-    <xs:element name="applicationname" minOccurs="0" maxOccurs="1" type="userNameType" />
+    <xs:element name="settings"        minOccurs="0" maxOccurs="1" type="settingsType" />
     <xs:element name="inputs"          minOccurs="0" maxOccurs="1" type="inputsType"/>
     <xs:element name="controls"        minOccurs="0" maxOccurs="1" type="controlsType"/>
     <xs:element name="outputs"         minOccurs="0" maxOccurs="1" type="outputsType"/>

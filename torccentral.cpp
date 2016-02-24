@@ -51,13 +51,33 @@
 // for system
 #include <stdlib.h>
 
+// default to metric temperature measurements
+TorcCentral::TemperatureUnits TorcCentral::gTemperatureUnits = TorcCentral::Celsius;
+
+QString TorcCentral::TemperatureUnitsToString(TorcCentral::TemperatureUnits Units)
+{
+    switch (Units)
+    {
+        case TorcCentral::Celsius:    return "celsius";
+        case TorcCentral::Fahrenheit: return "fahrenheit";
+    }
+
+    return "Unknown";
+}
+
+TorcCentral::TemperatureUnits TorcCentral::GetGlobalTemperatureUnits(void)
+{
+    return gTemperatureUnits;
+}
+
 TorcCentral::TorcCentral()
   : QObject(),
     TorcHTTPService(this, "central", "central", TorcCentral::staticMetaObject, ""),
     m_lock(new QMutex(QMutex::Recursive)),
     m_config(QVariantMap()),
     m_graph(new QByteArray()),
-    canRestartTorc(true)
+    canRestartTorc(true),
+    temperatureUnits("celsius")
 {
     // reset state graph and clear out old files
     // content directory should already have been created by TorcHTMLDynamicContent
@@ -82,6 +102,41 @@ TorcCentral::TorcCentral()
 
     if (LoadConfig())
     {
+        TemperatureUnits temperatureunits = Celsius; // default to metric
+
+        // handle settings now
+        if (m_config.contains("settings"))
+        {
+            QVariantMap settings = m_config.value("settings").toMap();
+
+            // applicationname
+            if (settings.contains("applicationname"))
+            {
+                QString name = settings.value("applicationname").toString().trimmed();
+                if (!name.isEmpty())
+                {
+                    QCoreApplication::setApplicationName(name);
+                    LOG(VB_GENERAL, LOG_INFO, QString("Changed application name to '%1'").arg(name));
+                }
+            }
+
+            // temperature units - metric or imperial...
+            if (settings.contains("temperatureunits"))
+            {
+                QString units = settings.value("temperatureunits").toString().trimmed().toLower();
+                if (units == "metric" || units == "celsius")
+                    temperatureunits = Celsius;
+                else if (units == "imperial" || units == "fahrenheit")
+                    temperatureunits = Fahrenheit;
+                else
+                    LOG(VB_GENERAL, LOG_WARNING, "Unknown temperature units - defaulting to metric (Celsius)");
+            }
+        }
+
+        LOG(VB_GENERAL, LOG_INFO, QString("Using '%1' temperature units").arg(TemperatureUnitsToString(temperatureunits)));
+        TorcCentral::gTemperatureUnits = temperatureunits;
+        temperatureUnits               = TemperatureUnitsToString(temperatureunits);
+
         // create the devices
         TorcDeviceHandler::Start(m_config);
 
@@ -189,7 +244,12 @@ bool TorcCentral::RestartTorc(void)
     return true;
 }
 
-bool TorcCentral::GetCanRestartTorc(void)
+QString TorcCentral::GetTemperatureUnits(void) const
+{
+    return temperatureUnits;
+}
+
+bool TorcCentral::GetCanRestartTorc(void) const
 {
     QMutexLocker locker(m_lock);
     return canRestartTorc;
@@ -334,17 +394,6 @@ bool TorcCentral::LoadConfig(void)
 
     m_config = result.value("torc").toMap();
 
-    // update application name
-    if (m_config.contains("applicationname"))
-    {
-        QString name = m_config.value("applicationname").toString().trimmed();
-        if (!name.isEmpty())
-        {
-            QCoreApplication::setApplicationName(name);
-            LOG(VB_GENERAL, LOG_INFO, QString("Changed application name to '%1'").arg(name));
-        }
-    }
-
     LOG(VB_GENERAL, LOG_INFO, QString("Loaded config from %1").arg(xml));
     return true;
 }
@@ -416,7 +465,7 @@ bool TorcCentral::event(QEvent *Event)
 /// Create the central controller object
 class TorcCentralObject : public TorcAdminObject, public TorcStringFactory
 {
-    Q_DECLARE_TR_FUNCTIONS(TorcPowerObject)
+    Q_DECLARE_TR_FUNCTIONS(TorcCentralObject)
 
   public:
     TorcCentralObject()
@@ -442,6 +491,10 @@ class TorcCentralObject : public TorcAdminObject, public TorcStringFactory
         Strings.insert("ViewXSDTitleTr",     QCoreApplication::translate("TorcCentral", "Configuration schema"));
         Strings.insert("ViewAPITr",          QCoreApplication::translate("TorcCentral", "View API"));
         Strings.insert("ViewAPITitleTr",     QCoreApplication::translate("TorcCentral", "API reference"));
+        Strings.insert("CelsiusTr",          QCoreApplication::translate("TorcCentral", "Celsius"));
+        Strings.insert("CelsiusUnitsTr",     QCoreApplication::translate("TorcCentral", "°C"));
+        Strings.insert("FahrenheitTr",       QCoreApplication::translate("TorcCentral", "Fahrenheit"));
+        Strings.insert("FahrenheitUnitsTr",  QCoreApplication::translate("TorcCentral", "°F"));
     }
 
     void Create(void)

@@ -24,7 +24,7 @@
 #include "torcswitchinput.h"
 
 TorcSwitchInput::TorcSwitchInput(double Default, const QString &ModelId, const QVariantMap &Details)
-  : TorcInput(TorcInput::Switch, Default, 0, 1, "", "", ModelId, Details)
+  : TorcInput(TorcInput::Switch, Default, 0, 1, ModelId, Details)
 {
 }
 

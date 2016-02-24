@@ -24,7 +24,7 @@
 #include "torcphinput.h"
 
 TorcpHInput::TorcpHInput(double Value, const QString &ModelId, const QVariantMap &Details)
-  : TorcInput(TorcInput::pH, Value, 0.0, 14.0, "", "", ModelId, Details)
+  : TorcInput(TorcInput::pH, Value, 0.0, 14.0, ModelId, Details)
 {
 }
 

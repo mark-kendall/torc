@@ -63,27 +63,21 @@ TorcInput::Type TorcInput::StringToType(const QString &Type)
  *       around non-constant member variables.
 */
 TorcInput::TorcInput(TorcInput::Type Type, double Value, double RangeMinimum, double RangeMaximum,
-                       const QString &ShortUnits,    const QString &LongUnits,
-                       const QString &ModelId,       const QVariantMap &Details)
+                     const QString &ModelId, const QVariantMap &Details)
   : TorcDevice(false, Value, Value, ModelId, Details),
     TorcHTTPService(this, SENSORS_DIRECTORY + "/" + TypeToString(Type) + "/" + Details.value("name").toString(),
                     Details.value("name").toString(), TorcInput::staticMetaObject,
                     ModelId.startsWith("Network") ? QString("") : BLACKLIST),
-    valueScaled(Value),
     operatingRangeMin(RangeMinimum),
     operatingRangeMax(RangeMaximum),
-    operatingRangeMinScaled(RangeMinimum),
-    operatingRangeMaxScaled(RangeMaximum),
     outOfRangeLow(true),
-    outOfRangeHigh(false),
-    shortUnits(ShortUnits),
-    longUnits(LongUnits)
+    outOfRangeHigh(false)
 {
     // guard against stupidity
     if (operatingRangeMax <= operatingRangeMin)
     {
         LOG(VB_GENERAL, LOG_WARNING, "Input has invalid operating ranges - adjusting");
-        operatingRangeMax = operatingRangeMaxScaled = operatingRangeMin + 1.0;
+        operatingRangeMax = operatingRangeMin + 1.0;
     }
 
     // register this input - the owner must DownRef AND call RemoveInput to ensure it is deleted.
@@ -146,9 +140,7 @@ void TorcInput::SetValue(double Value)
 
     // update value and valueScaled
     value = Value;
-    valueScaled = ScaleValue(value);
     emit ValueChanged(value);
-    emit ValueScaledChanged(valueScaled);
 
     // check for out of operating range - this works with default/unscaled values
     // N.B. use >= to allow for binary operation (e.g. a switch is either 0 or 1)
@@ -186,37 +178,6 @@ void TorcInput::SetValid(bool Valid)
     TorcDevice::SetValid(Valid);
 }
 
-/// shortUnits are the abbreviated, translated units shared with the user e.g. °C.
-void TorcInput::SetShortUnits(const QString &Units)
-{
-    QMutexLocker locker(lock);
-
-    if (Units == shortUnits)
-        return;
-
-    shortUnits = Units;
-    emit ShortUnitsChanged(shortUnits);
-}
-
-/// longUnits are the full units shared with the user e.g. Degrees Celsisus.
-void TorcInput::SetLongUnits(const QString &Units)
-{
-    QMutexLocker locker(lock);
-
-    if (Units == longUnits)
-        return;
-
-    longUnits = Units;
-    emit LongUnitsChanged(longUnits);
-}
-
-double TorcInput::GetValueScaled(void)
-{
-    QMutexLocker locker(lock);
-
-    return valueScaled;
-}
-
 double TorcInput::GetOperatingRangeMin(void)
 {
     // no need to lock
@@ -227,20 +188,6 @@ double TorcInput::GetOperatingRangeMax(void)
 {
     // no need to lock
     return operatingRangeMax;
-}
-
-double TorcInput::GetOperatingRangeMinScaled(void)
-{
-    QMutexLocker locker(lock);
-
-    return operatingRangeMinScaled;
-}
-
-double TorcInput::GetOperatingRangeMaxScaled(void)
-{
-    QMutexLocker locker(lock);
-
-    return operatingRangeMaxScaled;
 }
 
 bool TorcInput::GetOutOfRangeLow(void)
@@ -255,18 +202,4 @@ bool TorcInput::GetOutOfRangeHigh(void)
     QMutexLocker locker(lock);
 
     return outOfRangeHigh;
-}
-
-QString TorcInput::GetShortUnits(void)
-{
-    QMutexLocker locker(lock);
-
-    return shortUnits;
-}
-
-QString TorcInput::GetLongUnits(void)
-{
-    QMutexLocker locker(lock);
-
-    return longUnits;
 }

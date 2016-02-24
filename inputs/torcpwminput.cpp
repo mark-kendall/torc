@@ -24,7 +24,7 @@
 #include "torcpwminput.h"
 
 TorcPWMInput::TorcPWMInput(double Value, const QString &ModelId, const QVariantMap &Details)
-  : TorcInput(TorcInput::PWM, Value, 0.0, 1.0, tr("%"), tr("Percentage"), ModelId, Details)
+  : TorcInput(TorcInput::PWM, Value, 0.0, 1.0, ModelId, Details)
 {
 }
 

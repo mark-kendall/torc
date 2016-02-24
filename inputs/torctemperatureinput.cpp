@@ -20,35 +20,9 @@
 // Torc
 #include "torctemperatureinput.h"
 
-QString TorcTemperatureInput::UnitsToShortString(TorcTemperatureInput::Units Units)
-{
-    switch (Units)
-    {
-        case TorcTemperatureInput::Celsius:    return tr("°C");
-        case TorcTemperatureInput::Fahrenheit: return tr("°F");
-    }
-
-    return tr("Unknown");
-}
-
-QString TorcTemperatureInput::UnitsToLongString(TorcTemperatureInput::Units Units)
-{
-    switch (Units)
-    {
-        case TorcTemperatureInput::Celsius:    return tr("Degrees Celsius");
-        case TorcTemperatureInput::Fahrenheit: return tr("Degrees Fahrenheit");
-    }
-
-    return tr("Unknown");
-}
-
-TorcTemperatureInput::TorcTemperatureInput(TorcTemperatureInput::Units Units,
-                                             double Value, double RangeMinimum, double RangeMaximum,
-                                             const QString &ModelId, const QVariantMap &Details)
-  : TorcInput(TorcInput::Temperature, Value, RangeMinimum, RangeMaximum,
-              UnitsToShortString(Units), UnitsToLongString(Units), ModelId, Details),
-    defaultUnits(Units),
-    currentUnits(Units)
+TorcTemperatureInput::TorcTemperatureInput(double Value, double RangeMinimum, double RangeMaximum,
+                                           const QString &ModelId, const QVariantMap &Details)
+  : TorcInput(TorcInput::Temperature, Value, RangeMinimum, RangeMaximum, ModelId, Details)
 {
 }
 
@@ -61,21 +35,12 @@ TorcInput::Type TorcTemperatureInput::GetType(void)
     return TorcInput::Temperature;
 }
 
-/*! \brief Return the given Value scaled for the current units.
- */
-double TorcTemperatureInput::ScaleValue(double Value)
+double TorcTemperatureInput::CelsiusToFahrenheit(double Value)
 {
-    QMutexLocker locker(lock);
-
-    // no change required
-    if (currentUnits == defaultUnits)
-        return Value;
-
-    // convert Celsius to Fahrenheit
-    if (TorcTemperatureInput::Celsius == defaultUnits)
-        return (((Value * 9.0) / 5.0) + 32.0);
-
-    // Fahrenheit to Celsius
-    return (((Value - 32.0) * 5.0) / 9.0);
+    return (Value * 1.8) + 32.0;
 }
 
+double TorcTemperatureInput::FahrenheitToCelsius(double Value)
+{
+    return (Value - 32.0) / 1.8;
+}

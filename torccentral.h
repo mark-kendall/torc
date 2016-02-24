@@ -12,10 +12,19 @@
 
 class TorcCentral : public QObject, public TorcHTTPService
 {
+  public:
+    enum TemperatureUnits
+    {
+        Celsius = 0,
+        Fahrenheit = 1
+    };
+    Q_ENUMS(TemperatureUnits);
+
     Q_OBJECT
-    Q_CLASSINFO("Version",     "1.0.0")
-    Q_CLASSINFO("RestartTorc", "methods=PUT")
-    Q_PROPERTY(bool canRestartTorc READ GetCanRestartTorc NOTIFY CanRestartTorcChanged)
+    Q_CLASSINFO("Version",     "1.0.0");
+    Q_CLASSINFO("RestartTorc", "methods=PUT");
+    Q_PROPERTY(bool canRestartTorc READ GetCanRestartTorc NOTIFY CanRestartTorcChanged);
+    Q_PROPERTY(QString temperatureUnits READ GetTemperatureUnits CONSTANT);
 
   public:
     TorcCentral();
@@ -24,6 +33,8 @@ class TorcCentral : public QObject, public TorcHTTPService
     QString         GetUIName             (void);
     bool            event                 (QEvent *Event);
     static QByteArray GetCustomisedXSD    (const QString &BaseXSDFile);
+    static TemperatureUnits GetGlobalTemperatureUnits (void);
+    static QString   TemperatureUnitsToString(TemperatureUnits Units);
 
   signals:
     void            CanRestartTorcChanged (bool CanRestartTorc);
@@ -32,8 +43,12 @@ class TorcCentral : public QObject, public TorcHTTPService
     // TorcHTTPService
     void            SubscriberDeleted     (QObject *Subscriber);
 
-    bool            GetCanRestartTorc     (void);
+    bool            GetCanRestartTorc     (void) const;
     bool            RestartTorc           (void);
+    QString         GetTemperatureUnits   (void) const;
+
+  protected:
+    static TemperatureUnits gTemperatureUnits;
 
   private:
     bool            LoadConfig            (void);
@@ -43,6 +58,7 @@ class TorcCentral : public QObject, public TorcHTTPService
     QVariantMap     m_config;
     QByteArray     *m_graph;
     bool            canRestartTorc;
+    QString         temperatureUnits;
 };
 
 #define XSD_TYPES             QString("<!--TORC_XSD_TYPES-->")
