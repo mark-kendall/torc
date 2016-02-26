@@ -163,7 +163,7 @@
     <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="inputs"   type="deviceInputOutputType"/>
     <xs:element name="outputs"  type="deviceInputsOutputsType"/>
-    <xs:element name="reference" type="deviceInputOutputType"/>
+    <xs:element name="references" type="deviceInputOutputType"/>
   </xs:all>
 </xs:complexType>
 

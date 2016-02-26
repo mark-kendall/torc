@@ -68,13 +68,13 @@ TorcLogicControl::TorcLogicControl(const QString &Type, const QVariantMap &Detai
         m_operation == TorcLogicControl::GreaterThan ||
         m_operation == TorcLogicControl::GreaterThanOrEqual)
     {
-        if (!Details.contains("reference"))
+        if (!Details.contains("references"))
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Control '%1' has no reference device for operation").arg(uniqueId));
             return;
         }
 
-        QVariantMap reference = Details.value("reference").toMap();
+        QVariantMap reference = Details.value("references").toMap();
         if (!reference.contains("device"))
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Control '%1' has no reference device for operation").arg(uniqueId));
