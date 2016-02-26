@@ -81,8 +81,6 @@ void TorcTriggerNotification::InputValueChanged(double Value)
 {
     TorcDevice* input = qobject_cast<TorcDevice*>(sender());
 
-    LOG(VB_GENERAL, LOG_INFO, QString("%1: high %2 old %3 new %4").arg(uniqueId).arg(m_triggerHigh).arg(m_lastValue).arg(Value));
-
     if (input && (input == m_input))
     {
         if ((Value > 0.0 && m_lastValue <= 0.0 && m_triggerHigh) || // low to high
