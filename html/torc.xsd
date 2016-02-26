@@ -161,9 +161,9 @@
     <xs:element name="name"     type="deviceNameType"/>
     <xs:element name="username" type="userNameType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
-    <xs:element name="inputs"   type="deviceInputsOutputsType"/>
+    <xs:element name="inputs"   type="deviceInputOutputType"/>
     <xs:element name="outputs"  type="deviceInputsOutputsType"/>
-    <xs:element name="value"    type="xs:decimal"/>
+    <xs:element name="reference" type="deviceInputOutputType"/>
   </xs:all>
 </xs:complexType>
 

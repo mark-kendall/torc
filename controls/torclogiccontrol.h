@@ -41,7 +41,10 @@ class TorcLogicControl : public TorcControl
 
   private:
     TorcLogicControl::Operation m_operation;
-    double                      m_operationValue;
+
+    // Reference device for controls that require a 'comparison' value.
+    QString                     m_referenceDeviceId;
+    QObject                    *m_referenceDevice;
 };
 
 #endif // TORCLOGICCONTROL_H

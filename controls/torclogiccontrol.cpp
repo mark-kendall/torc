@@ -50,8 +50,7 @@ TorcLogicControl::Operation TorcLogicControl::StringToOperation(const QString &O
 
 TorcLogicControl::TorcLogicControl(const QString &Type, const QVariantMap &Details)
   : TorcControl(TorcControl::Logic, Details),
-    m_operation(TorcLogicControl::Passthrough),
-    m_operationValue(0.0)
+    m_operation(TorcLogicControl::Passthrough)
 {
     bool operationok = false;
     m_operation      = TorcLogicControl::StringToOperation(Type, &operationok);
@@ -69,23 +68,25 @@ TorcLogicControl::TorcLogicControl(const QString &Type, const QVariantMap &Detai
         m_operation == TorcLogicControl::GreaterThan ||
         m_operation == TorcLogicControl::GreaterThanOrEqual)
     {
-        // a value is explicitly required rather than defaulting to 0
-        if (!Details.contains("value"))
+        if (!Details.contains("reference"))
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Control '%1' has no value for operation").arg(uniqueId));
+            LOG(VB_GENERAL, LOG_ERR, QString("Control '%1' has no reference device for operation").arg(uniqueId));
             return;
         }
 
-        QString val   = Details.value("value").toString();
-        bool valueok = false;
-        m_operationValue = val.toDouble(&valueok);
-
-        // failed to parse value
-        if (!valueok)
+        QVariantMap reference = Details.value("reference").toMap();
+        if (!reference.contains("device"))
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse value '%1' for device '%2'").arg(val).arg(uniqueId));
+            LOG(VB_GENERAL, LOG_ERR, QString("Control '%1' has no reference device for operation").arg(uniqueId));
             return;
         }
+
+        m_referenceDeviceId = reference.value("device").toString().trimmed();
+
+        // and treat it as a normal input - this ensures TorcControl takes care of all of the input value and
+        // valid logic. We just ensure we know which is the reference device/value.
+        m_inputList.append(m_referenceDeviceId);
+        m_inputList.removeDuplicates();
     }
 
     // everything appears to be valid at this stage
@@ -104,23 +105,27 @@ TorcControl::Type TorcLogicControl::GetType(void)
 QStringList TorcLogicControl::GetDescription(void)
 {
     QStringList result;
+    QString reference("Unknown");
+    TorcDevice *device = qobject_cast<TorcDevice*>(m_referenceDevice);
+    if (device)
+        reference = device->GetUserName();
 
     switch (m_operation)
     {
         case TorcLogicControl::Equal:
-            result.append(tr("Equal to %1").arg(m_operationValue));
+            result.append(tr("Equal to '%1'").arg(reference));
             break;
         case TorcLogicControl::LessThan:
-            result.append(tr("Less than %1").arg(m_operationValue));
+            result.append(tr("Less than '%1'").arg(reference));
             break;
         case TorcLogicControl::LessThanOrEqual:
-            result.append(tr("Less than or equal to %1").arg(m_operationValue));
+            result.append(tr("Less than or equal to '%1'").arg(reference));
             break;
         case TorcLogicControl::GreaterThan:
-            result.append(tr("Greater than %1").arg(m_operationValue));
+            result.append(tr("Greater than '%1'").arg(reference));
             break;
         case TorcLogicControl::GreaterThanOrEqual:
-            result.append(tr("Greater than or equal to %1").arg(m_operationValue));
+            result.append(tr("Greater than or equal to '%1'").arg(reference));
             break;
         case TorcLogicControl::Any:
             result.append(tr("Any"));
@@ -187,6 +192,9 @@ bool TorcLogicControl::Validate(void)
     if (!TorcControl::Validate())
         return false;
 
+    // reference device must be valid if TorcControl::Validate is happy
+    m_referenceDevice = gDeviceList->value(m_referenceDeviceId);
+
     // we always need one or more outputs
     if (m_outputs.isEmpty())
     {
@@ -212,17 +220,27 @@ bool TorcLogicControl::Validate(void)
             }
             break;
         case TorcLogicControl::Passthrough:
-        case TorcLogicControl::Equal:
-        case TorcLogicControl::LessThan:
-        case TorcLogicControl::LessThanOrEqual:
-        case TorcLogicControl::GreaterThan:
-        case TorcLogicControl::GreaterThanOrEqual:
         case TorcLogicControl::Toggle:
         case TorcLogicControl::Invert:
             {
                 if (m_inputs.size() != 1)
                 {
                     LOG(VB_GENERAL, LOG_ERR, QString("%1 has %2 inputs for operation '%3' (must have 1) - ignoring.")
+                        .arg(uniqueId).arg(m_inputs.size()).arg(GetDescription().join(",")));
+                    return false;
+                }
+            }
+            break;
+        case TorcLogicControl::Equal:
+        case TorcLogicControl::LessThan:
+        case TorcLogicControl::LessThanOrEqual:
+        case TorcLogicControl::GreaterThan:
+        case TorcLogicControl::GreaterThanOrEqual:
+            // these should have one defined input and one reference device that is handled as an input
+            {
+                if (m_inputs.size() != 2)
+                {
+                    LOG(VB_GENERAL, LOG_ERR, QString("%1 has %2 inputs for operation '%3' (must have 1 input and 1 reference) - ignoring.")
                         .arg(uniqueId).arg(m_inputs.size()).arg(GetDescription().join(",")));
                     return false;
                 }
@@ -242,6 +260,35 @@ void TorcLogicControl::CalculateOutput(void)
     QMutexLocker locker(lock);
 
     double newvalue = value; // no change by default
+
+    double referencevalue = 0.0;
+    double inputvalue     = 0.0;
+
+    if (TorcLogicControl::Equal == m_operation ||
+        TorcLogicControl::LessThan == m_operation ||
+        TorcLogicControl::LessThanOrEqual == m_operation ||
+        TorcLogicControl::GreaterThan == m_operation ||
+        TorcLogicControl::GreaterThanOrEqual == m_operation)
+    {
+        if (m_inputValues.size() == 2)
+        {
+            if (m_inputValues.firstKey() == m_referenceDevice)
+            {
+                referencevalue = m_inputValues.first();
+                inputvalue     = m_inputValues.last();
+            }
+            else
+            {
+                referencevalue = m_inputValues.last();
+                inputvalue     = m_inputValues.first();
+            }
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Invalid control input size"));
+        }
+    }
+
     switch (m_operation)
     {
         case TorcLogicControl::Passthrough:
@@ -259,24 +306,24 @@ void TorcLogicControl::CalculateOutput(void)
             break;
         case TorcLogicControl::Equal:
             // single value ==
-            newvalue = qFuzzyCompare(m_inputValues.first() + 1.0, m_operationValue + 1.0) ? 1 : 0;
+            newvalue = qFuzzyCompare(inputvalue + 1.0, referencevalue + 1.0) ? 1 : 0;
             break;
         case TorcLogicControl::LessThan:
             // single value <
-            newvalue = m_inputValues.first() < m_operationValue ? 1 : 0;
+            newvalue = inputvalue < referencevalue ? 1 : 0;
             break;
         case TorcLogicControl::LessThanOrEqual:
             // Use qFuzzyCompare for = ?
             // single input <=
-            newvalue = m_inputValues.first() <= m_operationValue ? 1 : 0;
+            newvalue = inputvalue <= referencevalue ? 1 : 0;
             break;
         case TorcLogicControl::GreaterThan:
             // single input >
-            newvalue = m_inputValues.first() > m_operationValue ? 1 : 0;
+            newvalue = inputvalue > referencevalue ? 1 : 0;
             break;
         case TorcLogicControl::GreaterThanOrEqual:
             // single input >=
-            newvalue = m_inputValues.first() >= m_operationValue ? 1 : 0;
+            newvalue = inputvalue >= referencevalue ? 1 : 0;
             break;
         case TorcLogicControl::All:
             {
