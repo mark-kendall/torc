@@ -452,6 +452,16 @@
     <xs:selector xpath="./outputs//name|./notifications/trigger/name|./controls/transition//name|./controls/logic//name" />
     <xs:field xpath="."/>
   </xs:key>
+  <!-- list of devices that are valid inputs to another device-->
+  <xs:key name="validInputDevices">
+    <xs:selector xpath="./inputs//name|./controls//name"/>
+    <xs:field xpath="."/>
+  </xs:key>
+  <!-- restrict inputs to valid input devices (N.B. notify devices are handled seperately) -->
+  <xs:keyref name="validInputRef" refer="validInputDevices">
+    <xs:selector xpath="./inputs//inputs/device|./controls//inputs/device|./outputs//inputs/device"/>
+    <xs:field xpath="."/>
+  </xs:keyref>
   <!-- restrict outputs to valid output targets -->
   <xs:keyref name="validOutputRef" refer="validOutputTargetDevices">
     <xs:selector xpath=".//outputs/device"/>
@@ -461,6 +471,11 @@
   <xs:keyref name="notificationInputRef" refer="realDeviceNames">
     <xs:selector xpath=".//notifications//inputs/device" />
     <xs:field xpath="." />
+  </xs:keyref>
+  <!-- restrict reference devices to valid input types (i.e. inputs and controls) -->
+  <xs:keyref name="validReferenceRef" refer="validInputDevices">
+    <xs:selector xpath=".//references/device"/>
+    <xs:field xpath="."/>
   </xs:keyref>
 <!--TORC_XSD_UNIQUE-->
 </xs:element>
