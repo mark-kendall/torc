@@ -22,7 +22,7 @@ QT         += sql network
 QT         -= gui
 
 # debug builds
-#CONFIG     += debug
+CONFIG     += debug
 
 # libraries
 # zlib on windows is too much like hard work
@@ -220,6 +220,7 @@ HEADERS += notify/torcnotify.h
 HEADERS += notify/torcnotifier.h
 HEADERS += notify/torclognotifier.h
 HEADERS += notify/torcpushbulletnotifier.h
+HEADERS += notify/torcthingspeaknotifier.h
 HEADERS += notify/torcnotification.h
 HEADERS += notify/torcsystemnotification.h
 HEADERS += notify/torctriggernotification.h
@@ -300,6 +301,7 @@ SOURCES += notify/torcnotify.cpp
 SOURCES += notify/torcnotifier.cpp
 SOURCES += notify/torclognotifier.cpp
 SOURCES += notify/torcpushbulletnotifier.cpp
+SOURCES += notify/torcthingspeaknotifier.cpp
 SOURCES += notify/torcnotification.cpp
 SOURCES += notify/torcsystemnotification.cpp
 SOURCES += notify/torctriggernotification.cpp

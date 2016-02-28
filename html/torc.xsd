@@ -307,12 +307,36 @@
     <xs:element name="accesstoken"     type="validStringType"/>
   </xs:all>
 </xs:complexType>
+
+<xs:complexType name="thingspeakFieldsType">
+  <xs:all>
+     <xs:element name="field1" type="validStringType" minOccurs="0" maxOccurs="1"/>
+     <xs:element name="field2" type="validStringType" minOccurs="0" maxOccurs="1"/>
+     <xs:element name="field3" type="validStringType" minOccurs="0" maxOccurs="1"/>
+     <xs:element name="field4" type="validStringType" minOccurs="0" maxOccurs="1"/>
+     <xs:element name="field5" type="validStringType" minOccurs="0" maxOccurs="1"/>
+     <xs:element name="field6" type="validStringType" minOccurs="0" maxOccurs="1"/>
+     <xs:element name="field7" type="validStringType" minOccurs="0" maxOccurs="1"/>
+     <xs:element name="field8" type="validStringType" minOccurs="0" maxOccurs="1"/>
+   </xs:all>
+</xs:complexType>
+<xs:complexType name="thingspeakType">
+  <xs:all>
+    <xs:element name="name"            type="deviceNameType"/>
+    <xs:element name="username"        type="userNameType"        minOccurs="0" maxOccurs="1"/>
+    <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="apikey"          type="validStringType"/>
+    <xs:element name="fields"          type="thingspeakFieldsType"/>
+  </xs:all>
+</xs:complexType>
+
 <!--TORC_XSD_NOTIFIERTYPES-->
 <xs:complexType name="notifierType">
   <xs:choice minOccurs="1" maxOccurs="unbounded">
     <!-- 0 or more instances - though generally only one of each will be needed -->
     <xs:element minOccurs="0" maxOccurs="unbounded" name="log"        type="logType"/>
     <xs:element minOccurs="0" maxOccurs="unbounded" name="pushbullet" type="pushbulletType"/>
+    <xs:element minOccurs="0" maxOccurs="unbounded" name="thingspeak" type="thingspeakType"/>
 <!--TORC_XSD_NOTIFIERS-->
   </xs:choice>
 </xs:complexType>
@@ -371,6 +395,7 @@
     <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="inputs"          type="deviceInputOutputType"/>
     <xs:element name="outputs"         type="notifierOutputsType"/>
+    <xs:element name="references"      type="deviceInputsOutputsType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="message"         type="notificationMessageType"/>
     <!-- trigger is normally activated with low to high transition. set triggerlow to activate high to low -->
     <xs:element name="triggerlow"      type="validStringType"     minOccurs="0" maxOccurs="1"/>
@@ -462,7 +487,7 @@
     <xs:selector xpath="./inputs//inputs/device|./controls//inputs/device|./outputs//inputs/device"/>
     <xs:field xpath="."/>
   </xs:keyref>
-  <!-- restrict outputs to valid output targets -->
+  <!-- restrict outputs to valid output targets (N.B. notify devices are handled seperately) -->
   <xs:keyref name="validOutputRef" refer="validOutputTargetDevices">
     <xs:selector xpath=".//outputs/device"/>
     <xs:field xpath="."/>
