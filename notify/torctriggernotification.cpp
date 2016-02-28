@@ -65,6 +65,17 @@ TorcTriggerNotification::TorcTriggerNotification(const QVariantMap &Details)
         m_triggerHigh = false;
         m_lastValue = 1.0;
     }
+
+    if (Details.contains("references"))
+    {
+        QVariantMap references = Details.value("references").toMap();
+        QVariantMap::const_iterator it = references.constBegin();
+        for ( ; it != references.constEnd(); ++it)
+        {
+            if (it.key() == "device")
+                m_references.append(it.value().toString().trimmed());
+        }
+    }
 }
 
 TorcTriggerNotification::~TorcTriggerNotification()
@@ -79,6 +90,7 @@ bool TorcTriggerNotification::IsKnownInput(const QString &UniqueId) const
 
 void TorcTriggerNotification::InputValueChanged(double Value)
 {
+    // N.B. this should be thread safe as InputValueChanged is always triggered via a signal
     TorcDevice* input = qobject_cast<TorcDevice*>(sender());
 
     if (input && (input == m_input))
@@ -86,6 +98,9 @@ void TorcTriggerNotification::InputValueChanged(double Value)
         if ((Value > 0.0 && m_lastValue <= 0.0 && m_triggerHigh) || // low to high
             (Value <= 0.0 && m_lastValue > 0.0 && !m_triggerHigh))  // high to low
         {
+            // add 'key'-'value' data for each reference (e.g. 'tanktemperature', '27.0')
+            foreach (TorcDevice* device, m_referenceDevices)
+                m_customData.insert(device->GetUniqueId(), QString::number(device->GetValue()));
             QVariantMap message = TorcNotify::gNotify->SetNotificationText(m_title, m_body, m_customData);
             emit Notify(message);
         }
@@ -107,6 +122,7 @@ bool TorcTriggerNotification::Setup(void)
     if (m_inputName.isEmpty())
         return false;
 
+    // setup the input
     TorcDevice* input = NULL;
     {
         QMutexLocker locker(gDeviceListLock);
@@ -122,6 +138,14 @@ bool TorcTriggerNotification::Setup(void)
 
     connect(input, SIGNAL(ValueChanged(double)), this, SLOT(InputValueChanged(double)));
     m_input = input;
+
+    // check for the existence of reference devices
+    foreach (QString reference, m_references)
+    {
+        QMutexLocker locker(gDeviceListLock);
+        if (!reference.isEmpty() && gDeviceList->contains(reference))
+            m_referenceDevices.append(gDeviceList->value(reference));
+    }
 
     return TorcNotification::Setup();
 }

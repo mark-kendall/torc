@@ -27,6 +27,8 @@ class TorcTriggerNotification : public TorcNotification
     double       m_lastValue;
     bool         m_triggerHigh;
     QMap<QString,QString> m_customData;
+    QStringList  m_references;
+    QList<TorcDevice*> m_referenceDevices;
 };
 
 #endif // TORCTRIGGERNOTIFICATION_H
