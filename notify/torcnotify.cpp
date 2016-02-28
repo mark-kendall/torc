@@ -149,6 +149,10 @@ QVariantMap TorcNotify::SetNotificationText(const QString &Title, const QString 
     QVariantMap message;
     message.insert(NOTIFICATION_TITLE, title);
     message.insert(NOTIFICATION_BODY,  body);
+
+    QMap<QString,QString>::const_iterator it = Custom.constBegin();
+    for ( ; it != Custom.constEnd(); ++it)
+        message.insert(it.key(), it.value());
     return message;
 }
 
