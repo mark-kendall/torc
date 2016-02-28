@@ -47,7 +47,7 @@ TorcNotification::TorcNotification(const QVariantMap &Details)
             QVariantMap outputs = Details.value("outputs").toMap();
             QVariantMap::const_iterator it = outputs.constBegin();
             for (; it != outputs.constEnd(); ++it)
-                if (it.key() == "device")
+                if (it.key() == "notifier")
                     m_notifierNames.append(it.value().toString().trimmed());
         }
     }
