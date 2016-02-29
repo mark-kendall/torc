@@ -46,7 +46,8 @@ INCLUDEPATH += $$DEPENDPATH
 # use graphviz via library or executable?
 packagesExist(libgvc) {
     DEFINES += USING_GRAPHVIZ_LIBS
-    LIBS    += `pkg-config --libs libgvc`
+    CONFIG  += link_pkgconfig
+    PKGCONFIG += libgvc
     message("Linking to graphviz libraries")
 } else {
     message("Using external graphviz binary (if available)")
@@ -74,8 +75,8 @@ packagesExist(libxml-2.0) | !isEmpty(libxml2) {
     SOURCES += torc/torclibxmlvalidator.cpp
     if (isEmpty(libxml2)) {
         message("libxml2 available")
-        LIBS        += `pkg-config --libs libxml-2.0`
-        INCLUDEPATH += `pkg-config --cflags libxml-2.0`
+        CONFIG += link_pkgconfig
+        PKGCONFIG += libxml-2.0
     } else {
         message("libxml2 available (forced)")
         LIBS        += -lxml2
