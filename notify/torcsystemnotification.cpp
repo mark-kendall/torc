@@ -41,7 +41,10 @@
  *         <event>start</event>
  *         <event>stop</event>
  *       </inputs>
- *       <outputs>testnotifier,testnotifier2</outputs>
+ *       <outputs>
+ *         <notifier>testnotifier</notifier>
+ *         <notifier>testnotifier2</notifier>
+ *       </outputs>
  *       <message>
  *         <!-- title is optional -->
  *         <title>%applicationname% message:</title>
