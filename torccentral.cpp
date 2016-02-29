@@ -42,6 +42,8 @@
 
 #ifdef USING_XMLPATTERNS
 #include "torcxmlvalidator.h"
+#elif USING_LIBXML2
+#include "torclibxmlvalidator.h"
 #endif
 
 #ifdef USING_GRAPHVIZ_LIBS
@@ -262,7 +264,7 @@ void TorcCentral::SubscriberDeleted(QObject *Subscriber)
 
 bool TorcCentral::LoadConfig(void)
 {
-#ifdef USING_XMLPATTERNS
+#if defined(USING_XMLPATTERNS) || defined(USING_LIBXML2)
     bool skipvalidation = false;
 
     if (!qgetenv("TORC_NO_VALIDATION").isEmpty())
@@ -371,7 +373,7 @@ bool TorcCentral::LoadConfig(void)
         LOG(VB_GENERAL, LOG_INFO, "Skipping validation of configuration file");
     }
 #else
-    LOG(VB_GENERAL, LOG_INFO, "QXmlPatterns unavailable - not validating configuration file.");
+    LOG(VB_GENERAL, LOG_INFO, "Xml validation unavailable - not validating configuration file.");
 #endif
 
     TorcXMLReader reader(xml);

@@ -445,11 +445,11 @@
     <xs:element name="notify"          minOccurs="0" maxOccurs="1" type="notifyType">
       <!-- restrict notification outputs to notifiers -->
       <xs:key name="notifierNames">
-        <xs:selector xpath='.//notifiers//name' />
+        <xs:selector xpath='.//notifiers/*/name' />
         <xs:field xpath="." />
       </xs:key>
       <xs:keyref name="notifierRef" refer="notifierNames">
-        <xs:selector xpath=".//notifications//outputs/notifier" />
+        <xs:selector xpath=".//outputs/notifier" />
         <xs:field xpath="." />
       </xs:keyref>
     </xs:element>
@@ -469,22 +469,22 @@
   </xs:keyref>
   <!-- list of inputs/controls/outputs devices -->
   <xs:key name="realDeviceNames">
-    <xs:selector xpath="./inputs//name|./outputs//name|./controls//name" />
+    <xs:selector xpath="./inputs/*/*/name|./controls/*/*/name|./outputs/*/*/name|./outputs/i2c/*/*/name" />
     <xs:field xpath="." />
   </xs:key>
   <!-- list of devices that accept inputs (i.e. are valid output targets) -->
   <xs:key name="validOutputTargetDevices">
-    <xs:selector xpath="./outputs//name|./notifications/trigger/name|./controls/transition//name|./controls/logic//name" />
+    <xs:selector xpath="./outputs/*/*/name|./outputs/i2c/*/*/name|.//notifications/trigger/name|./controls/transition/*/name|./controls/logic/*/name" />
     <xs:field xpath="."/>
   </xs:key>
   <!-- list of devices that are valid inputs to another device-->
   <xs:key name="validInputDevices">
-    <xs:selector xpath="./inputs//name|./controls//name"/>
+    <xs:selector xpath="./inputs/*/*/name|./controls/*/*/name"/>
     <xs:field xpath="."/>
   </xs:key>
-  <!-- restrict inputs to valid input devices (N.B. notify devices are handled seperately) -->
+  <!-- restrict inputs to valid input devices -->
   <xs:keyref name="validInputRef" refer="validInputDevices">
-    <xs:selector xpath="./inputs//inputs/device|./controls//inputs/device|./outputs//inputs/device"/>
+    <xs:selector xpath=".//inputs/device"/>
     <xs:field xpath="."/>
   </xs:keyref>
   <!-- restrict outputs to valid output targets (N.B. notify devices are handled seperately) -->
@@ -494,7 +494,7 @@
   </xs:keyref>
   <!-- restrict notification device inputs to inputs/controls/outputs devices-->
   <xs:keyref name="notificationInputRef" refer="realDeviceNames">
-    <xs:selector xpath=".//notifications//inputs/device" />
+    <xs:selector xpath=".//notifications/*/inputs/device" />
     <xs:field xpath="." />
   </xs:keyref>
   <!-- restrict reference devices to valid input types (i.e. inputs and controls) -->

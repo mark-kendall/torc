@@ -26,9 +26,14 @@
 #include "torcexitcodes.h"
 #include "torclogging.h"
 #include "torcdirectories.h"
-#include "torcxmlvalidator.h"
 #include "torccentral.h"
 #include "torcxsdtest.h"
+
+#ifdef USING_XMLPATTERNS
+#include "torcxmlvalidator.h"
+#elif USING_LIBXML2
+#include "torclibxmlvalidator.h"
+#endif
 
 /*! \page xsd Configuration file format
  * \section xsdintro Introduction
@@ -91,7 +96,7 @@ TorcXSDTest::~TorcXSDTest()
 */
 int TorcXSDTest::RunXSDTestSuite(TorcCommandLine *CommandLine)
 {
-#ifdef USING_XMLPATTERNS
+#if defined(USING_XMLPATTERNS) || defined(USING_LIBXML2)
     if (!CommandLine)
         return TORC_EXIT_INVALID_CMDLINE;
 
@@ -123,29 +128,29 @@ int TorcXSDTest::RunXSDTestSuite(TorcCommandLine *CommandLine)
     }
 
     LOG(VB_GENERAL, LOG_INFO, QString("Found %1 files.").arg(testfiles.size()));
-    bool allfailed = true;
+    int passcount = 0;
     foreach (QString file, testfiles)
     {
         // these should all FAIL!
         QString path = directory + "/" + file;
+        LOG(VB_GENERAL, LOG_INFO, path);
         TorcXmlValidator validator(path, fullxsd, true);
         if (validator.Validated())
         {
-            LOG(VB_GENERAL, LOG_INFO, QString("Unexpected pass: %1").arg(path));
-            allfailed = false;
-        }
-        else
-        {
-            LOG(VB_GENERAL, LOG_INFO, path);
+            LOG(VB_GENERAL, LOG_ERR, QString("Unexpected pass: %1").arg(path));
+            passcount++;
         }
     }
 
-    if (allfailed)
+    if (!passcount)
         LOG(VB_GENERAL, LOG_INFO, "All test files failed as expected");
+    else
+        LOG(VB_GENERAL, LOG_ERR, QString("%1 unexpected passes.").arg(passcount));
+
     TorcLocalContext::TearDown();
 
 #else
-    LOG(VB_GENERAL, LOG_INFO, "QXMLPatterns not available.");
+    LOG(VB_GENERAL, LOG_INFO, "XML validation not available.");
 #endif
 
     return TORC_EXIT_OK;

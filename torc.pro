@@ -66,8 +66,26 @@ install.files += browserconfig.xml
 install.files += html/css html/fonts html/img html/js
 INSTALLS      += install
 
+# libxml2 for xml validation
+libxml2 = $$(TORC_LIBXML2)
+packagesExist(libxml2) | !isEmpty(libxml2) {
+    DEFINES += USING_LIBXML2
+    HEADERS += torc/torclibxmlvalidator.h
+    SOURCES += torc/torclibxmlvalidator.cpp
+    if (isEmpty(libxml2)) {
+        message("libxml2 available")
+        LIBS        += `pkg-config --libs libxml-2.0`
+        INCLUDEPATH += `pkg-config --cflags libxml-2.0`
+    } else {
+        message("libxml2 available (forced)")
+        LIBS        += -lxml2
+        INCLUDEPATH += $${PREFIX}/include/libxml2
+    }
+}
+
 # xmlpatterns module for xml validation
-qtHaveModule(xmlpatterns) {
+# xmlpatterns is slow and buggy - disable by default
+qtHaveModule(xmlpatterns_XX) {
     QT += xmlpatterns
     DEFINES += USING_XMLPATTERNS
     HEADERS += torc/torcxmlvalidator.h
