@@ -68,7 +68,7 @@ INSTALLS      += install
 
 # libxml2 for xml validation
 libxml2 = $$(TORC_LIBXML2)
-packagesExist(libxml2) | !isEmpty(libxml2) {
+packagesExist(libxml-2.0) | !isEmpty(libxml2) {
     DEFINES += USING_LIBXML2
     HEADERS += torc/torclibxmlvalidator.h
     SOURCES += torc/torclibxmlvalidator.cpp
