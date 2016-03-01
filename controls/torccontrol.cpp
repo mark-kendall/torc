@@ -368,6 +368,10 @@ void TorcControl::Graph(QByteArray* Data)
             TorcControl* control = qobject_cast<TorcControl*>(it.key());
             Data->append(QString("    \"%1\"->\"%2\"\r\n").arg(uniqueId).arg(control->GetUniqueId()));
         }
+        else if (qobject_cast<TorcNotification*>(it.key()))
+        {
+            // handled in TorcNotification
+        }
         else
         {
             LOG(VB_GENERAL, LOG_ERR, "Unknown output type");
