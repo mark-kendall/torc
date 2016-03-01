@@ -65,6 +65,45 @@ TorcNotifier* TorcNotify::FindNotifierByName(const QString &Name) const
     return NULL;
 }
 
+void TorcNotify::Graph(QByteArray *Data)
+{
+    if (!Data)
+        return;
+
+    foreach(TorcNotification *notification, m_notifications)
+    {
+        QString id    = notification->GetUniqueId();
+        QString label = notification->GetUserName();
+        QString desc;
+        QStringList source = notification->GetDescription();
+        foreach (QString item, source)
+            desc.append(QString(DEVICE_LINE_ITEM).arg(item));
+
+        if (label.isEmpty())
+            label = id;
+        Data->append(QString("        \"%1\" [shape=record style=rounded id=\"%1\" label=<<B>%2</B>%3>];\r\n")
+            .arg(id).arg(label).arg(desc));
+
+        // and add links
+        notification->Graph(Data);
+    }
+
+    foreach(TorcNotifier *notifier, m_notifiers)
+    {
+        QString id    = notifier->GetUniqueId();
+        QString label = notifier->GetUserName();
+        QString desc;
+        QStringList source = notifier->GetDescription();
+        foreach (QString item, source)
+            desc.append(QString(DEVICE_LINE_ITEM).arg(item));
+
+        if (label.isEmpty())
+            label = id;
+        Data->append(QString("        \"%1\" [shape=record style=rounded id=\"%1\" label=<<B>%2</B>%3>];\r\n")
+            .arg(id).arg(label).arg(desc));
+    }
+}
+
 QVariantMap TorcNotify::SetNotificationText(const QString &Title, const QString &Body, const QMap<QString,QString> &Custom)
 {
     static bool initialised = false;

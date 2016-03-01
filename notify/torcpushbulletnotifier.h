@@ -20,6 +20,7 @@ class TorcPushbulletNotifier : public TorcNotifier
     ~TorcPushbulletNotifier();
 
     void Notify               (const QVariantMap &Notification);
+    QStringList GetDescription(void);
 
   signals:
     void StartResetTimer      (int Seconds);

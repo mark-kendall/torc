@@ -73,6 +73,11 @@ TorcPushbulletNotifier::~TorcPushbulletNotifier()
     delete m_resetTimer;
 }
 
+QStringList TorcPushbulletNotifier::GetDescription(void)
+{
+    return QStringList() << tr("Pushbullet");
+}
+
 void TorcPushbulletNotifier::Notify(const QVariantMap &Notification)
 {
     if (m_accessToken.isEmpty() || m_badRequestCount >= MAX_BAD_REQUESTS || m_resetTimer->isActive())

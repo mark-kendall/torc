@@ -170,6 +170,7 @@ TorcCentral::TorcCentral()
         TorcInputs::gInputs->Graph(m_graph);
         TorcOutputs::gOutputs->Graph(m_graph);
         TorcControls::gControls->Graph(m_graph);
+        TorcNotify::gNotify->Graph(m_graph);
 
         // complete the graph
         m_graph->append("}\r\n");

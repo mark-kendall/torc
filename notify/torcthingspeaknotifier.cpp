@@ -94,6 +94,16 @@ TorcThingSpeakNotifier::~TorcThingSpeakNotifier()
     delete m_timer;
 }
 
+QStringList TorcThingSpeakNotifier::GetDescription(void)
+{
+    QStringList result;
+    result << tr("ThingSpeak");
+    QMap<QString,int>::const_iterator it = m_fields.constBegin();
+    for ( ; it != m_fields.constEnd(); ++it)
+        result << QString("field%1: %2").arg(it.value() + 1).arg(it.key());
+    return result;
+}
+
 void TorcThingSpeakNotifier::Notify(const QVariantMap &Notification)
 {
     if (!GetValid())

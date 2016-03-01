@@ -11,6 +11,7 @@ class TorcLogNotifier : public TorcNotifier
     ~TorcLogNotifier();
 
     void Notify (const QVariantMap &Notification);
+    QStringList GetDescription (void);
 };
 
 #endif // TORCLOGNOTIFIER_H

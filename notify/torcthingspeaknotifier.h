@@ -18,6 +18,8 @@ class TorcThingSpeakNotifier : public TorcNotifier
     TorcThingSpeakNotifier(const QVariantMap &Details);
     ~TorcThingSpeakNotifier();
 
+    QStringList GetDescription(void);
+
   public slots:
     void RequestReady         (TorcNetworkRequest* Request);
     void Notify               (const QVariantMap &Notification);

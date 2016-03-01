@@ -25,6 +25,7 @@ class TorcNotify : public QObject, public TorcDeviceHandler
     bool          Validate               (void) const;
     TorcNotifier* FindNotifierByName     (const QString &Name) const;
     QVariantMap   SetNotificationText    (const QString &Title, const QString &Body, const QMap<QString,QString> &Custom);
+    void          Graph                  (QByteArray* Data);
 
   public slots:
     void          ApplicationNameChanged (void);

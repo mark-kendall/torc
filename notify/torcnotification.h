@@ -13,6 +13,8 @@ class TorcNotification : public TorcDevice
     TorcNotification(const QVariantMap &Details);
     virtual bool         Setup        (void);
     virtual bool         IsKnownInput (const QString &UniqueId) const;
+    virtual QStringList  GetDescription (void) = 0;
+    virtual void         Graph        (QByteArray* Data) = 0;
 
   signals:
     void                 Notify       (const QVariantMap &Message);

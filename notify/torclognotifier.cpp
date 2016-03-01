@@ -39,6 +39,11 @@ TorcLogNotifier::~TorcLogNotifier()
 {
 }
 
+QStringList TorcLogNotifier::GetDescription(void)
+{
+    return QStringList() << tr("Log");
+}
+
 void TorcLogNotifier::Notify(const QVariantMap &Notification)
 {
     QString message = Notification.contains(NOTIFICATION_BODY) ? Notification.value(NOTIFICATION_BODY).toString() : UNKNOWN_BODY;

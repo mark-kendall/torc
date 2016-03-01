@@ -88,6 +88,23 @@ bool TorcTriggerNotification::IsKnownInput(const QString &UniqueId) const
     return UniqueId == m_inputName;
 }
 
+QStringList TorcTriggerNotification::GetDescription(void)
+{
+    return QStringList() << tr("Trigger");
+}
+
+void TorcTriggerNotification::Graph(QByteArray *Data)
+{
+    if (!Data)
+        return;
+
+    if (m_input)
+        Data->append(QString("    \"%2\"->\"%1\"\r\n").arg(uniqueId).arg(m_input->GetUniqueId()));
+
+    foreach (TorcNotifier* notifier, m_notifiers)
+        Data->append(QString("    \"%1\"->\"%2\"\r\n").arg(uniqueId).arg(notifier->GetUniqueId()));
+}
+
 void TorcTriggerNotification::InputValueChanged(double Value)
 {
     // N.B. this should be thread safe as InputValueChanged is always triggered via a signal

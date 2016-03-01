@@ -73,6 +73,7 @@ bool TorcNotification::Setup(void)
         if (notifier)
         {
             connect(this, SIGNAL(Notify(QVariantMap)), notifier, SLOT(Notify(QVariantMap)));
+            m_notifiers.append(notifier);
         }
         else
         {

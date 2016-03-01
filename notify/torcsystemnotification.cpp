@@ -90,6 +90,23 @@ TorcSystemNotification::~TorcSystemNotification()
     gLocalContext->RemoveObserver(this);
 }
 
+QStringList TorcSystemNotification::GetDescription(void)
+{
+    QStringList result;
+    result.append(tr("System event"));
+    result.append(m_events);
+    return result;
+}
+
+void TorcSystemNotification::Graph(QByteArray *Data)
+{
+    if (!Data)
+        return;
+
+    foreach (TorcNotifier* notifier, m_notifiers)
+        Data->append(QString("    \"%1\"->\"%2\"\r\n").arg(uniqueId).arg(notifier->GetUniqueId()));
+}
+
 /// Listen for system events (TorcEvent).
 bool TorcSystemNotification::event(QEvent *Event)
 {

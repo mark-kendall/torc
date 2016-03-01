@@ -12,6 +12,9 @@ class TorcSystemNotification : public TorcNotification
     TorcSystemNotification(const QVariantMap &Details);
     ~TorcSystemNotification();
 
+    QStringList GetDescription (void);
+    void        Graph          (QByteArray *Data);
+
   public slots:
     // QObject
     bool         event (QEvent *Event);

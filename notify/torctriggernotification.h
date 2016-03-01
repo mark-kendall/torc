@@ -14,6 +14,8 @@ class TorcTriggerNotification : public TorcNotification
     TorcTriggerNotification(const QVariantMap &Details);
     ~TorcTriggerNotification();
     bool         IsKnownInput      (const QString &UniqueId) const;
+    QStringList  GetDescription    (void);
+    void         Graph             (QByteArray *Data);
 
   public slots:
     void         InputValueChanged (double Value);
