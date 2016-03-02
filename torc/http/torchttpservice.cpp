@@ -815,7 +815,7 @@ void TorcHTTPService::HandleSubscriberDeleted(QObject *Subscriber)
 
     if (Subscriber && m_subscribers.contains(Subscriber))
     {
-        LOG(VB_GENERAL, LOG_INFO, "Subscriber deleted - cancelling subscription");
+        LOG(VB_GENERAL, LOG_DEBUG, "Subscriber deleted - cancelling subscription");
         m_subscribers.removeAll(Subscriber);
     }
 }
