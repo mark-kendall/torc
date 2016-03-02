@@ -37,3 +37,10 @@ QStringList TorcNetworkSwitchInput::GetDescription(void)
     return QStringList() << tr("Network switch");
 }
 
+void TorcNetworkSwitchInput::Start(void)
+{
+    SetValid(true);
+    SetValue(defaultValue);
+    TorcSwitchInput::Start();
+}
+

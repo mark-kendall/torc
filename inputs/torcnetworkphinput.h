@@ -10,7 +10,8 @@ class TorcNetworkpHInput : public TorcpHInput
     TorcNetworkpHInput(double Default, const QVariantMap &Details);
     ~TorcNetworkpHInput();
 
-    QStringList GetDescription(void);
+    QStringList GetDescription (void);
+    void        Start          (void);
 };
 
 #endif // TORCNETWORKPHINPUT_H

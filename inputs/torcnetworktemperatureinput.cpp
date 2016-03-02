@@ -38,4 +38,10 @@ QStringList TorcNetworkTemperatureInput::GetDescription(void)
     return QStringList() << tr("Network temperature");
 }
 
+void TorcNetworkTemperatureInput::Start(void)
+{
+    SetValid(true);
+    SetValue(defaultValue);
+    TorcTemperatureInput::Start();
+}
 

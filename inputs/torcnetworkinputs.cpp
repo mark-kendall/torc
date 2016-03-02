@@ -38,7 +38,7 @@
 
 /*! \class TorcNetworkInputs
  *
- * Creates and manages known sensors.
+ * Creates and manages known network (i.e. user set) sensors.
  *
  * \code
  *

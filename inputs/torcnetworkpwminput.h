@@ -10,7 +10,8 @@ class TorcNetworkPWMInput : public TorcPWMInput
     TorcNetworkPWMInput(double Default, const QVariantMap &Details);
     ~TorcNetworkPWMInput();
 
-    QStringList GetDescription(void);
+    QStringList GetDescription (void);
+    void        Start          (void);
 };
 
 #endif // TORCNETWORKPWMINPUT_H

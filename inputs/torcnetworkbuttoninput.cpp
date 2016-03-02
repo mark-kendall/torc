@@ -58,6 +58,13 @@ QStringList TorcNetworkButtonInput::GetDescription(void)
     return QStringList() << tr("Network button");
 }
 
+void TorcNetworkButtonInput::Start(void)
+{
+    SetValid(true);
+    SetValue(defaultValue);
+    TorcNetworkSwitchInput::Start();
+}
+
 /*! \brief Toggle the value of the button.
  *
  * The input value is ignored, the current value is toggled and the timer started to

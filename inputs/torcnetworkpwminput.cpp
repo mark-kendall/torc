@@ -37,3 +37,10 @@ QStringList TorcNetworkPWMInput::GetDescription(void)
 {
     return QStringList() << tr("Network PWM");
 }
+
+void TorcNetworkPWMInput::Start(void)
+{
+    SetValid(true);
+    SetValue(defaultValue);
+    TorcPWMInput::Start();
+}

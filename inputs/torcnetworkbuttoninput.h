@@ -15,7 +15,8 @@ class TorcNetworkButtonInput : public TorcNetworkSwitchInput
     TorcNetworkButtonInput(double Default, const QVariantMap &Details);
    ~TorcNetworkButtonInput();
 
-    QStringList GetDescription(void);
+    QStringList GetDescription (void);
+    void        Start          (void);
 
   signals:
     void Pushed     (void);

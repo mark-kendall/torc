@@ -37,3 +37,9 @@ QStringList TorcNetworkpHInput::GetDescription(void)
     return QStringList() << tr("Network pH");
 }
 
+void TorcNetworkpHInput::Start(void)
+{
+    SetValid(true);
+    SetValue(defaultValue);
+    TorcpHInput::Start();
+}
