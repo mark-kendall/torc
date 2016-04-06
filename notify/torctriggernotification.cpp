@@ -90,7 +90,9 @@ bool TorcTriggerNotification::IsKnownInput(const QString &UniqueId) const
 
 QStringList TorcTriggerNotification::GetDescription(void)
 {
-    return QStringList() << tr("Trigger");
+    if (m_triggerHigh)
+        return QStringList() << tr("Trigger 0->1");
+    return QStringList() << tr("Trigger 1->0");
 }
 
 void TorcTriggerNotification::Graph(QByteArray *Data)
