@@ -620,8 +620,13 @@ void TorcNetwork::Error(QNetworkReply::NetworkError Code)
     QNetworkReply *reply = dynamic_cast<QNetworkReply*>(sender());
 
     if (reply && m_requests.contains(reply))
+    {
         if (Code != QNetworkReply::OperationCanceledError)
+        {
+            m_requests.value(reply)->SetReplyError(Code);
             LOG(VB_GENERAL, LOG_ERR, QString("Network error '%1'").arg(reply->errorString()));
+        }
+    }
 }
 
 void TorcNetwork::SSLErrors(const QList<QSslError> &Errors)

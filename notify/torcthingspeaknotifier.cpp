@@ -190,15 +190,24 @@ void TorcThingSpeakNotifier::RequestReady(TorcNetworkRequest *Request)
     int status = Request->GetStatus();
     if (status >= HTTP_BadRequest && status < HTTP_InternalServerError)
     {
+        // not sure whether it is my network or the thingspeak server - but I get intermittent Host Not Found errors
+        // which end up disabling ThingSpeak. So check for HostNotFound...
         LOG(VB_GENERAL, LOG_ERR, QString("ThingSpeak update error '%1'").arg(TorcHTTPRequest::StatusToString((HTTPStatus)status)));
-        if (++m_badRequestCount > THINGSPEAK_MAX_ERRORS)
+
+        if (Request->GetReplyError() != QNetworkReply::HostNotFoundError)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("%1 ThingSpeak update errors. Disabling notifier. Check your API key."));
-            SetValid(false);
+            if (++m_badRequestCount > THINGSPEAK_MAX_ERRORS)
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("%1 ThingSpeak update errors. Disabling notifier. Check your API key.").arg(m_badRequestCount));
+                SetValid(false);
+            }
         }
     }
     else
     {
+        // reset error count
+        m_badRequestCount = 0;
+
         // a successful update returns a non-zero update id - and zero on error.
         QByteArray result = Request->ReadAll(1000).trimmed();
         bool ok = false;

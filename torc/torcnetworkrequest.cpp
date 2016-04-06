@@ -72,6 +72,7 @@ TorcNetworkRequest::TorcNetworkRequest(const QNetworkRequest Request, QNetworkAc
     m_replyBytesAvailable(0),
     m_bytesReceived(0),
     m_bytesTotal(0),
+    m_replyError(QNetworkReply::NoError),
     m_request(Request),
     m_rangeStart(0),
     m_rangeEnd(0),
@@ -385,6 +386,16 @@ QByteArray TorcNetworkRequest::GetHeader(const QByteArray &Header)
         if (header.first == Header)
             return header.second;
     return QByteArray();
+}
+
+QNetworkReply::NetworkError TorcNetworkRequest::GetReplyError(void)
+{
+    return m_replyError;
+}
+
+void TorcNetworkRequest::SetReplyError(QNetworkReply::NetworkError Error)
+{
+    m_replyError = Error;
 }
 
 QByteArray& TorcNetworkRequest::GetBuffer(void)
