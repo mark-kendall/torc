@@ -35,6 +35,7 @@ TorcLogicControl::Operation TorcLogicControl::StringToOperation(const QString &O
     if ("GREATERTHANOREQUAL" == operation) return TorcLogicControl::GreaterThanOrEqual;
     if ("ANY" == operation)                return TorcLogicControl::Any;
     if ("ALL" == operation)                return TorcLogicControl::All;
+    if ("NONE" == operation)               return TorcLogicControl::None;
     if ("AVERAGE" == operation)            return TorcLogicControl::Average;
     if ("PASSTHROUGH" == operation)        return TorcLogicControl::Passthrough;
     if ("TOGGLE" == operation)             return TorcLogicControl::Toggle;
@@ -133,6 +134,9 @@ QStringList TorcLogicControl::GetDescription(void)
         case TorcLogicControl::All:
             result.append(tr("All"));
             break;
+        case TorcLogicControl::None:
+            result.append(tr("None"));
+            break;
         case TorcLogicControl::Average:
             result.append(tr("Average"));
             break;
@@ -206,6 +210,7 @@ bool TorcLogicControl::Validate(void)
     {
         case TorcLogicControl::Any:
         case TorcLogicControl::All:
+        case TorcLogicControl::None:
         case TorcLogicControl::Average:
         case TorcLogicControl::Maximum:
         case TorcLogicControl::Minimum:
@@ -335,12 +340,16 @@ void TorcLogicControl::CalculateOutput(void)
             }
             break;
         case TorcLogicControl::Any:
+        case TorcLogicControl::None:
             {
-                // multiple binary (on/off) inputs - one or more of which must be 1/On/non-zero
+                // multiple binary (on/off) inputs
                 bool on = false;
                 foreach (double next, m_inputValues)
                     on |= !qFuzzyCompare(next + 1.0, 1.0);
-                newvalue = on ? 1 : 0;
+                if (m_operation == TorcLogicControl::Any)
+                    newvalue = on ? 1 : 0;
+                else
+                    newvalue = on ? 0 : 1;
             }
             break;
         case TorcLogicControl::Average:

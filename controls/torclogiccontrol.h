@@ -17,6 +17,7 @@ class TorcLogicControl : public TorcControl
         GreaterThanOrEqual,
         Any,
         All,
+        None,
         Average,
         Toggle,
         Invert,
