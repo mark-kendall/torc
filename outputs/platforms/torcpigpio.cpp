@@ -73,15 +73,15 @@
 *
 * You can change a number of Raspberry Pi specific behaviours from this utility. You will probably
 * want to 'Expand filesystem' (to make sure the entire SD card is available to you), 'Change user password',
-* set the timezone (IMPORTANT) and from the 'Advanced options' screen, 'Set the hostname', 'Enable SSH', 'Enable SPI' and 'Enable I2C'.
-* The last 2 options are dependant on the hardware you intend to attach to your device. If you have no intention of attaching
+* set the timezone (IMPORTANT) and from the 'Advanced options' screen, 'Set the hostname', 'Enable SSH' and 'Enable I2C'.
+* The last option is dependant on the hardware you intend to attach to your device. If you have no intention of attaching
 * a screen or monitor to your device, you can also allocate zero memory to the GPU.
 *
 * \subsection pidev Install software dependencies.
 *
 * From the command line run:
 * \code
-* sudo apt-get install libgraphviz-dev libavahi-compat-libdnssd-dev qt5-default git-core libqt5xmlpatterns5-dev upower
+* sudo apt-get install libgraphviz-dev libavahi-compat-libdnssd-dev qt5-default git-core libqt5xmlpatterns5-dev upower libxml2-dev
 * \endcode
 *
 * \subsection piwiringpi Install wiringPi.
@@ -103,7 +103,7 @@
 * cd ~
 * git clone https://github.com/mark-kendall/torc.git
 * cd torc
-* qmake
+* TORC_PI=true qmake
 * make -j2
 * sudo make install
 * \endcode
