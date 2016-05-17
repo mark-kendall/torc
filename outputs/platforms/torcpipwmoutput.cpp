@@ -43,14 +43,16 @@ TorcPiPWMOutput::TorcPiPWMOutput(int Pin, const QVariantMap &Details)
   : TorcPWMOutput(DEFAULT_VALUE, "PiGPIOPWMOutput", Details),
     m_pin(Pin)
 {
+    int value = (int)((DEFAULT_VALUE * 1024.0) + 0.5);
+
     if (m_pin == TORC_HWPWM_PIN)
     {
         pinMode(m_pin, PWM_OUTPUT);
-        digitalWrite(m_pin, DEFAULT_VALUE);
+        pwmWrite(m_pin, value);
     }
     else
     {
-        if (softPwmCreate(m_pin, DEFAULT_VALUE, 100 == 0))
+        if (softPwmCreate(m_pin, value, 1024) == 0)
         {
             LOG(VB_GENERAL, LOG_WARNING, QString("Using software PWM on pin %1: It MIGHT flicker...").arg(m_pin));
         }
@@ -68,7 +70,7 @@ TorcPiPWMOutput::~TorcPiPWMOutput()
     SetValue(defaultValue);
 
     // shutdown the soft pwm thread
-    if (m_pin == TORC_HWPWM_PIN)
+    if (m_pin != TORC_HWPWM_PIN)
         softPwmStop(m_pin);
 }
 
@@ -86,18 +88,12 @@ void TorcPiPWMOutput::SetValue(double Value)
     if (qFuzzyCompare(Value + 1.0f, value + 1.0f))
         return;
 
+    int value = (int)((Value * 1024.0) + 0.5);
+
     if (m_pin == TORC_HWPWM_PIN)
-    {
-        // hw pwm has a range of 1024
-        int value = (int)((Value * 1024.0) + 0.5);
         pwmWrite(m_pin, value);
-    }
     else
-    {
-        // we use a range of 100 for soft pwm
-        int value = (int)((Value * 100) + 0.5);
         softPwmWrite(m_pin, value);
-    }
 
     TorcPWMOutput::SetValue(Value);
 }
