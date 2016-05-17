@@ -1,0 +1,32 @@
+<torc>
+  <inputs>
+    <network>
+      <pwm>
+        <name>referencedevice</name>
+        <default>0</default>
+      </pwm>
+      <pwm>
+        <name>device</name>
+        <default>0</default>
+      </pwm>
+    </network>
+  </inputs>
+  <controls>
+    <logic>
+      <lessthan>
+        <name>lessthan</name>
+        <inputs><device>device</device></inputs>
+        <outputs><device>output</device></outputs>
+        <references><device>referencedevice</device></references>
+      </lessthan>
+    </logic>
+  </controls>
+  <outputs>
+    <network>
+      <switch>
+        <name>output</name>
+        <default>0</default>
+      </switch>
+    </network>
+  </outputs>
+</torc>

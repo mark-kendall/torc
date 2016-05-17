@@ -1,0 +1,15 @@
+<torc>
+  <controls>
+    <logic>
+      <passthrough>
+        <name>test</name>
+        <inputs>
+          <device>test</device>
+        </inputs>
+        <outputs>
+          <device>test</device>
+        </outputs>
+      </passthrough>
+    </logic>
+  </controls>
+</torc>

@@ -134,6 +134,8 @@
 *
 * \subsection pistart Run Torc at startup.
 *
+* The 'misc' directory in the source contains a script to run Torc as a service. Details are included in the file.
+*
 * \subsection Super user permissions
 */
 
