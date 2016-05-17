@@ -498,6 +498,8 @@ class TorcCentralObject : public TorcAdminObject, public TorcStringFactory
         Strings.insert("CelsiusUnitsTr",     QCoreApplication::translate("TorcCentral", "°C"));
         Strings.insert("FahrenheitTr",       QCoreApplication::translate("TorcCentral", "Fahrenheit"));
         Strings.insert("FahrenheitUnitsTr",  QCoreApplication::translate("TorcCentral", "°F"));
+        Strings.insert("Value",              QCoreApplication::translate("TorcCentral", "Value"));
+        Strings.insert("Valid",              QCoreApplication::translate("TorcCentral", "Valid"));
     }
 
     void Create(void)
