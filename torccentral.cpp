@@ -265,14 +265,15 @@ void TorcCentral::SubscriberDeleted(QObject *Subscriber)
 
 bool TorcCentral::LoadConfig(void)
 {
-#if defined(USING_XMLPATTERNS) || defined(USING_LIBXML2)
     bool skipvalidation = false;
 
+#if defined(USING_XMLPATTERNS) || defined(USING_LIBXML2)
     if (!qgetenv("TORC_NO_VALIDATION").isEmpty())
     {
         LOG(VB_GENERAL, LOG_INFO, "Skipping configuration file validation (command line).");
         skipvalidation = true;
     }
+#endif
 
     QString xml = GetTorcConfigDir() + "/torc.xml";
     QFileInfo config(xml);
@@ -282,6 +283,7 @@ bool TorcCentral::LoadConfig(void)
         return false;
     }
 
+#if defined(USING_XMLPATTERNS) || defined(USING_LIBXML2)
     QString customxsd = GetTorcConfigDir() + DYNAMIC_DIRECTORY + "torc.xsd";
     // we always want to delete the old xsd - if it isn't present, it wasn't used!
     // so retrieve now and then delete
