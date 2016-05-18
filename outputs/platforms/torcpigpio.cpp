@@ -81,7 +81,7 @@
 *
 * From the command line run:
 * \code
-* sudo apt-get install libgraphviz-dev libavahi-compat-libdnssd-dev qt5-default git-core libqt5xmlpatterns5-dev upower libxml2-dev
+* sudo apt-get install libgraphviz-dev libavahi-compat-libdnssd-dev qt5-default git-core libqt5xmlpatterns5-dev upower libxml2-dev consolekit
 * \endcode
 *
 * \subsection piwiringpi Install wiringPi.
@@ -113,6 +113,7 @@
 * are also available as a waterproof module.
 *
 * Add the following line to the end of '/boot/config.txt' file (sudo nano /boot/config.txt)
+* N.B. It may already be present if you enabled I2C from raspi-config.
 * \code
 * dtoverlay=w1-gpio
 * \endcode
@@ -124,9 +125,8 @@
 * \endcode
 *
 * \note If you enable w1-gpio support without adding the appropriate external hardware (i.e. a pull up
-* resister), you may find the kernel tries to recognise a number of phantom 1Wire devices. Don't panic.
-*
-* \subsection piPower Allow Torc to poweroff/restart your device.
+* resister), you may find the kernel tries to recognise a number of phantom 1Wire devices. Don't panic - but add
+* the resistor.
 *
 * \subsection pii2c Enable I2C bus.
 *
