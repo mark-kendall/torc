@@ -150,6 +150,7 @@ int TorcXSDTest::RunXSDTestSuite(TorcCommandLine *CommandLine)
     TorcLocalContext::TearDown();
 
 #else
+    (void) CommandLine;
     LOG(VB_GENERAL, LOG_INFO, "XML validation not available.");
 #endif
 
