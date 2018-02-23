@@ -14,13 +14,22 @@ class TorcHTTPRequest;
 
 class TorcHTTPReader
 {
+    friend class TorcHTTPConnection;
+
   public:
     TorcHTTPReader();
    ~TorcHTTPReader();
 
-    void                   Reset    (void);
-    bool                   Read     (QTcpSocket *Socket, int *Abort);
+    void                   TakeRequest      (QByteArray*& Content, QMap<QString,QString>*& Headers);
+    QString                GetMethod        (void);
+    bool                   Read             (QTcpSocket *Socket, int *Abort);
+    bool                   IsReady          (void);
+    bool                   HeadersComplete  (void);
 
+  protected:
+    void                   Reset            (void);
+
+  private:
     bool                   m_ready;
     bool                   m_requestStarted;
     bool                   m_headersComplete;
@@ -30,7 +39,6 @@ class TorcHTTPReader
     QString                m_method;
     QByteArray            *m_content;
     QMap<QString,QString> *m_headers;
-
 };
 
 class TorcHTTPConnection : public QRunnable

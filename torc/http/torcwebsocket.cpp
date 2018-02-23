@@ -720,7 +720,7 @@ void TorcWebSocket::ReadyRead(void)
             }
 
             // response complete
-            if (!m_upgradeResponseReader->m_ready)
+            if (!m_upgradeResponseReader->IsReady())
                 continue;
 
             // parse the response

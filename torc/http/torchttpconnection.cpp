@@ -32,7 +32,7 @@
  *  \brief A convenience class to read HTTP requests from a QTcpSocket
  *
  * \note Both m_content and m_headers MAY be transferred to new parents for processing. It is the new owner's
- *       responsibility to clear the these objects (set to NULL) and then later delete the data.
+ *       responsibility to delete them.
 */
 TorcHTTPReader::TorcHTTPReader()
   : m_ready(false),
@@ -51,6 +51,30 @@ TorcHTTPReader::~TorcHTTPReader()
 {
     delete m_content;
     delete m_headers;
+}
+
+///\brief Take ownership of the contents and headers. New owner is responsible for deleting.
+void TorcHTTPReader::TakeRequest(QByteArray*& Content, QMap<QString,QString>*& Headers)
+{
+    Content   = m_content;
+    Headers   = m_headers;
+    m_content = NULL;
+    m_headers = NULL;
+}
+
+bool TorcHTTPReader::IsReady(void)
+{
+    return m_ready;
+}
+
+QString TorcHTTPReader::GetMethod(void)
+{
+    return m_method;
+}
+
+bool TorcHTTPReader::HeadersComplete(void)
+{
+    return m_headersComplete;
 }
 
 ///\brief Reset the read state
@@ -234,7 +258,7 @@ void TorcHTTPConnection::run(void)
         // ensure we have a complete line if still waiting for complete headers.
         // This ensures we do not loop endlessly and at full load waiting for data that
         // never arrives.
-        while (!reader->m_headersComplete &&
+        while (!reader->HeadersComplete() &&
                m_socket->state() == QAbstractSocket::ConnectedState && !(*m_abort) &&
                count++ < 300 && !m_socket->canReadLine())
         {
@@ -252,7 +276,7 @@ void TorcHTTPConnection::run(void)
         if (!reader->Read(m_socket, m_abort))
             break;
 
-        if (!reader->m_ready)
+        if (!reader->IsReady())
             continue;
 
         // sanity check

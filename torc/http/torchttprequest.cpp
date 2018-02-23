@@ -86,11 +86,8 @@ TorcHTTPRequest::TorcHTTPRequest(TorcHTTPReader *Reader)
 {
     if (Reader)
     {
-        m_headers = Reader->m_headers;
-        m_content = Reader->m_content;
-        Reader->m_headers = NULL;
-        Reader->m_content = NULL;
-        Initialise(Reader->m_method);
+        Reader->TakeRequest(m_content, m_headers);
+        Initialise(Reader->GetMethod());
     }
     else
     {
