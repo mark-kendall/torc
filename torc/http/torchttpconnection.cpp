@@ -49,7 +49,8 @@ TorcHTTPReader::TorcHTTPReader()
 
 TorcHTTPReader::~TorcHTTPReader()
 {
-    Reset();
+    delete m_content;
+    delete m_headers;
 }
 
 ///\brief Reset the read state
