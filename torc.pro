@@ -39,6 +39,8 @@ else
 !mac:!win32:LIBS += -ldns_sd
 !mac:!win32:LIBS += -lrt
 
+QMAKE_CXXFLAGS = -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE
+
 DEPENDPATH  += ./torc ./torc/http ./torc/upnp ./inputs ./inputs/platforms
 DEPENDPATH  += ./outputs ./outputs/platforms
 INCLUDEPATH += $$DEPENDPATH
