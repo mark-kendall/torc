@@ -525,7 +525,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket, int *Abort)
             QList<QByteArray>::const_iterator bit = partheaders.begin();
             for ( ; (it != m_ranges.end() && !(*Abort)); ++it, ++bit)
             {
-                qint64 sent = Socket->write((*bit).data(), (*bit).size());
+                off64_t sent = Socket->write((*bit).data(), (*bit).size());
                 if ((*bit).size() != sent)
                     LOG(VB_GENERAL, LOG_WARNING, QString("Buffer size %1 - but sent %2").arg((*bit).size()).arg(sent));
                 else
@@ -535,8 +535,8 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket, int *Abort)
                     break;
 
                 sent   = 0;
-                qint64 offset = (*it).first;
-                qint64 size   = (*it).second - offset + 1;
+                off64_t offset = (*it).first;
+                off64_t size   = (*it).second - offset + 1;
 
 #if defined(Q_OS_LINUX)
                 if (size > sent)
@@ -546,8 +546,8 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket, int *Abort)
 
                     do
                     {
-                        qint64 remaining = qMin(size - sent, (qint64)READ_CHUNK_SIZE);
-                        qint64 send = sendfile64(Socket->socketDescriptor(), m_responseFile->handle(), &offset, remaining);
+                        off64_t remaining = qMin(size - sent, (off64_t)READ_CHUNK_SIZE);
+                        off64_t send = sendfile64(Socket->socketDescriptor(), m_responseFile->handle(), &offset, remaining);
 
                         if (send < 0)
                         {
@@ -575,8 +575,8 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket, int *Abort)
                     // sendfile accesses the socket directly, bypassing Qt's cache, so we must flush first
                     Socket->flush();
 
-                    off_t bytessent  = 0;
-                    off_t off        = offset;
+                    off64_t bytessent  = 0;
+                    off64_t off        = offset;
 
                     do
                     {
@@ -636,9 +636,9 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket, int *Abort)
         }
         else
         {
-            qint64 sent = 0;
-            qint64 size = sendsize;
-            qint64 offset = m_ranges.isEmpty() ? 0 : m_ranges[0].first;
+            off64_t sent = 0;
+            off64_t size = sendsize;
+            off64_t offset = m_ranges.isEmpty() ? 0 : m_ranges[0].first;
 
 #if defined(Q_OS_LINUX)
             if ((size > sent) && !(*Abort))
@@ -648,8 +648,8 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket, int *Abort)
 
                 do
                 {
-                    qint64 remaining = qMin(size - sent, (qint64)READ_CHUNK_SIZE);
-                    qint64 send = sendfile64(Socket->socketDescriptor(), m_responseFile->handle(), &offset, remaining);
+                    off64_t remaining = qMin(size - sent, (off64_t)READ_CHUNK_SIZE);
+                    off64_t send = sendfile64(Socket->socketDescriptor(), m_responseFile->handle(), &offset, remaining);
 
                     if (send < 0)
                     {
