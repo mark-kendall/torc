@@ -1151,8 +1151,8 @@ void TorcWebSocket::Connected(void)
     if (!m_socket)
         return;
 
-    QByteArray *upgrade = new QByteArray();
-    QTextStream stream(upgrade);
+    QScopedPointer<QByteArray> upgrade(new QByteArray());
+    QTextStream stream(upgrade.data());
 
     QByteArray nonce;
     for (int i = 0; i < 16; ++i)
