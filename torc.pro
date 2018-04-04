@@ -28,11 +28,11 @@ CONFIG     += debug
 # libraries
 # zlib on windows is too much like hard work
 win32 {
-    message("Zlib support NOT available")
+    message("Zlib support NOT available for compressed html")
 }
 else
 {
-    message("Zlib support available")
+    message("Zlib support available for compressed html")
     DEFINES += USING_ZLIB
     LIBS    += -lz
 }
@@ -51,9 +51,9 @@ packagesExist(libgvc) {
     DEFINES += USING_GRAPHVIZ_LIBS
     CONFIG  += link_pkgconfig
     PKGCONFIG += libgvc
-    message("Linking to graphviz libraries")
+    message("Linking to graphviz libraries for svg generation")
 } else {
-    message("Using external graphviz binary (if available)")
+    message("Using external graphviz binary for svg generation (if available)")
 }
 
 # translations
@@ -71,19 +71,23 @@ install.files += html/css html/fonts html/img html/js
 INSTALLS      += install
 
 # libxml2 for xml validation
-libxml2 = $$(TORC_LIBXML2)
-packagesExist(libxml-2.0) | !isEmpty(libxml2) {
-    DEFINES += USING_LIBXML2
-    HEADERS += torc/torclibxmlvalidator.h
-    SOURCES += torc/torclibxmlvalidator.cpp
-    if (isEmpty(libxml2)) {
-        message("libxml2 available")
-        CONFIG += link_pkgconfig
-        PKGCONFIG += libxml-2.0
+!win32 {
+    libxml2 = $$(TORC_LIBXML2)
+    packagesExist(libxml-2.0) | !isEmpty(libxml2) {
+        DEFINES += USING_LIBXML2
+        HEADERS += torc/torclibxmlvalidator.h
+        SOURCES += torc/torclibxmlvalidator.cpp
+        if (isEmpty(libxml2)) {
+            message("libxml2 available for xml validation")
+            CONFIG += link_pkgconfig
+            PKGCONFIG += libxml-2.0
+        } else {
+            message("libxml2 available for xml validation (forced)")
+            LIBS        += -lxml2
+            INCLUDEPATH += $${PREFIX}/include/libxml2
+        }
     } else {
-        message("libxml2 available (forced)")
-        LIBS        += -lxml2
-        INCLUDEPATH += $${PREFIX}/include/libxml2
+        message("No libxml2 for xml validation")
     }
 }
 
@@ -98,12 +102,16 @@ qtHaveModule(xmlpatterns_XX) {
 }
 
 # linux power support
-linux:qtHaveModule(dbus) {
-    QT += dbus
-    HEADERS += torc/platforms/torcpowerunixdbus.h
-    SOURCES += torc/platforms/torcpowerunixdbus.cpp
-    DEFINES += USING_QTDBUS
-    message("QtDBus available")
+linux {
+    qtHaveModule(dbus) {
+        QT += dbus
+        HEADERS += torc/platforms/torcpowerunixdbus.h
+        SOURCES += torc/platforms/torcpowerunixdbus.cpp
+        DEFINES += USING_QTDBUS
+        message("QtDBus available for power support")
+   } else {
+        message("No QtDBus support for power support")
+   }
 }
 
 # OS X power support
@@ -154,10 +162,10 @@ linux-rasp-pi-g++ | !isEmpty(pi) {
 # Bonjour is not available on windows
 win32 {
     SOURCES += torc/platforms/torcbonjourwindows.cpp
-    message("Bonjour NOT available")
+    message("Bonjour NOT available for peer detection")
 } else {
     SOURCES += torc/torcbonjour.cpp
-    message("Bonjour available")
+    message("Bonjour available for peer detection")
 }
 
 HEADERS += torc/torclogging.h
