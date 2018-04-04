@@ -206,9 +206,15 @@ TorcCentral::TorcCentral()
             QString command = QString("dot -Tsvg -o %1 %2").arg(graphsvg).arg(graphdot);
             int err = system(command.toLocal8Bit());
             if (err < 0)
-                LOG(VB_GENERAL, LOG_WARNING, QString("Failed to create stategraph representation (err: %1)").arg(strerror(err)));
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("Failed to create stategraph representation (err: %1)").arg(strerror(err)));
+            }
             else
+            {
                 LOG(VB_GENERAL, LOG_INFO, QString("Saved state graph representation as %1").arg(graphsvg));
+                if (err > 0)
+                    LOG(VB_GENERAL, LOG_ERR, "dot returned an unexpected result - stategraph may be incomplete or absent");
+            }
 #endif
         }
         else
