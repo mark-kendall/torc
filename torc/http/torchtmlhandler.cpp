@@ -86,6 +86,7 @@ void TorcHTMLHandler::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTTPConne
 
         HandleFile(Request, m_pathToContent + url, HTTPCacheNone);
     }
+    // I think this is unused/unreachable. img directory is served by TorcHTMLStaticContent
     else if (url.endsWith(".png", Qt::CaseInsensitive) || url.endsWith(".ico", Qt::CaseInsensitive))
     {
         HandleFile(Request, m_pathToContent + "/img" + url, HTTPCacheLongLife | HTTPCacheLastModified);
