@@ -101,10 +101,10 @@ void TorcTriggerNotification::Graph(QByteArray *Data)
         return;
 
     if (m_input)
-        Data->append(QString("    \"%2\" to \"%1\"\r\n").arg(uniqueId).arg(m_input->GetUniqueId()));
+        Data->append(QString("    \"%2\"->\"%1\"\r\n").arg(uniqueId).arg(m_input->GetUniqueId()));
 
     foreach (TorcNotifier* notifier, m_notifiers)
-        Data->append(QString("    \"%1\" to \"%2\"\r\n").arg(uniqueId).arg(notifier->GetUniqueId()));
+        Data->append(QString("    \"%1\"->\"%2\"\r\n").arg(uniqueId).arg(notifier->GetUniqueId()));
 }
 
 void TorcTriggerNotification::InputValueChanged(double Value)
