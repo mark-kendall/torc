@@ -45,11 +45,11 @@
  * -# All XML definitions are case sensitive.
  *
  * \section xsdxsd Device specification
- * All devices require a '<name>' that uniquely identifies that device.
+ * All devices require a "<name>" tag that uniquely identifies that device.
  * To that end, a name must be unique, must not be empty and for internal purposes can only contain
  * alphanumeric characters (a-z, A-Z and 0-9) as well as '_' and '-',
  *
- * Devices may also have '<username>' and '<userdescription>' tags. These do not affect the operation of
+ * Devices may also have "<username>" and "<userdescription>" tags. These do not affect the operation of
  * the device and are used purely for a user friendly interface.
  *
  * \section xsdinputs Input devices
