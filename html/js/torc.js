@@ -224,6 +224,25 @@ $(document).ready(function() {
         removeNavbarDropdown('torc-central-dropdown');
     }
 
+    function timeChanged(name, value) {
+        if (name === 'currentTime') {
+            $('.torc-time-value a').html(value);
+        }
+    }
+
+    function timeSubscriptionChanged(version, ignore, properties) {
+        if (version !== undefined && typeof properties === 'object') {
+            addNavbarDropdown('torc-time-dropdown', 'clock-o', 'torc-time-menu');
+            addDropdownMenuItem('torc-time-menu', 'torc-time-value', '#', 'dummy');
+            $.each(properties, function (key, value) {
+                timeChanged(key, value.value); });
+            return;
+        }
+
+        removeNavbarDropdown('torc-time-dropdown');
+    }
+
+
     function statusChanged (status) {
         if (status === torc.SocketNotConnected) {
             $(".torc-socket-status-icon").removeClass("fa-check fa-check-circle-o-circle-o fa-question-circle").addClass("fa-exclamation-circle");
@@ -248,6 +267,7 @@ $(document).ready(function() {
             torcconnection.subscribe('peers', ['peers'], peerListChanged, peerSubscriptionChanged);
             torcconnection.subscribe('power', ['canShutdown', 'canSuspend', 'canRestart', 'canHibernate', 'batteryLevel'], powerChanged, powerSubscriptionChanged);
             torcconnection.subscribe('central', ['canRestartTorc'], centralChanged, centralSubscriptionChanged);
+            torcconnection.subscribe('time', ['currentTime'], timeChanged, timeSubscriptionChanged);
 
             torcstategraph.setup(torcconnection);
         }
