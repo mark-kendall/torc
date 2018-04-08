@@ -72,6 +72,8 @@ TorcNetworkService::TorcNetworkService(const QString &Name, const QString &UUID,
     }
 
     m_debugString = TorcNetwork::IPAddressToLiteral(m_addresses[m_preferredAddressIndex], port);
+
+    connect(this, SIGNAL(TryConnect()), this, SLOT(Connect()));
 }
 
 /*! \brief Destroy this service.
@@ -233,7 +235,7 @@ void TorcNetworkService::Connected(void)
     if (m_webSocketThread && m_webSocketThread->Socket() == socket)
     {
         LOG(VB_GENERAL, LOG_INFO, QString("Connection established with %1").arg(m_debugString));
-        Connect();
+        emit TryConnect();
     }
     else
     {
@@ -300,7 +302,7 @@ void TorcNetworkService::RequestReady(TorcNetworkRequest *Request)
                     emit PriorityChanged();
                     emit StartTimeChanged();
 
-                    Connect();
+                    emit TryConnect();
                     return;
                 }
                 else
@@ -398,7 +400,7 @@ void TorcNetworkService::RequestReady(TorcRPCRequest *Request)
         if (success)
         {
             LOG(VB_GENERAL, LOG_INFO, "Reply received");
-            Connect();
+            emit TryConnect();
         }
     }
     else
@@ -742,7 +744,7 @@ bool TorcNetworkedContext::event(QEvent *Event)
                                 Add(service);
 
                                 // try and connect - the txt records should have given us everything we need to know
-                                service->Connect();
+                                emit service->TryConnect();
                             }
                         }
                     }
@@ -897,7 +899,7 @@ void TorcNetworkedContext::HandleUpgrade(TorcHTTPRequest *Request, QTcpSocket *S
             if (m_discoveredServices[i]->GetUuid() == uuid)
             {
                 service = m_discoveredServices[i];
-                LOG(VB_GENERAL, LOG_INFO, QString("Received WebSocket for known peer ('%1')").arg(service->GetName()));
+                LOG(VB_GENERAL, LOG_INFO, QString("Received WebSocket for known peer ('%1') %2").arg(service->GetName()).arg(uuid));
                 break;
             }
         }
@@ -910,7 +912,7 @@ void TorcNetworkedContext::HandleUpgrade(TorcHTTPRequest *Request, QTcpSocket *S
         if (index > -1)
             name = agent.left(index);
 
-        LOG(VB_GENERAL, LOG_INFO, QString("Received WebSocket for new peer ('%1')").arg(name));
+        LOG(VB_GENERAL, LOG_INFO, QString("Received WebSocket for new peer ('%1' %2)").arg(name).arg(uuid));
         QList<QHostAddress> address;
         address << (Socket->peerAddress());
         service = new TorcNetworkService(name, uuid, port < 1 ? Socket->peerPort() : port, address);
@@ -944,7 +946,7 @@ void TorcNetworkedContext::Add(TorcNetworkService *Peer)
 
         m_serviceList.append(Peer->GetUuid());
         emit PeersChanged();
-        LOG(VB_GENERAL, LOG_INFO, QString("New Torc peer '%1'").arg(Peer->GetName()));
+        LOG(VB_GENERAL, LOG_INFO, QString("New Torc peer '%1' %2").arg(Peer->GetName()).arg(Peer->GetUuid()));
     }
 }
 

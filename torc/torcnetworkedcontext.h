@@ -49,6 +49,7 @@ class TorcNetworkService : public QObject
     void                    PriorityChanged   (void);
     void                    ApiVersionChanged (void);
     void                    ConnectedChanged  (void);
+    void                    TryConnect        (void);
 
   public slots:
     QString                 GetName           (void);
