@@ -306,7 +306,7 @@ void TorcHTTPConnection::run(void)
         }
         else
         {
-            m_server->HandleRequest(this, request);
+            TorcHTTPServer::HandleRequest(this, request);
             request->Respond(m_socket, m_abort);
         }
 
