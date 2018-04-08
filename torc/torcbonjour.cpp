@@ -788,20 +788,29 @@ class TorcBonjourPriv
 
                     foreach (QHostAddress address, (*it).m_ipAddresses)
                     {
-                        LOG(VB_NETWORK, LOG_INFO, address.toString());
+                        LOG(VB_NETWORK, LOG_INFO, QString("Address: %1").arg(address.toString()));
                         addresses << address.toString();
                     }
 
+                    QVariantMap data;
+                    data.insert("name", (*it).m_name.data());
+                    data.insert("type", (*it).m_type.data());
+                    data.insert("port", (*it).m_port);
+                    data.insert("addresses", addresses);
+                    data.insert("txtrecords", (*it).m_txt);
+                    data.insert("host", (*it).m_host.data());
                     if (!addresses.isEmpty())
                     {
-                        QVariantMap data;
-                        data.insert("name", (*it).m_name.data());
-                        data.insert("type", (*it).m_type.data());
-                        data.insert("port", (*it).m_port);
-                        data.insert("addresses", addresses);
-                        data.insert("txtrecords", (*it).m_txt);
-                        data.insert("host", (*it).m_host.data());
                         TorcEvent event(Torc::ServiceDiscovered, data);
+                        gLocalContext->Notify(event);
+                    }
+                    else
+                    {
+                        LOG(VB_GENERAL, LOG_WARNING, QString("No valid addresses resolved for Service '%1' on '%2:%3'").arg((*it).m_type.data())
+                            .arg((*it).m_host.data())
+                            .arg((*it).m_port));
+                        // NB this is experimental!!!
+                        TorcEvent event(Torc::ServiceWentAway, data);
                         gLocalContext->Notify(event);
                     }
                 }
