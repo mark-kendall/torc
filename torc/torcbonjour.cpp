@@ -735,6 +735,16 @@ class TorcBonjourPriv
                     if (ErrorType != kDNSServiceErr_NoError)
                     {
                         LOG(VB_GENERAL, LOG_ERR, QString("Failed to resolve '%1' (Error %2)").arg((*it).m_name.data()).arg(ErrorType));
+                        QVariantMap data;
+                        data.insert("name", (*it).m_name.data());
+                        data.insert("type", (*it).m_type.data());
+                        data.insert("port", (*it).m_port);
+                        data.insert("txtrecords", (*it).m_txt);
+                        data.insert("host", (*it).m_host.data());
+                        // as per HostLookup below - resolve may have failed due to a network disruption and the service is no
+                        // longer available. Signal removal - if it wasn't already known it won't matter.
+                        TorcEvent event(Torc::ServiceWentAway, data);
+                        gLocalContext->Notify(event);
                         return;
                     }
 
