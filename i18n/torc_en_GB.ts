@@ -2,124 +2,128 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en_GB">
 <context>
-    <name>TorcHTMLHandler</name>
+    <name>TorcCentral</name>
     <message>
-        <location filename="../torc/http/torchtmlhandler.cpp" line="72"/>
-        <source>Services</source>
+        <location filename="../torccentral.cpp" line="246"/>
+        <source>Central</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../torc/http/torchtmlhandler.cpp" line="73"/>
-        <source>Interface</source>
+        <location filename="../torccentral.cpp" line="495"/>
+        <source>Restart Torc</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../torc/http/torchtmlhandler.cpp" line="74"/>
-        <source>State graph</source>
+        <location filename="../torccentral.cpp" line="496"/>
+        <source>Are you sure you want to restart Torc?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../torc/http/torchtmlhandler.cpp" line="75"/>
-        <source>Current config</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>TorcHTMLServicesHelp</name>
-    <message>
-        <location filename="../torc/http/torchtmlserviceshelp.cpp" line="51"/>
-        <source>Services</source>
+        <location filename="../torccentral.cpp" line="497"/>
+        <source>View configuration</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../torc/http/torchtmlserviceshelp.cpp" line="114"/>
-        <source>No services are registered</source>
+        <location filename="../torccentral.cpp" line="498"/>
+        <source>Current configuration</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../torc/http/torchtmlserviceshelp.cpp" line="118"/>
-        <source>Available services</source>
+        <location filename="../torccentral.cpp" line="499"/>
+        <source>View DOT</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../torc/http/torchtmlserviceshelp.cpp" line="127"/>
-        <source>Supported return formats</source>
+        <location filename="../torccentral.cpp" line="500"/>
+        <source>Stategraph Description</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../torccentral.cpp" line="501"/>
+        <source>View XSD</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../torccentral.cpp" line="502"/>
+        <source>Configuration schema</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../torccentral.cpp" line="503"/>
+        <source>View API</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../torccentral.cpp" line="504"/>
+        <source>API reference</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../torccentral.cpp" line="505"/>
+        <source>Celsius</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../torccentral.cpp" line="506"/>
+        <source>°C</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../torccentral.cpp" line="507"/>
+        <source>Fahrenheit</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../torccentral.cpp" line="508"/>
+        <source>°F</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../torccentral.cpp" line="509"/>
+        <source>Value</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../torccentral.cpp" line="510"/>
+        <source>Valid</source>
         <translation></translation>
     </message>
 </context>
 <context>
     <name>TorcHTTPServer</name>
     <message>
-        <location filename="../torc/http/torchttpserver.cpp" line="730"/>
+        <location filename="../torc/http/torchttpserver.cpp" line="1080"/>
         <source>Not connected</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../torc/http/torchttpserver.cpp" line="731"/>
+        <location filename="../torc/http/torchttpserver.cpp" line="1081"/>
         <source>Connecting</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../torc/http/torchttpserver.cpp" line="732"/>
+        <location filename="../torc/http/torchttpserver.cpp" line="1082"/>
         <source>Connected</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../torc/http/torchttpserver.cpp" line="733"/>
+        <location filename="../torc/http/torchttpserver.cpp" line="1083"/>
         <source>Ready</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../torc/http/torchttpserver.cpp" line="734"/>
+        <location filename="../torc/http/torchttpserver.cpp" line="1084"/>
+        <source>Disconnecting</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../torc/http/torchttpserver.cpp" line="1085"/>
         <source>Connected to</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../torc/http/torchttpserver.cpp" line="735"/>
+        <location filename="../torc/http/torchttpserver.cpp" line="1086"/>
         <source>Connect to</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>TorcHTTPService</name>
-    <message>
-        <location filename="../torc/http/torchttpservice.cpp" line="766"/>
-        <source>Services</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../torc/http/torchttpservice.cpp" line="768"/>
-        <source>Method list for </source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../torc/http/torchttpservice.cpp" line="805"/>
-        <source>Error</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../torc/http/torchttpservice.cpp" line="817"/>
-        <source>Example usage</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../torc/http/torchttpservice.cpp" line="820"/>
-        <source>Websocket methods</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../torc/http/torchttpservice.cpp" line="826"/>
-        <source>Properties</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../torc/http/torchttpservice.cpp" line="835"/>
-        <source>Signal</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../torc/http/torchttpservice.cpp" line="837"/>
-        <source>Constant</source>
         <translation></translation>
     </message>
 </context>
@@ -132,63 +136,137 @@
     </message>
 </context>
 <context>
+    <name>TorcHTTPServices</name>
+    <message>
+        <location filename="../torc/http/torchttpservices.cpp" line="67"/>
+        <source>Services</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>TorcI2CPCA9685Channel</name>
+    <message>
+        <location filename="../outputs/platforms/torci2cpca9685.cpp" line="78"/>
+        <source>I2C</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../outputs/platforms/torci2cpca9685.cpp" line="78"/>
+        <source>PCA9685 16 Channel PWM</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../outputs/platforms/torci2cpca9685.cpp" line="78"/>
+        <source>Channel %1</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
     <name>TorcLanguage</name>
     <message>
-        <location filename="../torc/torclanguage.cpp" line="59"/>
+        <location filename="../torc/torclanguage.cpp" line="86"/>
         <source>Languages</source>
         <translation></translation>
     </message>
 </context>
 <context>
-    <name>TorcNetwork</name>
+    <name>TorcNetworkButtonOutput</name>
     <message>
-        <location filename="../torc/torcnetwork.cpp" line="714"/>
-        <location filename="../torc/torcnetwork.cpp" line="734"/>
-        <source>Network</source>
+        <location filename="../outputs/torcnetworkbuttonoutput.cpp" line="58"/>
+        <source>Network button</source>
         <translation></translation>
     </message>
+</context>
+<context>
+    <name>TorcNetworkPWMOutput</name>
     <message>
-        <location filename="../torc/torcnetwork.cpp" line="714"/>
-        <source>Network available</source>
+        <location filename="../outputs/torcnetworkpwmoutput.cpp" line="37"/>
+        <source>Network PWM</source>
         <translation></translation>
     </message>
+</context>
+<context>
+    <name>TorcNetworkSwitchOutput</name>
     <message>
-        <location filename="../torc/torcnetwork.cpp" line="734"/>
-        <source>Network unavailable</source>
+        <location filename="../outputs/torcnetworkswitchoutput.cpp" line="37"/>
+        <source>Network switch</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>TorcNetworkTemperatureOutput</name>
+    <message>
+        <location filename="../outputs/torcnetworktemperatureoutput.cpp" line="37"/>
+        <source>Network temperature</source>
         <translation></translation>
     </message>
 </context>
 <context>
     <name>TorcNetworkedContext</name>
     <message>
-        <location filename="../torc/torcnetworkedcontext.cpp" line="632"/>
+        <location filename="../torc/torcnetworkedcontext.cpp" line="634"/>
         <source>Peers</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../torc/torcnetworkedcontext.cpp" line="974"/>
+        <location filename="../torc/torcnetworkedcontext.cpp" line="999"/>
         <source>No other Torc devices detected</source>
+        <translation></translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../torc/torcnetworkedcontext.cpp" line="1000"/>
+        <source>%n other Torc device(s) discovered</source>
+        <translation>
+            <numerusform>1 other Torc device discovered</numerusform>
+            <numerusform>%n other Torc devices discovered</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>TorcNetworkpHOutput</name>
+    <message>
+        <location filename="../outputs/torcnetworkphoutput.cpp" line="37"/>
+        <source>Network ph</source>
         <translation></translation>
     </message>
 </context>
 <context>
     <name>TorcOutputs</name>
     <message>
-        <location filename="../outputs/torcoutputs.cpp" line="34"/>
+        <location filename="../outputs/torcoutputs.cpp" line="46"/>
+        <location filename="../outputs/torcoutputs.cpp" line="58"/>
         <source>Outputs</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../outputs/torcoutputs.cpp" line="69"/>
+        <source>Default %1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../outputs/torcoutputs.cpp" line="70"/>
+        <source>Valid %1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../outputs/torcoutputs.cpp" line="71"/>
+        <source>Value %1</source>
         <translation></translation>
     </message>
 </context>
 <context>
-    <name>TorcPWMSensor</name>
+    <name>TorcPiPWMOutput</name>
     <message>
-        <location filename="../sensors/torcpwmsensor.cpp" line="27"/>
-        <source>%</source>
+        <location filename="../outputs/platforms/torcpipwmoutput.cpp" line="80"/>
+        <source>Pin %1 PWM</source>
         <translation></translation>
     </message>
+</context>
+<context>
+    <name>TorcPiSwitchOutput</name>
     <message>
-        <location filename="../sensors/torcpwmsensor.cpp" line="27"/>
-        <source>Percentage</source>
+        <location filename="../outputs/platforms/torcpiswitchoutput.cpp" line="51"/>
+        <source>Pin %1 Switch</source>
         <translation></translation>
     </message>
 </context>
@@ -273,43 +351,6 @@
     <message>
         <location filename="../torc/torcpower.cpp" line="542"/>
         <source>Unknown power status</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>TorcSensors</name>
-    <message>
-        <location filename="../sensors/torcsensors.cpp" line="46"/>
-        <source>Sensors</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>TorcTemperatureSensor</name>
-    <message>
-        <location filename="../sensors/torctemperaturesensor.cpp" line="27"/>
-        <source>°C</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../sensors/torctemperaturesensor.cpp" line="28"/>
-        <source>°F</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../sensors/torctemperaturesensor.cpp" line="31"/>
-        <location filename="../sensors/torctemperaturesensor.cpp" line="42"/>
-        <source>Unknown</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../sensors/torctemperaturesensor.cpp" line="38"/>
-        <source>Degrees Celsius</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../sensors/torctemperaturesensor.cpp" line="39"/>
-        <source>Degrees Fahrenheit</source>
         <translation></translation>
     </message>
 </context>
