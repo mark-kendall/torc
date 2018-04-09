@@ -6,6 +6,8 @@
 
 class TorcNetworkTemperatureOutput : public TorcTemperatureOutput
 {
+    Q_OBJECT
+
   public:
     TorcNetworkTemperatureOutput(double Default, const QVariantMap &Details);
     ~TorcNetworkTemperatureOutput();

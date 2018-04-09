@@ -6,6 +6,8 @@
 
 class TorcNetworkPWMOutput : public TorcPWMOutput
 {
+    Q_OBJECT
+
   public:
     TorcNetworkPWMOutput(double Default, const QVariantMap &Details);
    ~TorcNetworkPWMOutput();

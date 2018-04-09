@@ -6,6 +6,8 @@
 
 class TorcNetworkSwitchOutput : public TorcSwitchOutput
 {
+    Q_OBJECT
+
   public:
     TorcNetworkSwitchOutput(double Default, const QVariantMap &Details);
     virtual ~TorcNetworkSwitchOutput();
