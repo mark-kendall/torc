@@ -83,8 +83,7 @@ class TorcLocalContextPriv
     QObject              *m_UIObject;
     TorcAdminThread      *m_adminThread;
     TorcLanguage         *m_language;
-    QUuid                 m_uuid;
-    QString               m_uuidString;
+    QString               m_uuid;
 };
 
 TorcLocalContextPriv::TorcLocalContextPriv(TorcCommandLine *CommandLine)
@@ -94,16 +93,8 @@ TorcLocalContextPriv::TorcLocalContextPriv(TorcCommandLine *CommandLine)
     m_preferencesLock(new QReadWriteLock(QReadWriteLock::Recursive)),
     m_UIObject(NULL),
     m_adminThread(NULL),
-    m_language(NULL),
-    m_uuid(QUuid::createUuid())
+    m_language(NULL)
 {
-    // clean up the UUID
-    m_uuidString = m_uuid.toString();
-    if (m_uuidString.startsWith('{'))
-        m_uuidString = m_uuidString.mid(1);
-    if (m_uuidString.endsWith('}'))
-        m_uuidString.chop(1);
-
     // set any custom database location
     m_dbName = CommandLine->GetValue("db").toString();
 }
@@ -152,9 +143,6 @@ TorcLocalContextPriv::~TorcLocalContextPriv()
 
 bool TorcLocalContextPriv::Init(void)
 {
-    // log uuid
-    LOG(VB_GENERAL, LOG_INFO, QString("UUID: %1").arg(m_uuidString));
-
     // Create the configuration directory
     QString configdir = GetTorcConfigDir();
 
@@ -196,6 +184,21 @@ bool TorcLocalContextPriv::Init(void)
 
     // Create the root settings object
     gRootSetting = new TorcSettingGroup(NULL, QString("RootSetting"));
+
+    // create/load the UUID - make this persistent to ensure peers do not think
+    // there are multiple devices after a number of restarts.
+    QString uuid = QUuid::createUuid().toString();
+    if (uuid.startsWith('{'))
+        uuid = uuid.mid(1);
+    if (uuid.endsWith('}'))
+        uuid.chop(1);
+    TorcSetting* uuidsaved = new TorcSetting(NULL, QString("uuid"),QString("UUID"), TorcSetting::Checkbox, true, QVariant(uuid));
+    m_uuid = uuidsaved->GetValue().toString();
+    uuidsaved->Remove();
+    uuidsaved->DownRef();
+    uuidsaved = NULL;
+
+    LOG(VB_GENERAL, LOG_INFO, QString("UUID: %1").arg(m_uuid));
 
     // don't expire threads
     QThreadPool::globalInstance()->setExpiryTimeout(-1);
@@ -266,7 +269,7 @@ void TorcLocalContextPriv::SetPreference(const QString &Name, const QString &Val
 
 QString TorcLocalContextPriv::GetUuid(void)
 {
-    return m_uuidString;
+    return m_uuid;
 }
 
 QString Torc::ActionToString(Actions Action)
