@@ -997,6 +997,8 @@ static class TorcNetworkedContextObject : public TorcAdminObject, public TorcStr
     void GetStrings(QVariantMap &Strings)
     {
         Strings.insert("NoPeers", QCoreApplication::translate("TorcNetworkedContext", "No other Torc devices detected"));
+        // this is here to capture the plural translation
+        (void)QCoreApplication::translate("TorcNetworkedContext", "%n other Torc device(s) discovered", NULL, 2);
     }
 
     void Create(void)
