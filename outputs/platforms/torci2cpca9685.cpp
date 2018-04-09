@@ -2,7 +2,7 @@
 *
 * This file is part of the Torc project.
 *
-* Copyright (C) Mark Kendall 2015
+* Copyright (C) Mark Kendall 2015-18
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@
 
 // Torc
 #include "torclogging.h"
-#include "../torcpwmoutput.h"
 #include "torci2cpca9685.h"
 
 // wiringPi
@@ -40,23 +39,6 @@
 #define CLOCKFREQ     25000000.0
 
 #include <unistd.h>
-
-class TorcI2CPCA9685Channel : public TorcPWMOutput
-{
-  public:
-    TorcI2CPCA9685Channel(int Number, TorcI2CPCA9685 *Parent, const QVariantMap &Details);
-    ~TorcI2CPCA9685Channel();
-
-    QStringList GetDescription(void);
-
-  public slots:
-    void SetValue (double Value);
-
-  private:
-    int             m_channelNumber;
-    int             m_channelValue;
-    TorcI2CPCA9685 *m_parent;
-};
 
 TorcI2CPCA9685Channel::TorcI2CPCA9685Channel(int Number, TorcI2CPCA9685 *Parent, const QVariantMap &Details)
   : TorcPWMOutput(0.0, PCA9685, Details),

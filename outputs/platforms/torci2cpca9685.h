@@ -5,12 +5,30 @@
 #include <QMap>
 
 // Torc
+#include "../torcpwmoutput.h"
 #include "../torcoutputs.h"
 #include "torci2cbus.h"
 
-class TorcI2CPCA9685Channel;
-
 #define PCA9685 QString("pca9685")
+
+class TorcI2CPCA9685Channel : public TorcPWMOutput
+{
+    Q_OBJECT
+
+  public:
+    TorcI2CPCA9685Channel(int Number, TorcI2CPCA9685 *Parent, const QVariantMap &Details);
+    ~TorcI2CPCA9685Channel();
+
+    QStringList GetDescription(void);
+
+  public slots:
+    void SetValue (double Value);
+
+  private:
+    int             m_channelNumber;
+    int             m_channelValue;
+    TorcI2CPCA9685 *m_parent;
+};
 
 class TorcI2CPCA9685 : public TorcI2CDevice
 {
