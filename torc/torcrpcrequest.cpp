@@ -1,6 +1,6 @@
 /* Class TorcRPCRequest
 *
-* Copyright (C) Mark Kendall 2013
+* Copyright (C) Mark Kendall 2013-18
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by

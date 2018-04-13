@@ -1,6 +1,6 @@
 /* Class TorcXmlValidator
 *
-* Copyright (C) Mark Kendall 2016
+* Copyright (C) Mark Kendall 2016-18
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by

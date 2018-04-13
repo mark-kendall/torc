@@ -1,6 +1,6 @@
 /* Class TorcBonjourWindows
 *
-* Copyright (C) Mark Kendall 2015
+* Copyright (C) Mark Kendall 2015-18
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
