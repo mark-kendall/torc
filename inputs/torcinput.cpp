@@ -1,6 +1,6 @@
 /* Class TorcInput
 *
-* Copyright (C) Mark Kendall 2014-16
+* Copyright (C) Mark Kendall 2014-18
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
