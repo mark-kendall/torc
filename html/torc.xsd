@@ -308,7 +308,8 @@
   </xs:all>
 </xs:complexType>
 
-<xs:complexType name="thingspeakFieldsType">
+<!-- 8 field limit is arbitrary - code can use up to 32 as written-->
+<xs:complexType name="iotRESTFieldsType">
   <xs:all>
      <xs:element name="field1" type="validStringType" minOccurs="0" maxOccurs="1"/>
      <xs:element name="field2" type="validStringType" minOccurs="0" maxOccurs="1"/>
@@ -320,13 +321,23 @@
      <xs:element name="field8" type="validStringType" minOccurs="0" maxOccurs="1"/>
    </xs:all>
 </xs:complexType>
-<xs:complexType name="thingspeakType">
+<xs:complexType name="iotRESTInterfaceType">
   <xs:all>
     <xs:element name="name"            type="deviceNameType"/>
     <xs:element name="username"        type="userNameType"        minOccurs="0" maxOccurs="1"/>
     <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="apikey"          type="validStringType"/>
-    <xs:element name="fields"          type="thingspeakFieldsType"/>
+    <xs:element name="fields"          type="iotRESTFieldsType"/>
+  </xs:all>
+</xs:complexType>
+<xs:complexType name="iotplotterType">
+  <xs:all>
+    <xs:element name="name"            type="deviceNameType"/>
+    <xs:element name="username"        type="userNameType"        minOccurs="0" maxOccurs="1"/>
+    <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="apikey"          type="validStringType"/>
+    <xs:element name="fields"          type="iotRESTFieldsType"/>
+    <xs:element name="feedid"          type="validStringType"/>
   </xs:all>
 </xs:complexType>
 
@@ -336,7 +347,8 @@
     <!-- 0 or more instances - though generally only one of each will be needed -->
     <xs:element minOccurs="0" maxOccurs="unbounded" name="log"        type="logType"/>
     <xs:element minOccurs="0" maxOccurs="unbounded" name="pushbullet" type="pushbulletType"/>
-    <xs:element minOccurs="0" maxOccurs="unbounded" name="thingspeak" type="thingspeakType"/>
+    <xs:element minOccurs="0" maxOccurs="unbounded" name="thingspeak" type="iotRESTInterfaceType"/>
+    <xs:element minOccurs="0" maxOccurs="unbounded" name="iotplotter" type="iotplotterType"/>
 <!--TORC_XSD_NOTIFIERS-->
   </xs:choice>
 </xs:complexType>

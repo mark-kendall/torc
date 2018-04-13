@@ -2,7 +2,7 @@
 *
 * This file is part of the Torc project.
 *
-* Copyright (C) Mark Kendall 2016
+* Copyright (C) Mark Kendall 2016-18
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -28,135 +28,48 @@
 
 #define THINGSPEAK_UPDATE_URL QString("https://api.thingspeak.com/update")
 #define THINGSPEAK_MAX_ERRORS 5
+#define THINGSPEAK_MAX_FIELDS 8
 
 TorcThingSpeakNotifier::TorcThingSpeakNotifier(const QVariantMap &Details)
-  : TorcNotifier(Details),
-    m_timer(new QTimer()),
-    m_networkAbort(0),
-    m_apiKey(""),
-    m_lastUpdate(QDateTime::fromMSecsSinceEpoch(0)),
-    m_badRequestCount(0)
+  : TorcIOTLogger(Details)
 {
-    // setup timer
-    m_timer->setSingleShot(true);
-    connect(this,    SIGNAL(StartTimer(int)), m_timer, SLOT(start(int)));
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(DoNotify()));
+    m_description    = tr("ThingSpeak");
+    m_maxBadRequests = THINGSPEAK_MAX_ERRORS;
+    m_maxFields      = THINGSPEAK_MAX_FIELDS;
 
-    for (int i = 0; i < 8; i++)
-        m_fieldValues[i] = "";
-
-    if (Details.contains("apikey"))
-        m_apiKey = Details.value("apikey").toString().trimmed();
-
-    if (m_apiKey.isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_ERR, "ThingSpeak notifier has no api key - disabling");
-        return;
-    }
-
-    if (Details.contains("fields"))
-    {
-        QVariantMap fields = Details.value("fields").toMap();
-        for (int i = 0; i < 8; i++)
-        {
-            QString field = "field" + QString::number(i +1);
-            if (fields.contains(field))
-            {
-                QString value = fields.value(field).toString().trimmed();
-                if (!value.isEmpty())
-                    m_fields.insert(value, i);
-            }
-        }
-    }
-
-    if (m_fields.isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_ERR, "ThingSpeak notifier has no valid fields");
-        return;
-    }
-
-    SetValid(true);
+    SetValid(Initialise(Details));
 }
 
 TorcThingSpeakNotifier::~TorcThingSpeakNotifier()
 {
-    QMutexLocker locker(lock);
-
-    m_networkAbort = 1;
-
-    foreach (TorcNetworkRequest* request, m_requests)
-    {
-        TorcNetwork::Cancel(request);
-        request->DownRef();
-    }
-    m_requests.clear();
-
-    delete m_timer;
 }
 
-QStringList TorcThingSpeakNotifier::GetDescription(void)
+void TorcThingSpeakNotifier::ProcessRequest(TorcNetworkRequest *Request)
 {
-    QStringList result;
-    result << tr("ThingSpeak");
-    QMap<QString,int>::const_iterator it = m_fields.constBegin();
-    for ( ; it != m_fields.constEnd(); ++it)
-        result << QString("field%1: %2").arg(it.value() + 1).arg(it.key());
-    return result;
+    if (!Request)
+        return;
+
+    // a successful update returns a non-zero update id - and zero on error.
+    QByteArray result = Request->ReadAll(1000).trimmed();
+    bool ok = false;
+    quint64 id = result.toLongLong(&ok);
+    if (ok)
+    {
+        if (id == 0)
+            LOG(VB_GENERAL, LOG_ERR, QString("%1 update failed for '%2'").arg(m_description).arg(uniqueId));
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse update id from %1 response (%2)").arg(m_description).arg(uniqueId));
+    }
 }
 
-void TorcThingSpeakNotifier::Notify(const QVariantMap &Notification)
+TorcNetworkRequest* TorcThingSpeakNotifier::CreateRequest(void)
 {
-    if (!GetValid())
-        return;
-
-    // set fields...
-    bool updated = false;
-    QMap<QString,int>::const_iterator it = m_fields.constBegin();
-    for ( ; it != m_fields.constEnd(); ++it)
-    {
-        if (Notification.contains(it.key()))
-        {
-            m_fieldValues[it.value()] = Notification.value(it.key()).toString();
-            updated = true;
-        }
-    }
-
-    if (updated)
-        DoNotify();
-}
-
-void TorcThingSpeakNotifier::DoNotify(void)
-{
-    if (!GetValid())
-        return;
-
-    if (!TorcNetwork::IsAvailable())
-    {
-        LOG(VB_GENERAL, LOG_INFO, QString("Not sending ThingSpeak update. Network is not available"));
-        return;
-    }
-
-    QDateTime now = QDateTime::currentDateTime();
-
-    // ThingSpeak limits updates to a max of 1 every 15 seconds. If we try and update too fast, simply
-    // amalgamate fields and start the timer to trigger the next update. If the same field is updated more than
-    // once, its value is overwritten with the most recent value. The timestamp may also be out of date for 'stale' fields.
-
-    if (m_lastUpdate.secsTo(now) < 15)
-    {
-        if (m_timer->isActive())
-            return;
-
-        StartTimer(m_lastUpdate.msecsTo(now));
-        return;
-    }
-
-    m_lastUpdate = now;
-
     QUrl url(THINGSPEAK_UPDATE_URL);
     QUrlQuery query;
     query.addQueryItem("api_key", m_apiKey);
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < m_maxFields; i++)
     {
         if (!m_fieldValues[i].isEmpty())
             query.addQueryItem(QString("field%1").arg(i+1), m_fieldValues[i]);
@@ -166,65 +79,7 @@ void TorcThingSpeakNotifier::DoNotify(void)
     url.setQuery(query);
     QNetworkRequest qrequest(url);
 
-    TorcNetworkRequest *request = new TorcNetworkRequest(qrequest, QNetworkAccessManager::GetOperation, 0, &m_networkAbort);
-    TorcNetwork::GetAsynchronous(request, this);
-
-    {
-        QMutexLocker locker(lock);
-        m_requests.append(request);
-    }
-}
-
-void TorcThingSpeakNotifier::RequestReady(TorcNetworkRequest *Request)
-{
-    if (!Request)
-        return;
-
-    QMutexLocker locker(lock);
-    if (!m_requests.contains(Request))
-    {
-        LOG(VB_GENERAL, LOG_WARNING, "Response to unknown ThingSpeak update");
-        return;
-    }
-
-    int status = Request->GetStatus();
-    if (status >= HTTP_BadRequest && status < HTTP_InternalServerError)
-    {
-        // not sure whether it is my network or the thingspeak server - but I get intermittent Host Not Found errors
-        // which end up disabling ThingSpeak. So check for HostNotFound...
-        LOG(VB_GENERAL, LOG_ERR, QString("ThingSpeak update error '%1'").arg(TorcHTTPRequest::StatusToString((HTTPStatus)status)));
-
-        if (Request->GetReplyError() != QNetworkReply::HostNotFoundError)
-        {
-            if (++m_badRequestCount > THINGSPEAK_MAX_ERRORS)
-            {
-                LOG(VB_GENERAL, LOG_ERR, QString("%1 ThingSpeak update errors. Disabling notifier. Check your API key.").arg(m_badRequestCount));
-                SetValid(false);
-            }
-        }
-    }
-    else
-    {
-        // reset error count
-        m_badRequestCount = 0;
-
-        // a successful update returns a non-zero update id - and zero on error.
-        QByteArray result = Request->ReadAll(1000).trimmed();
-        bool ok = false;
-        quint64 id = result.toLongLong(&ok);
-        if (ok)
-        {
-            if (id == 0)
-                LOG(VB_GENERAL, LOG_ERR, QString("ThingSpeak update failed for '%1'").arg(uniqueId));
-        }
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse update id from ThingSpeak response (%1)").arg(uniqueId));
-        }
-    }
-
-    m_requests.removeAll(Request);
-    Request->DownRef();
+    return new TorcNetworkRequest(qrequest, QNetworkAccessManager::GetOperation, 0, &m_networkAbort);
 }
 
 class TorcThingSpeakNotifierFactory : public TorcNotifierFactory
