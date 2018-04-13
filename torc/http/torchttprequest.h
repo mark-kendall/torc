@@ -67,7 +67,11 @@ typedef enum
     HTTP_MethodNotAllowed    = 405,
     HTTP_RequestedRangeNotSatisfiable = 416,
     HTTP_TooManyRequests     = 429,
-    HTTP_InternalServerError = 500
+    HTTP_InternalServerError = 500,
+    HTTP_NotImplemented      = 501,
+    HTTP_BadGateway          = 502,
+    HTTP_ServiceUnavailable  = 503,
+    HTTP_NetworkAuthenticationRequired = 511
 } HTTPStatus;
 
 typedef enum

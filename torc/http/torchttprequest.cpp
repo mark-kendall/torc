@@ -845,6 +845,10 @@ QString TorcHTTPRequest::StatusToString(HTTPStatus Status)
         case HTTP_RequestedRangeNotSatisfiable: return QString("416 Requested Range Not Satisfiable");
         case HTTP_TooManyRequests:     return QString("429 Too Many Requests");
         case HTTP_InternalServerError: return QString("500 Internal Server Error");
+        case HTTP_NotImplemented:      return QString("501 Not Implemented");
+        case HTTP_BadGateway:          return QString("502 Bad Gateway");
+        case HTTP_ServiceUnavailable:  return QString("503 Service Unavailable");
+        case HTTP_NetworkAuthenticationRequired: return QString("511 Network Authentication Required");
     }
 
     return QString("Error");
