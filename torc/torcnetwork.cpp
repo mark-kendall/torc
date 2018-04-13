@@ -606,6 +606,12 @@ void TorcNetwork::Finished(void)
             if (!CheckHeaders(request, reply))
                 return;
         }
+        else if (request->m_type == QNetworkAccessManager::PostOperation)
+        {
+            // as for head, Post ops responses may have no content and hence ReadyRead is never triggered
+            // so check headers now (to set status etc)
+            (void)CheckHeaders(request, reply);
+        }
 
         request->m_replyFinished = true;
 
