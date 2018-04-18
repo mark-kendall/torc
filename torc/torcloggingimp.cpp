@@ -37,6 +37,8 @@ extern "C" {
 }
 #elif defined(Q_OS_MAC)
 #include <mach/mach.h>
+#include <sys/types.h>
+#include <unistd.h>
 #endif
 
 class LoggingThread;
