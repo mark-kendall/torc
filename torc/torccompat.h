@@ -337,6 +337,7 @@ static inline struct tm* localtime_r(const time_t *timep, struct tm *result)
 #if defined(Q_OS_MAC)
 #include <sys/types.h>
 #include <unistd.h>
+typedef off_t off64_t;
 #endif
 
 #ifdef USING_MINGW
