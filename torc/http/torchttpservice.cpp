@@ -516,7 +516,7 @@ QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVarian
                 }
 
                 QString type;
-                bool    voidresult;
+                bool    voidresult = false;
                 QVariant results = (*it)->Invoke(m_parent, params, type, voidresult);
 
                 // check result
