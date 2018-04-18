@@ -31,6 +31,7 @@
 #include <QUrl>
 
 // Torc
+#include "torccompat.h"
 #include "torclogging.h"
 #include "torccoreutils.h"
 #include "torcmime.h"
