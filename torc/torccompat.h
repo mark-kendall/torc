@@ -334,6 +334,11 @@ static inline struct tm* localtime_r(const time_t *timep, struct tm *result)
 // suseconds_t
 #include <sys/types.h>
 
+#if defined(Q_OS_MAC)
+#include <sys/types.h>
+#include <unistd.h>
+#endif
+
 #ifdef USING_MINGW
     typedef long suseconds_t;
 #endif
