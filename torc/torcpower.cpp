@@ -331,7 +331,7 @@ TorcPower::~TorcPower()
     if (m_powerGroupItem)
     {
         m_powerGroupItem->Remove();
-        m_powerEnabled->DownRef();
+        m_powerGroupItem->DownRef();
     }
 
     if (m_priv)
