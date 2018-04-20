@@ -54,7 +54,8 @@ TorcLogicControl::Operation TorcLogicControl::StringToOperation(const QString &O
 
 TorcLogicControl::TorcLogicControl(const QString &Type, const QVariantMap &Details)
   : TorcControl(TorcControl::Logic, Details),
-    m_operation(TorcLogicControl::Passthrough)
+    m_operation(TorcLogicControl::Passthrough),
+    m_referenceDevice(NULL)
 {
     bool operationok = false;
     m_operation      = TorcLogicControl::StringToOperation(Type, &operationok);
