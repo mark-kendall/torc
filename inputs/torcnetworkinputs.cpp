@@ -83,7 +83,7 @@ void TorcNetworkInputs::Create(const QVariantMap &Details)
 
         QVariantMap devices = i.value().toMap();
         QVariantMap::const_iterator j = devices.constBegin();
-        for ( ; j != devices.constEnd(); j++)
+        for ( ; j != devices.constEnd(); ++j)
         {
             // look for <network>
             if (j.key() != NETWORK_INPUTS_STRING)

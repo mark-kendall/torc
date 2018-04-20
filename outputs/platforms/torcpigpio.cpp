@@ -179,7 +179,7 @@ void TorcPiGPIO::Create(const QVariantMap &GPIO)
     }
 
     QVariantMap::const_iterator i = GPIO.constBegin();
-    for ( ; i != GPIO.constEnd(); i++)
+    for ( ; i != GPIO.constEnd(); ++i)
     {
         // GPIO can be under <sensors> or <outputs>
         if (i.key() != SENSORS_DIRECTORY && i.key() != OUTPUTS_DIRECTORY)

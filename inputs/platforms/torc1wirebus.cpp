@@ -88,7 +88,7 @@ void Torc1WireBus::Create(const QVariantMap &Details)
     }
 
     QVariantMap::const_iterator i = Details.constBegin();
-    for ( ; i != Details.constEnd(); i++)
+    for ( ; i != Details.constEnd(); ++i)
     {
         // we look for 1Wire devices in <inputs>
         if (i.key() != SENSORS_DIRECTORY)
@@ -151,7 +151,7 @@ void Torc1WireBus::Destroy(void)
 
     // delete any extant inputs
     QHash<QString,TorcInput*>::iterator it = m_inputs.begin();
-    for ( ; it != m_inputs.end(); it++)
+    for ( ; it != m_inputs.end(); ++it)
     {
         TorcInputs::gInputs->RemoveInput(it.value());
         it.value()->DownRef();

@@ -206,13 +206,13 @@ void TorcNotify::Create(const QVariantMap &Details)
     QMutexLocker locker(m_lock);
 
     QVariantMap::const_iterator ii = Details.constBegin();
-    for ( ; ii != Details.constEnd(); ii++)
+    for ( ; ii != Details.constEnd(); ++ii)
     {
         if (ii.key() == "notify")
         {
             QVariantMap notify = ii.value().toMap();
             QVariantMap::const_iterator i = notify.constBegin();
-            for ( ; i != notify.constEnd(); i++)
+            for ( ; i != notify.constEnd(); ++i)
             {
                 if (i.key() == "notifiers")
                 {
@@ -227,11 +227,10 @@ void TorcNotify::Create(const QVariantMap &Details)
                             continue;
                         }
 
-                        TorcNotifier* notifier = NULL;
                         TorcNotifierFactory* factory = TorcNotifierFactory::GetTorcNotifierFactory();
                         for ( ; factory; factory = factory->NextFactory())
                         {
-                            notifier = factory->Create(it.key(), details);
+                            TorcNotifier* notifier = factory->Create(it.key(), details);
                             if (notifier)
                             {
                                 m_notifiers.append(notifier);
@@ -266,11 +265,10 @@ void TorcNotify::Create(const QVariantMap &Details)
                             continue;
                         }
 
-                        TorcNotification* notification = NULL;
                         TorcNotificationFactory* factory = TorcNotificationFactory::GetTorcNotificationFactory();
                         for ( ; factory; factory = factory->NextFactory())
                         {
-                            notification = factory->Create(it.key(), details);
+                            TorcNotification* notification = factory->Create(it.key(), details);
                             if (notification)
                             {
                                 m_notifications.append(notification);
