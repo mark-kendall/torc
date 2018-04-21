@@ -835,6 +835,11 @@ class TorcBonjourPriv
     QMap<quint32,TorcBonjourService> m_services;
     QMutex                          *m_discoveredLock;
     QMap<quint32,TorcBonjourService> m_discoveredServices;
+
+  private:
+    // disable copy and assignment constructors
+    TorcBonjourPriv(const TorcBonjourPriv &) Q_DECL_EQ_DELETE;
+    TorcBonjourPriv &operator=(const TorcBonjourPriv &) Q_DECL_EQ_DELETE;
 };
 
 /*! \fn    BonjourRegisterCallback

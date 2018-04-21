@@ -29,6 +29,11 @@ class TorcDeviceHandler
     static TorcDeviceHandler        *gTorcDeviceHandler;
     static QMutex                   *gTorcDeviceHandlersLock;
     TorcDeviceHandler               *m_nextTorcDeviceHandler;
+
+  private:
+    // disable copy and assignment constructors
+    TorcDeviceHandler(const TorcDeviceHandler &) Q_DECL_EQ_DELETE;
+    TorcDeviceHandler &operator=(const TorcDeviceHandler &) Q_DECL_EQ_DELETE;
 };
 
 #endif // TORCDEVICEHANDLER_H

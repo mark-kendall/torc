@@ -1,6 +1,9 @@
 #ifndef TORCDB_H
 #define TORCDB_H
 
+// Qt
+#include <QObject>
+
 class QSqlDatabase;
 class QSqlQuery;
 class TorcDBPriv;
@@ -30,6 +33,11 @@ class TorcDB
     QString      m_databaseName;
     QString      m_databaseType;
     TorcDBPriv  *m_databasePriv;
+
+  private:
+    // disable copy and assignment constructors
+    TorcDB(const TorcDB &) Q_DECL_EQ_DELETE;
+    TorcDB &operator=(const TorcDB &) Q_DECL_EQ_DELETE;
 };
 
 #endif // TORCDB_H

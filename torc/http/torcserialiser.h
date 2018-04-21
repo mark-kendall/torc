@@ -29,6 +29,11 @@ class TorcSerialiser
 
   protected:
     QByteArray *m_content;
+
+  private:
+    // disable copy and assignment constructors
+    TorcSerialiser(const TorcSerialiser &) Q_DECL_EQ_DELETE;
+    TorcSerialiser &operator=(const TorcSerialiser &) Q_DECL_EQ_DELETE;
 };
 
 class TorcSerialiserFactory

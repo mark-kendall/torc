@@ -30,6 +30,10 @@ class TorcHTTPReader
     void                   Reset            (void);
 
   private:
+    // disable copy and assignment constructors
+    TorcHTTPReader(const TorcHTTPReader &) Q_DECL_EQ_DELETE;
+    TorcHTTPReader &operator=(const TorcHTTPReader &) Q_DECL_EQ_DELETE;
+
     bool                   m_ready;
     bool                   m_requestStarted;
     bool                   m_headersComplete;

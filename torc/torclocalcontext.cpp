@@ -84,6 +84,11 @@ class TorcLocalContextPriv
     TorcAdminThread      *m_adminThread;
     TorcLanguage         *m_language;
     QString               m_uuid;
+
+  private:
+    // disable copy and assignment constructors
+    TorcLocalContextPriv(const TorcLocalContextPriv &) Q_DECL_EQ_DELETE;
+    TorcLocalContextPriv &operator=(const TorcLocalContextPriv &) Q_DECL_EQ_DELETE;
 };
 
 TorcLocalContextPriv::TorcLocalContextPriv(TorcCommandLine *CommandLine)

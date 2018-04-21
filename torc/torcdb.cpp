@@ -151,6 +151,11 @@ class TorcDBPriv
     QString  m_type;
     QMutex  *m_lock;
     QHash<QThread*,QString> m_connectionMap;
+
+  private:
+    // disable copy and assignment constructors
+    TorcDBPriv(const TorcDBPriv &) Q_DECL_EQ_DELETE;
+    TorcDBPriv &operator=(const TorcDBPriv &) Q_DECL_EQ_DELETE;
 };
 
 /*! \class TorcDB
