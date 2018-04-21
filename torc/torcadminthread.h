@@ -34,7 +34,7 @@ class TorcAdminObject
                                     const TorcAdminObject *Object2);
 
   public:
-    TorcAdminObject(int Priority = TORC_ADMIN_LOW_PRIORITY);
+    explicit TorcAdminObject(int Priority = TORC_ADMIN_LOW_PRIORITY);
     virtual ~TorcAdminObject();
 
     int              Priority      (void) const;

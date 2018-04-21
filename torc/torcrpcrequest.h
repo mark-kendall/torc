@@ -27,7 +27,7 @@ class TorcRPCRequest : public TorcReferenceCounter
 
   public:
     TorcRPCRequest(const QString &Method, QObject *Parent);
-    TorcRPCRequest(const QString &Method);
+    explicit TorcRPCRequest(const QString &Method);
     TorcRPCRequest(TorcWebSocket::WSSubProtocol Protocol, const QByteArray &Data, QObject *Parent);
 
     bool                IsNotification         (void);
@@ -53,7 +53,7 @@ class TorcRPCRequest : public TorcReferenceCounter
     QByteArray&         GetData                (void);
 
   private:
-    TorcRPCRequest(const QJsonObject &Object);
+    explicit TorcRPCRequest(const QJsonObject &Object);
     ~TorcRPCRequest();
 
     void                ParseJSONObject        (const QJsonObject &Object);

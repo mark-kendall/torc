@@ -6,7 +6,7 @@
 class TorcSQLiteDB : public TorcDB
 {
   public:
-    TorcSQLiteDB(const QString &DatabaseName);
+    explicit TorcSQLiteDB(const QString &DatabaseName);
 
   protected:
     bool InitDatabase(void);

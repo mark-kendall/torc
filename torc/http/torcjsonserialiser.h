@@ -10,7 +10,7 @@
 class TorcJSONSerialiser : public TorcSerialiser
 {
   public:
-    TorcJSONSerialiser(bool Javascript = false);
+    explicit TorcJSONSerialiser(bool Javascript = false);
     virtual ~TorcJSONSerialiser();
 
     HTTPResponseType ResponseType      (void);

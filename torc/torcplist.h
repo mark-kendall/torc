@@ -27,7 +27,7 @@ class TorcPList
     };
 
   public:
-    TorcPList       (const QByteArray &Data);
+    explicit TorcPList                 (const QByteArray &Data);
 
     QVariant        GetValue           (const QString &Key);
     QString         ToString           (void);

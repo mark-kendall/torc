@@ -100,7 +100,7 @@ class TorcLocalContext : public QObject, public TorcObservable
     void                     DeregisterQThread        (void);
 
   private:
-    TorcLocalContext(TorcCommandLine* CommandLine);
+    explicit TorcLocalContext(TorcCommandLine* CommandLine);
    ~TorcLocalContext();
 
     bool          Init(void);

@@ -11,7 +11,7 @@ typedef QMultiMap<QString,QVariant> QVariantMultiMap;
 class TorcXMLReader
 {
   public:
-    TorcXMLReader(const QString &File);
+    explicit TorcXMLReader(const QString &File);
    ~TorcXMLReader();
 
     bool              IsValid     (QString &Message);

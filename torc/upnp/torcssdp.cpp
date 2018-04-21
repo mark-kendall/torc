@@ -47,7 +47,7 @@
 class TorcSSDPPriv
 {
   public:
-    TorcSSDPPriv(TorcSSDP *Parent);
+    explicit TorcSSDPPriv(TorcSSDP *Parent);
     ~TorcSSDPPriv();
 
     void         Start                (void);

@@ -64,7 +64,7 @@ static void ExitHandler(int Sig)
 class TorcLocalContextPriv
 {
   public:
-    TorcLocalContextPriv(TorcCommandLine *CommandLine);
+    explicit TorcLocalContextPriv(TorcCommandLine *CommandLine);
    ~TorcLocalContextPriv();
 
     bool    Init                 (void);

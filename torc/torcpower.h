@@ -20,7 +20,7 @@ class TorcPowerPriv : public QObject
   public:
     static TorcPowerPriv* Create(TorcPower *Parent);
 
-    TorcPowerPriv(TorcPower *Parent);
+    explicit TorcPowerPriv(TorcPower *Parent);
     virtual ~TorcPowerPriv();
 
     virtual bool        Shutdown        (void) = 0;

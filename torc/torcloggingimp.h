@@ -12,7 +12,7 @@ void DeregisterLoggingThread(void);
 class LoggerBase
 {
   public:
-    LoggerBase(QString FileName);
+    explicit LoggerBase(QString FileName);
     virtual ~LoggerBase();
 
     virtual bool Logmsg(LogItem *Item) = 0;
