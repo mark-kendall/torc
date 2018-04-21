@@ -56,7 +56,7 @@ TorcTimerControl::TimerType TorcTimerControl::StringToTimerType(const QString &T
 
 TorcTimerControl::TorcTimerControl(const QString &Type, const QVariantMap &Details)
   : TorcControl(TorcControl::Timer, Details),
-    m_timerType(TorcTimerControl::UnknownTimerType),
+    m_timerType(StringToTimerType(Type)),
     m_startTime(QTime()),
     m_startDay(0),
     m_startDuration(0),
@@ -66,7 +66,6 @@ TorcTimerControl::TorcTimerControl(const QString &Type, const QVariantMap &Detai
     m_timer(new QTimer()),
     m_firstTrigger(true)
 {
-    m_timerType = StringToTimerType(Type);
     if (m_timerType == TorcTimerControl::UnknownTimerType)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Unknown timer type '%1' for device '%2'").arg(Details.value("type").toString()).arg(uniqueId));
