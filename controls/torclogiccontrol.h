@@ -9,6 +9,7 @@ class TorcLogicControl : public TorcControl
   public:
     enum Operation
     {
+        UnknownLogicType,
         Passthrough, // no op
         Equal,
         LessThan,
@@ -26,7 +27,7 @@ class TorcLogicControl : public TorcControl
         Multiply
     };
 
-    static TorcLogicControl::Operation StringToOperation (const QString &Operation, bool *Ok);
+    static TorcLogicControl::Operation StringToOperation (const QString &Operation);
 
   public:
     TorcLogicControl(const QString &Type, const QVariantMap &Details);

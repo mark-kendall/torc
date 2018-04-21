@@ -26,9 +26,8 @@
 #include "torcoutput.h"
 #include "torclogiccontrol.h"
 
-TorcLogicControl::Operation TorcLogicControl::StringToOperation(const QString &Operation, bool *Ok)
+TorcLogicControl::Operation TorcLogicControl::StringToOperation(const QString &Operation)
 {
-    *Ok = true;
     QString operation = Operation.toUpper();
 
     if ("EQUAL" == operation)              return TorcLogicControl::Equal;
@@ -47,20 +46,15 @@ TorcLogicControl::Operation TorcLogicControl::StringToOperation(const QString &O
     if ("MINIMUM" == operation)            return TorcLogicControl::Minimum;
     if ("MULTIPLY" == operation)           return TorcLogicControl::Multiply;
 
-    // fail for anything that isn't explicitly a known operation
-    *Ok = false;
-    return TorcLogicControl::Passthrough;
+    return TorcLogicControl::UnknownLogicType;
 }
 
 TorcLogicControl::TorcLogicControl(const QString &Type, const QVariantMap &Details)
   : TorcControl(TorcControl::Logic, Details),
-    m_operation(TorcLogicControl::Passthrough),
+    m_operation(TorcLogicControl::StringToOperation(Type)),
     m_referenceDevice(NULL)
 {
-    bool operationok = false;
-    m_operation      = TorcLogicControl::StringToOperation(Type, &operationok);
-
-    if (!operationok)
+    if (m_operation == TorcLogicControl::UnknownLogicType)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Unrecognised control operation '%1' for device '%2'").arg(Type).arg(uniqueId));
         return;
@@ -162,6 +156,9 @@ QStringList TorcLogicControl::GetDescription(void)
         case TorcLogicControl::Multiply:
             result.append(tr("Multiply"));
             break;
+        case TorcLogicControl::UnknownLogicType:
+            result.append(tr("Unknown"));
+            break;
     }
 
     return result;
@@ -255,6 +252,8 @@ bool TorcLogicControl::Validate(void)
                 }
             }
             break;
+        case TorcLogicControl::UnknownLogicType:
+            break; // should be unreachable
     }
 
     // if we get this far, we can finish the device
@@ -395,6 +394,8 @@ void TorcLogicControl::CalculateOutput(void)
                         min = next;
                 newvalue = min;
             }
+            break;
+        case TorcLogicControl::UnknownLogicType:
             break;
     }
     SetValue(newvalue);
