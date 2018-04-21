@@ -216,7 +216,7 @@ void TorcPiGPIO::Create(const QVariantMap &GPIO)
 
                     bool ok = false;
                     int number = pin.value("gpiopinnumber").toInt(&ok);
-                    if (!ok || (ok && (wpiPinToGpio(number) < 0)))
+                    if (!ok || (wpiPinToGpio(number) < 0))
                     {
                         LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse valid pin from '%1'").arg(pin.value("pin").toString()));
                         continue;

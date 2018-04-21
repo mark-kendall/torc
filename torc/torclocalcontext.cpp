@@ -167,7 +167,7 @@ bool TorcLocalContextPriv::Init(void)
 
     m_sqliteDB = new TorcSQLiteDB(m_dbName);
 
-    if (!m_sqliteDB || (m_sqliteDB && !m_sqliteDB->IsValid()))
+    if (!m_sqliteDB || !m_sqliteDB->IsValid())
         return false;
 
     // Load the settings

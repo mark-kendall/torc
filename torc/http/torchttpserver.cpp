@@ -815,7 +815,7 @@ bool TorcHTTPServer::AuthenticateUser(TorcHTTPRequest *Request, QString &Usernam
 {
     bool authorised = false;
 
-    if (!Request || (Request && !Request->Headers()->contains("Authorization")))
+    if (!Request || !Request->Headers()->contains("Authorization"))
         return authorised;
 
     QString header = Request->Headers()->value("Authorization");

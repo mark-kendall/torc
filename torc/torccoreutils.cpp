@@ -154,7 +154,7 @@ QByteArray* TorcCoreUtils::GZipCompress(QByteArray *Source)
     return result;
 #else
     // this shouldn't happen
-    if (!Source || (Source && Source->size() < 0))
+    if (!Source || Source->size() < 0)
         return result;
 
     // initialise zlib (see zlib usage examples)
@@ -212,7 +212,7 @@ QByteArray* TorcCoreUtils::GZipCompressFile(QFile *Source)
     return result;
 #else
     // this shouldn't happen
-    if (!Source || (Source && Source->size() < 0))
+    if (!Source || Source->size() < 0)
         return result;
 
     // initialise zlib (see zlib usage examples)
