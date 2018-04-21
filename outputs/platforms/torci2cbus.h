@@ -14,7 +14,7 @@
 class TorcI2CDevice
 {
   public:
-    TorcI2CDevice(int Address);
+    explicit TorcI2CDevice(int Address);
     virtual ~TorcI2CDevice();
 
   protected:

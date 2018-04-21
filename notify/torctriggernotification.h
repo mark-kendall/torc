@@ -11,7 +11,7 @@ class TorcTriggerNotification : public TorcNotification
     Q_OBJECT
 
   public:
-    TorcTriggerNotification(const QVariantMap &Details);
+    explicit TorcTriggerNotification(const QVariantMap &Details);
     ~TorcTriggerNotification();
     bool         IsKnownInput      (const QString &UniqueId) const;
     QStringList  GetDescription    (void);

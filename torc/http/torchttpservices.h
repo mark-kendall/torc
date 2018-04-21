@@ -28,7 +28,7 @@ class TorcHTTPServices : public QObject, public TorcHTTPService
     Q_PROPERTY(QVariantList webSocketProtocols READ GetWebSocketProtocols CONSTANT)
 
   public:
-    TorcHTTPServices(TorcHTTPServer *Server);
+    explicit TorcHTTPServices(TorcHTTPServer *Server);
     virtual ~TorcHTTPServices();
 
     void           ProcessHTTPRequest   (TorcHTTPRequest *Request, TorcHTTPConnection* Connection);

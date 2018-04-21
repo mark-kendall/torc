@@ -15,7 +15,7 @@ class TorcPowerUnixDBus : public TorcPowerPriv
     static bool Available (void);
 
   public:
-    TorcPowerUnixDBus(TorcPower *Parent);
+    explicit TorcPowerUnixDBus(TorcPower *Parent);
     virtual ~TorcPowerUnixDBus();
 
     bool Shutdown         (void);

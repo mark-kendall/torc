@@ -9,7 +9,7 @@ class TorcSystemNotification : public TorcNotification
     Q_OBJECT
 
   public:
-    TorcSystemNotification(const QVariantMap &Details);
+    explicit TorcSystemNotification(const QVariantMap &Details);
     ~TorcSystemNotification();
 
     QStringList GetDescription (void);

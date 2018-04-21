@@ -9,7 +9,7 @@ class TorcThingSpeakNotifier : public TorcIOTLogger
     Q_OBJECT
 
   public:
-    TorcThingSpeakNotifier(const QVariantMap &Details);
+    explicit TorcThingSpeakNotifier(const QVariantMap &Details);
     virtual ~TorcThingSpeakNotifier();
 
     virtual void ProcessRequest(TorcNetworkRequest* Request);

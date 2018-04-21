@@ -111,7 +111,7 @@ class TorcHTTPRequest
     static char            DateFormat[];
 
   public:
-    TorcHTTPRequest(TorcHTTPReader *Reader);
+    explicit TorcHTTPRequest(TorcHTTPReader *Reader);
     TorcHTTPRequest(const QString &Method, QMap<QString,QString> *Headers, QByteArray *Content);
     ~TorcHTTPRequest();
 

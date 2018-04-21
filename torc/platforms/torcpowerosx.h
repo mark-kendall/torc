@@ -14,7 +14,7 @@ class TorcPowerOSX : public TorcPowerPriv
     Q_OBJECT
 
   public:
-    TorcPowerOSX(TorcPower *Parent);
+    explicit TorcPowerOSX(TorcPower *Parent);
     virtual ~TorcPowerOSX();
 
     bool Shutdown        (void);

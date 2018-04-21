@@ -233,7 +233,7 @@ class TorcBonjourService
 class TorcBonjourPriv
 {
   public:
-    TorcBonjourPriv(TorcBonjour *Parent)
+    explicit TorcBonjourPriv(TorcBonjour *Parent)
       : m_parent(Parent),
         m_suspended(false),
         m_serviceLock(new QMutex(QMutex::Recursive)),

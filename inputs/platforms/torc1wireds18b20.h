@@ -18,7 +18,7 @@ class Torc1WireDS18B20 : public TorcTemperatureInput
     Q_OBJECT
 
   public:
-    Torc1WireDS18B20(const QVariantMap &Details);
+    explicit Torc1WireDS18B20(const QVariantMap &Details);
     ~Torc1WireDS18B20();
 
     QStringList GetDescription (void);

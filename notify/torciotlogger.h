@@ -16,7 +16,7 @@ class TorcIOTLogger : public TorcNotifier
     Q_OBJECT
 
   public:
-    TorcIOTLogger(const QVariantMap &Details);
+    explicit TorcIOTLogger(const QVariantMap &Details);
     virtual ~ TorcIOTLogger();
 
     virtual QStringList GetDescription(void);

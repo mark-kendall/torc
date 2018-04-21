@@ -23,7 +23,7 @@ class TorcNotifier : public TorcDevice
     virtual QStringList GetDescription (void) = 0;
 
   protected:
-    TorcNotifier(const QVariantMap &Details);
+    explicit TorcNotifier(const QVariantMap &Details);
     virtual ~TorcNotifier();
 };
 

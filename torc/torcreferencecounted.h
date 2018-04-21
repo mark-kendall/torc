@@ -24,7 +24,7 @@ class TorcReferenceCounter
 class TorcReferenceLocker
 {
   public:
-    TorcReferenceLocker(TorcReferenceCounter *Counter);
+    explicit TorcReferenceLocker(TorcReferenceCounter *Counter);
    ~TorcReferenceLocker();
 
   private:

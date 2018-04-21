@@ -10,7 +10,7 @@ class TorcNotification : public TorcDevice
     Q_OBJECT
 
   public:
-    TorcNotification(const QVariantMap &Details);
+    explicit TorcNotification(const QVariantMap &Details);
     virtual bool         Setup        (void);
     virtual bool         IsKnownInput (const QString &UniqueId) const;
     virtual QStringList  GetDescription (void) = 0;

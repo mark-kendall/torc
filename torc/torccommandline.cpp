@@ -99,7 +99,7 @@ class TorcArgument
 class TorcCommandLinePriv
 {
   public:
-    TorcCommandLinePriv(TorcCommandLine::Options Flags);
+    explicit TorcCommandLinePriv(TorcCommandLine::Options Flags);
 
     int         Evaluate       (int argc, const char * const *argv, bool &Exit);
     void        Add            (const QString Keys, const QVariant &Default, const QString &HelpText, TorcCommandLine::Options Flags = TorcCommandLine::None, bool ExitImmediately = false);

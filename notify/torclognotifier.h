@@ -7,7 +7,7 @@
 class TorcLogNotifier : public TorcNotifier
 {
   public:
-    TorcLogNotifier(const QVariantMap &Details);
+    explicit TorcLogNotifier(const QVariantMap &Details);
     ~TorcLogNotifier();
 
     void Notify (const QVariantMap &Notification);

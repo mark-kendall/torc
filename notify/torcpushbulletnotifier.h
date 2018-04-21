@@ -16,7 +16,7 @@ class TorcPushbulletNotifier : public TorcNotifier
     Q_OBJECT
 
   public:
-    TorcPushbulletNotifier(const QVariantMap &Details);
+    explicit TorcPushbulletNotifier(const QVariantMap &Details);
     ~TorcPushbulletNotifier();
 
     void Notify               (const QVariantMap &Notification);
