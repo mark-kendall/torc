@@ -73,6 +73,7 @@ class TorcSSDPPriv
     QUdpSocket                        *m_ipv6LinkMulticastSocket;
     QHash<QString,TorcUPNPDescription> m_discoveredDevices;
     QMultiHash<QString,QObject*>       m_searchRequests;
+    QList<TorcUPNPDescription>         m_announcedServices;
 };
 
 TorcSSDP* gSSDP = NULL;
@@ -113,6 +114,12 @@ TorcSSDPPriv::TorcSSDPPriv(TorcSSDP *Parent)
 
 TorcSSDPPriv::~TorcSSDPPriv()
 {
+    if (!m_announcedServices.isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_WARNING, QString("%1 services still announced via SSDP").arg(m_announcedServices.size()));
+        m_announcedServices.clear();
+    }
+
     Stop();
 }
 
@@ -182,6 +189,8 @@ void TorcSSDPPriv::Start(void)
     m_started = true;
 
     // search is evented from TorcSSDP parent..
+
+    // TODO if this is a re-start, need to re-announce services.
 }
 
 void TorcSSDPPriv::Stop(void)
@@ -307,11 +316,25 @@ void TorcSSDPPriv::CancelSearch(const QString &Type, QObject *Owner)
 
 void TorcSSDPPriv::Announce(const TorcUPNPDescription &Description)
 {
+    if (m_announcedServices.contains(Description))
+    {
+        LOG(VB_GENERAL, LOG_WARNING, QString("Not re-announcing %1").arg(Description.GetType()));
+        return;
+    }
+
+    m_announcedServices.append(Description);
     LOG(VB_GENERAL, LOG_INFO, "ANNOUNCE " + Description.GetType());
 }
 
 void TorcSSDPPriv::CancelAnnounce(const TorcUPNPDescription &Description)
 {
+    if (!m_announcedServices.contains(Description))
+    {
+        LOG(VB_GENERAL, LOG_WARNING, QString("Cannot cancel announcing %1 - not announced").arg(Description.GetType()));
+        return;
+    }
+
+    m_announcedServices.removeAll(Description);
     LOG(VB_GENERAL, LOG_INFO, "CANCEL ANNOUNCE " + Description.GetType());
 }
 
