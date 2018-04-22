@@ -280,7 +280,7 @@ void TorcRPCRequest::ParseJSONObject(const QJsonObject &Object)
     }
 }
 
-bool TorcRPCRequest::IsNotification(void)
+bool TorcRPCRequest::IsNotification(void) const
 {
     return m_notification;
 }
@@ -395,37 +395,37 @@ void TorcRPCRequest::SetReply(const QVariant &Reply)
     m_reply = Reply;
 }
 
-int TorcRPCRequest::GetState(void)
+int TorcRPCRequest::GetState(void) const
 {
     return m_state;
 }
 
-int TorcRPCRequest::GetID(void)
+int TorcRPCRequest::GetID(void) const
 {
     return m_id;
 }
 
-QString TorcRPCRequest::GetMethod(void)
+QString TorcRPCRequest::GetMethod(void) const
 {
     return m_method;
 }
 
-QObject* TorcRPCRequest::GetParent(void)
+QObject* TorcRPCRequest::GetParent(void) const
 {
     return m_parent;
 }
 
-const QVariant& TorcRPCRequest::GetReply(void)
+const QVariant& TorcRPCRequest::GetReply(void) const
 {
     return m_reply;
 }
 
-const QList<QPair<QString,QVariant> >& TorcRPCRequest::GetParameters(void)
+const QList<QPair<QString,QVariant> >& TorcRPCRequest::GetParameters(void) const
 {
     return m_parameters;
 }
 
-const QList<QVariant>& TorcRPCRequest::GetPositionalParameters(void)
+const QList<QVariant>& TorcRPCRequest::GetPositionalParameters(void) const
 {
     return m_positionalParameters;
 }

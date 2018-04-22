@@ -22,17 +22,17 @@ class TorcNetworkRequest : public TorcReferenceCounter
     QByteArray&     GetBuffer         (void);
     QByteArray      ReadAll           (int Timeout);
     int             BytesAvailable    (void);
-    qint64          GetSize           (void);
-    qint64          GetPosition       (void);
+    qint64          GetSize           (void) const;
+    qint64          GetPosition       (void) const;
     void            SetReadSize       (int Size);
     void            SetRange          (int Start, int End = 0);
     void            DownloadProgress  (qint64 Received, qint64 Total);
-    bool            CanByteServe      (void);
-    QUrl            GetFinalURL       (void);
-    QString         GetContentType    (void);
-    int             GetStatus         (void);
-    QByteArray      GetHeader         (const QByteArray &Header);
-    QNetworkReply::NetworkError GetReplyError (void);
+    bool            CanByteServe      (void) const;
+    QUrl            GetFinalURL       (void) const;
+    QString         GetContentType    (void) const;
+    int             GetStatus         (void) const;
+    QByteArray      GetHeader         (const QByteArray &Header) const;
+    QNetworkReply::NetworkError GetReplyError (void) const;
     void            SetReplyError     (QNetworkReply::NetworkError Error);
 
   protected:

@@ -274,47 +274,47 @@ void TorcHTTPRequest::SetCache(int Cache, const QString Tag /* = QString("")*/)
     m_cacheTag = Tag;
 }
 
-HTTPStatus TorcHTTPRequest::GetHTTPStatus(void)
+HTTPStatus TorcHTTPRequest::GetHTTPStatus(void) const
 {
     return m_responseStatus;
 }
 
-HTTPType TorcHTTPRequest::GetHTTPType(void)
+HTTPType TorcHTTPRequest::GetHTTPType(void) const
 {
     return m_type;
 }
 
-HTTPRequestType TorcHTTPRequest::GetHTTPRequestType(void)
+HTTPRequestType TorcHTTPRequest::GetHTTPRequestType(void) const
 {
     return m_requestType;
 }
 
-HTTPProtocol TorcHTTPRequest::GetHTTPProtocol(void)
+HTTPProtocol TorcHTTPRequest::GetHTTPProtocol(void) const
 {
     return m_protocol;
 }
 
-QString TorcHTTPRequest::GetUrl(void)
+QString TorcHTTPRequest::GetUrl(void) const
 {
     return m_fullUrl;
 }
 
-QString TorcHTTPRequest::GetPath(void)
+QString TorcHTTPRequest::GetPath(void) const
 {
     return m_path;
 }
 
-QString TorcHTTPRequest::GetMethod(void)
+QString TorcHTTPRequest::GetMethod(void) const
 {
     return m_method;
 }
 
-QMap<QString,QString>* TorcHTTPRequest::Headers(void)
+const QMap<QString,QString>* TorcHTTPRequest::Headers(void) const
 {
     return m_headers;
 }
 
-const QMap<QString,QString>& TorcHTTPRequest::Queries(void)
+const QMap<QString,QString>& TorcHTTPRequest::Queries(void) const
 {
     return m_queries;
 }

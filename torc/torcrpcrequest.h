@@ -30,7 +30,7 @@ class TorcRPCRequest : public TorcReferenceCounter
     explicit TorcRPCRequest(const QString &Method);
     TorcRPCRequest(TorcWebSocket::WSSubProtocol Protocol, const QByteArray &Data, QObject *Parent);
 
-    bool                IsNotification         (void);
+    bool                IsNotification         (void) const;
     void                NotifyParent           (void);
     void                SetParent              (QObject *Parent);
     QByteArray&         SerialiseRequest       (TorcWebSocket::WSSubProtocol Protocol);
@@ -41,15 +41,15 @@ class TorcRPCRequest : public TorcReferenceCounter
     void                AddPositionalParameter (const QVariant &Value);
     void                SetReply               (const QVariant &Reply);
 
-    int                 GetState               (void);
-    int                 GetID                  (void);
-    QString             GetMethod              (void);
-    QObject*            GetParent              (void);
-    const QVariant&     GetReply               (void);
+    int                 GetState               (void) const;
+    int                 GetID                  (void) const;
+    QString             GetMethod              (void) const;
+    QObject*            GetParent              (void) const;
+    const QVariant&     GetReply               (void) const;
     const QList<QPair<QString,QVariant> >&
-                        GetParameters          (void);
+                        GetParameters          (void) const;
     const QList<QVariant>&
-                        GetPositionalParameters(void);
+                        GetPositionalParameters(void) const;
     QByteArray&         GetData                (void);
 
   private:

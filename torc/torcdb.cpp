@@ -188,7 +188,7 @@ TorcDB::~TorcDB()
 /*! \fn    TorcDB::IsValid
  *  \brief Returns true if the datbase has been opened/created.
 */
-bool TorcDB::IsValid(void)
+bool TorcDB::IsValid(void) const
 {
     return m_databaseValid;
 }

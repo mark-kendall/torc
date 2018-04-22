@@ -133,12 +133,12 @@ int TorcNetworkRequest::BytesAvailable(void)
     return m_availableToRead.fetchAndAddOrdered(0);
 }
 
-qint64 TorcNetworkRequest::GetSize(void)
+qint64 TorcNetworkRequest::GetSize(void) const
 {
     return m_contentLength;
 }
 
-qint64 TorcNetworkRequest::GetPosition(void)
+qint64 TorcNetworkRequest::GetPosition(void) const
 {
     if (!m_bufferSize)
         return -1;
@@ -354,22 +354,22 @@ void TorcNetworkRequest::DownloadProgress(qint64 Received, qint64 Total)
     m_bytesTotal    = Total;
 }
 
-bool TorcNetworkRequest::CanByteServe(void)
+bool TorcNetworkRequest::CanByteServe(void) const
 {
     return m_byteServingAvailable;
 }
 
-QUrl TorcNetworkRequest::GetFinalURL(void)
+QUrl TorcNetworkRequest::GetFinalURL(void) const
 {
     return m_request.url();
 }
 
-QString TorcNetworkRequest::GetContentType(void)
+QString TorcNetworkRequest::GetContentType(void) const
 {
     return m_contentType;
 }
 
-int TorcNetworkRequest::GetStatus(void)
+int TorcNetworkRequest::GetStatus(void) const
 {
     return m_httpStatus;
 }
@@ -380,7 +380,7 @@ int TorcNetworkRequest::GetStatus(void)
  * headers that are of interest to the caller.
  * \todo An empty return value could signify an empty header or no header...
 */
-QByteArray TorcNetworkRequest::GetHeader(const QByteArray &Header)
+QByteArray TorcNetworkRequest::GetHeader(const QByteArray &Header) const
 {
     foreach (QNetworkReply::RawHeaderPair header, m_rawHeaders)
         if (header.first == Header)
@@ -388,7 +388,7 @@ QByteArray TorcNetworkRequest::GetHeader(const QByteArray &Header)
     return QByteArray();
 }
 
-QNetworkReply::NetworkError TorcNetworkRequest::GetReplyError(void)
+QNetworkReply::NetworkError TorcNetworkRequest::GetReplyError(void) const
 {
     return m_replyError;
 }

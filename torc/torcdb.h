@@ -16,7 +16,7 @@ class TorcDB
 
     static bool  DebugError             (QSqlQuery *Query);
     static bool  DebugError             (QSqlDatabase *Database);
-    bool         IsValid                (void);
+    bool         IsValid                (void) const;
     void         CloseThreadConnection  (void);
 
     void         LoadSettings           (QMap<QString,QString> &Settings);

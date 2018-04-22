@@ -269,12 +269,12 @@ class TorcHTTPServerNonce
         RemoveNonce(this);
     }
 
-    QString GetNonce(void)
+    QString GetNonce(void) const
     {
         return m_nonce;
     }
 
-    QString GetOpaque(void)
+    QString GetOpaque(void) const
     {
         return m_opaque;
     }

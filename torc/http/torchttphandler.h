@@ -20,9 +20,9 @@ class TorcHTTPHandler
     TorcHTTPHandler(const QString &Signature, const QString &Name);
     virtual ~TorcHTTPHandler();
 
-    QString             Signature          (void);
-    bool                GetRecursive       (void);
-    QString             Name               (void);
+    QString             Signature          (void) const;
+    bool                GetRecursive       (void) const;
+    QString             Name               (void) const;
     virtual void        ProcessHTTPRequest (TorcHTTPRequest *Request, TorcHTTPConnection *Connection) = 0;
     virtual QVariantMap ProcessRequest     (const QString &Method, const QVariant &Parameters, QObject *Connection);
 

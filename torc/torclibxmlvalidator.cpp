@@ -136,12 +136,12 @@ void TorcXmlValidator::Validate(void)
     xmlSchemaFreeParserCtxt(parsercontext);
 }
 
-bool TorcXmlValidator::GetSilent(void)
+bool TorcXmlValidator::GetSilent(void) const
 {
     return m_silent;
 }
 
-bool TorcXmlValidator::Validated(void)
+bool TorcXmlValidator::Validated(void) const
 {
     return m_valid;
 }

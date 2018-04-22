@@ -275,7 +275,7 @@ class TorcBonjourPriv
         m_discoveredLock = NULL;
     }
 
-    bool IsSuspended(void)
+    bool IsSuspended(void) const
     {
         return m_suspended;
     }

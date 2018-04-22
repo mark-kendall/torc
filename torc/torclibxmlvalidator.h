@@ -11,8 +11,8 @@ class TorcXmlValidator
     TorcXmlValidator(const QString &XmlFile, const QByteArray &XSDData, bool Silent = false);
     ~TorcXmlValidator();
 
-    bool        GetSilent     (void);
-    bool        Validated     (void);
+    bool        GetSilent     (void) const;
+    bool        Validated     (void) const;
     static void HandleMessage (void *ctx, const char *format, ...);
 
   protected:

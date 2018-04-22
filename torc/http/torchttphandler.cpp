@@ -56,17 +56,17 @@ TorcHTTPHandler::~TorcHTTPHandler()
 {
 }
 
-QString TorcHTTPHandler::Signature(void)
+QString TorcHTTPHandler::Signature(void) const
 {
     return m_signature;
 }
 
-bool TorcHTTPHandler::GetRecursive(void)
+bool TorcHTTPHandler::GetRecursive(void) const
 {
     return m_recursive;
 }
 
-QString TorcHTTPHandler::Name(void)
+QString TorcHTTPHandler::Name(void) const
 {
     return m_name;
 }

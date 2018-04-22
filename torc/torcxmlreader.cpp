@@ -68,13 +68,13 @@ TorcXMLReader::~TorcXMLReader()
     delete m_reader;
 }
 
-bool TorcXMLReader::IsValid(QString &Message)
+bool TorcXMLReader::IsValid(QString &Message) const
 {
     Message = m_message;
     return m_valid;
 }
 
-QVariantMultiMap TorcXMLReader::GetResult(void)
+QVariantMultiMap TorcXMLReader::GetResult(void) const
 {
     return m_map;
 }

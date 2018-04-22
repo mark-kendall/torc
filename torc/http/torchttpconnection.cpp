@@ -62,17 +62,17 @@ void TorcHTTPReader::TakeRequest(QByteArray*& Content, QMap<QString,QString>*& H
     m_headers = NULL;
 }
 
-bool TorcHTTPReader::IsReady(void)
+bool TorcHTTPReader::IsReady(void) const
 {
     return m_ready;
 }
 
-QString TorcHTTPReader::GetMethod(void)
+QString TorcHTTPReader::GetMethod(void) const
 {
     return m_method;
 }
 
-bool TorcHTTPReader::HeadersComplete(void)
+bool TorcHTTPReader::HeadersComplete(void) const
 {
     return m_headersComplete;
 }

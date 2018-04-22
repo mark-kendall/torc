@@ -85,7 +85,7 @@ class TorcLocalContext : public QObject, public TorcObservable
     Q_INVOKABLE   void       SetPreference (const QString &Name, const bool    &Value);
     Q_INVOKABLE   void       SetPreference (const QString &Name, const int     &Value);
     Q_INVOKABLE   QObject*   GetUIObject   (void);
-    Q_INVOKABLE   QString    GetUuid       (void);
+    Q_INVOKABLE   QString    GetUuid       (void) const;
     Q_INVOKABLE   TorcSetting* GetRootSetting (void);
     Q_INVOKABLE   qint64     GetStartTime  (void);
     Q_INVOKABLE   int        GetPriority   (void);

@@ -14,8 +14,8 @@ class TorcXMLReader
     explicit TorcXMLReader(const QString &File);
    ~TorcXMLReader();
 
-    bool              IsValid     (QString &Message);
-    QVariantMultiMap  GetResult   (void);
+    bool              IsValid     (QString &Message) const;
+    QVariantMultiMap  GetResult   (void) const;
 
   private:
     bool              ReadXML     (void);

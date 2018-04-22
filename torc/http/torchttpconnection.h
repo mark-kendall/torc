@@ -21,10 +21,10 @@ class TorcHTTPReader
    ~TorcHTTPReader();
 
     void                   TakeRequest      (QByteArray*& Content, QMap<QString,QString>*& Headers);
-    QString                GetMethod        (void);
+    QString                GetMethod        (void) const;
     bool                   Read             (QTcpSocket *Socket, int *Abort);
-    bool                   IsReady          (void);
-    bool                   HeadersComplete  (void);
+    bool                   IsReady          (void) const;
+    bool                   HeadersComplete  (void) const;
 
   protected:
     void                   Reset            (void);

@@ -72,7 +72,7 @@ class TorcLocalContextPriv
     void    SetSetting           (const QString &Name, const QString &Value);
     QString GetPreference        (const QString &Name, const QString &DefaultValue);
     void    SetPreference        (const QString &Name, const QString &Value);
-    QString GetUuid              (void);
+    QString GetUuid              (void) const;
 
     TorcSQLiteDB         *m_sqliteDB;
     QString               m_dbName;
@@ -272,7 +272,7 @@ void TorcLocalContextPriv::SetPreference(const QString &Name, const QString &Val
     m_preferences[Name] = Value;
 }
 
-QString TorcLocalContextPriv::GetUuid(void)
+QString TorcLocalContextPriv::GetUuid(void) const
 {
     return m_uuid;
 }
@@ -497,7 +497,7 @@ void TorcLocalContext::DeregisterQThread(void)
     DeregisterLoggingThread();
 }
 
-QString TorcLocalContext::GetUuid(void)
+QString TorcLocalContext::GetUuid(void) const
 {
     return m_priv->GetUuid();
 }
