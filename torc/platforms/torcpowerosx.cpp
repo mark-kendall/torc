@@ -295,10 +295,8 @@ OSStatus SendAppleEventToSystemProcess(AEEventID EventToSend)
     AppleEvent eventReply       = { typeNull, NULL };
     AppleEvent appleEventToSend = { typeNull, NULL };
 
-    OSStatus error = noErr;
-
-    error = AECreateDesc(typeProcessSerialNumber, &kPSNOfSystemProcess,
-                         sizeof(kPSNOfSystemProcess), &targetDesc);
+    OSStatus error = AECreateDesc(typeProcessSerialNumber, &kPSNOfSystemProcess,
+                                  sizeof(kPSNOfSystemProcess), &targetDesc);
 
     if (error != noErr)
         return error;
