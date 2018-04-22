@@ -38,13 +38,6 @@ TorcIOTLogger::TorcIOTLogger(const QVariantMap &Details)
     m_lastUpdate(QDateTime::fromMSecsSinceEpoch(0)),
     m_maxFields(32)
 {
-    connect(this, SIGNAL(TryNotify()), this, SLOT(DoNotify()));
-
-    // setup timer
-    m_timer->setSingleShot(true);
-    connect(this,    SIGNAL(StartTimer(int)), m_timer, SLOT(start(int)));
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(DoNotify()));
-
     // clear fields
     for (int i = 0; i < 32; i++)
         m_fieldValues[i] = "";
@@ -101,6 +94,12 @@ bool TorcIOTLogger::Initialise(const QVariantMap &Details)
         LOG(VB_GENERAL, LOG_ERR, QString("%1 logger has no valid fields - disabling").arg(m_description));
         return false;
     }
+
+    // at this point, all should be good. Set up the timer
+    connect(this, SIGNAL(TryNotify()), this, SLOT(DoNotify()));
+    m_timer->setSingleShot(true);
+    connect(this,    SIGNAL(StartTimer(int)), m_timer, SLOT(start(int)));
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(DoNotify()));
 
     return true;
 }
