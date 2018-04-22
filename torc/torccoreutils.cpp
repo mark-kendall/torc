@@ -80,8 +80,6 @@ quint64 TorcCoreUtils::GetMicrosecondCount(void)
     clock_gettime(CLOCK_MONOTONIC, &timenow);
     return (timenow.tv_sec * 1000000) + ((timenow.tv_nsec + 500) / 1000);
 #endif
-
-    return 0;
 }
 
 /*! \brief Convert a QMetaEnum into a QString that can be passed to QScript.
