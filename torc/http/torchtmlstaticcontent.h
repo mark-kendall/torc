@@ -12,7 +12,7 @@ class TorcHTMLStaticContent : public TorcHTTPHandler
     void ProcessHTTPRequest          (TorcHTTPRequest *Request, TorcHTTPConnection* Connection);
 
   protected:
-    void GetJavascriptConfiguration  (TorcHTTPRequest *Request, TorcHTTPConnection* Connection);
+    static void GetJavascriptConfiguration  (TorcHTTPRequest *Request, TorcHTTPConnection* Connection);
 
   private:
     QString m_pathToContent;

@@ -166,7 +166,7 @@ class MethodParameters
         return result;
     }
 
-    void SetValue(void* Pointer, const QString &Value, int Type)
+    static void SetValue(void* Pointer, const QString &Value, int Type)
     {
         if (!Pointer)
             return;
@@ -202,7 +202,7 @@ class MethodParameters
         }
     }
 
-    bool ToBool(const QString &Value)
+    static bool ToBool(const QString &Value)
     {
         if (Value.compare("1", Qt::CaseInsensitive) == 0)
             return true;

@@ -27,8 +27,8 @@ class TorcHTTPHandler
     virtual QVariantMap ProcessRequest     (const QString &Method, const QVariant &Parameters, QObject *Connection);
 
   protected:
-    void                HandleOptions      (TorcHTTPRequest *Request, int Allowed);
-    void                HandleFile         (TorcHTTPRequest *Request, const QString &Filename, int Cache);
+    static void         HandleOptions      (TorcHTTPRequest *Request, int Allowed);
+    static void         HandleFile         (TorcHTTPRequest *Request, const QString &Filename, int Cache);
 
   protected:
     QString             m_signature;

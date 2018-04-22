@@ -99,7 +99,7 @@ QString TorcPList::ToString(void)
     QByteArray res;
     QBuffer buf(&res);
     buf.open(QBuffer::WriteOnly);
-    if (!ToXML(&buf))
+    if (!this->ToXML(&buf))
         return QString("");
     return QString::fromUtf8(res.data());
 }
