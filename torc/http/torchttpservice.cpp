@@ -36,6 +36,7 @@
 #include "torcjsonrpc.h"
 #include "torcserialiser.h"
 #include "torchttpservice.h"
+#include "torcexitcodes.h"
 
 class MethodParameters
 {
@@ -258,7 +259,8 @@ TorcHTTPService::TorcHTTPService(QObject *Parent, const QString &Signature, cons
     // the parent MUST implement SubscriberDeleted.
     if (MetaObject.indexOfSlot(QMetaObject::normalizedSignature("SubscriberDeleted(QObject*)")) < 0)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Service '%1' disabled - no SubscriberDeleted slot").arg(Name));
+        LOG(VB_GENERAL, LOG_ERR, QString("Service '%1' has no SubscriberDeleted slot. This is a programmer error - exiting").arg(Name));
+        QCoreApplication::exit(TORC_EXIT_UNKOWN_ERROR);
         return;
     }
 
