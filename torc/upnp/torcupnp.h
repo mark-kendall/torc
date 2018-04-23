@@ -32,4 +32,6 @@ class TorcUPNP
     static  QString     UUIDFromUSN (const QString &USN);
 };
 
+Q_DECLARE_METATYPE(TorcUPNPDescription);
+
 #endif // TORCUPNP_H

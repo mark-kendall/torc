@@ -30,7 +30,6 @@
 #include "torclogging.h"
 #include "torcadminthread.h"
 #include "torcnetwork.h"
-#include "torcqthread.h"
 #include "torcupnp.h"
 #include "torcssdp.h"
 
@@ -117,6 +116,8 @@ TorcSSDPPriv::~TorcSSDPPriv()
     if (!m_announcedServices.isEmpty())
     {
         LOG(VB_GENERAL, LOG_WARNING, QString("%1 services still announced via SSDP").arg(m_announcedServices.size()));
+        foreach (TorcUPNPDescription desc, m_announcedServices)
+            CancelAnnounce(desc);
         m_announcedServices.clear();
     }
 
@@ -748,7 +749,7 @@ bool TorcSSDP::event(QEvent *Event)
         }
     }
 
-    return false;
+    return QObject::event(Event);
 }
 
 void TorcSSDP::Read(void)
@@ -760,33 +761,31 @@ void TorcSSDP::Read(void)
     }
 }
 
-class TorcSSDPThread : public TorcQThread
+
+TorcSSDPThread::TorcSSDPThread() : TorcQThread("SSDP")
 {
-  public:
-    TorcSSDPThread() : TorcQThread("SSDP")
-    {
-    }
+}
 
-    void Start(void)
-    {
-        LOG(VB_GENERAL, LOG_INFO, "SSDP thread starting");
-        TorcSSDP::Create();
-    }
+void TorcSSDPThread::Start(void)
+{
+    LOG(VB_GENERAL, LOG_INFO, "SSDP thread starting");
+    TorcSSDP::Create();
+}
 
-    void Finish(void)
-    {
-        TorcSSDP::Create(true/*destroy*/);
-        LOG(VB_GENERAL, LOG_INFO, "SSDP thread stopping");
-    }
-};
+void TorcSSDPThread::Finish(void)
+{
+    TorcSSDP::Create(true/*destroy*/);
+    LOG(VB_GENERAL, LOG_INFO, "SSDP thread stopping");
+}
 
 class TorcSSDPObject : public TorcAdminObject
 {
   public:
     TorcSSDPObject()
-      : TorcAdminObject(TORC_ADMIN_MED_PRIORITY),
+      : TorcAdminObject(TORC_ADMIN_CRIT_PRIORITY - 1), // start after network but before TorcNetworkedContext
         m_ssdpThread(NULL)
     {
+        qRegisterMetaType<TorcUPNPDescription>();
     }
 
     ~TorcSSDPObject()
@@ -808,9 +807,9 @@ class TorcSSDPObject : public TorcAdminObject
         {
             m_ssdpThread->quit();
             m_ssdpThread->wait();
+            delete m_ssdpThread;
         }
 
-        delete m_ssdpThread;
         m_ssdpThread = NULL;
     }
 

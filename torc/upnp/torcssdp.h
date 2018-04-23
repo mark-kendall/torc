@@ -5,6 +5,8 @@
 #include <QObject>
 
 // Torc
+
+#include "torcqthread.h"
 #include "upnp/torcupnp.h"
 
 class TorcSSDPPriv;
@@ -41,4 +43,14 @@ class TorcSSDP : public QObject
     int              m_refreshTimer;
 };
 
+class TorcSSDPThread : public TorcQThread
+{
+    Q_OBJECT
+
+  public:
+    TorcSSDPThread();
+
+    void Start(void);
+    void Finish(void);
+};
 #endif // TORCSSDP_H
