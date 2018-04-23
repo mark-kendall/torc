@@ -89,8 +89,6 @@ TorcNetworkRequest* TorcIoTPlotterNotifier::CreateRequest(void)
     QJsonDocument doc(data);
     QByteArray serialiseddata = doc.toJson(QJsonDocument::Indented);
     qrequest.setHeader(QNetworkRequest::ContentLengthHeader, serialiseddata.size());
-    LOG(VB_GENERAL, LOG_INFO, "\r\n" + qrequest.rawHeaderList().join("\r\n"));
-    LOG(VB_GENERAL, LOG_INFO, "\r\n" + serialiseddata);
     return new TorcNetworkRequest(qrequest, serialiseddata, &m_networkAbort);
 }
 
