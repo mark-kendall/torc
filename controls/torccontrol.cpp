@@ -289,13 +289,13 @@ bool TorcControl::Validate(void)
 }
 
 /// Only certain logic controls can be passthrough
-bool TorcControl::IsPassthrough(void)
+bool TorcControl::IsPassthrough(void) const
 {
     return false;
 }
 
 /// Most controls have an input side.
-bool TorcControl::AllowInputs(void)
+bool TorcControl::AllowInputs(void) const
 {
     return true;
 }
@@ -308,7 +308,7 @@ QString TorcControl::GetUIName(void)
     return userName;
 }
 
-bool TorcControl::IsKnownInput(const QString &Input)
+bool TorcControl::IsKnownInput(const QString &Input) const
 {
     if (Input.isEmpty() || !AllowInputs())
         return false;
@@ -316,7 +316,7 @@ bool TorcControl::IsKnownInput(const QString &Input)
     return m_inputList.contains(Input);
 }
 
-bool TorcControl::IsKnownOutput(const QString &Output)
+bool TorcControl::IsKnownOutput(const QString &Output) const
 {
     if (Output.isEmpty())
         return false;
@@ -626,7 +626,7 @@ void TorcControl::SetValid(bool Valid)
     }
 }
 
-bool TorcControl::CheckForCircularReferences(const QString &UniqueId, QString Path)
+bool TorcControl::CheckForCircularReferences(const QString &UniqueId, QString Path) const
 {
     if (UniqueId.isEmpty())
     {

@@ -42,11 +42,11 @@ class TorcControl : public TorcDevice, public TorcHTTPService
 
   public:
     virtual bool           Validate               (void);
-    virtual TorcControl::Type GetType             (void) = 0;
-    virtual bool           IsPassthrough          (void);
-    virtual bool           AllowInputs            (void);
-    bool                   IsKnownInput           (const QString &Input);
-    bool                   IsKnownOutput          (const QString &Output);
+    virtual TorcControl::Type GetType             (void) const = 0;
+    virtual bool           IsPassthrough          (void) const;
+    virtual bool           AllowInputs            (void) const;
+    bool                   IsKnownInput           (const QString &Input) const;
+    bool                   IsKnownOutput          (const QString &Output) const;
     QString                GetUIName              (void);
 
   public slots:
@@ -64,7 +64,7 @@ class TorcControl : public TorcDevice, public TorcHTTPService
     void                   SetValue               (double Value);
     void                   SetValid               (bool Valid);
     virtual void           CalculateOutput        (void) = 0;
-    bool                   CheckForCircularReferences (const QString &UniqueId, QString Path);
+    bool                   CheckForCircularReferences (const QString &UniqueId, QString Path) const;
 
   protected:
     bool                   m_parsed;

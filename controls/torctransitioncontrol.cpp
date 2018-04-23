@@ -190,7 +190,7 @@ TorcTransitionControl::~TorcTransitionControl()
     delete m_animation;
 }
 
-TorcControl::Type TorcTransitionControl::GetType(void)
+TorcControl::Type TorcTransitionControl::GetType(void) const
 {
     return TorcControl::Transition;
 }

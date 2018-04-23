@@ -96,7 +96,7 @@ TorcLogicControl::~TorcLogicControl()
 {
 }
 
-TorcControl::Type TorcLogicControl::GetType(void)
+TorcControl::Type TorcLogicControl::GetType(void) const
 {
     return TorcControl::Logic;
 }
@@ -164,7 +164,7 @@ QStringList TorcLogicControl::GetDescription(void)
     return result;
 }
 
-bool TorcLogicControl::IsPassthrough(void)
+bool TorcLogicControl::IsPassthrough(void) const
 {
     QMutexLocker locker(lock);
 

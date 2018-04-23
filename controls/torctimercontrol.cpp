@@ -144,7 +144,7 @@ TorcTimerControl::~TorcTimerControl()
     delete m_timer;
 }
 
-TorcControl::Type TorcTimerControl::GetType(void)
+TorcControl::Type TorcTimerControl::GetType(void) const
 {
     return TorcControl::Timer;
 }
@@ -272,7 +272,7 @@ void TorcTimerControl::Start(void)
 }
 
 /// Timers cannot have inputs
-bool TorcTimerControl::AllowInputs(void)
+bool TorcTimerControl::AllowInputs(void) const
 {
     return false;
 }
@@ -381,7 +381,7 @@ void TorcTimerControl::TimerTimeout(void)
     LOG(VB_GENERAL, LOG_ERR, "Unknown timer state - SERIOUS ERROR");
 }
 
-TorcTimerControl::TimerType TorcTimerControl::GetTimerType(void)
+TorcTimerControl::TimerType TorcTimerControl::GetTimerType(void) const
 {
     return m_timerType;
 }
@@ -429,7 +429,7 @@ quint64 TorcTimerControl::TimeSinceLastTransition(void)
     return timesinceperiodstart + GetMaxDuration() - finishtime;
 }
 
-quint64 TorcTimerControl::GetMaxDuration(void)
+quint64 TorcTimerControl::GetMaxDuration(void) const
 {
     switch (m_timerType)
     {

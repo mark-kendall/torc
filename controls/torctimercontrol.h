@@ -30,20 +30,20 @@ class TorcTimerControl : public TorcControl
     TorcTimerControl(const QString &Type, const QVariantMap &Details);
    ~TorcTimerControl();
 
-    TorcControl::Type GetType         (void);
+    TorcControl::Type GetType         (void) const;
     QStringList       GetDescription  (void);
     bool              Validate        (void);
     void              Start           (void);
-    bool              AllowInputs     (void);
+    bool              AllowInputs     (void) const;
     quint64           TimeSinceLastTransition (void);
-    TorcTimerControl::TimerType GetTimerType  (void);
+    TorcTimerControl::TimerType GetTimerType  (void) const;
 
   public slots:
     void              TimerTimeout    (void);
 
   private:
     void              CalculateOutput (void);
-    quint64           GetMaxDuration  (void);
+    quint64           GetMaxDuration  (void) const;
 
   private:
     TorcTimerControl::TimerType m_timerType;

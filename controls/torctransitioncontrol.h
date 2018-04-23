@@ -20,7 +20,7 @@ class TorcTransitionControl : public TorcControl
     static QEasingCurve::Type EasingCurveFromString (const QString &Curve);
     static QString            StringFromEasingCurve (QEasingCurve::Type Type);
     bool                      Validate              (void);
-    TorcControl::Type         GetType               (void);
+    TorcControl::Type         GetType               (void) const;
     QStringList               GetDescription        (void);
 
     static qreal              LinearLEDFunction     (qreal progress);

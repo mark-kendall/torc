@@ -178,7 +178,7 @@ QVariantMap TorcControls::GetControlList(void)
 
 }
 
-QStringList TorcControls::GetControlTypes(void)
+QStringList TorcControls::GetControlTypes(void) const
 {
     QStringList result;
         for (int i = 0; i < TorcControl::MaxType; ++i)

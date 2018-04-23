@@ -34,9 +34,9 @@ class TorcLogicControl : public TorcControl
    ~TorcLogicControl();
 
     bool                        Validate         (void);
-    TorcControl::Type           GetType          (void);
+    TorcControl::Type           GetType          (void) const;
     QStringList                 GetDescription   (void);
-    bool                        IsPassthrough    (void);
+    bool                        IsPassthrough    (void) const;
 
   private:
     void                        CalculateOutput  (void);
