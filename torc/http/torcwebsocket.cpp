@@ -1371,8 +1371,8 @@ void TorcWebSocket::HandleCloseRequest(QByteArray &Close)
     if (Close.size() < 1)
     {
         QByteArray newpayload;
-        newpayload.append((CloseNormal >> 8) & 0xff);
-        newpayload.append(CloseNormal & 0xff);
+        newpayload.append((closecode >> 8) & 0xff);
+        newpayload.append(closecode & 0xff);
         Close = newpayload;
     }
     // payload size 1 is invalid
