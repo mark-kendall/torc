@@ -600,6 +600,7 @@ TorcHTTPServer::TorcHTTPServer()
     m_servicesHandler(NULL),
     m_staticContent(NULL),
     m_dynamicContent(NULL),
+    m_upnpContent(NULL),
     m_abort(0),
     m_httpBonjourReference(0),
     m_torcBonjourReference(0),
@@ -638,6 +639,10 @@ TorcHTTPServer::TorcHTTPServer()
     m_dynamicContent = new TorcHTMLDynamicContent();
     RegisterHandler(m_dynamicContent);
 
+    // upnp - device description
+    m_upnpContent = new TorcUPnPContent();
+    RegisterHandler(m_upnpContent);
+
     // set thread pool max size
     m_connectionPool.setMaxThreadCount(50);
 
@@ -658,6 +663,7 @@ TorcHTTPServer::~TorcHTTPServer()
     delete m_servicesHandler;
     delete m_staticContent;
     delete m_dynamicContent;
+    delete m_upnpContent;
 
     Close();
 

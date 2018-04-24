@@ -13,6 +13,7 @@ class TorcHTTPConnection;
 
 #define STATIC_DIRECTORY QString("/css,/img,/fonts,/js")
 #define DYNAMIC_DIRECTORY QString("/content/")
+#define UPNP_DIRECTORY   QString("/upnp/")
 
 class TorcHTTPHandler
 {
