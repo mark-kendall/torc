@@ -132,12 +132,16 @@ QUdpSocket* CreateSearchSocket(const QHostAddress &HostAddress, TorcSSDP *Parent
         socket->setSocketOption(QAbstractSocket::MulticastTtlOption, 4);
         socket->setSocketOption(QAbstractSocket::MulticastLoopbackOption, 1);
         QObject::connect(socket, SIGNAL(readyRead()), Parent, SLOT(Read()));
-        LOG(VB_NETWORK, LOG_INFO, "SSDP search socket " + socket->localAddress().toString() + ":" + QString::number(socket->localPort()));
+        LOG(VB_NETWORK, LOG_INFO, QString("%1 SSDP search socket %2:%3")
+            .arg(HostAddress.protocol() == QAbstractSocket::IPv6Protocol ? "IPv6" : "IPv4")
+            .arg(socket->localAddress().toString())
+            .arg(QString::number(socket->localPort())));
         return socket;
     }
 
-    LOG(VB_GENERAL, LOG_ERR, QString("Failed to bind %1 SSDP search socket (%2)")
-        .arg(HostAddress.protocol() == QAbstractSocket::IPv6Protocol ? "IPv6" : "IPv4").arg(socket->errorString()));
+    LOG(VB_GENERAL, LOG_ERR, QString("Failed to bind %1 SSDP search socket with address %3 (%2)")
+        .arg(HostAddress.protocol() == QAbstractSocket::IPv6Protocol ? "IPv6" : "IPv4").arg(socket->errorString())
+        .arg(HostAddress.toString()));
     delete socket;
     return NULL;
 }
@@ -150,7 +154,10 @@ QUdpSocket* CreateMulticastSocket(const QHostAddress &HostAddress, TorcSSDP *Par
         if (socket->joinMulticastGroup(HostAddress, Interface))
         {
             QObject::connect(socket, SIGNAL(readyRead()), Parent, SLOT(Read()));
-            LOG(VB_NETWORK, LOG_INFO, "SSDP multicast socket " + socket->localAddress().toString() + ":" + QString::number(socket->localPort()));
+            LOG(VB_NETWORK, LOG_INFO, QString("%1 SSDP multicast socket %2:%3")
+                .arg(HostAddress.protocol() == QAbstractSocket::IPv6Protocol ? "IPv6" : "IPv4")
+                .arg(socket->localAddress().toString())
+                .arg(QString::number(socket->localPort())));
             return socket;
         }
 
@@ -158,8 +165,9 @@ QUdpSocket* CreateMulticastSocket(const QHostAddress &HostAddress, TorcSSDP *Par
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to bind %1 SSDP multicast socket (%2)")
-            .arg(HostAddress.protocol() == QAbstractSocket::IPv6Protocol ? "IPv6" : "IPv4").arg(socket->errorString()));
+        LOG(VB_GENERAL, LOG_ERR, QString("Failed to bind %1 SSDP multicast socket with address %3 (%2)")
+            .arg(HostAddress.protocol() == QAbstractSocket::IPv6Protocol ? "IPv6" : "IPv4").arg(socket->errorString())
+            .arg(HostAddress.toString()));
     }
 
     delete socket;
@@ -176,10 +184,10 @@ void TorcSSDPPriv::Start(void)
     QNetworkInterface interface = TorcNetwork::GetInterface();
 
     // create sockets
-    m_ipv6LinkGroupAddress      = QHostAddress(m_ipv6LinkGroupBaseAddress + "%" + interface.name());
-    m_ipv4SearchSocket          = CreateSearchSocket(QHostAddress("0.0.0.0"), m_parent);
+    m_ipv6LinkGroupAddress      = QHostAddress(m_ipv6LinkGroupBaseAddress);
+    m_ipv4SearchSocket          = CreateSearchSocket(QHostAddress::AnyIPv4, m_parent);
     m_ipv4MulticastSocket       = CreateMulticastSocket(m_ipv4GroupAddress, m_parent, interface);
-    m_ipv6LinkSearchSocket      = CreateSearchSocket(QHostAddress("::"), m_parent);
+    m_ipv6LinkSearchSocket      = CreateSearchSocket(QHostAddress::AnyIPv6, m_parent);
     m_ipv6LinkMulticastSocket   = CreateMulticastSocket(m_ipv6LinkGroupAddress, m_parent, interface);
 
     // refresh the list of local ip addresses
@@ -245,11 +253,12 @@ void TorcSSDPPriv::Stop(void)
 
 void TorcSSDPPriv::Search(const QString &Type, QObject *Owner)
 {
+    // evented when the network is available will fill the cache with all upnp devices/services on the network
     if (Type.isEmpty() || !Owner)
     {
         // full search
 
-        if (m_ipv4SearchSocket && m_ipv4SearchSocket->isValid() && m_ipv4SearchSocket->state() == QAbstractSocket::BoundState)
+        if (m_ipv4MulticastSocket && m_ipv4MulticastSocket->isValid() && m_ipv4MulticastSocket->state() == QAbstractSocket::BoundState)
         {
             QByteArray search("M-SEARCH * HTTP/1.1\r\n"
                               "HOST: 239.255.255.250:1900\r\n"
@@ -257,14 +266,14 @@ void TorcSSDPPriv::Search(const QString &Type, QObject *Owner)
                               "MX: 3\r\n"
                               "ST: ssdp:all\r\n\r\n");
 
-            qint64 sent = m_ipv4SearchSocket->writeDatagram(search, m_ipv4GroupAddress, 1900);
+            qint64 sent = m_ipv4MulticastSocket->writeDatagram(search, m_ipv4GroupAddress, 1900);
             if (sent != search.size())
-                LOG(VB_GENERAL, LOG_ERR, QString("Error sending search request (%1)").arg(m_ipv4SearchSocket->errorString()));
+                LOG(VB_GENERAL, LOG_ERR, QString("Error sending search request (%1)").arg(m_ipv4MulticastSocket->errorString()));
             else
-                LOG(VB_NETWORK, LOG_INFO, "Sent IPv4 SSDP search request");
+                LOG(VB_NETWORK, LOG_INFO, "Sent IPv4 SSDP global search request");
         }
 
-        if (m_ipv6LinkSearchSocket && m_ipv6LinkSearchSocket->isValid() && m_ipv6LinkSearchSocket->state() == QAbstractSocket::BoundState)
+        if (m_ipv6LinkMulticastSocket && m_ipv6LinkMulticastSocket->isValid() && m_ipv6LinkMulticastSocket->state() == QAbstractSocket::BoundState)
         {
             QByteArray search("M-SEARCH * HTTP/1.1\r\n"
                               "HOST: [FF02::C]:1900\r\n"
@@ -272,17 +281,18 @@ void TorcSSDPPriv::Search(const QString &Type, QObject *Owner)
                               "MX: 3\r\n"
                               "ST: ssdp:all\r\n\r\n");
 
-            qint64 sent = m_ipv6LinkSearchSocket->writeDatagram(search, m_ipv6LinkGroupAddress, 1900);
+            qint64 sent = m_ipv6LinkMulticastSocket->writeDatagram(search, m_ipv6LinkGroupAddress, 1900);
             if (sent != search.size())
-                LOG(VB_GENERAL, LOG_ERR, QString("Error sending search request (%1)").arg(m_ipv6LinkSearchSocket->errorString()));
+                LOG(VB_GENERAL, LOG_ERR, QString("Error sending search request (%1)").arg(m_ipv6LinkMulticastSocket->errorString()));
             else
-                LOG(VB_NETWORK, LOG_INFO, "Sent IPv6 SSDP search request");
+                LOG(VB_NETWORK, LOG_INFO, "Sent IPv6 SSDP global search request");
         }
 
         return;
     }
 
-    // search request (NB we don't search specifically, just use the cache)
+    // search request (NB at the moment we don't search specifically, just use the cache)
+    // this assumes a global search has already been initiated
 
     if (!m_searchRequests.contains(Type, Owner))
     {
