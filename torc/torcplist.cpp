@@ -79,7 +79,7 @@ TorcPList::TorcPList(const QByteArray &Data)
 ///brief Return the value for the given Key.
 QVariant TorcPList::GetValue(const QString &Key)
 {
-    if ((int)m_result.type() != QMetaType::QVariantMap)
+    if ((QMetaType::Type)m_result.type() != QMetaType::QVariantMap)
         return QVariant();
 
     QVariantMap map = m_result.toMap();
@@ -151,7 +151,7 @@ bool TorcPList::ToXML(const QVariant &Data, QXmlStreamWriter &XML)
         case QMetaType::QDateTime:
             XML.writeTextElement("date", Data.toDateTime().toString(Qt::ISODate));
             break;
-        case QMetaType::Bool:
+        case (QVariant::Type)QMetaType::Bool:
             {
                 bool val = Data.toBool();
                 XML.writeEmptyElement(val ? "true" : "false");

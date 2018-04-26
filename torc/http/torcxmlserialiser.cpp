@@ -76,7 +76,7 @@ void TorcXMLSerialiser::VariantToXML(const QString &Name, const QVariant &Value)
         case QMetaType::QVariantList: ListToXML(Name, Value.toList());             return;
         case QMetaType::QStringList:  StringListToXML(Name, Value.toStringList()); return;
         case QMetaType::QVariantMap:  MapToXML(Name, Value.toMap());               return;
-        case QMetaType::QDateTime:
+        case (QVariant::Type)QMetaType::QDateTime:
         {
             QDateTime datetime(Value.toDateTime());
             if (datetime.isNull())

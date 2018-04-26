@@ -478,7 +478,7 @@ void TorcBinaryPListSerialiser::CountObjects(quint64 &Count, const QVariant &Val
                 Count += list.size();
             return;
         }
-        case QMetaType::QStringList:
+        case (QVariant::Type)QMetaType::QStringList:
         {
             Count++;
             QStringList list = Value.toStringList();
