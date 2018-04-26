@@ -1222,9 +1222,9 @@ bool TorcWebSocket::event(QEvent *Event)
                 m_requestTimers.remove(timerid);
 
                 // handle the timeout
-                if (m_currentRequests.contains(requestid))
+                TorcRPCRequest *request = NULL;
+                if (m_currentRequests.contains(requestid) && (request = m_currentRequests.value(requestid)))
                 {
-                    TorcRPCRequest *request = m_currentRequests.value(requestid);
                     request->AddState(TorcRPCRequest::TimedOut);
                     LOG(VB_GENERAL, LOG_WARNING, QString("'%1' request timed out").arg(request->GetMethod()));
 
