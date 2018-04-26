@@ -70,7 +70,10 @@ TorcNetworkService::TorcNetworkService(const QString &Name, const QString &UUID,
         uiAddress += TorcNetwork::IPAddressToLiteral(m_addresses.at(i), port) + ((i == m_addresses.size() - 1) ? "" : ", ");
     }
 
-    m_debugString = TorcNetwork::IPAddressToLiteral(m_addresses[m_preferredAddressIndex], port);
+    if (m_addresses.isEmpty())
+        m_debugString = "No address found";
+    else
+        m_debugString = TorcNetwork::IPAddressToLiteral(m_addresses[m_preferredAddressIndex], port);
 
     connect(this, SIGNAL(TryConnect()), this, SLOT(Connect()));
 }
@@ -489,9 +492,14 @@ void TorcNetworkService::RemoteRequest(TorcRPCRequest *Request)
         return;
 
     if (m_webSocketThread && m_webSocketThread->Socket())
+    {
         m_webSocketThread->Socket()->RemoteRequest(Request);
+    }
     else
+    {
         LOG(VB_GENERAL, LOG_ERR, "Cannot fulfill remote request - not connected");
+        Request->DownRef();
+    }
 }
 
 void TorcNetworkService::CancelRequest(TorcRPCRequest *Request)
@@ -512,7 +520,7 @@ QVariant TorcNetworkService::ToMap(void)
     result.insert("uuid",      uuid);
     result.insert("port",      port);
     result.insert("uiAddress", uiAddress);
-    result.insert("address",   TorcNetwork::IPAddressToLiteral(m_addresses[m_preferredAddressIndex], 0));
+    result.insert("address",   m_addresses.isEmpty() ? "INValid" : TorcNetwork::IPAddressToLiteral(m_addresses[m_preferredAddressIndex], 0));
     result.insert("host",      host);
     return result;
 }
