@@ -133,6 +133,7 @@ void TorcBinaryPListSerialiser::End(void)
         {
             for ( ; it != m_objectOffsets.end(); ++it)
                 m_content->append((quint8)((*it) & 0xff));
+            break;
         }
         case 2:
         {
@@ -142,6 +143,7 @@ void TorcBinaryPListSerialiser::End(void)
                 m_content->append(*((quint8*)&buffer));
                 m_content->append(*((quint8*)&buffer + 1));
             }
+            break;
         }
         case 4:
         {
@@ -153,6 +155,7 @@ void TorcBinaryPListSerialiser::End(void)
                 m_content->append(*((quint8*)&buffer + 2));
                 m_content->append(*((quint8*)&buffer + 3));
             }
+            break;
         }
         case 8:
         {
@@ -168,7 +171,10 @@ void TorcBinaryPListSerialiser::End(void)
                 m_content->append(*((quint8*)&buffer + 6));
                 m_content->append(*((quint8*)&buffer + 7));
             }
+            break;
         }
+        default:
+            break;
     }
 
     table = qToBigEndian(table);
@@ -477,6 +483,7 @@ void TorcBinaryPListSerialiser::CountObjects(quint64 &Count, const QVariant &Val
             Count++;
             QStringList list = Value.toStringList();
             Count += list.size();
+            return;
         }
         default:
             break;
