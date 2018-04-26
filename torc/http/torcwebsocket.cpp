@@ -1469,9 +1469,9 @@ void TorcWebSocket::ProcessPayload(const QByteArray &Payload)
         else if (request->GetID() > -1)
         {
             int id = request->GetID();
-            if (m_currentRequests.contains(id))
+            TorcRPCRequest *requestor = NULL;
+            if (m_currentRequests.contains(id) && (requestor = m_currentRequests.value(id)))
             {
-                TorcRPCRequest *requestor = m_currentRequests.value(id);
                 requestor->AddState(TorcRPCRequest::ReplyReceived);
 
                 if (request->GetState() & TorcRPCRequest::Errored)
