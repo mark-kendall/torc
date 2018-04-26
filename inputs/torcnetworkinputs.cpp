@@ -142,6 +142,7 @@ void TorcNetworkInputs::Create(const QVariantMap &Details)
                                     else
                                         newoutput = new TorcNetworkpHOutput(defaultdouble, sensor);
                                 }
+                                break;
                             case TorcInput::Button:
                                 {
                                     if (issensor)
