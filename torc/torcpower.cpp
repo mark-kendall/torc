@@ -292,8 +292,7 @@ TorcPower::TorcPower()
     connect(m_powerEnabled,         SIGNAL(ValueChanged(bool)), m_allowHibernate, SLOT(SetActive(bool)));
     connect(m_powerEnabled,         SIGNAL(ValueChanged(bool)), m_allowRestart,   SLOT(SetActive(bool)));
 
-    if (m_priv)
-        m_priv->Debug();
+    m_priv->Debug();
 }
 
 TorcPower::~TorcPower()
