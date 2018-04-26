@@ -29,8 +29,6 @@ class TorcNetwork : QNetworkAccessManager
     // Public API
     static bool IsAvailable         (void);
     static bool IsOwnAddress        (const QHostAddress &Address);
-    static QString GetMACAddress    (void);
-    static QNetworkInterface GetInterface (void);
     static bool Get                 (TorcNetworkRequest* Request);
     static void Cancel              (TorcNetworkRequest* Request);
     static void Poke                (TorcNetworkRequest* Request);
@@ -40,7 +38,9 @@ class TorcNetwork : QNetworkAccessManager
     static QStringList GetHostNames (void);
 
     static QString IPAddressToLiteral (const QHostAddress& Address, int Port, bool UseLocalhost = true);
-    static bool IsExternal          (const QHostAddress &Address, bool IncludeLinkLocal = false);
+    static bool IsExternal          (const QHostAddress &Address);
+    static bool IsLinkLocal         (const QHostAddress &Address);
+    static bool IsLocal             (const QHostAddress &Address);
     static bool IsGlobal            (const QHostAddress &Address);
 
   signals:
@@ -92,14 +92,11 @@ class TorcNetwork : QNetworkAccessManager
 
     void    CloseConnections        (void);
     void    UpdateConfiguration     (bool Creating = false);
-    QString MACAddress              (void);
-    QNetworkInterface Interface     (void);
 
   private:
     bool                             m_online;
     QNetworkConfigurationManager    *m_manager;
     QNetworkConfiguration            m_configuration;
-    QNetworkInterface                m_interface;
     QStringList                      m_hostNames;
 
     QMap<QNetworkReply*,TorcNetworkRequest*> m_requests;

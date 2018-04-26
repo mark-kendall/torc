@@ -33,11 +33,15 @@ QMutex*         gNetworkLock = new QMutex(QMutex::Recursive);
 QStringList     gNetworkHostNames;
 QReadWriteLock* gNetworkHostNamesLock = new QReadWriteLock();
 
-QPair<QHostAddress,int> gIPv4LinkLocal = QHostAddress::parseSubnet("169.254.0.0/16");
-QPair<QHostAddress,int> gIPv6LinkLocal = QHostAddress::parseSubnet("fe80::/10");
-QPair<QHostAddress,int> gIPv4PrivateA  = QHostAddress::parseSubnet("10.0.0.0/8");
-QPair<QHostAddress,int> gIPv4PrivateB  = QHostAddress::parseSubnet("172.16.0.0/12");
-QPair<QHostAddress,int> gIPv4PrivateC  = QHostAddress::parseSubnet("192.168.0.0/16");
+QPair<QHostAddress,int> gIPv4LinkLocal   = QHostAddress::parseSubnet("169.254.0.0/16");
+QPair<QHostAddress,int> gIPv4PrivateA    = QHostAddress::parseSubnet("10.0.0.0/8");
+QPair<QHostAddress,int> gIPv4PrivateB    = QHostAddress::parseSubnet("172.16.0.0/12");
+QPair<QHostAddress,int> gIPv4PrivateC    = QHostAddress::parseSubnet("192.168.0.0/16");
+
+QPair<QHostAddress,int> gIPv6LinkLocal   = QHostAddress::parseSubnet("fe80::/10");
+QPair<QHostAddress,int> gIPv6SiteLocal   = QHostAddress::parseSubnet("fec0::/10"); // deprecated
+QPair<QHostAddress,int> gIPv6UniqueLocal = QHostAddress::parseSubnet("fc00::/7");
+QPair<QHostAddress,int> gIPv6Global      = QHostAddress::parseSubnet("2000::/3");
 
 bool TorcNetwork::IsAvailable(void)
 {
@@ -51,20 +55,6 @@ bool TorcNetwork::IsOwnAddress(const QHostAddress &Address)
     QMutexLocker locker(gNetworkLock);
 
     return gNetwork ? gNetwork->IsOwnAddressPriv(Address) : false;
-}
-
-QString TorcNetwork::GetMACAddress(void)
-{
-    QMutexLocker locker(gNetworkLock);
-
-    return gNetwork ? gNetwork->MACAddress() : DEFAULT_MAC_ADDRESS;
-}
-
-QNetworkInterface TorcNetwork::GetInterface(void)
-{
-    QMutexLocker locker(gNetworkLock);
-
-    return gNetwork ? gNetwork->Interface() : QNetworkInterface();
 }
 
 bool TorcNetwork::Get(TorcNetworkRequest* Request)
@@ -149,7 +139,7 @@ void TorcNetwork::AddHostName(const QString &Host)
         {
             LOG(VB_GENERAL, LOG_WARNING, QString("Number of host names > 10 - ignoring new name '%1' (%2)").arg(Host).arg(gNetworkHostNames.join(",")));
         }
-        else
+        else if (!gNetworkHostNames.contains(Host))
         {
             LOG(VB_GENERAL, LOG_INFO, QString("New host name '%1'").arg(Host));
             gNetworkHostNames.append(Host);
@@ -176,7 +166,7 @@ void TorcNetwork::RemoveHostName(const QString &Host)
         if (gNetworkHostNames.contains(Host))
         {
             LOG(VB_GENERAL, LOG_INFO, QString("Removed host name '%1'").arg(Host));
-            gNetworkHostNames.removeOne(Host);
+            gNetworkHostNames.removeAll(Host);
             changed = true;
         }
     }
@@ -229,18 +219,42 @@ QString TorcNetwork::IPAddressToLiteral(const QHostAddress &Address, int Port, b
 }
 
 ///\brief Returns true if the address is accessible from other devices.
-bool TorcNetwork::IsExternal(const QHostAddress &Address, bool IncludeLinkLocal /* = false*/)
+bool TorcNetwork::IsExternal(const QHostAddress &Address)
 {
     if (Address.isNull() || Address.isLoopback())
         return false;
-
-    if (Address.isInSubnet(Address.protocol() == QAbstractSocket::IPv4Protocol ? gIPv4LinkLocal : gIPv6LinkLocal))
-        return IncludeLinkLocal;
-
     return true;
 }
 
-///\brief Returns true if the address is globally accessible (i.e. exposed to the real world!)
+bool TorcNetwork::IsLinkLocal(const QHostAddress &Address)
+{
+    if (Address.isNull())
+        return false;
+    if (Address.isInSubnet(Address.protocol() == QAbstractSocket::IPv4Protocol ? gIPv4LinkLocal : gIPv6LinkLocal))
+        return true;
+    return false;
+}
+
+bool TorcNetwork::IsLocal(const QHostAddress &Address)
+{
+    if (Address.isNull())
+        return false;
+
+    if (Address.protocol() == QAbstractSocket::IPv4Protocol)
+        if (Address.isInSubnet(gIPv4PrivateA) || Address.isInSubnet(gIPv4PrivateB) || Address.isInSubnet(gIPv4PrivateC))
+            return true;
+
+    // IPv6 - work in progress!
+    // use a whitelist approach
+    if (Address.isInSubnet(gIPv6UniqueLocal) || Address.isInSubnet(gIPv6SiteLocal))
+        return true;
+
+    return false;
+}
+
+/* \brief Returns true if the address is globally accessible (i.e. exposed to the real world!)
+ * \TODO make this ipv6 aware
+*/
 bool TorcNetwork::IsGlobal(const QHostAddress &Address)
 {
     // internal/loopback and link local
@@ -248,9 +262,8 @@ bool TorcNetwork::IsGlobal(const QHostAddress &Address)
         return false;
 
     // private
-    if (Address.protocol() == QAbstractSocket::IPv4Protocol)
-        if (Address.isInSubnet(gIPv4PrivateA) || Address.isInSubnet(gIPv4PrivateB) || Address.isInSubnet(gIPv4PrivateC))
-            return false;
+    if (IsLocal(Address))
+        return false;
 
     return true;
 }
@@ -349,7 +362,7 @@ bool TorcNetwork::IsOnline(void)
 
 bool TorcNetwork::IsOwnAddressPriv(const QHostAddress &Address)
 {
-    return m_interface.allAddresses().contains(Address);
+    return QNetworkInterface::allAddresses().contains(Address);
 }
 
 void TorcNetwork::GetSafe(TorcNetworkRequest* Request)
@@ -713,12 +726,10 @@ void TorcNetwork::UpdateConfiguration(bool Creating)
         {
             LOG(VB_GENERAL, LOG_INFO, QString("Network interface: %1 Bearer: %2").arg(configuration.name()).arg(configuration.bearerTypeName()));
             m_online = true;
-            m_interface = QNetworkInterface::interfaceFromName(m_configuration.name());
         }
         else
         {
             LOG(VB_GENERAL, LOG_INFO, "No valid network connection");
-            m_interface = QNetworkInterface();
             m_online = false;
         }
     }
@@ -728,13 +739,12 @@ void TorcNetwork::UpdateConfiguration(bool Creating)
         gLocalContext->NotifyEvent(Torc::NetworkAvailable);
 
         QStringList addresses;
-        QList<QNetworkAddressEntry> entries = m_interface.addressEntries();
-        foreach (QNetworkAddressEntry entry, entries)
+        QList<QHostAddress> entries = QNetworkInterface::allAddresses();
+        foreach (QHostAddress entry, entries)
         {
-            QString address = entry.ip().toString();
+            QString address = entry.toString();
             addresses << address;
-            if (IsExternal(entry.ip()))
-                QHostInfo::lookupHost(address, this, SLOT(NewHostName(QHostInfo)));
+            QHostInfo::lookupHost(address, this, SLOT(NewHostName(QHostInfo)));
         }
 
         LOG(VB_GENERAL, LOG_INFO, QString("Network up (%1)").arg(addresses.join(", ")));
@@ -754,22 +764,6 @@ void TorcNetwork::UpdateConfiguration(bool Creating)
         LOG(VB_GENERAL, LOG_INFO, "Network configuration changed");
         gLocalContext->NotifyEvent(Torc::NetworkChanged);
     }
-}
-
-QString TorcNetwork::MACAddress(void)
-{
-    if (m_interface.isValid())
-        return m_interface.hardwareAddress();
-
-    return DEFAULT_MAC_ADDRESS;
-}
-
-QNetworkInterface TorcNetwork::Interface(void)
-{
-    if (m_interface.isValid())
-        return QNetworkInterface(m_interface);
-
-    return QNetworkInterface();
 }
 
 /*! \class TorcNetworkObject

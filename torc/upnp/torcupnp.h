@@ -10,18 +10,14 @@ class TorcUPNPDescription
 {
   public:
     TorcUPNPDescription ();
-    TorcUPNPDescription (const QString &USN, const QString &Type, const QString &Location, qint64 Expires);
+    TorcUPNPDescription (const QString &USN, const QString &Location, qint64 Expires);
     QString GetUSN      (void) const;
-    QString GetType     (void) const;
     QString GetLocation (void) const;
     qint64  GetExpiry   (void) const;
     void    SetExpiry   (qint64 Expires);
 
-    bool operator == (const TorcUPNPDescription &Other) const;
-
   private:
     QString m_usn;
-    QString m_type;
     QString m_location;
     qint64  m_expiry;
 };

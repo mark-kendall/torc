@@ -25,15 +25,13 @@
 
 TorcUPNPDescription::TorcUPNPDescription()
   : m_usn(QString()),
-    m_type(QString()),
     m_location(QString()),
     m_expiry(-1)
 {
 }
 
-TorcUPNPDescription::TorcUPNPDescription(const QString &USN, const QString &Type, const QString &Location, qint64 Expires)
+TorcUPNPDescription::TorcUPNPDescription(const QString &USN, const QString &Location, qint64 Expires)
   : m_usn(USN),
-    m_type(Type),
     m_location(Location),
     m_expiry(Expires)
 {
@@ -42,11 +40,6 @@ TorcUPNPDescription::TorcUPNPDescription(const QString &USN, const QString &Type
 QString TorcUPNPDescription::GetUSN(void) const
 {
     return m_usn;
-}
-
-QString TorcUPNPDescription::GetType(void) const
-{
-    return m_type;
 }
 
 QString TorcUPNPDescription::GetLocation(void) const
@@ -62,11 +55,6 @@ qint64 TorcUPNPDescription::GetExpiry(void) const
 void TorcUPNPDescription::SetExpiry(qint64 Expires)
 {
     m_expiry = Expires;
-}
-
-bool TorcUPNPDescription::operator == (const TorcUPNPDescription &Other) const
-{
-    return this->GetLocation() == Other.GetLocation() && this->GetType() == Other.GetType() && this->GetUSN() == Other.GetUSN();
 }
 
 QString TorcUPNP::UUIDFromUSN(const QString &USN)

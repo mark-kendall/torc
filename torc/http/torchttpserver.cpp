@@ -41,6 +41,7 @@
 #include "torchttpservice.h"
 #include "torchttpserver.h"
 #include "torcbonjour.h"
+#include "torcssdp.h"
 
 #define TORC_REALM QString("Torc")
 
@@ -52,7 +53,10 @@
 class WebSocketAuthentication
 {
   public:
-    WebSocketAuthentication() { }
+    WebSocketAuthentication()
+      : m_timeStamp(0)
+    {
+    }
     WebSocketAuthentication(quint64 Timestamp, const QString &UserName, const QString &Host)
       : m_timeStamp(Timestamp),
         m_userName(UserName),
@@ -947,6 +951,8 @@ bool TorcHTTPServer::Open(void)
             m_torcBonjourReference = TorcBonjour::Instance()->Register(port, "_torc._tcp", name, map);
     }
 
+    TorcSSDP::Announce();
+
     if (!waslistening)
     {
         LOG(VB_GENERAL, LOG_INFO, QString("Web server listening on port %1").arg(port));
@@ -970,6 +976,8 @@ void TorcHTTPServer::Close(void)
         TorcBonjour::Instance()->Deregister(m_torcBonjourReference);
         m_torcBonjourReference = 0;
     }
+
+    TorcSSDP::CancelAnnounce();
 
     // close all pool threads
     m_abort = 1;
