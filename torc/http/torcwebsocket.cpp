@@ -537,6 +537,7 @@ void TorcWebSocket::PropertyChanged(void)
         TorcRPCRequest *request = new TorcRPCRequest(service->Signature() + service->GetMethod(senderSignalIndex()));
         request->AddParameter("value", service->GetProperty(senderSignalIndex()));
         SendFrame(m_subProtocolFrameFormat, request->SerialiseRequest(m_subProtocol));
+        request->DownRef();
     }
 }
 
