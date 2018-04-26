@@ -9,8 +9,6 @@ matrix:
     - os: linux
       dist: xenial
       compiler: gcc
-      before_install:
-        - echo Travis CI Linux/Xenial/GCC build
     - os: linux
       dist: xenial
       compiler: gcc
@@ -20,8 +18,8 @@ matrix:
             name: "mark-kendall/torc"
             description: "Torc"
           notification_email: mark.kendall@gmail.com
-          build_command_prepend: qmake torc.pro
-          build_command: make
+          build_command_prepend: "qmake torc.pro"
+          build_command: "make"
           branch_pattern: coverity_scan
       script:
         - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
