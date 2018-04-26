@@ -106,6 +106,7 @@ TorcNetworkRequest::TorcNetworkRequest(const QNetworkRequest Request, const QByt
     m_replyBytesAvailable(0),
     m_bytesReceived(0),
     m_bytesTotal(0),
+    m_replyError(QNetworkReply::NoError),
     m_request(Request),
     m_rangeStart(0),
     m_rangeEnd(0),
