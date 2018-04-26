@@ -26,6 +26,10 @@
 #include "torclocalcontext.h"
 #include "torctimercontrol.h"
 
+static const quint64 kSixty = 60;
+static const quint64 k24    = 24;
+static const quint64 k7     = 7;
+
 QString TorcTimerControl::TimerTypeToString(TorcTimerControl::TimerType Type)
 {
     switch (Type)
@@ -318,10 +322,10 @@ void TorcTimerControl::TimerTimeout(void)
                 if (TorcTimerControl::Weekly != m_timerType)
                     day = 0;
 
-                quint64 timesinceperiodstart = (day * 60 * 60 * 24) +
+                quint64 timesinceperiodstart = (day * kSixty * kSixty * k24) +
                                                 timenow.second() +
-                                                timenow.minute() * 60 +
-                                                timenow.hour()   * 60 * 60;
+                                                timenow.minute() * kSixty +
+                                                timenow.hour()   * kSixty * kSixty;
                 quint64 finishtime = m_startDuration + m_duration;
 
                 // hasn't started yet
@@ -362,13 +366,13 @@ void TorcTimerControl::TimerTimeout(void)
                     // handles drift and better accomodates complications arising from daylight savings changes.
                     SetValue(0);
                     if (m_timerType == TorcTimerControl::Weekly)
-                        m_timer->start(((60 * 60 * 24 * 7) - timesinceperiodstart) * 1000);
+                        m_timer->start(((kSixty * kSixty * k24 * k7) - timesinceperiodstart) * 1000);
                     else if (m_timerType == TorcTimerControl::Daily)
-                        m_timer->start(((60 * 60 * 24) - timesinceperiodstart) * 1000);
+                        m_timer->start(((kSixty * kSixty * k24) - timesinceperiodstart) * 1000);
                     else if (m_timerType == TorcTimerControl::Hourly)
-                        m_timer->start(((60 * 60) - timesinceperiodstart) * 1000);
+                        m_timer->start(((kSixty * kSixty) - timesinceperiodstart) * 1000);
                     else
-                        m_timer->start((60 - timesinceperiodstart) * 1000);
+                        m_timer->start((kSixty - timesinceperiodstart) * 1000);
                     return;
                 }
             }
@@ -410,10 +414,10 @@ quint64 TorcTimerControl::TimeSinceLastTransition(void)
     if (TorcTimerControl::Weekly != m_timerType)
         day = 0;
 
-    quint64 timesinceperiodstart = (day * 60 * 60 * 24) +
+    quint64 timesinceperiodstart = (day * kSixty * kSixty * k24) +
                                     timenow.second() +
-                                    timenow.minute() * 60 +
-                                    timenow.hour()   * 60 * 60;
+                                    timenow.minute() * kSixty +
+                                    timenow.hour()   * kSixty * kSixty;
     quint64 finishtime = m_startDuration + m_duration;
 
     if (timesinceperiodstart > finishtime)
@@ -433,10 +437,10 @@ quint64 TorcTimerControl::GetMaxDuration(void) const
 {
     switch (m_timerType)
     {
-        case TorcTimerControl::Minutely: return 60;
-        case TorcTimerControl::Hourly:   return 60 * 60;
-        case TorcTimerControl::Daily:    return 60 * 60 * 24;
-        case TorcTimerControl::Weekly:   return 60 * 60 * 24 * 7;
+        case TorcTimerControl::Minutely: return kSixty;
+        case TorcTimerControl::Hourly:   return kSixty * kSixty;
+        case TorcTimerControl::Daily:    return kSixty * kSixty * k24;
+        case TorcTimerControl::Weekly:   return kSixty * kSixty * k24 * k7;
         default:
             break;
     }
