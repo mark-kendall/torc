@@ -274,8 +274,8 @@ QVariant TorcPList::ParseBinaryNode(quint64 Num)
                 default:           return QVariant();
             }
         }
-        case BPLIST_UID: // FIXME
-        default: return QVariant();
+        case BPLIST_UID: break; // FIXME
+        default: break;
     }
 
     return QVariant();
