@@ -62,7 +62,6 @@ TorcNetworkService::TorcNetworkService(const QString &Name, const QString &UUID,
     m_retryScheduled(false),
     m_retryInterval(10000)
 {
-    QString ports = QString::number(port);
     for (int i = 0; i < m_addresses.size(); ++i)
     {
         if (m_addresses.at(i).protocol() == QAbstractSocket::IPv4Protocol)
@@ -432,11 +431,11 @@ void TorcNetworkService::QueryPeerDetails(void)
 
         LOG(VB_GENERAL, LOG_INFO, "Querying peer details over HTTP");
 
-        QUrl url(m_addresses[m_preferredAddressIndex].toString());
-        url.setPort(port);
+        QUrl url;
         url.setScheme("http");
+        url.setPort(port);
+        url.setHost(m_addresses[m_preferredAddressIndex].toString());
         url.setPath("/services/GetDetails");
-
         QNetworkRequest networkrequest(url);
         networkrequest.setRawHeader("Accept", "application/json");
 
@@ -597,21 +596,17 @@ TorcNetworkedContext::TorcNetworkedContext()
     m_bonjourBrowserReference = TorcBonjour::Instance()->Browse("_torc._tcp.");
 
     // NB if TorcSSDP singleton isn't running yet the request will be queued
-    TorcSSDP::Search(TORC_ROOT_UPNP_DEVICE, this);
-    TorcUPNPDescription upnp(QString("uuid:%1").arg(gLocalContext->GetUuid()), TORC_ROOT_UPNP_DEVICE, "LOCATION", 1000);
-    TorcSSDP::Announce(upnp);
+    // announcement is triggered from TorcHTTPServer
+    TorcSSDP::Search();
 }
 
 TorcNetworkedContext::~TorcNetworkedContext()
 {
-    TorcUPNPDescription upnp(QString("uuid:%1").arg(gLocalContext->GetUuid()), TORC_ROOT_UPNP_DEVICE, "LOCATION", 1000);
-    TorcSSDP::CancelAnnounce(upnp);
-
     // stoplistening
     gLocalContext->RemoveObserver(this);
 
     // cancel upnp search
-    TorcSSDP::CancelSearch(TORC_ROOT_UPNP_DEVICE, this);
+    TorcSSDP::CancelSearch();
 
     // stop browsing for torc._tcp
     if (m_bonjourBrowserReference)
@@ -759,7 +754,39 @@ bool TorcNetworkedContext::event(QEvent *Event)
             else if (event->Data().contains("usn"))
             {
                 // USN == Unique Service Name (UPnP)
-                QString uuid = TorcUPNP::UUIDFromUSN(event->Data().value("usn").toString());
+                QString usn      = event->Data().value("usn").toString();
+                QString uuid     = TorcUPNP::UUIDFromUSN(usn);
+
+                if (event->GetEvent() == Torc::ServiceWentAway)
+                {
+                    Remove(uuid, TorcNetworkService::UPnP);
+                }
+                else if (event->GetEvent() == Torc::ServiceDiscovered)
+                {
+                    if (uuid == gLocalContext->GetUuid().toLatin1())
+                    {
+                        // this is us!
+                    }
+                    else if (m_serviceList.contains(uuid))
+                    {
+                        // register this as an additional source
+                        QWriteLocker locker(m_discoveredServicesLock);
+                        for (int i = 0; i < m_discoveredServices.size(); ++i)
+                            if (m_discoveredServices.at(i)->GetUuid() == uuid)
+                                m_discoveredServices.at(i)->SetSource(TorcNetworkService::UPnP);
+                    }
+                    else
+                    {
+                        // need name, uuid, port, hosts, apiversion, priority, starttime, host?
+                        QUrl location(event->Data().value("address").toString());
+                        QList<QHostAddress> hosts;
+                        hosts << QHostAddress(location.host());
+                        TorcNetworkService *service = new TorcNetworkService("TorcUPnP", uuid, location.port(), hosts);
+                        service->SetSource(TorcNetworkService::UPnP);
+                        Add(service);
+                        emit service->TryConnect();
+                    }
+                }
             }
         }
     }
