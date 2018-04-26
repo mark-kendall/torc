@@ -1,3 +1,7 @@
+env:
+  global:
+    - secure: "JcGGQSB6S5999makDLfl8W7+8YhMo9pj55VhOx+xGBe5dfUjJH9u8d2M7sFz1aNeV2ntdqgtUl4SCip/4MgyHIKHjRwY/Bb087oy4AECxBA3+7IVXx5leR+M9iPvFk5LAmArQujvmZwhe07L1RuZEgCIypQOJ3n6R/NCUUYZ2nc="
+
 matrix:
   include:
     - os: osx
@@ -5,6 +9,22 @@ matrix:
     - os: linux
       dist: xenial
       compiler: gcc
+      before_install:
+        - echo Travis CI Linux/Xenial/GCC build
+    - os: linux
+      dist: xenial
+      compiler: gcc
+      addons:
+        coverity_scan:
+          project:
+            name: "mark-kendall/torc"
+            description: "Torc"
+          notification_email: mark.kendall@gmail.com
+          build_command_prepend: qmake torc.pro
+          build_command: make
+          branch_pattern: coverity_scan
+      script:
+        - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
 
 before_install:
   - |
