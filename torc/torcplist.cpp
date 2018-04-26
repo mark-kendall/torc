@@ -408,7 +408,7 @@ QVariant TorcPList::ParseBinaryReal(quint8 *Data)
     if (!count)
         return result;
 
-    count = (quint64)(1 << count);
+    count = (quint64)((quint64)1 << count);
     if (count == sizeof(float))
     {
         convert_float(Data, count);
