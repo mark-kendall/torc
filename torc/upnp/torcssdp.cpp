@@ -45,6 +45,13 @@ TorcSSDPSearchResponse::TorcSSDPSearchResponse(const QHostAddress &Address, cons
 {
 }
 
+TorcSSDPSearchResponse::TorcSSDPSearchResponse()
+  : m_responseAddress(QHostAddress(QHostAddress::Any)),
+    m_responseTypes(TorcSSDPSearchResponse::None),
+    m_port(0)
+{
+}
+
 /*! \class TorcSSDP
  *  \brief The public class for handling Simple Service Discovery Protocol searches and announcements
  *
