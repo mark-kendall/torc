@@ -576,9 +576,9 @@ void TorcNetwork::ReadyRead(void)
 {
     QNetworkReply *reply = dynamic_cast<QNetworkReply*>(sender());
 
-    if (reply && m_requests.contains(reply))
+    TorcNetworkRequest* request = NULL;
+    if (reply && m_requests.contains(reply) && (request = m_requests.value(reply)))
     {
-        TorcNetworkRequest* request = m_requests.value(reply);
         if (!request->m_started)
         {
             // check for redirection
@@ -605,10 +605,9 @@ void TorcNetwork::Finished(void)
 {
     QNetworkReply *reply = dynamic_cast<QNetworkReply*>(sender());
 
-    if (reply && m_requests.contains(reply))
+    TorcNetworkRequest *request = NULL;
+    if (reply && m_requests.contains(reply) && (request = m_requests.value(reply)))
     {
-        TorcNetworkRequest *request = m_requests.value(reply);
-
         if (request->m_type == QNetworkAccessManager::HeadOperation)
         {
             // head requests never trigger a read request (no content), so check redirection on completion
@@ -638,13 +637,11 @@ void TorcNetwork::Error(QNetworkReply::NetworkError Code)
 {
     QNetworkReply *reply = dynamic_cast<QNetworkReply*>(sender());
 
-    if (reply && m_requests.contains(reply))
+    TorcNetworkRequest *request = NULL;
+    if (reply && m_requests.contains(reply) && (request = m_requests.value(reply)) && (Code != QNetworkReply::OperationCanceledError))
     {
-        if (Code != QNetworkReply::OperationCanceledError)
-        {
-            m_requests.value(reply)->SetReplyError(Code);
-            LOG(VB_GENERAL, LOG_ERR, QString("Network error '%1'").arg(reply->errorString()));
-        }
+        request->SetReplyError(Code);
+        LOG(VB_GENERAL, LOG_ERR, QString("Network error '%1'").arg(reply->errorString()));
     }
 }
 
@@ -666,8 +663,9 @@ void TorcNetwork::DownloadProgress(qint64 Received, qint64 Total)
 {
     QNetworkReply *reply = dynamic_cast<QNetworkReply*>(sender());
 
-    if (reply && m_requests.contains(reply))
-        m_requests.value(reply)->DownloadProgress(Received, Total);
+    TorcNetworkRequest *request = NULL;
+    if (reply && m_requests.contains(reply) && (request = m_requests.value(reply)))
+        request->DownloadProgress(Received, Total);
 }
 
 void TorcNetwork::Authenticate(QNetworkReply *Reply, QAuthenticator *Authenticator)
