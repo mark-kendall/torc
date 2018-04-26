@@ -207,7 +207,7 @@ TorcCentral::TorcCentral()
             int err = system(command.toLocal8Bit());
             if (err < 0)
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("Failed to create stategraph representation (err: %1)").arg(strerror(err)));
+                LOG(VB_GENERAL, LOG_ERR, QString("Failed to create stategraph representation (err: %1)").arg(strerror(errno)));
             }
             else
             {
