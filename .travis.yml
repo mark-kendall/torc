@@ -1,6 +1,6 @@
 env:
   global:
-    - secure: "JcGGQSB6S5999makDLfl8W7+8YhMo9pj55VhOx+xGBe5dfUjJH9u8d2M7sFz1aNeV2ntdqgtUl4SCip/4MgyHIKHjRwY/Bb087oy4AECxBA3+7IVXx5leR+M9iPvFk5LAmArQujvmZwhe07L1RuZEgCIypQOJ3n6R/NCUUYZ2nc="
+    - secure: "QL962wkIoJCUArk44n2jsp9k7SNmqu4179U7fv8iV3knKmV6atiQVjoLkqgtTTLsIA/9O5IY7KJneaMU6GUKwWcGTfSEgWS7MIR1GUSzXCBwBgOEG5fmTNZ6GsueQj/n00VQBEKFktT7DG8eAzLpy27avFKGavTQU1x79LWUYOo="
 
 matrix:
   include:
@@ -13,7 +13,7 @@ matrix:
             brew install qt5
             brew link qt5 --force
           else
-            echo Done
+            echo Ignoring branch
           fi
 
       script:
@@ -22,7 +22,7 @@ matrix:
             qmake torc.pro
             make
           else
-            echo Done
+            echo Ignoring branch
           fi
 
     - os: linux
@@ -30,20 +30,34 @@ matrix:
       dist: xenial
       compiler: gcc
       before_install:
-        - sudo apt-get update
-        - sudo apt-get install libgraphviz-dev libavahi-compat-libdnssd-dev qt5-default libxml2-dev
+        - |
+          if [[ $TRAVIS_BRANCH != "coverity_scan" ]]; then
+            sudo apt-get update
+            sudo apt-get install libgraphviz-dev libavahi-compat-libdnssd-dev qt5-default libxml2-dev
+          fi
+
       script:
-        - qmake torc.pro
-        - make
+        - |
+          if [[ $TRAVIS_BRANCH != "coverity_scan" ]]; then
+            qmake torc.pro
+            make
+          else
+            echo Ignoring branch
+          fi
+
     - os: linux
       env: TORC=coverity_scan
       dist: xenial
       compiler: gcc
       before_install:
-        - sudo apt-get update
-        - sudo apt-get install libgraphviz-dev libavahi-compat-libdnssd-dev qt5-default libxml2-dev
+        - |
+          if [[ $TRAVIS_BRANCH == "coverity_scan" ]]; then
+            sudo apt-get update
+            sudo apt-get install libgraphviz-dev libavahi-compat-libdnssd-dev qt5-default libxml2-dev
+          fi
+
         - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
-        - curl -s --form project="mark-kendall/torc" --form token="YjI7NZmhQefOhYJUFkXR4A" https://scan.coverity.com/api/upload_permitted 
+
       addons:
         coverity_scan:
           project:
