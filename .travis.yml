@@ -46,7 +46,9 @@ matrix:
           fi
 
     - os: linux
-      env: TORC=coverity_scan
+      env:
+        - TORC=coverity_scan
+        - secure: "QL962wkIoJCUArk44n2jsp9k7SNmqu4179U7fv8iV3knKmV6atiQVjoLkqgtTTLsIA/9O5IY7KJneaMU6GUKwWcGTfSEgWS7MIR1GUSzXCBwBgOEG5fmTNZ6GsueQj/n00VQBEKFktT7DG8eAzLpy27avFKGavTQU1x79LWUYOo="
       dist: xenial
       compiler: gcc
       before_install:
