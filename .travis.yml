@@ -23,6 +23,10 @@ matrix:
           build_command: "make"
           branch_pattern: coverity_scan
 
+    - os: osx
+      env: TORC=osx
+      compiler: clang
+
 
 
 
