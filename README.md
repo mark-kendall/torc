@@ -1,7 +1,4 @@
-![Travis build status](https://travis-ci.org/mark-kendall/torc.svg?branch=master)
-<a href="https://scan.coverity.com/projects/mark-kendall-torc">
-  <img alt="Coverity Scan Build Status"
-       src="https://img.shields.io/coverity/scan/15519.svg"/>
-</a>
+[![Travis build status](https://travis-ci.org/mark-kendall/torc.svg?branch=master)](https://travis-ci.org/mark-kendall/torc)
+[![Coverity Scan status](https://img.shields.io/coverity/scan/15519.svg)](https://scan.coverity.com/projects/mark-kendall-torc)
 
-The documentation for this project can now be viewed at http://mark-kendall.github.io
+The documentation for this project can be viewed at http://mark-kendall.github.io
