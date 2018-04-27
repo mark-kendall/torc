@@ -1,25 +1,25 @@
 env:
   global:
-   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
-   #   via the "travis encrypt" command using the project repo's public key
    - secure: "o/zpwMgNrWsEK7NoH9gByY2UGZKyzJyZDhD3OQtKruS3ZXsXo411JC4KE8ZMnSPPuoSR1FSbsldrwnNwiRhlGkbZ9uDCt8mUree20bDzW/hYnYwKyq1NTrbSd5m0WcFGh2uk9NnkjGdjmgY9HPpXD+cyFp645jOXzJHg5Krk6XWrR9I7jDvO6J/+zr31of4m9Yp0Vnl9JTKGcitbLDbfpezLsgpcOLyR4/lGorL3Y5mXEYxODUqxtnMTQmKYxf0658gRUiERw4j7+Qe/r1PbKTJ0t+tn7kSHJVcV7rwJ70hrwQqiWro05c1DBN22wdN4EfZFRQIyMzOyA34mOk2HXEm5N/4408pYAGKGZpWabBrd/+6xGCGQKTylITiPHo8hjlXR4jGkDJbZZJ+Ij02gxCM6mAEsQlcwT4W6Hl76yMB7Y9SRZTpw6+Txf+I1ip2xrWMLa2eVkcMgE6Z8xllXQ3ulceQPhpyjm4NjcU4B8jLYXaoLva3nzTiGe85HF0PGBonCaFb5tvLpZdHmiHtusorK737YPsP20Cx2J84fO1lsxggIkn34IjRThlfQYoBaDcER128HhI9eLqBX+IWL98HvBgHGHeI8/nCfmSR6fdzHWL6lxOzELQjBvEz6UO+PACs3m3xNW2NwLiup3pAsfv3gc1P/D+2e8DacahJ0SvM="
 
 language: cpp
-os: linux
-dist: xenial
-compiler: gcc
 
-before_install:
-  - echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
+matrix:
+  include:
+    os: linux
+    dist: xenial
+    compiler: gcc
+    before_install:
+      - echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
 
-addons:
-  coverity_scan:
-    project:
-      name: "mark-kendall/torc"
-      description: "Torc"
-    notification_email: mark.kendall@gmail.com
-    build_command_prepend: "qmake torc.pro"
-    build_command: "make"
-    branch_pattern: coverity_scan
+    addons:
+      coverity_scan:
+        project:
+          name: "mark-kendall/torc"
+          description: "Torc"
+        notification_email: mark.kendall@gmail.com
+        build_command_prepend: "qmake torc.pro"
+        build_command: "make"
+        branch_pattern: coverity_scan
 
 
