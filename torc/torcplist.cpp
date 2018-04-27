@@ -79,7 +79,7 @@ TorcPList::TorcPList(const QByteArray &Data)
 ///brief Return the value for the given Key.
 QVariant TorcPList::GetValue(const QString &Key)
 {
-    if ((QMetaType::Type)m_result.type() != QMetaType::QVariantMap)
+    if (static_cast<QMetaType::Type>(m_result.type()) != QMetaType::QVariantMap)
         return QVariant();
 
     QVariantMap map = m_result.toMap();
@@ -125,7 +125,7 @@ bool TorcPList::ToXML(QIODevice *Device)
 ///brief Convert the given parsed Data element to valid XML.
 bool TorcPList::ToXML(const QVariant &Data, QXmlStreamWriter &XML)
 {
-    switch (Data.type())
+    switch (static_cast<QMetaType::Type>(Data.type()))
     {
         case QMetaType::QVariantMap:
             DictToXML(Data, XML);
@@ -151,7 +151,7 @@ bool TorcPList::ToXML(const QVariant &Data, QXmlStreamWriter &XML)
         case QMetaType::QDateTime:
             XML.writeTextElement("date", Data.toDateTime().toString(Qt::ISODate));
             break;
-        case (QVariant::Type)QMetaType::Bool:
+        case QMetaType::Bool:
             {
                 bool val = Data.toBool();
                 XML.writeEmptyElement(val ? "true" : "false");
