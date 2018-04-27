@@ -6,21 +6,23 @@ language: cpp
 
 matrix:
   include:
-    env: TORC=coverity_scan
-    os: linux
-    dist: xenial
-    compiler: gcc
-    before_install:
-      - echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
+    - os: linux
+      env: TORC=coverity_scan
+      dist: xenial
+      compiler: gcc
+      before_install:
+        - echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
 
-    addons:
-      coverity_scan:
-        project:
-          name: "mark-kendall/torc"
-          description: "Torc"
-        notification_email: mark.kendall@gmail.com
-        build_command_prepend: "qmake torc.pro"
-        build_command: "make"
-        branch_pattern: coverity_scan
+      addons:
+        coverity_scan:
+          project:
+            name: "mark-kendall/torc"
+            description: "Torc"
+          notification_email: mark.kendall@gmail.com
+          build_command_prepend: "qmake torc.pro"
+          build_command: "make"
+          branch_pattern: coverity_scan
+
+
 
 
