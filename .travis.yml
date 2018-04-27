@@ -22,14 +22,9 @@ matrix:
       dist: xenial
       compiler: gcc
       before_install:
-        - |
-          if [[ $(git rev-parse --abbrev-ref HEAD) == "coverity_scan" ]]; then
-            sudo apt-get update
-            sudo apt-get install libgraphviz-dev libavahi-compat-libdnssd-dev qt5-default libxml2-dev
-            echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
-          fi
-
-      script: echo Done
+        - sudo apt-get update
+        - sudo apt-get install libgraphviz-dev libavahi-compat-libdnssd-dev qt5-default libxml2-dev
+        - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
       addons:
         coverity_scan:
           project:
