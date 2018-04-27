@@ -6,6 +6,7 @@ language: cpp
 
 matrix:
   include:
+    env: TORC=coverity_scan
     os: linux
     dist: xenial
     compiler: gcc
