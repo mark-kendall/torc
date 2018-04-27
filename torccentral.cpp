@@ -182,26 +182,36 @@ TorcCentral::TorcCentral()
             file.flush();
             file.close();
             LOG(VB_GENERAL, LOG_INFO, QString("Saved state graph as %1").arg(graphdot));
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to open '%1' to write state graph").arg(graphdot));
+        }
+
+        // create a representation of the state graph
+        bool created = false;
 
 #ifdef USING_GRAPHVIZ_LIBS
-            FILE *handle = fopen(graphsvg.toLocal8Bit().data(), "w");
-            if (handle)
-            {
-                GVC_t *gvc  = gvContext();
-                Agraph_t *g = agmemread(m_graph->data());
-                gvLayout(gvc, g, "dot");
-                gvRender(gvc, g, "svg", handle);
-                gvFreeLayout(gvc,g);
-                agclose(g);
-                gvFreeContext(gvc);
-                fclose(handle);
-            }
-            else
-            {
-                LOG(VB_GENERAL, LOG_WARNING, QString("Failed to open '%1' for writing (err: %2)").arg(graphsvg).arg(strerror(errno)));
-            }
-#else
-            // create a representation of the state graph
+        FILE *handle = fopen(graphsvg.toLocal8Bit().data(), "w");
+        if (handle)
+        {
+            GVC_t *gvc  = gvContext();
+            Agraph_t *g = agmemread(m_graph->data());
+            gvLayout(gvc, g, "dot");
+            gvRender(gvc, g, "svg", handle);
+            gvFreeLayout(gvc,g);
+            agclose(g);
+            gvFreeContext(gvc);
+            fclose(handle);
+            created = true;
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_WARNING, QString("Failed to open '%1' for writing (err: %2)").arg(graphsvg).arg(strerror(errno)));
+        }
+#endif
+        if (!created)
+        {
             // NB QProcess appears to be fatally broken. Just use system instead
             QString command = QString("dot -Tsvg -o %1 %2").arg(graphsvg).arg(graphdot);
             int err = system(command.toLocal8Bit());
@@ -215,11 +225,6 @@ TorcCentral::TorcCentral()
                 if (err > 0)
                     LOG(VB_GENERAL, LOG_ERR, "dot returned an unexpected result - stategraph may be incomplete or absent");
             }
-#endif
-        }
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed to open '%1' to write state graph").arg(graphdot));
         }
     }
 
