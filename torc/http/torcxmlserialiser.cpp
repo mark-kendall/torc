@@ -71,7 +71,7 @@ void TorcXMLSerialiser::AddProperty(const QString &Name, const QVariant &Value)
 
 void TorcXMLSerialiser::VariantToXML(const QString &Name, const QVariant &Value)
 {
-    switch(Value.type())
+    switch(static_cast<QMetaType::Type>(Value.type()))
     {
         case QMetaType::QVariantList: ListToXML(Name, Value.toList());             return;
         case QMetaType::QStringList:  StringListToXML(Name, Value.toStringList()); return;
