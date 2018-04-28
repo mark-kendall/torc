@@ -450,7 +450,7 @@ void TorcBinaryPListSerialiser::BinaryFromUInt(quint64 Value)
 
 void TorcBinaryPListSerialiser::CountObjects(quint64 &Count, const QVariant &Value)
 {
-    switch (Value.type())
+    switch (static_cast<QMetaType::Type>(Value.type()))
     {
         case QMetaType::QVariantMap:
         {
