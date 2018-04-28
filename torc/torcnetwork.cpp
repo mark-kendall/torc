@@ -409,7 +409,10 @@ void TorcNetwork::CancelSafe(TorcNetworkRequest *Request)
         QNetworkReply* reply = m_reverseRequests.take(Request);
         Request->m_rawHeaders = reply->rawHeaderPairs();
         m_requests.remove(reply);
-        LOG(VB_NETWORK, LOG_INFO, QString("Cancelling '%1'").arg(reply->request().url().toString()));
+        if (reply->isFinished())
+            LOG(VB_NETWORK, LOG_DEBUG, QString("Deleting finished request '%1'").arg(reply->request().url().toString()));
+        else
+            LOG(VB_GENERAL, LOG_INFO, QString("Cancelling '%1'").arg(reply->request().url().toString()));
         reply->abort();
         reply->deleteLater();
         Request->DownRef();
