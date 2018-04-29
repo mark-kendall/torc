@@ -14,7 +14,7 @@
 #include "torchtmlstaticcontent.h"
 #include "torchtmldynamiccontent.h"
 #include "torcupnpcontent.h"
-#include "torcwebsocket.h"
+#include "torcwebsocketthread.h"
 
 class TorcHTTPConnection;
 class TorcHTTPHandler;

@@ -96,7 +96,7 @@ TorcNetworkService::~TorcNetworkService()
 
     if (m_getPeerDetailsRPC && m_webSocketThread)
     {
-        m_webSocketThread->Socket()->CancelRequest(m_getPeerDetailsRPC);
+        m_webSocketThread->CancelRequest(m_getPeerDetailsRPC);
         m_getPeerDetailsRPC->DownRef();
         m_getPeerDetailsRPC = NULL;
     }
@@ -111,7 +111,8 @@ TorcNetworkService::~TorcNetworkService()
     // delete websocket
     if (m_webSocketThread)
     {
-        m_webSocketThread->Shutdown();
+        m_webSocketThread->quit();
+        m_webSocketThread->wait();
         delete m_webSocketThread;
         m_webSocketThread = NULL;
     }
@@ -180,8 +181,8 @@ void TorcNetworkService::Connect(void)
     LOG(VB_GENERAL, LOG_INFO, QString("Trying to connect to %1").arg(m_debugString));
 
     m_webSocketThread = new TorcWebSocketThread(m_addresses.at(m_preferredAddressIndex), port, true);
-    connect(m_webSocketThread,           SIGNAL(Finished()),              this, SLOT(Disconnected()));
-    connect(m_webSocketThread->Socket(), SIGNAL(ConnectionEstablished()), this, SLOT(Connected()));
+    connect(m_webSocketThread, SIGNAL(Finished()),              this, SLOT(Disconnected()));
+    connect(m_webSocketThread, SIGNAL(ConnectionEstablished()), this, SLOT(Connected()));
 
     m_webSocketThread->start();
 }
@@ -233,8 +234,8 @@ bool TorcNetworkService::GetConnected(void)
 
 void TorcNetworkService::Connected(void)
 {
-    TorcWebSocket *socket = static_cast<TorcWebSocket*>(sender());
-    if (m_webSocketThread && m_webSocketThread->Socket() == socket)
+    TorcWebSocketThread *thread = static_cast<TorcWebSocketThread*>(sender());
+    if (m_webSocketThread && m_webSocketThread == thread)
     {
         LOG(VB_GENERAL, LOG_INFO, QString("Connection established with %1").arg(m_debugString));
         emit TryConnect();
@@ -247,7 +248,7 @@ void TorcNetworkService::Connected(void)
 
 void TorcNetworkService::Disconnected(void)
 {
-    QThread *thread = static_cast<QThread*>(sender());
+    TorcWebSocketThread *thread = static_cast<TorcWebSocketThread*>(sender());
     if (m_webSocketThread && m_webSocketThread == thread)
     {
         LOG(VB_GENERAL, LOG_INFO, QString("Connection with %1 closed").arg(m_debugString));
@@ -480,8 +481,8 @@ void TorcNetworkService::CreateSocket(TorcHTTPRequest *Request, QTcpSocket *Sock
     // create the socket
     m_webSocketThread = new TorcWebSocketThread(Request, Socket);
     Socket->moveToThread(m_webSocketThread);
-    connect(m_webSocketThread,           SIGNAL(Finished()),              this, SLOT(Disconnected()));
-    connect(m_webSocketThread->Socket(), SIGNAL(ConnectionEstablished()), this, SLOT(Connected()));
+    connect(m_webSocketThread, SIGNAL(Finished()),              this, SLOT(Disconnected()));
+    connect(m_webSocketThread, SIGNAL(ConnectionEstablished()), this, SLOT(Connected()));
 
     m_webSocketThread->start();
 }
@@ -491,9 +492,9 @@ void TorcNetworkService::RemoteRequest(TorcRPCRequest *Request)
     if (!Request)
         return;
 
-    if (m_webSocketThread && m_webSocketThread->Socket())
+    if (m_webSocketThread)
     {
-        m_webSocketThread->Socket()->RemoteRequest(Request);
+        m_webSocketThread->RemoteRequest(Request);
     }
     else
     {
@@ -507,8 +508,8 @@ void TorcNetworkService::CancelRequest(TorcRPCRequest *Request)
     if (!Request)
         return;
 
-    if (m_webSocketThread && m_webSocketThread->Socket())
-        m_webSocketThread->Socket()->CancelRequest(Request);
+    if (m_webSocketThread)
+        m_webSocketThread->CancelRequest(Request);
     else
         LOG(VB_GENERAL, LOG_ERR, "Cannot cancel request - not connected");
 }

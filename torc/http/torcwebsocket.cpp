@@ -48,6 +48,11 @@
  * \sa TorcHTTPServer
  * \sa TorcHTTPRequest
  * \sa TorcHTTPConnection
+ * \sa TorcWebSocketThread
+ *
+ * TorcWebSocket is NOT thread safe. It will make direct function calls to registered services - which must
+ * ensure those functions are thread safe. Likewise RemoteRequest etc can be called from any thread. For
+ * thread safe operation - use TorcWebSocketThread.
  *
  * \note SubProtocol support is currently limited to JSON-RPC. New subprotocols with mixed frame support
  *       (Binary and Text) are not currently supported.
@@ -58,13 +63,11 @@
  * \todo Limit frame size for reading
  * \todo Fix testsuite partial failures (fail fast on invalid UTF-8)
  * \todo Add timeout for response to upgrade request
- * \todo Fix deletion handling when there is no parent thread
  * \todo Add support for batched RPC calls
 */
 
-TorcWebSocket::TorcWebSocket(TorcQThread *Parent, TorcHTTPRequest *Request, QTcpSocket *Socket)
+TorcWebSocket::TorcWebSocket(TorcHTTPRequest *Request, QTcpSocket *Socket)
   : QObject(),
-    m_parent(Parent),
     m_authenticate(false),
     m_handShaking(false),
     m_upgradeResponseReader(NULL),
@@ -108,9 +111,8 @@ TorcWebSocket::TorcWebSocket(TorcQThread *Parent, TorcHTTPRequest *Request, QTcp
     }
 }
 
-TorcWebSocket::TorcWebSocket(TorcQThread *Parent, const QHostAddress &Address, quint16 Port, bool Authenticate, WSSubProtocol Protocol)
+TorcWebSocket::TorcWebSocket(const QHostAddress &Address, quint16 Port, bool Authenticate, WSSubProtocol Protocol)
   : QObject(),
-    m_parent(Parent),
     m_authenticate(Authenticate),
     m_handShaking(true),
     m_upgradeResponseReader(new TorcHTTPReader()),
@@ -149,7 +151,7 @@ TorcWebSocket::~TorcWebSocket()
         LOG(VB_GENERAL, LOG_WARNING, QString("%1 outstanding RPC requests").arg(m_currentRequests.size()));
 
         while (!m_currentRequests.isEmpty())
-            HandleCancelRequest(m_currentRequests.begin().value());
+            CancelRequest(m_currentRequests.begin().value());
     }
 
     InitiateClose(CloseGoingAway, QString("WebSocket exiting normally"));
@@ -482,10 +484,6 @@ QVariantList TorcWebSocket::GetSupportedSubProtocols(void)
 ///\brief Initialise the websocket once its parent thread is ready.
 void TorcWebSocket::Start(void)
 {
-    // connect up remote requests
-    connect(this, SIGNAL(NewRequest(TorcRPCRequest*)),       this, SLOT(HandleRemoteRequest(TorcRPCRequest*)));
-    connect(this, SIGNAL(RequestCancelled(TorcRPCRequest*)), this, SLOT(HandleCancelRequest(TorcRPCRequest*)));
-
     // server side:)
     if (m_serverSide)
     {
@@ -493,8 +491,7 @@ void TorcWebSocket::Start(void)
         {
             connect(m_socket, SIGNAL(readyRead()), this, SLOT(ReadyRead()));
             connect(m_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(Error(QAbstractSocket::SocketError)));
-            if (m_parent)
-                connect(m_socket, SIGNAL(disconnected()), m_parent, SLOT(quit()));
+            connect(m_socket, SIGNAL(disconnected()), this, SIGNAL(Disconnected()));
 
             m_upgradeRequest->Respond(m_socket, &m_abort);
 
@@ -515,8 +512,7 @@ void TorcWebSocket::Start(void)
         connect(m_socket, SIGNAL(connected()), this, SLOT(Connected()));
         connect(m_socket, SIGNAL(readyRead()), this, SLOT(ReadyRead()));
         connect(m_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(Error(QAbstractSocket::SocketError)));
-        if (m_parent)
-            connect(m_socket, SIGNAL(disconnected()), m_parent, SLOT(quit()));
+        connect(m_socket, SIGNAL(disconnected()), this, SIGNAL(Disconnected()));
 
         m_socket->connectToHost(m_address, m_port);
         return;
@@ -524,8 +520,7 @@ void TorcWebSocket::Start(void)
 
     // failed
     LOG(VB_GENERAL, LOG_ERR, "Failed to start Websocket");
-    if (m_parent)
-        m_parent->quit();
+    emit Disconnected();
 }
 
 ///\brief Receives notifications when a property for a subscribed service has changed.
@@ -559,129 +554,57 @@ bool TorcWebSocket::HandleNotification(const QString &Method)
 }
 
 /*! \brief Initiate a Remote Procedure Call.
+ *
+ * \note This should always be called from within the websocket's thread.
 */
 void TorcWebSocket::RemoteRequest(TorcRPCRequest *Request)
-{
-    if (Request)
-    {
-        if (Request->IsNotification())
-            m_outstandingNotifications.ref();
-        else
-            Request->UpRef(); // NB
-
-        emit NewRequest(Request);
-    }
-}
-
-/*! \brief Cancel a Remote Procedure Call.
- *
- * Under normal operation, there is usually no need to cancel a call. When a parent exits
- * before a call is completed however, HandleCancelRequest may not be invoked before
- * the parent deletes the thread. In this case it is highly likely the Request will leak.
- * Hence we default to waiting for a short period to allow the call to complete.
- *
- * \note We assume the request will only ever be referenced by its owner and by TorcWebSocket.
-*/
-void TorcWebSocket::CancelRequest(TorcRPCRequest *Request, int Wait /* = 1000 ms*/)
-{
-    if (Request && !Request->IsNotification())
-    {
-        Request->AddState(TorcRPCRequest::Cancelled);
-        emit RequestCancelled(Request);
-
-        if (Wait > 0)
-        {
-            int count = 0;
-            while (Request->IsShared() && (count++ < Wait))
-                QThread::msleep(1);
-
-            if (Request->IsShared())
-                LOG(VB_GENERAL, LOG_ERR, "Request is still shared after cancellation");
-        }
-    }
-}
-
-/*! \brief Block until all outstanding notifications have been processed.
- *
- * Notifications have no owner (but are tracked internally by TorcWebSocket) and hence
- * we need to wait for queued notifications to be processed in HandleRemoteRequest to avoid
- * potentially leaking TorcRPCRequest's when closing the connection.
- *
- * \note This method must be called from another thread.
-*/
-void TorcWebSocket::WaitForNotifications(void)
-{
-    if (QThread::currentThread() == this->thread())
-    {
-        LOG(VB_GENERAL, LOG_ERR, "WaitForNotifications called from the wrong thread. Ignoring");
-        return;
-    }
-
-    // wait a maximum of 1000ms
-    int count = 0;
-    while (count++ < 1000 && m_outstandingNotifications.fetchAndAddOrdered(0))
-        QThread::msleep(1);
-
-    if (m_outstandingNotifications.fetchAndAddOrdered(0))
-        LOG(VB_GENERAL, LOG_ERR, "Outstanding notifications even after waiting 1000ms");
-}
-
-/*! \brief Thread safe Remote Procedure Call implementation.
-*/
-void TorcWebSocket::HandleRemoteRequest(TorcRPCRequest *Request)
 {
     if (!Request)
         return;
 
     bool notification = Request->IsNotification();
 
-    // guard against a request that is immediately cancelled
-    if (Request->GetState() & TorcRPCRequest::Cancelled)
+    // NB notitications cannot be cancelled - they are fire and forget.
+    // NB other requests cannot be cancelled before this call is processed (they will not be present in m_currentRequests)
+    if (!notification)
     {
-        // NB a notification cannot be cancelled
-        Request->DownRef();
+        Request->UpRef();
+        int id = m_currentRequestID++;
+        while (m_currentRequests.contains(id))
+            id = m_currentRequestID++;
+
+        Request->SetID(id);
+        m_currentRequests.insert(id, Request);
+
+        // start a timer for this request
+        m_requestTimers.insert(startTimer(10000, Qt::CoarseTimer), id);
+
+        // keep id's at sane values
+        if (m_currentRequestID > 100000)
+            m_currentRequestID = 1;
     }
+
+    Request->AddState(TorcRPCRequest::RequestSent);
+
+    if (m_subProtocol != SubProtocolNone)
+        SendFrame(m_subProtocolFrameFormat, Request->SerialiseRequest(m_subProtocol));
     else
-    {
-        if (!notification)
-        {
-            int id = m_currentRequestID++;
-            while (m_currentRequests.contains(id))
-                id = m_currentRequestID++;
-
-            Request->SetID(id);
-            m_currentRequests.insert(id, Request);
-
-            // start a timer for this request
-            m_requestTimers.insert(startTimer(10000, Qt::CoarseTimer), id);
-
-            // keep id's at sane values
-            if (m_currentRequestID > 100000)
-                m_currentRequestID = 1;
-        }
-
-        Request->AddState(TorcRPCRequest::RequestSent);
-
-        if (m_subProtocol == SubProtocolNone)
-            LOG(VB_GENERAL, LOG_ERR, "No protocol specified for remote procedure call");
-        else
-            SendFrame(m_subProtocolFrameFormat, Request->SerialiseRequest(m_subProtocol));
-    }
+        LOG(VB_GENERAL, LOG_ERR, "No protocol specified for remote procedure call");
 
     // notifications are fire and forget, so downref immediately
     if (notification)
-    {
         Request->DownRef();
-        m_outstandingNotifications.deref();
-    }
 }
 
-/*! \brief Thread safe cancellation of Remote Procedure Call.
+/*! \brief Cancel a Remote Procedure Call.
+ *
+ * \note We assume the request will only ever be referenced by its owner and by TorcWebSocket.
 */
-void TorcWebSocket::HandleCancelRequest(TorcRPCRequest *Request)
+void TorcWebSocket::CancelRequest(TorcRPCRequest *Request)
 {
-    if (Request && Request->GetID() > -1)
+    if (Request && !Request->IsNotification() && Request->GetID() > -1)
     {
+        Request->AddState(TorcRPCRequest::Cancelled);
         int id = Request->GetID();
         if (m_currentRequests.contains(id))
         {
@@ -698,6 +621,9 @@ void TorcWebSocket::HandleCancelRequest(TorcRPCRequest *Request)
         {
             LOG(VB_GENERAL, LOG_ERR, "Cannot cancel unknown RPC request");
         }
+
+        if (Request->IsShared())
+            LOG(VB_GENERAL, LOG_ERR, "RPC request is still referenced after cancellation - potential leak");
     }
 }
 
@@ -1139,7 +1065,9 @@ void TorcWebSocket::CloseSocket(void)
     if (m_socket)
     {
         m_socket->disconnectFromHost();
-        if (m_socket->state() != QAbstractSocket::UnconnectedState && !m_socket->waitForDisconnected(1000))
+        // we only check for connected state - we don't care if it is any in any prior or subsequent state (hostlookup, connecting) and
+        // the wait is only a 'courtesy' anyway.
+        if (m_socket->state() == QAbstractSocket::ConnectedState && !m_socket->waitForDisconnected(1000))
             LOG(VB_GENERAL, LOG_WARNING, "WebSocket not successfully disconnected before closing");
         m_socket->close();
         m_socket->deleteLater();
@@ -1562,49 +1490,4 @@ void TorcWebSocket::ProcessPayload(const QByteArray &Payload)
 
         request->DownRef();
     }
-}
-
-TorcWebSocketThread::TorcWebSocketThread(TorcHTTPRequest *Request, QTcpSocket *Socket)
-  : TorcQThread("WebSocket"),
-    m_webSocket(new TorcWebSocket(this, Request, Socket))
-{
-    m_webSocket->moveToThread(this);
-}
-
-TorcWebSocketThread::TorcWebSocketThread(const QHostAddress &Address, quint16 Port, bool Authenticate, TorcWebSocket::WSSubProtocol Protocol)
-  : TorcQThread("WebSocket"),
-    m_webSocket(new TorcWebSocket(this, Address, Port, Authenticate, Protocol))
-{
-    m_webSocket->moveToThread(this);
-}
-
-TorcWebSocketThread::~TorcWebSocketThread()
-{
-    LOG(VB_GENERAL, LOG_INFO, "WebSocketThread dtor");
-
-    delete m_webSocket;
-    m_webSocket = NULL;
-}
-
-void TorcWebSocketThread::Start(void)
-{
-    m_webSocket->Start();
-}
-
-void TorcWebSocketThread::Finish(void)
-{
-}
-
-TorcWebSocket* TorcWebSocketThread::Socket(void)
-{
-    return m_webSocket;
-}
-
-void TorcWebSocketThread::Shutdown(void)
-{
-    if (m_webSocket)
-        m_webSocket->WaitForNotifications();
-    disconnect();
-    quit();
-    wait();
 }
