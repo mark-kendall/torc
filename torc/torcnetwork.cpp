@@ -148,7 +148,7 @@ void TorcNetwork::AddHostName(const QString &Host)
     }
 
     if (changed && gLocalContext)
-        gLocalContext->NotifyEvent(Torc::NetworkHostNamesChanged);
+        TorcLocalContext::NotifyEvent(Torc::NetworkHostNamesChanged);
 }
 
 /*! \brief Remove a host name from the known list of host names.
@@ -172,7 +172,7 @@ void TorcNetwork::RemoveHostName(const QString &Host)
     }
 
     if (changed && gLocalContext)
-        gLocalContext->NotifyEvent(Torc::NetworkHostNamesChanged);
+        TorcLocalContext::NotifyEvent(Torc::NetworkHostNamesChanged);
 }
 
 /*! \brief Retrieve the list of currently identified host names.
@@ -737,7 +737,7 @@ void TorcNetwork::UpdateConfiguration(bool Creating)
 
     if (m_online && !wasonline)
     {
-        gLocalContext->NotifyEvent(Torc::NetworkAvailable);
+        TorcLocalContext::NotifyEvent(Torc::NetworkAvailable);
 
         QStringList addresses;
         QList<QHostAddress> entries = QNetworkInterface::allAddresses();
@@ -754,7 +754,7 @@ void TorcNetwork::UpdateConfiguration(bool Creating)
     {
         LOG(VB_GENERAL, LOG_INFO, "Network down");
         CloseConnections();
-        gLocalContext->NotifyEvent(Torc::NetworkUnavailable);
+        TorcLocalContext::NotifyEvent(Torc::NetworkUnavailable);
 
         foreach (QString host, m_hostNames)
             RemoveHostName(host);
@@ -763,7 +763,7 @@ void TorcNetwork::UpdateConfiguration(bool Creating)
     else if (changed)
     {
         LOG(VB_GENERAL, LOG_INFO, "Network configuration changed");
-        gLocalContext->NotifyEvent(Torc::NetworkChanged);
+        TorcLocalContext::NotifyEvent(Torc::NetworkChanged);
     }
 }
 

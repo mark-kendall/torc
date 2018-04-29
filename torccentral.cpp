@@ -157,7 +157,7 @@ TorcCentral::TorcCentral()
                 it.value()->Start();
         }
 
-        gLocalContext->NotifyEvent(Torc::Start);
+        TorcLocalContext::NotifyEvent(Torc::Start);
 
         // iff we have got this far, then create the graph
         // start the graph
@@ -254,7 +254,7 @@ QString TorcCentral::GetUIName(void)
 bool TorcCentral::RestartTorc(void)
 {
     // NB could be called from any thread
-    gLocalContext->NotifyEvent(Torc::RestartTorc);
+    TorcLocalContext::NotifyEvent(Torc::RestartTorc);
     return true;
 }
 
