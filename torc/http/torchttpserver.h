@@ -66,7 +66,7 @@ class TorcHTTPServer : public QTcpServer
 
   protected:
     static TorcHTTPServer*            gWebServer;
-    static QMutex*                    gWebServerLock;
+    static QMutex                     gWebServerLock;
     static QString                    gPlatform;
     static QString                    gOriginWhitelist;
     static QReadWriteLock             gOriginWhitelistLock;

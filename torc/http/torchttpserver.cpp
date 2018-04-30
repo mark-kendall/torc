@@ -510,7 +510,7 @@ QVariantMap TorcHTTPServer::GetServiceDescription(const QString &Service)
 
 void TorcHTTPServer::UpgradeSocket(TorcHTTPRequest *Request, QTcpSocket *Socket)
 {
-    QMutexLocker locker(gWebServerLock);
+    QMutexLocker locker(&gWebServerLock);
 
     if (gWebServer && Request && Socket)
     {
@@ -529,7 +529,7 @@ void TorcHTTPServer::UpgradeSocket(TorcHTTPRequest *Request, QTcpSocket *Socket)
 
 int TorcHTTPServer::GetPort(void)
 {
-    QMutexLocker locker(gWebServerLock);
+    QMutexLocker locker(&gWebServerLock);
 
     if (gWebServer)
         return gWebServer->serverPort();
@@ -539,7 +539,7 @@ int TorcHTTPServer::GetPort(void)
 
 bool TorcHTTPServer::IsListening(void)
 {
-    QMutexLocker locker(gWebServerLock);
+    QMutexLocker locker(&gWebServerLock);
 
     if (gWebServer)
         return gWebServer->isListening();
@@ -573,7 +573,7 @@ QString TorcHTTPServer::PlatformName(void)
 */
 
 TorcHTTPServer* TorcHTTPServer::gWebServer = NULL;
-QMutex*         TorcHTTPServer::gWebServerLock = new QMutex(QMutex::Recursive);
+QMutex          TorcHTTPServer::gWebServerLock(QMutex::Recursive);
 QString         TorcHTTPServer::gPlatform = QString("");
 QString         TorcHTTPServer::gOriginWhitelist = QString("");
 QReadWriteLock  TorcHTTPServer::gOriginWhitelistLock(QReadWriteLock::Recursive);
@@ -962,13 +962,13 @@ class TorcHTTPServerObject : public TorcAdminObject, public TorcStringFactory
     {
         Destroy();
 
-        QMutexLocker locker(TorcHTTPServer::gWebServerLock);
+        QMutexLocker locker(&TorcHTTPServer::gWebServerLock);
         TorcHTTPServer::gWebServer = new TorcHTTPServer();
     }
 
     void Destroy(void)
     {
-        QMutexLocker locker(TorcHTTPServer::gWebServerLock);
+        QMutexLocker locker(&TorcHTTPServer::gWebServerLock);
 
         // this may need to use deleteLater but this causes issues with setting deletion
         // as the object is actually destroyed after the parent (network) setting
