@@ -404,7 +404,7 @@ void TorcHTTPServer::HandleRequest(TorcHTTPConnection *Connection, TorcHTTPReque
 
         // verify cross domain requests
         // should an invalid origin fail?
-        Connection->GetServer()->ValidateOrigin(Request);
+        TorcHTTPServer::ValidateOrigin(Request);
 
         QReadLocker locker(gHandlersLock);
 
@@ -575,6 +575,8 @@ QString TorcHTTPServer::PlatformName(void)
 TorcHTTPServer* TorcHTTPServer::gWebServer = NULL;
 QMutex*         TorcHTTPServer::gWebServerLock = new QMutex(QMutex::Recursive);
 QString         TorcHTTPServer::gPlatform = QString("");
+QString         TorcHTTPServer::gOriginWhitelist = QString("");
+QReadWriteLock  TorcHTTPServer::gOriginWhitelistLock(QReadWriteLock::Recursive);
 
 TorcHTTPServer::TorcHTTPServer()
   : QTcpServer(),
@@ -586,8 +588,7 @@ TorcHTTPServer::TorcHTTPServer()
     m_upnpContent(),                                           // upnp - device description
     m_abort(0),
     m_httpBonjourReference(0),
-    m_torcBonjourReference(0),
-    m_originWhitelistLock(QReadWriteLock::Recursive)
+    m_torcBonjourReference(0)
 {
     // port setting - this could become a user editable setting
     m_port = new TorcSetting(NULL, TORC_CORE + "WebServerPort", QString(), TorcSetting::Integer, true, QVariant((int)4840));
@@ -681,7 +682,7 @@ void TorcHTTPServer::Authorise(TorcHTTPConnection *Connection, TorcHTTPRequest *
         // clients to authenticate (i.e. browsers).
         QString dummy;
         bool stale = false;
-        if (AuthenticateUser(Request, dummy, stale))
+        if (TorcHTTPServer::AuthenticateUser(Request, dummy, stale))
         {
             Request->Authorise(true);
             return;
@@ -719,13 +720,13 @@ void TorcHTTPServer::Authorise(TorcHTTPConnection *Connection, TorcHTTPRequest *
 */
 void TorcHTTPServer::ValidateOrigin(TorcHTTPRequest *Request)
 {
-    m_originWhitelistLock.lockForRead();
-    if (Request && Request->Headers()->contains("Origin") && m_originWhitelist.contains(Request->Headers()->value("Origin"), Qt::CaseInsensitive))
+    gOriginWhitelistLock.lockForRead();
+    if (Request && Request->Headers()->contains("Origin") && gOriginWhitelist.contains(Request->Headers()->value("Origin"), Qt::CaseInsensitive))
     {
         Request->SetResponseHeader("Access-Control-Allow-Origin", Request->Headers()->value("Origin"));
         Request->SetResponseHeader("Access-Control-Allow-Credentials", "true");
     }
-    m_originWhitelistLock.unlock();
+    gOriginWhitelistLock.unlock();
 }
 
 bool TorcHTTPServer::AuthenticateUser(TorcHTTPRequest *Request, QString &Username, bool &Stale)
@@ -774,26 +775,25 @@ bool TorcHTTPServer::AuthenticateUser(TorcHTTPRequest *Request, QString &Usernam
  *
  * \note This assumes the server is listening on all interfaces (currently true).
 */
-void TorcHTTPServer::UpdateOriginWhitelist(void)
+void TorcHTTPServer::UpdateOriginWhitelist(int Port)
 {
-    QWriteLocker locker(&m_originWhitelistLock);
-    int port = m_port->GetValue().toInt();
+    QWriteLocker locker(&gOriginWhitelistLock);
 
     // localhost first
-    m_originWhitelist = "http://localhost:" + QString::number(port) + " ";
+    gOriginWhitelist = "http://localhost:" + QString::number(Port) + " ";
 
     // all known raw IP addresses
     QList<QHostAddress> addresses = QNetworkInterface::allAddresses();
     for (int i = 0; i < addresses.size(); ++i)
-        m_originWhitelist += QString("%1%2 ").arg("http://").arg(TorcNetwork::IPAddressToLiteral(addresses[i], port, false));
+        gOriginWhitelist += QString("%1%2 ").arg("http://").arg(TorcNetwork::IPAddressToLiteral(addresses[i], Port, false));
 
     // and any known host names
     QStringList hosts = TorcNetwork::GetHostNames();
     foreach (QString host, hosts)
         if (!host.isEmpty())
-            m_originWhitelist += QString("%1%2:%3 ").arg("http://").arg(host).arg(port);
+            gOriginWhitelist += QString("%1%2:%3 ").arg("http://").arg(host).arg(Port);
 
-    LOG(VB_NETWORK, LOG_INFO, "Origin whitelist: " + m_originWhitelist);
+    LOG(VB_NETWORK, LOG_INFO, "Origin whitelist: " + gOriginWhitelist);
 }
 
 bool TorcHTTPServer::Open(void)
@@ -864,7 +864,7 @@ bool TorcHTTPServer::Open(void)
     if (!waslistening)
     {
         LOG(VB_GENERAL, LOG_INFO, QString("Web server listening on port %1").arg(port));
-        UpdateOriginWhitelist();
+        UpdateOriginWhitelist(m_port->GetValue().toInt());
     }
 
     return true;
@@ -916,7 +916,7 @@ bool TorcHTTPServer::event(QEvent *Event)
                 case Torc::NetworkUnavailable:
                 case Torc::NetworkChanged:
                 case Torc::NetworkHostNamesChanged:
-                    UpdateOriginWhitelist();
+                    UpdateOriginWhitelist(m_port->GetValue().toInt());
                     break;
                 default:
                     break;
@@ -929,7 +929,7 @@ bool TorcHTTPServer::event(QEvent *Event)
 
 void TorcHTTPServer::incomingConnection(qintptr SocketDescriptor)
 {
-    m_connectionPool.start(new TorcHTTPConnection(this, SocketDescriptor, &m_abort), 0);
+    m_connectionPool.start(new TorcHTTPConnection(SocketDescriptor, &m_abort), 0);
 }
 
 class TorcHTTPServerObject : public TorcAdminObject, public TorcStringFactory

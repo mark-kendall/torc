@@ -44,10 +44,9 @@
  * \todo Check content length early and deal with large or unexpected content payloads
 */
 
-TorcHTTPConnection::TorcHTTPConnection(TorcHTTPServer *Parent, qintptr SocketDescriptor, int *Abort)
+TorcHTTPConnection::TorcHTTPConnection(qintptr SocketDescriptor, int *Abort)
   : QRunnable(),
     m_abort(Abort),
-    m_server(Parent),
     m_socketDescriptor(SocketDescriptor),
     m_socket(NULL)
 {
@@ -60,11 +59,6 @@ TorcHTTPConnection::~TorcHTTPConnection()
 QTcpSocket* TorcHTTPConnection::GetSocket(void)
 {
     return m_socket;
-}
-
-TorcHTTPServer* TorcHTTPConnection::GetServer(void)
-{
-    return m_server;
 }
 
 void TorcHTTPConnection::run(void)
@@ -90,7 +84,7 @@ void TorcHTTPConnection::run(void)
     TorcHTTPReader *reader  = new TorcHTTPReader();
     bool connectionupgraded = false;
 
-    while (m_server && !(*m_abort) && m_socket->state() == QAbstractSocket::ConnectedState)
+    while (!(*m_abort) && m_socket->state() == QAbstractSocket::ConnectedState)
     {
         // wait for data
         int count = 0;
@@ -130,7 +124,7 @@ void TorcHTTPConnection::run(void)
         // have headers and content - process request
         TorcHTTPRequest *request = new TorcHTTPRequest(reader);
         bool upgrade = request->Headers()->contains("Upgrade");
-        m_server->Authorise(this, request, upgrade);
+        TorcHTTPServer::Authorise(this, request, upgrade);
 
         if (request->GetHTTPType() == HTTPResponse)
         {

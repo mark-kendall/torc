@@ -29,6 +29,9 @@ class TorcHTTPServer : public QTcpServer
 
   public:
     // Content/service handlers
+    static void    Authorise          (TorcHTTPConnection *Connection, TorcHTTPRequest *Request, bool ForceCheck);
+    static bool    AuthenticateUser   (TorcHTTPRequest *Request, QString &Username, bool &Stale);
+    static void    ValidateOrigin     (TorcHTTPRequest *Request);
     static void    RegisterHandler    (TorcHTTPHandler *Handler);
     static void    DeregisterHandler  (TorcHTTPHandler *Handler);
     static void    HandleRequest      (TorcHTTPConnection *Connection, TorcHTTPRequest *Request);
@@ -46,8 +49,6 @@ class TorcHTTPServer : public QTcpServer
 
   public:
     virtual       ~TorcHTTPServer     ();
-    void           Authorise          (TorcHTTPConnection *Connection, TorcHTTPRequest *Request, bool ForceCheck);
-    void           ValidateOrigin     (TorcHTTPRequest *Request);
 
   signals:
     void           HandlersChanged    (void);
@@ -67,10 +68,11 @@ class TorcHTTPServer : public QTcpServer
     static TorcHTTPServer*            gWebServer;
     static QMutex*                    gWebServerLock;
     static QString                    gPlatform;
+    static QString                    gOriginWhitelist;
+    static QReadWriteLock             gOriginWhitelistLock;
 
   private:
-    bool           AuthenticateUser      (TorcHTTPRequest *Request, QString &Username, bool &Stale);
-    void           UpdateOriginWhitelist (void);
+    static void     UpdateOriginWhitelist (int Port);
 
   private:
     TorcSetting                      *m_port;
@@ -84,8 +86,6 @@ class TorcHTTPServer : public QTcpServer
     quint32                           m_httpBonjourReference;
     quint32                           m_torcBonjourReference;
     TorcWebSocketPool                 m_webSocketPool;
-    QString                           m_originWhitelist;
-    QReadWriteLock                    m_originWhitelistLock;
 };
 
 Q_DECLARE_METATYPE(TorcHTTPRequest*);
