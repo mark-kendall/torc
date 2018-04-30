@@ -7,7 +7,9 @@
 #include <QString>
 #include <QDateTime>
 
-class TorcHTTPReader;
+// Torc
+#include "torchttpreader.h"
+
 class TorcSerialiser;
 class QTcpSocket;
 class QFile;
