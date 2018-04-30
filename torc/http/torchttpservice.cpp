@@ -575,7 +575,7 @@ QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVarian
             if (change > -1)
             {
                 // this method is not thread-safe and is called from multiple threads so lock the subscribers
-                QMutexLocker locker(m_subscriberLock);
+                QMutexLocker locker(&m_subscriberLock);
 
                 if (!m_subscribers.contains(Connection))
                 {
@@ -619,7 +619,7 @@ QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVarian
         // implicit 'Unsubscribe' method
         else if (method.compare("Unsubscribe") == 0)
         {
-            QMutexLocker locker(m_subscriberLock);
+            QMutexLocker locker(&m_subscriberLock);
 
             if (m_subscribers.contains(Connection))
             {
@@ -823,7 +823,7 @@ void TorcHTTPService::DisableMethod(const QString &Method)
 
 void TorcHTTPService::HandleSubscriberDeleted(QObject *Subscriber)
 {
-    QMutexLocker locker(m_subscriberLock);
+    QMutexLocker locker(&m_subscriberLock);
 
     if (Subscriber && m_subscribers.contains(Subscriber))
     {
