@@ -250,7 +250,7 @@ TorcHTTPService::TorcHTTPService(QObject *Parent, const QString &Signature, cons
     m_parent(Parent),
     m_version("Unknown"),
     m_metaObject(MetaObject),
-    m_subscriberLock(new QMutex(QMutex::Recursive))
+    m_subscriberLock(QMutex::Recursive)
 {
     QStringList blacklist = Blacklist.split(",");
 
@@ -377,7 +377,6 @@ TorcHTTPService::TorcHTTPService(QObject *Parent, const QString &Signature, cons
 TorcHTTPService::~TorcHTTPService()
 {
     qDeleteAll(m_methods);
-    delete m_subscriberLock;
 }
 
 QString TorcHTTPService::GetUIName(void)
@@ -669,8 +668,7 @@ QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVarian
  */
 QVariantMap TorcHTTPService::GetServiceDetails(void)
 {
-    // this method is not thread-safe and is called from multiple threads so lock the subscribers
-    QMutexLocker locker(m_subscriberLock);
+    // no need for locking here
 
     QVariantMap details;
     QVariantMap properties;

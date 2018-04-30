@@ -46,7 +46,7 @@ class TorcHTTPService : public TorcHTTPHandler
     QMap<QString,MethodParameters*>        m_methods;
     QMap<int,int>                          m_properties;
     QList<QObject*>                        m_subscribers;
-    QMutex                                *m_subscriberLock;
+    QMutex                                 m_subscriberLock;
 };
 
 Q_DECLARE_METATYPE(TorcHTTPService*);
