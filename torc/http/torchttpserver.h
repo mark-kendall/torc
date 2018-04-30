@@ -45,7 +45,6 @@ class TorcHTTPServer : public QTcpServer
 
   public:
     virtual       ~TorcHTTPServer     ();
-    QString        GetWebSocketToken  (TorcHTTPConnection *Connection, TorcHTTPRequest *Request);
     void           Authorise          (TorcHTTPConnection *Connection, TorcHTTPRequest *Request, bool ForceCheck);
     void           ValidateOrigin     (TorcHTTPRequest *Request);
 
@@ -69,7 +68,6 @@ class TorcHTTPServer : public QTcpServer
     static QString                    gPlatform;
 
   private:
-    static void    ExpireWebSocketTokens (void);
     bool           AuthenticateUser      (TorcHTTPRequest *Request, QString &Username, bool &Stale);
     void           UpdateOriginWhitelist (void);
 

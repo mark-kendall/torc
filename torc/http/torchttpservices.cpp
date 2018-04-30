@@ -34,6 +34,7 @@
 #include "torchttpservice.h"
 #include "torchttpconnection.h"
 #include "torchttpservices.h"
+#include "torcwebsockettoken.h"
 
 /*! \class TorcHTTPServices
  *  \brief Top level interface into services.
@@ -90,7 +91,7 @@ void TorcHTTPServices::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTTPConn
                 Request->SetStatus(HTTP_OK);
                 TorcSerialiser *serialiser = Request->GetSerialiser();
                 Request->SetResponseType(serialiser->ResponseType());
-                Request->SetResponseContent(serialiser->Serialise(Connection->GetServer()->GetWebSocketToken(Connection, Request), "accesstoken"));
+                Request->SetResponseContent(serialiser->Serialise(TorcWebSocketToken::GetWebSocketToken(Connection, Request), "accesstoken"));
                 delete serialiser;
             }
             else

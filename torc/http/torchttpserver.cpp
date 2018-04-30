@@ -22,7 +22,6 @@
 
 // Qt
 #include <QUrl>
-#include <QUuid>
 #include <QTcpSocket>
 #include <QCoreApplication>
 
@@ -31,7 +30,6 @@
 #include "torclocalcontext.h"
 #include "torclanguage.h"
 #include "torclogging.h"
-#include "torccoreutils.h"
 #include "torcadminthread.h"
 #include "torcnetwork.h"
 #include "torchttpconnection.h"
@@ -42,33 +40,13 @@
 #include "torchttpserver.h"
 #include "torcbonjour.h"
 #include "torcssdp.h"
+#include "torcwebsockettoken.h"
 
 #define TORC_REALM QString("Torc")
 
 #ifndef Q_OS_WIN
 #include <sys/utsname.h>
 #endif
-
-///\brief A simple container for authenticaion tokens.
-class WebSocketAuthentication
-{
-  public:
-    WebSocketAuthentication()
-      : m_timeStamp(0)
-    {
-    }
-    WebSocketAuthentication(quint64 Timestamp, const QString &Host)
-      : m_timeStamp(Timestamp),
-        m_host(Host)
-    {
-    }
-
-    quint64 m_timeStamp;
-    QString m_host;
-};
-
-QMap<QString,WebSocketAuthentication> gWebSocketTokens;
-QMutex* gWebSocketTokensLock = new QMutex(QMutex::Recursive);
 
 /*! \brief A server nonce for Digest Access Authentication
  *
@@ -657,32 +635,6 @@ TorcHTTPServer::~TorcHTTPServer()
     }
 }
 
-/*! \brief Retrieve an authentication token for the given request.
- *
- * The request must contain a valid 'Authorization' header for a known user, in which case
- * a unique token is returned. The token is single use, expires after 10 seconds and must
- * be appended to the url used to open a WebSocket with the server (e.g. ws://localhost:port?accesstoken=YOURTOKENHERE).
- *
- *  \note The request is authorized/authenticated in HandleRequest. Authenticating again here is
- *        cpu intensive and double's up on nonce count incrementing.
- *  \todo Add an authenticated field/var to TorcHTTPRequest? (along with username)?
-*/
-QString TorcHTTPServer::GetWebSocketToken(TorcHTTPConnection *Connection, TorcHTTPRequest *Request)
-{
-    ExpireWebSocketTokens();
-
-    if (Request)
-    {
-        QMutexLocker locker(gWebSocketTokensLock);
-        QString uuid = QUuid::createUuid().toString().mid(1, 36);
-        QString host = Connection->GetSocket() ? Connection->GetSocket()->peerAddress().toString() : QString("ErrOR");
-        gWebSocketTokens.insert(uuid, WebSocketAuthentication(TorcCoreUtils::GetMicrosecondCount(), host));
-        return uuid;
-    }
-
-    return QString("ServerErRor");
-}
-
 /*! \brief Ensures remote user is authorised to access this request.
  *
  * The 'Authorization' header is used for standard HTTP requests.
@@ -709,6 +661,18 @@ void TorcHTTPServer::Authorise(TorcHTTPConnection *Connection, TorcHTTPRequest *
             return;
         }
 
+        // authentication token supplied in the url (WebSocket)
+        // do this before 'standard' authentication to ensure token is checked and expired
+        if (Request->Queries().contains("accesstoken") && Connection)
+        {
+            QString token = Request->Queries().value("accesstoken");
+            if (token == TorcWebSocketToken::GetWebSocketToken(Connection, Request, token))
+            {
+                Request->Authorise(true);
+                return;
+            }
+        }
+
         // explicit authorization header
         // N.B. This will also authorise websocket clients who send authorisation headers with
         // the upgrade request i.e. there is no need to use the accesstoken route IF the correct headers
@@ -720,32 +684,6 @@ void TorcHTTPServer::Authorise(TorcHTTPConnection *Connection, TorcHTTPRequest *
         {
             Request->Authorise(true);
             return;
-        }
-
-        // authentication token supplied in the url (WebSocket)
-        if (Request->Queries().contains("accesstoken"))
-        {
-            ExpireWebSocketTokens();
-            if (Connection)
-            {
-                QMutexLocker locker(gWebSocketTokensLock);
-                QString token = Request->Queries().value("accesstoken");
-
-                if (gWebSocketTokens.contains(token))
-                {
-                    QString host = Connection->GetSocket() ? Connection->GetSocket()->peerAddress().toString() : QString("eRROr");
-                    if (gWebSocketTokens.value(token).m_host == host)
-                    {
-                        gWebSocketTokens.remove(token);
-                        Request->Authorise(true);
-                        return;
-                    }
-                    else
-                    {
-                        LOG(VB_GENERAL, LOG_ERR, "Host mismatch for websocket authentication");
-                    }
-                }
-            }
         }
 
         Request->Authorise(false);
@@ -785,22 +723,6 @@ void TorcHTTPServer::ValidateOrigin(TorcHTTPRequest *Request)
         Request->SetResponseHeader("Access-Control-Allow-Origin", Request->Headers()->value("Origin"));
         Request->SetResponseHeader("Access-Control-Allow-Credentials", "true");
     }
-}
-
-void TorcHTTPServer::ExpireWebSocketTokens(void)
-{
-    QMutexLocker locker(gWebSocketTokensLock);
-
-    quint64 tooold = TorcCoreUtils::GetMicrosecondCount() - 10000000;
-
-    QStringList old;
-    QMap<QString,WebSocketAuthentication>::iterator it = gWebSocketTokens.begin();
-    for ( ; it != gWebSocketTokens.end(); ++it)
-        if (it.value().m_timeStamp < tooold)
-            old.append(it.key());
-
-    foreach (QString expire, old)
-        gWebSocketTokens.remove(expire);
 }
 
 bool TorcHTTPServer::AuthenticateUser(TorcHTTPRequest *Request, QString &Username, bool &Stale)
