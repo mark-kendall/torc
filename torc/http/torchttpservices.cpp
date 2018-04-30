@@ -85,7 +85,7 @@ void TorcHTTPServices::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTTPConn
                 Request->SetResponseType(HTTPResponseDefault);
                 Request->SetAllowed(HTTPGet | HTTPOptions);
             }
-            else if (type == HTTPGet)
+            else if (type == HTTPPut)
             {
                 Request->SetStatus(HTTP_OK);
                 TorcSerialiser *serialiser = Request->GetSerialiser();
