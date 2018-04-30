@@ -57,15 +57,13 @@ class WebSocketAuthentication
       : m_timeStamp(0)
     {
     }
-    WebSocketAuthentication(quint64 Timestamp, const QString &UserName, const QString &Host)
+    WebSocketAuthentication(quint64 Timestamp, const QString &Host)
       : m_timeStamp(Timestamp),
-        m_userName(UserName),
         m_host(Host)
     {
     }
 
     quint64 m_timeStamp;
-    QString m_userName;
     QString m_host;
 };
 
@@ -421,6 +419,10 @@ void TorcHTTPServer::HandleRequest(TorcHTTPConnection *Connection, TorcHTTPReque
 {
     if (Request && Connection)
     {
+        // this should already have been checked - but better safe than sorry
+        if (!Request->IsAuthorised())
+            return;
+
         // verify cross domain requests
         // should an invalid origin fail?
         Connection->GetServer()->ValidateOrigin(Request);
@@ -433,8 +435,7 @@ void TorcHTTPServer::HandleRequest(TorcHTTPConnection *Connection, TorcHTTPReque
         if (it != gHandlers.end())
         {
             // direct path match
-            if (Connection->GetServer()->Authenticated(Connection, Request))
-                (*it)->ProcessHTTPRequest(Request, Connection);
+            (*it)->ProcessHTTPRequest(Request, Connection);
         }
         else
         {
@@ -444,8 +445,7 @@ void TorcHTTPServer::HandleRequest(TorcHTTPConnection *Connection, TorcHTTPReque
             {
                 if ((*it)->GetRecursive() && path.startsWith(it.key()))
                 {
-                    if (Connection->GetServer()->Authenticated(Connection, Request))
-                        (*it)->ProcessHTTPRequest(Request, Connection);
+                    (*it)->ProcessHTTPRequest(Request, Connection);
                     break;
                 }
             }
@@ -462,7 +462,7 @@ void TorcHTTPServer::HandleRequest(TorcHTTPConnection *Connection, TorcHTTPReque
  * successful requests will have a 'result' entry and failed requests will have an 'error' field with
  * an error code and error message.
 */
-QVariantMap TorcHTTPServer::HandleRequest(const QString &Method, const QVariant &Parameters, QObject *Connection)
+QVariantMap TorcHTTPServer::HandleRequest(const QString &Method, const QVariant &Parameters, QObject *Connection, bool Authenticated)
 {
     QReadLocker locker(gHandlersLock);
 
@@ -477,7 +477,7 @@ QVariantMap TorcHTTPServer::HandleRequest(const QString &Method, const QVariant 
         // NB no recursive path handling here
         QMap<QString,TorcHTTPHandler*>::const_iterator it = gHandlers.find(path);
         if (it != gHandlers.end())
-            return (*it)->ProcessRequest(Method, Parameters, Connection);
+            return (*it)->ProcessRequest(Method, Parameters, Connection, Authenticated);
     }
 
     LOG(VB_GENERAL, LOG_ERR, QString("Method '%1' not found in services").arg(Method));
@@ -599,7 +599,6 @@ QString         TorcHTTPServer::gPlatform = QString("");
 TorcHTTPServer::TorcHTTPServer()
   : QTcpServer(),
     m_port(NULL),
-    m_requiresAuthentication(true),
     m_defaultHandler(NULL),
     m_servicesHandler(NULL),
     m_staticContent(NULL),
@@ -697,54 +696,60 @@ QString TorcHTTPServer::GetWebSocketToken(TorcHTTPConnection *Connection, TorcHT
 
     if (Request)
     {
-        QString user("admin"); // hrm - drop this now that authentication is not done here
         QMutexLocker locker(gWebSocketTokensLock);
         QString uuid = QUuid::createUuid().toString().mid(1, 36);
         QString host = Connection->GetSocket() ? Connection->GetSocket()->peerAddress().toString() : QString("ErrOR");
-        gWebSocketTokens.insert(uuid, WebSocketAuthentication(TorcCoreUtils::GetMicrosecondCount(), user, host));
+        gWebSocketTokens.insert(uuid, WebSocketAuthentication(TorcCoreUtils::GetMicrosecondCount(), host));
         return uuid;
     }
 
     return QString("ServerErRor");
 }
 
-/*! \brief Ensures remote user is authorised to access this server.
+/*! \brief Ensures remote user is authorised to access this request.
  *
  * The 'Authorization' header is used for standard HTTP requests.
  *
  * Authentication credentials supplied via the url are used for WebSocket upgrade requests - and it is assumed the if the
- * initial request is authenticated, the entire socket is then authenticated for that user. This needs a lot of
- * further work and consideration:
- *
- * - for the remote html based interface, the user will be asked to authenticate but the authentication details are
- *   not available in javascript. Hence an additional authentication form will be needed to supply credentials
- *   to the WebSocket url. There are numerous possible alternative approaches - don't require authentication for
- *   static content (only for the socket, which provides all of the content anyway), perform socket authentication after
- *   connecting by way of a token/salt that is retrieved via the HTTP interface (which will supply the necessary
- *   'Authorization' header.
- * - Basic HTTP authorization does not explicitly handle logging out.
- * - for peers connecting to one another via sockets, some form of centralised user tracking is required....
+ * initial request is authenticated, the entire socket is then authenticated for that user.
  *
  * \todo Use proper username and password.
 */
-bool TorcHTTPServer::Authenticated(TorcHTTPConnection *Connection, TorcHTTPRequest *Request)
+void TorcHTTPServer::Authorise(TorcHTTPConnection *Connection, TorcHTTPRequest *Request, bool ForceCheck)
 {
-    if (!m_requiresAuthentication)
-        return true;
-
     if (Request)
     {
+        // We allow unauthenticated access to anything that doesn't alter state.
+        // N.B. If a rogue peer posts to a 'setter' type function using a GET type request, the request
+        // will fail during processing - so don't validate the method here as it may lead to fall positives.
+        // ForceCheck is used to process any authentication headers for WebSocket upgrade requests.
+        HTTPRequestType type = Request->GetHTTPRequestType();
+        bool authenticate = type == HTTPPost || type == HTTPPut || type == HTTPDelete || type == HTTPUnknownType;
+
+        if (!authenticate && !ForceCheck)
+        {
+            Request->Authorise(true);
+            return;
+        }
+
         // explicit authorization header
+        // N.B. This will also authorise websocket clients who send authorisation headers with
+        // the upgrade request i.e. there is no need to use the accesstoken route IF the correct headers
+        // are sent. Use GetWebSocketToken (which is a PUT operation and requires authorisation) to force
+        // clients to authenticate (i.e. browsers).
         QString dummy;
         bool stale = false;
         if (AuthenticateUser(Request, dummy, stale))
-            return true;
+        {
+            Request->Authorise(true);
+            return;
+        }
 
         // authentication token supplied in the url (WebSocket)
         if (Request->Queries().contains("accesstoken"))
         {
             ExpireWebSocketTokens();
-
+            if (Connection)
             {
                 QMutexLocker locker(gWebSocketTokensLock);
                 QString token = Request->Queries().value("accesstoken");
@@ -755,7 +760,8 @@ bool TorcHTTPServer::Authenticated(TorcHTTPConnection *Connection, TorcHTTPReque
                     if (gWebSocketTokens.value(token).m_host == host)
                     {
                         gWebSocketTokens.remove(token);
-                        return true;
+                        Request->Authorise(true);
+                        return;
                     }
                     else
                     {
@@ -765,6 +771,7 @@ bool TorcHTTPServer::Authenticated(TorcHTTPConnection *Connection, TorcHTTPReque
             }
         }
 
+        Request->Authorise(false);
         Request->SetResponseType(HTTPResponseNone);
         Request->SetStatus(HTTP_Unauthorized);
 
@@ -786,8 +793,6 @@ bool TorcHTTPServer::Authenticated(TorcHTTPConnection *Connection, TorcHTTPReque
             Request->SetResponseHeader("WWW-Authenticate", QString("Basic realm=\"%1\"").arg(TORC_REALM));
         }
     }
-
-    return false;
 }
 
 /*! \brief Check the Origin header for validity and respond appropriately.

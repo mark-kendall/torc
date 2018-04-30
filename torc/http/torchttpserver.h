@@ -30,7 +30,7 @@ class TorcHTTPServer : public QTcpServer
     static void    RegisterHandler    (TorcHTTPHandler *Handler);
     static void    DeregisterHandler  (TorcHTTPHandler *Handler);
     static void    HandleRequest      (TorcHTTPConnection *Connection, TorcHTTPRequest *Request);
-    static QVariantMap HandleRequest  (const QString &Method, const QVariant &Parameters, QObject *Connection);
+    static QVariantMap HandleRequest  (const QString &Method, const QVariant &Parameters, QObject *Connection, bool Authenticated);
     static QVariantMap GetServiceHandlers (void);
     static QVariantMap GetServiceDescription(const QString &Service);
 
@@ -45,7 +45,7 @@ class TorcHTTPServer : public QTcpServer
   public:
     virtual       ~TorcHTTPServer     ();
     QString        GetWebSocketToken  (TorcHTTPConnection *Connection, TorcHTTPRequest *Request);
-    bool           Authenticated      (TorcHTTPConnection *Connection, TorcHTTPRequest *Request);
+    void           Authorise          (TorcHTTPConnection *Connection, TorcHTTPRequest *Request, bool ForceCheck);
     void           ValidateOrigin     (TorcHTTPRequest *Request);
 
   signals:
@@ -75,7 +75,6 @@ class TorcHTTPServer : public QTcpServer
 
   private:
     TorcSetting                      *m_port;
-    bool                              m_requiresAuthentication;
     TorcHTMLHandler                  *m_defaultHandler;
     TorcHTTPServices                 *m_servicesHandler;
     TorcHTMLStaticContent            *m_staticContent;

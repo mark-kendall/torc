@@ -138,6 +138,8 @@ class TorcHTTPRequest
     TorcSerialiser*        GetSerialiser            (void);
     bool                   Unmodified               (const QDateTime &LastModified);
     bool                   Unmodified               (void);
+    void                   Authorise                (bool Allow);
+    bool                   IsAuthorised             (void);
 
   protected:
     void                   Initialise               (const QString &Method);
@@ -159,6 +161,7 @@ class TorcHTTPRequest
 
     bool                   m_allowGZip;
     int                    m_allowed;
+    bool                   m_authorised;
     HTTPResponseType       m_responseType;
     int                    m_cache;
     QString                m_cacheTag;

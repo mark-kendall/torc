@@ -25,7 +25,7 @@ class TorcHTTPHandler
     bool                GetRecursive       (void) const;
     QString             Name               (void) const;
     virtual void        ProcessHTTPRequest (TorcHTTPRequest *Request, TorcHTTPConnection *Connection) = 0;
-    virtual QVariantMap ProcessRequest     (const QString &Method, const QVariant &Parameters, QObject *Connection);
+    virtual QVariantMap ProcessRequest     (const QString &Method, const QVariant &Parameters, QObject *Connection, bool Authenticated);
 
   protected:
     static void         HandleOptions      (TorcHTTPRequest *Request, int Allowed);

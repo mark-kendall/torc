@@ -285,16 +285,20 @@ void TorcHTTPConnection::run(void)
 
         // have headers and content - process request
         TorcHTTPRequest *request = new TorcHTTPRequest(reader);
+        bool upgrade = request->Headers()->contains("Upgrade");
+        m_server->Authorise(this, request, upgrade);
 
         if (request->GetHTTPType() == HTTPResponse)
         {
             LOG(VB_GENERAL, LOG_ERR, "Received unexpected HTTP response");
         }
-        else if (request->Headers()->contains("Upgrade"))
+        else if (upgrade)
         {
             // if the connection is upgraded, both request and m_socket will be transferred
             // to a new thread. DO NOT DELETE!
-            if (m_server->Authenticated(this, request) && TorcWebSocket::ProcessUpgradeRequest(this, request, m_socket))
+            // N.B. we do not check for authorisation here - an 'unauthorised' upgrade request will disallow access
+            // to 'setters'.
+            if (TorcWebSocket::ProcessUpgradeRequest(this, request, m_socket))
             {
                 connectionupgraded = true;
                 break;
@@ -306,7 +310,8 @@ void TorcHTTPConnection::run(void)
         }
         else
         {
-            TorcHTTPServer::HandleRequest(this, request);
+            if (request->IsAuthorised())
+                TorcHTTPServer::HandleRequest(this, request);
             request->Respond(m_socket, m_abort);
         }
 

@@ -69,6 +69,7 @@
 TorcWebSocket::TorcWebSocket(TorcHTTPRequest *Request, QTcpSocket *Socket)
   : QObject(),
     m_authenticate(false),
+    m_authenticated(false),
     m_handShaking(false),
     m_upgradeResponseReader(NULL),
     m_address(QHostAddress()),
@@ -114,6 +115,7 @@ TorcWebSocket::TorcWebSocket(TorcHTTPRequest *Request, QTcpSocket *Socket)
 TorcWebSocket::TorcWebSocket(const QHostAddress &Address, quint16 Port, bool Authenticate, WSSubProtocol Protocol)
   : QObject(),
     m_authenticate(Authenticate),
+    m_authenticated(false),
     m_handShaking(true),
     m_upgradeResponseReader(new TorcHTTPReader()),
     m_address(Address),
@@ -489,15 +491,18 @@ void TorcWebSocket::Start(void)
     {
         if (m_upgradeRequest && m_socket)
         {
+            m_authenticated = m_upgradeRequest->IsAuthorised();
             connect(m_socket, SIGNAL(readyRead()), this, SLOT(ReadyRead()));
             connect(m_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(Error(QAbstractSocket::SocketError)));
             connect(m_socket, SIGNAL(disconnected()), this, SIGNAL(Disconnected()));
 
             m_upgradeRequest->Respond(m_socket, &m_abort);
 
-            LOG(VB_GENERAL, LOG_INFO, "Server WebSocket connected to '" +
-                    (m_socket->peerAddress().toString() + ":" + QString::number(m_socket->peerPort())) +
-                    "' (Subprotocol: " + (SubProtocolsToString(m_subProtocol)) + ")");
+            LOG(VB_GENERAL, LOG_INFO, QString("%1 WebSocket connected from '%2:%3' (SubProtocol: %4)")
+                .arg(m_authenticated ? "Authenticated" : "Unauthenticated")
+                .arg(m_socket->peerAddress().toString())
+                .arg(m_socket->peerPort())
+                .arg(SubProtocolsToString(m_subProtocol)));
 
             emit ConnectionEstablished();
             return;
@@ -1386,7 +1391,7 @@ void TorcWebSocket::ProcessPayload(const QByteArray &Payload)
         // NB there is no method to support SENDING batched requests (hence
         // we should only receive batched requests from 3rd parties) and hence there
         // is no support for handling batched responses.
-        TorcRPCRequest *request = new TorcRPCRequest(m_subProtocol, Payload, this);
+        TorcRPCRequest *request = new TorcRPCRequest(m_subProtocol, Payload, this, m_authenticated);
 
         // if the request has data, we need to send it (it was a request!)
         if (!request->GetData().isEmpty())

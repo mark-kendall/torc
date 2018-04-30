@@ -46,7 +46,8 @@
  * deleted.
 */
 TorcRPCRequest::TorcRPCRequest(const QString &Method, QObject *Parent)
-  : m_notification(false),
+  : m_authenticated(false),
+    m_notification(false),
     m_state(None),
     m_id(-1),
     m_method(Method),
@@ -62,7 +63,8 @@ TorcRPCRequest::TorcRPCRequest(const QString &Method, QObject *Parent)
  * Notification requests are deleted after they have been sent.
 */
 TorcRPCRequest::TorcRPCRequest(const QString &Method)
-  : m_notification(true),
+  : m_authenticated(false),
+    m_notification(true),
     m_state(None),
     m_id(-1),
     m_method(Method),
@@ -74,8 +76,9 @@ TorcRPCRequest::TorcRPCRequest(const QString &Method)
 
 /*! \brief Creates a request from the given QJsonObject
 */
-TorcRPCRequest::TorcRPCRequest(const QJsonObject &Object)
-  : m_notification(true),
+TorcRPCRequest::TorcRPCRequest(const QJsonObject &Object, bool Authenticated)
+  : m_authenticated(Authenticated),
+    m_notification(true),
     m_state(None),
     m_id(-1),
     m_method(),
@@ -89,8 +92,9 @@ TorcRPCRequest::TorcRPCRequest(const QJsonObject &Object)
 /*! \brief Creates a request or response from the given raw data using the given protocol.
  *
 */
-TorcRPCRequest::TorcRPCRequest(TorcWebSocket::WSSubProtocol Protocol, const QByteArray &Data, QObject *Parent)
-  : m_notification(true),
+TorcRPCRequest::TorcRPCRequest(TorcWebSocket::WSSubProtocol Protocol, const QByteArray &Data, QObject *Parent, bool Authenticated)
+  : m_authenticated(Authenticated),
+    m_notification(true),
     m_state(None),
     m_id(-1),
     m_method(),
@@ -176,7 +180,7 @@ TorcRPCRequest::TorcRPCRequest(TorcWebSocket::WSSubProtocol Protocol, const QByt
                 }
 
                 // process this object
-                TorcRPCRequest *request = new TorcRPCRequest((*it).toObject());
+                TorcRPCRequest *request = new TorcRPCRequest((*it).toObject(), m_authenticated);
 
                 if (!request->GetData().isEmpty())
                 {
@@ -239,7 +243,7 @@ void TorcRPCRequest::ParseJSONObject(const QJsonObject &Object)
 
         if (!handled)
         {
-            QVariantMap result = TorcHTTPServer::HandleRequest(method, Object.value("params").toVariant(), m_parent);
+            QVariantMap result = TorcHTTPServer::HandleRequest(method, Object.value("params").toVariant(), m_parent, m_authenticated);
 
             // not a notification, response expected
             if (id > -1)

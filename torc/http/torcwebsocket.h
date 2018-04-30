@@ -138,6 +138,7 @@ class TorcWebSocket : public QObject
     };
 
     bool             m_authenticate;
+    bool             m_authenticated;
     bool             m_handShaking;
     TorcHTTPReader  *m_upgradeResponseReader;
     QString          m_challengeResponse;

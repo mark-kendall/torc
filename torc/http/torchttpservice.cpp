@@ -472,7 +472,7 @@ void TorcHTTPService::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTTPConne
     }
 }
 
-QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVariant &Parameters, QObject *Connection)
+QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVariant &Parameters, QObject *Connection, bool Authenticated)
 {
     QString method;
     int index = Method.lastIndexOf("/");
@@ -485,8 +485,25 @@ QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVarian
         QMap<QString,MethodParameters*>::iterator it = m_methods.find(method);
         if (it != m_methods.end())
         {
-            // ignore disabled methods
-            if (!(it.value()->m_allowedRequestTypes & HTTPDisabled))
+            // disallow methods based on state and authentication
+            int types         = it.value()->m_allowedRequestTypes;
+            bool disabled     = types & HTTPDisabled;
+            bool unauthorised = !Authenticated && (types & HTTPPost || types & HTTPPut || types & HTTPDelete || types & HTTPUnknownType);
+
+            if (disabled || unauthorised)
+            {
+                if (disabled)
+                    LOG(VB_GENERAL, LOG_ERR, QString("'%1' method '%2' is disabled").arg(m_signature).arg(method));
+                else
+                    LOG(VB_GENERAL, LOG_ERR, QString("'%1' method '%2' unauthorised").arg(m_signature).arg(method));
+                QVariantMap result;
+                QVariantMap error;
+                error.insert("code", -401); // HTTP 401!
+                error.insert("message", "Method not authorised");
+                result.insert("error", error);
+                return result;
+            }
+            else
             {
                 // invoke it
 

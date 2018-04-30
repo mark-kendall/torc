@@ -27,7 +27,7 @@ class TorcHTTPService : public TorcHTTPHandler
     virtual ~TorcHTTPService();
 
     void         ProcessHTTPRequest       (TorcHTTPRequest *Request, TorcHTTPConnection *Connection);
-    QVariantMap  ProcessRequest           (const QString &Method, const QVariant &Parameters, QObject *Connection);
+    QVariantMap  ProcessRequest           (const QString &Method, const QVariant &Parameters, QObject *Connection, bool Authenticated) Q_DECL_OVERRIDE;
     QString      GetMethod                (int Index);
     QVariant     GetProperty              (int Index);
     QVariantMap  GetServiceDetails        (void);
