@@ -6,6 +6,7 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QMutex>
+#include <QReadWriteLock>
 
 // Torc
 #include "torcsetting.h"
@@ -78,16 +79,13 @@ class TorcHTTPServer : public QTcpServer
     TorcHTMLStaticContent             m_staticContent;
     TorcHTMLDynamicContent            m_dynamicContent;
     TorcUPnPContent                   m_upnpContent;
-
     QThreadPool                       m_connectionPool;
     int                               m_abort;
-
     quint32                           m_httpBonjourReference;
     quint32                           m_torcBonjourReference;
-
     TorcWebSocketPool                 m_webSocketPool;
-
     QString                           m_originWhitelist;
+    QReadWriteLock                    m_originWhitelistLock;
 };
 
 Q_DECLARE_METATYPE(TorcHTTPRequest*);
