@@ -58,8 +58,8 @@ class TorcHTTPServer : public QTcpServer
 
   protected:
     TorcHTTPServer ();
-    void           incomingConnection (qintptr SocketDescriptor);
-    bool           event              (QEvent *Event);
+    void           incomingConnection (qintptr SocketDescriptor) Q_DECL_OVERRIDE Q_DECL_FINAL;
+    bool           event              (QEvent *Event) Q_DECL_OVERRIDE Q_DECL_FINAL;
     bool           Open               (void);
     void           Close              (void);
 
