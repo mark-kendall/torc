@@ -1,4 +1,4 @@
-/* Class TorcWebSocket
+/* Class TorcWebSocketPool
 *
 * This file is part of the Torc project.
 *
