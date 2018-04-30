@@ -14,6 +14,7 @@
 #include "torchtmlstaticcontent.h"
 #include "torchtmldynamiccontent.h"
 #include "torcupnpcontent.h"
+#include "torcwebsocketpool.h"
 #include "torcwebsocketthread.h"
 
 class TorcHTTPConnection;
@@ -50,11 +51,10 @@ class TorcHTTPServer : public QTcpServer
 
   signals:
     void           HandlersChanged    (void);
-
-  protected slots:
     // WebSockets
     void           HandleUpgrade      (TorcHTTPRequest *Request, QTcpSocket *Socket);
-    void           WebSocketClosed    (void);
+
+  protected slots:
 
   protected:
     TorcHTTPServer ();
@@ -87,8 +87,7 @@ class TorcHTTPServer : public QTcpServer
     quint32                           m_httpBonjourReference;
     quint32                           m_torcBonjourReference;
 
-    QList<TorcWebSocketThread*>       m_webSockets;
-    QMutex*                           m_webSocketsLock;
+    TorcWebSocketPool                 m_webSocketPool;
 
     QString                           m_originWhitelist;
 };
