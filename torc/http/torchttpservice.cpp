@@ -372,16 +372,11 @@ TorcHTTPService::TorcHTTPService(QObject *Parent, const QString &Signature, cons
             }
         }
     }
-
-    TorcHTTPServer::RegisterHandler(this);
 }
 
 TorcHTTPService::~TorcHTTPService()
 {
-    TorcHTTPServer::DeregisterHandler(this);
-
     qDeleteAll(m_methods);
-
     delete m_subscriberLock;
 }
 

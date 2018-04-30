@@ -75,11 +75,11 @@ class TorcHTTPServer : public QTcpServer
 
   private:
     TorcSetting                      *m_port;
-    TorcHTMLHandler                  *m_defaultHandler;
-    TorcHTTPServices                 *m_servicesHandler;
-    TorcHTMLStaticContent            *m_staticContent;
-    TorcHTMLDynamicContent           *m_dynamicContent;
-    TorcUPnPContent                  *m_upnpContent;
+    TorcHTMLHandler                   m_defaultHandler;
+    TorcHTTPServices                  m_servicesHandler;
+    TorcHTMLStaticContent             m_staticContent;
+    TorcHTMLDynamicContent            m_dynamicContent;
+    TorcUPnPContent                   m_upnpContent;
 
     QThreadPool                       m_connectionPool;
     int                               m_abort;

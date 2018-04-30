@@ -26,6 +26,7 @@
 
 // Torc
 #include "torclogging.h"
+#include "torchttpserver.h"
 #include "torchttphandler.h"
 
 /*! \class TorcHTTPHandler
@@ -50,10 +51,13 @@ TorcHTTPHandler::TorcHTTPHandler(const QString &Signature, const QString &Name)
 {
     if (!m_signature.endsWith("/"))
         m_signature += "/";
+
+    TorcHTTPServer::RegisterHandler(this);
 }
 
 TorcHTTPHandler::~TorcHTTPHandler()
 {
+    TorcHTTPServer::DeregisterHandler(this);
 }
 
 QString TorcHTTPHandler::Signature(void) const

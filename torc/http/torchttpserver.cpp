@@ -405,6 +405,7 @@ void TorcHTTPServer::DeregisterHandler(TorcHTTPHandler *Handler)
             QMap<QString,TorcHTTPHandler*>::iterator it = gHandlers.find(signature);
             if (it != gHandlers.end())
             {
+                LOG(VB_GENERAL, LOG_DEBUG, QString("Removing handler '%1'").arg(it.key()));
                 gHandlers.erase(it);
                 changed = true;
             }
@@ -599,11 +600,11 @@ QString         TorcHTTPServer::gPlatform = QString("");
 TorcHTTPServer::TorcHTTPServer()
   : QTcpServer(),
     m_port(NULL),
-    m_defaultHandler(NULL),
-    m_servicesHandler(NULL),
-    m_staticContent(NULL),
-    m_dynamicContent(NULL),
-    m_upnpContent(NULL),
+    m_defaultHandler("", QCoreApplication::applicationName()), // default top level handler
+    m_servicesHandler(this),                                   // services 'helper' service for '/services'
+    m_staticContent(),                                         // static files - for /css /fonts /js /img etc
+    m_dynamicContent(),                                        // dynamic files - for config files etc (typically served from ~/.torc/content)
+    m_upnpContent(),                                           // upnp - device description
     m_abort(0),
     m_httpBonjourReference(0),
     m_torcBonjourReference(0),
@@ -627,25 +628,6 @@ TorcHTTPServer::TorcHTTPServer()
 #endif
     }
 
-    // add the default top level handler
-    m_defaultHandler = new TorcHTMLHandler("", QCoreApplication::applicationName());
-    RegisterHandler(m_defaultHandler);
-
-    // services 'helper' service for '/services'
-    m_servicesHandler = new TorcHTTPServices(this);
-
-    // static files - for /css /fonts /js /img etc
-    m_staticContent = new TorcHTMLStaticContent();
-    RegisterHandler(m_staticContent);
-
-    // dynamic files - for config files etc (typically served from ~/.torc/content)
-    m_dynamicContent = new TorcHTMLDynamicContent();
-    RegisterHandler(m_dynamicContent);
-
-    // upnp - device description
-    m_upnpContent = new TorcUPnPContent();
-    RegisterHandler(m_upnpContent);
-
     // set thread pool max size
     m_connectionPool.setMaxThreadCount(50);
 
@@ -661,12 +643,6 @@ TorcHTTPServer::~TorcHTTPServer()
     disconnect();
 
     gLocalContext->RemoveObserver(this);
-
-    delete m_defaultHandler;
-    delete m_servicesHandler;
-    delete m_staticContent;
-    delete m_dynamicContent;
-    delete m_upnpContent;
 
     Close();
 
