@@ -31,7 +31,6 @@
 // Torc
 #include "torclogging.h"
 #include "torcnetwork.h"
-#include "torchttpconnection.h"
 #include "torchttpserver.h"
 #include "torcjsonrpc.h"
 #include "torcserialiser.h"

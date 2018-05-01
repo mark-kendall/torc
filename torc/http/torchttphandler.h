@@ -9,7 +9,6 @@
 #include "torchttprequest.h"
 
 class TorcHTTPServer;
-class TorcHTTPConnection;
 
 #define STATIC_DIRECTORY QString("/css,/img,/fonts,/js")
 #define DYNAMIC_DIRECTORY QString("/content/")

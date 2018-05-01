@@ -41,7 +41,6 @@
 #include "torcxmlserialiser.h"
 #include "torcplistserialiser.h"
 #include "torcbinaryplistserialiser.h"
-#include "torchttpconnection.h"
 #include "torchttprequest.h"
 
 #if defined(Q_OS_LINUX)
@@ -59,7 +58,6 @@
  *
  * \sa TorcHTTPServer
  * \sa TorcHTTPHandler
- * \sa TorcHTTPConnection
  *
  * \todo Add support for multiple headers of the same type (e.g. Sec-WebSocket-Protocol).
  * \todo Support gzip compression for range requests (if it is possible?)
@@ -1097,7 +1095,7 @@ void TorcHTTPRequest::Authorise(bool Allow)
     m_authorised = Allow;
 }
 
-bool TorcHTTPRequest::IsAuthorised(void)
+bool TorcHTTPRequest::IsAuthorised(void) const
 {
     return m_authorised;
 }

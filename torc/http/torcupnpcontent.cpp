@@ -21,12 +21,12 @@
 */
 
 // Qt
+#include <QHostAddress>
 #include <QXmlStreamWriter>
 
 // Torc
 #include "torclocalcontext.h"
 #include "torchttphandler.h"
-#include "torchttpconnection.h"
 #include "torcupnp.h"
 #include "torcupnpcontent.h"
 

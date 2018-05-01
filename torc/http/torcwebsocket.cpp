@@ -47,7 +47,6 @@
  *
  * \sa TorcHTTPServer
  * \sa TorcHTTPRequest
- * \sa TorcHTTPConnection
  * \sa TorcWebSocketThread
  *
  * TorcWebSocket is NOT thread safe. It will make direct function calls to registered services - which must

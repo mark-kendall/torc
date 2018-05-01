@@ -41,7 +41,6 @@
  *
  * \sa TorcHTTPServer
  * \sa TorcHTTPRequest
- * \sa TorcHTTPConnection
 */
 
 TorcHTTPHandler::TorcHTTPHandler(const QString &Signature, const QString &Name)

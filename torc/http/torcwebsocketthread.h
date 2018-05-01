@@ -12,7 +12,7 @@ class TorcWebSocketThread : public TorcQThread
     Q_OBJECT
 
   public:
-    TorcWebSocketThread (qintptr SocketDescriptor);
+    explicit TorcWebSocketThread (qintptr SocketDescriptor);
     TorcWebSocketThread (const QHostAddress &Address, quint16 Port, bool Authenticate = false, TorcWebSocket::WSSubProtocol Protocol = TorcWebSocket::SubProtocolJSONRPC);
     ~TorcWebSocketThread();
 

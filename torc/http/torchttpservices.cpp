@@ -32,7 +32,6 @@
 #include "torchttpserver.h"
 #include "torchttprequest.h"
 #include "torchttpservice.h"
-#include "torchttpconnection.h"
 #include "torchttpservices.h"
 #include "torcwebsockettoken.h"
 

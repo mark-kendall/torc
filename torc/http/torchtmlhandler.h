@@ -9,7 +9,6 @@
 
 class TorcHTTPServer;
 class TorcHTTPRequest;
-class TorcHTTPConnection;
 
 class TorcHTMLHandler : public TorcHTTPHandler
 {

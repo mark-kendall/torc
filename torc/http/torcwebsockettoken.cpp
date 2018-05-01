@@ -22,6 +22,7 @@
 
 // Qt
 #include <QUuid>
+#include <QMutex>
 
 // Torc
 #include "torclogging.h"

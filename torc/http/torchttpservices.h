@@ -10,7 +10,6 @@
 
 class TorcHTTPServer;
 class TorcHTTPRequest;
-class TorcHTTPConnection;
 
 class TorcHTTPServices : public QObject, public TorcHTTPService
 {
@@ -32,7 +31,7 @@ class TorcHTTPServices : public QObject, public TorcHTTPService
     virtual ~TorcHTTPServices();
 
     void           ProcessHTTPRequest   (const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest *Request) Q_DECL_OVERRIDE;
-    QString        GetUIName            (void);
+    QString        GetUIName            (void) Q_DECL_OVERRIDE;
 
   signals:
     void           ServiceListChanged   (void);

@@ -18,7 +18,6 @@
 #include "torcwebsocketpool.h"
 #include "torcwebsocketthread.h"
 
-class TorcHTTPConnection;
 class TorcHTTPHandler;
 
 class TorcHTTPServer : public QTcpServer

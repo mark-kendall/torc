@@ -141,7 +141,7 @@ class TorcHTTPRequest
     bool                   Unmodified               (const QDateTime &LastModified);
     bool                   Unmodified               (void);
     void                   Authorise                (bool Allow);
-    bool                   IsAuthorised             (void);
+    bool                   IsAuthorised             (void) const;
 
   protected:
     void                   Initialise               (const QString &Method);

@@ -32,7 +32,6 @@
 #include "torclogging.h"
 #include "torcadminthread.h"
 #include "torcnetwork.h"
-#include "torchttpconnection.h"
 #include "torchttprequest.h"
 #include "torchtmlhandler.h"
 #include "torchttphandler.h"
@@ -538,7 +537,7 @@ QString TorcHTTPServer::PlatformName(void)
  *
  * TorcHTTPServer listens for incoming TCP connections. The default port is 4840
  * though any available port may be used if the default is unavailable. New
- * connections are passed to instances of TorcHTTPConnection.
+ * connections are passed to to TorcWebSocketPool.
  *
  * Register new content handlers with RegisterHandler and remove
  * them with DeregisterHandler. These can then be used with the static
@@ -546,7 +545,6 @@ QString TorcHTTPServer::PlatformName(void)
  *
  * \sa TorcHTTPRequest
  * \sa TorcHTTPHandler
- * \sa TorcHTTPConnection
  *
  * \todo Fix potential socket and request leak in UpgradeSocket.
  * \todo Add setting for authentication (and hence full username/password requirement).

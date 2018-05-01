@@ -3,7 +3,6 @@
 
 // Torc
 #include "torchttprequest.h"
-#include "torchttpconnection.h"
 
 class TorcWebSocketToken
 {

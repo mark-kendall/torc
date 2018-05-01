@@ -47,7 +47,6 @@
  *
  * \sa TorcHTTPServer
  * \sa TorcHTTPHandler
- * \sa TorcHTTPConnection
 */
 
 TorcHTMLHandler::TorcHTMLHandler(const QString &Path, const QString &Name)

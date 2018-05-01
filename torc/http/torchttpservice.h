@@ -12,7 +12,6 @@
 #include "torchttprequest.h"
 
 class TorcHTTPServer;
-class TorcHTTPConnection;
 class MethodParameters;
 
 #define SERVICES_DIRECTORY QString("/services/")

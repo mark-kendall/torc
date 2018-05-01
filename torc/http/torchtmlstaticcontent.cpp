@@ -28,7 +28,6 @@
 #include "torchttpserver.h"
 #include "torchttprequest.h"
 #include "torchttpservice.h"
-#include "torchttpconnection.h"
 #include "torchtmlstaticcontent.h"
 
 /*! \class TorcHTMLStaticContent
