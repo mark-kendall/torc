@@ -95,12 +95,12 @@ void TorcHTTPReader::Reset(void)
  * The HTTP method (e.g. GET / 200 OK), headers and content will be split out
  * for further processing.
  */
-bool TorcHTTPReader::Read(QTcpSocket *Socket, int *Abort)
+bool TorcHTTPReader::Read(QTcpSocket *Socket)
 {
     if (!Socket)
         return false;
 
-    if (*Abort || Socket->state() != QAbstractSocket::ConnectedState)
+    if (Socket->state() != QAbstractSocket::ConnectedState)
         return false;
 
     // sanity check
@@ -113,7 +113,7 @@ bool TorcHTTPReader::Read(QTcpSocket *Socket, int *Abort)
     // read headers
     if (!m_headersComplete)
     {
-        while (!(*Abort) && Socket->canReadLine() && m_headersRead < 200)
+        while (Socket->canReadLine() && m_headersRead < 200)
         {
             QByteArray line = Socket->readLine().trimmed();
 
@@ -157,11 +157,11 @@ bool TorcHTTPReader::Read(QTcpSocket *Socket, int *Abort)
         return true;
 
     // abort early if needed
-    if (*Abort || Socket->state() != QAbstractSocket::ConnectedState)
+    if (Socket->state() != QAbstractSocket::ConnectedState)
         return false;
 
     // read content
-    while (!(*Abort) && (m_contentReceived < m_contentLength) && Socket->bytesAvailable() &&
+    while ((m_contentReceived < m_contentLength) && Socket->bytesAvailable() &&
            Socket->state() == QAbstractSocket::ConnectedState)
     {
         static quint64 MAX_CHUNK = 32 * 1024;
@@ -174,7 +174,7 @@ bool TorcHTTPReader::Read(QTcpSocket *Socket, int *Abort)
         return true;
 
     // abort early if needed
-    if (*Abort || Socket->state() != QAbstractSocket::ConnectedState)
+    if (Socket->state() != QAbstractSocket::ConnectedState)
         return false;
 
     m_ready = true;

@@ -135,7 +135,7 @@ class TorcHTTPRequest
     QString                GetMethod                (void) const;
     const QMap<QString,QString>* Headers            (void) const;
     const QMap<QString,QString>& Queries            (void) const;
-    void                   Respond                  (QTcpSocket *Socket, int* Abort);
+    void                   Respond                  (QTcpSocket *Socket);
     void                   Redirected               (const QString &Redirected);
     TorcSerialiser*        GetSerialiser            (void);
     bool                   Unmodified               (const QDateTime &LastModified);

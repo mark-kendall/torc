@@ -17,11 +17,12 @@ class TorcWebSocketPool : public QObject
     ~TorcWebSocketPool();
 
   public slots:
-    void WebSocketClosed (void);
-    void HandleUpgrade(TorcHTTPRequest *Request, QTcpSocket *Socket);
+    void WebSocketClosed        (void);
+    void IncomingConnection     (qintptr SocketDescriptor);
 
   public:
     void CloseSockets ();
+    TorcWebSocketThread* TakeSocket(TorcWebSocketThread* Socket);
 
   private:
     QList<TorcWebSocketThread*> m_webSockets;

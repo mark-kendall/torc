@@ -37,16 +37,15 @@
  * \sa TorcQThread
  * \sa TorcHTTPRequest
  *
- * \todo Investigate edge case leak when RemoteRequest or CancelRequest are not delivered during socket
+ * \todo Investigate edge case leak when RemoteRequest or CancelRequest possibly might not be delivered during socket
  *       or application shutdown. Is this a real issue? (N.B. Only applies when signals are asynchronous
  *       i.e. running inside TorcWebSocketThread).
 */
 
-TorcWebSocketThread::TorcWebSocketThread(TorcHTTPRequest *Request, QTcpSocket *Socket)
-  : TorcQThread("WebSocket"),
+TorcWebSocketThread::TorcWebSocketThread(qintptr SocketDescriptor)
+  : TorcQThread("SocketIn"),
     m_webSocket(NULL),
-    m_request(Request),
-    m_socket(Socket),
+    m_socketDescriptor(SocketDescriptor),
     m_address(QHostAddress::Null),
     m_port(0),
     m_authenticate(false),
@@ -55,10 +54,9 @@ TorcWebSocketThread::TorcWebSocketThread(TorcHTTPRequest *Request, QTcpSocket *S
 }
 
 TorcWebSocketThread::TorcWebSocketThread(const QHostAddress &Address, quint16 Port, bool Authenticate, TorcWebSocket::WSSubProtocol Protocol)
-  : TorcQThread("WebSocket"),
+  : TorcQThread("SocketOut"),
     m_webSocket(NULL),
-    m_request(NULL),
-    m_socket(NULL),
+    m_socketDescriptor(0),
     m_address(Address),
     m_port(Port),
     m_authenticate(Authenticate),
@@ -72,13 +70,13 @@ TorcWebSocketThread::~TorcWebSocketThread()
 
 void TorcWebSocketThread::Start(void)
 {
-    if (m_request && m_socket)
-        m_webSocket = new TorcWebSocket(m_request, m_socket);
+    if (m_socketDescriptor)
+        m_webSocket = new TorcWebSocket(this, m_socketDescriptor);
     else
-        m_webSocket = new TorcWebSocket(m_address, m_port, m_authenticate, m_protocol);
+        m_webSocket = new TorcWebSocket(this, m_address, m_port, m_authenticate, m_protocol);
 
     connect(m_webSocket, SIGNAL(ConnectionEstablished()), this, SIGNAL(ConnectionEstablished()));
-    connect(m_webSocket, SIGNAL(Disconnected()), this, SLOT(quit()));
+    connect(m_webSocket, SIGNAL(Disconnected()),          this, SLOT(quit()));
     // the websocket is created in its own thread so these signals will be delivered into the correct thread.
     connect(this, SIGNAL(RemoteRequestSignal(TorcRPCRequest*)), m_webSocket, SLOT(RemoteRequest(TorcRPCRequest*)));
     connect(this, SIGNAL(CancelRequestSignal(TorcRPCRequest*)), m_webSocket, SLOT(CancelRequest(TorcRPCRequest*)));
@@ -87,7 +85,8 @@ void TorcWebSocketThread::Start(void)
 
 void TorcWebSocketThread::Finish(void)
 {
-    delete m_webSocket;
+    if (m_webSocket)
+        delete m_webSocket;
     m_webSocket = NULL;
 }
 

@@ -384,9 +384,12 @@ QString TorcHTTPService::GetUIName(void)
     return Name();
 }
 
-void TorcHTTPService::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTTPConnection *Connection)
+void TorcHTTPService::ProcessHTTPRequest(const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest *Request)
 {
-    (void)Connection;
+    (void)PeerAddress;
+    (void)PeerPort;
+    (void)LocalAddress;
+    (void)LocalPort;
 
     QString method = Request->GetMethod();
     HTTPRequestType type = Request->GetHTTPRequestType();

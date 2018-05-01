@@ -394,9 +394,9 @@ void TorcHTTPServer::DeregisterHandler(TorcHTTPHandler *Handler)
         emit gWebServer->HandlersChanged();
 }
 
-void TorcHTTPServer::HandleRequest(TorcHTTPConnection *Connection, TorcHTTPRequest *Request)
+void TorcHTTPServer::HandleRequest(const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort,  TorcHTTPRequest *Request)
 {
-    if (Request && Connection)
+    if (Request)
     {
         // this should already have been checked - but better safe than sorry
         if (!Request->IsAuthorised())
@@ -414,7 +414,7 @@ void TorcHTTPServer::HandleRequest(TorcHTTPConnection *Connection, TorcHTTPReque
         if (it != gHandlers.end())
         {
             // direct path match
-            (*it)->ProcessHTTPRequest(Request, Connection);
+            (*it)->ProcessHTTPRequest(PeerAddress, PeerPort, LocalAddress, LocalPort, Request);
         }
         else
         {
@@ -424,7 +424,7 @@ void TorcHTTPServer::HandleRequest(TorcHTTPConnection *Connection, TorcHTTPReque
             {
                 if ((*it)->GetRecursive() && path.startsWith(it.key()))
                 {
-                    (*it)->ProcessHTTPRequest(Request, Connection);
+                    (*it)->ProcessHTTPRequest(PeerAddress, PeerPort, LocalAddress, LocalPort, Request);
                     break;
                 }
             }
@@ -508,25 +508,6 @@ QVariantMap TorcHTTPServer::GetServiceDescription(const QString &Service)
     return QVariantMap();
 }
 
-void TorcHTTPServer::UpgradeSocket(TorcHTTPRequest *Request, QTcpSocket *Socket)
-{
-    QMutexLocker locker(&gWebServerLock);
-
-    if (gWebServer && Request && Socket)
-    {
-        // at this stage, the remote device has sent a valid upgrade request, Request contains
-        // the appropriate response and Socket still resides in a QRunnable. The remote device
-        // should not send any more data until it has received a response.
-
-        // firstly, move the Socket into the server thread, which must be done from the QRunnable
-        // from there it can be moved into the websocket thread
-        Socket->moveToThread(gWebServer->thread());
-
-        // and process the upgrade from the server thread
-        QMetaObject::invokeMethod(gWebServer, "HandleUpgrade", Qt::AutoConnection, Q_ARG(TorcHTTPRequest*, Request), Q_ARG(QTcpSocket*, Socket));
-    }
-}
-
 int TorcHTTPServer::GetPort(void)
 {
     QMutexLocker locker(&gWebServerLock);
@@ -586,7 +567,6 @@ TorcHTTPServer::TorcHTTPServer()
     m_staticContent(),                                         // static files - for /css /fonts /js /img etc
     m_dynamicContent(),                                        // dynamic files - for config files etc (typically served from ~/.torc/content)
     m_upnpContent(),                                           // upnp - device description
-    m_abort(0),
     m_httpBonjourReference(0),
     m_torcBonjourReference(0)
 {
@@ -608,14 +588,8 @@ TorcHTTPServer::TorcHTTPServer()
 #endif
     }
 
-    // set thread pool max size
-    m_connectionPool.setMaxThreadCount(50);
-
     // listen for host name updates
     gLocalContext->AddObserver(this);
-
-    // pass on upgrade responses
-    connect(this, SIGNAL(HandleUpgrade(TorcHTTPRequest*,QTcpSocket*)), &m_webSocketPool, SLOT(HandleUpgrade(TorcHTTPRequest*,QTcpSocket*)));
 
     // and start
     Open();
@@ -637,6 +611,14 @@ TorcHTTPServer::~TorcHTTPServer()
     }
 }
 
+TorcWebSocketThread* TorcHTTPServer::TakeSocket(TorcWebSocketThread *Socket)
+{
+    QMutexLocker locker(&gWebServerLock);
+    if (gWebServer)
+        return gWebServer->TakeSocketPriv(Socket);
+    return NULL;
+}
+
 /*! \brief Ensures remote user is authorised to access this request.
  *
  * The 'Authorization' header is used for standard HTTP requests.
@@ -646,7 +628,7 @@ TorcHTTPServer::~TorcHTTPServer()
  *
  * \todo Use proper username and password.
 */
-void TorcHTTPServer::Authorise(TorcHTTPConnection *Connection, TorcHTTPRequest *Request, bool ForceCheck)
+void TorcHTTPServer::Authorise(const QString &Host, TorcHTTPRequest *Request, bool ForceCheck)
 {
     if (Request)
     {
@@ -665,10 +647,10 @@ void TorcHTTPServer::Authorise(TorcHTTPConnection *Connection, TorcHTTPRequest *
 
         // authentication token supplied in the url (WebSocket)
         // do this before 'standard' authentication to ensure token is checked and expired
-        if (Request->Queries().contains("accesstoken") && Connection)
+        if (Request->Queries().contains("accesstoken"))
         {
             QString token = Request->Queries().value("accesstoken");
-            if (token == TorcWebSocketToken::GetWebSocketToken(Connection, Request, token))
+            if (token == TorcWebSocketToken::GetWebSocketToken(Host, Request, token))
             {
                 Request->Authorise(true);
                 return;
@@ -798,7 +780,6 @@ void TorcHTTPServer::UpdateOriginWhitelist(int Port)
 
 bool TorcHTTPServer::Open(void)
 {
-    m_abort = 0;
     int port = m_port->GetValue().toInt();
     bool waslistening = isListening();
 
@@ -887,12 +868,7 @@ void TorcHTTPServer::Close(void)
 
     TorcSSDP::CancelAnnounce();
 
-    // close all pool threads
-    m_abort = 1;
-    if (!m_connectionPool.waitForDone(30000))
-        LOG(VB_GENERAL, LOG_WARNING, "HTTP connection threads are still running");
-
-    // close websocket threads
+    // close connections
     m_webSocketPool.CloseSockets();
 
     // actually close
@@ -927,9 +903,14 @@ bool TorcHTTPServer::event(QEvent *Event)
     return QTcpServer::event(Event);
 }
 
+TorcWebSocketThread* TorcHTTPServer::TakeSocketPriv(TorcWebSocketThread *Socket)
+{
+    return m_webSocketPool.TakeSocket(Socket);
+}
+
 void TorcHTTPServer::incomingConnection(qintptr SocketDescriptor)
 {
-    m_connectionPool.start(new TorcHTTPConnection(SocketDescriptor, &m_abort), 0);
+    m_webSocketPool.IncomingConnection(SocketDescriptor);
 }
 
 class TorcHTTPServerObject : public TorcAdminObject, public TorcStringFactory
@@ -941,6 +922,7 @@ class TorcHTTPServerObject : public TorcAdminObject, public TorcStringFactory
         qRegisterMetaType<TorcHTTPRequest*>();
         qRegisterMetaType<TorcHTTPService*>();
         qRegisterMetaType<QTcpSocket*>();
+        qRegisterMetaType<QHostAddress>();
     }
 
     void GetStrings(QVariantMap &Strings)

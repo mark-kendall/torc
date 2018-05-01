@@ -70,16 +70,26 @@ void TorcWebSocketPool::WebSocketClosed(void)
     }
 }
 
-void TorcWebSocketPool::HandleUpgrade(TorcHTTPRequest *Request, QTcpSocket *Socket)
+void TorcWebSocketPool::IncomingConnection(qintptr SocketDescriptor)
 {
-    if (!Request || ! Socket)
-        return;
-
     QMutexLocker locker(&m_webSocketsLock);
-
-    TorcWebSocketThread *thread = new TorcWebSocketThread(Request, Socket);
-    Socket->moveToThread(thread);
+    TorcWebSocketThread *thread = new TorcWebSocketThread(SocketDescriptor);
+    m_webSockets.append(thread);
     connect(thread, SIGNAL(Finished()), this, SLOT(WebSocketClosed()));
     thread->start();
-    m_webSockets.append(thread);
+}
+
+TorcWebSocketThread* TorcWebSocketPool::TakeSocket(TorcWebSocketThread *Socket)
+{
+    if (!Socket)
+        return NULL;
+
+    QMutexLocker locker(&m_webSocketsLock);
+    for (int i = 0; i < m_webSockets.size(); ++i)
+    {
+        if (m_webSockets[i] == Socket)
+            return m_webSockets.takeAt(i);
+    }
+
+    return NULL;
 }

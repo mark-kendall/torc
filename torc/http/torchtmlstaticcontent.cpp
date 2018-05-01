@@ -47,8 +47,12 @@ TorcHTMLStaticContent::TorcHTMLStaticContent()
     m_recursive = true;
 }
 
-void TorcHTMLStaticContent::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTTPConnection* Connection)
+void TorcHTMLStaticContent::ProcessHTTPRequest(const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest *Request)
 {
+    (void)PeerAddress;
+    (void)PeerPort;
+    (void)LocalAddress;
+    (void)LocalPort;
     if (!Request)
         return;
 
@@ -67,7 +71,7 @@ void TorcHTMLStaticContent::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTT
 
     if (subpath == "/js/torcconfiguration.js")
     {
-        GetJavascriptConfiguration(Request, Connection);
+        GetJavascriptConfiguration(Request);
         Request->SetAllowGZip(true);
         return;
     }
@@ -81,10 +85,8 @@ void TorcHTMLStaticContent::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTT
  *
  * \todo Translations are static and will need to be regenerated if the language is changed.
 */
-void TorcHTMLStaticContent::GetJavascriptConfiguration(TorcHTTPRequest *Request, TorcHTTPConnection *Connection)
+void TorcHTMLStaticContent::GetJavascriptConfiguration(TorcHTTPRequest *Request)
 {
-    (void)Connection;
-
     if (!Request)
         return;
 

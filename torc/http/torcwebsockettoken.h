@@ -8,7 +8,7 @@
 class TorcWebSocketToken
 {
   public:
-    static QString GetWebSocketToken(TorcHTTPConnection *Connection, TorcHTTPRequest *Request, const QString &Current = QString());
+    static QString GetWebSocketToken(const QString &Host, TorcHTTPRequest *Request, const QString &Current = QString());
 };
 
 #endif // TORCWEBSOCKETTOKEN_H

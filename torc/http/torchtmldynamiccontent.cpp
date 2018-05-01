@@ -52,8 +52,12 @@ TorcHTMLDynamicContent::TorcHTMLDynamicContent()
             LOG(VB_GENERAL, LOG_ERR, QString("Failed to create content directory ('%1')").arg(configdir));
     }
 
-void TorcHTMLDynamicContent::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTTPConnection*)
+void TorcHTMLDynamicContent::ProcessHTTPRequest(const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest *Request)
 {
+    (void)PeerAddress;
+    (void)PeerPort;
+    (void)LocalAddress;
+    (void)LocalPort;
     if (!Request)
         return;
 

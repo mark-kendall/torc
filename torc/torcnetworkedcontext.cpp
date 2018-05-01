@@ -460,31 +460,22 @@ void TorcNetworkService::QueryPeerDetails(void)
     RemoteRequest(m_getPeerDetailsRPC);
 }
 
-void TorcNetworkService::CreateSocket(TorcHTTPRequest *Request, QTcpSocket *Socket)
+void TorcNetworkService::SetWebSocketThread(TorcWebSocketThread *Thread)
 {
-    if (!Request || !Socket)
+    if (!Thread)
         return;
 
     // guard against incorrect use
     if (m_webSocketThread)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Already have websocket - deleting new request");
-        delete Request;
-        Socket->disconnectFromHost();
-        if (Socket->state() != QAbstractSocket::UnconnectedState && !Socket->waitForDisconnected(1000))
-            LOG(VB_GENERAL, LOG_WARNING, "WebSocket not successfully disconnected before closing");
-        Socket->close();
-        Socket->deleteLater();
+        LOG(VB_GENERAL, LOG_ERR, "Already have websocket - closing new socket");
+        Thread->quit();
         return;
     }
 
     // create the socket
-    m_webSocketThread = new TorcWebSocketThread(Request, Socket);
-    Socket->moveToThread(m_webSocketThread);
-    connect(m_webSocketThread, SIGNAL(Finished()),              this, SLOT(Disconnected()));
-    connect(m_webSocketThread, SIGNAL(ConnectionEstablished()), this, SLOT(Connected()));
-
-    m_webSocketThread->start();
+    m_webSocketThread = Thread;
+    connect(m_webSocketThread, SIGNAL(Finished()), this, SLOT(Disconnected()));
 }
 
 void TorcNetworkService::RemoteRequest(TorcRPCRequest *Request)
@@ -596,7 +587,7 @@ TorcNetworkedContext::TorcNetworkedContext()
     // connect signals
     connect(this, SIGNAL(NewRequest(QString,TorcRPCRequest*)), this, SLOT(HandleNewRequest(QString,TorcRPCRequest*)));
     connect(this, SIGNAL(RequestCancelled(QString,TorcRPCRequest*)), this, SLOT(HandleCancelRequest(QString,TorcRPCRequest*)));
-    connect(this, SIGNAL(UpgradeRequest(TorcHTTPRequest*,QTcpSocket*)), this, SLOT(HandleUpgrade(TorcHTTPRequest*,QTcpSocket*)));
+    connect(this, SIGNAL(NewPeer(TorcWebSocketThread*,QString,int,QString,QHostAddress)), this, SLOT(HandleNewPeer(TorcWebSocketThread*,QString,int,QString,QHostAddress)));
 
     // always create the global instance
     TorcBonjour::Instance();
@@ -808,9 +799,9 @@ bool TorcNetworkedContext::event(QEvent *Event)
  * \sa TorcWebSocket
  * \sa TorcHTTPServer::UpgradeSocket
 */
-void TorcNetworkedContext::UpgradeSocket(TorcHTTPRequest *Request, QTcpSocket *Socket)
+void TorcNetworkedContext::PeerConnected(TorcWebSocketThread* Thread, const QString UUID, int Port, const QString Name, const QHostAddress Address)
 {
-    if (!Request || !Socket)
+    if (!Thread)
         return;
 
     if (!gNetworkedContext)
@@ -819,11 +810,8 @@ void TorcNetworkedContext::UpgradeSocket(TorcHTTPRequest *Request, QTcpSocket *S
         return;
     }
 
-    // 'push' the socket into the correct thread
-    Socket->moveToThread(gNetworkedContext->thread());
-
     // and create the WebSocket in the correct thread
-    emit gNetworkedContext->UpgradeRequest(Request, Socket);
+    emit gNetworkedContext->NewPeer(Thread, UUID, Port, Name, Address);
 }
 
 /// \brief Pass Request to the remote connection identified by UUID
@@ -916,58 +904,46 @@ void TorcNetworkedContext::SubscriberDeleted(QObject *Subscriber)
     TorcHTTPService::HandleSubscriberDeleted(Subscriber);
 }
 
-void TorcNetworkedContext::HandleUpgrade(TorcHTTPRequest *Request, QTcpSocket *Socket)
+void TorcNetworkedContext::HandleNewPeer(TorcWebSocketThread *Thread, const QString UUID, int Port, const QString Name, const QHostAddress Address)
 {
-    if (!Request || !Socket)
+    if (!Thread)
         return;
 
-    QString uuid = Request->Headers()->value("Torc-UUID").trimmed();
-    int     port = Request->Headers()->value("Torc-Port").trimmed().toInt();
+    if (UUID.isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_INFO, QString("Received WebSocket for peer without UUID (%1) - closing").arg(Name));
+        Thread->quit(); // is this safe?
+        return;
+    }
 
-    TorcNetworkService *service = NULL;
-
-    if (!uuid.isEmpty() && m_serviceList.contains(uuid))
+    if (m_serviceList.contains(UUID))
     {
         // no locking required - discovered services are changed in this thread.
         for (int i = 0; i < m_discoveredServices.size(); ++i)
         {
-            if (m_discoveredServices[i]->GetUuid() == uuid)
+            if (m_discoveredServices[i]->GetUuid() == UUID)
             {
-                service = m_discoveredServices[i];
-                LOG(VB_GENERAL, LOG_INFO, QString("Received WebSocket for known peer ('%1') %2").arg(service->GetName()).arg(uuid));
-                break;
+                LOG(VB_GENERAL, LOG_INFO, QString("Received WebSocket for known peer ('%1') %2 - closing")
+                    .arg(m_discoveredServices[i]->GetName()).arg(UUID));
+                Thread->quit();
+                return;
             }
         }
     }
-    else if (!uuid.isEmpty())
-    {
-        QString name;
-        QString agent = Request->Headers()->value("User-Agent").trimmed();
-        int index = agent.indexOf(',');
-        if (index > -1)
-            name = agent.left(index);
 
-        LOG(VB_GENERAL, LOG_INFO, QString("Received WebSocket for new peer ('%1' %2)").arg(name).arg(uuid));
+    TorcWebSocketThread* thread = TorcHTTPServer::TakeSocket(Thread);
+    if (Thread == thread)
+    {
+        LOG(VB_GENERAL, LOG_INFO, QString("Received WebSocket for new peer ('%1' %2)").arg(Name).arg(UUID));
         QList<QHostAddress> address;
-        address << (Socket->peerAddress());
-        service = new TorcNetworkService(name, uuid, port < 1 ? Socket->peerPort() : port, address);
+        address << Address;
+        TorcNetworkService *service = new TorcNetworkService(Name, UUID, Port, address);
+        service->SetWebSocketThread(thread);
         Add(service);
-    }
-
-    if (!service)
-    {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to fulfill upgrade request - deleting");
-        delete Request;
-        Socket->disconnectFromHost();
-        if (Socket->state() != QAbstractSocket::UnconnectedState && !Socket->waitForDisconnected(1000))
-            LOG(VB_GENERAL, LOG_WARNING, "WebSocket not successfully disconnected before closing");
-        Socket->close();
-        Socket->deleteLater();
         return;
     }
 
-    // create the socket
-    service->CreateSocket(Request, Socket);
+    LOG(VB_GENERAL, LOG_ERR, QString("Failed to take ownership of WebSocket from %1").arg(TorcNetwork::IPAddressToLiteral(Address, Port)));
 }
 
 void TorcNetworkedContext::Add(TorcNetworkService *Peer)

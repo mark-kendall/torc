@@ -7,7 +7,7 @@
 
 class TorcHTTPReader
 {
-    friend class TorcHTTPConnection;
+    friend class TorcWebSocket;
 
   public:
     TorcHTTPReader();
@@ -15,7 +15,7 @@ class TorcHTTPReader
 
     void                   TakeRequest      (QByteArray*& Content, QMap<QString,QString>*& Headers);
     QString                GetMethod        (void) const;
-    bool                   Read             (QTcpSocket *Socket, int *Abort);
+    bool                   Read             (QTcpSocket *Socket);
     bool                   IsReady          (void) const;
     bool                   HeadersComplete  (void) const;
 

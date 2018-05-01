@@ -48,7 +48,7 @@ class WebSocketAuthentication
 
 /*! \brief Retrieve an authentication token for the given request or validate a current token.
 */
-QString TorcWebSocketToken::GetWebSocketToken(TorcHTTPConnection *Connection, TorcHTTPRequest *Request, const QString &Current)
+QString TorcWebSocketToken::GetWebSocketToken(const QString &Host, TorcHTTPRequest *Request, const QString &Current)
 {
     static QMutex lock(QMutex::Recursive);
     static QMap<QString,WebSocketAuthentication> tokens;
@@ -67,7 +67,7 @@ QString TorcWebSocketToken::GetWebSocketToken(TorcHTTPConnection *Connection, To
         tokens.remove(expire);
 
     // safety net
-    if (!Request || !Connection)
+    if (!Request)
         return QString("ServerErRor");
 
     // if a current token is supplied, validate it
@@ -75,9 +75,8 @@ QString TorcWebSocketToken::GetWebSocketToken(TorcHTTPConnection *Connection, To
     {
         if (tokens.contains(Current))
         {
-            QString host = Connection->GetSocket() ? Connection->GetSocket()->peerAddress().toString() : QString("eRROr");
             // validate the host
-            if (tokens.value(Current).m_host == host)
+            if (tokens.value(Current).m_host == Host)
             {
                 tokens.remove(Current);
                 return Current;
@@ -90,7 +89,6 @@ QString TorcWebSocketToken::GetWebSocketToken(TorcHTTPConnection *Connection, To
 
     // create new
     QString uuid = QUuid::createUuid().toString().mid(1, 36);
-    QString host = Connection->GetSocket() ? Connection->GetSocket()->peerAddress().toString() : QString("ErrOR");
-    tokens.insert(uuid, WebSocketAuthentication(TorcCoreUtils::GetMicrosecondCount(), host));
+    tokens.insert(uuid, WebSocketAuthentication(TorcCoreUtils::GetMicrosecondCount(), Host));
     return uuid;
 }

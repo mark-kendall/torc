@@ -26,7 +26,7 @@ class TorcHTTPService : public TorcHTTPHandler
                     const QMetaObject &MetaObject, const QString &Blacklist = QString(""));
     virtual ~TorcHTTPService();
 
-    void         ProcessHTTPRequest       (TorcHTTPRequest *Request, TorcHTTPConnection *Connection) Q_DECL_OVERRIDE;
+    void         ProcessHTTPRequest       (const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest *Request) Q_DECL_OVERRIDE;
     QVariantMap  ProcessRequest           (const QString &Method, const QVariant &Parameters, QObject *Connection, bool Authenticated) Q_DECL_OVERRIDE;
     QString      GetMethod                (int Index);
     QVariant     GetProperty              (int Index);
