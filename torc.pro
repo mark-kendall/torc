@@ -44,7 +44,7 @@ else
 
 QMAKE_CXXFLAGS += -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE
 
-DEPENDPATH  += ./torc ./torc/http ./torc/upnp ./inputs ./inputs/platforms
+DEPENDPATH  += ./torc ./torc/http ./torc/upnp ./inputs ./inputs/platforms ./server
 DEPENDPATH  += ./outputs ./outputs/platforms
 INCLUDEPATH += $$DEPENDPATH
 
@@ -352,14 +352,14 @@ SOURCES += notify/torcnotification.cpp
 SOURCES += notify/torcsystemnotification.cpp
 SOURCES += notify/torctriggernotification.cpp
 
-HEADERS += torccentral.h
-HEADERS += torcdevice.h
-HEADERS += torcdevicehandler.h
-HEADERS += torcxsdtest.h
-SOURCES += main.cpp
-SOURCES += torccentral.cpp
-SOURCES += torcdevice.cpp
-SOURCES += torcdevicehandler.cpp
-SOURCES += torcxsdtest.cpp
+HEADERS += server/torccentral.h
+HEADERS += server/torcdevice.h
+HEADERS += server/torcdevicehandler.h
+HEADERS += server/torcxsdtest.h
+SOURCES += server/main.cpp
+SOURCES += server/torccentral.cpp
+SOURCES += server/torcdevice.cpp
+SOURCES += server/torcdevicehandler.cpp
+SOURCES += server/torcxsdtest.cpp
 
 QMAKE_CLEAN += $(TARGET)
