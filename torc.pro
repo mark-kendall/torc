@@ -23,7 +23,7 @@ QT         += sql network
 QT         -= gui
 
 # debug builds
-CONFIG     += debug
+#CONFIG     += debug
 
 # libraries
 # zlib on windows is too much like hard work
