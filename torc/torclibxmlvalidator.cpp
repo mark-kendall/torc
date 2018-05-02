@@ -69,10 +69,13 @@ void TorcXmlValidator::HandleMessage(void *ctx, const char *format, ...)
     char *error;
     va_list args;
     va_start(args, format);
-    (void)vasprintf(&error, format, args);
+    bool ok = vasprintf(&error, format, args) >= 0;
     va_end(args);
-    LOG(VB_GENERAL, LOG_ERR, QString("Libxml error: %1").arg(error));
-    free(error);
+    if (ok)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Libxml error: %1").arg(error));
+        free(error);
+    }
 }
 
 
