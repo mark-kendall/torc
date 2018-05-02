@@ -48,7 +48,6 @@
 #include "torcdirectories.h"
 
 TorcLocalContext *gLocalContext = NULL;
-QMutex*            gAVCodecLock = new QMutex(QMutex::Recursive);
 TorcSetting       *gRootSetting = NULL;
 qint64             gStartTime   = QDateTime::currentMSecsSinceEpoch();
 
