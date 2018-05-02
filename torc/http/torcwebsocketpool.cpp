@@ -26,6 +26,7 @@
 
 TorcWebSocketPool::TorcWebSocketPool()
   : QObject(),
+    m_webSockets(),
     m_webSocketsLock(QMutex::Recursive)
 {
 }

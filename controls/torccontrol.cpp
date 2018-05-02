@@ -184,6 +184,11 @@ TorcControl::TorcControl(TorcControl::Type Type, const QVariantMap &Details)
     m_validated(false),
     m_inputList(),
     m_outputList(),
+    m_inputs(),
+    m_outputs(),
+    m_inputValues(),
+    m_lastInputValues(),
+    m_inputValids(),
     m_allInputsValid(false)
 {
     // parse inputs
@@ -209,7 +214,7 @@ TorcControl::~TorcControl()
 
 bool TorcControl::Validate(void)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
     // lock the device list as well to ensure device aren't deleted while we're using them
     QMutexLocker locke2(gDeviceListLock);
 
@@ -289,7 +294,7 @@ bool TorcControl::Validate(void)
 }
 
 /// Only certain logic controls can be passthrough
-bool TorcControl::IsPassthrough(void) const
+bool TorcControl::IsPassthrough(void)
 {
     return false;
 }
@@ -302,7 +307,7 @@ bool TorcControl::AllowInputs(void) const
 
 QString TorcControl::GetUIName(void)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
     if (userName.isEmpty())
         return uniqueId;
     return userName;
@@ -336,7 +341,7 @@ void TorcControl::Graph(QByteArray* Data)
     if (!Data)
         return;
 
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     bool passthrough = IsPassthrough();
 
@@ -413,7 +418,7 @@ void TorcControl::Graph(QByteArray* Data)
 */
 bool TorcControl::Finish(void)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     QMap<QObject*,QString>::const_iterator it = m_outputs.constBegin();
     for ( ; it != m_outputs.constEnd(); ++it)
@@ -506,7 +511,7 @@ void TorcControl::SubscriberDeleted(QObject *Subscriber)
 
 void TorcControl::InputValueChanged(double Value)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     if (!m_parsed || !m_validated)
         return;
@@ -541,7 +546,7 @@ void TorcControl::InputValueChanged(double Value)
 
 void TorcControl::CheckInputValues(void)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     if (!m_parsed || !m_validated)
         return;
@@ -558,7 +563,7 @@ void TorcControl::CheckInputValues(void)
 
 void TorcControl::InputValidChanged(bool Valid)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     if (!m_parsed || !m_validated)
         return;
@@ -605,7 +610,7 @@ void TorcControl::InputValidChangedPriv(QObject *Input, bool Valid)
 
 void TorcControl::SetValue(double Value)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     if (m_parsed && m_validated)
         TorcDevice::SetValue(Value);
@@ -613,7 +618,7 @@ void TorcControl::SetValue(double Value)
 
 void TorcControl::SetValid(bool Valid)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     if (m_parsed && m_validated)
     {

@@ -32,13 +32,14 @@ TorcOutputs* TorcOutputs::gOutputs = new TorcOutputs();
 TorcOutputs::TorcOutputs()
   : QObject(),
     TorcHTTPService(this, OUTPUTS_DIRECTORY, "outputs", TorcOutputs::staticMetaObject, BLACKLIST),
-    m_lock(new QMutex(QMutex::Recursive))
+    outputList(),
+    outputTypes(),
+    m_lock(QMutex::Recursive)
 {
 }
 
 TorcOutputs::~TorcOutputs()
 {
-    delete m_lock;
 }
 
 QString TorcOutputs::GetUIName(void)
@@ -89,7 +90,7 @@ void TorcOutputs::SubscriberDeleted(QObject *Subscriber)
 QVariantMap TorcOutputs::GetOutputList(void)
 {
     QVariantMap result;
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(&m_lock);
 
     // iterate over our list for each output type
     for (int type = TorcOutput::Unknown; type < TorcOutput::MaxType; type++)
@@ -115,7 +116,7 @@ QStringList TorcOutputs::GetOutputTypes(void)
 
 void TorcOutputs::AddOutput(TorcOutput *Output)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(&m_lock);
     if (!Output)
         return;
 
@@ -133,7 +134,7 @@ void TorcOutputs::AddOutput(TorcOutput *Output)
 
 void TorcOutputs::RemoveOutput(TorcOutput *Output)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(&m_lock);
     if (!Output)
         return;
 

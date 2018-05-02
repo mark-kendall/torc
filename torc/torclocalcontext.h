@@ -102,6 +102,7 @@ class TorcLocalContext : public QObject, public TorcObservable
   private:
     explicit TorcLocalContext(TorcCommandLine* CommandLine);
    ~TorcLocalContext();
+    Q_DISABLE_COPY(TorcLocalContext)
 
     bool          Init(void);
 

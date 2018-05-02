@@ -82,7 +82,7 @@ QStringList TorcPiPWMOutput::GetDescription(void)
 
 void TorcPiPWMOutput::SetValue(double Value)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     // ignore same value updates
     if (qFuzzyCompare(Value + 1.0f, value + 1.0f))

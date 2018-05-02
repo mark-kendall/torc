@@ -50,8 +50,8 @@ bool TorcNotifier::event(QEvent *Event)
 TorcNotifierFactory* TorcNotifierFactory::gTorcNotifierFactory = NULL;
 
 TorcNotifierFactory::TorcNotifierFactory()
+  : nextTorcNotifierFactory(gTorcNotifierFactory)
 {
-    nextTorcNotifierFactory = gTorcNotifierFactory;
     gTorcNotifierFactory = this;
 }
 

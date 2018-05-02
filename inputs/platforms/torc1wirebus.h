@@ -40,6 +40,9 @@ class Torc1WireDeviceFactory
   protected:
     static Torc1WireDeviceFactory*   gTorc1WireDeviceFactory;
     Torc1WireDeviceFactory*          nextTorc1WireDeviceFactory;
+
+  private:
+    Q_DISABLE_COPY(Torc1WireDeviceFactory)
 };
 
 #endif // TORC1WIREBUS_H

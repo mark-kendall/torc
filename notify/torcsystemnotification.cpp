@@ -59,7 +59,8 @@
  * \todo Validate the list of events against those specified in Torc::Actions.
 */
 TorcSystemNotification::TorcSystemNotification(const QVariantMap &Details)
-  : TorcNotification(Details)
+  : TorcNotification(Details),
+    m_events()
 {
     if (uniqueId.isEmpty() || m_notifierNames.isEmpty() || m_body.isEmpty())
         return;
@@ -115,7 +116,7 @@ bool TorcSystemNotification::event(QEvent *Event)
         TorcEvent* torcevent = dynamic_cast<TorcEvent*>(Event);
         if (torcevent)
         {
-            QMutexLocker locker(lock);
+            QMutexLocker locker(&lock);
             QString eventname = Torc::ActionToString((Torc::Actions)torcevent->GetEvent()).toLower();
             if (m_events.contains(eventname))
             {

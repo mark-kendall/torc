@@ -34,7 +34,8 @@ class WebSocketAuthentication
 {
   public:
     WebSocketAuthentication()
-      : m_timeStamp(0)
+      : m_timeStamp(0),
+        m_host()
     {
     }
     WebSocketAuthentication(quint64 Timestamp, const QString &Host)

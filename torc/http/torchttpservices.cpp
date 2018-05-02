@@ -44,7 +44,10 @@
 */
 TorcHTTPServices::TorcHTTPServices(TorcHTTPServer *Server)
   : QObject(),
-    TorcHTTPService(this, "", "services", TorcHTTPServices::staticMetaObject, QString("HandlersChanged"))
+    TorcHTTPService(this, "", "services", TorcHTTPServices::staticMetaObject, QString("HandlersChanged")),
+    serviceList(),
+    returnFormats(),
+    webSocketProtocols()
 {
     connect(Server, SIGNAL(HandlersChanged()), this, SLOT(HandlersChanged()));
 

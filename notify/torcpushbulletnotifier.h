@@ -30,7 +30,7 @@ class TorcPushbulletNotifier : public TorcNotifier
     void ResetTimerTimeout    (void);
 
   private:
-    QTimer                    *m_resetTimer;
+    QTimer                     m_resetTimer;
     int                        m_networkAbort;
     QString                    m_accessToken;
     QList<TorcNetworkRequest*> m_requests;

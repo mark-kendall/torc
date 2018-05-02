@@ -40,6 +40,7 @@ void TorcReferenceCounter::EventLoopEnding(bool Ending)
 }
 
 TorcReferenceCounter::TorcReferenceCounter(void)
+  : m_refCount()
 {
     UpRef();
 }

@@ -51,7 +51,8 @@ class TorcDBPriv
     TorcDBPriv(const QString &Name, const QString &Type)
       : m_name(Name),
         m_type(Type),
-        m_lock(new QMutex(QMutex::Recursive))
+        m_lock(new QMutex(QMutex::Recursive)),
+        m_connectionMap()
     {
     }
 

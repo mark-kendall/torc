@@ -89,9 +89,13 @@ class LogItem
 
     LogItem(const char *File, const char *Function,
             int Line, LogLevel Level, int Type)
-      : threadId((uint64_t)(QThread::currentThreadId())),
+      : refCount(),
+        threadId((uint64_t)(QThread::currentThreadId())),
+        usec(0),
         line(Line),         type(Type),
-        level(Level),       file(File),
+        level(Level),
+        tm(),
+        file(File),
         function(Function), threadName(NULL)
     {
         SetTime();
@@ -176,8 +180,8 @@ class LoggingThread : public TorcQThread
         {
             if (gLogQueue.isEmpty())
             {
-                m_waitEmpty->wakeAll();
-                m_waitNotEmpty->wait(lock.mutex(), 100);
+                m_waitEmpty.wakeAll();
+                m_waitNotEmpty.wait(lock.mutex(), 100);
                 continue;
             }
 
@@ -213,7 +217,7 @@ class LoggingThread : public TorcQThread
         QMutexLocker lock(&gLogQueueLock);
         Flush(1000);
         m_aborted = true;
-        m_waitNotEmpty->wakeAll();
+        m_waitNotEmpty.wakeAll();
     }
 
     bool Flush(int TimeoutMS = 200000)
@@ -222,10 +226,10 @@ class LoggingThread : public TorcQThread
         t.start();
         while (!m_aborted && gLogQueue.isEmpty() && t.elapsed() < TimeoutMS)
         {
-            m_waitNotEmpty->wakeAll();
+            m_waitNotEmpty.wakeAll();
             int left = TimeoutMS - t.elapsed();
             if (left > 0)
-                m_waitEmpty->wait(&gLogQueueLock, left);
+                m_waitEmpty.wait(&gLogQueueLock, left);
         }
         return gLogQueue.isEmpty();
     }
@@ -289,9 +293,9 @@ class LoggingThread : public TorcQThread
     }
 
   private:
-    QWaitCondition *m_waitNotEmpty;
-    QWaitCondition *m_waitEmpty;
-    bool            m_aborted;
+    QWaitCondition m_waitNotEmpty;
+    QWaitCondition m_waitEmpty;
+    bool           m_aborted;
 };
 
 typedef struct {
@@ -300,7 +304,7 @@ typedef struct {
     QString path;
 } LogPropagateOpts;
 
-LogPropagateOpts gLogPropagationOpts;
+LogPropagateOpts gLogPropagationOpts = { false, 0, QString("") };
 QString          gLogPropagationArgs;
 
 #define TIMESTAMP_MAX 30
@@ -309,18 +313,18 @@ QString          gLogPropagationArgs;
 LogLevel gLogLevel = (LogLevel)LOG_INFO;
 
 typedef struct {
-    uint64_t mask;
-    QString  name;
-    bool     additive;
-    QString  helpText;
+    uint64_t mask      { 0 };
+    QString  name      { QString("") };
+    bool     additive  { false };
+    QString  helpText  { QString("") };
 } VerboseDef;
 
 typedef QMap<QString, VerboseDef> VerboseMap;
 
 typedef struct {
-    int         value;
-    QString     name;
-    char        shortname;
+    int         value     { 0 };
+    QString     name      { QString("") };
+    char        shortname { '?' };
 } LoglevelDef;
 
 typedef QMap<int, LoglevelDef> LoglevelMap;
@@ -516,8 +520,8 @@ int64_t GetThreadTid(LogItem *Item)
 
 LoggingThread::LoggingThread()
   : TorcQThread("Logger"),
-    m_waitNotEmpty(new QWaitCondition()),
-    m_waitEmpty(new QWaitCondition()),
+    m_waitNotEmpty(),
+    m_waitEmpty(),
     m_aborted(false)
 {
     if (!qgetenv("VERBOSE_THREADS").isEmpty())
@@ -533,9 +537,6 @@ LoggingThread::~LoggingThread()
     Stop();
     quit();
     wait();
-
-    delete m_waitNotEmpty;
-    delete m_waitEmpty;
 }
 
 void PrintLogLine(uint64_t Mask, LogLevel Level, const char *File, int Line,

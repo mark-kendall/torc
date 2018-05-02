@@ -50,9 +50,10 @@
 */
 
 TorcHTMLHandler::TorcHTMLHandler(const QString &Path, const QString &Name)
-  : TorcHTTPHandler(Path, Name)
+  : TorcHTTPHandler(Path, Name),
+    m_pathToContent(GetTorcShareDir()),
+    m_allowedFiles()
 {
-    m_pathToContent = GetTorcShareDir();
     if (m_pathToContent.endsWith("/"))
         m_pathToContent.chop(1);
     m_pathToContent += "/html";

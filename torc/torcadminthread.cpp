@@ -106,7 +106,8 @@ TorcAdminObject* TorcAdminObject::gTorcAdminObject = NULL;
 QMutex* TorcAdminObject::gTorcAdminObjectsLock = new QMutex(QMutex::Recursive);
 
 TorcAdminObject::TorcAdminObject(int Priority)
-  : m_priority(Priority)
+  : m_nextTorcAdminObject(NULL),
+    m_priority(Priority)
 {
     QMutexLocker lock(gTorcAdminObjectsLock);
     m_nextTorcAdminObject = gTorcAdminObject;

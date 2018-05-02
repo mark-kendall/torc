@@ -53,6 +53,9 @@ TorcSetting::TorcSetting(TorcSetting *Parent, const QString &DBName, const QStri
     m_persistent(Persistent),
     m_dbName(DBName),
     m_uiName(UIName),
+    m_description(),
+    m_helpText(),
+    m_value(),
     m_default(Default),
     m_begin(0),
     m_end(1),
@@ -60,6 +63,7 @@ TorcSetting::TorcSetting(TorcSetting *Parent, const QString &DBName, const QStri
     m_isActive(false),
     m_active(0),
     m_activeThreshold(1),
+    m_children(),
     m_childrenLock(new QMutex(QMutex::Recursive))
 {
     setObjectName(DBName);

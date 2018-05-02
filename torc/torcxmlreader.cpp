@@ -40,9 +40,10 @@
  * \note TorcXMLReader does not support empty elements.
 */
 TorcXMLReader::TorcXMLReader(const QString &File)
-  : m_reader(new QXmlStreamReader()),
+  : m_reader(),
+    m_map(),
     m_valid(false),
-    m_message(QString(""))
+    m_message()
 {
     if (!QFile::exists(File))
     {
@@ -57,7 +58,7 @@ TorcXMLReader::TorcXMLReader(const QString &File)
         return;
     }
 
-    m_reader = new QXmlStreamReader(&file);
+    m_reader.setDevice(&file);
     m_valid = ReadXML();
 
     file.close();
@@ -65,7 +66,6 @@ TorcXMLReader::TorcXMLReader(const QString &File)
 
 TorcXMLReader::~TorcXMLReader()
 {
-    delete m_reader;
 }
 
 bool TorcXMLReader::IsValid(QString &Message) const
@@ -81,15 +81,12 @@ QVariantMultiMap TorcXMLReader::GetResult(void) const
 
 bool TorcXMLReader::ReadXML(void)
 {
-    if (!m_reader)
+    if (!m_reader.readNextStartElement())
         return false;
 
-    if (!m_reader->readNextStartElement())
-        return false;
-
-    QString root = m_reader->name().toString();
+    QString root = m_reader.name().toString();
     QVariantMultiMap objects;
-    while (m_reader->readNextStartElement())
+    while (m_reader.readNextStartElement())
         if (!ReadElement(&objects))
             return false;
     m_map.insert(root, objects);
@@ -101,24 +98,21 @@ bool TorcXMLReader::ReadXML(void)
 */
 bool TorcXMLReader::ReadElement(QVariantMultiMap *Map)
 {
-    if (!m_reader)
-        return false;
-
-    QString     name = m_reader->name().toString();
+    QString     name = m_reader.name().toString();
     QVariantMultiMap element;
 
     bool done = false;
     while (!done)
     {
-        switch (m_reader->readNext())
+        switch (m_reader.readNext())
         {
             case QXmlStreamReader::Invalid:
-                m_message = QString("XML error: '%1' at line %2:%3").arg(m_reader->errorString()).arg(m_reader->lineNumber()).arg(m_reader->columnNumber());
+                m_message = QString("XML error: '%1' at line %2:%3").arg(m_reader.errorString()).arg(m_reader.lineNumber()).arg(m_reader.columnNumber());
                 return false;
             case QXmlStreamReader::EntityReference:
             case QXmlStreamReader::Characters:
-                if (!m_reader->isWhitespace())
-                    Map->insert(name, m_reader->text().toString());
+                if (!m_reader.isWhitespace())
+                    Map->insert(name, m_reader.text().toString());
                 break;
             case QXmlStreamReader::StartElement:
                 if (!ReadElement(&element))

@@ -13,13 +13,13 @@ class TorcBinaryPListSerialiser : public TorcSerialiser
     TorcBinaryPListSerialiser();
     virtual ~TorcBinaryPListSerialiser();
 
-    HTTPResponseType ResponseType         (void);
+    HTTPResponseType ResponseType         (void) Q_DECL_OVERRIDE;
 
   protected:
-    void             Prepare              (void);
-    void             Begin                (void);
-    void             AddProperty          (const QString &Name, const QVariant &Value);
-    void             End                  (void);
+    void             Prepare              (void) Q_DECL_OVERRIDE;
+    void             Begin                (void) Q_DECL_OVERRIDE;
+    void             AddProperty          (const QString &Name, const QVariant &Value) Q_DECL_OVERRIDE;
+    void             End                  (void) Q_DECL_OVERRIDE;
 
   private:
     quint64          BinaryFromVariant    (const QString &Name, const QVariant &Value);
@@ -35,6 +35,9 @@ class TorcBinaryPListSerialiser : public TorcSerialiser
     QTextCodec            *m_codec;
     QList<quint64>         m_objectOffsets;
     QHash<QString,quint64> m_strings;
+
+  private:
+    Q_DISABLE_COPY(TorcBinaryPListSerialiser)
 };
 
 #endif // TORCBINARYPLISTSERIALISER_H

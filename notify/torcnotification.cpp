@@ -31,6 +31,8 @@
 */
 TorcNotification::TorcNotification(const QVariantMap &Details)
   : TorcDevice(false, 0, 0, "Notification", Details),
+    m_notifierNames(),
+    m_notifiers(),
     m_title(),
     m_body()
 {
@@ -62,7 +64,7 @@ TorcNotification::~TorcNotification()
 
 bool TorcNotification::Setup(void)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     if (uniqueId.isEmpty())
         return false;
@@ -84,7 +86,7 @@ bool TorcNotification::Setup(void)
     return true;
 }
 
-bool TorcNotification::IsKnownInput(const QString &UniqueId) const
+bool TorcNotification::IsKnownInput(const QString &UniqueId)
 {
     (void)UniqueId;
     return false;
@@ -93,8 +95,8 @@ bool TorcNotification::IsKnownInput(const QString &UniqueId) const
 TorcNotificationFactory* TorcNotificationFactory::gTorcNotificationFactory = NULL;
 
 TorcNotificationFactory::TorcNotificationFactory()
+  : nextTorcNotificationFactory(gTorcNotificationFactory)
 {
-    nextTorcNotificationFactory = gTorcNotificationFactory;
     gTorcNotificationFactory = this;
 }
 

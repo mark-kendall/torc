@@ -52,6 +52,7 @@ TorcLogicControl::Operation TorcLogicControl::StringToOperation(const QString &O
 TorcLogicControl::TorcLogicControl(const QString &Type, const QVariantMap &Details)
   : TorcControl(TorcControl::Logic, Details),
     m_operation(TorcLogicControl::StringToOperation(Type)),
+    m_referenceDeviceId(),
     m_referenceDevice(NULL)
 {
     if (m_operation == TorcLogicControl::UnknownLogicType)
@@ -164,9 +165,9 @@ QStringList TorcLogicControl::GetDescription(void)
     return result;
 }
 
-bool TorcLogicControl::IsPassthrough(void) const
+bool TorcLogicControl::IsPassthrough(void)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     bool passthrough = false;
     if ((m_operation == TorcLogicControl::Passthrough) && (m_inputs.size() == 1))
@@ -187,7 +188,7 @@ bool TorcLogicControl::IsPassthrough(void) const
 
 bool TorcLogicControl::Validate(void)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     // don't repeat validation
     if (m_validated)
@@ -265,7 +266,7 @@ bool TorcLogicControl::Validate(void)
 
 void TorcLogicControl::CalculateOutput(void)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     double newvalue = value; // no change by default
 

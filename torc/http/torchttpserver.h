@@ -78,6 +78,9 @@ class TorcHTTPServer : public QTcpServer
     quint32                           m_httpBonjourReference;
     quint32                           m_torcBonjourReference;
     TorcWebSocketPool                 m_webSocketPool;
+
+  private:
+    Q_DISABLE_COPY(TorcHTTPServer)
 };
 
 Q_DECLARE_METATYPE(TorcHTTPRequest*);

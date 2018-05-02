@@ -58,13 +58,13 @@ TorcOutput::TorcOutput(TorcOutput::Type Type, double Value, const QString &Model
 
 bool TorcOutput::HasOwner(void)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
     return m_owner != NULL;
 }
 
 QString TorcOutput::GetUIName(void)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
     if (userName.isEmpty())
         return uniqueId;
     return userName;
@@ -72,7 +72,7 @@ QString TorcOutput::GetUIName(void)
 
 bool TorcOutput::SetOwner(QObject *Owner)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     if (!Owner)
     {
@@ -100,7 +100,7 @@ void TorcOutput::SubscriberDeleted(QObject *Subscriber)
 
 void TorcOutput::SetValid(bool Valid)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     if (!Valid)
         SetValue(defaultValue);

@@ -3,6 +3,7 @@
 
 // Qt
 #include <QObject>
+#include <QReadWriteLock>
 #include <QHostAddress>
 
 // Torc
@@ -84,6 +85,7 @@ class TorcNetworkService : public QObject
     QVariant                ToMap             (void);
 
   private:
+    Q_DISABLE_COPY(TorcNetworkService)
     void                    ScheduleRetry     (void);
     void                    QueryPeerDetails  (void);
 
@@ -157,12 +159,13 @@ class TorcNetworkedContext: public QObject, public TorcHTTPService
     bool                       event               (QEvent* Event);
 
   private:
+    Q_DISABLE_COPY(TorcNetworkedContext)
     void                       Add                 (TorcNetworkService* Peer);
     void                       Remove              (const QString &UUID, TorcNetworkService::ServiceSource Source = TorcNetworkService::Spontaneous);
 
   private:
     QList<TorcNetworkService*> m_discoveredServices;
-    QReadWriteLock            *m_discoveredServicesLock;
+    QReadWriteLock             m_discoveredServicesLock;
     QList<QString>             m_serviceList;
     quint32                    m_bonjourBrowserReference;
     QVariantMap                peers; // dummy

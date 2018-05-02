@@ -75,9 +75,9 @@ TorcCentral::TemperatureUnits TorcCentral::GetGlobalTemperatureUnits(void)
 TorcCentral::TorcCentral()
   : QObject(),
     TorcHTTPService(this, "central", "central", TorcCentral::staticMetaObject, ""),
-    m_lock(new QMutex(QMutex::Recursive)),
+    m_lock(QMutex::Recursive),
     m_config(QVariantMap()),
-    m_graph(new QByteArray()),
+    m_graph(),
     canRestartTorc(true),
     temperatureUnits("celsius")
 {
@@ -161,24 +161,25 @@ TorcCentral::TorcCentral()
 
         // iff we have got this far, then create the graph
         // start the graph
-        m_graph->append(QString("strict digraph \"%1\" {\r\n"
+        m_graph.clear();
+        m_graph.append(QString("strict digraph \"%1\" {\r\n"
                                     "    rankdir=\"LR\";\r\n"
                                     "    node [shape=rect];\r\n")
                             .arg(QCoreApplication::applicationName()));
 
         // build the graph contents
-        TorcInputs::gInputs->Graph(m_graph);
-        TorcOutputs::gOutputs->Graph(m_graph);
-        TorcControls::gControls->Graph(m_graph);
-        TorcNotify::gNotify->Graph(m_graph);
+        TorcInputs::gInputs->Graph(&m_graph);
+        TorcOutputs::gOutputs->Graph(&m_graph);
+        TorcControls::gControls->Graph(&m_graph);
+        TorcNotify::gNotify->Graph(&m_graph);
 
         // complete the graph
-        m_graph->append("}\r\n");
+        m_graph.append("}\r\n");
 
         QFile file(graphdot);
         if (file.open(QIODevice::ReadWrite))
         {
-            file.write(*m_graph);
+            file.write(m_graph);
             file.flush();
             file.close();
             LOG(VB_GENERAL, LOG_INFO, QString("Saved state graph as %1").arg(graphdot));
@@ -196,7 +197,7 @@ TorcCentral::TorcCentral()
         if (handle)
         {
             GVC_t *gvc  = gvContext();
-            Agraph_t *g = agmemread(m_graph->data());
+            Agraph_t *g = agmemread(m_graph.data());
             gvLayout(gvc, g, "dot");
             gvRender(gvc, g, "svg", handle);
             gvFreeLayout(gvc,g);
@@ -229,7 +230,7 @@ TorcCentral::TorcCentral()
     }
 
     // no need for the graph data from here
-    m_graph->clear();
+    m_graph.clear();
 }
 
 TorcCentral::~TorcCentral()
@@ -239,11 +240,6 @@ TorcCentral::~TorcCentral()
 
     // cleanup any devices
     TorcDeviceHandler::Stop();
-
-    // cleanup graph
-    delete m_graph;
-
-    delete m_lock;
 }
 
 QString TorcCentral::GetUIName(void)
@@ -263,9 +259,9 @@ QString TorcCentral::GetTemperatureUnits(void) const
     return temperatureUnits;
 }
 
-bool TorcCentral::GetCanRestartTorc(void) const
+bool TorcCentral::GetCanRestartTorc(void)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(&m_lock);
     return canRestartTorc;
 }
 
@@ -528,14 +524,15 @@ class TorcCentralObject : public TorcAdminObject, public TorcStringFactory
     }
 
   private:
+    Q_DISABLE_COPY(TorcCentralObject)
     TorcCentral *m_object;
 } TorcCentralObject;
 
 TorcXSDFactory* TorcXSDFactory::gTorcXSDFactory = NULL;
 
 TorcXSDFactory::TorcXSDFactory()
+  : nextTorcXSDFactory(gTorcXSDFactory)
 {
-    nextTorcXSDFactory = gTorcXSDFactory;
     gTorcXSDFactory = this;
 }
 

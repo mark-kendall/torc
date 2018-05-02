@@ -36,13 +36,13 @@ HTTPResponseType TorcPListSerialiser::ResponseType(void)
 
 void TorcPListSerialiser::Begin(void)
 {
-    m_xmlStream->setAutoFormatting(true);
-    m_xmlStream->setAutoFormattingIndent(4);
-    m_xmlStream->writeStartDocument("1.0");
-    m_xmlStream->writeDTD("<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">");
-    m_xmlStream->writeStartElement("plist");
-    m_xmlStream->writeAttribute("version", "1.0");
-    m_xmlStream->writeStartElement("dict");
+    m_xmlStream.setAutoFormatting(true);
+    m_xmlStream.setAutoFormattingIndent(4);
+    m_xmlStream.writeStartDocument("1.0");
+    m_xmlStream.writeDTD("<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">");
+    m_xmlStream.writeStartElement("plist");
+    m_xmlStream.writeAttribute("version", "1.0");
+    m_xmlStream.writeStartElement("dict");
 }
 
 void TorcPListSerialiser::AddProperty(const QString &Name, const QVariant &Value)
@@ -52,9 +52,9 @@ void TorcPListSerialiser::AddProperty(const QString &Name, const QVariant &Value
 
 void TorcPListSerialiser::End(void)
 {
-    m_xmlStream->writeEndElement();
-    m_xmlStream->writeEndElement();
-    m_xmlStream->writeEndDocument();
+    m_xmlStream.writeEndElement();
+    m_xmlStream.writeEndElement();
+    m_xmlStream.writeEndDocument();
 }
 
 void TorcPListSerialiser::PListFromVariant(const QString &Name, const QVariant &Value, bool NeedKey)
@@ -69,8 +69,8 @@ void TorcPListSerialiser::PListFromVariant(const QString &Name, const QVariant &
             if (Value.toDateTime().isValid())
             {
                 if (NeedKey)
-                    m_xmlStream->writeTextElement("key", Name);
-                m_xmlStream->writeTextElement("date", Value.toDateTime().toUTC().toString("yyyy-MM-ddThh:mm:ssZ"));
+                    m_xmlStream.writeTextElement("key", Name);
+                m_xmlStream.writeTextElement("date", Value.toDateTime().toUTC().toString("yyyy-MM-ddThh:mm:ssZ"));
             }
             break;
         }
@@ -79,16 +79,16 @@ void TorcPListSerialiser::PListFromVariant(const QString &Name, const QVariant &
             if (!Value.toByteArray().isNull())
             {
                 if (NeedKey)
-                    m_xmlStream->writeTextElement("key", Name);
-                m_xmlStream->writeTextElement("data", Value.toByteArray().toBase64().data());
+                    m_xmlStream.writeTextElement("key", Name);
+                m_xmlStream.writeTextElement("data", Value.toByteArray().toBase64().data());
             }
             break;
         }
         case QMetaType::Bool:
         {
             if (NeedKey)
-                m_xmlStream->writeTextElement("key", Name);
-            m_xmlStream->writeEmptyElement(Value.toBool() ? "true" : "false");
+                m_xmlStream.writeTextElement("key", Name);
+            m_xmlStream.writeEmptyElement(Value.toBool() ? "true" : "false");
             break;
         }
 
@@ -98,8 +98,8 @@ void TorcPListSerialiser::PListFromVariant(const QString &Name, const QVariant &
         case QMetaType::ULongLong:
         {
             if (NeedKey)
-                m_xmlStream->writeTextElement("key", Name);
-            m_xmlStream->writeTextElement("integer", QString::number(Value.toULongLong()));
+                m_xmlStream.writeTextElement("key", Name);
+            m_xmlStream.writeTextElement("integer", QString::number(Value.toULongLong()));
             break;
         }
 
@@ -111,8 +111,8 @@ void TorcPListSerialiser::PListFromVariant(const QString &Name, const QVariant &
         case QMetaType::Double:
         {
             if (NeedKey)
-                m_xmlStream->writeTextElement("key", Name);
-            m_xmlStream->writeTextElement("real", QString("%1").arg(Value.toDouble(), 0, 'f', 6));
+                m_xmlStream.writeTextElement("key", Name);
+            m_xmlStream.writeTextElement("real", QString("%1").arg(Value.toDouble(), 0, 'f', 6));
             break;
         }
 
@@ -120,8 +120,8 @@ void TorcPListSerialiser::PListFromVariant(const QString &Name, const QVariant &
         default:
         {
             if (NeedKey)
-                m_xmlStream->writeTextElement("key", Name);
-            m_xmlStream->writeTextElement("string", Value.toString());
+                m_xmlStream.writeTextElement("key", Name);
+            m_xmlStream.writeTextElement("string", Value.toString());
             break;
         }
     }
@@ -144,38 +144,38 @@ void TorcPListSerialiser::PListFromList(const QString &Name, const QVariantList 
         }
     }
 
-    m_xmlStream->writeTextElement("key", Name);
-    m_xmlStream->writeStartElement("array");
+    m_xmlStream.writeTextElement("key", Name);
+    m_xmlStream.writeStartElement("array");
 
     QVariantList::const_iterator it = Value.begin();
     for ( ; it != Value.end(); ++it)
         PListFromVariant(Name, (*it), false);
 
-    m_xmlStream->writeEndElement();
+    m_xmlStream.writeEndElement();
 }
 
 void TorcPListSerialiser::PListFromStringList(const QString &Name, const QStringList &Value)
 {
-    m_xmlStream->writeTextElement("key", Name);
-    m_xmlStream->writeStartElement("array");
+    m_xmlStream.writeTextElement("key", Name);
+    m_xmlStream.writeStartElement("array");
 
     QStringList::const_iterator it = Value.begin();
     for ( ; it != Value.end(); ++it)
-        m_xmlStream->writeTextElement("string", (*it));
+        m_xmlStream.writeTextElement("string", (*it));
 
-    m_xmlStream->writeEndElement();
+    m_xmlStream.writeEndElement();
 }
 
 void TorcPListSerialiser::PListFromMap(const QString &Name, const QVariantMap &Value)
 {
-    m_xmlStream->writeTextElement("key", Name);
-    m_xmlStream->writeStartElement("dict");
+    m_xmlStream.writeTextElement("key", Name);
+    m_xmlStream.writeStartElement("dict");
 
     QVariantMap::const_iterator it = Value.begin();
     for ( ; it != Value.end(); ++it)
         PListFromVariant(it.key(), it.value());
 
-    m_xmlStream->writeEndElement();
+    m_xmlStream.writeEndElement();
 }
 
 class TorcApplePListSerialiserFactory : public TorcSerialiserFactory

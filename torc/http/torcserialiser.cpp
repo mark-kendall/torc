@@ -62,10 +62,10 @@ QByteArray* TorcSerialiser::Serialise(const QVariant &Data, const QString &Type)
 TorcSerialiserFactory* TorcSerialiserFactory::gTorcSerialiserFactory = NULL;
 
 TorcSerialiserFactory::TorcSerialiserFactory(const QString &Accepts, const QString &Description)
-  : m_accepts(Accepts),
+  : m_nextTorcSerialiserFactory(gTorcSerialiserFactory),
+    m_accepts(Accepts),
     m_description(Description)
 {
-    m_nextTorcSerialiserFactory = gTorcSerialiserFactory;
     gTorcSerialiserFactory      = this;
 }
 

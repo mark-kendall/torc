@@ -37,8 +37,8 @@ TorcI2CDevice::~TorcI2CDevice()
 TorcI2CDeviceFactory* TorcI2CDeviceFactory::gTorcI2CDeviceFactory = NULL;
 
 TorcI2CDeviceFactory::TorcI2CDeviceFactory()
+  : nextTorcI2CDeviceFactory(gTorcI2CDeviceFactory)
 {
-    nextTorcI2CDeviceFactory = gTorcI2CDeviceFactory;
     gTorcI2CDeviceFactory = this;
 }
 
@@ -59,7 +59,8 @@ TorcI2CDeviceFactory* TorcI2CDeviceFactory::NextFactory(void) const
 TorcI2CBus* TorcI2CBus::gTorcI2CBus = new TorcI2CBus();
 
 TorcI2CBus::TorcI2CBus()
-  : TorcDeviceHandler()
+  : TorcDeviceHandler(),
+    m_devices()
 {
 }
 

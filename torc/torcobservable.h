@@ -18,13 +18,11 @@ class TorcObservable
     void            Notify         (const TorcEvent &Event);
 
   private:
-    QMutex         *m_observerLock;
+    QMutex          m_observerLock;
     QList<QObject*> m_observers;
 
   private:
-    // disable copy and assignment constructors
-    TorcObservable(const TorcObservable &) Q_DECL_EQ_DELETE;
-    TorcObservable &operator=(const TorcObservable &) Q_DECL_EQ_DELETE;
+    Q_DISABLE_COPY(TorcObservable)
 };
 
 #endif // TORCOBSERVABLE_H

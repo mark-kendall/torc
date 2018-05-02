@@ -94,11 +94,14 @@ class TorcLocalContextPriv
 TorcLocalContextPriv::TorcLocalContextPriv(TorcCommandLine *CommandLine)
   : m_sqliteDB(NULL),
     m_dbName(QString("")),
+    m_localSettings(),
     m_localSettingsLock(new QReadWriteLock(QReadWriteLock::Recursive)),
+    m_preferences(),
     m_preferencesLock(new QReadWriteLock(QReadWriteLock::Recursive)),
     m_UIObject(NULL),
     m_adminThread(NULL),
-    m_language(NULL)
+    m_language(NULL),
+    m_uuid()
 {
     // set any custom database location
     m_dbName = CommandLine->GetValue("db").toString();

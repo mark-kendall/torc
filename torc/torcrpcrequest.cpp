@@ -53,7 +53,11 @@ TorcRPCRequest::TorcRPCRequest(const QString &Method, QObject *Parent)
     m_method(Method),
     m_parent(NULL),
     m_parentLock(new QMutex()),
-    m_validParent(true)
+    m_validParent(true),
+    m_parameters(),
+    m_positionalParameters(),
+    m_serialisedData(),
+    m_reply()
 {
     SetParent(Parent);
 }
@@ -70,7 +74,11 @@ TorcRPCRequest::TorcRPCRequest(const QString &Method)
     m_method(Method),
     m_parent(NULL),
     m_parentLock(new QMutex()),
-    m_validParent(false)
+    m_validParent(false),
+    m_parameters(),
+    m_positionalParameters(),
+    m_serialisedData(),
+    m_reply()
 {
 }
 
@@ -84,7 +92,11 @@ TorcRPCRequest::TorcRPCRequest(const QJsonObject &Object, bool Authenticated)
     m_method(),
     m_parent(NULL),
     m_parentLock(new QMutex()),
-    m_validParent(false)
+    m_validParent(false),
+    m_parameters(),
+    m_positionalParameters(),
+    m_serialisedData(),
+    m_reply()
 {
     ParseJSONObject(Object);
 }
@@ -100,7 +112,11 @@ TorcRPCRequest::TorcRPCRequest(TorcWebSocket::WSSubProtocol Protocol, const QByt
     m_method(),
     m_parent(Parent),
     m_parentLock(new QMutex()),
-    m_validParent(false)
+    m_validParent(false),
+    m_parameters(),
+    m_positionalParameters(),
+    m_serialisedData(),
+    m_reply()
 {
     if (Protocol == TorcWebSocket::SubProtocolJSONRPC)
     {

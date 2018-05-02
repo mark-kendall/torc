@@ -566,7 +566,8 @@ TorcHTTPServer::TorcHTTPServer()
     m_dynamicContent(),                                        // dynamic files - for config files etc (typically served from ~/.torc/content)
     m_upnpContent(),                                           // upnp - device description
     m_httpBonjourReference(0),
-    m_torcBonjourReference(0)
+    m_torcBonjourReference(0),
+    m_webSocketPool()
 {
     // port setting - this could become a user editable setting
     m_port = new TorcSetting(NULL, TORC_CORE + "WebServerPort", QString(), TorcSetting::Integer, true, QVariant((int)4840));

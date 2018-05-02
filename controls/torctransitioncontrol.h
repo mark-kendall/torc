@@ -35,7 +35,7 @@ class TorcTransitionControl : public TorcControl
   private:
     quint64                   m_duration;
     QEasingCurve::Type        m_type;
-    QPropertyAnimation       *m_animation;
+    QPropertyAnimation        m_animation;
     double                    animationValue;
     bool                      m_firstTrigger;
     double                    m_transitionValue; // tracks the input value to filter transitions

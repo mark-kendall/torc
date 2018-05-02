@@ -64,12 +64,13 @@ TorcPowerPriv* TorcPowerPriv::Create(TorcPower *Parent)
 
 TorcPowerPriv::TorcPowerPriv(TorcPower *Parent)
   : QObject(static_cast<QObject*>(Parent)),
+    m_canShutdown(new TorcSetting(NULL, QString("CanShutdown"),  QString(), TorcSetting::Checkbox, false, QVariant((bool)false))),
+    m_canSuspend(new TorcSetting(NULL, QString("CanSuspend"),   QString(), TorcSetting::Checkbox, false, QVariant((bool)false))),
+    m_canHibernate(new TorcSetting(NULL, QString("CanHibernate"), QString(), TorcSetting::Checkbox, false, QVariant((bool)false))),
+    m_canRestart(new TorcSetting(NULL, QString("CanRestart"),   QString(), TorcSetting::Checkbox, false, QVariant((bool)false))),
     m_batteryLevel(TorcPower::UnknownPower)
 {
-    m_canShutdown  = new TorcSetting(NULL, QString("CanShutdown"),  QString(), TorcSetting::Checkbox, false, QVariant((bool)false));
-    m_canSuspend   = new TorcSetting(NULL, QString("CanSuspend"),   QString(), TorcSetting::Checkbox, false, QVariant((bool)false));
-    m_canHibernate = new TorcSetting(NULL, QString("CanHibernate"), QString(), TorcSetting::Checkbox, false, QVariant((bool)false));
-    m_canRestart   = new TorcSetting(NULL, QString("CanRestart"),   QString(), TorcSetting::Checkbox, false, QVariant((bool)false));
+
 }
 
 TorcPowerPriv::~TorcPowerPriv()
@@ -160,8 +161,8 @@ class PowerFactoryNull : public PowerFactory
 PowerFactory* PowerFactory::gPowerFactory = NULL;
 
 PowerFactory::PowerFactory()
+  : nextPowerFactory(gPowerFactory)
 {
-    nextPowerFactory = gPowerFactory;
     gPowerFactory = this;
 }
 
@@ -223,6 +224,22 @@ void TorcPower::TearDown(void)
 TorcPower::TorcPower()
   : QObject(),
     TorcHTTPService(this, "power", "power", TorcPower::staticMetaObject, "ShuttingDown,Suspending,Hibernating,Restarting,WokeUp,LowBattery,Refresh"),
+    m_powerGroupItem(new TorcSettingGroup(gRootSetting, tr("Power"))),
+    m_powerEnabled(new TorcSetting(m_powerGroupItem, QString(TORC_CORE + "EnablePower"),
+                                       tr("Enable power management"),
+                                       TorcSetting::Checkbox, true, QVariant((bool)true))),
+    m_allowShutdown(new TorcSetting(m_powerEnabled, QString(TORC_CORE + "AllowShutdown"),
+                                       tr("Allow Torc to shutdown the system"),
+                                       TorcSetting::Checkbox, true, QVariant((bool)true))),
+    m_allowSuspend(new TorcSetting(m_powerEnabled, QString(TORC_CORE + "AllowSuspend"),
+                                       tr("Allow Torc to suspend the system"),
+                                       TorcSetting::Checkbox, true, QVariant((bool)true))),
+    m_allowHibernate(new TorcSetting(m_powerEnabled, QString(TORC_CORE + "AllowHibernate"),
+                                       tr("Allow Torc to hibernate the system"),
+                                       TorcSetting::Checkbox, true, QVariant((bool)true))),
+    m_allowRestart(new TorcSetting(m_powerEnabled, QString(TORC_CORE + "AllowRestart"),
+                                       tr("Allow Torc to restart the system"),
+                                       TorcSetting::Checkbox, true, QVariant((bool)true))),
     m_lastBatteryLevel(UnknownPower),
     m_priv(TorcPowerPriv::Create(this)),
     canShutdown(false),

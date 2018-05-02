@@ -48,6 +48,9 @@ class TorcAdminObject
     static QMutex                 *gTorcAdminObjectsLock;
     TorcAdminObject               *m_nextTorcAdminObject;
     int                            m_priority;
+
+  private:
+    Q_DISABLE_COPY(TorcAdminObject)
 };
 
 #endif // TORCADMINTHREAD_H

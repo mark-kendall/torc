@@ -43,6 +43,8 @@ class MethodParameters
     MethodParameters(int Index, const QMetaMethod &Method, int AllowedRequestTypes, const QString &ReturnType)
       : m_valid(false),
         m_index(Index),
+        m_names(),
+        m_types(),
         m_allowedRequestTypes(AllowedRequestTypes),
         m_returnType(ReturnType)
     {
@@ -249,6 +251,9 @@ TorcHTTPService::TorcHTTPService(QObject *Parent, const QString &Signature, cons
     m_parent(Parent),
     m_version("Unknown"),
     m_metaObject(MetaObject),
+    m_methods(),
+    m_properties(),
+    m_subscribers(),
     m_subscriberLock(QMutex::Recursive)
 {
     QStringList blacklist = Blacklist.split(",");

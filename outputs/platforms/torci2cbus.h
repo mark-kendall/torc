@@ -35,6 +35,9 @@ class TorcI2CDeviceFactory
   protected:
     static TorcI2CDeviceFactory*   gTorcI2CDeviceFactory;
     TorcI2CDeviceFactory*          nextTorcI2CDeviceFactory;
+
+  private:
+    Q_DISABLE_COPY(TorcI2CDeviceFactory)
 };
 
 class TorcI2CBus : public TorcDeviceHandler

@@ -95,7 +95,7 @@ class TorcNetwork : QNetworkAccessManager
 
   private:
     bool                             m_online;
-    QNetworkConfigurationManager    *m_manager;
+    QNetworkConfigurationManager     m_manager;
     QNetworkConfiguration            m_configuration;
     QStringList                      m_hostNames;
 

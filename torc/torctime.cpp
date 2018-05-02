@@ -38,7 +38,9 @@
  *        to an ntp server or local real time clock.
 */
 TorcTime::TorcTime()
-  : QObject(), TorcHTTPService(this, "time", "time", TorcTime::staticMetaObject, "Tick")
+  : QObject(), TorcHTTPService(this, "time", "time", TorcTime::staticMetaObject, "Tick"),
+    currentTime(),
+    m_timer()
 {
     m_timer.setInterval(1000);
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(Tick()));
@@ -95,6 +97,7 @@ static class TorcTimeObject : public TorcAdminObject
     }
 
   private:
+    Q_DISABLE_COPY(TorcTimeObject)
     TorcTime *m_time;
 
 } TorcTimeObject;

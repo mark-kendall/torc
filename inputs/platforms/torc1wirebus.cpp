@@ -66,7 +66,8 @@ Torc1WireBus* Torc1WireBus::gTorc1WireBus = new Torc1WireBus();
  * \endcode
 */
 Torc1WireBus::Torc1WireBus()
-  : TorcDeviceHandler()
+  : TorcDeviceHandler(),
+    m_inputs()
 {
 }
 
@@ -162,8 +163,8 @@ void Torc1WireBus::Destroy(void)
 Torc1WireDeviceFactory* Torc1WireDeviceFactory::gTorc1WireDeviceFactory = NULL;
 
 Torc1WireDeviceFactory::Torc1WireDeviceFactory()
+  : nextTorc1WireDeviceFactory(gTorc1WireDeviceFactory)
 {
-    nextTorc1WireDeviceFactory = gTorc1WireDeviceFactory;
     gTorc1WireDeviceFactory = this;
 }
 

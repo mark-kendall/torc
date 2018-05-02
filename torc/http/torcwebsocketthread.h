@@ -37,6 +37,9 @@ class TorcWebSocketThread : public TorcQThread
     quint16             m_port;
     bool                m_authenticate;
     TorcWebSocket::WSSubProtocol m_protocol;
+
+  private:
+    Q_DISABLE_COPY(TorcWebSocketThread)
 };
 
 #endif // TORCWEBSOCKETTHREAD_H

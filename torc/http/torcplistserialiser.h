@@ -10,12 +10,12 @@ class TorcPListSerialiser : public TorcXMLSerialiser
     TorcPListSerialiser();
     virtual ~TorcPListSerialiser();
 
-    HTTPResponseType ResponseType        (void);
+    HTTPResponseType ResponseType        (void) Q_DECL_OVERRIDE;
 
   protected:
-    void             Begin               (void);
-    void             AddProperty         (const QString &Name, const QVariant &Value);
-    void             End                 (void);
+    void             Begin               (void) Q_DECL_OVERRIDE;
+    void             AddProperty         (const QString &Name, const QVariant &Value) Q_DECL_OVERRIDE;
+    void             End                 (void) Q_DECL_OVERRIDE;
 
     void             PListFromVariant    (const QString &Name, const QVariant &Value, bool NeedKey = true);
     void             PListFromList       (const QString &Name, const QVariantList &Value);

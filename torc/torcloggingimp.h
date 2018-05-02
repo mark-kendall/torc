@@ -27,9 +27,10 @@ class FileLogger : public LoggerBase
     FileLogger(QString Filename, bool ErrorsOnly, int Quiet);
    ~FileLogger();
 
-    bool   Logmsg(LogItem *Item);
+    bool   Logmsg(LogItem *Item) Q_DECL_OVERRIDE;
 
   private:
+    Q_DISABLE_COPY(FileLogger)
     bool   m_opened;
     QFile *m_file;
     bool   m_errorsOnly;

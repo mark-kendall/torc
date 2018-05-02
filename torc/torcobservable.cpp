@@ -38,19 +38,19 @@
  * the signal/slot mechanism should be used.
 */
 TorcObservable::TorcObservable()
-  : m_observerLock(new QMutex(QMutex::Recursive))
+  : m_observerLock(QMutex::Recursive),
+    m_observers()
 {
 }
 
 TorcObservable::~TorcObservable()
 {
-    delete m_observerLock;
 }
 
 ///brief Register the given object to receive events.
 void TorcObservable::AddObserver(QObject *Observer)
 {
-    QMutexLocker locker(m_observerLock);
+    QMutexLocker locker(&m_observerLock);
     if (!Observer || m_observers.contains(Observer))
         return;
     m_observers.append(Observer);
@@ -59,15 +59,14 @@ void TorcObservable::AddObserver(QObject *Observer)
 ///brief Deregister the given object.
 void TorcObservable::RemoveObserver(QObject *Observer)
 {
-    QMutexLocker locker(m_observerLock);
+    QMutexLocker locker(&m_observerLock);
     m_observers.removeAll(Observer);
 }
 
 ///Brief Send the given event to each registered listener/observer.
 void TorcObservable::Notify(const TorcEvent &Event)
 {
-    QMutexLocker locker(m_observerLock);
-
+    QMutexLocker locker(&m_observerLock);
     foreach (QObject* observer, m_observers)
         QCoreApplication::postEvent(observer, Event.Copy());
 }

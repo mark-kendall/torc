@@ -126,9 +126,10 @@ class TorcWebSocket : public QObject
     void            SubscriberDeleted     (QObject *Subscriber);
 
   protected:
-    bool            event                 (QEvent *Event);
+    bool            event                 (QEvent *Event) Q_DECL_OVERRIDE;
 
   private:
+    Q_DISABLE_COPY(TorcWebSocket)
     void            SetState              (SocketState State);
     void            HandleUpgradeRequest  (TorcHTTPRequest *Request);
     void            SendHandshake         (void);

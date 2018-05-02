@@ -71,8 +71,10 @@ TorcWebSocket::TorcWebSocket(TorcWebSocketThread* Parent, qintptr SocketDescript
     m_socket(NULL),
     m_socketState(SocketState::DisconnectedSt),
     m_socketDescriptor(SocketDescriptor),
+    m_reader(),
     m_authenticate(false),
     m_authenticated(false),
+    m_challengeResponse(),
     m_address(QHostAddress()),
     m_port(0),
     m_serverSide(true),
@@ -91,7 +93,10 @@ TorcWebSocket::TorcWebSocket(TorcWebSocketThread* Parent, qintptr SocketDescript
     m_bufferedPayloadOpCode(OpContinuation),
     m_closeReceived(false),
     m_closeSent(false),
-    m_currentRequestID(1)
+    m_currentRequestID(1),
+    m_currentRequests(),
+    m_requestTimers(),
+    m_subscribers()
 {
 }
 
@@ -101,8 +106,10 @@ TorcWebSocket::TorcWebSocket(TorcWebSocketThread* Parent, const QHostAddress &Ad
     m_socket(NULL),
     m_socketState(SocketState::DisconnectedSt),
     m_socketDescriptor(0),
+    m_reader(),
     m_authenticate(Authenticate),
     m_authenticated(false),
+    m_challengeResponse(),
     m_address(Address),
     m_port(Port),
     m_serverSide(false),
@@ -121,7 +128,10 @@ TorcWebSocket::TorcWebSocket(TorcWebSocketThread* Parent, const QHostAddress &Ad
     m_bufferedPayloadOpCode(OpContinuation),
     m_closeReceived(false),
     m_closeSent(false),
-    m_currentRequestID(1)
+    m_currentRequestID(1),
+    m_currentRequests(),
+    m_requestTimers(),
+    m_subscribers()
 {
 }
 

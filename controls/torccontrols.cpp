@@ -34,7 +34,9 @@ TorcControls* TorcControls::gControls = new TorcControls();
 TorcControls::TorcControls()
   : QObject(),
     TorcHTTPService(this, CONTROLS_DIRECTORY, "controls", TorcControls::staticMetaObject, BLACKLIST),
-    TorcDeviceHandler()
+    TorcDeviceHandler(),
+    controlList(),
+    controlTypes()
 {
 }
 

@@ -47,12 +47,14 @@ TorcNetworkService::TorcNetworkService(const QString &Name, const QString &UUID,
     name(Name),
     uuid(UUID),
     port(Port),
+    host(),
     uiAddress(QString()),
     startTime(0),
     priority(-1),
     apiVersion(QString()),
     connected(false),
     m_sources(Spontaneous),
+    m_debugString(),
     m_addresses(Addresses),
     m_preferredAddressIndex(0),
     m_abort(0),
@@ -578,8 +580,11 @@ void TorcNetworkService::RemoveSource(ServiceSource Source)
 TorcNetworkedContext::TorcNetworkedContext()
   : QObject(),
     TorcHTTPService(this, "peers", "peers", TorcNetworkedContext::staticMetaObject, BLACKLIST),
-    m_discoveredServicesLock(new QReadWriteLock(QReadWriteLock::Recursive)),
-    m_bonjourBrowserReference(0)
+    m_discoveredServices(),
+    m_discoveredServicesLock(QReadWriteLock::Recursive),
+    m_serviceList(),
+    m_bonjourBrowserReference(0),
+    peers()
 {
     // listen for events
     gLocalContext->AddObserver(this);
@@ -617,7 +622,7 @@ TorcNetworkedContext::~TorcNetworkedContext()
     TorcBonjour::TearDown();
 
     {
-        QWriteLocker locker(m_discoveredServicesLock);
+        QWriteLocker locker(&m_discoveredServicesLock);
         while (!m_discoveredServices.isEmpty())
             delete m_discoveredServices.takeLast();
     }
@@ -632,7 +637,7 @@ QVariantList TorcNetworkedContext::GetPeers(void)
 {
     QVariantList result;
 
-    QReadLocker locker(m_discoveredServicesLock);
+    QReadLocker locker(&m_discoveredServicesLock);
     foreach (TorcNetworkService* service, m_discoveredServices)
         result.append(service->ToMap());
 
@@ -685,7 +690,7 @@ bool TorcNetworkedContext::event(QEvent *Event)
                         else if (m_serviceList.contains(uuid))
                         {
                             // register this as an additional source
-                            QWriteLocker locker(m_discoveredServicesLock);
+                            QWriteLocker locker(&m_discoveredServicesLock);
                             for (int i = 0; i < m_discoveredServices.size(); ++i)
                                 if (m_discoveredServices.at(i)->GetUuid() == uuid)
                                     m_discoveredServices.at(i)->SetSource(TorcNetworkService::Bonjour);
@@ -770,7 +775,7 @@ bool TorcNetworkedContext::event(QEvent *Event)
                     else if (m_serviceList.contains(uuid))
                     {
                         // register this as an additional source
-                        QWriteLocker locker(m_discoveredServicesLock);
+                        QWriteLocker locker(&m_discoveredServicesLock);
                         for (int i = 0; i < m_discoveredServices.size(); ++i)
                             if (m_discoveredServices.at(i)->GetUuid() == uuid)
                                 m_discoveredServices.at(i)->SetSource(TorcNetworkService::UPnP);
@@ -951,7 +956,7 @@ void TorcNetworkedContext::Add(TorcNetworkService *Peer)
     if (Peer && !m_serviceList.contains(Peer->GetUuid()))
     {
         {
-            QWriteLocker locker(m_discoveredServicesLock);
+            QWriteLocker locker(&m_discoveredServicesLock);
             m_discoveredServices.append(Peer);
         }
 
@@ -966,7 +971,7 @@ void TorcNetworkedContext::Remove(const QString &UUID, TorcNetworkService::Servi
     if (m_serviceList.contains(UUID))
     {
         {
-            QWriteLocker locker(m_discoveredServicesLock);
+            QWriteLocker locker(&m_discoveredServicesLock);
             for (int i = 0; i < m_discoveredServices.size(); ++i)
             {
                 if (m_discoveredServices.at(i)->GetUuid() == UUID)

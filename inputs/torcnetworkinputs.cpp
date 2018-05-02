@@ -60,6 +60,8 @@
 TorcNetworkInputs* TorcNetworkInputs::gNetworkInputs = new TorcNetworkInputs();
 
 TorcNetworkInputs::TorcNetworkInputs()
+  : m_inputs(),
+    m_outputs()
 {
 }
 

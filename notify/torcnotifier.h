@@ -40,5 +40,8 @@ class TorcNotifierFactory
   protected:
     static TorcNotifierFactory*   gTorcNotifierFactory;
     TorcNotifierFactory*          nextTorcNotifierFactory;
+
+  private:
+    Q_DISABLE_COPY(TorcNotifierFactory)
 };
 #endif // TORCNOTIFIER_H

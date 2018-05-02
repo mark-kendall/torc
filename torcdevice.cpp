@@ -35,7 +35,7 @@ TorcDevice::TorcDevice(bool Valid, double Value, double Default,
     uniqueId(QString("")),
     userName(QString("")),
     userDescription(QString("")),
-    lock(new QMutex(QMutex::Recursive)),
+    lock(QMutex::Recursive),
     wasInvalid(true)
 {
     if (!Details.contains("name"))
@@ -73,9 +73,6 @@ TorcDevice::~TorcDevice()
         LOG(VB_GENERAL, LOG_INFO, QString("Device id: %1 removed").arg(uniqueId));
         gDeviceList->remove(uniqueId);
     }
-
-    delete lock;
-    lock = NULL;
 }
 
 QStringList TorcDevice::GetDescription(void)
@@ -102,7 +99,7 @@ void TorcDevice::Stop(void)
 
 void TorcDevice::SetValid(bool Valid)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     if (Valid == valid)
         return;
@@ -116,7 +113,7 @@ void TorcDevice::SetValid(bool Valid)
 
 void TorcDevice::SetValue(double Value)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     // force an update if the last value was 'invalid'
     if (wasInvalid)
@@ -136,7 +133,7 @@ void TorcDevice::SetValue(double Value)
 
 void TorcDevice::SetUserName(const QString &Name)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     if (Name == userName)
         return;
@@ -147,7 +144,7 @@ void TorcDevice::SetUserName(const QString &Name)
 
 void TorcDevice::SetUserDescription(const QString &Description)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     if (Description == userDescription)
         return;
@@ -158,21 +155,21 @@ void TorcDevice::SetUserDescription(const QString &Description)
 
 bool TorcDevice::GetValid(void)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     return valid;
 }
 
 double TorcDevice::GetValue(void)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     return value;
 }
 
 double TorcDevice::GetDefaultValue(void)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     return defaultValue;
 }
@@ -191,14 +188,14 @@ QString TorcDevice::GetUniqueId(void)
 
 QString TorcDevice::GetUserName(void)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     return userName;
 }
 
 QString TorcDevice::GetUserDescription(void)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     return userDescription;
 }

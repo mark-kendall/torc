@@ -64,7 +64,7 @@ class TorcDevice : public QObject, public TorcReferenceCounter
     QString                uniqueId;
     QString                userName;
     QString                userDescription;
-    QMutex                *lock;
+    QMutex                 lock;
 
     static QHash<QString,TorcDevice*> *gDeviceList;
     static QMutex         *gDeviceListLock;

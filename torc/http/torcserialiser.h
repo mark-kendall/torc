@@ -54,6 +54,9 @@ class TorcSerialiserFactory
     TorcSerialiserFactory*        m_nextTorcSerialiserFactory;
     QString                       m_accepts;
     QString                       m_description;
+
+  private:
+    Q_DISABLE_COPY(TorcSerialiserFactory)
 };
 
 #endif // TORCSERIALISER_H

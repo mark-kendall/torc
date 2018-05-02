@@ -67,11 +67,18 @@ QRegExp gRegExp = QRegExp("[ \r\n][ \r\n]*");
 char TorcHTTPRequest::DateFormat[] = "ddd, dd MMM yyyy HH:mm:ss 'GMT'";
 
 TorcHTTPRequest::TorcHTTPRequest(TorcHTTPReader *Reader)
-  : m_type(HTTPRequest),
+  : m_fullUrl(),
+    m_path(),
+    m_method(),
+    m_query(),
+    m_redirectedTo(),
+    m_type(HTTPRequest),
     m_requestType(HTTPUnknownType),
     m_protocol(HTTPUnknownProtocol),
     m_connection(HTTPConnectionClose),
+    m_ranges(),
     m_headers(NULL),
+    m_queries(),
     m_content(NULL),
     m_allowGZip(false),
     m_allowed(0),
@@ -96,11 +103,18 @@ TorcHTTPRequest::TorcHTTPRequest(TorcHTTPReader *Reader)
 }
 
 TorcHTTPRequest::TorcHTTPRequest(const QString &Method, QMap<QString,QString> *Headers, QByteArray *Content)
-  : m_type(HTTPRequest),
+  : m_fullUrl(),
+    m_path(),
+    m_method(),
+    m_query(),
+    m_redirectedTo(),
+    m_type(HTTPRequest),
     m_requestType(HTTPUnknownType),
     m_protocol(HTTPUnknownProtocol),
     m_connection(HTTPConnectionClose),
+    m_ranges(),
     m_headers(Headers),
+    m_queries(),
     m_content(Content),
     m_allowGZip(false),
     m_allowed(0),

@@ -55,6 +55,7 @@ class TorcRPCRequest : public TorcReferenceCounter
   private:
     explicit TorcRPCRequest(const QJsonObject &Object, bool Authenticated);
     ~TorcRPCRequest();
+    Q_DISABLE_COPY(TorcRPCRequest)
 
     void                ParseJSONObject        (const QJsonObject &Object);
 
