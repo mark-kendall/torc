@@ -28,6 +28,7 @@ class TorcReferenceLocker
    ~TorcReferenceLocker();
 
   private:
+    Q_DISABLE_COPY(TorcReferenceLocker)
     TorcReferenceCounter *m_refCountedObject;
 };
 

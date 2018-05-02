@@ -171,6 +171,9 @@ class TorcHTTPRequest
     QByteArray            *m_responseContent;
     QFile                 *m_responseFile;
     QMap<QString,QString> *m_responseHeaders;
+
+  private:
+    Q_DISABLE_COPY(TorcHTTPRequest)
 };
 
 #endif // TORCHTTPREQUEST_H

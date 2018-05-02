@@ -46,6 +46,9 @@ class TorcHTTPService : public TorcHTTPHandler
     QMap<int,int>                          m_properties;
     QList<QObject*>                        m_subscribers;
     QMutex                                 m_subscriberLock;
+
+  private:
+    Q_DISABLE_COPY(TorcHTTPService)
 };
 
 Q_DECLARE_METATYPE(TorcHTTPService*);
