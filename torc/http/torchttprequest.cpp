@@ -1034,15 +1034,7 @@ QString TorcHTTPRequest::RangeToString(const QPair<quint64, quint64> &Range, qin
 
 TorcSerialiser* TorcHTTPRequest::GetSerialiser(void)
 {
-    QString accept = m_headers->value("Accept");
-
-    TorcSerialiserFactory *factory = TorcSerialiserFactory::GetTorcSerialiserFactory();
-    for ( ; factory; factory = factory->NextTorcSerialiserFactory())
-        if (accept.contains(factory->Accepts(), Qt::CaseInsensitive))
-            return factory->Create();
-
-    LOG(VB_GENERAL, LOG_WARNING, QString("Failed to find serialiser for '%1' - defaulting to XML").arg(accept));
-    return new TorcXMLSerialiser();
+    return TorcSerialiser::GetSerialiser(m_headers->value("Accept"));
 }
 
 /*! \brief Return true if the resource is unmodified.
