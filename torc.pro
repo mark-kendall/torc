@@ -22,6 +22,8 @@ DEFINES    += __STDC_LIMIT_MACROS
 QT         += sql network
 QT         -= gui
 
+QMAKE_CXXFLAGS += -Wall -Wextra -Weffc++ -Werror
+
 # debug builds
 #CONFIG     += debug
 
