@@ -359,8 +359,10 @@ LoggerBase::~LoggerBase()
 }
 
 FileLogger::FileLogger(QString Filename, bool ErrorsOnly, int Quiet)
-  : LoggerBase(Filename), m_opened(false),
-    m_file(NULL),         m_errorsOnly(ErrorsOnly),
+  : LoggerBase(Filename),
+    m_opened(false),
+    m_file(),
+    m_errorsOnly(ErrorsOnly),
     m_quiet(Quiet)
 {
     if (m_fileName.isEmpty())
@@ -383,16 +385,9 @@ FileLogger::FileLogger(QString Filename, bool ErrorsOnly, int Quiet)
 
         m_errorsOnly = false;
         m_quiet    = false;
-        m_file     = new QFile(m_fileName);
-        if (m_file)
-        {
-            m_opened = m_file->open(QIODevice::WriteOnly |
-                                    QIODevice::Append |
-                                    QIODevice::Truncate |
-                                    QIODevice::Text |
-                                    QIODevice::Unbuffered);
-        }
-
+        m_file.setFileName(m_fileName);
+        m_opened = m_file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Truncate |
+                               QIODevice::Text | QIODevice::Unbuffered);
         LOG(VB_GENERAL, LOG_INFO, QString("Logging to '%1'").arg(m_fileName));
     }
 }
@@ -404,18 +399,12 @@ FileLogger::~FileLogger()
         LogItem *item = LogItem::Create(__FILE__, __FUNCTION__,
                                         __LINE__, LOG_INFO, kMessage);
 
-        strcpy(item->message, m_file ? "Closing file logger." : "Closing console logger.");
+        strcpy(item->message, &m_file ? "Closing file logger." : "Closing console logger.");
         Logmsg(item);
 
-        if (m_file)
-        {
-            m_file->flush();
-            m_file->close();
-        }
+        m_file.flush();
+        m_file.close();
     }
-
-    delete m_file;
-    m_file = NULL;
 }
 
 bool FileLogger::Logmsg(LogItem *Item)
@@ -460,8 +449,8 @@ bool FileLogger::Logmsg(LogItem *Item)
                  timestamp, shortname, getpid(), tid, threadName, fileline,
                  Item->message);
 
-        if (m_file)
-            error = m_file->write(line);
+        if (m_file.isOpen())
+            error = m_file.write(line);
         else
             error = write(1, line, strlen(line));
     }
