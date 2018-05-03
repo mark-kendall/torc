@@ -399,7 +399,7 @@ FileLogger::~FileLogger()
         LogItem *item = LogItem::Create(__FILE__, __FUNCTION__,
                                         __LINE__, LOG_INFO, kMessage);
 
-        strcpy(item->message, &m_file ? "Closing file logger." : "Closing console logger.");
+        strcpy(item->message, m_file.isOpen() ? "Closing file logger." : "Closing console logger.");
         Logmsg(item);
 
         m_file.flush();
