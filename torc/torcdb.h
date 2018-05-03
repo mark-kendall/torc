@@ -35,9 +35,7 @@ class TorcDB
     TorcDBPriv  *m_databasePriv;
 
   private:
-    // disable copy and assignment constructors
-    TorcDB(const TorcDB &) Q_DECL_EQ_DELETE;
-    TorcDB &operator=(const TorcDB &) Q_DECL_EQ_DELETE;
+    Q_DISABLE_COPY(TorcDB)
 };
 
 #endif // TORCDB_H

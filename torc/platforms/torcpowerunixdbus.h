@@ -40,9 +40,9 @@ class TorcPowerUnixDBus : public TorcPowerPriv
   private:
     bool                  m_onBattery;
     QMap<QString,int>     m_devices;
-    QMutex               *m_deviceLock;
-    QDBusInterface       *m_upowerInterface;
-    QDBusInterface       *m_consoleInterface;
+    QMutex                m_deviceLock;
+    QDBusInterface        m_upowerInterface;
+    QDBusInterface        m_consoleInterface;
 };
 
 #endif // TORCPOWERUNIXDBUS_H

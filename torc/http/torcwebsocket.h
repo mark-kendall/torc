@@ -8,13 +8,12 @@
 #include <QHostAddress>
 
 // Torc
+#include "torchttpreader.h"
 #include "torcqthread.h"
 
-class TorcHTTPConnection;
-class TorcHTTPService;
 class TorcHTTPRequest;
-class TorcHTTPReader;
 class TorcRPCRequest;
+class TorcWebSocketThread;
 
 #define TORC_JSON_RPC QString("torc.json-rpc")
 
@@ -84,12 +83,22 @@ class TorcWebSocket : public QObject
         CloseTLSHandshakeError   = 1015
     };
 
+    enum SocketState
+    {
+        DisconnectedSt = (0 << 0),
+        ConnectingTo   = (1 << 1),
+        ConnectedTo    = (1 << 2),
+        Upgrading      = (1 << 3),
+        Upgraded       = (1 << 4),
+        Disconnecting  = (1 << 5),
+        ErroredSt      = (1 << 6)
+    };
+
   public:
-    TorcWebSocket(TorcQThread *Parent, TorcHTTPRequest *Request, QTcpSocket *Socket);
-    TorcWebSocket(TorcQThread *Parent, const QHostAddress &Address, quint16 Port, bool Authenticate, WSSubProtocol Protocol = SubProtocolJSONRPC);
+    TorcWebSocket(TorcWebSocketThread* Parent, qintptr SocketDescriptor);
+    TorcWebSocket(TorcWebSocketThread* Parent, const QHostAddress &Address, quint16 Port, bool Authenticate, WSSubProtocol Protocol = SubProtocolJSONRPC);
     ~TorcWebSocket();
 
-    static bool     ProcessUpgradeRequest (TorcHTTPConnection *Connection, TorcHTTPRequest *Request, QTcpSocket *Socket);
     static QString  OpCodeToString        (OpCode Code);
     static QString  CloseCodeToString     (CloseCode Code);
     static QString  SubProtocolsToString  (WSSubProtocols Protocols);
@@ -99,32 +108,33 @@ class TorcWebSocket : public QObject
 
   signals:
     void            ConnectionEstablished (void);
-    void            NewRequest            (TorcRPCRequest *Request);
-    void            RequestCancelled      (TorcRPCRequest *Request);
+    void            Disconnected          (void);
+    void            Disconnect            (void);
 
   public slots:
     void            Start                 (void);
+    void            CloseSocket           (void);
     void            PropertyChanged       (void);
     bool            HandleNotification    (const QString &Method);
-
-  public:
     void            RemoteRequest         (TorcRPCRequest *Request);
-    void            CancelRequest         (TorcRPCRequest *Request, int Wait = 1000 /*ms*/);
-    void            WaitForNotifications  (void);
+    void            CancelRequest         (TorcRPCRequest *Request);
 
   protected slots:
     void            ReadyRead             (void);
-    void            CloseSocket           (void);
     void            Connected             (void);
     void            Error                 (QAbstractSocket::SocketError);
-    void            HandleRemoteRequest   (TorcRPCRequest *Request);
-    void            HandleCancelRequest   (TorcRPCRequest *Request);
     void            SubscriberDeleted     (QObject *Subscriber);
 
   protected:
-    bool            event                 (QEvent *Event);
+    bool            event                 (QEvent *Event) Q_DECL_OVERRIDE;
 
   private:
+    Q_DISABLE_COPY(TorcWebSocket)
+    void            SetState              (SocketState State);
+    void            HandleUpgradeRequest  (TorcHTTPRequest *Request);
+    void            SendHandshake         (void);
+    void            ReadHandshake         (void);
+    void            ReadHTTP              (void);
     OpCode          FormatForSubProtocol  (WSSubProtocol Protocol);
     void            SendFrame             (OpCode Code, QByteArray &Payload);
     void            HandlePing            (QByteArray &Payload);
@@ -143,16 +153,16 @@ class TorcWebSocket : public QObject
         ReadPayload
     };
 
-    TorcQThread     *m_parent;
+    TorcWebSocketThread *m_parent;
+    QTcpSocket      *m_socket;
+    SocketState      m_socketState;
+    qintptr          m_socketDescriptor;
+    TorcHTTPReader   m_reader;
     bool             m_authenticate;
-    bool             m_handShaking;
-    TorcHTTPReader  *m_upgradeResponseReader;
+    bool             m_authenticated;
     QString          m_challengeResponse;
     QHostAddress     m_address;
     quint16          m_port;
-    TorcHTTPRequest *m_upgradeRequest;
-    QTcpSocket      *m_socket;
-    int              m_abort;
     bool             m_serverSide;
     ReadState        m_readState;
     bool             m_echoTest;
@@ -176,28 +186,9 @@ class TorcWebSocket : public QObject
     int              m_currentRequestID;
     QMap<int,TorcRPCRequest*> m_currentRequests;
     QMap<int,int>    m_requestTimers;
-    QAtomicInt       m_outstandingNotifications;
 
     QMultiMap<QString,QObject*> m_subscribers;   // client side
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(TorcWebSocket::WSSubProtocols);
-
-class TorcWebSocketThread : public TorcQThread
-{
-  public:
-    TorcWebSocketThread(TorcHTTPRequest *Request, QTcpSocket *Socket);
-    TorcWebSocketThread(const QHostAddress &Address, quint16 Port, bool Authenticate = false, TorcWebSocket::WSSubProtocol Protocol = TorcWebSocket::SubProtocolJSONRPC);
-    ~TorcWebSocketThread();
-
-    TorcWebSocket*      Socket   (void);
-
-    void                Start    (void);
-    void                Finish   (void);
-    void                Shutdown (void);
-
-  private:
-    TorcWebSocket      *m_webSocket;
-};
-
 #endif // TORCWEBSOCKET_H

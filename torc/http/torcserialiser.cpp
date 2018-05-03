@@ -21,6 +21,8 @@
 */
 
 // Torc
+#include "torclogging.h"
+#include "torcxmlserialiser.h"
 #include "torcserialiser.h"
 
 TorcSerialiser::TorcSerialiser()
@@ -31,6 +33,17 @@ TorcSerialiser::TorcSerialiser()
 TorcSerialiser::~TorcSerialiser()
 {
     delete m_content;
+}
+
+TorcSerialiser* TorcSerialiser::GetSerialiser(const QString &MimeType)
+{
+    TorcSerialiserFactory *factory = TorcSerialiserFactory::GetTorcSerialiserFactory();
+    for ( ; factory; factory = factory->NextTorcSerialiserFactory())
+        if (MimeType.contains(factory->Accepts(), Qt::CaseInsensitive))
+            return factory->Create();
+
+    LOG(VB_GENERAL, LOG_WARNING, QString("Failed to find serialiser for '%1' - defaulting to XML").arg(MimeType));
+    return new TorcXMLSerialiser();
 }
 
 QByteArray* TorcSerialiser::Serialise(const QVariant &Data, const QString &Type)
@@ -49,10 +62,10 @@ QByteArray* TorcSerialiser::Serialise(const QVariant &Data, const QString &Type)
 TorcSerialiserFactory* TorcSerialiserFactory::gTorcSerialiserFactory = NULL;
 
 TorcSerialiserFactory::TorcSerialiserFactory(const QString &Accepts, const QString &Description)
-  : m_accepts(Accepts),
+  : m_nextTorcSerialiserFactory(gTorcSerialiserFactory),
+    m_accepts(Accepts),
     m_description(Description)
 {
-    m_nextTorcSerialiserFactory = gTorcSerialiserFactory;
     gTorcSerialiserFactory      = this;
 }
 

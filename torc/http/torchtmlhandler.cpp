@@ -47,13 +47,13 @@
  *
  * \sa TorcHTTPServer
  * \sa TorcHTTPHandler
- * \sa TorcHTTPConnection
 */
 
 TorcHTMLHandler::TorcHTMLHandler(const QString &Path, const QString &Name)
-  : TorcHTTPHandler(Path, Name)
+  : TorcHTTPHandler(Path, Name),
+    m_pathToContent(GetTorcShareDir()),
+    m_allowedFiles()
 {
-    m_pathToContent = GetTorcShareDir();
     if (m_pathToContent.endsWith("/"))
         m_pathToContent.chop(1);
     m_pathToContent += "/html";
@@ -61,8 +61,12 @@ TorcHTMLHandler::TorcHTMLHandler(const QString &Path, const QString &Name)
     m_allowedFiles << "/" << "/index.html" << "/torc.xsd" << "/browserconfig.xml" << "/manifest.json";
 }
 
-void TorcHTMLHandler::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTTPConnection*)
+void TorcHTMLHandler::ProcessHTTPRequest(const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest *Request)
 {
+    (void)PeerAddress;
+    (void)PeerPort;
+    (void)LocalAddress;
+    (void)LocalPort;
     if (!Request)
         return;
 

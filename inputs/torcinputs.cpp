@@ -44,13 +44,14 @@ TorcInputs* TorcInputs::gInputs = new TorcInputs();
 TorcInputs::TorcInputs()
   : QObject(),
     TorcHTTPService(this, SENSORS_DIRECTORY, "inputs", TorcInputs::staticMetaObject, BLACKLIST),
-    m_lock(new QMutex(QMutex::Recursive))
+    inputList(),
+    inputTypes(),
+    m_lock(QMutex::Recursive)
 {
 }
 
 TorcInputs::~TorcInputs()
 {
-    delete m_lock;
 }
 
 QString TorcInputs::GetUIName(void)
@@ -105,7 +106,7 @@ void TorcInputs::SubscriberDeleted(QObject *Subscriber)
 QVariantMap TorcInputs::GetInputList(void)
 {
     QVariantMap result;
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(&m_lock);
 
     // iterate over our list for each input type
     for (int type = TorcInput::Unknown; type < TorcInput::MaxType; type++)
@@ -131,7 +132,7 @@ QStringList TorcInputs::GetInputTypes(void)
 
 void TorcInputs::AddInput(TorcInput *Input)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(&m_lock);
     if (!Input)
         return;
 
@@ -149,7 +150,7 @@ void TorcInputs::AddInput(TorcInput *Input)
 
 void TorcInputs::RemoveInput(TorcInput *Input)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(&m_lock);
     if (!Input)
         return;
 

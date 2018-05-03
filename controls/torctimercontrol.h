@@ -56,7 +56,7 @@ class TorcTimerControl : public TorcControl
     QTime             m_durationTime;
     int               m_durationDay;
 
-    QTimer           *m_timer;
+    QTimer            m_timer;
     bool              m_firstTrigger;
 };
 

@@ -34,6 +34,7 @@ class TorcPList
     bool            ToXML              (QIODevice *Device);
 
   private:
+    Q_DISABLE_COPY(TorcPList)
     void            ParseBinaryPList   (const QByteArray &Data);
     QVariant        ParseBinaryNode    (quint64 Num);
     QVariantMap     ParseBinaryDict    (quint8 *Data);

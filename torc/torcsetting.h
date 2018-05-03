@@ -84,6 +84,9 @@ class TorcSetting : public QObject, public TorcReferenceCounter
   protected:
     virtual               ~TorcSetting();
 
+  private:
+    Q_DISABLE_COPY(TorcSetting);
+
   protected:
     TorcSetting           *m_parent;
     Type                   m_type;

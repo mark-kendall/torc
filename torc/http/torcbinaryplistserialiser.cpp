@@ -39,7 +39,9 @@
 TorcBinaryPListSerialiser::TorcBinaryPListSerialiser()
   : TorcSerialiser(),
     m_referenceSize(8),
-    m_codec(QTextCodec::codecForName("UTF-16BE"))
+    m_codec(QTextCodec::codecForName("UTF-16BE")),
+    m_objectOffsets(),
+    m_strings()
 {
 }
 

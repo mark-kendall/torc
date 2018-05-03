@@ -31,7 +31,6 @@
 // Torc
 #include "torclogging.h"
 #include "torcnetwork.h"
-#include "torchttpconnection.h"
 #include "torchttpserver.h"
 #include "torcjsonrpc.h"
 #include "torcserialiser.h"
@@ -44,6 +43,8 @@ class MethodParameters
     MethodParameters(int Index, const QMetaMethod &Method, int AllowedRequestTypes, const QString &ReturnType)
       : m_valid(false),
         m_index(Index),
+        m_names(),
+        m_types(),
         m_allowedRequestTypes(AllowedRequestTypes),
         m_returnType(ReturnType)
     {
@@ -250,7 +251,10 @@ TorcHTTPService::TorcHTTPService(QObject *Parent, const QString &Signature, cons
     m_parent(Parent),
     m_version("Unknown"),
     m_metaObject(MetaObject),
-    m_subscriberLock(new QMutex(QMutex::Recursive))
+    m_methods(),
+    m_properties(),
+    m_subscribers(),
+    m_subscriberLock(QMutex::Recursive)
 {
     QStringList blacklist = Blacklist.split(",");
 
@@ -372,17 +376,11 @@ TorcHTTPService::TorcHTTPService(QObject *Parent, const QString &Signature, cons
             }
         }
     }
-
-    TorcHTTPServer::RegisterHandler(this);
 }
 
 TorcHTTPService::~TorcHTTPService()
 {
-    TorcHTTPServer::DeregisterHandler(this);
-
     qDeleteAll(m_methods);
-
-    delete m_subscriberLock;
 }
 
 QString TorcHTTPService::GetUIName(void)
@@ -390,9 +388,12 @@ QString TorcHTTPService::GetUIName(void)
     return Name();
 }
 
-void TorcHTTPService::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTTPConnection *Connection)
+void TorcHTTPService::ProcessHTTPRequest(const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest *Request)
 {
-    (void)Connection;
+    (void)PeerAddress;
+    (void)PeerPort;
+    (void)LocalAddress;
+    (void)LocalPort;
 
     QString method = Request->GetMethod();
     HTTPRequestType type = Request->GetHTTPRequestType();
@@ -472,7 +473,7 @@ void TorcHTTPService::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTTPConne
     }
 }
 
-QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVariant &Parameters, QObject *Connection)
+QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVariant &Parameters, QObject *Connection, bool Authenticated)
 {
     QString method;
     int index = Method.lastIndexOf("/");
@@ -485,8 +486,25 @@ QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVarian
         QMap<QString,MethodParameters*>::iterator it = m_methods.find(method);
         if (it != m_methods.end())
         {
-            // ignore disabled methods
-            if (!(it.value()->m_allowedRequestTypes & HTTPDisabled))
+            // disallow methods based on state and authentication
+            int types         = it.value()->m_allowedRequestTypes;
+            bool disabled     = types & HTTPDisabled;
+            bool unauthorised = !Authenticated && (types & HTTPPost || types & HTTPPut || types & HTTPDelete || types & HTTPUnknownType);
+
+            if (disabled || unauthorised)
+            {
+                if (disabled)
+                    LOG(VB_GENERAL, LOG_ERR, QString("'%1' method '%2' is disabled").arg(m_signature).arg(method));
+                else
+                    LOG(VB_GENERAL, LOG_ERR, QString("'%1' method '%2' unauthorised").arg(m_signature).arg(method));
+                QVariantMap result;
+                QVariantMap error;
+                error.insert("code", -401); // HTTP 401!
+                error.insert("message", "Method not authorised");
+                result.insert("error", error);
+                return result;
+            }
+            else
             {
                 // invoke it
 
@@ -564,7 +582,7 @@ QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVarian
             if (change > -1)
             {
                 // this method is not thread-safe and is called from multiple threads so lock the subscribers
-                QMutexLocker locker(m_subscriberLock);
+                QMutexLocker locker(&m_subscriberLock);
 
                 if (!m_subscribers.contains(Connection))
                 {
@@ -608,7 +626,7 @@ QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVarian
         // implicit 'Unsubscribe' method
         else if (method.compare("Unsubscribe") == 0)
         {
-            QMutexLocker locker(m_subscriberLock);
+            QMutexLocker locker(&m_subscriberLock);
 
             if (m_subscribers.contains(Connection))
             {
@@ -657,8 +675,7 @@ QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVarian
  */
 QVariantMap TorcHTTPService::GetServiceDetails(void)
 {
-    // this method is not thread-safe and is called from multiple threads so lock the subscribers
-    QMutexLocker locker(m_subscriberLock);
+    // no need for locking here
 
     QVariantMap details;
     QVariantMap properties;
@@ -813,7 +830,7 @@ void TorcHTTPService::DisableMethod(const QString &Method)
 
 void TorcHTTPService::HandleSubscriberDeleted(QObject *Subscriber)
 {
-    QMutexLocker locker(m_subscriberLock);
+    QMutexLocker locker(&m_subscriberLock);
 
     if (Subscriber && m_subscribers.contains(Subscriber))
     {

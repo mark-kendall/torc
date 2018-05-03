@@ -34,17 +34,16 @@
 */
 
 TorcHTMLDynamicContent::TorcHTMLDynamicContent()
-  : TorcHTTPHandler(DYNAMIC_DIRECTORY, "dynamic")
+  : TorcHTTPHandler(DYNAMIC_DIRECTORY, "dynamic"),
+    m_pathToContent(GetTorcConfigDir())
 {
     m_recursive = true;
 
     // Create the content directory if needed
     // TorcLocalContext should already have created the config directory
-    QString configdir = GetTorcConfigDir();
-    if (configdir.endsWith("/"))
-        configdir.chop(1);
-    m_pathToContent = configdir;
-    configdir.append(DYNAMIC_DIRECTORY);
+    if (m_pathToContent.endsWith("/"))
+        m_pathToContent.chop(1);
+    QString configdir = m_pathToContent + DYNAMIC_DIRECTORY;
 
     QDir dir(configdir);
     if (!dir.exists())
@@ -52,8 +51,12 @@ TorcHTMLDynamicContent::TorcHTMLDynamicContent()
             LOG(VB_GENERAL, LOG_ERR, QString("Failed to create content directory ('%1')").arg(configdir));
     }
 
-void TorcHTMLDynamicContent::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTTPConnection*)
+void TorcHTMLDynamicContent::ProcessHTTPRequest(const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest *Request)
 {
+    (void)PeerAddress;
+    (void)PeerPort;
+    (void)LocalAddress;
+    (void)LocalPort;
     if (!Request)
         return;
 

@@ -1,5 +1,11 @@
 #include "torctimer.h"
 
+TorcTimer::TorcTimer()
+  : m_timer(),
+    m_running(false)
+{
+}
+
 void TorcTimer::Start(void)
 {
     m_running = true;

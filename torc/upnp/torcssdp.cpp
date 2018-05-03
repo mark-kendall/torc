@@ -66,6 +66,7 @@ TorcSSDPSearchResponse::TorcSSDPSearchResponse()
 
 TorcSSDP::TorcSSDP()
   : QObject(),
+    m_serverString(),
     m_searching(false),
     m_firstSearchTimer(0),
     m_secondSearchTimer(0),
@@ -74,12 +75,18 @@ TorcSSDP::TorcSSDP()
     m_secondAnnounceTimer(0),
     m_refreshTimer(0),
     m_started(false),
+    m_ipv4Address(),
+    m_ipv6Address(),
+    m_addressess(),
     m_ipv4GroupAddress(TORC_IPV4_UDP_MULTICAST_ADDR),
     m_ipv4MulticastSocket(NULL),
     m_ipv6LinkGroupBaseAddress(TORC_IPV6_UDP_MULTICAST_ADDR2),
     m_ipv6LinkMulticastSocket(NULL),
+    m_discoveredDevices(),
     m_ipv4UnicastSocket(NULL),
-    m_ipv6UnicastSocket(NULL)
+    m_ipv6UnicastSocket(NULL),
+    m_responseTimer(),
+    m_responseQueue()
 {
     m_serverString = QString("%1/%2 UPnP/1.0 Torc/0.1").arg(QSysInfo::productType()).arg(QSysInfo::productVersion());
 
@@ -963,6 +970,7 @@ class TorcSSDPObject : public TorcAdminObject
     }
 
   private:
+    Q_DISABLE_COPY(TorcSSDPObject)
     TorcSSDPThread *m_ssdpThread;
 
 } TorcSSDPObject;

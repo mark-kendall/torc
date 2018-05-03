@@ -12,7 +12,6 @@
 #include "torchttprequest.h"
 
 class TorcHTTPServer;
-class TorcHTTPConnection;
 class MethodParameters;
 
 #define SERVICES_DIRECTORY QString("/services/")
@@ -26,8 +25,8 @@ class TorcHTTPService : public TorcHTTPHandler
                     const QMetaObject &MetaObject, const QString &Blacklist = QString(""));
     virtual ~TorcHTTPService();
 
-    void         ProcessHTTPRequest       (TorcHTTPRequest *Request, TorcHTTPConnection *Connection);
-    QVariantMap  ProcessRequest           (const QString &Method, const QVariant &Parameters, QObject *Connection);
+    void         ProcessHTTPRequest       (const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest *Request) Q_DECL_OVERRIDE;
+    QVariantMap  ProcessRequest           (const QString &Method, const QVariant &Parameters, QObject *Connection, bool Authenticated) Q_DECL_OVERRIDE;
     QString      GetMethod                (int Index);
     QVariant     GetProperty              (int Index);
     QVariantMap  GetServiceDetails        (void);
@@ -46,7 +45,10 @@ class TorcHTTPService : public TorcHTTPHandler
     QMap<QString,MethodParameters*>        m_methods;
     QMap<int,int>                          m_properties;
     QList<QObject*>                        m_subscribers;
-    QMutex                                *m_subscriberLock;
+    QMutex                                 m_subscriberLock;
+
+  private:
+    Q_DISABLE_COPY(TorcHTTPService)
 };
 
 Q_DECLARE_METATYPE(TorcHTTPService*);

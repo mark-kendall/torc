@@ -65,7 +65,8 @@ static void convert_float(quint8 *p, quint8 s)
  *  \todo Support for importing Xml formatted property lists.
  */
 TorcPList::TorcPList(const QByteArray &Data)
-  : m_data(NULL),
+  : m_result(),
+    m_data(NULL),
     m_offsetTable(NULL),
     m_rootObj(0),
     m_numObjs(0),

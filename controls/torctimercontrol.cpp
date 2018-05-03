@@ -67,7 +67,7 @@ TorcTimerControl::TorcTimerControl(const QString &Type, const QVariantMap &Detai
     m_duration(0),
     m_durationTime(QTime()),
     m_durationDay(0),
-    m_timer(new QTimer()),
+    m_timer(),
     m_firstTrigger(true)
 {
     if (m_timerType == TorcTimerControl::UnknownTimerType)
@@ -145,7 +145,6 @@ TorcTimerControl::TorcTimerControl(const QString &Type, const QVariantMap &Detai
 
 TorcTimerControl::~TorcTimerControl()
 {
-    delete m_timer;
 }
 
 TorcControl::Type TorcTimerControl::GetType(void) const
@@ -205,7 +204,7 @@ QStringList TorcTimerControl::GetDescription(void)
 
 bool TorcTimerControl::Validate(void)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     // don't repeat validation
     if (m_validated)
@@ -238,13 +237,13 @@ bool TorcTimerControl::Validate(void)
 
     // this is probably overkill - but we shouldn't have that many timers and most will
     // have relatively long durations
-    m_timer->setTimerType(Qt::PreciseTimer);
+    m_timer.setTimerType(Qt::PreciseTimer);
 
     // connect the timer
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(TimerTimeout()));
+    connect(&m_timer, SIGNAL(timeout()), this, SLOT(TimerTimeout()));
 
     // all timers are single shot and reset at each trigger
-    m_timer->setSingleShot(true);
+    m_timer.setSingleShot(true);
 
     return true;
 }
@@ -256,7 +255,7 @@ bool TorcTimerControl::Validate(void)
 */
 void TorcTimerControl::Start(void)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     if (!m_parsed || !m_validated)
         return;
@@ -283,7 +282,7 @@ bool TorcTimerControl::AllowInputs(void) const
 
 void TorcTimerControl::TimerTimeout(void)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     bool first = m_firstTrigger;
     m_firstTrigger = false;
@@ -296,7 +295,7 @@ void TorcTimerControl::TimerTimeout(void)
             // of hours) operations (e.g. circulation pumps). Using them for anything else is not recommended,
             // not least because the behaviour is prescriptive at startup.
             {
-                m_timer->start((value > 0 ? m_startDuration : m_duration) * 1000);
+                m_timer.start((value > 0 ? m_startDuration : m_duration) * 1000);
                 SetValue(value > 0 ? 0 : 1);
                 return;
             }
@@ -332,7 +331,7 @@ void TorcTimerControl::TimerTimeout(void)
                 if (timesinceperiodstart < m_startDuration)
                 {
                     SetValue(0);
-                    m_timer->start((m_startDuration - timesinceperiodstart) * 1000);
+                    m_timer.start((m_startDuration - timesinceperiodstart) * 1000);
                     return;
                 }
                 // should be on now
@@ -356,7 +355,7 @@ void TorcTimerControl::TimerTimeout(void)
                             .arg(onduration).arg(m_duration));
                     }
                     SetValue(1);
-                    m_timer->start(onduration * 1000);
+                    m_timer.start(onduration * 1000);
                     return;
                 }
                 // finished
@@ -366,13 +365,13 @@ void TorcTimerControl::TimerTimeout(void)
                     // handles drift and better accomodates complications arising from daylight savings changes.
                     SetValue(0);
                     if (m_timerType == TorcTimerControl::Weekly)
-                        m_timer->start(((kSixty * kSixty * k24 * k7) - timesinceperiodstart) * 1000);
+                        m_timer.start(((kSixty * kSixty * k24 * k7) - timesinceperiodstart) * 1000);
                     else if (m_timerType == TorcTimerControl::Daily)
-                        m_timer->start(((kSixty * kSixty * k24) - timesinceperiodstart) * 1000);
+                        m_timer.start(((kSixty * kSixty * k24) - timesinceperiodstart) * 1000);
                     else if (m_timerType == TorcTimerControl::Hourly)
-                        m_timer->start(((kSixty * kSixty) - timesinceperiodstart) * 1000);
+                        m_timer.start(((kSixty * kSixty) - timesinceperiodstart) * 1000);
                     else
-                        m_timer->start((kSixty - timesinceperiodstart) * 1000);
+                        m_timer.start((kSixty - timesinceperiodstart) * 1000);
                     return;
                 }
             }
@@ -392,7 +391,7 @@ TorcTimerControl::TimerType TorcTimerControl::GetTimerType(void) const
 
 quint64 TorcTimerControl::TimeSinceLastTransition(void)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     // Custom timers don't have a defined start time
     if (TorcTimerControl::Custom == m_timerType ||

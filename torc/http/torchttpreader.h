@@ -1,20 +1,13 @@
-#ifndef TORCHTTPCONNECTION_H
-#define TORCHTTPCONNECTION_H
+#ifndef TORCHTTPREADER_H
+#define TORCHTTPREADER_H
 
 // Qt
-#include <QBuffer>
-#include <QObject>
-#include <QRunnable>
+#include <QByteArray>
 #include <QTcpSocket>
-
-// Torc
-#include "torchttpserver.h"
-
-class TorcHTTPRequest;
 
 class TorcHTTPReader
 {
-    friend class TorcHTTPConnection;
+    friend class TorcWebSocket;
 
   public:
     TorcHTTPReader();
@@ -22,7 +15,7 @@ class TorcHTTPReader
 
     void                   TakeRequest      (QByteArray*& Content, QMap<QString,QString>*& Headers);
     QString                GetMethod        (void) const;
-    bool                   Read             (QTcpSocket *Socket, int *Abort);
+    bool                   Read             (QTcpSocket *Socket);
     bool                   IsReady          (void) const;
     bool                   HeadersComplete  (void) const;
 
@@ -45,22 +38,4 @@ class TorcHTTPReader
     QMap<QString,QString> *m_headers;
 };
 
-class TorcHTTPConnection : public QRunnable
-{
-  public:
-    TorcHTTPConnection(TorcHTTPServer *Parent, qintptr SocketDescriptor, int *Abort);
-    virtual ~TorcHTTPConnection();
-
-  public:
-    void                     run            (void);
-    QTcpSocket*              GetSocket      (void);
-    TorcHTTPServer*          GetServer      (void);
-
-  protected:
-    int                     *m_abort;
-    TorcHTTPServer          *m_server;
-    qintptr                  m_socketDescriptor;
-    QTcpSocket              *m_socket;
-};
-
-#endif // TORCHTTPCONNECTION_H
+#endif // TORCHTTPREADER_H

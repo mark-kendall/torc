@@ -32,8 +32,8 @@
 #include "torchttpserver.h"
 #include "torchttprequest.h"
 #include "torchttpservice.h"
-#include "torchttpconnection.h"
 #include "torchttpservices.h"
+#include "torcwebsockettoken.h"
 
 /*! \class TorcHTTPServices
  *  \brief Top level interface into services.
@@ -44,7 +44,10 @@
 */
 TorcHTTPServices::TorcHTTPServices(TorcHTTPServer *Server)
   : QObject(),
-    TorcHTTPService(this, "", "services", TorcHTTPServices::staticMetaObject, QString("HandlersChanged"))
+    TorcHTTPService(this, "", "services", TorcHTTPServices::staticMetaObject, QString("HandlersChanged")),
+    serviceList(),
+    returnFormats(),
+    webSocketProtocols()
 {
     connect(Server, SIGNAL(HandlersChanged()), this, SLOT(HandlersChanged()));
 
@@ -67,7 +70,7 @@ QString TorcHTTPServices::GetUIName(void)
     return tr("Services");
 }
 
-void TorcHTTPServices::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTTPConnection* Connection)
+void TorcHTTPServices::ProcessHTTPRequest(const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest *Request)
 {
     if (!Request)
         return;
@@ -85,12 +88,12 @@ void TorcHTTPServices::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTTPConn
                 Request->SetResponseType(HTTPResponseDefault);
                 Request->SetAllowed(HTTPGet | HTTPOptions);
             }
-            else if (type == HTTPGet)
+            else if (type == HTTPPut)
             {
                 Request->SetStatus(HTTP_OK);
                 TorcSerialiser *serialiser = Request->GetSerialiser();
                 Request->SetResponseType(serialiser->ResponseType());
-                Request->SetResponseContent(serialiser->Serialise(Connection->GetServer()->GetWebSocketToken(Connection, Request), "accesstoken"));
+                Request->SetResponseContent(serialiser->Serialise(TorcWebSocketToken::GetWebSocketToken(PeerAddress, Request), "accesstoken"));
                 delete serialiser;
             }
             else
@@ -102,7 +105,7 @@ void TorcHTTPServices::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTTPConn
             return;
         }
 
-        TorcHTTPService::ProcessHTTPRequest(Request, Connection);
+        TorcHTTPService::ProcessHTTPRequest(PeerAddress, PeerPort, LocalAddress, LocalPort, Request);
         return;
     }
 

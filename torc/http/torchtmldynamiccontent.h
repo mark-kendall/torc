@@ -8,7 +8,7 @@ class TorcHTMLDynamicContent : public TorcHTTPHandler
 {
   public:
     TorcHTMLDynamicContent();
-    void ProcessHTTPRequest          (TorcHTTPRequest *Request, TorcHTTPConnection*);
+    void ProcessHTTPRequest          (const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest *Request) Q_DECL_OVERRIDE;
 
   private:
     QString m_pathToContent;

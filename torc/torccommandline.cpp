@@ -21,9 +21,7 @@
 */
 
 // Qt
-#include <QHash>
 #include <QMutex>
-#include <QVariant>
 #include <QStringList>
 #include <QCoreApplication>
 
@@ -41,10 +39,10 @@ class TorcEnvironmentVariable
 {
   public:
     TorcEnvironmentVariable(const QString &Var, const QString &Description)
-      : m_variable(Var),
+      : nextEnvironmentVariable(gEnvironmentVariable),
+        m_variable(Var),
         m_description(Description)
     {
-        nextEnvironmentVariable = gEnvironmentVariable;
         gEnvironmentVariable = this;
     }
 
@@ -52,6 +50,9 @@ class TorcEnvironmentVariable
     TorcEnvironmentVariable*        nextEnvironmentVariable;
     QString                         m_variable;
     QString                         m_description;
+
+  private:
+    Q_DISABLE_COPY(TorcEnvironmentVariable)
 };
 
 TorcEnvironmentVariable* TorcEnvironmentVariable::gEnvironmentVariable = NULL;
@@ -64,78 +65,76 @@ TorcEnvironmentVariable* TorcEnvironmentVariable::gEnvironmentVariable = NULL;
  * no value. When a value is detected in the command line, m_value is updated accordingly for
  * later retrieval, or is set to true for options to indicate the option was detected.
 */
-class TorcArgument
+TorcArgument::TorcArgument()
+  : m_value(QVariant()),
+    m_helpText(""),
+    m_exitImmediately(true),
+    m_flags(TorcCommandLine::None)
 {
-  public:
-    TorcArgument()
-      : m_value(QVariant()),
-        m_helpText(""),
-        m_exitImmediately(true),
-        m_flags(TorcCommandLine::None)
-    {
-        // default constructor is provided for QHash support only
-        LOG(VB_GENERAL, LOG_ERR, "Invalid TorcArgument usage");
-    }
+    // default constructor is provided for QHash support only
+    LOG(VB_GENERAL, LOG_ERR, "Invalid TorcArgument usage");
+}
 
-    TorcArgument(const QVariant &Default, const QString &HelpText, TorcCommandLine::Options Flags, bool Exit)
-      : m_value(Default),
-        m_helpText(HelpText),
-        m_exitImmediately(Exit),
-        m_flags(Flags)
-    {
-    }
+TorcArgument::TorcArgument(const QVariant &Default, const QString &HelpText, TorcCommandLine::Options Flags, bool Exit)
+  : m_value(Default),
+    m_helpText(HelpText),
+    m_exitImmediately(Exit),
+    m_flags(Flags)
+{
+}
 
-    QVariant                 m_value;
-    QString                  m_helpText;
-    bool                     m_exitImmediately;
-    TorcCommandLine::Options m_flags;
-};
-
-/*! \class TorcCommandLinePriv
- *  \brief Private implementation of command line handler.
+/*! \class TorcCommandLine
+ *  \brief Torc command line handler.
  *
- * \todo Handle more QVariant types in Evaluate.
+ * TorcCommandLine will always add handling for help, log, verbose and version handling.
+ *
+ * Additional pre-defined handlers can be implemented by passing additional TorcCommandLine::Options flags to
+ * the constructor.
+ *
+ * Custom command line options can be implemented by calling Add and retrieving the expected value via GetValue.
 */
-class TorcCommandLinePriv
-{
-  public:
-    explicit TorcCommandLinePriv(TorcCommandLine::Options Flags);
-
-    int         Evaluate       (int argc, const char * const *argv, bool &Exit);
-    void        Add            (const QString Keys, const QVariant &Default, const QString &HelpText, TorcCommandLine::Options Flags = TorcCommandLine::None, bool ExitImmediately = false);
-    QVariant    GetValue       (const QString &Key);
-
-  private:
-    QHash<QString,TorcArgument> m_options;
-    QHash<QString,QString>      m_aliases;
-    QHash<QString,QString>      m_help;
-    uint                        m_maxLength;
-};
-
-TorcCommandLinePriv::TorcCommandLinePriv(TorcCommandLine::Options Flags)
-  : m_maxLength(0)
+TorcCommandLine::TorcCommandLine(Options Flags)
+  : m_options(),
+    m_aliases(),
+    m_help(),
+    m_maxLength(0)
 {
     // always enable version, help and logging
     TorcCommandLine::Options options = Flags | TorcCommandLine::Version | TorcCommandLine::Help | TorcCommandLine::LogLevel | TorcCommandLine::LogType;
 
     if (options.testFlag(TorcCommandLine::Help))
-        Add("h,help", QVariant(), "Display full usage information.", TorcCommandLine::Help, true);
+        AddPriv(QString("h,help"), QVariant(), QString("Display full usage information."), TorcCommandLine::Help, true);
     if (options.testFlag(TorcCommandLine::LogLevel))
-        Add("l,log", QStringList("general"), "Set the logging level.", TorcCommandLine::None);
+        AddPriv(QString("l,log"), QStringList("general"), QString("Set the logging level."), TorcCommandLine::None);
     if (options.testFlag(TorcCommandLine::LogType))
-        Add("v,verbose,verbosity", QString("info"), "Set the logging type.", TorcCommandLine::None);
+        AddPriv(QString("v,verbose,verbosity"), QString("info"), QString("Set the logging type."), TorcCommandLine::None);
     if (options.testFlag(TorcCommandLine::Version))
-        Add("version", QVariant(), "Display version information.", TorcCommandLine::Version, true);
+        AddPriv(QString("version"), QVariant(), QString("Display version information."), TorcCommandLine::Version, true);
     if (options.testFlag(TorcCommandLine::Database))
-        Add("db,database", QString(""), "Use a custom database location. If the file does not exist, it will be created.");
+        AddPriv(QString("db,database"), QString(""), QString("Use a custom database location. If the file does not exist, it will be created."));
     if (options.testFlag(TorcCommandLine::LogFile))
-        Add("logfile", QString(""), "Override the logfile location.");
+        AddPriv(QString("logfile"), QString(""), QString("Override the logfile location."));
     if (options.testFlag(TorcCommandLine::XSDTest))
-        Add("xsdtest", QString(""), "Run validation of test configuration XML files found in the given directory.", TorcCommandLine::XSDTest);
+        AddPriv(QString("xsdtest"), QString(""), QString("Run validation of test configuration XML files found in the given directory."), TorcCommandLine::XSDTest);
 }
 
-/// \brief Add a command line option
-void TorcCommandLinePriv::Add(const QString Keys, const QVariant &Default, const QString &HelpText, TorcCommandLine::Options Flags, bool ExitImmediately)
+TorcCommandLine::~TorcCommandLine()
+{
+}
+
+/*! \brief Implement custom command line options.
+ *
+ * \param Keys            A comma separated list of synonymous command line options (e.g. "h,help").
+ * \param Default         The default value AND type for an option (e.g. QString("info") or (bool)true).
+ * \param HelpText        Brief help text for the option.
+ * \param ExitImmediately Tell the application to exit immediately after processing the command line.
+*/
+void TorcCommandLine::Add(const QString Keys, const QVariant &Default, const QString &HelpText, bool ExitImmediately/*=false*/)
+{
+    AddPriv(Keys, Default, HelpText, TorcCommandLine::None, ExitImmediately);
+}
+
+void TorcCommandLine::AddPriv(const QString Keys, const QVariant &Default, const QString &HelpText, TorcCommandLine::Options Flags /*= TorcCommandLine::None*/, bool ExitImmediately /*=false*/)
 {
     QStringList keys = Keys.split(",");
 
@@ -176,29 +175,13 @@ void TorcCommandLinePriv::Add(const QString Keys, const QVariant &Default, const
     }
 }
 
-/// \brief Returns the value for the given key or an invalid QVariant if the option is not present.
-QVariant TorcCommandLinePriv::GetValue(const QString &Key)
-{
-    if (m_options.contains(Key))
-        return m_options[Key].m_value;
-
-    if (m_aliases.contains(Key))
-        return m_options[m_aliases[Key]].m_value;
-
-    return QVariant();
-}
-
-/*! \brief Evaluate the command line paramaters
+/*! \brief Evaluate the command line options.
  *
- * Exit is set to true if any of the known options are discovered and require the application to exit
- * immediately (e.g. --help).
- *
- * Arguments can be preceeded by any number of '-'s. If a value is expected (the default value is a valid
- * QVariant) then the expected format is either --key=value or --key value.
- *
- * If there is a parsing error, the help text is printed and the application terminates immediately.
+ * \param argc As passed to the main application at startup.
+ * \param argv As passed to the main application at startup.
+ * \param Exit Will be set to true if the application should exit after command line processing.
 */
-int TorcCommandLinePriv::Evaluate(int argc, const char * const *argv, bool &Exit)
+int TorcCommandLine::Evaluate(int argc, const char * const *argv, bool &Exit)
 {
     QString error;
     bool parserror    = false;
@@ -351,49 +334,6 @@ int TorcCommandLinePriv::Evaluate(int argc, const char * const *argv, bool &Exit
     return result;
 }
 
-/*! \class TorcCommandLine
- *  \brief Public implementation of Torc command line handler.
- *
- * TorcCommandLine will always add handling for help, log, verbose and version handling.
- *
- * Additional pre-defined handlers can be implemented by passing additional TorcCommandLine::Options flags to
- * the constructor.
- *
- * Custom command line options can be implemented by calling Add and retrieving the expected value via GetValue.
-*/
-TorcCommandLine::TorcCommandLine(Options Flags)
-  : m_priv(new TorcCommandLinePriv(Flags))
-{
-}
-
-TorcCommandLine::~TorcCommandLine()
-{
-    delete m_priv;
-}
-
-/*! \brief Implement custom command line options.
- *
- * \param Keys            A comma separated list of synonymous command line options (e.g. "h,help").
- * \param Default         The default value AND type for an option (e.g. QString("info") or (bool)true).
- * \param HelpText        Brief help text for the option.
- * \param ExitImmediately Tell the application to exit immediately after processing the command line.
-*/
-void TorcCommandLine::Add(const QString Keys, const QVariant &Default, const QString &HelpText, bool ExitImmediately/*=false*/)
-{
-    m_priv->Add(Keys, Default, HelpText, TorcCommandLine::None, ExitImmediately);
-}
-
-/*! \brief Evaluate the command line options.
- *
- * \param argc As passed to the main application at startup.
- * \param argv As passed to the main application at startup.
- * \param Exit Will be set to true if the application should exit after command line processing.
-*/
-int TorcCommandLine::Evaluate(int argc, const char * const *argv, bool &Exit)
-{
-    return m_priv->Evaluate(argc, argv, Exit);
-}
-
 /*! \brief Return the value associated with Key or an invalid QVariant if the option is not present.
  *
  * \note In the case of options that require no value (e.g. --help), QVariant((bool)true) is returned if
@@ -401,7 +341,13 @@ int TorcCommandLine::Evaluate(int argc, const char * const *argv, bool &Exit)
 */
 QVariant TorcCommandLine::GetValue(const QString &Key)
 {
-    return m_priv->GetValue(Key);
+    if (m_options.contains(Key))
+        return m_options[Key].m_value;
+
+    if (m_aliases.contains(Key))
+        return m_options[m_aliases[Key]].m_value;
+
+    return QVariant();
 }
 
 ///\brief Register an environment variable for display via the help option.

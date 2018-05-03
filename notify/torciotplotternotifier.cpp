@@ -31,7 +31,8 @@
 #define IOTPLOTTER_MAX_FIELDS 8 // I can't actually see a max
 
 TorcIoTPlotterNotifier::TorcIoTPlotterNotifier(const QVariantMap &Details)
-  : TorcIOTLogger(Details)
+  : TorcIOTLogger(Details),
+    m_feedId()
 {
     m_description    = tr("IoTPlotter");
     m_maxBadRequests = IOTPLOTTER_MAX_ERRORS;

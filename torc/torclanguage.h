@@ -60,8 +60,8 @@ class TorcLanguage : public QObject, public TorcHTTPService
     QLocale                  m_locale;
     QList<QLocale>           m_languages;
     QVariantMap              languages; // dummy
-    QTranslator             *m_translator;
-    QReadWriteLock          *m_lock;
+    QTranslator              m_translator;
+    QReadWriteLock           m_lock;
 };
 
 class TorcStringFactory
@@ -79,6 +79,9 @@ class TorcStringFactory
   protected:
     static TorcStringFactory*    gTorcStringFactory;
     TorcStringFactory*           nextTorcStringFactory;
+
+  private:
+    Q_DISABLE_COPY(TorcStringFactory)
 };
 
 #endif // TORCLANGUAGE_H

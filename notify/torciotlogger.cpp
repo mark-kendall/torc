@@ -29,14 +29,18 @@
 TorcIOTLogger::TorcIOTLogger(const QVariantMap &Details)
   : TorcNotifier(Details),
     m_description("IOTLogger"),
-    m_timer(new QTimer()),
+    m_timer(),
     m_networkAbort(0),
     m_apiKey(""),
     m_badRequestCount(0),
     m_maxBadRequests(5),
     m_maxUpdateInterval(15),
     m_lastUpdate(QDateTime::fromMSecsSinceEpoch(0)),
-    m_maxFields(32)
+    m_requests(),
+    m_maxFields(32),
+    m_fields(),
+    m_reverseFields()
+
 {
     // clear fields
     for (int i = 0; i < 32; i++)
@@ -45,7 +49,7 @@ TorcIOTLogger::TorcIOTLogger(const QVariantMap &Details)
 
 TorcIOTLogger::~TorcIOTLogger()
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     m_networkAbort = 1;
 
@@ -55,9 +59,6 @@ TorcIOTLogger::~TorcIOTLogger()
         request->DownRef();
     }
     m_requests.clear();
-
-    delete m_timer;
-    m_timer = NULL;
 }
 
 bool TorcIOTLogger::Initialise(const QVariantMap &Details)
@@ -97,9 +98,9 @@ bool TorcIOTLogger::Initialise(const QVariantMap &Details)
 
     // at this point, all should be good. Set up the timer
     connect(this, SIGNAL(TryNotify()), this, SLOT(DoNotify()));
-    m_timer->setSingleShot(true);
-    connect(this,    SIGNAL(StartTimer(int)), m_timer, SLOT(start(int)));
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(DoNotify()));
+    m_timer.setSingleShot(true);
+    connect(this,    SIGNAL(StartTimer(int)), &m_timer, SLOT(start(int)));
+    connect(&m_timer, SIGNAL(timeout()), this, SLOT(DoNotify()));
 
     return true;
 }
@@ -122,7 +123,7 @@ void TorcIOTLogger::Notify(const QVariantMap &Notification)
     bool updated = false;
     // set fields...
     {
-        QMutexLocker locker(lock);
+        QMutexLocker locker(&lock);
 
         QMap<QString,int>::const_iterator it = m_fields.constBegin();
         for ( ; it != m_fields.constEnd(); ++it)
@@ -158,7 +159,7 @@ void TorcIOTLogger::DoNotify(void)
 
     if (m_lastUpdate.secsTo(now) < m_maxUpdateInterval)
     {
-        if (m_timer->isActive())
+        if (m_timer.isActive())
             return;
 
         StartTimer(m_lastUpdate.msecsTo(now));
@@ -172,7 +173,7 @@ void TorcIOTLogger::DoNotify(void)
     {
         TorcNetwork::GetAsynchronous(request, this);
         {
-            QMutexLocker locker(lock);
+            QMutexLocker locker(&lock);
             m_requests.append(request);
         }
     }
@@ -183,7 +184,7 @@ void TorcIOTLogger::RequestReady(TorcNetworkRequest *Request)
     if (!Request)
         return;
 
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
     if (!m_requests.contains(Request))
     {
         LOG(VB_GENERAL, LOG_WARNING, QString("Response to unknown %1 request").arg(m_description));

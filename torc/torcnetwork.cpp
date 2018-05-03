@@ -148,7 +148,7 @@ void TorcNetwork::AddHostName(const QString &Host)
     }
 
     if (changed && gLocalContext)
-        gLocalContext->NotifyEvent(Torc::NetworkHostNamesChanged);
+        TorcLocalContext::NotifyEvent(Torc::NetworkHostNamesChanged);
 }
 
 /*! \brief Remove a host name from the known list of host names.
@@ -172,7 +172,7 @@ void TorcNetwork::RemoveHostName(const QString &Host)
     }
 
     if (changed && gLocalContext)
-        gLocalContext->NotifyEvent(Torc::NetworkHostNamesChanged);
+        TorcLocalContext::NotifyEvent(Torc::NetworkHostNamesChanged);
 }
 
 /*! \brief Retrieve the list of currently identified host names.
@@ -313,20 +313,25 @@ QString ConfigurationTypeToString(QNetworkConfiguration::Type Type)
 TorcNetwork::TorcNetwork()
   : QNetworkAccessManager(),
     m_online(false),
-    m_manager(new QNetworkConfigurationManager(this))
+    m_manager(this),
+    m_configuration(),
+    m_hostNames(),
+    m_requests(),
+    m_reverseRequests(),
+    m_asynchronousRequests()
 {
     LOG(VB_GENERAL, LOG_INFO, "Opening network access manager");
     LOG(VB_GENERAL, LOG_INFO, QString("SSL support is %1available").arg(QSslSocket::supportsSsl() ? "" : "not "));
 
-    connect(m_manager, SIGNAL(configurationAdded(const QNetworkConfiguration&)),
+    connect(&m_manager, SIGNAL(configurationAdded(const QNetworkConfiguration&)),
             this,      SLOT(ConfigurationAdded(const QNetworkConfiguration&)));
-    connect(m_manager, SIGNAL(configurationChanged(const QNetworkConfiguration&)),
+    connect(&m_manager, SIGNAL(configurationChanged(const QNetworkConfiguration&)),
             this,      SLOT(ConfigurationChanged(const QNetworkConfiguration&)));
-    connect(m_manager, SIGNAL(configurationRemoved(const QNetworkConfiguration&)),
+    connect(&m_manager, SIGNAL(configurationRemoved(const QNetworkConfiguration&)),
             this,      SLOT(ConfigurationRemoved(const QNetworkConfiguration&)));
-    connect(m_manager, SIGNAL(onlineStateChanged(bool)),
+    connect(&m_manager, SIGNAL(onlineStateChanged(bool)),
             this,      SLOT(OnlineStateChanged(bool)));
-    connect(m_manager, SIGNAL(updateCompleted()),
+    connect(&m_manager, SIGNAL(updateCompleted()),
             this,      SLOT(UpdateCompleted()));
 
     connect(this, SIGNAL(NewRequest(TorcNetworkRequest*)),    this, SLOT(GetSafe(TorcNetworkRequest*)));
@@ -338,7 +343,7 @@ TorcNetwork::TorcNetwork()
     connect(this, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)), this, SLOT(Authenticate(QNetworkReply*,QAuthenticator*)), Qt::DirectConnection);
 
     // set initial state
-    setConfiguration(m_manager->defaultConfiguration());
+    setConfiguration(m_manager.defaultConfiguration());
     UpdateConfiguration(true);
 }
 
@@ -346,11 +351,6 @@ TorcNetwork::~TorcNetwork()
 {
     // release any outstanding requests
     CloseConnections();
-
-    // delete the configuration manager
-    if (m_manager)
-        m_manager->deleteLater();
-    m_manager = NULL;
 
     LOG(VB_GENERAL, LOG_INFO, "Closing network access manager");
 }
@@ -409,7 +409,10 @@ void TorcNetwork::CancelSafe(TorcNetworkRequest *Request)
         QNetworkReply* reply = m_reverseRequests.take(Request);
         Request->m_rawHeaders = reply->rawHeaderPairs();
         m_requests.remove(reply);
-        LOG(VB_NETWORK, LOG_INFO, QString("Cancelling '%1'").arg(reply->request().url().toString()));
+        if (reply->isFinished())
+            LOG(VB_NETWORK, LOG_DEBUG, QString("Deleting finished request '%1'").arg(reply->request().url().toString()));
+        else
+            LOG(VB_GENERAL, LOG_INFO, QString("Cancelling '%1'").arg(reply->request().url().toString()));
         reply->abort();
         reply->deleteLater();
         Request->DownRef();
@@ -711,7 +714,7 @@ void TorcNetwork::CloseConnections(void)
 
 void TorcNetwork::UpdateConfiguration(bool Creating)
 {
-    QNetworkConfiguration configuration = m_manager->defaultConfiguration();
+    QNetworkConfiguration configuration = m_manager.defaultConfiguration();
     bool wasonline = m_online;
     bool changed = false;
 
@@ -734,7 +737,7 @@ void TorcNetwork::UpdateConfiguration(bool Creating)
 
     if (m_online && !wasonline)
     {
-        gLocalContext->NotifyEvent(Torc::NetworkAvailable);
+        TorcLocalContext::NotifyEvent(Torc::NetworkAvailable);
 
         QStringList addresses;
         QList<QHostAddress> entries = QNetworkInterface::allAddresses();
@@ -751,7 +754,7 @@ void TorcNetwork::UpdateConfiguration(bool Creating)
     {
         LOG(VB_GENERAL, LOG_INFO, "Network down");
         CloseConnections();
-        gLocalContext->NotifyEvent(Torc::NetworkUnavailable);
+        TorcLocalContext::NotifyEvent(Torc::NetworkUnavailable);
 
         foreach (QString host, m_hostNames)
             RemoveHostName(host);
@@ -760,7 +763,7 @@ void TorcNetwork::UpdateConfiguration(bool Creating)
     else if (changed)
     {
         LOG(VB_GENERAL, LOG_INFO, "Network configuration changed");
-        gLocalContext->NotifyEvent(Torc::NetworkChanged);
+        TorcLocalContext::NotifyEvent(Torc::NetworkChanged);
     }
 }
 

@@ -31,6 +31,8 @@ TorcNotify* TorcNotify::gNotify = new TorcNotify();
 TorcNotify::TorcNotify()
   : QObject(),
     TorcDeviceHandler(),
+    m_notifiers(),
+    m_notifications(),
     m_applicationNameChanged(false)
 {
 }

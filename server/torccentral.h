@@ -43,7 +43,7 @@ class TorcCentral : public QObject, public TorcHTTPService
     // TorcHTTPService
     void            SubscriberDeleted     (QObject *Subscriber);
 
-    bool            GetCanRestartTorc     (void) const;
+    bool            GetCanRestartTorc     (void);
     bool            RestartTorc           (void);
     QString         GetTemperatureUnits   (void) const;
 
@@ -54,9 +54,9 @@ class TorcCentral : public QObject, public TorcHTTPService
     bool            LoadConfig            (void);
 
   private:
-    QMutex         *m_lock;
+    QMutex          m_lock;
     QVariantMap     m_config;
-    QByteArray     *m_graph;
+    QByteArray      m_graph;
     bool            canRestartTorc;
     QString         temperatureUnits;
 };
@@ -89,6 +89,9 @@ class TorcXSDFactory
   protected:
     static TorcXSDFactory*    gTorcXSDFactory;
     TorcXSDFactory*           nextTorcXSDFactory;
+
+  private:
+    Q_DISABLE_COPY(TorcXSDFactory)
 };
 
 #endif // TORCCENTRAL_H

@@ -7,7 +7,7 @@
 class TorcTimer
 {
   public:
-    TorcTimer() : m_running(false) { }
+    TorcTimer();
 
     void Start(void);
     int  Restart(void);

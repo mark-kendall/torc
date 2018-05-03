@@ -64,61 +64,42 @@ bool TorcPowerUnixDBus::Available(void)
 TorcPowerUnixDBus::TorcPowerUnixDBus(TorcPower *Parent)
   : TorcPowerPriv(Parent),
     m_onBattery(false),
-    m_deviceLock(new QMutex(QMutex::Recursive))
+    m_devices(QMap<QString,int>()),
+    m_deviceLock(QMutex::Recursive),
+    m_upowerInterface("org.freedesktop.UPower", "/org/freedesktop/UPower", "org.freedesktop.UPower", QDBusConnection::systemBus()),
+    m_consoleInterface("org.freedesktop.ConsoleKit", "/org/freedesktop/ConsoleKit/Manager", "org.freedesktop.ConsoleKit.Manager", QDBusConnection::systemBus())
 {
-    // create interfaces
-    m_upowerInterface = new QDBusInterface("org.freedesktop.UPower",
-                                           "/org/freedesktop/UPower",
-                                           "org.freedesktop.UPower",
-                                           QDBusConnection::systemBus());
-    m_consoleInterface = new QDBusInterface("org.freedesktop.ConsoleKit",
-                                            "/org/freedesktop/ConsoleKit/Manager",
-                                            "org.freedesktop.ConsoleKit.Manager",
-                                            QDBusConnection::systemBus());
-
-    if (m_upowerInterface)
+    if (m_consoleInterface.isValid())
     {
-        if (!m_upowerInterface->isValid())
-        {
-            LOG(VB_GENERAL, LOG_ERR, "Failed to create UPower interface");
-            delete m_upowerInterface;
-            m_upowerInterface = NULL;
-        }
-    }
-
-    if (m_consoleInterface)
-    {
-        if (!m_consoleInterface->isValid())
-        {
-            LOG(VB_GENERAL, LOG_ERR, "Failed to create ConsoleKit interface");
-            delete m_consoleInterface;
-            m_consoleInterface = NULL;
-        }
-    }
-
-    if (m_consoleInterface)
-    {
-        QDBusReply<bool> shutdown = m_consoleInterface->call(QLatin1String("CanStop"));
+        QDBusReply<bool> shutdown = m_consoleInterface.call(QLatin1String("CanStop"));
         if (shutdown.isValid() && shutdown.value())
             m_canShutdown->SetValue(QVariant((bool)true));
 
-        QDBusReply<bool> restart = m_consoleInterface->call(QLatin1String("CanRestart"));
+        QDBusReply<bool> restart = m_consoleInterface.call(QLatin1String("CanRestart"));
         if (restart.isValid() && restart.value())
             m_canRestart->SetValue(QVariant((bool)true));
     }
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Failed to create ConsoleKit interface");
+    }
 
     // populate devices
-    if (m_upowerInterface)
+    if (m_upowerInterface.isValid())
     {
-        QDBusReply<QList<QDBusObjectPath> > devicecheck = m_upowerInterface->call(QLatin1String("EnumerateDevices"));
+        QDBusReply<QList<QDBusObjectPath> > devicecheck = m_upowerInterface.call(QLatin1String("EnumerateDevices"));
 
         if (devicecheck.isValid())
         {
-            QMutexLocker locker(m_deviceLock);
+            QMutexLocker locker(&m_deviceLock);
 
             foreach (QDBusObjectPath device, devicecheck.value())
                 m_devices.insert(device.path(), GetBatteryLevel(device.path()));
         }
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Failed to create UPower interface");
     }
 
     // register for events
@@ -176,17 +157,14 @@ TorcPowerUnixDBus::TorcPowerUnixDBus(TorcPower *Parent)
 
 TorcPowerUnixDBus::~TorcPowerUnixDBus()
 {
-    delete m_upowerInterface;
-    delete m_consoleInterface;
-    delete m_deviceLock;
 }
 
 bool TorcPowerUnixDBus::Shutdown(void)
 {
-    if (m_consoleInterface && m_canShutdown->GetValue().toBool())
+    if (m_consoleInterface.isValid() && m_canShutdown->GetValue().toBool())
     {
         QList<QVariant> dummy;
-        if (m_consoleInterface->callWithCallback(QLatin1String("Stop"), dummy, (QObject*)this, SLOT(DBusCallback()), SLOT(DBusError(QDBusError))))
+        if (m_consoleInterface.callWithCallback(QLatin1String("Stop"), dummy, (QObject*)this, SLOT(DBusCallback()), SLOT(DBusError(QDBusError))))
             return true;
 
         LOG(VB_GENERAL, LOG_ERR, "Shutdown call failed");
@@ -197,11 +175,11 @@ bool TorcPowerUnixDBus::Shutdown(void)
 
 bool TorcPowerUnixDBus::Suspend(void)
 {
-    if (m_upowerInterface && m_canSuspend->GetValue().toBool())
+    if (m_upowerInterface.isValid() && m_canSuspend->GetValue().toBool())
     {
         QList<QVariant> dummy;
-        if (m_upowerInterface->callWithCallback(QLatin1String("AboutToSleep"), dummy, (QObject*)this, SLOT(DBusCallback()), SLOT(DBusError(QDBusError))))
-            if (m_upowerInterface->callWithCallback(QLatin1String("Suspend"), dummy, (QObject*)this, SLOT(DBusCallback()), SLOT(DBusError(QDBusError))))
+        if (m_upowerInterface.callWithCallback(QLatin1String("AboutToSleep"), dummy, (QObject*)this, SLOT(DBusCallback()), SLOT(DBusError(QDBusError))))
+            if (m_upowerInterface.callWithCallback(QLatin1String("Suspend"), dummy, (QObject*)this, SLOT(DBusCallback()), SLOT(DBusError(QDBusError))))
                 return true;
 
         LOG(VB_GENERAL, LOG_ERR, "Suspend call failed");
@@ -212,11 +190,11 @@ bool TorcPowerUnixDBus::Suspend(void)
 
 bool TorcPowerUnixDBus::Hibernate(void)
 {
-    if (m_upowerInterface && m_canHibernate->GetValue().toBool())
+    if (m_upowerInterface.isValid() && m_canHibernate->GetValue().toBool())
     {
         QList<QVariant> dummy;
-        if (m_upowerInterface->callWithCallback(QLatin1String("AboutToSleep"), dummy, (QObject*)this, SLOT(DBusCallback()), SLOT(DBusError(QDBusError))))
-            if (m_upowerInterface->callWithCallback(QLatin1String("Hibernate"), dummy, (QObject*)this, SLOT(DBusCallback()), SLOT(DBusError(QDBusError))))
+        if (m_upowerInterface.callWithCallback(QLatin1String("AboutToSleep"), dummy, (QObject*)this, SLOT(DBusCallback()), SLOT(DBusError(QDBusError))))
+            if (m_upowerInterface.callWithCallback(QLatin1String("Hibernate"), dummy, (QObject*)this, SLOT(DBusCallback()), SLOT(DBusError(QDBusError))))
                 return true;
 
         LOG(VB_GENERAL, LOG_ERR, "Hibernate call failed");
@@ -227,10 +205,10 @@ bool TorcPowerUnixDBus::Hibernate(void)
 
 bool TorcPowerUnixDBus::Restart(void)
 {
-    if (m_consoleInterface && m_canRestart->GetValue().toBool())
+    if (m_consoleInterface.isValid() && m_canRestart->GetValue().toBool())
     {
         QList<QVariant> dummy;
-        if (m_consoleInterface->callWithCallback(QLatin1String("Restart"), dummy, (QObject*)this, SLOT(DBusCallback()), SLOT(DBusError(QDBusError))))
+        if (m_consoleInterface.callWithCallback(QLatin1String("Restart"), dummy, (QObject*)this, SLOT(DBusCallback()), SLOT(DBusError(QDBusError))))
             return true;
 
         LOG(VB_GENERAL, LOG_ERR, "Restart call failed");
@@ -246,7 +224,7 @@ void TorcPowerUnixDBus::Refresh(void)
 void TorcPowerUnixDBus::DeviceAdded(QDBusObjectPath Device)
 {
     {
-        QMutexLocker locker(m_deviceLock);
+        QMutexLocker locker(&m_deviceLock);
 
         if (m_devices.contains(Device.path()))
             return;
@@ -263,7 +241,7 @@ void TorcPowerUnixDBus::DeviceAdded(QDBusObjectPath Device)
 void TorcPowerUnixDBus::DeviceRemoved(QDBusObjectPath Device)
 {
     {
-        QMutexLocker locker(m_deviceLock);
+        QMutexLocker locker(&m_deviceLock);
 
         if (!m_devices.contains(Device.path()))
             return;
@@ -280,7 +258,7 @@ void TorcPowerUnixDBus::DeviceRemoved(QDBusObjectPath Device)
 void TorcPowerUnixDBus::DeviceChanged(QDBusObjectPath Device)
 {
     {
-        QMutexLocker locker(m_deviceLock);
+        QMutexLocker locker(&m_deviceLock);
 
         if (!m_devices.contains(Device.path()))
             return;
@@ -311,7 +289,7 @@ void TorcPowerUnixDBus::UpdateBattery(void)
 {
     if (m_onBattery)
     {
-        QMutexLocker locker(m_deviceLock);
+        QMutexLocker locker(&m_deviceLock);
 
         qreal total = 0;
         int   count = 0;
@@ -376,17 +354,17 @@ void TorcPowerUnixDBus::UpdateProperties(void)
     m_canHibernate->SetValue(QVariant((bool)false));
     m_onBattery = false;
 
-    if (m_upowerInterface)
+    if (m_upowerInterface.isValid())
     {
-        QVariant cansuspend = m_upowerInterface->property("CanSuspend");
+        QVariant cansuspend = m_upowerInterface.property("CanSuspend");
         if (cansuspend.isValid() && cansuspend.toBool() == true)
             m_canSuspend->SetValue(QVariant((bool)true));
 
-        QVariant canhibernate = m_upowerInterface->property("CanHibernate");
+        QVariant canhibernate = m_upowerInterface.property("CanHibernate");
         if (canhibernate.isValid() && canhibernate.toBool() == true)
             m_canHibernate->SetValue(QVariant((bool)true));
 
-        QVariant onbattery = m_upowerInterface->property("OnBattery");
+        QVariant onbattery = m_upowerInterface.property("OnBattery");
         if (onbattery.isValid() && onbattery.toBool() == true)
             m_onBattery = true;
     }

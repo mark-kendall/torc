@@ -38,6 +38,9 @@ class TorcPowerPriv : public QObject
     TorcSetting        *m_canHibernate;
     TorcSetting        *m_canRestart;
     int                 m_batteryLevel;
+
+  private:
+    Q_DISABLE_COPY(TorcPowerPriv)
 };
 
 class PowerFactory
@@ -54,6 +57,9 @@ class PowerFactory
   protected:
     static PowerFactory* gPowerFactory;
     PowerFactory*        nextPowerFactory;
+
+  private:
+    Q_DISABLE_COPY(PowerFactory)
 };
 
 class TorcPower : public QObject, public TorcHTTPService
@@ -150,6 +156,9 @@ class TorcPower : public QObject, public TorcHTTPService
     bool                  canHibernate; // dummy
     bool                  canRestart;   // dummy
     int                   batteryLevel; // dummy
+
+  private:
+    Q_DISABLE_COPY(TorcPower)
 };
 
 extern TorcPower *gPower;

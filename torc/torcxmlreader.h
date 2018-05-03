@@ -22,15 +22,10 @@ class TorcXMLReader
     bool              ReadElement (QVariantMultiMap *Map);
 
   private:
-    QXmlStreamReader *m_reader;
+    QXmlStreamReader  m_reader;
     QVariantMultiMap  m_map;
     bool              m_valid;
     QString           m_message;
-
-  private:
-    // disable copy and assignment constructors
-    TorcXMLReader(const TorcXMLReader &) Q_DECL_EQ_DELETE;
-    TorcXMLReader &operator=(const TorcXMLReader &) Q_DECL_EQ_DELETE;
 };
 
 #endif // TORCXMLREADER_H

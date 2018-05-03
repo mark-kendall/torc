@@ -59,6 +59,7 @@ TorcNetworkRequest::TorcNetworkRequest(const QNetworkRequest Request, QNetworkAc
     m_rewindPositionInFile(0),
     m_readPosition(0),
     m_writePosition(0),
+    m_availableToRead(0),
     m_bufferSize(BufferSize),
     m_reserveBufferSize(BufferSize >> 3),
     m_writeBufferSize(BufferSize - m_reserveBufferSize),
@@ -72,12 +73,14 @@ TorcNetworkRequest::TorcNetworkRequest(const QNetworkRequest Request, QNetworkAc
     m_replyBytesAvailable(0),
     m_bytesReceived(0),
     m_bytesTotal(0),
+    m_rawHeaders(),
     m_replyError(QNetworkReply::NoError),
     m_request(Request),
     m_rangeStart(0),
     m_rangeEnd(0),
     m_httpStatus(HTTP_BadRequest),
     m_contentLength(0),
+    m_contentType(),
     m_byteServingAvailable(false)
 {
     // reserve some space for seeking backwards in the stream
@@ -93,6 +96,7 @@ TorcNetworkRequest::TorcNetworkRequest(const QNetworkRequest Request, const QByt
     m_rewindPositionInFile(0),
     m_readPosition(0),
     m_writePosition(0),
+    m_availableToRead(0),
     m_bufferSize(0),
     m_reserveBufferSize(0),
     m_writeBufferSize(0),
@@ -106,12 +110,14 @@ TorcNetworkRequest::TorcNetworkRequest(const QNetworkRequest Request, const QByt
     m_replyBytesAvailable(0),
     m_bytesReceived(0),
     m_bytesTotal(0),
+    m_rawHeaders(),
     m_replyError(QNetworkReply::NoError),
     m_request(Request),
     m_rangeStart(0),
     m_rangeEnd(0),
     m_httpStatus(HTTP_BadRequest),
     m_contentLength(0),
+    m_contentType(),
     m_byteServingAvailable(false)
 {
 }

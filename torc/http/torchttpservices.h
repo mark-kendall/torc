@@ -10,7 +10,6 @@
 
 class TorcHTTPServer;
 class TorcHTTPRequest;
-class TorcHTTPConnection;
 
 class TorcHTTPServices : public QObject, public TorcHTTPService
 {
@@ -21,7 +20,7 @@ class TorcHTTPServices : public QObject, public TorcHTTPService
     Q_CLASSINFO("GetPriority",       "type=priority")
     Q_CLASSINFO("GetUuid",           "type=uuid")
     Q_CLASSINFO("GetDetails",        "type=details")
-    Q_CLASSINFO("GetWebSocketToken", "type=accesstoken")
+    Q_CLASSINFO("GetWebSocketToken", "type=accesstoken,methods=PUT") // force authentication for the GetWebSocketToken method
 
     Q_PROPERTY(QMap serviceList READ GetServiceList   NOTIFY ServiceListChanged)
     Q_PROPERTY(QVariantList returnFormats READ GetReturnFormats CONSTANT)
@@ -31,8 +30,8 @@ class TorcHTTPServices : public QObject, public TorcHTTPService
     explicit TorcHTTPServices(TorcHTTPServer *Server);
     virtual ~TorcHTTPServices();
 
-    void           ProcessHTTPRequest   (TorcHTTPRequest *Request, TorcHTTPConnection* Connection);
-    QString        GetUIName            (void);
+    void           ProcessHTTPRequest   (const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest *Request) Q_DECL_OVERRIDE;
+    QString        GetUIName            (void) Q_DECL_OVERRIDE;
 
   signals:
     void           ServiceListChanged   (void);

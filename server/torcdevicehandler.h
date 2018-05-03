@@ -31,9 +31,7 @@ class TorcDeviceHandler
     TorcDeviceHandler               *m_nextTorcDeviceHandler;
 
   private:
-    // disable copy and assignment constructors
-    TorcDeviceHandler(const TorcDeviceHandler &) Q_DECL_EQ_DELETE;
-    TorcDeviceHandler &operator=(const TorcDeviceHandler &) Q_DECL_EQ_DELETE;
+    Q_DISABLE_COPY(TorcDeviceHandler)
 };
 
 #endif // TORCDEVICEHANDLER_H

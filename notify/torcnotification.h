@@ -12,7 +12,7 @@ class TorcNotification : public TorcDevice
   public:
     explicit TorcNotification(const QVariantMap &Details);
     virtual bool         Setup        (void);
-    virtual bool         IsKnownInput (const QString &UniqueId) const;
+    virtual bool         IsKnownInput (const QString &UniqueId);
     virtual QStringList  GetDescription (void) = 0;
     virtual void         Graph        (QByteArray* Data) = 0;
 
@@ -42,6 +42,9 @@ class TorcNotificationFactory
   protected:
     static TorcNotificationFactory*   gTorcNotificationFactory;
     TorcNotificationFactory*          nextTorcNotificationFactory;
+
+  private:
+    Q_DISABLE_COPY(TorcNotificationFactory)
 };
 
 #endif // TORCNOTIFICATION_H

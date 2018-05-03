@@ -3,6 +3,7 @@
 
 // Qt
 #include <QObject>
+#include <QReadWriteLock>
 #include <QHostAddress>
 
 // Torc
@@ -11,6 +12,7 @@
 
 class TorcRPCRequest;
 class TorcNetworkRequest;
+class TorcWebSocket;
 class TorcWebSocketThread;
 class TorcHTTPRequest;
 class QTcpSocket;
@@ -77,12 +79,13 @@ class TorcNetworkService : public QObject
     void                    SetSource         (ServiceSource Source);
     ServiceSources          GetSources        (void);
     void                    RemoveSource      (ServiceSource Source);
-    void                    CreateSocket      (TorcHTTPRequest *Request, QTcpSocket *Socket);
+    void                    SetWebSocketThread(TorcWebSocketThread *Thread);
     void                    RemoteRequest     (TorcRPCRequest *Request);
     void                    CancelRequest     (TorcRPCRequest *Request);
     QVariant                ToMap             (void);
 
   private:
+    Q_DISABLE_COPY(TorcNetworkService)
     void                    ScheduleRetry     (void);
     void                    QueryPeerDetails  (void);
 
@@ -123,9 +126,7 @@ class TorcNetworkedContext: public QObject, public TorcHTTPService
     Q_PROPERTY(QVariantList peers READ GetPeers NOTIFY PeersChanged)
 
   public:
-    // TorcWebSocket
-    static void                UpgradeSocket       (TorcHTTPRequest *Request, QTcpSocket *Socket);
-
+    static void                PeerConnected       (TorcWebSocketThread* Thread, const QString UUID, int Port, const QString Name, const QHostAddress Address);
     static void                RemoteRequest       (const QString &UUID, TorcRPCRequest *Request);
     static void                CancelRequest       (const QString &UUID, TorcRPCRequest *Request, int Wait = 1000);
 
@@ -136,7 +137,7 @@ class TorcNetworkedContext: public QObject, public TorcHTTPService
     void                       PeersChanged        (void);
     void                       PeerConnected       (QString Name, QString UUID);
     void                       PeerDisconnected    (QString Name, QString UUID);
-    void                       UpgradeRequest      (TorcHTTPRequest *Request, QTcpSocket *Socket);
+    void                       NewPeer             (TorcWebSocketThread* Socket, const QString UUID, int Port, const QString Name, const QHostAddress Address);
     void                       NewRequest          (const QString &UUID, TorcRPCRequest *Request);
     void                       RequestCancelled    (const QString &UUID, TorcRPCRequest *Request);
 
@@ -145,7 +146,7 @@ class TorcNetworkedContext: public QObject, public TorcHTTPService
     void                       SubscriberDeleted   (QObject *Subscriber);
 
   protected slots:
-    void                       HandleUpgrade       (TorcHTTPRequest *Request, QTcpSocket *Socket);
+    void                       HandleNewPeer       (TorcWebSocketThread *Thread, const QString UUID, int Port, const QString Name, const QHostAddress Address);
     void                       HandleNewRequest    (const QString &UUID, TorcRPCRequest *Request);
     void                       HandleCancelRequest (const QString &UUID, TorcRPCRequest *Request);
 
@@ -158,12 +159,13 @@ class TorcNetworkedContext: public QObject, public TorcHTTPService
     bool                       event               (QEvent* Event);
 
   private:
+    Q_DISABLE_COPY(TorcNetworkedContext)
     void                       Add                 (TorcNetworkService* Peer);
     void                       Remove              (const QString &UUID, TorcNetworkService::ServiceSource Source = TorcNetworkService::Spontaneous);
 
   private:
     QList<TorcNetworkService*> m_discoveredServices;
-    QReadWriteLock            *m_discoveredServicesLock;
+    QReadWriteLock             m_discoveredServicesLock;
     QList<QString>             m_serviceList;
     quint32                    m_bonjourBrowserReference;
     QVariantMap                peers; // dummy

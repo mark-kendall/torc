@@ -50,6 +50,9 @@ class TorcOutput : public TorcDevice, public TorcHTTPService
 
   private:
     QObject         *m_owner;
+
+  private:
+    Q_DISABLE_COPY(TorcOutput)
 };
 
 #endif // TORCOUTPUT_H

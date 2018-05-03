@@ -38,7 +38,8 @@
  * \sa TorcNetworkButtonOutput
 */
 TorcNetworkButtonInput::TorcNetworkButtonInput(double Default, const QVariantMap &Details)
-  : TorcNetworkSwitchInput(Default, Details)
+  : TorcNetworkSwitchInput(Default, Details),
+    m_pulseTimer()
 {
     // timers cannot be started from other threads, so use some signalling
     connect(this, SIGNAL(Pushed()), this, SLOT(StartTimer()));
@@ -74,7 +75,7 @@ void TorcNetworkButtonInput::Start(void)
 void TorcNetworkButtonInput::SetValue(double Value)
 {
     (void)Value;
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     if (m_pulseTimer.isActive())
         return;
@@ -91,7 +92,7 @@ void TorcNetworkButtonInput::StartTimer(void)
 
 void TorcNetworkButtonInput::EndPulse(void)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     TorcSwitchInput::SetValue(value < 1.0 ? 1.0 : 0.0);
 }

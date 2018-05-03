@@ -22,8 +22,10 @@ DEFINES    += __STDC_LIMIT_MACROS
 QT         += sql network
 QT         -= gui
 
+QMAKE_CXXFLAGS += -Wall -Wextra -Weffc++ -Werror
+
 # debug builds
-CONFIG     += debug
+#CONFIG     += debug
 
 # libraries
 # zlib on windows is too much like hard work
@@ -42,7 +44,7 @@ else
 
 QMAKE_CXXFLAGS += -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE
 
-DEPENDPATH  += ./torc ./torc/http ./torc/upnp ./inputs ./inputs/platforms
+DEPENDPATH  += ./torc ./torc/http ./torc/upnp ./inputs ./inputs/platforms ./server
 DEPENDPATH  += ./outputs ./outputs/platforms
 INCLUDEPATH += $$DEPENDPATH
 
@@ -207,8 +209,11 @@ HEADERS += torc/http/torchtmlstaticcontent.h
 HEADERS += torc/http/torchtmldynamiccontent.h
 HEADERS += torc/http/torcupnpcontent.h
 HEADERS += torc/http/torchttphandler.h
-HEADERS += torc/http/torchttpconnection.h
+HEADERS += torc/http/torchttpreader.h
 HEADERS += torc/http/torcwebsocket.h
+HEADERS += torc/http/torcwebsocketthread.h
+HEADERS += torc/http/torcwebsocketpool.h
+HEADERS += torc/http/torcwebsockettoken.h
 HEADERS += torc/http/torcserialiser.h
 HEADERS += torc/http/torcxmlserialiser.h
 HEADERS += torc/http/torcjsonserialiser.h
@@ -290,10 +295,13 @@ SOURCES += torc/http/torchtmlstaticcontent.cpp
 SOURCES += torc/http/torchtmldynamiccontent.cpp
 SOURCES += torc/http/torcupnpcontent.cpp
 SOURCES += torc/http/torchttphandler.cpp
-SOURCES += torc/http/torchttpconnection.cpp
+SOURCES += torc/http/torchttpreader.cpp
 SOURCES += torc/http/torchttpservice.cpp
 SOURCES += torc/http/torchttpservices.cpp
 SOURCES += torc/http/torcwebsocket.cpp
+SOURCES += torc/http/torcwebsocketthread.cpp
+SOURCES += torc/http/torcwebsocketpool.cpp
+SOURCES += torc/http/torcwebsockettoken.cpp
 SOURCES += torc/http/torcserialiser.cpp
 SOURCES += torc/http/torcxmlserialiser.cpp
 SOURCES += torc/http/torcjsonserialiser.cpp
@@ -344,14 +352,14 @@ SOURCES += notify/torcnotification.cpp
 SOURCES += notify/torcsystemnotification.cpp
 SOURCES += notify/torctriggernotification.cpp
 
-HEADERS += torccentral.h
-HEADERS += torcdevice.h
-HEADERS += torcdevicehandler.h
-HEADERS += torcxsdtest.h
-SOURCES += main.cpp
-SOURCES += torccentral.cpp
-SOURCES += torcdevice.cpp
-SOURCES += torcdevicehandler.cpp
-SOURCES += torcxsdtest.cpp
+HEADERS += server/torccentral.h
+HEADERS += server/torcdevice.h
+HEADERS += server/torcdevicehandler.h
+HEADERS += server/torcxsdtest.h
+SOURCES += server/main.cpp
+SOURCES += server/torccentral.cpp
+SOURCES += server/torcdevice.cpp
+SOURCES += server/torcdevicehandler.cpp
+SOURCES += server/torcxsdtest.cpp
 
 QMAKE_CLEAN += $(TARGET)

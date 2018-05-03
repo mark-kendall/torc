@@ -53,7 +53,7 @@ QStringList TorcPiSwitchOutput::GetDescription(void)
 
 void TorcPiSwitchOutput::SetValue(double Value)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     // as in TorcSwitchOutput::SetValue
     double newvalue = Value == 0.0 ? 0 : 1;

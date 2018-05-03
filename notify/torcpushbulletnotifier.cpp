@@ -35,15 +35,16 @@
 */
 TorcPushbulletNotifier::TorcPushbulletNotifier(const QVariantMap &Details)
   : TorcNotifier(Details),
-    m_resetTimer(new QTimer()),
+    m_resetTimer(),
     m_networkAbort(0),
     m_accessToken(QString("")),
+    m_requests(),
     m_badRequestCount(0)
 {
     // setup timer
-    m_resetTimer->setSingleShot(true);
-    connect(this, SIGNAL(StartResetTimer(int)), m_resetTimer, SLOT(start(int)));
-    connect(m_resetTimer, SIGNAL(timeout()), this, SLOT(ResetTimerTimeout()));
+    m_resetTimer.setSingleShot(true);
+    connect(this, SIGNAL(StartResetTimer(int)), &m_resetTimer, SLOT(start(int)));
+    connect(&m_resetTimer, SIGNAL(timeout()), this, SLOT(ResetTimerTimeout()));
 
     if (Details.contains("accesstoken"))
     {
@@ -59,7 +60,7 @@ TorcPushbulletNotifier::TorcPushbulletNotifier(const QVariantMap &Details)
 
 TorcPushbulletNotifier::~TorcPushbulletNotifier()
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     m_networkAbort = 1;
 
@@ -69,8 +70,6 @@ TorcPushbulletNotifier::~TorcPushbulletNotifier()
         request->DownRef();
     }
     m_requests.clear();
-
-    delete m_resetTimer;
 }
 
 QStringList TorcPushbulletNotifier::GetDescription(void)
@@ -80,7 +79,7 @@ QStringList TorcPushbulletNotifier::GetDescription(void)
 
 void TorcPushbulletNotifier::Notify(const QVariantMap &Notification)
 {
-    if (m_accessToken.isEmpty() || m_badRequestCount >= MAX_BAD_REQUESTS || m_resetTimer->isActive())
+    if (m_accessToken.isEmpty() || m_badRequestCount >= MAX_BAD_REQUESTS || m_resetTimer.isActive())
     {
         LOG(VB_GENERAL, LOG_WARNING, "Ignoring Pushbullet notify request");
         return;
@@ -111,7 +110,7 @@ void TorcPushbulletNotifier::Notify(const QVariantMap &Notification)
     TorcNetwork::GetAsynchronous(request, this);
 
     {
-        QMutexLocker locker(lock);
+        QMutexLocker locker(&lock);
         m_requests.append(request);
     }
 }
@@ -121,7 +120,7 @@ void TorcPushbulletNotifier::RequestReady(TorcNetworkRequest *Request)
     if (!Request)
         return;
 
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
     if (!m_requests.contains(Request))
     {
         LOG(VB_GENERAL, LOG_ERR, "Response to unknown Pushbullet request");

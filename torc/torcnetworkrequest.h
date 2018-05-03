@@ -41,6 +41,7 @@ class TorcNetworkRequest : public TorcReferenceCounter
 
   private:
     bool            WritePriv         (QNetworkReply *Reply, char* Buffer, int Size);
+    Q_DISABLE_COPY(TorcNetworkRequest)
 
   protected:
     // internal state/type

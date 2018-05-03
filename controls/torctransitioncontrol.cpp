@@ -144,7 +144,7 @@ TorcTransitionControl::TorcTransitionControl(const QString &Type, const QVariant
   : TorcControl(TorcControl::Transition, Details),
     m_duration(0),
     m_type(QEasingCurve::Linear),
-    m_animation(new QPropertyAnimation(this, "animationValue")),
+    m_animation(this, "animationValue"),
     animationValue(0),
     m_firstTrigger(true),
     m_transitionValue(0)
@@ -187,7 +187,6 @@ TorcTransitionControl::TorcTransitionControl(const QString &Type, const QVariant
 
 TorcTransitionControl::~TorcTransitionControl()
 {
-    delete m_animation;
 }
 
 TorcControl::Type TorcTransitionControl::GetType(void) const
@@ -209,7 +208,7 @@ QStringList TorcTransitionControl::GetDescription(void)
 
 bool TorcTransitionControl::Validate(void)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     // don't repeat validation
     if (m_validated)
@@ -243,10 +242,10 @@ bool TorcTransitionControl::Validate(void)
         easingcurve.setCustomType(TorcTransitionControl::LinearLEDFunction);
     else
         easingcurve.setType(m_type);
-    m_animation->setEasingCurve(easingcurve);
-    m_animation->setStartValue(0);
-    m_animation->setEndValue(1);
-    m_animation->setDuration(m_duration * 1000);
+    m_animation.setEasingCurve(easingcurve);
+    m_animation.setStartValue(0);
+    m_animation.setEndValue(1);
+    m_animation.setDuration(m_duration * 1000);
 
     // debug
     LOG(VB_GENERAL, LOG_DEBUG, QString("%1: %2").arg(uniqueId).arg(GetDescription().join(",")));
@@ -283,7 +282,7 @@ qreal TorcTransitionControl::LinearLEDFunction(qreal progress)
 */
 void TorcTransitionControl::CalculateOutput(void)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     // sanity check
     if (m_inputs.size() != 1)
@@ -345,18 +344,18 @@ void TorcTransitionControl::CalculateOutput(void)
     // reverse for the 'mirrored' falling operation.
     // NB if the animation is still running, it will reverse from its current position - so there
     // will be no glitches/jumps/interruptions.
-    m_animation->setDirection(newvalue > 0 ? QAbstractAnimation::Forward : QAbstractAnimation::Backward);
-    m_animation->start();
+    m_animation.setDirection(newvalue > 0 ? QAbstractAnimation::Forward : QAbstractAnimation::Backward);
+    m_animation.start();
 
     // this has to come after start
     if (timesincelasttransition > 0)
-        m_animation->setCurrentTime(timesincelasttransition * 1000);
+        m_animation.setCurrentTime(timesincelasttransition * 1000);
 }
 
 /// Our main output, value, is read only. So the animation operates on a proxy, animationValue.
 void TorcTransitionControl::SetAnimationValue(double Value)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     animationValue = Value;
     SetValue(Value);
@@ -364,6 +363,6 @@ void TorcTransitionControl::SetAnimationValue(double Value)
 
 double TorcTransitionControl::GetAnimationValue(void)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
     return animationValue;
 }

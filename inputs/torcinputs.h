@@ -45,7 +45,7 @@ class TorcInputs : public QObject, public TorcHTTPService
   private:
     QList<TorcInput*>   inputList;
     QStringList         inputTypes;
-    QMutex              *m_lock;
+    QMutex              m_lock;
 };
 
 #endif // TORCINPUTS_H

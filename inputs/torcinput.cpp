@@ -100,7 +100,7 @@ void TorcInput::Start(void)
 
 QString TorcInput::GetUIName(void)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
     if (userName.isEmpty())
         return uniqueId;
     return userName;
@@ -117,7 +117,7 @@ void TorcInput::SubscriberDeleted(QObject *Subscriber)
 */
 void TorcInput::SetValue(double Value)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     // a call to SetValue implies there is a valid reading
     if (!valid)
@@ -170,7 +170,7 @@ void TorcInput::SetValue(double Value)
 
 void TorcInput::SetValid(bool Valid)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     if (!Valid)
         SetValue(defaultValue);
@@ -192,14 +192,14 @@ double TorcInput::GetOperatingRangeMax(void)
 
 bool TorcInput::GetOutOfRangeLow(void)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     return outOfRangeLow;
 }
 
 bool TorcInput::GetOutOfRangeHigh(void)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     return outOfRangeHigh;
 }

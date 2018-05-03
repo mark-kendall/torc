@@ -7,7 +7,9 @@
 #include <QString>
 #include <QDateTime>
 
-class TorcHTTPReader;
+// Torc
+#include "torchttpreader.h"
+
 class TorcSerialiser;
 class QTcpSocket;
 class QFile;
@@ -133,11 +135,13 @@ class TorcHTTPRequest
     QString                GetMethod                (void) const;
     const QMap<QString,QString>* Headers            (void) const;
     const QMap<QString,QString>& Queries            (void) const;
-    void                   Respond                  (QTcpSocket *Socket, int* Abort);
+    void                   Respond                  (QTcpSocket *Socket);
     void                   Redirected               (const QString &Redirected);
     TorcSerialiser*        GetSerialiser            (void);
     bool                   Unmodified               (const QDateTime &LastModified);
     bool                   Unmodified               (void);
+    void                   Authorise                (bool Allow);
+    bool                   IsAuthorised             (void) const;
 
   protected:
     void                   Initialise               (const QString &Method);
@@ -159,6 +163,7 @@ class TorcHTTPRequest
 
     bool                   m_allowGZip;
     int                    m_allowed;
+    bool                   m_authorised;
     HTTPResponseType       m_responseType;
     int                    m_cache;
     QString                m_cacheTag;
@@ -166,6 +171,9 @@ class TorcHTTPRequest
     QByteArray            *m_responseContent;
     QFile                 *m_responseFile;
     QMap<QString,QString> *m_responseHeaders;
+
+  private:
+    Q_DISABLE_COPY(TorcHTTPRequest)
 };
 
 #endif // TORCHTTPREQUEST_H

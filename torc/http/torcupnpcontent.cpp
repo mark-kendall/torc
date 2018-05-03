@@ -21,12 +21,12 @@
 */
 
 // Qt
+#include <QHostAddress>
 #include <QXmlStreamWriter>
 
 // Torc
 #include "torclocalcontext.h"
 #include "torchttphandler.h"
-#include "torchttpconnection.h"
 #include "torcupnp.h"
 #include "torcupnpcontent.h"
 
@@ -35,9 +35,11 @@ TorcUPnPContent::TorcUPnPContent()
 {
 }
 
-void TorcUPnPContent::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTTPConnection* Connection)
+void TorcUPnPContent::ProcessHTTPRequest(const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest *Request)
 {
-    if (!Request || !Connection)
+    (void)PeerAddress;
+    (void)PeerPort;
+    if (!Request)
         return;
 
     // handle options request
@@ -51,11 +53,10 @@ void TorcUPnPContent::ProcessHTTPRequest(TorcHTTPRequest *Request, TorcHTTPConne
     // N.B. this does not check whether the device is actually published on this interface
     if (Request->GetMethod().toLower() == "description")
     {
-        QHostAddress base = Connection->GetSocket()->localAddress();
-        int port = Connection->GetSocket()->localPort();
+        QHostAddress base(LocalAddress);
         QString url = base.protocol() == QAbstractSocket::IPv6Protocol ?
-                    QString("http://[%1]:%2").arg(base.toString()).arg(port) :
-                    QString("http://%1:%2").arg(base.toString().arg(port));
+                    QString("http://[%1]:%2").arg(LocalAddress).arg(LocalPort) :
+                    QString("http://%1:%2").arg(LocalAddress).arg(LocalPort);
         QByteArray *result = new QByteArray();
         QXmlStreamWriter xml(result);
         xml.writeStartDocument("1.0");

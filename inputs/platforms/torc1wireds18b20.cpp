@@ -123,20 +123,16 @@ Torc1WireDS18B20::Torc1WireDS18B20(const QVariantMap &Details)
                          TorcCentral::GetGlobalTemperatureUnits() == TorcCentral::Celsius ? -55.0 : -67.0,
                          TorcCentral::GetGlobalTemperatureUnits() == TorcCentral::Celsius ? 125.0 : 257.0,
                          DS18B20NAME, Details),
-    m_deviceId(""),
-    m_readThread(NULL)
+    m_deviceId(Details.value("wire1serial").toString()),
+    m_readThread(this, Details.value("wire1serial").toString())
 {
-    m_deviceId = Details.value("wire1serial").toString();
-    m_readThread = new Torc1WireReadThread(this, m_deviceId);
-    m_readThread->start();
+    m_readThread.start();
 }
 
 Torc1WireDS18B20::~Torc1WireDS18B20()
 {
-    m_readThread->quit();
-    m_readThread->wait();
-    delete m_readThread;
-    m_readThread = NULL;
+    m_readThread.quit();
+    m_readThread.wait();
 }
 
 QStringList Torc1WireDS18B20::GetDescription(void)

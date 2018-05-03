@@ -62,7 +62,7 @@ QStringList TorcI2CPCA9685Channel::GetDescription(void)
 
 void TorcI2CPCA9685Channel::SetValue(double Value)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
 
     // anything that doesn't change the range sent to the device is just noise, so
     // calculate now and filter early

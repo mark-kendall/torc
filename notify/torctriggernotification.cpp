@@ -39,7 +39,10 @@ TorcTriggerNotification::TorcTriggerNotification(const QVariantMap &Details)
     m_inputName(),
     m_input(NULL),
     m_lastValue(0.0),
-    m_triggerHigh(true)
+    m_triggerHigh(true),
+    m_customData(),
+    m_references(),
+    m_referenceDevices()
 {
     if (uniqueId.isEmpty() || m_notifierNames.isEmpty() || m_body.isEmpty())
         return;
@@ -82,9 +85,9 @@ TorcTriggerNotification::~TorcTriggerNotification()
 {
 }
 
-bool TorcTriggerNotification::IsKnownInput(const QString &UniqueId) const
+bool TorcTriggerNotification::IsKnownInput(const QString &UniqueId)
 {
-    QMutexLocker locker(lock);
+    QMutexLocker locker(&lock);
     return UniqueId == m_inputName;
 }
 

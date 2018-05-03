@@ -37,7 +37,7 @@ class TorcIOTLogger : public TorcNotifier
 
   protected:
     QString      m_description;
-    QTimer      *m_timer;
+    QTimer       m_timer;
     int          m_networkAbort;
     QString      m_apiKey;
     int          m_badRequestCount;
