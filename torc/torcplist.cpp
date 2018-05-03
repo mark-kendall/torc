@@ -80,8 +80,7 @@ TorcPList::TorcPList(const QByteArray &Data)
 ///brief Return the value for the given Key.
 QVariant TorcPList::GetValue(const QString &Key)
 {
-    QMetaType::Type type = static_cast<QMetaType::Type>(m_result.type());
-    if (type != QMetaType::QVariantMap)
+    if (m_result.type() != QVariant::Map)
         return QVariant();
 
     QVariantMap map = m_result.toMap();
