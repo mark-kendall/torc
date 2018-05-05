@@ -133,6 +133,7 @@ class TorcHTTPRequest
     QString                GetUrl                   (void) const;
     QString                GetPath                  (void) const;
     QString                GetMethod                (void) const;
+    QString                GetCache                 (void) const;
     const QMap<QString,QString>* Headers            (void) const;
     const QMap<QString,QString>& Queries            (void) const;
     void                   Respond                  (QTcpSocket *Socket);

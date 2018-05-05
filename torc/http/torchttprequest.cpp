@@ -323,6 +323,11 @@ QString TorcHTTPRequest::GetMethod(void) const
     return m_method;
 }
 
+QString TorcHTTPRequest::GetCache(void) const
+{
+    return m_cacheTag;
+}
+
 const QMap<QString,QString>* TorcHTTPRequest::Headers(void) const
 {
     return m_headers;

@@ -389,15 +389,8 @@ void TorcHTTPServer::Authorise(const QString &Host, TorcHTTPRequest *Request, bo
         // HTTP 1.1 should support Digest
         if (Request->GetHTTPProtocol() > HTTPOneDotZero)
         {
-            TorcHTTPServerNonce *nonce = new TorcHTTPServerNonce();
-            // NB SHA-256 doesn't seem to be implemented anywhere yet - so just offer MD5
-            // should probably use insertMulti for SetResponseHeader
-              QString auth = QString("Digest realm=\"%1\", qop=\"auth\", algorithm=MD5, nonce=\"%2\", opaque=\"%3\"%4")
-                    .arg(TORC_REALM)
-                    .arg(nonce->GetNonce())
-                    .arg(nonce->GetOpaque())
-                    .arg(stale ? QString(", stale=\"true\"") : QString(""));
-            Request->SetResponseHeader("WWW-Authenticate", auth);
+            bool dummy = false;
+            (void)TorcHTTPServerNonce::ProcessDigestAuth(Request, stale, dummy);
         }
         else // otherwise fallback to Basic
         {
@@ -438,9 +431,10 @@ bool TorcHTTPServer::AuthenticateUser(TorcHTTPRequest *Request, QString &Usernam
     // most clients will support Digest Access Authentication, so try that first
     if (header.startsWith("Digest", Qt::CaseInsensitive))
     {
-        authorised = TorcHTTPServerNonce::CheckAuthentication(username, password, header,
-                                                          TorcHTTPRequest::RequestTypeToString(Request->GetHTTPRequestType()),
-                                                          Request->GetUrl(), Stale);
+        authorised = TorcHTTPServerNonce::ProcessDigestAuth(NULL, false, Stale,
+                                                            username, password, header,
+                                                            TorcHTTPRequest::RequestTypeToString(Request->GetHTTPRequestType()),
+                                                            Request->GetUrl());
     }
     else if (header.startsWith("Basic", Qt::CaseInsensitive))
     {
