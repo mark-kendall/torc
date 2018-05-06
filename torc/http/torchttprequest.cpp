@@ -82,7 +82,7 @@ TorcHTTPRequest::TorcHTTPRequest(TorcHTTPReader *Reader)
     m_content(NULL),
     m_allowGZip(false),
     m_allowed(0),
-    m_authorised(false),
+    m_authorised(HTTPNotAuthorised),
     m_responseType(HTTPResponseUnknown),
     m_cache(HTTPCacheNone),
     m_cacheTag(QString("")),
@@ -118,7 +118,7 @@ TorcHTTPRequest::TorcHTTPRequest(const QString &Method, QMap<QString,QString> *H
     m_content(Content),
     m_allowGZip(false),
     m_allowed(0),
-    m_authorised(false),
+    m_authorised(HTTPNotAuthorised),
     m_responseType(HTTPResponseUnknown),
     m_cache(HTTPCacheNone),
     m_cacheTag(QString("")),
@@ -1101,12 +1101,12 @@ bool TorcHTTPRequest::Unmodified(void)
     return false;
 }
 
-void TorcHTTPRequest::Authorise(bool Allow)
+void TorcHTTPRequest::Authorise(HTTPAuthorisation Authorisation)
 {
-    m_authorised = Allow;
+    m_authorised = Authorisation;
 }
 
-bool TorcHTTPRequest::IsAuthorised(void) const
+HTTPAuthorisation TorcHTTPRequest::IsAuthorised(void) const
 {
     return m_authorised;
 }

@@ -42,10 +42,7 @@
 // count to something reasonable/manageable. (maybe an implementation issue that is causing the browser
 // to re-issue)
 
-bool TorcHTTPServerNonce::ProcessDigestAuth(TorcHTTPRequest *Request, bool WasStale, bool &Stale,
-                                            const QString &Username, const QString &Password,
-                                            const QString &Header, const QString &Method,
-                                            const QString &URI)
+void TorcHTTPServerNonce::ProcessDigestAuth(TorcHTTPRequest &Request, const QString &Username, const QString &Password)
 {
     static QHash<QString,TorcHTTPServerNonce> nonces;
     static QByteArray token = QUuid::createUuid().toByteArray();
@@ -55,10 +52,10 @@ bool TorcHTTPServerNonce::ProcessDigestAuth(TorcHTTPRequest *Request, bool WasSt
     QDateTime current = QDateTime::currentDateTime();
 
     // Set digest authentication headers
-    if (Request)
+    if (Username.isEmpty() || Password.isEmpty())
     {
         // try and build a unique nonce
-        QByteArray tag = QByteArray::number(current.toMSecsSinceEpoch()) + Request->GetCache().toLocal8Bit() + token;
+        QByteArray tag = QByteArray::number(current.toMSecsSinceEpoch()) + Request.GetCache().toLocal8Bit() + token;
         QString nonce;
 
         {
@@ -79,18 +76,13 @@ bool TorcHTTPServerNonce::ProcessDigestAuth(TorcHTTPRequest *Request, bool WasSt
                 .arg(TORC_REALM)
                 .arg(nonce)
                 .arg(nonceobj.GetOpaque())
-                .arg(WasStale ? QString(", stale=\"true\"") : QString(""));
+                .arg(Request.IsAuthorised() == HTTPAuthorisedStale ? QString(", stale=\"true\"") : QString(""));
         lock.unlock();
-
-        LOG(VB_GENERAL, LOG_INFO, QString("New nonce: %1").arg(auth));
-        LOG(VB_GENERAL, LOG_INFO, QString("Now %1 nonces").arg(nonces.size())); // not thread safe - do not leave
-
-        Request->SetResponseHeader("WWW-Authenticate", auth);
+        Request.SetResponseHeader("WWW-Authenticate", auth);
     }
     // Check digest authentication
     else
     {
-LOG(VB_GENERAL, LOG_INFO, QString("Before expire %1 nonces").arg(nonces.size())); // not thread safe - do not leave
         // expire old here. The authentication check is performed first (and on every request)
         {
             QMutexLocker locker(&lock);
@@ -102,9 +94,9 @@ LOG(VB_GENERAL, LOG_INFO, QString("Before expire %1 nonces").arg(nonces.size()))
                     it.remove();
             }
         }
-LOG(VB_GENERAL, LOG_INFO, QString("After expire %1 nonces").arg(nonces.size())); // not thread safe - do not leave
+
         // remove leading 'Digest' and split out parameters
-        QStringList authentication = Header.mid(6).trimmed().split(",", QString::SkipEmptyParts);
+        QStringList authentication = Request.Headers()->value("Authorization").mid(6).trimmed().split(",", QString::SkipEmptyParts);
 
         // create a filtered hash of the parameters
         QHash<QString,QString> params;
@@ -121,7 +113,7 @@ LOG(VB_GENERAL, LOG_INFO, QString("After expire %1 nonces").arg(nonces.size()));
         if (params.size() < 10)
         {
             LOG(VB_NETWORK, LOG_DEBUG, "Digest response received too few parameters");
-            return false;
+            return;
         }
 
         // check for presence of each
@@ -131,7 +123,7 @@ LOG(VB_GENERAL, LOG_INFO, QString("After expire %1 nonces").arg(nonces.size()));
             !params.contains("opaque"))
         {
             LOG(VB_NETWORK, LOG_DEBUG, "Did not receive expected paramaters");
-            return false;
+            return;
         }
 
         // we check the digest early, even though it is an expensive operation, as it will automatically
@@ -139,10 +131,11 @@ LOG(VB_GENERAL, LOG_INFO, QString("After expire %1 nonces").arg(nonces.size()));
         // is not recognised (i.e. stale), we can respond with stale="true', as per the spec, and the client
         // can resubmit without prompting the user for credentials (i.e. the client has proved it knows the correct
         // credentials but the nonce is out of date)
+        QString       URI = Request.GetUrl();
         QString  noncestr = params.value("nonce");
         QString    ncstr  = params.value("nc");
         QString    first  = QString("%1:%2:%3").arg(Username).arg(TORC_REALM).arg(Password);
-        QString    second = QString("%1:%2").arg(Method).arg(URI);
+        QString    second = QString("%1:%2").arg(TorcHTTPRequest::RequestTypeToString(Request.GetHTTPRequestType())).arg(URI);
         QByteArray hash1  = QCryptographicHash::hash(first.toLatin1(), QCryptographicHash::Md5).toHex();
         QByteArray hash2  = QCryptographicHash::hash(second.toLatin1(), QCryptographicHash::Md5).toHex();
         QString    third  = QString("%1:%2:%3:%4:%5:%6").arg(QString(hash1)).arg(noncestr).arg(ncstr).arg(params.value("cnonce")).arg("auth").arg(QString(hash2));
@@ -151,7 +144,7 @@ LOG(VB_GENERAL, LOG_INFO, QString("After expire %1 nonces").arg(nonces.size()));
         if (hash3 != params.value("response"))
         {
             LOG(VB_GENERAL, LOG_WARNING, "Digest hash failed");
-            return false;
+            return;
         }
 
         // the uri MUST match the uri provided in the standard HTTP header, otherwise we could be authorise
@@ -159,7 +152,7 @@ LOG(VB_GENERAL, LOG_INFO, QString("After expire %1 nonces").arg(nonces.size()));
         if (URI != params.value("uri"))
         {
             LOG(VB_GENERAL, LOG_WARNING, "URI mismatch between HTTP request and WWW-Authenticate header");
-            return false;
+            return;
         }
 
         // we now don't need to check username, realm, password, method, URI or qop - as the hash check
@@ -175,8 +168,8 @@ LOG(VB_GENERAL, LOG_INFO, QString("After expire %1 nonces").arg(nonces.size()));
             {
                 LOG(VB_NETWORK, LOG_DEBUG, QString("Failed to find nonce '%1'").arg(noncestr));
                 // if we got this far the nonce was valid but old, so set Stale and ask for re-auth
-                Stale = true;
-                return false;
+                Request.Authorise(HTTPAuthorisedStale);
+                return;
             }
 
             TorcHTTPServerNonce nonce = it.value();
@@ -186,7 +179,7 @@ LOG(VB_GENERAL, LOG_INFO, QString("After expire %1 nonces").arg(nonces.size()));
             {
                 // this is an error
                 LOG(VB_NETWORK, LOG_DEBUG, "Failed to match opaque");
-                return false;
+                return;
             }
 
             // parse nonse count from hex
@@ -195,23 +188,20 @@ LOG(VB_GENERAL, LOG_INFO, QString("After expire %1 nonces").arg(nonces.size()));
             if (!ok)
             {
                 LOG(VB_NETWORK, LOG_DEBUG, "Failed to parse nonce count");
-                return false;
+                return;
             }
 
             // check nonce count
-            if (!nonce.UseOnce(nc, Stale, current))
+            if (!nonce.UseOnce(nc, current))
             {
+                Request.Authorise(HTTPAuthorisedStale);
                 LOG(VB_NETWORK, LOG_DEBUG, "Nonce count use failed");
-                return false;
+                return;
             }
         }
 
-LOG(VB_GENERAL, LOG_INFO, QString("Digest success"));
-
-        return true; // joy unbounded
+        Request.Authorise(HTTPAuthorised);
     }
-
-    return false;
 }
 
 TorcHTTPServerNonce::TorcHTTPServerNonce()
@@ -246,7 +236,7 @@ QString TorcHTTPServerNonce::GetOpaque(void) const
     return m_opaque;
 }
 
-bool TorcHTTPServerNonce::UseOnce(quint64 ClientCount, bool &Stale, const QDateTime &Current)
+bool TorcHTTPServerNonce::UseOnce(quint64 ClientCount, const QDateTime &Current)
 {
     m_useCount++;
 
@@ -263,7 +253,6 @@ bool TorcHTTPServerNonce::UseOnce(quint64 ClientCount, bool &Stale, const QDateT
     if (m_useCount > 0xffffffff)
     {
         m_expired = true;
-        Stale = true;
         m_useCount = 1;
         return false;
     }
@@ -277,7 +266,6 @@ bool TorcHTTPServerNonce::UseOnce(quint64 ClientCount, bool &Stale, const QDateT
         if (m_lifetimeInRequests > 0 && m_useCount >= m_lifetimeInRequests)
         {
             m_expired = true;
-            Stale = true;
             return false;
         }
 
@@ -288,7 +276,6 @@ bool TorcHTTPServerNonce::UseOnce(quint64 ClientCount, bool &Stale, const QDateT
 
     // unexpected nc value (less than expected)
     m_expired = true;
-    Stale = true;
     return false;
 }
 

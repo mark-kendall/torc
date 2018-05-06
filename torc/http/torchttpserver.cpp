@@ -340,62 +340,53 @@ TorcWebSocketThread* TorcHTTPServer::TakeSocket(TorcWebSocketThread *Socket)
  *
  * \todo Use proper username and password.
 */
-void TorcHTTPServer::Authorise(const QString &Host, TorcHTTPRequest *Request, bool ForceCheck)
+void TorcHTTPServer::Authorise(const QString &Host, TorcHTTPRequest &Request, bool ForceCheck)
 {
-    if (Request)
+    // We allow unauthenticated access to anything that doesn't alter state.
+    // N.B. If a rogue peer posts to a 'setter' type function using a GET type request, the request
+    // will fail during processing - so don't validate the method here as it may lead to fall positives.
+    // ForceCheck is used to process any authentication headers for WebSocket upgrade requests.
+    HTTPRequestType type = Request.GetHTTPRequestType();
+    bool authenticate = type == HTTPPost || type == HTTPPut || type == HTTPDelete || type == HTTPUnknownType;
+
+    if (!authenticate && !ForceCheck)
     {
-        // We allow unauthenticated access to anything that doesn't alter state.
-        // N.B. If a rogue peer posts to a 'setter' type function using a GET type request, the request
-        // will fail during processing - so don't validate the method here as it may lead to fall positives.
-        // ForceCheck is used to process any authentication headers for WebSocket upgrade requests.
-        HTTPRequestType type = Request->GetHTTPRequestType();
-        bool authenticate = type == HTTPPost || type == HTTPPut || type == HTTPDelete || type == HTTPUnknownType;
+        Request.Authorise(HTTPAuthorised);
+        return;
+    }
 
-        if (!authenticate && !ForceCheck)
+    // authentication token supplied in the url (WebSocket)
+    // do this before 'standard' authentication to ensure token is checked and expired
+    if (Request.Queries().contains("accesstoken"))
+    {
+        QString token = Request.Queries().value("accesstoken");
+        if (token == TorcWebSocketToken::GetWebSocketToken(Host, token))
         {
-            Request->Authorise(true);
+            Request.Authorise(HTTPAuthorised);
             return;
         }
+    }
 
-        // authentication token supplied in the url (WebSocket)
-        // do this before 'standard' authentication to ensure token is checked and expired
-        if (Request->Queries().contains("accesstoken"))
-        {
-            QString token = Request->Queries().value("accesstoken");
-            if (token == TorcWebSocketToken::GetWebSocketToken(Host, Request, token))
-            {
-                Request->Authorise(true);
-                return;
-            }
-        }
+    // explicit authorization header
+    // N.B. This will also authorise websocket clients who send authorisation headers with
+    // the upgrade request i.e. there is no need to use the accesstoken route IF the correct headers
+    // are sent. Use GetWebSocketToken (which is a PUT operation and requires authorisation) to force
+    // clients to authenticate (i.e. browsers).
+    TorcHTTPServer::AuthenticateUser(Request);
+    if (Request.IsAuthorised() == HTTPAuthorised)
+        return;
 
-        // explicit authorization header
-        // N.B. This will also authorise websocket clients who send authorisation headers with
-        // the upgrade request i.e. there is no need to use the accesstoken route IF the correct headers
-        // are sent. Use GetWebSocketToken (which is a PUT operation and requires authorisation) to force
-        // clients to authenticate (i.e. browsers).
-        QString dummy;
-        bool stale = false;
-        if (TorcHTTPServer::AuthenticateUser(Request, dummy, stale))
-        {
-            Request->Authorise(true);
-            return;
-        }
+    Request.SetResponseType(HTTPResponseNone);
+    Request.SetStatus(HTTP_Unauthorized);
 
-        Request->Authorise(false);
-        Request->SetResponseType(HTTPResponseNone);
-        Request->SetStatus(HTTP_Unauthorized);
-
-        // HTTP 1.1 should support Digest
-        if (Request->GetHTTPProtocol() > HTTPOneDotZero)
-        {
-            bool dummy = false;
-            (void)TorcHTTPServerNonce::ProcessDigestAuth(Request, stale, dummy);
-        }
-        else // otherwise fallback to Basic
-        {
-            Request->SetResponseHeader("WWW-Authenticate", QString("Basic realm=\"%1\"").arg(TORC_REALM));
-        }
+    // HTTP 1.1 should support Digest
+    if (Request.GetHTTPProtocol() > HTTPOneDotZero)
+    {
+        TorcHTTPServerNonce::ProcessDigestAuth(Request);
+    }
+    else // otherwise fallback to Basic
+    {
+        Request.SetResponseHeader("WWW-Authenticate", QString("Basic realm=\"%1\"").arg(TORC_REALM));
     }
 }
 
@@ -416,32 +407,26 @@ void TorcHTTPServer::ValidateOrigin(TorcHTTPRequest *Request)
     gOriginWhitelistLock.unlock();
 }
 
-bool TorcHTTPServer::AuthenticateUser(TorcHTTPRequest *Request, QString &Username, bool &Stale)
+void TorcHTTPServer::AuthenticateUser(TorcHTTPRequest &Request)
 {
-    bool authorised = false;
+    if (!Request.Headers()->contains("Authorization"))
+        return;
 
-    if (!Request || !Request->Headers()->contains("Authorization"))
-        return authorised;
-
-    QString header = Request->Headers()->value("Authorization");
-
+    QString header = Request.Headers()->value("Authorization");
     static QString username("admin");
     static QString password("1234");
 
     // most clients will support Digest Access Authentication, so try that first
     if (header.startsWith("Digest", Qt::CaseInsensitive))
     {
-        authorised = TorcHTTPServerNonce::ProcessDigestAuth(NULL, false, Stale,
-                                                            username, password, header,
-                                                            TorcHTTPRequest::RequestTypeToString(Request->GetHTTPRequestType()),
-                                                            Request->GetUrl());
+        TorcHTTPServerNonce::ProcessDigestAuth(Request, username, password);
     }
     else if (header.startsWith("Basic", Qt::CaseInsensitive))
     {
         /* enable this once Digest authentication is enabled for Torc to Torc websocket connections (TorcNetworkedContext)
 
         // only accept Basic authentication if using < HTTP 1.1
-        if (Request->GetHTTPProtocol() > HTTPOneDotZero)
+        if (Request.GetHTTPProtocol() > HTTPOneDotZero)
         {
             LOG(VB_GENERAL, LOG_WARNING, "Disallowing basic authentication for HTTP 1.1 client");
         }
@@ -450,13 +435,10 @@ bool TorcHTTPServer::AuthenticateUser(TorcHTTPRequest *Request, QString &Usernam
             // remove leading 'Basic' and split off token
             QString authentication = header.mid(5).trimmed();
             QStringList userinfo   = QString(QByteArray::fromBase64(authentication.toUtf8())).split(':');
-            authorised = (userinfo.size() == 2) && (userinfo[0] == username) && (userinfo[1] == password);
+            if ((userinfo.size() == 2) && (userinfo[0] == username) && (userinfo[1] == password))
+                Request.Authorise(HTTPAuthorised);
         }
     }
-
-    if (authorised)
-        Username = username;
-    return authorised;
 }
 
 /*! \brief Create the 'Origin' whitelist for cross domain requests

@@ -93,7 +93,7 @@ void TorcHTTPServices::ProcessHTTPRequest(const QString &PeerAddress, int PeerPo
                 Request->SetStatus(HTTP_OK);
                 TorcSerialiser *serialiser = Request->GetSerialiser();
                 Request->SetResponseType(serialiser->ResponseType());
-                Request->SetResponseContent(serialiser->Serialise(TorcWebSocketToken::GetWebSocketToken(PeerAddress, Request), "accesstoken"));
+                Request->SetResponseContent(serialiser->Serialise(TorcWebSocketToken::GetWebSocketToken(PeerAddress), "accesstoken"));
                 delete serialiser;
             }
             else

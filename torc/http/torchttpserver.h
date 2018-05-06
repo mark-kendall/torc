@@ -28,8 +28,8 @@ class TorcHTTPServer : public QTcpServer
 
   public:
     // Content/service handlers
-    static void    Authorise          (const QString &Host, TorcHTTPRequest *Request, bool ForceCheck);
-    static bool    AuthenticateUser   (TorcHTTPRequest *Request, QString &Username, bool &Stale);
+    static void    Authorise          (const QString &Host, TorcHTTPRequest &Request, bool ForceCheck);
+    static void    AuthenticateUser   (TorcHTTPRequest &Request);
     static void    ValidateOrigin     (TorcHTTPRequest *Request);
     static void    RegisterHandler    (TorcHTTPHandler *Handler);
     static void    DeregisterHandler  (TorcHTTPHandler *Handler);

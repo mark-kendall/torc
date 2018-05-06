@@ -15,17 +15,14 @@
 class TorcHTTPServerNonce
 {
   public:
-    static bool ProcessDigestAuth (TorcHTTPRequest *Request, bool WasStale /* set */, bool &Stale,
-                                   const QString &Username = QString(),  const QString &Password = QString(),
-                                   const QString &Header = QString(),    const QString &Method = QString(),
-                                   const QString &URI = QString());
+    static void ProcessDigestAuth (TorcHTTPRequest &Request, const QString &Username = QString(),  const QString &Password = QString());
 
     TorcHTTPServerNonce();
     TorcHTTPServerNonce(const QDateTime &Time);
    ~TorcHTTPServerNonce();
 
     QString     GetOpaque(void) const;
-    bool        UseOnce(quint64 ClientCount, bool &Stale, const QDateTime &Current);
+    bool        UseOnce(quint64 ClientCount, const QDateTime &Current);
     bool        IsOutOfDate(const QDateTime &Current);
 
   private:

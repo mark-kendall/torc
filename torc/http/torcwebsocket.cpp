@@ -687,33 +687,29 @@ void TorcWebSocket::ReadHTTP(void)
             LOG(VB_GENERAL, LOG_WARNING, QString("%1 unread bytes from %2").arg(m_socket->bytesAvailable()).arg(m_socket->peerAddress().toString()));
 
         // have headers and content - process request
-        TorcHTTPRequest *request = new TorcHTTPRequest(&m_reader);
+        TorcHTTPRequest request(&m_reader);
 
-        if (request->GetHTTPType() == HTTPResponse)
+        if (request.GetHTTPType() == HTTPResponse)
         {
             LOG(VB_GENERAL, LOG_ERR, "Received unexpected HTTP response");
             SetState(SocketState::ErroredSt);
-            delete request;
             return;
         }
 
-        bool upgrade = request->Headers()->contains("Upgrade");
+        bool upgrade = request.Headers()->contains("Upgrade");
         TorcHTTPServer::Authorise(m_socket->peerAddress().toString(), request, upgrade);
 
         if (upgrade)
         {
-            HandleUpgradeRequest(request);
+            HandleUpgradeRequest(&request);
         }
         else
         {
-            if (request->IsAuthorised())
+            if (request.IsAuthorised() == HTTPAuthorised)
                 TorcHTTPServer::HandleRequest(m_socket->peerAddress().toString(), m_socket->peerPort(),
-                                              m_socket->localAddress().toString(), m_socket->localPort(), request);
+                                              m_socket->localAddress().toString(), m_socket->localPort(), &request);
         }
-        request->Respond(m_socket);
-
-        // this will delete content and headers
-        delete request;
+        request.Respond(m_socket);
 
         // reset
         m_reader.Reset();
