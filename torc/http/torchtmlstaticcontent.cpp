@@ -46,24 +46,22 @@ TorcHTMLStaticContent::TorcHTMLStaticContent()
     m_recursive = true;
 }
 
-void TorcHTMLStaticContent::ProcessHTTPRequest(const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest *Request)
+void TorcHTMLStaticContent::ProcessHTTPRequest(const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest &Request)
 {
     (void)PeerAddress;
     (void)PeerPort;
     (void)LocalAddress;
     (void)LocalPort;
-    if (!Request)
-        return;
 
     // handle options request
-    if (Request->GetHTTPRequestType() == HTTPOptions)
+    if (Request.GetHTTPRequestType() == HTTPOptions)
     {
         HandleOptions(Request, HTTPHead | HTTPGet | HTTPOptions);
         return;
     }
 
     // get the requested file subpath
-    QString subpath = Request->GetUrl();
+    QString subpath = Request.GetUrl();
 
     // request for Torc configuration. This is used to add some appropriate Javascript globals
     // and translated strings
@@ -71,7 +69,7 @@ void TorcHTMLStaticContent::ProcessHTTPRequest(const QString &PeerAddress, int P
     if (subpath == "/js/torcconfiguration.js")
     {
         GetJavascriptConfiguration(Request);
-        Request->SetAllowGZip(true);
+        Request.SetAllowGZip(true);
         return;
     }
 
@@ -84,11 +82,8 @@ void TorcHTMLStaticContent::ProcessHTTPRequest(const QString &PeerAddress, int P
  *
  * \todo Translations are static and will need to be regenerated if the language is changed.
 */
-void TorcHTMLStaticContent::GetJavascriptConfiguration(TorcHTTPRequest *Request)
+void TorcHTMLStaticContent::GetJavascriptConfiguration(TorcHTTPRequest &Request)
 {
-    if (!Request)
-        return;
-
     // populate the list of static constants and translations
     QVariantMap strings = TorcStringFactory::GetTorcStrings();
 
@@ -103,7 +98,7 @@ void TorcHTMLStaticContent::GetJavascriptConfiguration(TorcHTTPRequest *Request)
         result->chop(1);
     result->append(";\r\n\r\nif (Object.freeze) { Object.freeze(torc); }\r\n");
 
-    Request->SetStatus(HTTP_OK);
-    Request->SetResponseType(HTTPResponseJSONJavascript);
-    Request->SetResponseContent(result);
+    Request.SetStatus(HTTP_OK);
+    Request.SetResponseType(HTTPResponseJSONJavascript);
+    Request.SetResponseContent(result);
 }

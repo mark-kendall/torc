@@ -51,22 +51,20 @@ TorcHTMLDynamicContent::TorcHTMLDynamicContent()
             LOG(VB_GENERAL, LOG_ERR, QString("Failed to create content directory ('%1')").arg(configdir));
     }
 
-void TorcHTMLDynamicContent::ProcessHTTPRequest(const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest *Request)
+void TorcHTMLDynamicContent::ProcessHTTPRequest(const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest &Request)
 {
     (void)PeerAddress;
     (void)PeerPort;
     (void)LocalAddress;
     (void)LocalPort;
-    if (!Request)
-        return;
 
     // handle options request
-    if (Request->GetHTTPRequestType() == HTTPOptions)
+    if (Request.GetHTTPRequestType() == HTTPOptions)
     {
         HandleOptions(Request, HTTPHead | HTTPGet | HTTPOptions);
         return;
     }
 
     // get the requested file subpath
-    HandleFile(Request, m_pathToContent + Request->GetUrl(), HTTPCacheNone);
+    HandleFile(Request, m_pathToContent + Request.GetUrl(), HTTPCacheNone);
 }

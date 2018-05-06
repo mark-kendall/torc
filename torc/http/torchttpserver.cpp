@@ -106,39 +106,36 @@ void TorcHTTPServer::DeregisterHandler(TorcHTTPHandler *Handler)
         emit gWebServer->HandlersChanged();
 }
 
-void TorcHTTPServer::HandleRequest(const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort,  TorcHTTPRequest *Request)
+void TorcHTTPServer::HandleRequest(const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort,  TorcHTTPRequest &Request)
 {
-    if (Request)
+    // this should already have been checked - but better safe than sorry
+    if (!Request.IsAuthorised())
+        return;
+
+    // verify cross domain requests
+    // should an invalid origin fail?
+    TorcHTTPServer::ValidateOrigin(Request);
+
+    QReadLocker locker(gHandlersLock);
+
+    QString path = Request.GetPath();
+
+    QMap<QString,TorcHTTPHandler*>::const_iterator it = gHandlers.find(path);
+    if (it != gHandlers.end())
     {
-        // this should already have been checked - but better safe than sorry
-        if (!Request->IsAuthorised())
-            return;
-
-        // verify cross domain requests
-        // should an invalid origin fail?
-        TorcHTTPServer::ValidateOrigin(Request);
-
-        QReadLocker locker(gHandlersLock);
-
-        QString path = Request->GetPath();
-
-        QMap<QString,TorcHTTPHandler*>::const_iterator it = gHandlers.find(path);
-        if (it != gHandlers.end())
+        // direct path match
+        (*it)->ProcessHTTPRequest(PeerAddress, PeerPort, LocalAddress, LocalPort, Request);
+    }
+    else
+    {
+        // fully recursive handler
+        it = gHandlers.begin();
+        for ( ; it != gHandlers.end(); ++it)
         {
-            // direct path match
-            (*it)->ProcessHTTPRequest(PeerAddress, PeerPort, LocalAddress, LocalPort, Request);
-        }
-        else
-        {
-            // fully recursive handler
-            it = gHandlers.begin();
-            for ( ; it != gHandlers.end(); ++it)
+            if ((*it)->GetRecursive() && path.startsWith(it.key()))
             {
-                if ((*it)->GetRecursive() && path.startsWith(it.key()))
-                {
-                    (*it)->ProcessHTTPRequest(PeerAddress, PeerPort, LocalAddress, LocalPort, Request);
-                    break;
-                }
+                (*it)->ProcessHTTPRequest(PeerAddress, PeerPort, LocalAddress, LocalPort, Request);
+                break;
             }
         }
     }
@@ -396,13 +393,13 @@ void TorcHTTPServer::Authorise(const QString &Host, TorcHTTPRequest &Request, bo
  * when the IP address is a localhost (IPv4 or IPv6) and we can never guarantee that the domain will 'look' equivalent.
  * So validate the incoming origin (which is good practice anyway) and set the outgoing headers as necessary.
 */
-void TorcHTTPServer::ValidateOrigin(TorcHTTPRequest *Request)
+void TorcHTTPServer::ValidateOrigin(TorcHTTPRequest &Request)
 {
     gOriginWhitelistLock.lockForRead();
-    if (Request && Request->Headers()->contains("Origin") && gOriginWhitelist.contains(Request->Headers()->value("Origin"), Qt::CaseInsensitive))
+    if (Request.Headers()->contains("Origin") && gOriginWhitelist.contains(Request.Headers()->value("Origin"), Qt::CaseInsensitive))
     {
-        Request->SetResponseHeader("Access-Control-Allow-Origin", Request->Headers()->value("Origin"));
-        Request->SetResponseHeader("Access-Control-Allow-Credentials", "true");
+        Request.SetResponseHeader("Access-Control-Allow-Origin", Request.Headers()->value("Origin"));
+        Request.SetResponseHeader("Access-Control-Allow-Credentials", "true");
     }
     gOriginWhitelistLock.unlock();
 }

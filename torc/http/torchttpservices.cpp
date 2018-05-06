@@ -70,36 +70,33 @@ QString TorcHTTPServices::GetUIName(void)
     return tr("Services");
 }
 
-void TorcHTTPServices::ProcessHTTPRequest(const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest *Request)
+void TorcHTTPServices::ProcessHTTPRequest(const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest &Request)
 {
-    if (!Request)
-        return;
-
     // handle own service
-    if (!Request->GetMethod().isEmpty())
+    if (!Request.GetMethod().isEmpty())
     {
         // we handle GetWebSocketToken manually as it needs access to the authentication headers.`
-        if (Request->GetMethod() == "GetWebSocketToken")
+        if (Request.GetMethod() == "GetWebSocketToken")
         {
-            HTTPRequestType type = Request->GetHTTPRequestType();
+            HTTPRequestType type = Request.GetHTTPRequestType();
             if (type == HTTPOptions)
             {
-                Request->SetStatus(HTTP_OK);
-                Request->SetResponseType(HTTPResponseDefault);
-                Request->SetAllowed(HTTPGet | HTTPOptions);
+                Request.SetStatus(HTTP_OK);
+                Request.SetResponseType(HTTPResponseDefault);
+                Request.SetAllowed(HTTPGet | HTTPOptions);
             }
             else if (type == HTTPPut)
             {
-                Request->SetStatus(HTTP_OK);
-                TorcSerialiser *serialiser = Request->GetSerialiser();
-                Request->SetResponseType(serialiser->ResponseType());
-                Request->SetResponseContent(serialiser->Serialise(TorcWebSocketToken::GetWebSocketToken(PeerAddress), "accesstoken"));
+                Request.SetStatus(HTTP_OK);
+                TorcSerialiser *serialiser = Request.GetSerialiser();
+                Request.SetResponseType(serialiser->ResponseType());
+                Request.SetResponseContent(serialiser->Serialise(TorcWebSocketToken::GetWebSocketToken(PeerAddress), "accesstoken"));
                 delete serialiser;
             }
             else
             {
-                Request->SetStatus(HTTP_BadRequest);
-                Request->SetResponseType(HTTPResponseDefault);
+                Request.SetStatus(HTTP_BadRequest);
+                Request.SetResponseType(HTTPResponseDefault);
             }
 
             return;
@@ -110,14 +107,14 @@ void TorcHTTPServices::ProcessHTTPRequest(const QString &PeerAddress, int PeerPo
     }
 
     // handle options request
-    if (Request->GetHTTPRequestType() == HTTPOptions)
+    if (Request.GetHTTPRequestType() == HTTPOptions)
     {
         HandleOptions(Request, HTTPHead | HTTPGet | HTTPOptions);
         return;
     }
 
-    Request->SetStatus(HTTP_NotFound);
-    Request->SetResponseType(HTTPResponseDefault);
+    Request.SetStatus(HTTP_NotFound);
+    Request.SetResponseType(HTTPResponseDefault);
 }
 
 void TorcHTTPServices::SubscriberDeleted(QObject *Subscriber)

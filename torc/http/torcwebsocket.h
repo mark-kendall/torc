@@ -131,7 +131,7 @@ class TorcWebSocket : public QObject
   private:
     Q_DISABLE_COPY(TorcWebSocket)
     void            SetState              (SocketState State);
-    void            HandleUpgradeRequest  (TorcHTTPRequest *Request);
+    void            HandleUpgradeRequest  (TorcHTTPRequest &Request);
     void            SendHandshake         (void);
     void            ReadHandshake         (void);
     void            ReadHTTP              (void);
