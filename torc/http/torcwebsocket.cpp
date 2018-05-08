@@ -66,9 +66,8 @@
 */
 
 TorcWebSocket::TorcWebSocket(TorcWebSocketThread* Parent, qintptr SocketDescriptor)
-  : QObject(),
+  : QSslSocket(),
     m_parent(Parent),
-    m_socket(NULL),
     m_socketState(SocketState::DisconnectedSt),
     m_socketDescriptor(SocketDescriptor),
     m_reader(),
@@ -101,9 +100,8 @@ TorcWebSocket::TorcWebSocket(TorcWebSocketThread* Parent, qintptr SocketDescript
 }
 
 TorcWebSocket::TorcWebSocket(TorcWebSocketThread* Parent, const QHostAddress &Address, quint16 Port, bool Authenticate, WSSubProtocol Protocol)
-  : QObject(),
+  : QSslSocket(),
     m_parent(Parent),
-    m_socket(NULL),
     m_socketState(SocketState::DisconnectedSt),
     m_socketDescriptor(0),
     m_reader(),
@@ -226,9 +224,9 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest &Request)
 
     // default ports (e.g. 80) are not listed in host, so don't check in this case
     QUrl host("http://" + Request.Headers()->value("Host"));
-    int localport = m_socket->localPort();
+    int localport = localPort();
 
-    if (valid && localport != 80 && host.port() != localport)
+    if (valid && localport != 80 && localport != 443 && host.port() != localport)
     {
         error = "Invalid Host port";
         valid = false;
@@ -237,7 +235,7 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest &Request)
     // disable host check. It offers us no additional security and may be a raw
     // ip address, domain name or or other host name.
 #if 0
-    if (valid && host.host() != m_socket->localAddress().toString())
+    if (valid && host.host() != localAddress().toString())
     {
         error = "Invalid Host";
         valid = false;
@@ -383,7 +381,7 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest &Request)
     m_authenticated = Request.IsAuthorised();
 
     LOG(VB_GENERAL, LOG_INFO, QString("Upgraded socket from %1 (%2)")
-        .arg(TorcNetwork::IPAddressToLiteral(m_socket->peerAddress(), m_socket->peerPort()))
+        .arg(TorcNetwork::IPAddressToLiteral(peerAddress(), peerPort()))
         .arg(m_authenticated ? "Authenticated" : "Unauthenticated"));
 
     if (Request.Headers()->contains("Torc-UUID"))
@@ -393,7 +391,7 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest &Request)
         int index = agent.indexOf(',');
         if (index > -1)
             name = agent.left(index);
-        TorcNetworkedContext::PeerConnected(m_parent, Request.Headers()->value("Torc-UUID"), m_socket->peerPort(), name, m_socket->peerAddress());
+        TorcNetworkedContext::PeerConnected(m_parent, Request.Headers()->value("Torc-UUID"), peerPort(), name, peerAddress());
     }
 
     if (Request.GetMethod().startsWith(QStringLiteral("echo"), Qt::CaseInsensitive))
@@ -501,28 +499,62 @@ QVariantList TorcWebSocket::GetSupportedSubProtocols(void)
     return result;
 }
 
+void TorcWebSocket::Encrypted(void)
+{
+    connect(this, SIGNAL(readyRead()), this, SLOT(ReadyRead()));
+    emit ConnectionEstablished();
+    LOG(VB_GENERAL, LOG_INFO, "Encrypted");
+
+    if (!m_serverSide)
+        Connected();
+}
+
+void TorcWebSocket::SSLErrors(const QList<QSslError> &Errors)
+{
+    foreach (QSslError error, Errors)
+        LOG(VB_GENERAL, LOG_INFO, QString("Ssl Error: %1").arg(error.errorString()));
+}
+
 ///\brief Initialise the websocket once its parent thread is ready.
 void TorcWebSocket::Start(void)
 {
+    static bool SSL = false;
+
     connect(this, SIGNAL(Disconnect()), this, SLOT(CloseSocket()));
+
+    // common setup
+    m_reader.Reset();
+
+    connect(this, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(Error(QAbstractSocket::SocketError)));
+    connect(this, SIGNAL(disconnected()),                      this, SIGNAL(Disconnected()));
+    connect(this, SIGNAL(encrypted()),                         this, SLOT(Encrypted()));
+    connect(this, SIGNAL(sslErrors(QList<QSslError>)),         this, SLOT(SSLErrors(QList<QSslError>)));
+
+    // Ignore errors for Self signed certificates
+    QList<QSslError> ignore;
+    ignore << QSslError::SelfSignedCertificate;
+    ignoreSslErrors(ignore);
 
     // server side:)
     if (m_serverSide && m_socketDescriptor)
     {
-        m_socket = new QTcpSocket();
-        if (m_socket->setSocketDescriptor(m_socketDescriptor))
+        if (setSocketDescriptor(m_socketDescriptor))
         {
-            SetState(SocketState::ConnectedTo);
-            m_reader.Reset();
-            connect(m_socket, SIGNAL(readyRead()), this, SLOT(ReadyRead()));
-            connect(m_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(Error(QAbstractSocket::SocketError)));
-            connect(m_socket, SIGNAL(disconnected()), this, SIGNAL(Disconnected()));
-
             LOG(VB_GENERAL, LOG_INFO, QString("%1 socket connected from %2")
                 .arg(m_authenticated ? "Authenticated" : "Unauthenticated")
-                .arg(TorcNetwork::IPAddressToLiteral(m_socket->peerAddress(), m_socket->peerPort())));
+                .arg(TorcNetwork::IPAddressToLiteral(peerAddress(), peerPort())));
 
-            emit ConnectionEstablished();
+            SetState(SocketState::ConnectedTo);
+
+            if (SSL)
+            {
+                startServerEncryption();
+            }
+            else
+            {
+                connect(this, SIGNAL(readyRead()), this, SLOT(ReadyRead()));
+                emit ConnectionEstablished();
+            }
             return;
         }
         else
@@ -530,18 +562,20 @@ void TorcWebSocket::Start(void)
             LOG(VB_GENERAL, LOG_INFO, "Failed to set socket descriptor");
         }
     }
-    else
+    else if (!m_serverSide)
     {
-        // guard against inappropriate usage
-        delete m_socket;
-        m_reader.Reset();
         SetState(SocketState::ConnectingTo);
-        m_socket = new QTcpSocket();
-        connect(m_socket, SIGNAL(connected()), this, SLOT(Connected()));
-        connect(m_socket, SIGNAL(readyRead()), this, SLOT(ReadyRead()));
-        connect(m_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(Error(QAbstractSocket::SocketError)));
-        connect(m_socket, SIGNAL(disconnected()), this, SIGNAL(Disconnected()));
-        m_socket->connectToHost(m_address, m_port);
+
+        if (SSL)
+        {
+            connectToHostEncrypted(m_address.toString(), m_port);
+        }
+        else
+        {
+            connect(this, SIGNAL(connected()), this, SLOT(Connected()));
+            connect(this, SIGNAL(readyRead()), this, SLOT(ReadyRead()));
+            connectToHost(m_address, m_port);
+        }
         return;
     }
 
@@ -670,18 +704,18 @@ void TorcWebSocket::ReadHTTP(void)
         return;
     }
 
-    while (m_socket && m_socket->canReadLine())
+    while (canReadLine())
     {
         // read data
-        if (!m_reader.Read(m_socket))
+        if (!m_reader.Read(this))
             break;
 
         if (!m_reader.IsReady())
             continue;
 
         // sanity check
-        if (m_socket->bytesAvailable() > 0)
-            LOG(VB_GENERAL, LOG_WARNING, QString("%1 unread bytes from %2").arg(m_socket->bytesAvailable()).arg(m_socket->peerAddress().toString()));
+        if (bytesAvailable() > 0)
+            LOG(VB_GENERAL, LOG_WARNING, QString("%1 unread bytes from %2").arg(bytesAvailable()).arg(peerAddress().toString()));
 
         // have headers and content - process request
         TorcHTTPRequest request(&m_reader);
@@ -694,7 +728,7 @@ void TorcWebSocket::ReadHTTP(void)
         }
 
         bool upgrade = request.Headers()->contains("Upgrade");
-        TorcHTTPServer::Authorise(m_socket->peerAddress().toString(), request, upgrade);
+        TorcHTTPServer::Authorise(peerAddress().toString(), request, upgrade);
 
         if (upgrade)
         {
@@ -703,10 +737,10 @@ void TorcWebSocket::ReadHTTP(void)
         else
         {
             if (request.IsAuthorised() == HTTPAuthorised)
-                TorcHTTPServer::HandleRequest(m_socket->peerAddress().toString(), m_socket->peerPort(),
-                                              m_socket->localAddress().toString(), m_socket->localPort(), request);
+                TorcHTTPServer::HandleRequest(peerAddress().toString(), peerPort(),
+                                              localAddress().toString(), localPort(), request);
         }
-        request.Respond(m_socket);
+        request.Respond(this);
 
         // reset
         m_reader.Reset();
@@ -719,7 +753,8 @@ void TorcWebSocket::ReadHTTP(void)
 */
 void TorcWebSocket::ReadyRead(void)
 {
-    while (m_socket && (m_socket->bytesAvailable() || (m_readState == ReadPayload && m_framePayloadLength == 0)))
+    while (((m_socketState == SocketState::ConnectedTo || m_socketState == SocketState::Upgrading || m_socketState == SocketState::Upgraded) &&
+            bytesAvailable()) || (m_readState == ReadPayload && m_framePayloadLength == 0))
     {
         if (m_socketState == SocketState::ConnectedTo)
         {
@@ -744,18 +779,18 @@ void TorcWebSocket::ReadyRead(void)
         }
 
         // we may now be upgraded
-        else if (m_socketState == SocketState::Upgraded)
+        if (m_socketState == SocketState::Upgraded)
         {
             switch (m_readState)
             {
                 case ReadHeader:
                 {
                     // we need at least 2 bytes to start reading
-                    if (m_socket->bytesAvailable() < 2)
+                    if (bytesAvailable() < 2)
                         return;
 
                     char header[2];
-                    if (m_socket->read(header, 2) != 2)
+                    if (read(header, 2) != 2)
                     {
                         InitiateClose(CloseUnexpectedError, QString("Read error"));
                         return;
@@ -860,12 +895,12 @@ void TorcWebSocket::ReadyRead(void)
 
                 case Read16BitLength:
                 {
-                    if (m_socket->bytesAvailable() < 2)
+                    if (bytesAvailable() < 2)
                         return;
 
                     uchar length[2];
 
-                    if (m_socket->read(reinterpret_cast<char *>(length), 2) != 2)
+                    if (read(reinterpret_cast<char *>(length), 2) != 2)
                     {
                         InitiateClose(CloseUnexpectedError, QString("Read error"));
                         return;
@@ -878,11 +913,11 @@ void TorcWebSocket::ReadyRead(void)
 
                 case Read64BitLength:
                 {
-                    if (m_socket->bytesAvailable() < 8)
+                    if (bytesAvailable() < 8)
                         return;
 
                     uchar length[8];
-                    if (m_socket->read(reinterpret_cast<char *>(length), 8) != 8)
+                    if (read(reinterpret_cast<char *>(length), 8) != 8)
                     {
                         InitiateClose(CloseUnexpectedError, QString("Read error"));
                         return;
@@ -895,10 +930,10 @@ void TorcWebSocket::ReadyRead(void)
 
                 case ReadMask:
                 {
-                    if (m_socket->bytesAvailable() < 4)
+                    if (bytesAvailable() < 4)
                         return;
 
-                    if (m_socket->read(m_frameMask.data(), 4) != 4)
+                    if (read(m_frameMask.data(), 4) != 4)
                     {
                         InitiateClose(CloseUnexpectedError, QString("Read error"));
                         return;
@@ -919,15 +954,15 @@ void TorcWebSocket::ReadyRead(void)
                     // payload length may be zero
                     if (needed > 0)
                     {
-                        qint64 read = qMin(m_socket->bytesAvailable(), needed);
+                        qint64 red = qMin(bytesAvailable(), needed);
 
-                        if (m_socket->read(m_framePayload.data() + m_framePayloadReadPosition, read) != read)
+                        if (read(m_framePayload.data() + m_framePayloadReadPosition, red) != red)
                         {
                             InitiateClose(CloseUnexpectedError, QString("Read error"));
                             return;
                         }
 
-                        m_framePayloadReadPosition += read;
+                        m_framePayloadReadPosition += red;
                     }
 
                     // finished
@@ -1024,7 +1059,8 @@ void TorcWebSocket::ReadyRead(void)
                                         ProcessPayload(m_bufferedPayload ? *m_bufferedPayload : m_framePayload);
                                     }
                                 }
-                                delete m_bufferedPayload;
+                                if (m_bufferedPayload)
+                                    delete m_bufferedPayload;
                                 m_bufferedPayload = NULL;
                             }
                         }
@@ -1071,28 +1107,16 @@ void TorcWebSocket::SubscriberDeleted(QObject *Object)
 
 void TorcWebSocket::CloseSocket(void)
 {
-    if (m_socket)
-    {
-        m_socket->disconnectFromHost();
-        // we only check for connected state - we don't care if it is any in any prior or subsequent state (hostlookup, connecting) and
-        // the wait is only a 'courtesy' anyway.
-        if (m_socket->state() == QAbstractSocket::ConnectedState && !m_socket->waitForDisconnected(1000))
-            LOG(VB_GENERAL, LOG_WARNING, "WebSocket not successfully disconnected before closing");
-        m_socket->close();
-        m_socket->deleteLater();
-        m_socket = NULL;
-    }
+    disconnectFromHost();
+    // we only check for connected state - we don't care if it is any in any prior or subsequent state (hostlookup, connecting) and
+    // the wait is only a 'courtesy' anyway.
+    if (state() == QAbstractSocket::ConnectedState && !waitForDisconnected(1000))
+        LOG(VB_GENERAL, LOG_WARNING, "WebSocket not successfully disconnected before closing");
+    close();
 }
 
 void TorcWebSocket::Connected(void)
 {
-    if (!m_socket)
-    {
-        LOG(VB_GENERAL, LOG_ERR, "Trying to connect but no socket");
-        SetState(SocketState::ErroredSt);
-        return;
-    }
-
     SetState(SocketState::Upgrading);
     SendHandshake();
 }
@@ -1143,7 +1167,7 @@ void TorcWebSocket::SendHandshake(void)
     stream << "\r\n";
     stream.flush();
 
-    if (m_socket->write(upgrade->data(), upgrade->size()) != upgrade->size())
+    if (write(upgrade->data(), upgrade->size()) != upgrade->size())
     {
         LOG(VB_GENERAL, LOG_ERR, "Unexpected write error");
         SetState(SocketState::ErroredSt);
@@ -1173,7 +1197,7 @@ void TorcWebSocket::ReadHandshake(void)
     }
 
     // read response (which is the only raw HTTP we should see)
-    if (!m_reader.Read(m_socket))
+    if (!m_reader.Read(this))
     {
         LOG(VB_GENERAL, LOG_ERR, "Error reading upgrade response");
         SetState(SocketState::ErroredSt);
@@ -1272,11 +1296,8 @@ void TorcWebSocket::ReadHandshake(void)
 void TorcWebSocket::Error(QAbstractSocket::SocketError SocketError)
 {
     (void)SocketError;
-    if (m_socket)
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("Socket error: %1 ('%2')").arg(m_socket->error()).arg(m_socket->errorString()));
-        SetState(SocketState::ErroredSt);
-    }
+    LOG(VB_GENERAL, LOG_ERR, QString("Socket error: %1 ('%2')").arg(error()).arg(errorString()));
+    SetState(SocketState::ErroredSt);
 }
 
 bool TorcWebSocket::event(QEvent *Event)
@@ -1313,7 +1334,7 @@ bool TorcWebSocket::event(QEvent *Event)
         }
     }
 
-    return QObject::event(Event);
+    return QSslSocket::event(Event);
 }
 
 void TorcWebSocket::SetState(SocketState State)
@@ -1425,11 +1446,10 @@ void TorcWebSocket::SendFrame(OpCode Code, QByteArray &Payload)
             Payload[i] = Payload[i] ^ mask[i % 4];
     }
 
-    if (m_socket && m_socket->write(frame) == frame.size())
+    if (write(frame) == frame.size())
     {
-        if ((Payload.size() && m_socket->write(Payload) == Payload.size()) || !Payload.size())
+        if ((Payload.size() && write(Payload) == Payload.size()) || !Payload.size())
         {
-            m_socket->flush();
             LOG(VB_NETWORK, LOG_DEBUG, QString("Sent frame (Final), OpCode: '%1' Masked: %2 Length: %3")
                 .arg(OpCodeToString(Code)).arg(!m_serverSide).arg(Payload.size()));
             return;

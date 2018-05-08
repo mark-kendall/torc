@@ -4,7 +4,7 @@
 // Qt
 #include <QUrl>
 #include <QObject>
-#include <QTcpSocket>
+#include <QSslSocket>
 #include <QHostAddress>
 
 // Torc
@@ -17,7 +17,7 @@ class TorcWebSocketThread;
 
 #define TORC_JSON_RPC QString("torc.json-rpc")
 
-class TorcWebSocket : public QObject
+class TorcWebSocket : public QSslSocket
 {
     Q_OBJECT
     Q_ENUMS(WSVersion)
@@ -119,6 +119,10 @@ class TorcWebSocket : public QObject
     void            RemoteRequest         (TorcRPCRequest *Request);
     void            CancelRequest         (TorcRPCRequest *Request);
 
+    // SSL
+    void            Encrypted             (void);
+    void            SSLErrors             (const QList<QSslError> &Errors);
+
   protected slots:
     void            ReadyRead             (void);
     void            Connected             (void);
@@ -154,7 +158,6 @@ class TorcWebSocket : public QObject
     };
 
     TorcWebSocketThread *m_parent;
-    QTcpSocket      *m_socket;
     SocketState      m_socketState;
     qintptr          m_socketDescriptor;
     TorcHTTPReader   m_reader;
