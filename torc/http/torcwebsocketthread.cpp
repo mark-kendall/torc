@@ -56,11 +56,12 @@ TorcWebSocketThread::TorcWebSocketThread(qintptr SocketDescriptor)
     m_address(QHostAddress::Null),
     m_port(0),
     m_authenticate(false),
-    m_protocol(TorcWebSocket::SubProtocolNone)
+    m_protocol(TorcWebSocketReader::SubProtocolNone)
 {
 }
 
-TorcWebSocketThread::TorcWebSocketThread(const QHostAddress &Address, quint16 Port, bool Authenticate, TorcWebSocket::WSSubProtocol Protocol)
+TorcWebSocketThread::TorcWebSocketThread(const QHostAddress &Address, quint16 Port, bool Authenticate,
+                                         TorcWebSocketReader::WSSubProtocol Protocol)
   : TorcQThread("SocketOut"),
     m_webSocket(NULL),
     m_socketDescriptor(0),

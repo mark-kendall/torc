@@ -104,7 +104,7 @@ TorcRPCRequest::TorcRPCRequest(const QJsonObject &Object, bool Authenticated)
 /*! \brief Creates a request or response from the given raw data using the given protocol.
  *
 */
-TorcRPCRequest::TorcRPCRequest(TorcWebSocket::WSSubProtocol Protocol, const QByteArray &Data, QObject *Parent, bool Authenticated)
+TorcRPCRequest::TorcRPCRequest(TorcWebSocketReader::WSSubProtocol Protocol, const QByteArray &Data, QObject *Parent, bool Authenticated)
   : m_authenticated(Authenticated),
     m_notification(true),
     m_state(None),
@@ -118,7 +118,7 @@ TorcRPCRequest::TorcRPCRequest(TorcWebSocket::WSSubProtocol Protocol, const QByt
     m_serialisedData(),
     m_reply()
 {
-    if (Protocol == TorcWebSocket::SubProtocolJSONRPC)
+    if (Protocol == TorcWebSocketReader::SubProtocolJSONRPC)
     {
         // parse the JSON
         QJsonDocument doc = QJsonDocument::fromJson(Data);
@@ -339,9 +339,9 @@ void TorcRPCRequest::SetParent(QObject *Parent)
  *
  * \note QJsonValue may not be flexbible enough for all types.
 */
-QByteArray& TorcRPCRequest::SerialiseRequest(TorcWebSocket::WSSubProtocol Protocol)
+QByteArray& TorcRPCRequest::SerialiseRequest(TorcWebSocketReader::WSSubProtocol Protocol)
 {
-    if (Protocol == TorcWebSocket::SubProtocolJSONRPC)
+    if (Protocol == TorcWebSocketReader::SubProtocolJSONRPC)
     {
         QJsonObject object;
         object.insert("jsonrpc", QString("2.0"));
