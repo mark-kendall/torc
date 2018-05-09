@@ -3,10 +3,10 @@
 
 // Qt
 #include <QObject>
+#include <QMutex>
 
 class QSqlDatabase;
 class QSqlQuery;
-class TorcDBPriv;
 
 class TorcDB
 {
@@ -27,15 +27,14 @@ class TorcDB
   protected:
     virtual bool InitDatabase           (void) = 0;
     QString      GetThreadConnection    (void);
+    void         CloseConnections       (void);
 
   protected:
     bool         m_databaseValid;
     QString      m_databaseName;
     QString      m_databaseType;
-    TorcDBPriv  *m_databasePriv;
-
-  private:
-    Q_DISABLE_COPY(TorcDB)
+    QMutex       m_lock;
+    QHash<QThread*,QString> m_connectionMap;
 };
 
 #endif // TORCDB_H
