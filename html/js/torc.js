@@ -192,17 +192,19 @@ $(document).ready(function() {
         var contentid   = modalid + 'content';
         var menuid      = modalid + 'menu';
         $('.navbar-fixed-top').after(template(theme.FileModal, { "id": modalid, "title": title, "contentid": contentid }));
+        var item = template(theme.DropdownItemWithIcon, { "icon": "file-text-o", "text": menu });
+        addDropdownMenuItem('torc-central-menu', menuid, '#' + modalid, item,
+                            function () {
+                                $.ajax({ url: contentSource,
+                                         dataType: contentType,
+                                         xhrFields: { withCredentials: true }
+                                       })
+                                       .done(function (ignore, ignore2, xhr) {
+                                            $('#' + contentid).text(xhr.responseText);
+                                       });
+                            });
+        $('.' + menuid + ' > a').attr('data-toggle', 'modal');
 
-        $.ajax({ url: contentSource,
-                 dataType: contentType,
-                 xhrFields: { withCredentials: true }
-               })
-               .done(function (ignore, ignore2, xhr) {
-                    $('#' + contentid).text(xhr.responseText);
-                   var item = template(theme.DropdownItemWithIcon, { "icon": "file-text-o", "text": menu });
-                   addDropdownMenuItem('torc-central-menu', menuid, '#' + modalid, item);
-                   $('.' + menuid + ' > a').attr('data-toggle', 'modal');
-               });
     }
 
     function centralSubscriptionChanged(version, ignore, properties) {
