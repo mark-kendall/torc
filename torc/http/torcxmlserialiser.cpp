@@ -141,7 +141,7 @@ void TorcXMLSerialiser::MapToXML(const QString &Name, const QVariantMap &Value)
 class TorcXMLSerialiserFactory : public TorcSerialiserFactory
 {
   public:
-    TorcXMLSerialiserFactory() : TorcSerialiserFactory("application/xml", "XML")
+    TorcXMLSerialiserFactory() : TorcSerialiserFactory("application", "xml", "XML")
     {
     }
 

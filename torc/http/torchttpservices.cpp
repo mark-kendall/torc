@@ -56,7 +56,7 @@ TorcHTTPServices::TorcHTTPServices(TorcHTTPServer *Server)
     {
         QVariantMap item;
         item.insert("name", factory->Description());
-        item.insert("type", factory->Accepts());
+        item.insert("type", factory->MimeType());
         returnFormats.append(item);
     }
 }

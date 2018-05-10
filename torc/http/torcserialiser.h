@@ -40,19 +40,21 @@ class TorcSerialiser
 class TorcSerialiserFactory
 {
   public:
-    TorcSerialiserFactory(const QString &Accepts, const QString &Description);
+    TorcSerialiserFactory(const QString &Type, const QString &SubType, const QString &Description);
     virtual ~TorcSerialiserFactory();
 
     static TorcSerialiserFactory* GetTorcSerialiserFactory  (void);
     TorcSerialiserFactory*        NextTorcSerialiserFactory (void) const;
     virtual TorcSerialiser*       Create                    (void) = 0;
-    const QString&                Accepts                   (void) const;
+    bool                          Accepts                   (const QPair<QString,QString> &MimeType) const;
     const QString&                Description               (void) const;
+    QString                       MimeType                  (void) const;
 
   protected:
     static TorcSerialiserFactory* gTorcSerialiserFactory;
     TorcSerialiserFactory*        m_nextTorcSerialiserFactory;
-    QString                       m_accepts;
+    QString                       m_type;
+    QString                       m_subtype;
     QString                       m_description;
 
   private:

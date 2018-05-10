@@ -56,7 +56,7 @@ void TorcPlainTextSerialiser::AddProperty(const QString &Name, const QVariant &V
 class TorcPlainTextSerialiserFactory : public TorcSerialiserFactory
 {
   public:
-    TorcPlainTextSerialiserFactory() : TorcSerialiserFactory("text/plain", "Text")
+    TorcPlainTextSerialiserFactory() : TorcSerialiserFactory("text", "plain", "Text")
     {
     }
 
