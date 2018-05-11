@@ -3,6 +3,7 @@
 
 // Qt
 #include <QUrl>
+#include <QTimer>
 #include <QObject>
 #include <QSslSocket>
 #include <QHostAddress>
@@ -15,6 +16,9 @@
 class TorcHTTPRequest;
 class TorcRPCRequest;
 class TorcWebSocketThread;
+
+#define HTTP_SOCKET_TIMEOUT 30000  // 30 seconds of inactivity
+#define FULL_SOCKET_TIMEOUT 300000 // 5 minutes of inactivity
 
 class TorcWebSocket : public QSslSocket
 {
@@ -62,6 +66,7 @@ class TorcWebSocket : public QSslSocket
     void            Connected             (void);
     void            Error                 (QAbstractSocket::SocketError);
     void            SubscriberDeleted     (QObject *Subscriber);
+    void            TimedOut              (void);
 
   protected:
     bool            event                 (QEvent *Event) Q_DECL_OVERRIDE;
@@ -79,6 +84,7 @@ class TorcWebSocket : public QSslSocket
     TorcWebSocketThread *m_parent;
     SocketState      m_socketState;
     qintptr          m_socketDescriptor;
+    QTimer           m_watchdogTimer;
     TorcHTTPReader   m_reader;
     TorcWebSocketReader m_wsReader;
     bool             m_authenticate;
