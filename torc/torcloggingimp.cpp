@@ -501,7 +501,7 @@ bool WebLogger::event(QEvent *event)
     {
         lock.lock();
         if (changed)
-            emit logChanged(true);
+            emit logChanged();
         changed = false;
         lock.unlock();
     }
@@ -543,7 +543,7 @@ bool WebLogger::Logmsg(LogItem *Item)
     tail = line;
     lock.unlock();
 
-    emit tailChanged(line);
+    emit tailChanged();
     return PrintLine(line);
 }
 
