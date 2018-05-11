@@ -82,11 +82,7 @@ void Torc1WireBus::Create(const QVariantMap &Details)
 
     // check for the correct directory
     QDir dir(ONE_WIRE_DIRECTORY);
-    if (!dir.exists(ONE_WIRE_DIRECTORY))
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("Cannot find 1Wire directory (%1) - have you loaded the correct kernel modules").arg(ONE_WIRE_DIRECTORY));
-        return;
-    }
+    bool wire1found = dir.exists();
 
     QVariantMap::const_iterator i = Details.constBegin();
     for ( ; i != Details.constEnd(); ++i)
@@ -104,6 +100,13 @@ void Torc1WireBus::Create(const QVariantMap &Details)
 
             if (it.key() == ONE_WIRE_NAME)
             {
+                // we have found a 1wire device config - make sure 1wire is available
+                if (!wire1found)
+                {
+                    LOG(VB_GENERAL, LOG_ERR, QString("1Wire device configured but cannot find 1Wire directory (%1)").arg(ONE_WIRE_DIRECTORY));
+                    return;
+                }
+
                 QVariantMap devices = it.value().toMap();
                 QVariantMap::iterator it2 = devices.begin();
                 for ( ; it2 != devices.end(); ++it2)
