@@ -33,7 +33,7 @@ $(document).ready(function() {
         $('.' + menu).append(template(theme.NavbarDropdownDivider, { "id": identifier }));
     }
 
-    function addDropdownMenuItem(menu, identifier, link, text, click) {
+    function addDropdownMenuItem(menu, identifier, link, text, click, hide) {
         $('.' + menu).append(template(theme.NavbarDropdownItem, {"id": identifier, "link": link, "text": text }));
         if (typeof click === 'function') { $('.' + identifier).click(click); }
     }
@@ -187,38 +187,6 @@ $(document).ready(function() {
         }
     }
 
-    function addLogTailModal(title, menu, contentSource, contentType) {
-        var modalid     = 'logtail' + 'torcmodal';
-        var contentid   = modalid + 'content';
-        var menuid      = modalid + 'menu';
-        $('.navbar-fixed-top').after(template(theme.FileModal, { "id": modalid, "title": title, "contentid": contentid }));
-        var item = template(theme.DropdownItemWithIcon, { "icon": "file-text-o", "text": menu });
-        addDropdownMenuItem('torc-central-menu', menuid, '#' + modalid, item,
-                            function () {
-                                $('#' + modalid).on('hidden.bs.modal', function () {
-                                            $('#' + contentid).text('');
-                                            torcconnection.unsubscribe('log');
-                                        }
-                                    );
-                                torcconnection.subscribe('log', ['tail'],
-                                    function (name, value) {
-                                        if (name === 'tail') {
-                                            var current = $('#' + contentid).text();
-                                            $('#' + contentid).text(current + value);
-                                            $('#' + modalid).scrollTop($('#' + modalid).scrollTop() + $('#' + modalid).height());
-                                        };
-                                    },
-                                    function (version, ignore, properties) {
-                                        $.each(properties, function (key, value) {
-                                            if (key === 'tail') {
-                                                $('#' + contentid).text(value.value);
-                                            }
-                                        });
-                                    });
-                            });
-        $('.' + menuid + ' > a').attr('data-toggle', 'modal');
-    }
-
     function addFileModal(name, title, menu, contentSource, contentType) {
         var modalid     = name    + 'torcmodal';
         var contentid   = modalid + 'content';
@@ -226,16 +194,93 @@ $(document).ready(function() {
         $('.navbar-fixed-top').after(template(theme.FileModal, { "id": modalid, "title": title, "contentid": contentid }));
         var item = template(theme.DropdownItemWithIcon, { "icon": "file-text-o", "text": menu });
         addDropdownMenuItem('torc-central-menu', menuid, '#' + modalid, item,
-                            function () {
-                                $.ajax({ url: contentSource,
-                                         dataType: contentType,
-                                         xhrFields: { withCredentials: true }
-                                       })
-                                       .done(function (ignore, ignore2, xhr) {
-                                            $('#' + contentid).text(xhr.responseText);
-                                       });
-                            });
+                            contentSource !== '' ?
+                                function () { $.ajax({ url: contentSource, dataType: contentType, xhrFields: { withCredentials: true }})
+                                              .done(function (ignore, ignore2, xhr) { $('#' + contentid).text(xhr.responseText); }); } : '');
         $('.' + menuid + ' > a').attr('data-toggle', 'modal');
+    }
+
+    function addComplexModal(name, title, menu, setup, shown, hidden) {
+        addFileModal(name, title, menu);
+        var modalid = name + 'torcmodal';
+        if (typeof setup  === 'function') { setup(); };
+        if (typeof shown  === 'function') { $('#' + modalid).on('show.bs.modal', shown); };
+        if (typeof hidden === 'function') { $('#' + modalid).on('hidden.bs.modal', hidden); };
+    }
+
+    function addLogModal(name, title, menu) {
+        var modalid   = name + 'torcmodal';
+        var contentid = modalid + 'content';
+        function load () {
+            $.ajax({ url: '/services/log/GetLog', dataType: 'text', xhrFields: { withCredentials: true }})
+                .done(function (ignore, ignore2, xhr) { $('#' + contentid).text(xhr.responseText); });
+        };
+        addComplexModal(name, title, menu,
+            function() { // setup
+                $('#' + modalid + ' h4').replaceWith('<button type="button" class="btn btn-info hidden torclogrefresh">' + torc.RefreshTr + '</button>');
+                $('#' + modalid + ' .modal-footer').prepend('<button type="button" class="btn btn-info hidden torclogrefresh">' + torc.RefreshTr + '</button>');
+                $('.torclogrefresh').click(
+                    function () {
+                        load();
+                        $('.torclogrefresh').addClass('hidden');
+                    });
+            },
+            function () { // show
+                torcconnection.subscribe('log', ['log'],
+                    function (name, value) {
+                        if (name === 'log') { $('.torclogrefresh').removeClass('hidden'); }
+                    });
+                load();
+            },
+            function () { // hidden
+                $('.torclogrefresh').addClass('hidden');
+                torcconnection.unsubscribe('log');
+            });
+    }
+
+    function addLogtailModal(name, title, menu) {
+        var modalid   = name + 'torcmodal';
+        var contentid = modalid + 'content';
+        var following = false;
+        addComplexModal(name, title, menu,
+            function () { // setup
+                $('#' + modalid + ' h4').replaceWith('<button type="button" class="btn btn-info hidden torclogtoggle">' + torc.FollowTr + '</button>');
+                $('#' + modalid + ' .modal-footer').prepend('<button type="button" class="btn btn-info hidden torclogtoggle">' + torc.FollowTr + '</button>');
+                $('.torclogtoggle').click(function() {
+                    if (following) {
+                        following = false;
+                        $('.torclogtoggle').text(torc.FollowTr);
+                    } else {
+                        following = true;
+                        $('.torclogtoggle').text(torc.UnfollowTr);
+                        $('#' + modalid).animate( { scrollTop: ($('#' + modalid)[0].scrollHeight - $('#' + modalid).height()) }, 250);
+                    }
+                });
+            },
+            function () { // show
+                $('#' + contentid).text('');
+                torcconnection.subscribe('log', ['tail'],
+                    function (name, value) {
+                        if (name === 'tail') {
+                            var current = $('#' + contentid).text();
+                            $('#' + contentid).text(current + value);
+                            if ($('#' + modalid)[0].scrollHeight > $('#' + modalid).height()) { $('.torclogtoggle').removeClass('hidden'); };
+                            if (following === true) { $('#' + modalid).scrollTop($('#' + modalid)[0].scrollHeight - $('#' + modalid).height()); };
+                        };
+                    },
+                    function (version, ignore, properties) {
+                        $.each(properties, function (key, value) {
+                            if (key === 'tail') {
+                                $('#' + contentid).text(value.value);
+                            }
+                        });
+                    });
+            },
+            function () { // hidden
+                following = false;
+                $('.torclogtoggle').addClass('hidden').text(torc.FollowTr);
+                torcconnection.unsubscribe('log');
+            });
     }
 
     function centralSubscriptionChanged(version, ignore, properties) {
@@ -249,9 +294,8 @@ $(document).ready(function() {
             addFileModal('config',  torc.ViewConfigTitleTr, torc.ViewConfigTr, '/content/torc.xml',       'xml');
             addFileModal('xsd',     torc.ViewXSDTitleTr,    torc.ViewXSDTr,    '/content/torc.xsd',       'xml');
             addFileModal('dot',     torc.ViewDOTTitleTr,    torc.ViewDOTTr,    '/content/stategraph.dot', 'text');
-            addFileModal('log',     torc.ViewLogTitleTr,    torc.ViewLogTr,    '/services/log/GetLog',    'text');
-            addLogTailModal(torc.FollowLogTitleTr, torc.FollowLogTr, '/services/log/GetTail', 'text');
-
+            addLogModal('log', '',  torc.ViewLogTr);
+            addLogtailModal('logtail', '', torc.FollowLogTr);
             torcapi.setup(torcconnection);
             return;
         }
