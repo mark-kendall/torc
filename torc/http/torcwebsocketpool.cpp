@@ -74,10 +74,22 @@ void TorcWebSocketPool::WebSocketClosed(void)
 void TorcWebSocketPool::IncomingConnection(qintptr SocketDescriptor)
 {
     QMutexLocker locker(&m_webSocketsLock);
-    TorcWebSocketThread *thread = new TorcWebSocketThread(SocketDescriptor);
-    m_webSockets.append(thread);
-    connect(thread, SIGNAL(Finished()), this, SLOT(WebSocketClosed()));
-    thread->start();
+    if (m_webSockets.size() <= MAX_SOCKET_THREADS)
+    {
+        TorcWebSocketThread *thread = new TorcWebSocketThread(SocketDescriptor);
+        m_webSockets.append(thread);
+        connect(thread, SIGNAL(Finished()), this, SLOT(WebSocketClosed()));
+        thread->start();
+    }
+    else
+    {
+        // Not sure whether this is the polite thing to do or not!
+        QTcpSocket *socket = new QTcpSocket();
+        socket->setSocketDescriptor(SocketDescriptor);
+        socket->close();
+        delete socket;
+        LOG(VB_GENERAL, LOG_WARNING, "Ignoring incoming connection - too many connections");
+    }
 }
 
 TorcWebSocketThread* TorcWebSocketPool::TakeSocket(TorcWebSocketThread *Socket)

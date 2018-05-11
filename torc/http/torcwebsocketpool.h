@@ -8,6 +8,8 @@
 // Torc
 #include "torcwebsocketthread.h"
 
+#define MAX_SOCKET_THREADS 50 // this will exclude peer websockets
+
 class TorcWebSocketPool : public QObject
 {
     Q_OBJECT
