@@ -78,6 +78,10 @@ var TorcSubscription = function (socket, serviceName, servicePath, subscribedCha
         if (typeof subscribedChanged === 'function') { subscribedChanged(serviceName, undefined); }
     }
 
+    this.unsubscribe = function () {
+        socket.call(servicePath + 'Unsubscribe');
+    }
+
     // subscribe
     socket.call(servicePath + 'Subscribe', null, subscribed, failed);
 };

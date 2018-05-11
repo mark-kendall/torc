@@ -43,6 +43,15 @@ var TorcConnection = function ($, torc, statusChanged) {
         console.log('Failed to call ' + serviceName + method);
     };
 
+    this.unsubscribe = function (serviceName) {
+        if (subscriptions[serviceName]) {
+            subscriptions[serviceName].subscription.unsubscribe();
+            delete subscriptions[serviceName];
+        } else {
+            console.log('Cannot unsubscribe from ' + serviceName + ' - not subscribed');
+        }
+    }
+
     this.subscribe = function (serviceName, properties, propertyChanges, subscriptionChanges) {
         // is this a known service
         if (!serviceList.hasOwnProperty(serviceName)) {
