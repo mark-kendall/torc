@@ -64,7 +64,7 @@ void TorcJSONSerialiser::End(void)
 class TorcJSONSerialiserFactory : public TorcSerialiserFactory
 {
   public:
-    TorcJSONSerialiserFactory() : TorcSerialiserFactory("application/json", "JSON")
+    TorcJSONSerialiserFactory() : TorcSerialiserFactory("application", "json", "JSON")
     {
     }
 
@@ -77,7 +77,7 @@ class TorcJSONSerialiserFactory : public TorcSerialiserFactory
 class TorcJavascriptSerialiserFactory : public TorcSerialiserFactory
 {
   public:
-    TorcJavascriptSerialiserFactory() : TorcSerialiserFactory("text/javascript", "JSON")
+    TorcJavascriptSerialiserFactory() : TorcSerialiserFactory("text", "javascript", "JSON")
     {
     }
 

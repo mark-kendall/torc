@@ -23,7 +23,6 @@
 // Qt
 #include <QUrl>
 #include <QTimer>
-#include <QtEndian>
 #include <QTextStream>
 #include <QJsonDocument>
 #include <QCryptographicHash>
@@ -36,11 +35,6 @@
 #include "torcrpcrequest.h"
 #include "torchttpserver.h"
 #include "torcwebsocket.h"
-
-// utf8
-#include "utf8/core.h"
-#include "utf8/checked.h"
-#include "utf8/unchecked.h"
 
 /*! \class TorcWebSocket
  *  \brief Overlays the Websocket protocol over a QTcpSocket
@@ -66,33 +60,20 @@
 */
 
 TorcWebSocket::TorcWebSocket(TorcWebSocketThread* Parent, qintptr SocketDescriptor)
-  : QObject(),
+  : QSslSocket(),
     m_parent(Parent),
-    m_socket(NULL),
     m_socketState(SocketState::DisconnectedSt),
     m_socketDescriptor(SocketDescriptor),
     m_reader(),
+    m_wsReader(*this, TorcWebSocketReader::SubProtocolNone, true),
     m_authenticate(false),
     m_authenticated(false),
     m_challengeResponse(),
     m_address(QHostAddress()),
     m_port(0),
     m_serverSide(true),
-    m_readState(ReadHeader),
-    m_echoTest(false),
-    m_subProtocol(SubProtocolNone),
-    m_subProtocolFrameFormat(OpText),
-    m_frameFinalFragment(false),
-    m_frameOpCode(OpContinuation),
-    m_frameMasked(false),
-    m_framePayloadLength(0),
-    m_framePayloadReadPosition(0),
-    m_frameMask(QByteArray(4, 0)),
-    m_framePayload(QByteArray()),
-    m_bufferedPayload(NULL),
-    m_bufferedPayloadOpCode(OpContinuation),
-    m_closeReceived(false),
-    m_closeSent(false),
+    m_subProtocol(TorcWebSocketReader::SubProtocolNone),
+    m_subProtocolFrameFormat(TorcWebSocketReader::OpText),
     m_currentRequestID(1),
     m_currentRequests(),
     m_requestTimers(),
@@ -100,34 +81,22 @@ TorcWebSocket::TorcWebSocket(TorcWebSocketThread* Parent, qintptr SocketDescript
 {
 }
 
-TorcWebSocket::TorcWebSocket(TorcWebSocketThread* Parent, const QHostAddress &Address, quint16 Port, bool Authenticate, WSSubProtocol Protocol)
-  : QObject(),
+TorcWebSocket::TorcWebSocket(TorcWebSocketThread* Parent, const QHostAddress &Address, quint16 Port, bool Authenticate,
+                             TorcWebSocketReader::WSSubProtocol Protocol)
+  : QSslSocket(),
     m_parent(Parent),
-    m_socket(NULL),
     m_socketState(SocketState::DisconnectedSt),
     m_socketDescriptor(0),
     m_reader(),
+    m_wsReader(*this, Protocol, false),
     m_authenticate(Authenticate),
     m_authenticated(false),
     m_challengeResponse(),
     m_address(Address),
     m_port(Port),
     m_serverSide(false),
-    m_readState(ReadHeader),
-    m_echoTest(false),
     m_subProtocol(Protocol),
-    m_subProtocolFrameFormat(FormatForSubProtocol(Protocol)),
-    m_frameFinalFragment(false),
-    m_frameOpCode(OpContinuation),
-    m_frameMasked(false),
-    m_framePayloadLength(0),
-    m_framePayloadReadPosition(0),
-    m_frameMask(QByteArray(4, 0)),
-    m_framePayload(QByteArray()),
-    m_bufferedPayload(NULL),
-    m_bufferedPayloadOpCode(OpContinuation),
-    m_closeReceived(false),
-    m_closeSent(false),
+    m_subProtocolFrameFormat(TorcWebSocketReader::FormatForSubProtocol(Protocol)),
     m_currentRequestID(1),
     m_currentRequests(),
     m_requestTimers(),
@@ -148,21 +117,16 @@ TorcWebSocket::~TorcWebSocket()
             CancelRequest(m_currentRequests.begin().value());
     }
 
-    InitiateClose(CloseGoingAway, QString("WebSocket exiting normally"));
+    if (m_socketState == SocketState::Upgraded)
+        m_wsReader.InitiateClose(TorcWebSocketReader::CloseGoingAway, QString("WebSocket exiting normally"));
 
     CloseSocket();
-
-    delete m_bufferedPayload;
-    m_bufferedPayload       = NULL;
 
     LOG(VB_GENERAL, LOG_INFO, "WebSocket dtor");
 }
 
-void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest *Request)
+void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest &Request)
 {
-    if (!Request)
-        return;
-
     if (!m_serverSide)
     {
         LOG(VB_GENERAL, LOG_ERR, "Trying to send response to upgrade request but not server side");
@@ -180,7 +144,7 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest *Request)
     bool valid = true;
     bool versionerror = false;
     QString error;
-    WSSubProtocol protocol = SubProtocolNone;
+    TorcWebSocketReader::WSSubProtocol protocol = TorcWebSocketReader::SubProtocolNone;
 
     /* Excerpt from RFC 6455
 
@@ -196,7 +160,7 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest *Request)
             the first line sent should be "GET /chat HTTP/1.1".
     */
 
-    if (valid && (Request->GetHTTPRequestType() != HTTPGet || Request->GetHTTPProtocol() != HTTPOneDotOne))
+    if (valid && (Request.GetHTTPRequestType() != HTTPGet || Request.GetHTTPProtocol() != HTTPOneDotOne))
     {
         error = "Must be GET and HTTP/1.1";
         valid = false;
@@ -209,7 +173,7 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest *Request)
             and /port/ that match the corresponding ws/wss URI.
     */
 
-    if (valid && Request->GetPath().isEmpty())
+    if (valid && Request.GetPath().isEmpty())
     {
         error = "invalid Request-URI";
         valid = false;
@@ -221,17 +185,17 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest *Request)
             using the default port).
     */
 
-    if (valid && !Request->Headers()->contains("Host"))
+    if (valid && !Request.Headers()->contains("Host"))
     {
         error = "No Host header";
         valid = false;
     }
 
     // default ports (e.g. 80) are not listed in host, so don't check in this case
-    QUrl host("http://" + Request->Headers()->value("Host"));
-    int localport = m_socket->localPort();
+    QUrl host("http://" + Request.Headers()->value("Host"));
+    int localport = localPort();
 
-    if (valid && localport != 80 && host.port() != localport)
+    if (valid && localport != 80 && localport != 443 && host.port() != localport)
     {
         error = "Invalid Host port";
         valid = false;
@@ -240,7 +204,7 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest *Request)
     // disable host check. It offers us no additional security and may be a raw
     // ip address, domain name or or other host name.
 #if 0
-    if (valid && host.host() != m_socket->localAddress().toString())
+    if (valid && host.host() != localAddress().toString())
     {
         error = "Invalid Host";
         valid = false;
@@ -251,13 +215,13 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest *Request)
             MUST include the "websocket" keyword.
     */
 
-    if (valid && !Request->Headers()->contains("Upgrade"))
+    if (valid && !Request.Headers()->contains("Upgrade"))
     {
         error = "No Upgrade header";
         valid = false;
     }
 
-    if (valid && !Request->Headers()->value("Upgrade").contains("websocket", Qt::CaseInsensitive))
+    if (valid && !Request.Headers()->value("Upgrade").contains("websocket", Qt::CaseInsensitive))
     {
         error = "No 'websocket request";
         valid = false;
@@ -268,13 +232,13 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest *Request)
             MUST include the "Upgrade" token.
     */
 
-    if (valid && !Request->Headers()->contains("Connection"))
+    if (valid && !Request.Headers()->contains("Connection"))
     {
         error = "No Connection header";
         valid = false;
     }
 
-    if (valid && !Request->Headers()->value("Connection").contains("Upgrade", Qt::CaseInsensitive))
+    if (valid && !Request.Headers()->value("Connection").contains("Upgrade", Qt::CaseInsensitive))
     {
         error = "No Upgrade request";
         valid = false;
@@ -293,13 +257,13 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest *Request)
             field would be "AQIDBAUGBwgJCgsMDQ4PEC=="
     */
 
-    if (valid && !Request->Headers()->contains("Sec-WebSocket-Key"))
+    if (valid && !Request.Headers()->contains("Sec-WebSocket-Key"))
     {
         error = "No Sec-WebSocket-Key header";
         valid = false;
     }
 
-    if (valid && Request->Headers()->value("Sec-WebSocket-Key").isEmpty())
+    if (valid && Request.Headers()->value("Sec-WebSocket-Key").isEmpty())
     {
         error = "Invalid Sec-WebSocket-Key";
         valid = false;
@@ -325,15 +289,15 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest *Request)
             13.
     */
 
-    if (valid && !Request->Headers()->contains("Sec-WebSocket-Version"))
+    if (valid && !Request.Headers()->contains("Sec-WebSocket-Version"))
     {
         error = "No Sec-WebSocket-Version header";
         valid = false;
     }
 
-    int version = Request->Headers()->value("Sec-WebSocket-Version").toInt();
+    int version = Request.Headers()->value("Sec-WebSocket-Version").toInt();
 
-    if (valid && version != Version13 && version != Version8)
+    if (valid && version != TorcWebSocketReader::Version13 && version != TorcWebSocketReader::Version8)
     {
         error = "Unsupported WebSocket version";
         versionerror = true;
@@ -352,9 +316,9 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest *Request)
         constructs and rules are as given in [RFC2616].
     */
 
-    if (Request->Headers()->contains("Sec-WebSocket-Protocol"))
+    if (Request.Headers()->contains("Sec-WebSocket-Protocol"))
     {
-        QList<WSSubProtocol> protocols = SubProtocolsFromPrioritisedString(Request->Headers()->value("Sec-WebSocket-Protocol"));
+        QList<TorcWebSocketReader::WSSubProtocol> protocols = TorcWebSocketReader::SubProtocolsFromPrioritisedString(Request.Headers()->value("Sec-WebSocket-Protocol"));
         if (!protocols.isEmpty())
             protocol = protocols.first();
     }
@@ -362,135 +326,53 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest *Request)
     if (!valid)
     {
         LOG(VB_GENERAL, LOG_ERR, error);
-        Request->SetStatus(HTTP_BadRequest);
+        Request.SetStatus(HTTP_BadRequest);
         if (versionerror)
-            Request->SetResponseHeader("Sec-WebSocket-Version", "8,13");
+            Request.SetResponseHeader("Sec-WebSocket-Version", "8,13");
         return;
     }
 
     // valid handshake so set response headers and transfer socket
     LOG(VB_GENERAL, LOG_DEBUG, "Received valid websocket Upgrade request");
 
-    QString key = Request->Headers()->value("Sec-WebSocket-Key") + QLatin1String("258EAFA5-E914-47DA-95CA-C5AB0DC85B11");
+    QString key = Request.Headers()->value("Sec-WebSocket-Key") + QLatin1String("258EAFA5-E914-47DA-95CA-C5AB0DC85B11");
     QString nonce = QCryptographicHash::hash(key.toUtf8(), QCryptographicHash::Sha1).toBase64();
 
-    Request->SetResponseType(HTTPResponseNone);
-    Request->SetStatus(HTTP_SwitchingProtocols);
-    Request->SetConnection(HTTPConnectionUpgrade);
-    Request->SetResponseHeader("Upgrade", "websocket");
-    Request->SetResponseHeader("Sec-WebSocket-Accept", nonce);
-    if (protocol != SubProtocolNone)
-        Request->SetResponseHeader("Sec-WebSocket-Protocol", SubProtocolsToString(protocol));
+    Request.SetResponseType(HTTPResponseNone);
+    Request.SetStatus(HTTP_SwitchingProtocols);
+    Request.SetConnection(HTTPConnectionUpgrade);
+    Request.SetResponseHeader("Upgrade", "websocket");
+    Request.SetResponseHeader("Sec-WebSocket-Accept", nonce);
+    if (protocol != TorcWebSocketReader::SubProtocolNone)
+    {
+        Request.SetResponseHeader("Sec-WebSocket-Protocol", TorcWebSocketReader::SubProtocolsToString(protocol));
+        m_subProtocol = protocol;
+        m_subProtocolFrameFormat = TorcWebSocketReader::FormatForSubProtocol(protocol);
+        m_wsReader.SetSubProtocol(protocol);
+    }
 
     SetState(SocketState::Upgraded);
-    m_authenticated = Request->IsAuthorised();
+    m_authenticated = Request.IsAuthorised();
 
     LOG(VB_GENERAL, LOG_INFO, QString("Upgraded socket from %1 (%2)")
-        .arg(TorcNetwork::IPAddressToLiteral(m_socket->peerAddress(), m_socket->peerPort()))
+        .arg(TorcNetwork::IPAddressToLiteral(peerAddress(), peerPort()))
         .arg(m_authenticated ? "Authenticated" : "Unauthenticated"));
 
-    if (Request->Headers()->contains("Torc-UUID"))
+    if (Request.Headers()->contains("Torc-UUID"))
     {
         QString name;
-        QString agent = Request->Headers()->value("User-Agent").trimmed();
+        QString agent = Request.Headers()->value("User-Agent").trimmed();
         int index = agent.indexOf(',');
         if (index > -1)
             name = agent.left(index);
-        TorcNetworkedContext::PeerConnected(m_parent, Request->Headers()->value("Torc-UUID"), m_socket->peerPort(), name, m_socket->peerAddress());
+        TorcNetworkedContext::PeerConnected(m_parent, Request.Headers()->value("Torc-UUID"), peerPort(), name, peerAddress());
     }
 
-    if (Request->GetMethod().startsWith(QStringLiteral("echo"), Qt::CaseInsensitive))
+    if (Request.GetMethod().startsWith(QStringLiteral("echo"), Qt::CaseInsensitive))
     {
-        m_echoTest = true;
+        m_wsReader.EnableEcho();
         LOG(VB_GENERAL, LOG_INFO, "Enabling WebSocket echo for testing");
     }
-
-    if (Request->Headers()->contains("Sec-WebSocket-Protocol"))
-    {
-        QList<WSSubProtocol> protocols = SubProtocolsFromPrioritisedString(Request->Headers()->value("Sec-WebSocket-Protocol"));
-        if (!protocols.isEmpty())
-        {
-            m_subProtocol = protocols.first();
-            m_subProtocolFrameFormat = FormatForSubProtocol(m_subProtocol);
-        }
-    }
-}
-
-///\brief Convert OpCode to human readable string
-QString TorcWebSocket::OpCodeToString(OpCode Code)
-{
-    switch (Code)
-    {
-        case OpContinuation: return QString("Continuation");
-        case OpText:         return QString("Text");
-        case OpBinary:       return QString("Binary");
-        case OpClose:        return QString("Close");
-        case OpPing:         return QString("Ping");
-        case OpPong:         return QString("Pong");
-        default: break;
-    }
-
-    return QString("Reserved");
-}
-
-///\brief Convert CloseCode to human readable string
-QString TorcWebSocket::CloseCodeToString(CloseCode Code)
-{
-    switch (Code)
-    {
-        case CloseNormal:              return QString("Normal");
-        case CloseGoingAway:           return QString("GoingAway");
-        case CloseProtocolError:       return QString("ProtocolError");
-        case CloseUnsupportedDataType: return QString("UnsupportedDataType");
-        case CloseReserved1004:        return QString("Reserved");
-        case CloseStatusCodeMissing:   return QString("StatusCodeMissing");
-        case CloseAbnormal:            return QString("Abnormal");
-        case CloseInconsistentData:    return QString("InconsistentData");
-        case ClosePolicyViolation:     return QString("PolicyViolation");
-        case CloseMessageTooBig:       return QString("MessageTooBig");
-        case CloseMissingExtension:    return QString("MissingExtension");
-        case CloseUnexpectedError:     return QString("UnexpectedError");
-        case CloseTLSHandshakeError:   return QString("TLSHandshakeError");
-        default: break;
-    }
-
-    return QString("Unknown");
-}
-
-///\brief Convert SubProtocols to HTTP readable string.
-QString TorcWebSocket::SubProtocolsToString(WSSubProtocols Protocols)
-{
-    QStringList list;
-
-    if (Protocols.testFlag(SubProtocolJSONRPC)) list.append(TORC_JSON_RPC.toLatin1());
-
-    return list.join(",");
-}
-
-///\brief Parse supported WSSubProtocols from Protocols.
-TorcWebSocket::WSSubProtocols TorcWebSocket::SubProtocolsFromString(const QString &Protocols)
-{
-    WSSubProtocols protocols = SubProtocolNone;
-
-    if (Protocols.contains(TORC_JSON_RPC.toLatin1(), Qt::CaseInsensitive)) protocols |= SubProtocolJSONRPC;
-
-    return protocols;
-}
-
-///\brief Parse a prioritised list of supported WebSocket sub-protocols.
-QList<TorcWebSocket::WSSubProtocol> TorcWebSocket::SubProtocolsFromPrioritisedString(const QString &Protocols)
-{
-    QList<WSSubProtocol> results;
-
-    QStringList protocols = Protocols.split(",");
-    for (int i = 0; i < protocols.size(); ++i)
-    {
-        QString protocol = protocols[i].trimmed();
-
-        if (!QString::compare(protocol, TORC_JSON_RPC.toLatin1(), Qt::CaseInsensitive)) results.append(SubProtocolJSONRPC);
-    }
-
-    return results;
 }
 
 ///\brief Return a list of supported WebSocket sub-protocols
@@ -504,28 +386,63 @@ QVariantList TorcWebSocket::GetSupportedSubProtocols(void)
     return result;
 }
 
+void TorcWebSocket::Encrypted(void)
+{
+    connect(this, SIGNAL(readyRead()), this, SLOT(ReadyRead()));
+    emit ConnectionEstablished();
+    LOG(VB_GENERAL, LOG_INFO, "Encrypted");
+
+    if (!m_serverSide)
+        Connected();
+}
+
+void TorcWebSocket::SSLErrors(const QList<QSslError> &Errors)
+{
+    foreach (QSslError error, Errors)
+        LOG(VB_GENERAL, LOG_INFO, QString("Ssl Error: %1").arg(error.errorString()));
+}
+
 ///\brief Initialise the websocket once its parent thread is ready.
 void TorcWebSocket::Start(void)
 {
+    static bool SSL = false;
+
     connect(this, SIGNAL(Disconnect()), this, SLOT(CloseSocket()));
+
+    // common setup
+    m_reader.Reset();
+    m_wsReader.Reset();
+
+    connect(this, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(Error(QAbstractSocket::SocketError)));
+    connect(this, SIGNAL(disconnected()),                      this, SIGNAL(Disconnected()));
+    connect(this, SIGNAL(encrypted()),                         this, SLOT(Encrypted()));
+    connect(this, SIGNAL(sslErrors(QList<QSslError>)),         this, SLOT(SSLErrors(QList<QSslError>)));
+
+    // Ignore errors for Self signed certificates
+    QList<QSslError> ignore;
+    ignore << QSslError::SelfSignedCertificate;
+    ignoreSslErrors(ignore);
 
     // server side:)
     if (m_serverSide && m_socketDescriptor)
     {
-        m_socket = new QTcpSocket();
-        if (m_socket->setSocketDescriptor(m_socketDescriptor))
+        if (setSocketDescriptor(m_socketDescriptor))
         {
-            SetState(SocketState::ConnectedTo);
-            m_reader.Reset();
-            connect(m_socket, SIGNAL(readyRead()), this, SLOT(ReadyRead()));
-            connect(m_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(Error(QAbstractSocket::SocketError)));
-            connect(m_socket, SIGNAL(disconnected()), this, SIGNAL(Disconnected()));
-
             LOG(VB_GENERAL, LOG_INFO, QString("%1 socket connected from %2")
                 .arg(m_authenticated ? "Authenticated" : "Unauthenticated")
-                .arg(TorcNetwork::IPAddressToLiteral(m_socket->peerAddress(), m_socket->peerPort())));
+                .arg(TorcNetwork::IPAddressToLiteral(peerAddress(), peerPort())));
 
-            emit ConnectionEstablished();
+            SetState(SocketState::ConnectedTo);
+
+            if (SSL)
+            {
+                startServerEncryption();
+            }
+            else
+            {
+                connect(this, SIGNAL(readyRead()), this, SLOT(ReadyRead()));
+                emit ConnectionEstablished();
+            }
             return;
         }
         else
@@ -533,18 +450,20 @@ void TorcWebSocket::Start(void)
             LOG(VB_GENERAL, LOG_INFO, "Failed to set socket descriptor");
         }
     }
-    else
+    else if (!m_serverSide)
     {
-        // guard against inappropriate usage
-        delete m_socket;
-        m_reader.Reset();
         SetState(SocketState::ConnectingTo);
-        m_socket = new QTcpSocket();
-        connect(m_socket, SIGNAL(connected()), this, SLOT(Connected()));
-        connect(m_socket, SIGNAL(readyRead()), this, SLOT(ReadyRead()));
-        connect(m_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(Error(QAbstractSocket::SocketError)));
-        connect(m_socket, SIGNAL(disconnected()), this, SIGNAL(Disconnected()));
-        m_socket->connectToHost(m_address, m_port);
+
+        if (SSL)
+        {
+            connectToHostEncrypted(m_address.toString(), m_port);
+        }
+        else
+        {
+            connect(this, SIGNAL(connected()), this, SLOT(Connected()));
+            connect(this, SIGNAL(readyRead()), this, SLOT(ReadyRead()));
+            connectToHost(m_address, m_port);
+        }
         return;
     }
 
@@ -561,7 +480,7 @@ void TorcWebSocket::PropertyChanged(void)
     {
         TorcRPCRequest *request = new TorcRPCRequest(service->Signature() + service->GetMethod(senderSignalIndex()));
         request->AddParameter("value", service->GetProperty(senderSignalIndex()));
-        SendFrame(m_subProtocolFrameFormat, request->SerialiseRequest(m_subProtocol));
+        m_wsReader.SendFrame(m_subProtocolFrameFormat, request->SerialiseRequest(m_subProtocol));
         request->DownRef();
     }
 }
@@ -616,8 +535,8 @@ void TorcWebSocket::RemoteRequest(TorcRPCRequest *Request)
 
     Request->AddState(TorcRPCRequest::RequestSent);
 
-    if (m_subProtocol != SubProtocolNone)
-        SendFrame(m_subProtocolFrameFormat, Request->SerialiseRequest(m_subProtocol));
+    if (m_subProtocol != TorcWebSocketReader::SubProtocolNone)
+        m_wsReader.SendFrame(m_subProtocolFrameFormat, Request->SerialiseRequest(m_subProtocol));
     else
         LOG(VB_GENERAL, LOG_ERR, "No protocol specified for remote procedure call");
 
@@ -673,32 +592,31 @@ void TorcWebSocket::ReadHTTP(void)
         return;
     }
 
-    while (m_socket && m_socket->canReadLine())
+    while (canReadLine())
     {
         // read data
-        if (!m_reader.Read(m_socket))
+        if (!m_reader.Read(this))
             break;
 
         if (!m_reader.IsReady())
             continue;
 
         // sanity check
-        if (m_socket->bytesAvailable() > 0)
-            LOG(VB_GENERAL, LOG_WARNING, QString("%1 unread bytes from %2").arg(m_socket->bytesAvailable()).arg(m_socket->peerAddress().toString()));
+        if (bytesAvailable() > 0)
+            LOG(VB_GENERAL, LOG_WARNING, QString("%1 unread bytes from %2").arg(bytesAvailable()).arg(peerAddress().toString()));
 
         // have headers and content - process request
-        TorcHTTPRequest *request = new TorcHTTPRequest(&m_reader);
+        TorcHTTPRequest request(&m_reader);
 
-        if (request->GetHTTPType() == HTTPResponse)
+        if (request.GetHTTPType() == HTTPResponse)
         {
             LOG(VB_GENERAL, LOG_ERR, "Received unexpected HTTP response");
             SetState(SocketState::ErroredSt);
-            delete request;
             return;
         }
 
-        bool upgrade = request->Headers()->contains("Upgrade");
-        TorcHTTPServer::Authorise(m_socket->peerAddress().toString(), request, upgrade);
+        bool upgrade = request.Headers()->contains("Upgrade");
+        TorcHTTPServer::Authorise(peerAddress().toString(), request, upgrade);
 
         if (upgrade)
         {
@@ -706,14 +624,13 @@ void TorcWebSocket::ReadHTTP(void)
         }
         else
         {
-            if (request->IsAuthorised())
-                TorcHTTPServer::HandleRequest(m_socket->peerAddress().toString(), m_socket->peerPort(),
-                                              m_socket->localAddress().toString(), m_socket->localPort(), request);
+            if (request.IsAuthorised() == HTTPAuthorised)
+            {
+                TorcHTTPServer::HandleRequest(peerAddress().toString(), peerPort(),
+                                              localAddress().toString(), localPort(), request);
+            }
         }
-        request->Respond(m_socket);
-
-        // this will delete content and headers
-        delete request;
+        request.Respond(this);
 
         // reset
         m_reader.Reset();
@@ -726,7 +643,8 @@ void TorcWebSocket::ReadHTTP(void)
 */
 void TorcWebSocket::ReadyRead(void)
 {
-    while (m_socket && (m_socket->bytesAvailable() || (m_readState == ReadPayload && m_framePayloadLength == 0)))
+    while ((m_socketState == SocketState::ConnectedTo || m_socketState == SocketState::Upgrading || m_socketState == SocketState::Upgraded) &&
+            bytesAvailable())
     {
         if (m_socketState == SocketState::ConnectedTo)
         {
@@ -751,305 +669,18 @@ void TorcWebSocket::ReadyRead(void)
         }
 
         // we may now be upgraded
-        else if (m_socketState == SocketState::Upgraded)
+        if (m_socketState == SocketState::Upgraded)
         {
-            switch (m_readState)
+            if (!m_wsReader.Read())
             {
-                case ReadHeader:
-                {
-                    // we need at least 2 bytes to start reading
-                    if (m_socket->bytesAvailable() < 2)
-                        return;
-
-                    char header[2];
-                    if (m_socket->read(header, 2) != 2)
-                    {
-                        InitiateClose(CloseUnexpectedError, QString("Read error"));
-                        return;
-                    }
-
-                    m_frameFinalFragment = (header[0] & 0x80) != 0;
-                    m_frameOpCode        = static_cast<OpCode>(header[0] & 0x0F);
-                    m_frameMasked        = (header[1] & 0x80) != 0;
-                    quint8 length        = (header[1] & 0x7F);
-                    bool reservedbits    = (header[0] & 0x70) != 0;
-
-                    // validate the header against current state and specification
-                    CloseCode error = CloseNormal;
-                    QString reason;
-
-                    // invalid use of reserved bits
-                    if (reservedbits)
-                    {
-                        reason = QString("Invalid use of reserved bits");
-                        error = CloseProtocolError;
-                    }
-
-                    // control frames can only have payloads of up to 125 bytes
-                    else if ((m_frameOpCode & 0x8) && length > 125)
-                    {
-                        reason = QString("Control frame payload too large");
-                        error = CloseProtocolError;
-
-                        // need to acknowledge when an OpClose is received
-                        if (OpClose == m_frameOpCode)
-                            m_closeReceived = true;
-                    }
-
-                    // if this is a server, clients must be sending masked frames and vice versa
-                    else if (m_serverSide != m_frameMasked)
-                    {
-                        reason = QString("Masking error");
-                        error = CloseProtocolError;
-                    }
-
-                    // we should never receive a reserved opcode
-                    else if (m_frameOpCode != OpText && m_frameOpCode != OpBinary && m_frameOpCode != OpContinuation &&
-                        m_frameOpCode != OpPing && m_frameOpCode != OpPong   && m_frameOpCode != OpClose)
-                    {
-                        reason = QString("Invalid use of reserved opcode");
-                        error = CloseProtocolError;
-                    }
-
-                    // control frames cannot be fragmented
-                    else if (!m_frameFinalFragment && (m_frameOpCode == OpPing || m_frameOpCode == OpPong || m_frameOpCode == OpClose))
-                    {
-                        reason = QString("Fragmented control frame");
-                        error = CloseProtocolError;
-                    }
-
-                    // a continuation frame must have an opening frame
-                    else if (!m_bufferedPayload && m_frameOpCode == OpContinuation)
-                    {
-                        reason = QString("Fragmentation error");
-                        error = CloseProtocolError;
-                    }
-
-                    // only continuation frames or control frames are expected once in the middle of a frame
-                    else if (m_bufferedPayload && !(m_frameOpCode == OpContinuation || m_frameOpCode == OpPing || m_frameOpCode == OpPong || m_frameOpCode == OpClose))
-                    {
-                        reason = QString("Fragmentation error");
-                        error = CloseProtocolError;
-                    }
-
-                    // ensure OpCode matches that expected by SubProtocol
-                    else if ((!m_echoTest && m_subProtocol != SubProtocolNone) &&
-                             (m_frameOpCode == OpText || m_frameOpCode == OpBinary) &&
-                              m_frameOpCode != m_subProtocolFrameFormat)
-                    {
-                        reason = QString("Received incorrect frame type for subprotocol");
-                        error  = CloseUnsupportedDataType;
-                    }
-
-                    if (error != CloseNormal)
-                    {
-                        LOG(VB_GENERAL, LOG_ERR, QString("Read error: %1 (%2)").arg(CloseCodeToString(error)).arg(reason));
-                        InitiateClose(error, reason);
-                        return;
-                    }
-
-                    if (126 == length)
-                    {
-                        m_readState = Read16BitLength;
-                        break;
-                    }
-
-                    if (127 == length)
-                    {
-                        m_readState = Read64BitLength;
-                        break;
-                    }
-
-                    m_framePayloadLength = length;
-                    m_readState          = m_frameMasked ? ReadMask : ReadPayload;
-                }
-                break;
-
-                case Read16BitLength:
-                {
-                    if (m_socket->bytesAvailable() < 2)
-                        return;
-
-                    uchar length[2];
-
-                    if (m_socket->read(reinterpret_cast<char *>(length), 2) != 2)
-                    {
-                        InitiateClose(CloseUnexpectedError, QString("Read error"));
-                        return;
-                    }
-
-                    m_framePayloadLength = qFromBigEndian<quint16>(reinterpret_cast<const uchar *>(length));
-                    m_readState          = m_frameMasked ? ReadMask : ReadPayload;
-                }
-                break;
-
-                case Read64BitLength:
-                {
-                    if (m_socket->bytesAvailable() < 8)
-                        return;
-
-                    uchar length[8];
-                    if (m_socket->read(reinterpret_cast<char *>(length), 8) != 8)
-                    {
-                        InitiateClose(CloseUnexpectedError, QString("Read error"));
-                        return;
-                    }
-
-                    m_framePayloadLength = qFromBigEndian<quint64>(length) & ~(1LL << 63);
-                    m_readState          = m_frameMasked ? ReadMask : ReadPayload;
-                }
-                break;
-
-                case ReadMask:
-                {
-                    if (m_socket->bytesAvailable() < 4)
-                        return;
-
-                    if (m_socket->read(m_frameMask.data(), 4) != 4)
-                    {
-                        InitiateClose(CloseUnexpectedError, QString("Read error"));
-                        return;
-                    }
-
-                    m_readState = ReadPayload;
-                }
-                break;
-
-                case ReadPayload:
-                {
-                    // allocate the payload buffer if needed
-                    if (m_framePayloadReadPosition == 0)
-                        m_framePayload = QByteArray(m_framePayloadLength, 0);
-
-                    qint64 needed = m_framePayloadLength - m_framePayloadReadPosition;
-
-                    // payload length may be zero
-                    if (needed > 0)
-                    {
-                        qint64 read = qMin(m_socket->bytesAvailable(), needed);
-
-                        if (m_socket->read(m_framePayload.data() + m_framePayloadReadPosition, read) != read)
-                        {
-                            InitiateClose(CloseUnexpectedError, QString("Read error"));
-                            return;
-                        }
-
-                        m_framePayloadReadPosition += read;
-                    }
-
-                    // finished
-                    if (m_framePayloadReadPosition == m_framePayloadLength)
-                    {
-                        LOG(VB_NETWORK, LOG_DEBUG, QString("Frame, Final: %1 OpCode: '%2' Masked: %3 Length: %4")
-                            .arg(m_frameFinalFragment).arg(OpCodeToString(m_frameOpCode)).arg(m_frameMasked).arg(m_framePayloadLength));
-
-                        // unmask payload
-                        if (m_frameMasked)
-                            for (int i = 0; i < m_framePayload.size(); ++i)
-                                m_framePayload[i] = (m_framePayload[i] ^ m_frameMask[i % 4]);
-
-                        // start buffering fragmented payloads
-                        if (!m_frameFinalFragment && (m_frameOpCode == OpText || m_frameOpCode == OpBinary))
-                        {
-                            // header checks should prevent this
-                            if (m_bufferedPayload)
-                            {
-                                delete m_bufferedPayload;
-                                LOG(VB_GENERAL, LOG_WARNING, "Already have payload buffer - deleting");
-                            }
-
-                            m_bufferedPayload = new QByteArray(m_framePayload);
-                            m_bufferedPayloadOpCode = m_frameOpCode;
-                        }
-                        else if (m_frameOpCode == OpContinuation)
-                        {
-                            if (m_bufferedPayload)
-                                m_bufferedPayload->append(m_framePayload);
-                            else
-                                LOG(VB_GENERAL, LOG_ERR, "Continuation frame but no buffered payload");
-                        }
-
-                        // finished
-                        if (m_frameFinalFragment)
-                        {
-                            if (m_frameOpCode == OpPong)
-                            {
-                                HandlePong(m_framePayload);
-                            }
-                            else if (m_frameOpCode == OpPing)
-                            {
-                                HandlePing(m_framePayload);
-                            }
-                            else if (m_frameOpCode == OpClose)
-                            {
-                                HandleCloseRequest(m_framePayload);
-                            }
-                            else
-                            {
-                                bool invalidtext = false;
-
-                                // validate and debug UTF8 text
-                                if (!m_bufferedPayload && m_frameOpCode == OpText && !m_framePayload.isEmpty())
-                                {
-                                    if (!utf8::is_valid(m_framePayload.data(), m_framePayload.data() + m_framePayload.size()))
-                                    {
-                                        LOG(VB_GENERAL, LOG_ERR, "Invalid UTF8");
-                                        invalidtext = true;
-                                    }
-                                    else
-                                    {
-                                        LOG(VB_NETWORK, LOG_DEBUG, QString("'%1'").arg(QString::fromUtf8(m_framePayload)));
-                                    }
-                                }
-                                else if (m_bufferedPayload && m_bufferedPayloadOpCode == OpText)
-                                {
-                                    if (!utf8::is_valid(m_bufferedPayload->data(), m_bufferedPayload->data() + m_bufferedPayload->size()))
-                                    {
-                                        LOG(VB_GENERAL, LOG_ERR, "Invalid UTF8");
-                                        invalidtext = true;
-                                    }
-                                    else
-                                    {
-                                        LOG(VB_NETWORK, LOG_DEBUG, QString("'%1'").arg(QString::fromUtf8(*m_bufferedPayload)));
-                                    }
-                                }
-
-                                if (invalidtext)
-                                {
-                                    InitiateClose(CloseInconsistentData, "Invalid UTF-8 text");
-                                }
-                                else
-                                {
-                                    // echo test for AutoBahn test suite
-                                    if (m_echoTest)
-                                    {
-                                        SendFrame(m_bufferedPayload ? m_bufferedPayloadOpCode : m_frameOpCode,
-                                                  m_bufferedPayload ? *m_bufferedPayload : m_framePayload);
-                                    }
-                                    else
-                                    {
-                                        ProcessPayload(m_bufferedPayload ? *m_bufferedPayload : m_framePayload);
-                                    }
-                                }
-                                delete m_bufferedPayload;
-                                m_bufferedPayload = NULL;
-                            }
-                        }
-
-                        // reset frame and readstate
-                        m_readState = ReadHeader;
-                        m_framePayload = QByteArray();
-                        m_framePayloadReadPosition = 0;
-                        m_framePayloadLength = 0;
-                    }
-                    else if (m_framePayload.size() > (qint64)m_framePayloadLength)
-                    {
-                        // this shouldn't happen
-                        InitiateClose(CloseUnexpectedError, QString("Read error"));
-                        return;
-                    }
-                }
-                break;
+                if (m_wsReader.CloseSent())
+                    SetState(SocketState::Disconnecting);
+            }
+            else
+            {
+                // have a payload
+                ProcessPayload(m_wsReader.GetPayload());
+                m_wsReader.Reset();
             }
         }
     }
@@ -1078,28 +709,16 @@ void TorcWebSocket::SubscriberDeleted(QObject *Object)
 
 void TorcWebSocket::CloseSocket(void)
 {
-    if (m_socket)
-    {
-        m_socket->disconnectFromHost();
-        // we only check for connected state - we don't care if it is any in any prior or subsequent state (hostlookup, connecting) and
-        // the wait is only a 'courtesy' anyway.
-        if (m_socket->state() == QAbstractSocket::ConnectedState && !m_socket->waitForDisconnected(1000))
-            LOG(VB_GENERAL, LOG_WARNING, "WebSocket not successfully disconnected before closing");
-        m_socket->close();
-        m_socket->deleteLater();
-        m_socket = NULL;
-    }
+    disconnectFromHost();
+    // we only check for connected state - we don't care if it is any in any prior or subsequent state (hostlookup, connecting) and
+    // the wait is only a 'courtesy' anyway.
+    if (state() == QAbstractSocket::ConnectedState && !waitForDisconnected(1000))
+        LOG(VB_GENERAL, LOG_WARNING, "WebSocket not successfully disconnected before closing");
+    close();
 }
 
 void TorcWebSocket::Connected(void)
 {
-    if (!m_socket)
-    {
-        LOG(VB_GENERAL, LOG_ERR, "Trying to connect but no socket");
-        SetState(SocketState::ErroredSt);
-        return;
-    }
-
     SetState(SocketState::Upgrading);
     SendHandshake();
 }
@@ -1143,14 +762,14 @@ void TorcWebSocket::SendHandshake(void)
     stream << "Sec-WebSocket-Key: " << nonce.data() << "\r\n";
     stream << "Torc-UUID: " << gLocalContext->GetUuid() << "\r\n";
     stream << "Torc-Port: " << QString::number(TorcHTTPServer::GetPort()) << "\r\n";
-    if (m_subProtocol != SubProtocolNone)
-        stream << "Sec-WebSocket-Protocol: " << SubProtocolsToString(m_subProtocol) << "\r\n";
+    if (m_subProtocol != TorcWebSocketReader::SubProtocolNone)
+        stream << "Sec-WebSocket-Protocol: " << TorcWebSocketReader::SubProtocolsToString(m_subProtocol) << "\r\n";
     if (m_authenticate)
         stream << "Authorization: " << QByteArray("Basic " + QByteArray("admin:1234").toBase64()) << "\r\n";
     stream << "\r\n";
     stream.flush();
 
-    if (m_socket->write(upgrade->data(), upgrade->size()) != upgrade->size())
+    if (write(upgrade->data(), upgrade->size()) != upgrade->size())
     {
         LOG(VB_GENERAL, LOG_ERR, "Unexpected write error");
         SetState(SocketState::ErroredSt);
@@ -1158,7 +777,7 @@ void TorcWebSocket::SendHandshake(void)
     }
 
     LOG(VB_GENERAL, LOG_DEBUG, QString("Client WebSocket connected to '%1' (SubProtocol: %2)")
-        .arg(TorcNetwork::IPAddressToLiteral(m_address, (m_port))).arg(SubProtocolsToString(m_subProtocol)));
+        .arg(TorcNetwork::IPAddressToLiteral(m_address, (m_port))).arg(TorcWebSocketReader::SubProtocolsToString(m_subProtocol)));
 
     LOG(VB_NETWORK, LOG_DEBUG, QString("Data...\r\n%1").arg(upgrade->data()));
 }
@@ -1180,7 +799,7 @@ void TorcWebSocket::ReadHandshake(void)
     }
 
     // read response (which is the only raw HTTP we should see)
-    if (!m_reader.Read(m_socket))
+    if (!m_reader.Read(this))
     {
         LOG(VB_GENERAL, LOG_ERR, "Error reading upgrade response");
         SetState(SocketState::ErroredSt);
@@ -1245,7 +864,7 @@ void TorcWebSocket::ReadHandshake(void)
         // ensure the correct subprotocol (if any) has been agreed
         if (valid)
         {
-            if (m_subProtocol == SubProtocolNone)
+            if (m_subProtocol == TorcWebSocketReader::SubProtocolNone)
             {
                 if (!protocols.isEmpty())
                 {
@@ -1255,7 +874,7 @@ void TorcWebSocket::ReadHandshake(void)
             }
             else
             {
-                WSSubProtocols subprotocols = SubProtocolsFromString(protocols);
+                TorcWebSocketReader::WSSubProtocols subprotocols = TorcWebSocketReader::SubProtocolsFromString(protocols);
                 if ((subprotocols | m_subProtocol) != m_subProtocol)
                 {
                     valid = false;
@@ -1279,11 +898,8 @@ void TorcWebSocket::ReadHandshake(void)
 void TorcWebSocket::Error(QAbstractSocket::SocketError SocketError)
 {
     (void)SocketError;
-    if (m_socket)
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("Socket error: %1 ('%2')").arg(m_socket->error()).arg(m_socket->errorString()));
-        SetState(SocketState::ErroredSt);
-    }
+    LOG(VB_GENERAL, LOG_ERR, QString("Socket error: %1 ('%2')").arg(error()).arg(errorString()));
+    SetState(SocketState::ErroredSt);
 }
 
 bool TorcWebSocket::event(QEvent *Event)
@@ -1320,7 +936,7 @@ bool TorcWebSocket::event(QEvent *Event)
         }
     }
 
-    return QObject::event(Event);
+    return QSslSocket::event(Event);
 }
 
 void TorcWebSocket::SetState(SocketState State)
@@ -1340,219 +956,9 @@ void TorcWebSocket::SetState(SocketState State)
         emit ConnectionEstablished();
 }
 
-TorcWebSocket::OpCode TorcWebSocket::FormatForSubProtocol(WSSubProtocol Protocol)
-{
-    switch (Protocol)
-    {
-        case SubProtocolNone:
-            return OpText;
-        case SubProtocolJSONRPC:
-            return OpText;
-    }
-
-    return OpText;
-}
-
-/*! \brief Compose and send a properly formatted websocket frame.
- *
- * \note If this is a client side socket, Payload will be masked in place.
-*/
-void TorcWebSocket::SendFrame(OpCode Code, QByteArray &Payload)
-{
-    // guard against programmer error
-    if (m_socketState != SocketState::Upgraded)
-    {
-        LOG(VB_GENERAL, LOG_ERR, "Trying to send frame from non-upgraded socket");
-        SetState(SocketState::ErroredSt);
-        return;
-    }
-
-    // don't send if OpClose has already been sent or OpClose received and
-    // we're sending anything other than the echoed OpClose
-    if (m_closeSent || (m_closeReceived && Code != OpClose))
-        return;
-
-    QByteArray frame;
-    QByteArray mask;
-    QByteArray size;
-
-    // no fragmentation yet - so this is always the final fragment
-    frame.append(Code | 0x80);
-
-    quint8 byte = 0;
-
-    // is this masked
-    if (!m_serverSide)
-    {
-        for (int i = 0; i < 4; ++i)
-            mask.append(qrand() % 0x100);
-
-        byte |= 0x80;
-    }
-
-    // generate correct size
-    quint64 length = Payload.size();
-
-    if (length < 126)
-    {
-        byte |= length;
-    }
-    else if (length <= 0xffff)
-    {
-        byte |= 126;
-        size.append((length >> 8) & 0xff);
-        size.append(length & 0xff);
-    }
-    else if (length <= 0x7fffffff)
-    {
-        byte |= 127;
-        size.append((length >> 56) & 0xff);
-        size.append((length >> 48) & 0xff);
-        size.append((length >> 40) & 0xff);
-        size.append((length >> 32) & 0xff);
-        size.append((length >> 24) & 0xff);
-        size.append((length >> 16) & 0xff);
-        size.append((length >> 8 ) & 0xff);
-        size.append((length      ) & 0xff);
-    }
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, "Infeasibly large payload!");
-        return;
-    }
-
-    frame.append(byte);
-    if (size.size())
-        frame.append(size);
-
-    if (!m_serverSide)
-    {
-        frame.append(mask);
-        for (int i = 0; i < Payload.size(); ++i)
-            Payload[i] = Payload[i] ^ mask[i % 4];
-    }
-
-    if (m_socket && m_socket->write(frame) == frame.size())
-    {
-        if ((Payload.size() && m_socket->write(Payload) == Payload.size()) || !Payload.size())
-        {
-            m_socket->flush();
-            LOG(VB_NETWORK, LOG_DEBUG, QString("Sent frame (Final), OpCode: '%1' Masked: %2 Length: %3")
-                .arg(OpCodeToString(Code)).arg(!m_serverSide).arg(Payload.size()));
-            return;
-        }
-    }
-
-    if (Code != OpClose)
-        InitiateClose(CloseUnexpectedError, QString("Send error"));
-}
-
-void TorcWebSocket::HandlePing(QByteArray &Payload)
-{
-    // ignore pings once in close down
-    if (m_closeReceived || m_closeSent)
-        return;
-
-    SendFrame(OpPong, Payload);
-}
-
-void TorcWebSocket::HandlePong(QByteArray &Payload)
-{
-    // TODO validate known pings
-    (void)Payload;
-}
-
-void TorcWebSocket::HandleCloseRequest(QByteArray &Close)
-{
-    CloseCode newclosecode = CloseNormal;
-    int closecode = CloseNormal;
-    QString reason;
-
-    if (Close.size() < 1)
-    {
-        QByteArray newpayload;
-        newpayload.append((closecode >> 8) & 0xff);
-        newpayload.append(closecode & 0xff);
-        Close = newpayload;
-    }
-    // payload size 1 is invalid
-    else if (Close.size() == 1)
-    {
-        LOG(VB_GENERAL, LOG_ERR, "Invalid close payload size (<2)");
-        newclosecode = CloseProtocolError;
-    }
-    // check close code if present
-    else if (Close.size() > 1)
-    {
-        closecode = qFromBigEndian<quint16>(reinterpret_cast<const uchar *>(Close.data()));
-
-        if (closecode < CloseNormal || closecode > 4999 || closecode == CloseReserved1004 ||
-            closecode == CloseStatusCodeMissing || closecode == CloseAbnormal || closecode == CloseTLSHandshakeError)
-        {
-            LOG(VB_GENERAL, LOG_ERR, "Invalid close code");
-            newclosecode = CloseProtocolError;
-        }
-    }
-
-    // check close reason if present
-    if (Close.size() > 2 && newclosecode == CloseNormal)
-    {
-        if (!utf8::is_valid(Close.data() + 2, Close.data() + Close.size()))
-        {
-            LOG(VB_GENERAL, LOG_ERR, "Invalid UTF8 in close payload");
-            newclosecode = CloseInconsistentData;
-        }
-        else
-        {
-            reason = QString::fromUtf8(Close.data() + 2, Close.size() -2);
-        }
-    }
-
-    if (newclosecode != CloseNormal)
-    {
-        QByteArray newpayload;
-        newpayload.append((newclosecode >> 8) & 0xff);
-        newpayload.append(newclosecode & 0xff);
-        Close = newpayload;
-    }
-    else
-    {
-        LOG(VB_NETWORK, LOG_INFO, QString("Received Close: %1 ('%2')").arg(CloseCodeToString((CloseCode)closecode)).arg(reason));
-    }
-
-    m_closeReceived = true;
-
-    if (m_closeSent)
-    {
-        // OpClose sent and received, exit immediately
-        SetState(SocketState::Disconnecting);
-    }
-    else
-    {
-        // echo back the payload and close request
-        SendFrame(OpClose, Close);
-        m_closeSent = true;
-        SetState(SocketState::Disconnecting);
-    }
-}
-
-void TorcWebSocket::InitiateClose(CloseCode Close, const QString &Reason)
-{
-    if (!m_closeSent && m_socketState == SocketState::Upgraded)
-    {
-        QByteArray payload;
-        payload.append((Close >> 8) & 0xff);
-        payload.append(Close & 0xff);
-        payload.append(Reason.toUtf8());
-        SendFrame(OpClose, payload);
-        m_closeSent = true;
-        SetState(SocketState::Disconnecting);
-    }
-}
-
 void TorcWebSocket::ProcessPayload(const QByteArray &Payload)
 {
-    if (m_subProtocol == SubProtocolJSONRPC)
+    if (m_subProtocol == TorcWebSocketReader::SubProtocolJSONRPC)
     {
         // NB there is no method to support SENDING batched requests (hence
         // we should only receive batched requests from 3rd parties) and hence there
@@ -1562,7 +968,7 @@ void TorcWebSocket::ProcessPayload(const QByteArray &Payload)
         // if the request has data, we need to send it (it was a request!)
         if (!request->GetData().isEmpty())
         {
-            SendFrame(m_subProtocolFrameFormat, request->GetData());
+            m_wsReader.SendFrame(m_subProtocolFrameFormat, request->GetData());
         }
         // if the request has an id, we need to process it
         else if (request->GetID() > -1)

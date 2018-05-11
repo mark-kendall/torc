@@ -50,7 +50,7 @@ class WebSocketAuthentication
 
 /*! \brief Retrieve an authentication token for the given request or validate a current token.
 */
-QString TorcWebSocketToken::GetWebSocketToken(const QString &Host, TorcHTTPRequest *Request, const QString &Current)
+QString TorcWebSocketToken::GetWebSocketToken(const QString &Host, const QString &Current)
 {
     static QMutex lock(QMutex::Recursive);
     static QMap<QString,WebSocketAuthentication> tokens;
@@ -67,10 +67,6 @@ QString TorcWebSocketToken::GetWebSocketToken(const QString &Host, TorcHTTPReque
 
     foreach (QString expire, old)
         tokens.remove(expire);
-
-    // safety net
-    if (!Request)
-        return QString("ServerErRor");
 
     // if a current token is supplied, validate it
     if (!Current.isEmpty())

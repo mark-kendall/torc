@@ -61,20 +61,18 @@ TorcHTMLHandler::TorcHTMLHandler(const QString &Path, const QString &Name)
     m_allowedFiles << "/" << "/index.html" << "/torc.xsd" << "/browserconfig.xml" << "/manifest.json";
 }
 
-void TorcHTMLHandler::ProcessHTTPRequest(const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest *Request)
+void TorcHTMLHandler::ProcessHTTPRequest(const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest &Request)
 {
     (void)PeerAddress;
     (void)PeerPort;
     (void)LocalAddress;
     (void)LocalPort;
-    if (!Request)
-        return;
 
     // handle options request
-    if (Request->GetHTTPRequestType() == HTTPOptions)
+    if (Request.GetHTTPRequestType() == HTTPOptions)
     {
         // this is the 'global' options - return everything possible
-        if (Request->GetUrl() == "/*")
+        if (Request.GetUrl() == "/*")
             HandleOptions(Request, HTTPHead | HTTPGet | HTTPPost | HTTPPut | HTTPDelete | HTTPOptions);
         else
             HandleOptions(Request, HTTPHead | HTTPGet | HTTPOptions);
@@ -82,7 +80,7 @@ void TorcHTMLHandler::ProcessHTTPRequest(const QString &PeerAddress, int PeerPor
     }
 
     // allowed file?
-    QString url = Request->GetUrl();
+    QString url = Request.GetUrl();
     if (m_allowedFiles.contains(url))
     {
         if (url == "/")
@@ -97,7 +95,7 @@ void TorcHTMLHandler::ProcessHTTPRequest(const QString &PeerAddress, int PeerPor
     }
     else
     {
-        Request->SetResponseType(HTTPResponseNone);
-        Request->SetStatus(HTTP_NotFound);
+        Request.SetResponseType(HTTPResponseNone);
+        Request.SetStatus(HTTP_NotFound);
     }
 }

@@ -187,22 +187,55 @@ $(document).ready(function() {
         }
     }
 
+    function addLogTailModal(title, menu, contentSource, contentType) {
+        var modalid     = 'logtail' + 'torcmodal';
+        var contentid   = modalid + 'content';
+        var menuid      = modalid + 'menu';
+        $('.navbar-fixed-top').after(template(theme.FileModal, { "id": modalid, "title": title, "contentid": contentid }));
+        var item = template(theme.DropdownItemWithIcon, { "icon": "file-text-o", "text": menu });
+        addDropdownMenuItem('torc-central-menu', menuid, '#' + modalid, item,
+                            function () {
+                                $('#' + modalid).on('hidden.bs.modal', function () {
+                                            $('#' + contentid).text('');
+                                            torcconnection.unsubscribe('log');
+                                        }
+                                    );
+                                torcconnection.subscribe('log', ['tail'],
+                                    function (name, value) {
+                                        if (name === 'tail') {
+                                            var current = $('#' + contentid).text();
+                                            $('#' + contentid).text(current + value);
+                                            $('#' + modalid).scrollTop($('#' + modalid).scrollTop() + $('#' + modalid).height());
+                                        };
+                                    },
+                                    function (version, ignore, properties) {
+                                        $.each(properties, function (key, value) {
+                                            if (key === 'tail') {
+                                                $('#' + contentid).text(value.value);
+                                            }
+                                        });
+                                    });
+                            });
+        $('.' + menuid + ' > a').attr('data-toggle', 'modal');
+    }
+
     function addFileModal(name, title, menu, contentSource, contentType) {
         var modalid     = name    + 'torcmodal';
         var contentid   = modalid + 'content';
         var menuid      = modalid + 'menu';
         $('.navbar-fixed-top').after(template(theme.FileModal, { "id": modalid, "title": title, "contentid": contentid }));
-
-        $.ajax({ url: contentSource,
-                 dataType: contentType,
-                 xhrFields: { withCredentials: true }
-               })
-               .done(function (ignore, ignore2, xhr) {
-                    $('#' + contentid).text(xhr.responseText);
-                   var item = template(theme.DropdownItemWithIcon, { "icon": "file-text-o", "text": menu });
-                   addDropdownMenuItem('torc-central-menu', menuid, '#' + modalid, item);
-                   $('.' + menuid + ' > a').attr('data-toggle', 'modal');
-               });
+        var item = template(theme.DropdownItemWithIcon, { "icon": "file-text-o", "text": menu });
+        addDropdownMenuItem('torc-central-menu', menuid, '#' + modalid, item,
+                            function () {
+                                $.ajax({ url: contentSource,
+                                         dataType: contentType,
+                                         xhrFields: { withCredentials: true }
+                                       })
+                                       .done(function (ignore, ignore2, xhr) {
+                                            $('#' + contentid).text(xhr.responseText);
+                                       });
+                            });
+        $('.' + menuid + ' > a').attr('data-toggle', 'modal');
     }
 
     function centralSubscriptionChanged(version, ignore, properties) {
@@ -213,9 +246,11 @@ $(document).ready(function() {
 
             // we need the central menu before adding other options
             // NB centralSubscriptionChanged should only ever be called once...
-            addFileModal('config', torc.ViewConfigTitleTr, torc.ViewConfigTr, '/content/torc.xml', 'xml');
-            addFileModal('xsd',    torc.ViewXSDTitleTr,    torc.ViewXSDTr,    '/content/torc.xsd', 'xml');
-            addFileModal('dot',    torc.ViewDOTTitleTr,    torc.ViewDOTTr,    '/content/stategraph.dot', 'text');
+            addFileModal('config',  torc.ViewConfigTitleTr, torc.ViewConfigTr, '/content/torc.xml',       'xml');
+            addFileModal('xsd',     torc.ViewXSDTitleTr,    torc.ViewXSDTr,    '/content/torc.xsd',       'xml');
+            addFileModal('dot',     torc.ViewDOTTitleTr,    torc.ViewDOTTr,    '/content/stategraph.dot', 'text');
+            addFileModal('log',     torc.ViewLogTitleTr,    torc.ViewLogTr,    '/services/log/GetLog',    'text');
+            addLogTailModal(torc.FollowLogTitleTr, torc.FollowLogTr, '/services/log/GetTail', 'text');
 
             torcapi.setup(torcconnection);
             return;

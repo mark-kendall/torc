@@ -207,6 +207,7 @@ bool TorcLocalContextPriv::Init(void)
 
     LOG(VB_GENERAL, LOG_INFO, QString("UUID: %1").arg(m_uuid));
 
+    /* We no longer use QRunnables, so ignore this for now at least
     // don't expire threads
     QThreadPool::globalInstance()->setExpiryTimeout(-1);
 
@@ -215,6 +216,7 @@ bool TorcLocalContextPriv::Init(void)
     int want  = ideal * 8;
     LOG(VB_GENERAL, LOG_INFO, QString("Setting thread pool size to %1 (was %2)").arg(want).arg(ideal));
     QThreadPool::globalInstance()->setMaxThreadCount(want);
+    */
 
     // Bump the UI thread priority
     QThread::currentThread()->setPriority(QThread::TimeCriticalPriority);

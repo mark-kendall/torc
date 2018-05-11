@@ -9,7 +9,7 @@ class TorcSQLiteDB : public TorcDB
     explicit TorcSQLiteDB(const QString &DatabaseName);
 
   protected:
-    bool InitDatabase(void);
+    bool InitDatabase(void) Q_DECL_OVERRIDE;
 };
 
 #endif // TORCSQLITEDB_H

@@ -29,10 +29,13 @@
 #include "torclogging.h"
 #include "torcdb.h"
 
-/*! \class TorcDBPriv
- *  \brief Private implementation of Sql database management.
+/*! \class TorcDB
+ *  \brief Base Sql database access class.
  *
- * TorcDBPriv handles multi-threaded access to the database engine.
+ * TorcDB is the base implementation for Sql database access. It is currently limited
+ * to setting and retrieving preferences and settings and whilst designed for generic Sql
+ * usage, the only current concrete subclass is TorcSQliteDB. Changes may (will) be required for
+ * other database types and usage.
  *
  * By default, QSql database access is not thread safe and a new connection must be opened for
  * each thread that wishes to use the database. TorcDB (and its subclasses) will ask
@@ -42,132 +45,6 @@
  * hence database access will not work from QRunnable's or other miscellaneous threads - this is by design
  * and is NOT a bug.
  *
- * \sa TorcDB
- * \sa TorcSQLiteDB
-*/
-class TorcDBPriv
-{
-  public:
-    TorcDBPriv(const QString &Name, const QString &Type)
-      : m_name(Name),
-        m_type(Type),
-        m_lock(new QMutex(QMutex::Recursive)),
-        m_connectionMap()
-    {
-    }
-
-    ~TorcDBPriv()
-    {
-        CloseConnections();
-
-        delete m_lock;
-        m_lock = NULL;
-    }
-
-    /*! \fn    TorcDBPriv::CloseConnections
-     *  \brief Close all cached database connections.
-    */
-    void CloseConnections(void)
-    {
-        QMutexLocker locker(m_lock);
-
-        CloseThreadConnection();
-
-        if (!m_connectionMap.size())
-            return;
-
-        LOG(VB_GENERAL, LOG_WARNING, QString("%1 open connections.").arg(m_connectionMap.size()));
-
-        QHashIterator<QThread*,QString> it(m_connectionMap);
-        while (it.hasNext())
-        {
-            it.next();
-            QString name = it.value();
-            LOG(VB_GENERAL, LOG_INFO, QString("Removing connection '%1'").arg(name));
-            QSqlDatabase::removeDatabase(name);
-        }
-        m_connectionMap.clear();
-    }
-
-/*! \fn    TorcDBPriv::GetThreadConnection
- *  \brief Retrieve a database connection for the current thread.
- *
- * Database connections are cached (thus limiting connections to one per thread).
- *
- * \sa CloseConnections
- * \sa CloseThreadConnection
-*/
-    QString GetThreadConnection(void)
-    {
-        QThread* thread = QThread::currentThread();
-
-        {
-            QMutexLocker locker(m_lock);
-            if (m_connectionMap.contains(thread))
-                return m_connectionMap.value(thread);
-        }
-
-        if (thread->objectName().isEmpty())
-        {
-            LOG(VB_GENERAL, LOG_ERR, "Database access is only available from TorcQThread");
-            return QString();
-        }
-
-        QString name = QString("%1-%2")
-                           .arg(thread->objectName())
-                           .arg(QString::number((unsigned long long)thread));
-        QSqlDatabase newdb = QSqlDatabase::addDatabase(m_type, name);
-
-        if (m_type == "QSQLITE")
-            newdb.setConnectOptions("QSQLITE_BUSY_TIMEOUT=1");
-        newdb.setDatabaseName(m_name);
-
-        {
-            QMutexLocker locker(m_lock);
-            m_connectionMap.insert(thread, name);
-            LOG(VB_GENERAL, LOG_INFO, QString("New connection '%1'").arg(name));
-        }
-
-        return name;
-    }
-
-    /*! \fn    TorcDBPriv::CloseThreadConnection
-     *  \brief Close the database connection for the current thread.
-    */
-    void CloseThreadConnection(void)
-    {
-        QThread* thread = QThread::currentThread();
-        QMutexLocker locker(m_lock);
-        if (m_connectionMap.contains(thread))
-        {
-            QString name = m_connectionMap.value(thread);
-            LOG(VB_GENERAL, LOG_INFO, QString("Removing connection '%1'").arg(name));
-            QSqlDatabase::removeDatabase(name);
-            m_connectionMap.remove(thread);
-        }
-    }
-
-  private:
-    QString  m_name;
-    QString  m_type;
-    QMutex  *m_lock;
-    QHash<QThread*,QString> m_connectionMap;
-
-  private:
-    // disable copy and assignment constructors
-    TorcDBPriv(const TorcDBPriv &) Q_DECL_EQ_DELETE;
-    TorcDBPriv &operator=(const TorcDBPriv &) Q_DECL_EQ_DELETE;
-};
-
-/*! \class TorcDB
- *  \brief Base Sql database access class.
- *
- * TorcDB is the base implementation for Sql database access. It is currently limited
- * to setting and retrieving preferences and settings and whilst designed for generic Sql
- * usage, the only current concrete subclass is TorcSQliteDB. Changes may (will) be required for
- * other database types and usage.
- *
- * \sa TorcDBPriv
  * \sa TorcSQLiteDB
  * \sa TorcLocalContext
 */
@@ -175,15 +52,15 @@ TorcDB::TorcDB(const QString &DatabaseName, const QString &DatabaseType)
   : m_databaseValid(false),
     m_databaseName(DatabaseName),
     m_databaseType(DatabaseType),
-    m_databasePriv(new TorcDBPriv(DatabaseName, DatabaseType))
+    m_lock(QMutex::Recursive),
+    m_connectionMap()
 {
 }
 
 TorcDB::~TorcDB()
 {
     m_databaseValid = false;
-    delete m_databasePriv;
-    m_databasePriv = NULL;
+    CloseConnections();
 }
 
 /*! \fn    TorcDB::IsValid
@@ -194,22 +71,87 @@ bool TorcDB::IsValid(void) const
     return m_databaseValid;
 }
 
-/*! \fn TorcDB::CloseThreadConnection
- *
- * \sa TorcDBPriv::CloseThreadConnection
+/*! \fn    TorcDB::CloseConnections
+ *  \brief Close all cached database connections.
+*/
+void TorcDB::CloseConnections(void)
+{
+    QMutexLocker locker(&m_lock);
+
+    CloseThreadConnection();
+
+    if (!m_connectionMap.size())
+        return;
+
+    LOG(VB_GENERAL, LOG_WARNING, QString("%1 open connections.").arg(m_connectionMap.size()));
+
+    QHashIterator<QThread*,QString> it(m_connectionMap);
+    while (it.hasNext())
+    {
+        it.next();
+        QString name = it.value();
+        LOG(VB_GENERAL, LOG_INFO, QString("Removing connection '%1'").arg(name));
+        QSqlDatabase::removeDatabase(name);
+    }
+    m_connectionMap.clear();
+}
+
+/*! \fn    TorcDB::CloseThreadConnection
+ *  \brief Close the database connection for the current thread.
 */
 void TorcDB::CloseThreadConnection(void)
 {
-    m_databasePriv->CloseThreadConnection();
+    QThread* thread = QThread::currentThread();
+    QMutexLocker locker(&m_lock);
+    if (m_connectionMap.contains(thread))
+    {
+        QString name = m_connectionMap.value(thread);
+        LOG(VB_GENERAL, LOG_INFO, QString("Removing connection '%1'").arg(name));
+        QSqlDatabase::removeDatabase(name);
+        m_connectionMap.remove(thread);
+    }
 }
 
-/*! \fn TorcDB::GetThreadConnection
+/*! \fn    TorcDB::GetThreadConnection
+ *  \brief Retrieve a database connection for the current thread.
  *
- * \sa TorcDBPriv::GetThreadConnection
+ * Database connections are cached (thus limiting connections to one per thread).
+ *
+ * \sa CloseConnections
+ * \sa CloseThreadConnection
 */
 QString TorcDB::GetThreadConnection(void)
 {
-    return m_databasePriv->GetThreadConnection();
+    QThread* thread = QThread::currentThread();
+
+    {
+        QMutexLocker locker(&m_lock);
+        if (m_connectionMap.contains(thread))
+            return m_connectionMap.value(thread);
+    }
+
+    if (thread->objectName().isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Database access is only available from TorcQThread");
+        return QString();
+    }
+
+    QString name = QString("%1-%2")
+                       .arg(thread->objectName())
+                       .arg(QString::number((unsigned long long)thread));
+    QSqlDatabase newdb = QSqlDatabase::addDatabase(m_databaseType, name);
+
+    if (m_databaseType == "QSQLITE")
+        newdb.setConnectOptions("QSQLITE_BUSY_TIMEOUT=1");
+    newdb.setDatabaseName(m_databaseName);
+
+    {
+        QMutexLocker locker(&m_lock);
+        m_connectionMap.insert(thread, name);
+        LOG(VB_GENERAL, LOG_INFO, QString("New connection '%1'").arg(name));
+    }
+
+    return name;
 }
 
 /*! \fn    TorcDB::DebugError(QSqlQuery*)

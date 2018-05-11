@@ -5,39 +5,28 @@
 #include <QMutex>
 #include <QDateTime>
 
+// Torc
+#include "torchttprequest.h"
+
 #define TORC_REALM QString("Torc")
-#define DEFAULT_NONCE_LIFETIME_SECONDS  60
-#define DEFAULT_NONCE_LIFETIME_REQUESTS 0  // unlimited
+#define DEFAULT_NONCE_LIFETIME_SECONDS  10 // expire 10 seconds after issue or last use
+#define DEFAULT_NONCE_LIFETIME_REQUESTS 0  // unlimited uses
 
 class TorcHTTPServerNonce
 {
   public:
-    static quint64                             gServerNoncesCount;
-    static QHash<QString,TorcHTTPServerNonce*> gServerNonces;
-    static QMutex                             *gServerNoncesLock;
+    static void ProcessDigestAuth (TorcHTTPRequest &Request, const QString &Username = QString(),  const QString &Password = QString());
 
-    static bool AddNonce(TorcHTTPServerNonce* Nonce);
-    static void RemoveNonce(TorcHTTPServerNonce* Nonce);
-    static void ExpireNonces(void);
-    static bool CheckAuthentication(const QString &Username, const QString &Password,
-                                    const QString &Header,   const QString &Method,
-                                    const QString &URI,      bool &Stale);
-  public:
     TorcHTTPServerNonce();
-    TorcHTTPServerNonce(quint64 LifetimeInSeconds, quint64 LifetimeInRequests = DEFAULT_NONCE_LIFETIME_REQUESTS);
+    TorcHTTPServerNonce(const QDateTime &Time);
    ~TorcHTTPServerNonce();
 
-    QString GetNonce(void) const;
-    QString GetOpaque(void) const;
-    bool UseOnce(quint64 ThisUse, bool &Stale);
-    bool IsOutOfDate(const QDateTime &Current);
-
-  private:
-    void CreateNonce(void);
+    QString     GetOpaque(void) const;
+    bool        UseOnce(quint64 ClientCount, const QDateTime &Current);
+    bool        IsOutOfDate(const QDateTime &Current);
 
   private:
     bool       m_expired;
-    QString    m_nonce;
     QString    m_opaque;
     quint64    m_startMs;
     QDateTime  m_startTime;

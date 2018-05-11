@@ -28,12 +28,12 @@ class TorcRPCRequest : public TorcReferenceCounter
   public:
     TorcRPCRequest(const QString &Method, QObject *Parent);
     explicit TorcRPCRequest(const QString &Method);
-    TorcRPCRequest(TorcWebSocket::WSSubProtocol Protocol, const QByteArray &Data, QObject *Parent, bool Authenticated);
+    TorcRPCRequest(TorcWebSocketReader::WSSubProtocol Protocol, const QByteArray &Data, QObject *Parent, bool Authenticated);
 
     bool                IsNotification         (void) const;
     void                NotifyParent           (void);
     void                SetParent              (QObject *Parent);
-    QByteArray&         SerialiseRequest       (TorcWebSocket::WSSubProtocol Protocol);
+    QByteArray&         SerialiseRequest       (TorcWebSocketReader::WSSubProtocol Protocol);
 
     void                AddState               (int State);
     void                SetID                  (int ID);

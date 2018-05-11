@@ -44,7 +44,8 @@ typedef enum
     HTTPResponsePList,
     HTTPResponseBinaryPList,
     HTTPResponsePListApple,
-    HTTPResponseBinaryPListApple
+    HTTPResponseBinaryPListApple,
+    HTTPResponsePlainText
 } HTTPResponseType;
 
 typedef enum
@@ -92,10 +93,19 @@ typedef enum
     HTTPCacheETag           = (1 << 4)
 } HTTPCacheing;
 
+typedef enum
+{
+    HTTPNotAuthorised       = 0,
+    HTTPAuthorised          = 1,
+    HTTPAuthorisedStale     = 2
+} HTTPAuthorisation;
+
 #define READ_CHUNK_SIZE (1024 *64)
 
 class TorcHTTPRequest
 {
+    friend class TorcWebSocket;
+
   public:
     static HTTPRequestType RequestTypeFromString    (const QString &Type);
     static QString         RequestTypeToString      (HTTPRequestType Type);
@@ -115,7 +125,6 @@ class TorcHTTPRequest
   public:
     explicit TorcHTTPRequest(TorcHTTPReader *Reader);
     TorcHTTPRequest(const QString &Method, QMap<QString,QString> *Headers, QByteArray *Content);
-    ~TorcHTTPRequest();
 
     void                   SetConnection            (HTTPConnection Connection);
     void                   SetStatus                (HTTPStatus Status);
@@ -133,6 +142,7 @@ class TorcHTTPRequest
     QString                GetUrl                   (void) const;
     QString                GetPath                  (void) const;
     QString                GetMethod                (void) const;
+    QString                GetCache                 (void) const;
     const QMap<QString,QString>* Headers            (void) const;
     const QMap<QString,QString>& Queries            (void) const;
     void                   Respond                  (QTcpSocket *Socket);
@@ -140,10 +150,11 @@ class TorcHTTPRequest
     TorcSerialiser*        GetSerialiser            (void);
     bool                   Unmodified               (const QDateTime &LastModified);
     bool                   Unmodified               (void);
-    void                   Authorise                (bool Allow);
-    bool                   IsAuthorised             (void) const;
+    void                   Authorise                (HTTPAuthorisation Authorisation);
+    HTTPAuthorisation      IsAuthorised             (void) const;
 
   protected:
+   ~TorcHTTPRequest();
     void                   Initialise               (const QString &Method);
 
   protected:
@@ -163,7 +174,7 @@ class TorcHTTPRequest
 
     bool                   m_allowGZip;
     int                    m_allowed;
-    bool                   m_authorised;
+    HTTPAuthorisation      m_authorised;
     HTTPResponseType       m_responseType;
     int                    m_cache;
     QString                m_cacheTag;

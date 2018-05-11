@@ -20,8 +20,15 @@
 * USA.
 */
 
+// Qt
+#include <QFile>
+#include <QSslKey>
+#include <QSslCipher>
+#include <QSslConfiguration>
+
 // Torc
 #include "torclogging.h"
+#include "torcdirectories.h"
 #include "torcwebsocketthread.h"
 
 /*! \class TorcWebSocketThread
@@ -49,11 +56,12 @@ TorcWebSocketThread::TorcWebSocketThread(qintptr SocketDescriptor)
     m_address(QHostAddress::Null),
     m_port(0),
     m_authenticate(false),
-    m_protocol(TorcWebSocket::SubProtocolNone)
+    m_protocol(TorcWebSocketReader::SubProtocolNone)
 {
 }
 
-TorcWebSocketThread::TorcWebSocketThread(const QHostAddress &Address, quint16 Port, bool Authenticate, TorcWebSocket::WSSubProtocol Protocol)
+TorcWebSocketThread::TorcWebSocketThread(const QHostAddress &Address, quint16 Port, bool Authenticate,
+                                         TorcWebSocketReader::WSSubProtocol Protocol)
   : TorcQThread("SocketOut"),
     m_webSocket(NULL),
     m_socketDescriptor(0),
@@ -70,6 +78,64 @@ TorcWebSocketThread::~TorcWebSocketThread()
 
 void TorcWebSocketThread::Start(void)
 {
+    // one off SSL default configuration
+    static bool SSL = false;
+    static bool SSLDefaultsSet = false;
+    if (!SSLDefaultsSet && SSL)
+    {
+        SSLDefaultsSet = true;
+        QSslConfiguration config;
+        config.setProtocol(QSsl::TlsV1_2OrLater);
+        config.setCiphers(QSslConfiguration::supportedCiphers());
+
+        QString certlocation = GetTorcConfigDir() + "/torc.cert";
+        LOG(VB_GENERAL, LOG_INFO, QString("SSL: looking for cert in '%1'").arg(certlocation));
+        QFile certFile(certlocation);
+        certFile.open(QIODevice::ReadOnly);
+        if (certFile.isOpen())
+        {
+            QSslCertificate certificate(&certFile, QSsl::Pem);
+            if (!certificate.isNull())
+            {
+                config.setLocalCertificate(certificate);
+                LOG(VB_GENERAL, LOG_INFO, "SSL: cert loaded");
+            }
+            else
+            {
+                LOG(VB_GENERAL, LOG_ERR, "SSL: error loading/reading cert file");
+            }
+            certFile.close();
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_ERR, "SSL: failed to open cert file for reading");
+        }
+
+        QString keylocation  = GetTorcConfigDir() + "/torc.key";
+        LOG(VB_GENERAL, LOG_INFO, QString("SSL: looking for key in '%1'").arg(keylocation));
+        QFile keyFile(keylocation);
+        keyFile.open(QIODevice::ReadOnly);
+        if (keyFile.isOpen())
+        {
+            QSslKey key(&keyFile, QSsl::Rsa, QSsl::Pem);
+            if (!key.isNull())
+            {
+                config.setPrivateKey(key);
+                LOG(VB_GENERAL, LOG_INFO, "SSL: key loaded");
+            }
+            else
+            {
+                LOG(VB_GENERAL, LOG_ERR, "SSL: error loading/reading key file");
+            }
+            keyFile.close();
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_ERR, "SSL: failed to open key file for reading");
+        }
+        QSslConfiguration::setDefaultConfiguration(config);
+    }
+
     if (m_socketDescriptor)
         m_webSocket = new TorcWebSocket(this, m_socketDescriptor);
     else

@@ -13,7 +13,8 @@ class TorcWebSocketThread : public TorcQThread
 
   public:
     explicit TorcWebSocketThread (qintptr SocketDescriptor);
-    TorcWebSocketThread (const QHostAddress &Address, quint16 Port, bool Authenticate = false, TorcWebSocket::WSSubProtocol Protocol = TorcWebSocket::SubProtocolJSONRPC);
+    TorcWebSocketThread (const QHostAddress &Address, quint16 Port, bool Authenticate = false,
+                         TorcWebSocketReader::WSSubProtocol Protocol = TorcWebSocketReader::SubProtocolJSONRPC);
     ~TorcWebSocketThread();
 
     void                Start    (void) Q_DECL_OVERRIDE;
@@ -36,7 +37,7 @@ class TorcWebSocketThread : public TorcQThread
     const QHostAddress  m_address;
     quint16             m_port;
     bool                m_authenticate;
-    TorcWebSocket::WSSubProtocol m_protocol;
+    TorcWebSocketReader::WSSubProtocol m_protocol;
 
   private:
     Q_DISABLE_COPY(TorcWebSocketThread)

@@ -181,7 +181,7 @@ void TorcPListSerialiser::PListFromMap(const QString &Name, const QVariantMap &V
 class TorcApplePListSerialiserFactory : public TorcSerialiserFactory
 {
   public:
-    TorcApplePListSerialiserFactory() : TorcSerialiserFactory("text/x-apple-plist+xml", "PList")
+    TorcApplePListSerialiserFactory() : TorcSerialiserFactory("text", "x-apple-plist+xml", "PList")
     {
     }
 
@@ -194,7 +194,7 @@ class TorcApplePListSerialiserFactory : public TorcSerialiserFactory
 class TorcPListSerialiserFactory : public TorcSerialiserFactory
 {
   public:
-    TorcPListSerialiserFactory() : TorcSerialiserFactory("application/plist", "PList")
+    TorcPListSerialiserFactory() : TorcSerialiserFactory("application", "plist", "PList")
     {
     }
 

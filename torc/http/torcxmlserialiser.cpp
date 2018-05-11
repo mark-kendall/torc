@@ -49,6 +49,7 @@ HTTPResponseType TorcXMLSerialiser::ResponseType(void)
 void TorcXMLSerialiser::Prepare(void)
 {
     m_buffer.setBuffer(m_content);
+    m_buffer.open(QBuffer::ReadWrite);
     m_xmlStream.setDevice(&m_buffer);
 }
 
@@ -140,7 +141,7 @@ void TorcXMLSerialiser::MapToXML(const QString &Name, const QVariantMap &Value)
 class TorcXMLSerialiserFactory : public TorcSerialiserFactory
 {
   public:
-    TorcXMLSerialiserFactory() : TorcSerialiserFactory("application/xml", "XML")
+    TorcXMLSerialiserFactory() : TorcSerialiserFactory("application", "xml", "XML")
     {
     }
 

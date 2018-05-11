@@ -35,15 +35,13 @@ TorcUPnPContent::TorcUPnPContent()
 {
 }
 
-void TorcUPnPContent::ProcessHTTPRequest(const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest *Request)
+void TorcUPnPContent::ProcessHTTPRequest(const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest &Request)
 {
     (void)PeerAddress;
     (void)PeerPort;
-    if (!Request)
-        return;
 
     // handle options request
-    if (Request->GetHTTPRequestType() == HTTPOptions)
+    if (Request.GetHTTPRequestType() == HTTPOptions)
     {
         HandleOptions(Request, HTTPHead | HTTPGet | HTTPOptions);
         return;
@@ -51,7 +49,7 @@ void TorcUPnPContent::ProcessHTTPRequest(const QString &PeerAddress, int PeerPor
 
     // handle device description
     // N.B. this does not check whether the device is actually published on this interface
-    if (Request->GetMethod().toLower() == "description")
+    if (Request.GetMethod().toLower() == "description")
     {
         QHostAddress base(LocalAddress);
         QString url = base.protocol() == QAbstractSocket::IPv6Protocol ?
@@ -91,10 +89,10 @@ void TorcUPnPContent::ProcessHTTPRequest(const QString &PeerAddress, int PeerPor
         xml.writeEndElement(); // root
         xml.writeEndDocument();
 
-        Request->SetAllowGZip(true);
-        Request->SetStatus(HTTP_OK);
-        Request->SetResponseType(HTTPResponseXML);
-        Request->SetResponseContent(result);
+        Request.SetAllowGZip(true);
+        Request.SetStatus(HTTP_OK);
+        Request.SetResponseType(HTTPResponseXML);
+        Request.SetResponseContent(result);
         return;
     }
 }

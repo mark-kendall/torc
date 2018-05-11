@@ -358,6 +358,52 @@ LoggerBase::~LoggerBase()
 {
 }
 
+QByteArray LoggerBase::GetLine(LogItem *Item)
+{
+    if (!Item)
+        return QByteArray();
+
+    Item->refCount.ref();
+
+    QByteArray line(MAX_STRING_LENGTH, ' ');
+    //char line[MAX_STRING_LENGTH];
+    char timestamp[TIMESTAMP_MAX];
+    char usPart[9];
+    strftime(timestamp, TIMESTAMP_MAX-8, "%Y-%m-%d %H:%M:%S",
+             (const struct tm *)&Item->tm );
+    snprintf(usPart, 5, ".%03d", (int)(Item->usec));
+    strcat(timestamp, usPart);
+    char shortname;
+
+    {
+        QMutexLocker locker(&gLoglevelMapLock);
+        LoglevelMap::iterator it = gLoglevelMap.find(Item->level);
+        if (it == gLoglevelMap.end())
+            shortname = '-';
+        else
+            shortname = (*it).shortname;
+    }
+
+    if (Item->type & kStandardIO)
+    {
+        snprintf(line.data(), MAX_STRING_LENGTH, "%s", Item->message);
+    }
+    else
+    {
+        char fileline[50];
+        snprintf(fileline, 50, "%s (%s:%d)", Item->function, Item->file, Item->line);
+        char* threadName = GetThreadName(Item);
+        pid_t tid = GetThreadTid(Item);
+
+        snprintf(line.data(), MAX_STRING_LENGTH, "%s %c [%6d/%6d] %-11s %-50s - %s\n",
+                 timestamp, shortname, getpid(), tid, threadName, fileline,
+                 Item->message);
+    }
+
+    Item->refCount.deref();
+    return line.trimmed();
+}
+
 FileLogger::FileLogger(QString Filename, bool ErrorsOnly, int Quiet)
   : LoggerBase(Filename),
     m_opened(false),
@@ -413,50 +459,14 @@ bool FileLogger::Logmsg(LogItem *Item)
         return false;
 
     Item->refCount.ref();
-
-    char line[MAX_STRING_LENGTH];
-    char timestamp[TIMESTAMP_MAX];
-    char usPart[9];
-    strftime(timestamp, TIMESTAMP_MAX-8, "%Y-%m-%d %H:%M:%S",
-             (const struct tm *)&Item->tm );
-    snprintf(usPart, 9, ".%06d", (int)(Item->usec));
-    strcat(timestamp, usPart);
-    char shortname;
-
-    {
-        QMutexLocker locker(&gLoglevelMapLock);
-        LoglevelMap::iterator it = gLoglevelMap.find(Item->level);
-        if (it == gLoglevelMap.end())
-            shortname = '-';
-        else
-            shortname = (*it).shortname;
-    }
-
-    int error = 0;
-
-    if (Item->type & kStandardIO)
-    {
-        snprintf(line, MAX_STRING_LENGTH, "%s", Item->message);
-    }
-    else
-    {
-        char fileline[50];
-        snprintf(fileline, 50, "%s (%s:%d)", Item->function, Item->file, Item->line);
-        char* threadName = GetThreadName(Item);
-        pid_t tid = GetThreadTid(Item);
-
-        snprintf(line, MAX_STRING_LENGTH, "%s %c [%6d/%6d] %-11s %-50s - %s\n",
-                 timestamp, shortname, getpid(), tid, threadName, fileline,
-                 Item->message);
-
-        if (m_file.isOpen())
-            error = m_file.write(line);
-        else
-            error = write(1, line, strlen(line));
-    }
-
+    QByteArray line = GetLine(Item);
     LogItem::Delete(Item);
+    return PrintLine(line);
+}
 
+bool FileLogger::PrintLine(QByteArray &Line)
+{
+    int error = m_file.isOpen() ? m_file.write(Line) : write(1, Line, Line.size() /*strlen(line)*/);
     if (error == -1)
     {
         LOG(VB_GENERAL, LOG_ERR,
@@ -466,6 +476,75 @@ bool FileLogger::Logmsg(LogItem *Item)
     }
 
     return true;
+}
+
+WebLogger::WebLogger(QString Filename)
+  : QObject(),
+    TorcHTTPService(this, "log", "log", WebLogger::staticMetaObject, ""),
+    FileLogger(Filename, false, false),
+    log(),
+    tail(),
+    changed(false),
+    lock(QMutex::Recursive)
+{
+    // we rate limit the LogChanged signal to once every 10 seconds
+    startTimer(10000);
+}
+
+WebLogger::~WebLogger()
+{
+}
+
+bool WebLogger::event(QEvent *event)
+{
+    if (event && event->type() == QEvent::Timer)
+    {
+        lock.lock();
+        if (changed)
+            emit logChanged(true);
+        changed = false;
+        lock.unlock();
+    }
+    return QObject::event(event);
+}
+
+void WebLogger::SubscriberDeleted(QObject *Subscriber)
+{
+    TorcHTTPService::HandleSubscriberDeleted(Subscriber);
+}
+
+QByteArray WebLogger::GetLog(void)
+{
+    QFile log(m_file.fileName());
+    if (!log.open(QIODevice::ReadOnly))
+        return QByteArray();
+    QByteArray result = log.readAll();
+    log.close();
+    return result;
+}
+
+QByteArray WebLogger::GetTail(void)
+{
+    QMutexLocker locker(&lock);
+    return tail;
+}
+
+bool WebLogger::Logmsg(LogItem *Item)
+{
+    if (!m_opened || m_quiet || (m_errorsOnly && (Item->level > LOG_ERR)))
+        return false;
+
+    Item->refCount.ref();
+    QByteArray line = GetLine(Item);
+    LogItem::Delete(Item);
+
+    lock.lock();
+    changed = true;
+    tail = line;
+    lock.unlock();
+
+    emit tailChanged(line);
+    return PrintLine(line);
 }
 
 char *GetThreadName(LogItem *Item)
@@ -630,7 +709,7 @@ void StartLogging(QString Logfile, int progress, int quiet,
     new FileLogger(QString(""), progress, quiet);
 
     if (!Logfile.isEmpty())
-        new FileLogger(Logfile, false, false);
+        new WebLogger(Logfile);
 
     gLogThread->start();
 }

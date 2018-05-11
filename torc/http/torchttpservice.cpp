@@ -388,37 +388,37 @@ QString TorcHTTPService::GetUIName(void)
     return Name();
 }
 
-void TorcHTTPService::ProcessHTTPRequest(const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest *Request)
+void TorcHTTPService::ProcessHTTPRequest(const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest &Request)
 {
     (void)PeerAddress;
     (void)PeerPort;
     (void)LocalAddress;
     (void)LocalPort;
 
-    QString method = Request->GetMethod();
-    HTTPRequestType type = Request->GetHTTPRequestType();
+    QString method = Request.GetMethod();
+    HTTPRequestType type = Request.GetHTTPRequestType();
 
     if (method.compare("GetServiceVersion") == 0)
     {
         if (type == HTTPOptions)
         {
-            Request->SetStatus(HTTP_OK);
-            Request->SetResponseType(HTTPResponseDefault);
-            Request->SetAllowed(HTTPHead | HTTPGet | HTTPOptions);
+            Request.SetStatus(HTTP_OK);
+            Request.SetResponseType(HTTPResponseDefault);
+            Request.SetAllowed(HTTPHead | HTTPGet | HTTPOptions);
             return;
         }
 
         if (type != HTTPGet && type != HTTPHead)
         {
-            Request->SetStatus(HTTP_BadRequest);
-            Request->SetResponseType(HTTPResponseDefault);
+            Request.SetStatus(HTTP_BadRequest);
+            Request.SetResponseType(HTTPResponseDefault);
             return;
         }
 
-        Request->SetStatus(HTTP_OK);
-        TorcSerialiser *serialiser = Request->GetSerialiser();
-        Request->SetResponseType(serialiser->ResponseType());
-        Request->SetResponseContent(serialiser->Serialise(m_version, "version"));
+        Request.SetStatus(HTTP_OK);
+        TorcSerialiser *serialiser = Request.GetSerialiser();
+        Request.SetResponseType(serialiser->ResponseType());
+        Request.SetResponseContent(serialiser->Serialise(m_version, "version"));
         delete serialiser;
 
         return;
@@ -431,8 +431,8 @@ void TorcHTTPService::ProcessHTTPRequest(const QString &PeerAddress, int PeerPor
         if ((!(type & (*it)->m_allowedRequestTypes)) ||
             (*it)->m_allowedRequestTypes & HTTPDisabled)
         {
-            Request->SetStatus(HTTP_BadRequest);
-            Request->SetResponseType(HTTPResponseDefault);
+            Request.SetStatus(HTTP_BadRequest);
+            Request.SetResponseType(HTTPResponseDefault);
             return;
         }
 
@@ -445,7 +445,7 @@ void TorcHTTPService::ProcessHTTPRequest(const QString &PeerAddress, int PeerPor
 
         QString type;
         bool    voidresult;
-        QVariant result = (*it)->Invoke(m_parent, Request->Queries(), type, voidresult);
+        QVariant result = (*it)->Invoke(m_parent, Request.Queries(), type, voidresult);
 
         // is there a result
         if (!voidresult)
@@ -453,23 +453,23 @@ void TorcHTTPService::ProcessHTTPRequest(const QString &PeerAddress, int PeerPor
             // check for invocation errors
             if (result.type() == QVariant::Invalid)
             {
-                Request->SetStatus(HTTP_BadRequest);
-                Request->SetResponseType(HTTPResponseDefault);
+                Request.SetStatus(HTTP_BadRequest);
+                Request.SetResponseType(HTTPResponseDefault);
                 return;
             }
 
-            TorcSerialiser *serialiser = Request->GetSerialiser();
-            Request->SetResponseType(serialiser->ResponseType());
-            Request->SetResponseContent(serialiser->Serialise(result, type));
-            Request->SetAllowGZip(true);
+            TorcSerialiser *serialiser = Request.GetSerialiser();
+            Request.SetResponseType(serialiser->ResponseType());
+            Request.SetResponseContent(serialiser->Serialise(result, type));
+            Request.SetAllowGZip(true);
             delete serialiser;
         }
         else
         {
-            Request->SetResponseType(HTTPResponseNone);
+            Request.SetResponseType(HTTPResponseNone);
         }
 
-        Request->SetStatus(HTTP_OK);
+        Request.SetStatus(HTTP_OK);
     }
 }
 

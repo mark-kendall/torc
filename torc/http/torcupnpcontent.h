@@ -9,7 +9,7 @@ class TorcUPnPContent : public TorcHTTPHandler
   public:
     TorcUPnPContent();
 
-    void ProcessHTTPRequest (const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest *Request) Q_DECL_OVERRIDE;
+    void ProcessHTTPRequest (const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest &Request) Q_DECL_OVERRIDE;
 };
 
 #endif // TORCUPNPCONTENT_H

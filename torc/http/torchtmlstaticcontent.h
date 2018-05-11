@@ -9,10 +9,10 @@ class TorcHTMLStaticContent : public TorcHTTPHandler
   public:
     TorcHTMLStaticContent();
 
-    void ProcessHTTPRequest (const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest *Request) Q_DECL_OVERRIDE;
+    void ProcessHTTPRequest (const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest &Request) Q_DECL_OVERRIDE;
 
   protected:
-    static void GetJavascriptConfiguration  (TorcHTTPRequest *Request);
+    static void GetJavascriptConfiguration  (TorcHTTPRequest &Request);
 
   private:
     QString m_pathToContent;
