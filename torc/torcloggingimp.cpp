@@ -480,7 +480,7 @@ bool FileLogger::PrintLine(QByteArray &Line)
 
 WebLogger::WebLogger(QString Filename)
   : QObject(),
-    TorcHTTPService(this, "log", "log", WebLogger::staticMetaObject, ""),
+    TorcHTTPService(this, "log", "log", WebLogger::staticMetaObject, "event"),
     FileLogger(Filename, false, false),
     log(),
     tail(),
