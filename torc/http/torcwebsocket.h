@@ -67,6 +67,7 @@ class TorcWebSocket : public QSslSocket
     void            Error                 (QAbstractSocket::SocketError);
     void            SubscriberDeleted     (QObject *Subscriber);
     void            TimedOut              (void);
+    void            BytesWritten          (qint64);
 
   protected:
     bool            event                 (QEvent *Event) Q_DECL_OVERRIDE;

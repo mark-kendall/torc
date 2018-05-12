@@ -420,6 +420,7 @@ void TorcWebSocket::Start(void)
     static bool SSL = false;
 
     connect(this, SIGNAL(Disconnect()), this, SLOT(CloseSocket()));
+    connect(this, SIGNAL(bytesWritten(qint64)), this, SLOT(BytesWritten(qint64)));
 
     // common setup
     m_reader.Reset();
@@ -925,6 +926,12 @@ void TorcWebSocket::TimedOut(void)
     else
         LOG(VB_GENERAL, LOG_DEBUG, QString("No activity on HTTP socket for %1seconds - closing").arg(m_watchdogTimer.interval() / 1000));
     SetState(SocketState::DisconnectedSt);
+}
+
+void TorcWebSocket::BytesWritten(qint64)
+{
+    if (m_watchdogTimer.isActive())
+        m_watchdogTimer.start();
 }
 
 bool TorcWebSocket::event(QEvent *Event)
