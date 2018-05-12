@@ -142,7 +142,10 @@
 TorcPiGPIO* TorcPiGPIO::gPiGPIO = new TorcPiGPIO();
 
 TorcPiGPIO::TorcPiGPIO()
-  : m_setup(false)
+  : m_inputs(),
+    m_outputs(),
+    m_pwmOutputs(),
+    m_setup(false)
 {
     if (wiringPiSetup() > -1)
         m_setup = true;

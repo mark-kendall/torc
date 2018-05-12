@@ -31,6 +31,7 @@ class TorcPiSwitchInputThread : public TorcQThread
     void         Update   (void);
  
   private:
+    Q_DISABLE_COPY(TorcPiSwitchInputThread)
     TorcPiSwitchInput *m_parent;
     int                m_pin;
     bool               m_aborted;
@@ -49,6 +50,7 @@ class TorcPiSwitchInput : public TorcSwitchInput
     QStringList        GetDescription (void);
 
   private:
+    Q_DISABLE_COPY(TorcPiSwitchInput)
     int                      m_pin;
     TorcPiSwitchInputThread *m_inputThread;
 };

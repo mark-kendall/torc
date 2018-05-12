@@ -85,9 +85,13 @@ void TorcWebSocketThread::Start(void)
     {
         SSLDefaultsSet = true;
         QSslConfiguration config;
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
         config.setProtocol(QSsl::TlsV1_2OrLater);
         config.setCiphers(QSslConfiguration::supportedCiphers());
-
+#else
+        config.setProtocol(QSsl::TlsV1_0);
+        config.setCiphers(QSslSocket::supportedCiphers());
+#endif
         QString certlocation = GetTorcConfigDir() + "/torc.cert";
         LOG(VB_GENERAL, LOG_INFO, QString("SSL: looking for cert in '%1'").arg(certlocation));
         QFile certFile(certlocation);
