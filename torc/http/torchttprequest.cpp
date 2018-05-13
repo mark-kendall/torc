@@ -102,34 +102,6 @@ TorcHTTPRequest::TorcHTTPRequest(TorcHTTPReader *Reader)
     }
 }
 
-TorcHTTPRequest::TorcHTTPRequest(const QString &Method, QMap<QString,QString> *Headers, QByteArray *Content)
-  : m_fullUrl(),
-    m_path(),
-    m_method(),
-    m_query(),
-    m_redirectedTo(),
-    m_type(HTTPRequest),
-    m_requestType(HTTPUnknownType),
-    m_protocol(HTTPUnknownProtocol),
-    m_connection(HTTPConnectionClose),
-    m_ranges(),
-    m_headers(Headers),
-    m_queries(),
-    m_content(Content),
-    m_allowGZip(false),
-    m_allowed(0),
-    m_authorised(HTTPNotAuthorised),
-    m_responseType(HTTPResponseUnknown),
-    m_cache(HTTPCacheNone),
-    m_cacheTag(QString("")),
-    m_responseStatus(HTTP_NotFound),
-    m_responseContent(NULL),
-    m_responseFile(NULL),
-    m_responseHeaders(NULL)
-{
-    Initialise(Method);
-}
-
 void TorcHTTPRequest::Initialise(const QString &Method)
 {
     QStringList items = Method.split(gRegExp, QString::SkipEmptyParts);

@@ -124,7 +124,6 @@ class TorcHTTPRequest
 
   public:
     explicit TorcHTTPRequest(TorcHTTPReader *Reader);
-    TorcHTTPRequest(const QString &Method, QMap<QString,QString> *Headers, QByteArray *Content);
 
     void                   SetConnection            (HTTPConnection Connection);
     void                   SetStatus                (HTTPStatus Status);
