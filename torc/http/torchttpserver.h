@@ -70,6 +70,7 @@ class TorcHTTPServer : public QTcpServer
 
   private:
     TorcSetting                      *m_port;
+    TorcSetting                      *m_secure;
     TorcHTMLHandler                   m_defaultHandler;
     TorcHTTPServices                  m_servicesHandler;
     TorcHTMLStaticContent             m_staticContent;

@@ -42,12 +42,14 @@ TorcNetworkedContext *gNetworkedContext = NULL;
  * \todo Should retries be limited? If support is added for manually specified peers (e.g. remote) and that
  *       peer is offline, need a better approach.
 */
-TorcNetworkService::TorcNetworkService(const QString &Name, const QString &UUID, int Port, const QList<QHostAddress> &Addresses)
+TorcNetworkService::TorcNetworkService(const QString &Name, const QString &UUID, int Port,
+                                       bool Secure, const QList<QHostAddress> &Addresses)
   : QObject(),
     name(Name),
     uuid(UUID),
     port(Port),
     host(),
+    secure(Secure),
     uiAddress(QString()),
     startTime(0),
     priority(-1),
@@ -182,7 +184,7 @@ void TorcNetworkService::Connect(void)
 
     LOG(VB_GENERAL, LOG_INFO, QString("Trying to connect to %1").arg(m_debugString));
 
-    m_webSocketThread = new TorcWebSocketThread(m_addresses.at(m_preferredAddressIndex), port, true);
+    m_webSocketThread = new TorcWebSocketThread(m_addresses.at(m_preferredAddressIndex), port, secure, true);
     connect(m_webSocketThread, SIGNAL(Finished()),              this, SLOT(Disconnected()));
     connect(m_webSocketThread, SIGNAL(ConnectionEstablished()), this, SLOT(Connected()));
 
@@ -516,6 +518,7 @@ QVariant TorcNetworkService::ToMap(void)
     result.insert("uiAddress", uiAddress);
     result.insert("address",   m_addresses.isEmpty() ? "INValid" : TorcNetwork::IPAddressToLiteral(m_addresses[m_preferredAddressIndex], 0));
     result.insert("host",      host);
+    result.insert("secure",    secure ? "yes"  : "no");
     return result;
 }
 
@@ -729,10 +732,11 @@ bool TorcNetworkedContext::event(QEvent *Event)
                                 QString version       = QString(map.value("apiversion"));
                                 qint64 starttime      = map.value("starttime").toULongLong();
                                 int priority          = map.value("priority").toInt();
-
+                                bool secure = map.contains("secure") ? (map.value("secure").trimmed() == "yes" ? true : false) : false;
 
                                 // create the new peer
-                                TorcNetworkService *service = new TorcNetworkService(name, uuid, event->Data().value("port").toInt(), hosts);
+                                TorcNetworkService *service = new TorcNetworkService(name, uuid, event->Data().value("port").toInt(),
+                                                                                     secure, hosts);
                                 service->SetAPIVersion(version);
                                 service->SetPriority(priority);
                                 service->SetStartTime(starttime);
@@ -784,9 +788,10 @@ bool TorcNetworkedContext::event(QEvent *Event)
                     {
                         // need name, uuid, port, hosts, apiversion, priority, starttime, host?
                         QUrl location(event->Data().value("address").toString());
+                        bool secure = location.scheme().toLower() == "https";
                         QList<QHostAddress> hosts;
                         hosts << QHostAddress(location.host());
-                        TorcNetworkService *service = new TorcNetworkService("TorcUPnP", uuid, location.port(), hosts);
+                        TorcNetworkService *service = new TorcNetworkService("TorcUPnP", uuid, location.port(), secure, hosts);
                         service->SetSource(TorcNetworkService::UPnP);
                         Add(service);
                         emit service->TryConnect();
@@ -942,7 +947,7 @@ void TorcNetworkedContext::HandleNewPeer(TorcWebSocketThread *Thread, const QStr
         LOG(VB_GENERAL, LOG_INFO, QString("Received WebSocket for new peer ('%1' %2)").arg(Name).arg(UUID));
         QList<QHostAddress> address;
         address << Address;
-        TorcNetworkService *service = new TorcNetworkService(Name, UUID, Port, address);
+        TorcNetworkService *service = new TorcNetworkService(Name, UUID, Port, thread->IsSecure(), address);
         service->SetWebSocketThread(thread);
         Add(service);
         return;

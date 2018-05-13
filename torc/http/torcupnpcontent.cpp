@@ -29,6 +29,7 @@
 #include "torchttphandler.h"
 #include "torcupnp.h"
 #include "torcupnpcontent.h"
+#include "torcnetwork.h"
 
 TorcUPnPContent::TorcUPnPContent()
   : TorcHTTPHandler(UPNP_DIRECTORY, "upnp")
@@ -52,9 +53,7 @@ void TorcUPnPContent::ProcessHTTPRequest(const QString &PeerAddress, int PeerPor
     if (Request.GetMethod().toLower() == "description")
     {
         QHostAddress base(LocalAddress);
-        QString url = base.protocol() == QAbstractSocket::IPv6Protocol ?
-                    QString("http://[%1]:%2").arg(LocalAddress).arg(LocalPort) :
-                    QString("http://%1:%2").arg(LocalAddress).arg(LocalPort);
+        QString url = QString("http://%1%2").arg(Request.GetSecure() ? "s" : "").arg(TorcNetwork::IPAddressToLiteral(base, LocalPort, false));
         QByteArray *result = new QByteArray();
         QXmlStreamWriter xml(result);
         xml.writeStartDocument("1.0");

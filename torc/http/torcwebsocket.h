@@ -37,8 +37,8 @@ class TorcWebSocket : public QSslSocket
     };
 
   public:
-    TorcWebSocket(TorcWebSocketThread* Parent, qintptr SocketDescriptor);
-    TorcWebSocket(TorcWebSocketThread* Parent, const QHostAddress &Address, quint16 Port, bool Authenticate,
+    TorcWebSocket(TorcWebSocketThread* Parent, qintptr SocketDescriptor, bool Secure);
+    TorcWebSocket(TorcWebSocketThread* Parent, const QHostAddress &Address, quint16 Port, bool Secure, bool Authenticate,
                   TorcWebSocketReader::WSSubProtocol Protocol = TorcWebSocketReader::SubProtocolJSONRPC);
     ~TorcWebSocket();
 
@@ -83,6 +83,7 @@ class TorcWebSocket : public QSslSocket
 
   private:
     TorcWebSocketThread *m_parent;
+    bool             m_secure;
     SocketState      m_socketState;
     qintptr          m_socketDescriptor;
     QTimer           m_watchdogTimer;

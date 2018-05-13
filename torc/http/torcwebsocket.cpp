@@ -59,9 +59,10 @@
  * \todo Add support for batched RPC calls
 */
 
-TorcWebSocket::TorcWebSocket(TorcWebSocketThread* Parent, qintptr SocketDescriptor)
+TorcWebSocket::TorcWebSocket(TorcWebSocketThread* Parent, qintptr SocketDescriptor, bool Secure)
   : QSslSocket(),
     m_parent(Parent),
+    m_secure(Secure),
     m_socketState(SocketState::DisconnectedSt),
     m_socketDescriptor(SocketDescriptor),
     m_watchdogTimer(),
@@ -84,10 +85,11 @@ TorcWebSocket::TorcWebSocket(TorcWebSocketThread* Parent, qintptr SocketDescript
     m_watchdogTimer.start(HTTP_SOCKET_TIMEOUT);
 }
 
-TorcWebSocket::TorcWebSocket(TorcWebSocketThread* Parent, const QHostAddress &Address, quint16 Port, bool Authenticate,
-                             TorcWebSocketReader::WSSubProtocol Protocol)
+TorcWebSocket::TorcWebSocket(TorcWebSocketThread* Parent, const QHostAddress &Address, quint16 Port, bool Secure,
+                             bool Authenticate, TorcWebSocketReader::WSSubProtocol Protocol)
   : QSslSocket(),
     m_parent(Parent),
+    m_secure(Secure),
     m_socketState(SocketState::DisconnectedSt),
     m_socketDescriptor(0),
     m_watchdogTimer(),
@@ -417,8 +419,6 @@ void TorcWebSocket::SSLErrors(const QList<QSslError> &Errors)
 ///\brief Initialise the websocket once its parent thread is ready.
 void TorcWebSocket::Start(void)
 {
-    static bool SSL = false;
-
     connect(this, SIGNAL(Disconnect()), this, SLOT(CloseSocket()));
     connect(this, SIGNAL(bytesWritten(qint64)), this, SLOT(BytesWritten(qint64)));
 
@@ -447,7 +447,7 @@ void TorcWebSocket::Start(void)
 
             SetState(SocketState::ConnectedTo);
 
-            if (SSL)
+            if (m_secure)
             {
                 startServerEncryption();
             }
@@ -467,7 +467,7 @@ void TorcWebSocket::Start(void)
     {
         SetState(SocketState::ConnectingTo);
 
-        if (SSL)
+        if (m_secure)
         {
             connectToHostEncrypted(m_address.toString(), m_port);
         }
@@ -620,6 +620,7 @@ void TorcWebSocket::ReadHTTP(void)
 
         // have headers and content - process request
         TorcHTTPRequest request(&m_reader);
+        request.SetSecure(m_secure);
 
         if (request.GetHTTPType() == HTTPResponse)
         {

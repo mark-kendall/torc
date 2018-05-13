@@ -8,6 +8,4 @@
 #define TORC_MAIN_THREAD  QString("MainLoop")
 #define TORC_ADMIN_THREAD QString("AdminLoop")
 
-#define TORC_CORE                  QString("CORE_")
-
 #endif // TORCLOCALDEFS_H

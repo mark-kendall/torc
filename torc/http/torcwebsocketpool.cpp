@@ -71,12 +71,12 @@ void TorcWebSocketPool::WebSocketClosed(void)
     }
 }
 
-void TorcWebSocketPool::IncomingConnection(qintptr SocketDescriptor)
+void TorcWebSocketPool::IncomingConnection(qintptr SocketDescriptor, bool Secure)
 {
     QMutexLocker locker(&m_webSocketsLock);
     if (m_webSockets.size() <= MAX_SOCKET_THREADS)
     {
-        TorcWebSocketThread *thread = new TorcWebSocketThread(SocketDescriptor);
+        TorcWebSocketThread *thread = new TorcWebSocketThread(SocketDescriptor, Secure);
         m_webSockets.append(thread);
         connect(thread, SIGNAL(Finished()), this, SLOT(WebSocketClosed()));
         thread->start();

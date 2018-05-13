@@ -49,9 +49,10 @@
  *       i.e. running inside TorcWebSocketThread).
 */
 
-TorcWebSocketThread::TorcWebSocketThread(qintptr SocketDescriptor)
+TorcWebSocketThread::TorcWebSocketThread(qintptr SocketDescriptor, bool Secure)
   : TorcQThread("SocketIn"),
     m_webSocket(NULL),
+    m_secure(Secure),
     m_socketDescriptor(SocketDescriptor),
     m_address(QHostAddress::Null),
     m_port(0),
@@ -60,10 +61,11 @@ TorcWebSocketThread::TorcWebSocketThread(qintptr SocketDescriptor)
 {
 }
 
-TorcWebSocketThread::TorcWebSocketThread(const QHostAddress &Address, quint16 Port, bool Authenticate,
-                                         TorcWebSocketReader::WSSubProtocol Protocol)
+TorcWebSocketThread::TorcWebSocketThread(const QHostAddress &Address, quint16 Port, bool Secure,
+                                         bool Authenticate, TorcWebSocketReader::WSSubProtocol Protocol)
   : TorcQThread("SocketOut"),
     m_webSocket(NULL),
+    m_secure(Secure),
     m_socketDescriptor(0),
     m_address(Address),
     m_port(Port),
@@ -79,9 +81,8 @@ TorcWebSocketThread::~TorcWebSocketThread()
 void TorcWebSocketThread::Start(void)
 {
     // one off SSL default configuration
-    static bool SSL = false;
     static bool SSLDefaultsSet = false;
-    if (!SSLDefaultsSet && SSL)
+    if (!SSLDefaultsSet && m_secure)
     {
         SSLDefaultsSet = true;
         QSslConfiguration config;
@@ -141,9 +142,9 @@ void TorcWebSocketThread::Start(void)
     }
 
     if (m_socketDescriptor)
-        m_webSocket = new TorcWebSocket(this, m_socketDescriptor);
+        m_webSocket = new TorcWebSocket(this, m_socketDescriptor, m_secure);
     else
-        m_webSocket = new TorcWebSocket(this, m_address, m_port, m_authenticate, m_protocol);
+        m_webSocket = new TorcWebSocket(this, m_address, m_port, m_secure, m_authenticate, m_protocol);
 
     connect(m_webSocket, SIGNAL(ConnectionEstablished()), this, SIGNAL(ConnectionEstablished()));
     connect(m_webSocket, SIGNAL(Disconnected()),          this, SLOT(quit()));
@@ -158,6 +159,11 @@ void TorcWebSocketThread::Finish(void)
     if (m_webSocket)
         delete m_webSocket;
     m_webSocket = NULL;
+}
+
+bool TorcWebSocketThread::IsSecure(void)
+{
+    return m_secure;
 }
 
 void TorcWebSocketThread::RemoteRequest(TorcRPCRequest *Request)

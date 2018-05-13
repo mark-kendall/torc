@@ -270,6 +270,7 @@ QReadWriteLock  TorcHTTPServer::gOriginWhitelistLock(QReadWriteLock::Recursive);
 TorcHTTPServer::TorcHTTPServer()
   : QTcpServer(),
     m_port(NULL),
+    m_secure(NULL),
     m_defaultHandler("", QCoreApplication::applicationName()), // default top level handler
     m_servicesHandler(this),                                   // services 'helper' service for '/services'
     m_staticContent(),                                         // static files - for /css /fonts /js /img etc
@@ -279,8 +280,11 @@ TorcHTTPServer::TorcHTTPServer()
     m_torcBonjourReference(0),
     m_webSocketPool()
 {
-    // port setting - this could become a user editable setting
-    m_port = new TorcSetting(NULL, TORC_CORE + "WebServerPort", QString(), TorcSetting::Integer, true, QVariant((int)4840));
+    // if app is running with root privilges (e.g. Raspberry Pi) then try and default to sensible port settings
+    // when first run. No point in trying 443 for secure sockets as SSL is not enabled by default (would require
+    // additional setup step).
+    m_port   = new TorcSetting(NULL, "WebServerPort",   tr("HTTP Port"),      TorcSetting::Integer, true, QVariant((int)(geteuid() ? 4840 : 80)));
+    m_secure = new TorcSetting(NULL, "WebServerSecure", tr("Secure sockets"), TorcSetting::Bool,    true, QVariant((bool)false));
 
     // initialise platform name
     static bool initialised = false;
@@ -317,6 +321,13 @@ TorcHTTPServer::~TorcHTTPServer()
         m_port->Remove();
         m_port->DownRef();
         m_port = NULL;
+    }
+
+    if (m_secure)
+    {
+        m_secure->Remove();
+        m_secure->DownRef();
+        m_secure = NULL;
     }
 }
 
@@ -513,19 +524,20 @@ bool TorcHTTPServer::Open(void)
         map.insert("apiversion", (index > -1) ? TorcHTTPServices::staticMetaObject.classInfo(index).value() : "unknown");
         map.insert("priority",   QByteArray::number(gLocalContext->GetPriority()));
         map.insert("starttime",  QByteArray::number(gLocalContext->GetStartTime()));
+        map.insert("secure",     m_secure->GetValue().toBool() ? "yes" : "no");
 
         QByteArray name(QCoreApplication::applicationName().toLatin1());
         name.append(" on ");
         name.append(QHostInfo::localHostName());
 
         if (!m_httpBonjourReference)
-            m_httpBonjourReference = TorcBonjour::Instance()->Register(port, "_http._tcp.", name, map);
+            m_httpBonjourReference = TorcBonjour::Instance()->Register(port, m_secure->GetValue().toBool() ? "_https._tcp" : "_http._tcp", name, map);
 
         if (!m_torcBonjourReference)
             m_torcBonjourReference = TorcBonjour::Instance()->Register(port, "_torc._tcp", name, map);
     }
 
-    TorcSSDP::Announce();
+    TorcSSDP::Announce(m_secure);
 
     if (!waslistening)
     {
@@ -595,7 +607,7 @@ TorcWebSocketThread* TorcHTTPServer::TakeSocketPriv(TorcWebSocketThread *Socket)
 
 void TorcHTTPServer::incomingConnection(qintptr SocketDescriptor)
 {
-    m_webSocketPool.IncomingConnection(SocketDescriptor);
+    m_webSocketPool.IncomingConnection(SocketDescriptor, m_secure->GetValue().toBool());
 }
 
 class TorcHTTPServerObject : public TorcAdminObject, public TorcStringFactory

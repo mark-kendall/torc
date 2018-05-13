@@ -12,8 +12,8 @@ class TorcWebSocketThread : public TorcQThread
     Q_OBJECT
 
   public:
-    explicit TorcWebSocketThread (qintptr SocketDescriptor);
-    TorcWebSocketThread (const QHostAddress &Address, quint16 Port, bool Authenticate = false,
+    TorcWebSocketThread (qintptr SocketDescriptor, bool Secure);
+    TorcWebSocketThread (const QHostAddress &Address, quint16 Port, bool Secure, bool Authenticate = false,
                          TorcWebSocketReader::WSSubProtocol Protocol = TorcWebSocketReader::SubProtocolJSONRPC);
     ~TorcWebSocketThread();
 
@@ -21,6 +21,7 @@ class TorcWebSocketThread : public TorcQThread
     void                Finish   (void) Q_DECL_OVERRIDE;
     void                RemoteRequest         (TorcRPCRequest *Request);
     void                CancelRequest         (TorcRPCRequest *Request);
+    bool                IsSecure              (void);
 
   signals:
     void                ConnectionEstablished (void);
@@ -29,7 +30,7 @@ class TorcWebSocketThread : public TorcQThread
 
   private:
     TorcWebSocket      *m_webSocket;
-
+    bool                m_secure;
     // incoming
     qintptr             m_socketDescriptor;
 

@@ -20,7 +20,7 @@ class TorcWebSocketPool : public QObject
 
   public slots:
     void WebSocketClosed        (void);
-    void IncomingConnection     (qintptr SocketDescriptor);
+    void IncomingConnection     (qintptr SocketDescriptor, bool Secure);
 
   public:
     void CloseSockets ();
