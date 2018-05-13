@@ -46,21 +46,36 @@
  * \sa TorcUISetting
  */
 
+QString TorcSetting::TypeToString(Type type)
+{
+    switch (type)
+    {
+        case Bool:       return QString("bool");
+        case Integer:    return QString("integer");
+        case String:     return QString("string");
+        case StringList: return QString("stringlist");
+    }
+    return QString("erRor");
+}
+
 TorcSetting::TorcSetting(TorcSetting *Parent, const QString &DBName, const QString &UIName,
                          Type SettingType, bool Persistent, const QVariant &Default)
-  : m_parent(Parent),
-    m_type(SettingType),
-    m_persistent(Persistent),
+  : QObject(),
+    TorcHTTPService(this, "settings/" + DBName, DBName, TorcSetting::staticMetaObject, "SetActive,SetTrue,SetFalse"),
+    m_parent(Parent),
+    type(SettingType),
+    settingType(TypeToString(SettingType)),
+    persistent(Persistent),
     m_dbName(DBName),
-    m_uiName(UIName),
-    m_description(),
-    m_helpText(),
-    m_value(),
-    m_default(Default),
+    uiName(UIName),
+    description(),
+    helpText(),
+    value(),
+    defaultValue(Default),
     m_begin(0),
     m_end(1),
     m_step(1),
-    m_isActive(false),
+    isActive(false),
     m_active(0),
     m_activeThreshold(1),
     m_children(),
@@ -71,37 +86,37 @@ TorcSetting::TorcSetting(TorcSetting *Parent, const QString &DBName, const QStri
     if (m_parent)
         m_parent->AddChild(this);
 
-    QVariant::Type type = m_default.type();
+    QVariant::Type vtype = defaultValue.type();
 
-    if (type == QVariant::Int && m_type == Integer)
+    if (vtype == QVariant::Int && type == Integer)
     {
-        m_value = m_persistent ? gLocalContext->GetSetting(m_dbName, (int)m_default.toInt()) : m_default.toInt();
+        value = persistent ? gLocalContext->GetSetting(m_dbName, (int)defaultValue.toInt()) : defaultValue.toInt();
     }
-    else if (type == QVariant::Bool && m_type == Checkbox)
+    else if (vtype == QVariant::Bool && type == Bool)
     {
-        m_value = m_persistent ? gLocalContext->GetSetting(m_dbName, (bool)m_default.toBool()) : m_default.toBool();
+        value = persistent ? gLocalContext->GetSetting(m_dbName, (bool)defaultValue.toBool()) : defaultValue.toBool();
     }
-    else if (type == QVariant::String)
+    else if (vtype == QVariant::String)
     {
-        m_value = m_persistent ? gLocalContext->GetSetting(m_dbName, (QString)m_default.toString()) : m_default.toString();
+        value = persistent ? gLocalContext->GetSetting(m_dbName, (QString)defaultValue.toString()) : defaultValue.toString();
     }
-    else if (type == QVariant::StringList)
+    else if (vtype == QVariant::StringList)
     {
-        if (m_persistent)
+        if (persistent)
         {
-            QString value = gLocalContext->GetSetting(m_dbName, (QString)m_default.toString());
-            m_value = QVariant(value.split(","));
+            QString svalue = gLocalContext->GetSetting(m_dbName, (QString)defaultValue.toString());
+            value = QVariant(svalue.split(","));
         }
         else
         {
-            m_value = m_default.toStringList();
+            value = defaultValue.toStringList();
         }
     }
     else
     {
-        if (type != QVariant::Invalid)
-            LOG(VB_GENERAL, LOG_ERR, QString("Unsupported setting data type for %1 (%2)").arg(m_dbName).arg(type));
-        m_value = QVariant();
+        if (vtype != QVariant::Invalid)
+            LOG(VB_GENERAL, LOG_ERR, QString("Unsupported setting data type for %1 (%2)").arg(m_dbName).arg(vtype));
+        value = QVariant();
     }
 }
 
@@ -110,9 +125,14 @@ TorcSetting::~TorcSetting()
     delete m_childrenLock;
 }
 
+void TorcSetting::SubscriberDeleted(QObject *Subscriber)
+{
+    return TorcHTTPService::HandleSubscriberDeleted(Subscriber);
+}
+
 QVariant::Type TorcSetting::GetStorageType(void)
 {
-    return m_default.type();
+    return defaultValue.type();
 }
 
 void TorcSetting::AddChild(TorcSetting *Child)
@@ -194,39 +214,44 @@ QSet<TorcSetting*> TorcSetting::GetChildren(void)
     return result;
 }
 
-bool TorcSetting::IsActive(void)
+bool TorcSetting::GetIsActive(void)
 {
-    return m_isActive;
+    return isActive;
 }
 
-QString TorcSetting::GetName(void)
+QString TorcSetting::GetUiName(void)
 {
-    return m_uiName;
+    return uiName;
 }
 
 QString TorcSetting::GetDescription(void)
 {
-    return m_description;
+    return description;
 }
 
 QString TorcSetting::GetHelpText(void)
 {
-    return m_helpText;
+    return helpText;
 }
 
-QVariant TorcSetting::GetDefault(void)
+QVariant TorcSetting::GetDefaultValue(void)
 {
-    return m_default;
+    return defaultValue;
 }
 
 bool TorcSetting::GetPersistent(void)
 {
-    return m_persistent;
+    return persistent;
 }
 
-TorcSetting::Type TorcSetting::GetSettingType(void)
+QString TorcSetting::GetSettingType(void)
 {
-    return m_type;
+    return settingType;
+}
+
+TorcSetting::Type TorcSetting::GetType(void)
+{
+    return type;
 }
 
 TorcSetting* TorcSetting::GetChildByIndex(int Index)
@@ -255,82 +280,82 @@ int TorcSetting::GetStep(void)
 
 void TorcSetting::SetActive(bool Value)
 {
-    bool wasactive = m_isActive;
+    bool wasactive = isActive;
     m_active += Value ? 1 : -1;
-    m_isActive = m_active >= m_activeThreshold;
+    isActive = m_active >= m_activeThreshold;
 
-    if (wasactive != m_isActive)
-        emit ActiveChanged(m_isActive);
+    if (wasactive != isActive)
+        emit ActiveChanged(isActive);
 }
 
 void TorcSetting::SetActiveThreshold(int Threshold)
 {
-    bool wasactive = m_isActive;
+    bool wasactive = isActive;
     m_activeThreshold = Threshold;
-    m_isActive = m_active >= m_activeThreshold;
+    isActive = m_active >= m_activeThreshold;
 
-    if (wasactive != m_isActive)
-        emit ActiveChanged(m_isActive);
+    if (wasactive != isActive)
+        emit ActiveChanged(isActive);
 }
 
 void TorcSetting::SetTrue(void)
 {
-    if (m_default.type() == QVariant::Bool)
+    if (defaultValue.type() == QVariant::Bool)
         SetValue(QVariant((bool)true));
 }
 
 void TorcSetting::SetFalse(void)
 {
-    if (m_default.type() == QVariant::Bool)
+    if (defaultValue.type() == QVariant::Bool)
         SetValue(QVariant((bool)false));
 }
 
 void TorcSetting::SetValue(const QVariant &Value)
 {
-    if (m_value == Value)
+    if (value == Value)
         return;
 
-    m_value = Value;
+    value = Value;
 
-    QVariant::Type type = m_default.type();
+    QVariant::Type vtype = defaultValue.type();
 
-    if (type == QVariant::Int)
+    if (vtype == QVariant::Int)
     {
-        int value = m_value.toInt();
-        if (value >= m_begin && value <= m_end)
+        int ivalue = value.toInt();
+        if (ivalue >= m_begin && ivalue <= m_end)
         {
-            if (m_persistent)
-                gLocalContext->SetSetting(m_dbName, (int)value);
-            emit ValueChanged(value);
+            if (persistent)
+                gLocalContext->SetSetting(m_dbName, (int)ivalue);
+            emit ValueChanged(ivalue);
         }
     }
-    else if (type == QVariant::Bool)
+    else if (vtype == QVariant::Bool)
     {
-        bool value = m_value.toBool();
-        if (m_persistent)
-            gLocalContext->SetSetting(m_dbName, (bool)value);
+        bool bvalue = value.toBool();
+        if (persistent)
+            gLocalContext->SetSetting(m_dbName, (bool)bvalue);
 
-        emit ValueChanged(value);
+        emit ValueChanged(bvalue);
     }
-    else if (type == QVariant::String)
+    else if (vtype == QVariant::String)
     {
-        QString value = m_value.toString();
-        if (m_persistent)
-            gLocalContext->SetSetting(m_dbName, value);
-        emit ValueChanged(value);
+        QString svalue = value.toString();
+        if (persistent)
+            gLocalContext->SetSetting(m_dbName, svalue);
+        emit ValueChanged(svalue);
     }
-    else if (type == QVariant::StringList)
+    else if (vtype == QVariant::StringList)
     {
-        QStringList value = m_value.toStringList();
-        if (m_persistent)
-            gLocalContext->SetSetting(m_dbName, value.join(","));
-        emit ValueChanged(value);
+        QStringList svalue = value.toStringList();
+        if (persistent)
+            gLocalContext->SetSetting(m_dbName, svalue.join(","));
+        emit ValueChanged(svalue);
     }
 }
 
 void TorcSetting::SetRange(int Begin, int End, int Step)
 {
-    if (m_type != Integer)
+    if (type != Integer)
         return;
 
     if (Begin >= End || Step < 1)
@@ -347,17 +372,17 @@ void TorcSetting::SetRange(int Begin, int End, int Step)
 
 void TorcSetting::SetDescription(const QString &Description)
 {
-    m_description = Description;
+    description = Description;
 }
 
 void TorcSetting::SetHelpText(const QString &HelpText)
 {
-    m_helpText = HelpText;
+    helpText = HelpText;
 }
 
 QVariant TorcSetting::GetValue(void)
 {
-    return m_value;
+    return value;
 }
 
 /*! \class TorcSettingGroup
@@ -367,7 +392,7 @@ QVariant TorcSetting::GetValue(void)
 */
 
 TorcSettingGroup::TorcSettingGroup(TorcSetting *Parent, const QString &UIName)
-  : TorcSetting(Parent, UIName, UIName, Checkbox, false, QVariant())
+  : TorcSetting(Parent, UIName, UIName, Bool, false, QVariant())
 {
     SetActiveThreshold(0);
 }

@@ -70,8 +70,8 @@ class WebLogger : public QObject, public TorcHTTPService, public FileLogger
     QByteArray GetTail           (void);
 
   signals:
-    void       logChanged        (bool Updated);
-    void       tailChanged       (QByteArray Tail);
+    void       logChanged        (void);
+    void       tailChanged       (void);
 
   private:
     QByteArray log;

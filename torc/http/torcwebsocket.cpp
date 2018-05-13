@@ -59,11 +59,13 @@
  * \todo Add support for batched RPC calls
 */
 
-TorcWebSocket::TorcWebSocket(TorcWebSocketThread* Parent, qintptr SocketDescriptor)
+TorcWebSocket::TorcWebSocket(TorcWebSocketThread* Parent, qintptr SocketDescriptor, bool Secure)
   : QSslSocket(),
     m_parent(Parent),
+    m_secure(Secure),
     m_socketState(SocketState::DisconnectedSt),
     m_socketDescriptor(SocketDescriptor),
+    m_watchdogTimer(),
     m_reader(),
     m_wsReader(*this, TorcWebSocketReader::SubProtocolNone, true),
     m_authenticate(false),
@@ -79,14 +81,18 @@ TorcWebSocket::TorcWebSocket(TorcWebSocketThread* Parent, qintptr SocketDescript
     m_requestTimers(),
     m_subscribers()
 {
+    connect(&m_watchdogTimer, SIGNAL(timeout()), this, SLOT(TimedOut()));
+    m_watchdogTimer.start(HTTP_SOCKET_TIMEOUT);
 }
 
-TorcWebSocket::TorcWebSocket(TorcWebSocketThread* Parent, const QHostAddress &Address, quint16 Port, bool Authenticate,
-                             TorcWebSocketReader::WSSubProtocol Protocol)
+TorcWebSocket::TorcWebSocket(TorcWebSocketThread* Parent, const QHostAddress &Address, quint16 Port, bool Secure,
+                             bool Authenticate, TorcWebSocketReader::WSSubProtocol Protocol)
   : QSslSocket(),
     m_parent(Parent),
+    m_secure(Secure),
     m_socketState(SocketState::DisconnectedSt),
     m_socketDescriptor(0),
+    m_watchdogTimer(),
     m_reader(),
     m_wsReader(*this, Protocol, false),
     m_authenticate(Authenticate),
@@ -102,6 +108,7 @@ TorcWebSocket::TorcWebSocket(TorcWebSocketThread* Parent, const QHostAddress &Ad
     m_requestTimers(),
     m_subscribers()
 {
+    // NB outgoing connection - do not start watchdog timer
 }
 
 TorcWebSocket::~TorcWebSocket()
@@ -360,12 +367,19 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest &Request)
 
     if (Request.Headers()->contains("Torc-UUID"))
     {
+        // stop the watchdog timer for peers
+        m_watchdogTimer.stop();
         QString name;
         QString agent = Request.Headers()->value("User-Agent").trimmed();
         int index = agent.indexOf(',');
         if (index > -1)
             name = agent.left(index);
         TorcNetworkedContext::PeerConnected(m_parent, Request.Headers()->value("Torc-UUID"), peerPort(), name, peerAddress());
+    }
+    else
+    {
+        // increase the timeout for upgraded sockets
+        m_watchdogTimer.start(FULL_SOCKET_TIMEOUT);
     }
 
     if (Request.GetMethod().startsWith(QStringLiteral("echo"), Qt::CaseInsensitive))
@@ -405,9 +419,8 @@ void TorcWebSocket::SSLErrors(const QList<QSslError> &Errors)
 ///\brief Initialise the websocket once its parent thread is ready.
 void TorcWebSocket::Start(void)
 {
-    static bool SSL = false;
-
     connect(this, SIGNAL(Disconnect()), this, SLOT(CloseSocket()));
+    connect(this, SIGNAL(bytesWritten(qint64)), this, SLOT(BytesWritten(qint64)));
 
     // common setup
     m_reader.Reset();
@@ -434,7 +447,7 @@ void TorcWebSocket::Start(void)
 
             SetState(SocketState::ConnectedTo);
 
-            if (SSL)
+            if (m_secure)
             {
                 startServerEncryption();
             }
@@ -454,7 +467,7 @@ void TorcWebSocket::Start(void)
     {
         SetState(SocketState::ConnectingTo);
 
-        if (SSL)
+        if (m_secure)
         {
             connectToHostEncrypted(m_address.toString(), m_port);
         }
@@ -607,6 +620,7 @@ void TorcWebSocket::ReadHTTP(void)
 
         // have headers and content - process request
         TorcHTTPRequest request(&m_reader);
+        request.SetSecure(m_secure);
 
         if (request.GetHTTPType() == HTTPResponse)
         {
@@ -643,6 +657,10 @@ void TorcWebSocket::ReadHTTP(void)
 */
 void TorcWebSocket::ReadyRead(void)
 {
+    // restart the watchdog timer
+    if (m_watchdogTimer.isActive())
+        m_watchdogTimer.start();
+
     while ((m_socketState == SocketState::ConnectedTo || m_socketState == SocketState::Upgrading || m_socketState == SocketState::Upgraded) &&
             bytesAvailable())
     {
@@ -900,6 +918,21 @@ void TorcWebSocket::Error(QAbstractSocket::SocketError SocketError)
     (void)SocketError;
     LOG(VB_GENERAL, LOG_ERR, QString("Socket error: %1 ('%2')").arg(error()).arg(errorString()));
     SetState(SocketState::ErroredSt);
+}
+
+void TorcWebSocket::TimedOut(void)
+{
+    if(m_socketState == SocketState::Upgraded)
+        LOG(VB_GENERAL, LOG_WARNING, QString("No activity on upgraded websocket for %1seconds - closing").arg(m_watchdogTimer.interval() / 1000));
+    else
+        LOG(VB_GENERAL, LOG_DEBUG, QString("No activity on HTTP socket for %1seconds - closing").arg(m_watchdogTimer.interval() / 1000));
+    SetState(SocketState::DisconnectedSt);
+}
+
+void TorcWebSocket::BytesWritten(qint64)
+{
+    if (m_watchdogTimer.isActive())
+        m_watchdogTimer.start();
 }
 
 bool TorcWebSocket::event(QEvent *Event)

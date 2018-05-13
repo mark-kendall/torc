@@ -57,6 +57,7 @@ QMap<QString,int> TorcLanguage::gLanguageMap;
 TorcLanguage::TorcLanguage()
   : QObject(),
     TorcHTTPService(this, "languages", "languages", TorcLanguage::staticMetaObject, BLACKLIST),
+    m_languageSetting(NULL), // Don't initialise setting until we have a local default
     languageCode(),
     languageString(),
     m_locale(),
@@ -73,12 +74,21 @@ TorcLanguage::TorcLanguage()
         .arg(m_locale.name()).arg(qgetenv("LANG").data()));
 
     Initialise();
+
+    InitialiseTranslations();
+    QString language = m_locale.name(); // somewhat circular
+    if (language.isEmpty())
+        language = "en_GB";
+    m_languageSetting = new TorcSetting(NULL, "language", tr("Language"), TorcSetting::StringList, true, QVariant(language));
+    SetLanguageCode(language);
 }
 
 TorcLanguage::~TorcLanguage()
 {
     QWriteLocker locker(&m_lock);
     QCoreApplication::removeTranslator(&m_translator);
+    m_languageSetting->Remove();
+    m_languageSetting->DownRef();
 }
 
 QString TorcLanguage::GetUIName(void)
@@ -170,28 +180,6 @@ QString TorcLanguage::GetTranslation(const QString &Context, const QString &Stri
 void TorcLanguage::SubscriberDeleted(QObject *Subscriber)
 {
     TorcHTTPService::HandleSubscriberDeleted(Subscriber);
-}
-
-/*! \brief Load the user's preferred Language and Country settings
- *
- * If a language has not been specifically set and stored in the database, then we fall back
- * to the system language, otherwise assume en_GB.
-*/
-void TorcLanguage::LoadPreferences(void)
-{
-    InitialiseTranslations();
-
-    QString language = gLocalContext->GetSetting(TORC_CORE + "Language", QString(""));
-
-    if (language.isEmpty())
-    {
-        language = m_locale.name(); // somewhat circular
-
-        if (language.isEmpty())
-            language = "en_GB";
-    }
-
-    SetLanguageCode(language);
 }
 
 /// \brief Return a user readable string for the current language.

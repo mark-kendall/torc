@@ -33,7 +33,7 @@ class TorcNetworkService : public QObject
     Q_DECLARE_FLAGS(ServiceSources, ServiceSource);
 
   public:
-    TorcNetworkService(const QString &Name, const QString &UUID, int Port, const QList<QHostAddress> &Addresses);
+    TorcNetworkService(const QString &Name, const QString &UUID, int Port, bool Secure, const QList<QHostAddress> &Addresses);
     ~TorcNetworkService();
 
     Q_PROPERTY (QString     name              READ GetName         CONSTANT)
@@ -94,6 +94,7 @@ class TorcNetworkService : public QObject
     QString                 uuid;
     int                     port;
     QString                 host;
+    bool                    secure;
     QString                 uiAddress;
     qint64                  startTime;
     int                     priority;

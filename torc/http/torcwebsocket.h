@@ -3,6 +3,7 @@
 
 // Qt
 #include <QUrl>
+#include <QTimer>
 #include <QObject>
 #include <QSslSocket>
 #include <QHostAddress>
@@ -15,6 +16,9 @@
 class TorcHTTPRequest;
 class TorcRPCRequest;
 class TorcWebSocketThread;
+
+#define HTTP_SOCKET_TIMEOUT 30000  // 30 seconds of inactivity
+#define FULL_SOCKET_TIMEOUT 300000 // 5 minutes of inactivity
 
 class TorcWebSocket : public QSslSocket
 {
@@ -33,8 +37,8 @@ class TorcWebSocket : public QSslSocket
     };
 
   public:
-    TorcWebSocket(TorcWebSocketThread* Parent, qintptr SocketDescriptor);
-    TorcWebSocket(TorcWebSocketThread* Parent, const QHostAddress &Address, quint16 Port, bool Authenticate,
+    TorcWebSocket(TorcWebSocketThread* Parent, qintptr SocketDescriptor, bool Secure);
+    TorcWebSocket(TorcWebSocketThread* Parent, const QHostAddress &Address, quint16 Port, bool Secure, bool Authenticate,
                   TorcWebSocketReader::WSSubProtocol Protocol = TorcWebSocketReader::SubProtocolJSONRPC);
     ~TorcWebSocket();
 
@@ -62,6 +66,8 @@ class TorcWebSocket : public QSslSocket
     void            Connected             (void);
     void            Error                 (QAbstractSocket::SocketError);
     void            SubscriberDeleted     (QObject *Subscriber);
+    void            TimedOut              (void);
+    void            BytesWritten          (qint64);
 
   protected:
     bool            event                 (QEvent *Event) Q_DECL_OVERRIDE;
@@ -77,8 +83,10 @@ class TorcWebSocket : public QSslSocket
 
   private:
     TorcWebSocketThread *m_parent;
+    bool             m_secure;
     SocketState      m_socketState;
     qintptr          m_socketDescriptor;
+    QTimer           m_watchdogTimer;
     TorcHTTPReader   m_reader;
     TorcWebSocketReader m_wsReader;
     bool             m_authenticate;

@@ -164,10 +164,6 @@ bool TorcLocalContextPriv::Init(void)
         }
     }
 
-    // Load language and translation preferences
-    m_language = new TorcLanguage();
-    m_language->LoadPreferences();
-
     // Open the local database
     if (m_dbName.isEmpty())
         m_dbName = configdir + "/" + QCoreApplication::applicationName() + "-settings.sqlite";
@@ -199,13 +195,16 @@ bool TorcLocalContextPriv::Init(void)
         uuid = uuid.mid(1);
     if (uuid.endsWith('}'))
         uuid.chop(1);
-    TorcSetting* uuidsaved = new TorcSetting(NULL, QString("uuid"),QString("UUID"), TorcSetting::Checkbox, true, QVariant(uuid));
+    TorcSetting* uuidsaved = new TorcSetting(NULL, QString("uuid"),QString("UUID"), TorcSetting::Bool, true, QVariant(uuid));
     m_uuid = uuidsaved->GetValue().toString();
     uuidsaved->Remove();
     uuidsaved->DownRef();
     uuidsaved = NULL;
 
     LOG(VB_GENERAL, LOG_INFO, QString("UUID: %1").arg(m_uuid));
+
+    // Load language and translation preferences
+    m_language = new TorcLanguage();
 
     /* We no longer use QRunnables, so ignore this for now at least
     // don't expire threads
@@ -375,10 +374,10 @@ TorcLocalContext::~TorcLocalContext()
     delete m_priv;
     m_priv = NULL;
 
-    StopLogging();
-
     // revert to the default message handler
     qInstallMessageHandler(0);
+
+    StopLogging();
 }
 
 bool TorcLocalContext::Init(void)

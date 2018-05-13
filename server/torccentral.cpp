@@ -79,6 +79,7 @@ TorcCentral::TorcCentral()
     m_config(QVariantMap()),
     m_graph(),
     canRestartTorc(true),
+    canStopTorc(true),
     temperatureUnits("celsius")
 {
     // reset state graph and clear out old files
@@ -252,6 +253,18 @@ bool TorcCentral::RestartTorc(void)
     // NB could be called from any thread
     TorcLocalContext::NotifyEvent(Torc::RestartTorc);
     return true;
+}
+
+bool TorcCentral::StopTorc(void)
+{
+    TorcLocalContext::NotifyEvent(Torc::Stop);
+    return true;
+}
+
+bool TorcCentral::GetCanStopTorc(void)
+{
+    QMutexLocker locker(&m_lock);
+    return canStopTorc;
 }
 
 QString TorcCentral::GetTemperatureUnits(void) const
@@ -504,9 +517,10 @@ class TorcCentralObject : public TorcAdminObject, public TorcStringFactory
         Strings.insert("ViewAPITr",          QCoreApplication::translate("TorcCentral", "View API"));
         Strings.insert("ViewAPITitleTr",     QCoreApplication::translate("TorcCentral", "API reference"));
         Strings.insert("ViewLogTr",          QCoreApplication::translate("TorcCentral", "View Log"));
-        Strings.insert("ViewLogTitleTr",     QCoreApplication::translate("TorcCentral", "Log"));
+        Strings.insert("RefreshTr",          QCoreApplication::translate("TorcCentral", "Refresh"));
         Strings.insert("FollowLogTr",        QCoreApplication::translate("TorcCentral", "Follow Log"));
-        Strings.insert("FollowLogTitleTr",   QCoreApplication::translate("TorcCentral", "Following log"));
+        Strings.insert("FollowTr",           QCoreApplication::translate("TorcCentral", "Follow"));
+        Strings.insert("UnfollowTr",         QCoreApplication::translate("TorcCentral", "Unfollow"));
         Strings.insert("CelsiusTr",          QCoreApplication::translate("TorcCentral", "Celsius"));
         Strings.insert("CelsiusUnitsTr",     QCoreApplication::translate("TorcCentral", "°C"));
         Strings.insert("FahrenheitTr",       QCoreApplication::translate("TorcCentral", "Fahrenheit"));

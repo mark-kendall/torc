@@ -124,7 +124,6 @@ class TorcHTTPRequest
 
   public:
     explicit TorcHTTPRequest(TorcHTTPReader *Reader);
-    TorcHTTPRequest(const QString &Method, QMap<QString,QString> *Headers, QByteArray *Content);
 
     void                   SetConnection            (HTTPConnection Connection);
     void                   SetStatus                (HTTPStatus Status);
@@ -135,6 +134,8 @@ class TorcHTTPRequest
     void                   SetAllowed               (int Allowed);
     void                   SetAllowGZip             (bool Allowed);
     void                   SetCache                 (int Cache, const QString Tag = QString(""));
+    void                   SetSecure                (bool Secure);
+    bool                   GetSecure                (void);
     HTTPStatus             GetHTTPStatus            (void) const;
     HTTPType               GetHTTPType              (void) const;
     HTTPRequestType        GetHTTPRequestType       (void) const;
@@ -171,6 +172,7 @@ class TorcHTTPRequest
     QMap<QString,QString> *m_headers;
     QMap<QString,QString>  m_queries;
     QByteArray            *m_content;
+    bool                   m_secure;
 
     bool                   m_allowGZip;
     int                    m_allowed;

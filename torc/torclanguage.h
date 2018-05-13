@@ -9,6 +9,7 @@
 #include <QReadWriteLock>
 
 // Torc
+#include "torcsetting.h"
 #include "torchttpservice.h"
 
 #define DEFAULT_QT_LANGUAGE (QLocale::AnyLanguage)
@@ -33,7 +34,6 @@ class TorcLanguage : public QObject, public TorcHTTPService
     TorcLanguage();
     virtual ~TorcLanguage();
 
-    void                     LoadPreferences       (void);
     QLocale                  GetLocale             (void);
     QString                  GetUIName             (void);
 
@@ -55,6 +55,8 @@ class TorcLanguage : public QObject, public TorcHTTPService
     static void              Initialise            (void);
 
   private:
+    Q_DISABLE_COPY(TorcLanguage)
+    TorcSetting             *m_languageSetting;
     QString                  languageCode;
     QString                  languageString;
     QLocale                  m_locale;

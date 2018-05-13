@@ -50,13 +50,14 @@ class TorcSSDP : public QObject
   public:
     static void      Search             (void);
     static void      CancelSearch       (void);
-    static void      Announce           (void);
+    static void      Announce           (bool Secure);
     static void      CancelAnnounce     (void);
 
     static TorcSSDP                    *gSSDP;
     static QMutex                      *gSSDPLock;
     static bool                         gSearchEnabled;
     static bool                         gAnnounceEnabled;
+    static bool                         gAnnounceSecure;
 
   protected:
     TorcSSDP();
@@ -67,7 +68,7 @@ class TorcSSDP : public QObject
   protected slots:
     void             SearchPriv         (void);
     void             CancelSearchPriv   (void);
-    void             AnnouncePriv       (void);
+    void             AnnouncePriv       (bool Secure);
     void             CancelAnnouncePriv (void);
 
     void             SendSearch         (void);
@@ -89,11 +90,12 @@ class TorcSSDP : public QObject
     qint64           GetExpiryTime      (const QString &Expires);
     void             StartSearch        (void);
     void             StopSearch         (void);
-    void             StartAnnounce      (void);
+    void             StartAnnounce      (bool Secure);
     void             StopAnnounce       (void);
     void             ProcessResponse    (const TorcSSDPSearchResponse &Response);
 
   private:
+    bool                                m_secure;
     QString                             m_serverString;
     bool                                m_searching;
     int                                 m_firstSearchTimer;

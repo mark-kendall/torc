@@ -9,33 +9,39 @@
 #include <QStringList>
 
 // Torc
+#include "torchttpservice.h"
 #include "torcreferencecounted.h"
 
-class TorcSetting : public QObject, public TorcReferenceCounter
+class TorcSetting : public QObject, public TorcHTTPService, public TorcReferenceCounter
 {
-    Q_OBJECT
+
     Q_ENUMS(Type)
 
   public:
     enum Type
     {
-        Checkbox,
-        Integer
+        Bool,
+        Integer,
+        String,
+        StringList
     };
 
   public:
+    static QString TypeToString(Type type);
     TorcSetting(TorcSetting *Parent, const QString &DBName, const QString &UIName,
                 Type SettingType, bool Persistent, const QVariant &Default);
 
   public:
-    Q_PROPERTY (QVariant m_value       READ GetValue()       NOTIFY ValueChanged()       );
-    Q_PROPERTY (QString  m_uiName      READ GetName()        CONSTANT                    );
-    Q_PROPERTY (QString  m_description READ GetDescription() CONSTANT                    );
-    Q_PROPERTY (QString  m_helpText    READ GetHelpText()    CONSTANT                    );
-    Q_PROPERTY (QVariant m_default     READ GetDefault()     CONSTANT                    );
-    Q_PROPERTY (bool     m_persistent  READ GetPersistent()  CONSTANT                    );
-    Q_PROPERTY (int      m_isActive    READ IsActive()       NOTIFY ActiveChanged()      );
-    Q_PROPERTY (Type     m_type        READ GetSettingType   CONSTANT                    );
+    Q_OBJECT
+    Q_CLASSINFO("Version",   "1.0.0")
+    Q_PROPERTY (QVariant value        READ GetValue()        NOTIFY ValueChanged()       )
+    Q_PROPERTY (QString  uiName       READ GetUiName()       CONSTANT                    )
+    Q_PROPERTY (QString  description  READ GetDescription()  CONSTANT                    )
+    Q_PROPERTY (QString  helpText     READ GetHelpText()     CONSTANT                    )
+    Q_PROPERTY (QVariant defaultValue READ GetDefaultValue() CONSTANT                    )
+    Q_PROPERTY (bool     persistent   READ GetPersistent()   CONSTANT                    )
+    Q_PROPERTY (bool     isActive     READ GetIsActive()     NOTIFY ActiveChanged()      )
+    Q_PROPERTY (QString  settingType  READ GetSettingType()  CONSTANT                    )
 
   public:
     QVariant::Type         GetStorageType       (void);
@@ -44,24 +50,25 @@ class TorcSetting : public QObject, public TorcReferenceCounter
     void                   Remove               (void);
     TorcSetting*           FindChild            (const QString &Child, bool Recursive = false);
     QSet<TorcSetting*>     GetChildren          (void);
-
-  public slots:
-    void                   SetValue             (const QVariant &Value);
-    void                   SetRange             (int Begin, int End, int Step);
-    bool                   IsActive             (void);
-    void                   SetActive            (bool Value);
+    TorcSetting*           GetChildByIndex      (int Index);
     void                   SetActiveThreshold   (int  Threshold);
     void                   SetDescription       (const QString &Description);
     void                   SetHelpText          (const QString &HelpText);
+    void                   SetRange             (int Begin, int End, int Step);
+    Type                   GetType              (void);
 
+  public slots:
+    void                   SubscriberDeleted    (QObject *Subscriber);
+    void                   SetValue             (const QVariant &Value);
+    bool                   GetIsActive          (void);
+    void                   SetActive            (bool Value);
     QVariant               GetValue             (void);
-    QString                GetName              (void);
+    QString                GetUiName            (void);
     QString                GetDescription       (void);
     QString                GetHelpText          (void);
-    QVariant               GetDefault           (void);
+    QVariant               GetDefaultValue      (void);
     bool                   GetPersistent        (void);
-    Type                   GetSettingType       (void);
-    TorcSetting*           GetChildByIndex      (int Index);
+    QString                GetSettingType       (void);
 
     // Checkbox
     void                   SetTrue              (void);
@@ -87,16 +94,17 @@ class TorcSetting : public QObject, public TorcReferenceCounter
   private:
     Q_DISABLE_COPY(TorcSetting);
 
-  protected:
+  private:
     TorcSetting           *m_parent;
-    Type                   m_type;
-    bool                   m_persistent;
+    Type                   type;
+    QString                settingType;
+    bool                   persistent;
     QString                m_dbName;
-    QString                m_uiName;
-    QString                m_description;
-    QString                m_helpText;
-    QVariant               m_value;
-    QVariant               m_default;
+    QString                uiName;
+    QString                description;
+    QString                helpText;
+    QVariant               value;
+    QVariant               defaultValue;
 
     // Integer
     int                    m_begin;
@@ -104,7 +112,7 @@ class TorcSetting : public QObject, public TorcReferenceCounter
     int                    m_step;
 
   private:
-    bool                   m_isActive;
+    bool                   isActive;
     int                    m_active;
     int                    m_activeThreshold;
     QList<TorcSetting*>    m_children;

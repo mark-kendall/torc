@@ -11,6 +11,8 @@
 
 #define PCA9685 QString("pca9685")
 
+class TorcI2CPCA9685;
+
 class TorcI2CPCA9685Channel : public TorcPWMOutput
 {
     Q_OBJECT
@@ -28,6 +30,9 @@ class TorcI2CPCA9685Channel : public TorcPWMOutput
     int             m_channelNumber;
     int             m_channelValue;
     TorcI2CPCA9685 *m_parent;
+
+  private:
+    Q_DISABLE_COPY(TorcI2CPCA9685Channel)
 };
 
 class TorcI2CPCA9685 : public TorcI2CDevice
@@ -42,6 +47,7 @@ class TorcI2CPCA9685 : public TorcI2CDevice
     bool                   SetPWM (int Channel, int Value);
 
   private:
+    Q_DISABLE_COPY(TorcI2CPCA9685)
     TorcI2CPCA9685Channel *m_outputs[16];
 };
 

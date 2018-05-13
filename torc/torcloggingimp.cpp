@@ -447,8 +447,8 @@ FileLogger::~FileLogger()
 
         strcpy(item->message, m_file.isOpen() ? "Closing file logger." : "Closing console logger.");
         Logmsg(item);
-
-        m_file.flush();
+        LogItem::Delete(item);
+        //m_file.flush();
         m_file.close();
     }
 }
@@ -480,7 +480,7 @@ bool FileLogger::PrintLine(QByteArray &Line)
 
 WebLogger::WebLogger(QString Filename)
   : QObject(),
-    TorcHTTPService(this, "log", "log", WebLogger::staticMetaObject, ""),
+    TorcHTTPService(this, "log", "log", WebLogger::staticMetaObject, "event"),
     FileLogger(Filename, false, false),
     log(),
     tail(),
@@ -501,7 +501,7 @@ bool WebLogger::event(QEvent *event)
     {
         lock.lock();
         if (changed)
-            emit logChanged(true);
+            emit logChanged();
         changed = false;
         lock.unlock();
     }
@@ -543,7 +543,7 @@ bool WebLogger::Logmsg(LogItem *Item)
     tail = line;
     lock.unlock();
 
-    emit tailChanged(line);
+    emit tailChanged();
     return PrintLine(line);
 }
 
