@@ -174,6 +174,10 @@ $(document).ready(function() {
             translatedName = template(theme.DropdownItemWithIcon, { "icon": "refresh", "text": torc.RestartTorcTr });
             translatedConfirmation = torc.ConfirmRestartTorc;
             method = 'RestartTorc';
+        } else if (name === 'canStopTorc') {
+            translatedName = template(theme.DropdownItemWithIcon, { "icon": "refresh", "text": 'Stop Torc' });
+            translatedConfirmation = 'Are you sure you want to stop Torc?';
+            method = 'StopTorc';
         } else { return; }
 
         if (value === false || value === undefined) {

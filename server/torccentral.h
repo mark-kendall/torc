@@ -18,13 +18,15 @@ class TorcCentral : public QObject, public TorcHTTPService
         Celsius = 0,
         Fahrenheit = 1
     };
-    Q_ENUMS(TemperatureUnits);
+    Q_ENUMS(TemperatureUnits)
 
     Q_OBJECT
-    Q_CLASSINFO("Version",     "1.0.0");
-    Q_CLASSINFO("RestartTorc", "methods=PUT");
-    Q_PROPERTY(bool canRestartTorc READ GetCanRestartTorc NOTIFY CanRestartTorcChanged);
-    Q_PROPERTY(QString temperatureUnits READ GetTemperatureUnits CONSTANT);
+    Q_CLASSINFO("Version",     "1.0.0")
+    Q_CLASSINFO("RestartTorc", "methods=PUT")
+    Q_CLASSINFO("StopTorc",    "methods=PUT")
+    Q_PROPERTY(bool canRestartTorc      READ GetCanRestartTorc() CONSTANT)
+    Q_PROPERTY(bool canStopTorc         READ GetCanStopTorc      CONSTANT)
+    Q_PROPERTY(QString temperatureUnits READ GetTemperatureUnits CONSTANT)
 
   public:
     TorcCentral();
@@ -36,15 +38,14 @@ class TorcCentral : public QObject, public TorcHTTPService
     static TemperatureUnits GetGlobalTemperatureUnits (void);
     static QString   TemperatureUnitsToString(TemperatureUnits Units);
 
-  signals:
-    void            CanRestartTorcChanged (bool CanRestartTorc);
-
   public slots:
     // TorcHTTPService
     void            SubscriberDeleted     (QObject *Subscriber);
 
     bool            GetCanRestartTorc     (void);
     bool            RestartTorc           (void);
+    bool            StopTorc              (void);
+    bool            GetCanStopTorc        (void);
     QString         GetTemperatureUnits   (void) const;
 
   protected:
@@ -58,6 +59,7 @@ class TorcCentral : public QObject, public TorcHTTPService
     QVariantMap     m_config;
     QByteArray      m_graph;
     bool            canRestartTorc;
+    bool            canStopTorc;
     QString         temperatureUnits;
 };
 

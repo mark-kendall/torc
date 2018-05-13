@@ -79,6 +79,7 @@ TorcCentral::TorcCentral()
     m_config(QVariantMap()),
     m_graph(),
     canRestartTorc(true),
+    canStopTorc(true),
     temperatureUnits("celsius")
 {
     // reset state graph and clear out old files
@@ -252,6 +253,18 @@ bool TorcCentral::RestartTorc(void)
     // NB could be called from any thread
     TorcLocalContext::NotifyEvent(Torc::RestartTorc);
     return true;
+}
+
+bool TorcCentral::StopTorc(void)
+{
+    TorcLocalContext::NotifyEvent(Torc::Stop);
+    return true;
+}
+
+bool TorcCentral::GetCanStopTorc(void)
+{
+    QMutexLocker locker(&m_lock);
+    return canStopTorc;
 }
 
 QString TorcCentral::GetTemperatureUnits(void) const
