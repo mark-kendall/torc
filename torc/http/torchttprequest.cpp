@@ -80,6 +80,7 @@ TorcHTTPRequest::TorcHTTPRequest(TorcHTTPReader *Reader)
     m_headers(NULL),
     m_queries(),
     m_content(NULL),
+    m_secure(false),
     m_allowGZip(false),
     m_allowed(0),
     m_authorised(HTTPNotAuthorised),
@@ -258,6 +259,16 @@ void TorcHTTPRequest::SetCache(int Cache, const QString Tag /* = QString("")*/)
 {
     m_cache = Cache;
     m_cacheTag = Tag;
+}
+
+void TorcHTTPRequest::SetSecure(bool Secure)
+{
+    m_secure = Secure;
+}
+
+bool TorcHTTPRequest::GetSecure(void)
+{
+    return m_secure;
 }
 
 HTTPStatus TorcHTTPRequest::GetHTTPStatus(void) const
