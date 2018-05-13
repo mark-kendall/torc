@@ -447,8 +447,8 @@ FileLogger::~FileLogger()
 
         strcpy(item->message, m_file.isOpen() ? "Closing file logger." : "Closing console logger.");
         Logmsg(item);
-
-        m_file.flush();
+        LogItem::Delete(item);
+        //m_file.flush();
         m_file.close();
     }
 }
