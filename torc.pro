@@ -49,7 +49,8 @@ DEPENDPATH  += ./outputs ./outputs/platforms
 INCLUDEPATH += $$DEPENDPATH
 
 # use graphviz via library or executable?
-packagesExist(libgvc) {
+libgvc = $$(TORC_LIBGVC)
+!isEmpty(libgvc):packagesExist(libgvc) {
     DEFINES += USING_GRAPHVIZ_LIBS
     CONFIG  += link_pkgconfig
     PKGCONFIG += libgvc
