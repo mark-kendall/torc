@@ -3,6 +3,14 @@ lessThan(QT_MAJOR_VERSION, 5) {
     error("Must build against Qt5")
 }
 
+# Environment overrides
+# Force use of graphviz libraries. Currently disabled due to leaks.
+libgvc = $$(TORC_LIBGVC)
+# Force libxml2 check
+libxml2 = $$(TORC_LIBXML2)
+# Force Pi build due to incorrect Raspbian makespec
+pi = $$(TORC_PI)
+
 TEMPLATE    = app
 CONFIG     += thread console
 CONFIG     -= app_bundle
@@ -49,7 +57,6 @@ DEPENDPATH  += ./outputs ./outputs/platforms
 INCLUDEPATH += $$DEPENDPATH
 
 # use graphviz via library or executable?
-libgvc = $$(TORC_LIBGVC)
 !isEmpty(libgvc):packagesExist(libgvc) {
     DEFINES += USING_GRAPHVIZ_LIBS
     CONFIG  += link_pkgconfig
@@ -75,7 +82,6 @@ INSTALLS      += install
 
 # libxml2 for xml validation
 !win32 {
-    libxml2 = $$(TORC_LIBXML2)
     packagesExist(libxml-2.0) | !isEmpty(libxml2) {
         DEFINES += USING_LIBXML2
         HEADERS += torc/torclibxmlvalidator.h
@@ -134,7 +140,6 @@ macx {
 # Raspberry Pi build
 # Qt5 distributed with Raspbian Jessie uses the generic linux-g++ makespec, not linux-rasp-pi-g++
 # so force it with an environment variable if necessary (i.e. TORC_PI=1 qmake).
-pi = $$(TORC_PI)
 linux-rasp-pi-g++ | !isEmpty(pi) {
     LIBS += -lwiringPi
     DEFINES += USING_I2C
