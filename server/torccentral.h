@@ -43,8 +43,8 @@ class TorcCentral : public QObject, public TorcHTTPService
     void            SubscriberDeleted     (QObject *Subscriber);
 
     bool            GetCanRestartTorc     (void);
-    bool            RestartTorc           (void);
-    bool            StopTorc              (void);
+    void            RestartTorc           (void);
+    void            StopTorc              (void);
     bool            GetCanStopTorc        (void);
     QString         GetTemperatureUnits   (void) const;
 

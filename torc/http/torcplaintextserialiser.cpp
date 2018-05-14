@@ -50,6 +50,7 @@ void TorcPlainTextSerialiser::End(void)
 void TorcPlainTextSerialiser::AddProperty(const QString &Name, const QVariant &Value)
 {
     // Name is added for consistency with other serialisers...
+    delete m_content;
     m_content = new QByteArray(Name.toLocal8Bit() + "\r\n" + Value.toByteArray());
 }
 

@@ -214,9 +214,11 @@ class LoggingThread : public TorcQThread
         if (m_aborted)
             return;
 
-        QMutexLocker lock(&gLogQueueLock);
-        Flush(1000);
-        m_aborted = true;
+        {
+            QMutexLocker lock(&gLogQueueLock);
+            Flush(1000);
+            m_aborted = true;
+        }
         m_waitNotEmpty.wakeAll();
     }
 
@@ -224,7 +226,7 @@ class LoggingThread : public TorcQThread
     {
         QTime t;
         t.start();
-        while (!m_aborted && gLogQueue.isEmpty() && t.elapsed() < TimeoutMS)
+        while (!m_aborted && !gLogQueue.isEmpty() && t.elapsed() < TimeoutMS)
         {
             m_waitNotEmpty.wakeAll();
             int left = TimeoutMS - t.elapsed();
@@ -241,6 +243,9 @@ class LoggingThread : public TorcQThread
             int64_t tid = GetThreadTid(Item);
 
             QMutexLocker locker(&gLogThreadLock);
+            if (gLogThreadHash.contains(Item->threadId))
+                free(gLogThreadHash.take(Item->threadId));
+
             gLogThreadHash[Item->threadId] = strdup(Item->threadName);
 
             if (gDebugRegistration)
@@ -618,16 +623,21 @@ void PrintLogLine(uint64_t Mask, LogLevel Level, const char *File, int Line,
     if (!item)
         return;
 
+    char* copy = NULL;
     if (FromQString && strchr(Format, '%'))
     {
         QString string(Format);
-        Format = string.replace(gLogRexExp, "%%").toLocal8Bit().constData();
+        Format = strdup(string.replace(gLogRexExp, "%%").toLocal8Bit().constData());
+        copy = (char*)Format;
     }
 
     va_list arguments;
     va_start(arguments, Format);
     vsnprintf(item->message, LOGLINE_MAX, Format, arguments);
     va_end(arguments);
+
+    if (copy)
+        free(copy);
 
     QMutexLocker lock(&gLogQueueLock);
 
@@ -733,6 +743,15 @@ void StopLogging(void)
         QMutexLocker locker(&gLoggerListLock);
         foreach (LoggerBase* logger, gLoggerList)
             delete logger;
+    }
+
+    // this cleans up the last thread name - the logging thread itself - which is deregistered
+    // after the logging thread runloop has finished...
+    {
+        QMutexLocker locker(&gLogThreadLock);
+        QHash<uint64_t, char *>::iterator it = gLogThreadHash.begin();
+        for ( ; it != gLogThreadHash.end(); ++it)
+            free(it.value());
     }
 }
 

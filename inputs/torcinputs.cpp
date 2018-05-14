@@ -160,8 +160,8 @@ void TorcInputs::RemoveInput(TorcInput *Input)
         return;
     }
 
+    LOG(VB_GENERAL, LOG_INFO, QString("Input %1 de-registered").arg(Input->GetUniqueId()));
     Input->DownRef();
     inputList.removeOne(Input);
-    LOG(VB_GENERAL, LOG_INFO, QString("Input %1 de-registered").arg(Input->GetUniqueId()));
     emit InputsChanged();
 }
