@@ -80,7 +80,7 @@ void TorcNetworkButtonInput::SetValue(double Value)
     if (m_pulseTimer.isActive())
         return;
 
-    TorcSwitchInput::SetValue(value < 1.0 ? 1.0 : 0.0);
+    TorcNetworkSwitchInput::SetValue(value < 1.0 ? 1.0 : 0.0);
     emit Pushed();
 }
 
