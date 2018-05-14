@@ -248,17 +248,15 @@ QString TorcCentral::GetUIName(void)
     return tr("Central");
 }
 
-bool TorcCentral::RestartTorc(void)
+void TorcCentral::RestartTorc(void)
 {
     // NB could be called from any thread
     TorcLocalContext::NotifyEvent(Torc::RestartTorc);
-    return true;
 }
 
-bool TorcCentral::StopTorc(void)
+void TorcCentral::StopTorc(void)
 {
     TorcLocalContext::NotifyEvent(Torc::Stop);
-    return true;
 }
 
 bool TorcCentral::GetCanStopTorc(void)
