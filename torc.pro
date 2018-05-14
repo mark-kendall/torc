@@ -34,6 +34,11 @@ QMAKE_CXXFLAGS += -Wall -Wextra -Weffc++ -Werror
 
 # debug builds
 #CONFIG     += debug
+CONFIG(debug, debug|release) {
+    message("Debug build")
+}else {
+    message("Release build")
+}
 
 # libraries
 # zlib on windows is too much like hard work
