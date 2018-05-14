@@ -618,16 +618,21 @@ void PrintLogLine(uint64_t Mask, LogLevel Level, const char *File, int Line,
     if (!item)
         return;
 
+    char* copy = NULL;
     if (FromQString && strchr(Format, '%'))
     {
         QString string(Format);
-        Format = string.replace(gLogRexExp, "%%").toLocal8Bit().constData();
+        Format = strdup(string.replace(gLogRexExp, "%%").toLocal8Bit().constData());
+        copy = (char*)Format;
     }
 
     va_list arguments;
     va_start(arguments, Format);
     vsnprintf(item->message, LOGLINE_MAX, Format, arguments);
     va_end(arguments);
+
+    if (copy)
+        free(copy);
 
     QMutexLocker lock(&gLogQueueLock);
 
