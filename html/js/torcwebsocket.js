@@ -229,7 +229,7 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
         // start the connection by requesting a token. If authentication is not required, it will be silently ignored.
         $.ajax({ url: torc.ServicesPath + 'GetWebSocketToken',
                  dataType: "json",
-                 type: 'PUT',
+                 type: 'GET',
                  xhrFields: { withCredentials: true },
                  success: function(result) { connect(result.accesstoken); },
                  error: function() { setSocketStatus(torc.SocketNotConnected); }

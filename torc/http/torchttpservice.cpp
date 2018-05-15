@@ -310,9 +310,9 @@ TorcHTTPService::TorcHTTPService(QObject *Parent, const QString &Signature, cons
                     continue;
 
                 // any Q_CLASSINFO for this method?
-                // current 'schema' allows specification of allowed HTTP methods (PUT, GET etc)
-                // and custom return types, which are used to improve the usability of maps and
-                // lists when returned via XML, JSON, PLIST etc
+                // current 'schema' allows specification of allowed HTTP methods (PUT, GET etc),
+                // custom return types, which are used to improve the usability of maps and
+                // lists when returned via XML, JSON, PLIST etc and requiring authentication (add AUTH to methods)
                 QString returntype;
                 int customallowed = HTTPUnknownType;
 
@@ -472,6 +472,11 @@ void TorcHTTPService::ProcessHTTPRequest(const QString &PeerAddress, int PeerPor
             return;
         }
 
+        // reject requests that have a particular need for authorisation. We can only
+        // check at this late stage but these should be in the minority
+        if (!MethodIsAuthorised(Request, (*it)->m_allowedRequestTypes))
+            return;
+
         QString type;
         bool    voidresult;
         QVariant result = (*it)->Invoke(m_parent, Request.Queries(), type, voidresult);
@@ -518,7 +523,7 @@ QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVarian
             // disallow methods based on state and authentication
             int types         = it.value()->m_allowedRequestTypes;
             bool disabled     = types & HTTPDisabled;
-            bool unauthorised = !Authenticated && (types & HTTPPost || types & HTTPPut || types & HTTPDelete || types & HTTPUnknownType);
+            bool unauthorised = !Authenticated && (types & HTTPAuth || types & HTTPPost || types & HTTPPut || types & HTTPDelete || types & HTTPUnknownType);
 
             if (disabled || unauthorised)
             {
@@ -815,6 +820,18 @@ QVariant TorcHTTPService::GetProperty(int Index)
         LOG(VB_GENERAL, LOG_ERR, "Failed to retrieve property");
 
     return result;
+}
+
+/*! \brief Check the current request is authorised and set the authentication header if not.
+ */
+bool TorcHTTPService::MethodIsAuthorised(TorcHTTPRequest &Request, int Allowed)
+{
+    if (Request.IsAuthorised() != HTTPAuthorised && (Allowed & HTTPAuth))
+    {
+        TorcHTTPServer::AddAuthenticationHeader(Request);
+        return false;
+    }
+    return true;
 }
 
 /*! \brief Enable the given method.

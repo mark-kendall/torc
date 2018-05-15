@@ -52,8 +52,8 @@ class WebLogger : public QObject, public TorcHTTPService, public FileLogger
 {
     Q_OBJECT
     Q_CLASSINFO("Version", "1.0.0")
-    Q_CLASSINFO("GetLog",  "type=Log")
-    Q_CLASSINFO("GetTail", "type=Logline")
+    Q_CLASSINFO("GetLog",  "type=Log,method=GET+AUTH")
+    Q_CLASSINFO("GetTail", "type=Logline,method=GET+AUTH")
     Q_PROPERTY(QByteArray log  READ GetLog  NOTIFY logChanged)
     Q_PROPERTY(QByteArray tail READ GetTail NOTIFY tailChanged)
 
