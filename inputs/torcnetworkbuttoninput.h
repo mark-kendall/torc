@@ -15,14 +15,14 @@ class TorcNetworkButtonInput : public TorcNetworkSwitchInput
     TorcNetworkButtonInput(double Default, const QVariantMap &Details);
    ~TorcNetworkButtonInput();
 
-    QStringList GetDescription (void);
-    void        Start          (void);
+    QStringList GetDescription (void) Q_DECL_OVERRIDE;
+    void        Start          (void) Q_DECL_OVERRIDE;
 
   signals:
     void Pushed     (void);
 
   public slots:
-    void SetValue   (double Value);
+    void SetValue   (double Value) Q_DECL_FINAL;
 
   private slots:
     void EndPulse   (void);

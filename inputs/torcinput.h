@@ -56,8 +56,8 @@ class TorcInput : public TorcDevice, public TorcHTTPService
     // TorcHTTPService
     void             SubscriberDeleted         (QObject *Subscriber);
 
-    void             SetValue                  (double Value);
-    void             SetValid                  (bool Valid);
+    void             SetValue                  (double Value) Q_DECL_OVERRIDE;
+    void             SetValid                  (bool Valid)   Q_DECL_FINAL;
 
     double           GetOperatingRangeMin      (void);
     double           GetOperatingRangeMax      (void);
