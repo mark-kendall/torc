@@ -35,7 +35,7 @@ $(document).ready(function() {
 
     function addDropdownMenuItem(menu, identifier, link, text, click, hide) {
         $('.' + menu).append(template(theme.NavbarDropdownItem, {"id": identifier, "link": link, "text": text }));
-        if (typeof click === 'function') { $('.' + identifier).click(click); }
+        if (typeof click === 'function') { $('.' + identifier).on("click", click); }
     }
 
     function peerListChanged(name, value) {
@@ -223,7 +223,7 @@ $(document).ready(function() {
             function() { // setup
                 $('#' + modalid + ' h4').replaceWith('<button type="button" class="btn btn-info hidden torclogrefresh">' + torc.RefreshTr + '</button>');
                 $('#' + modalid + ' .modal-footer').prepend('<button type="button" class="btn btn-info hidden torclogrefresh">' + torc.RefreshTr + '</button>');
-                $('.torclogrefresh').click(
+                $('.torclogrefresh').on("click",
                     function () {
                         load();
                         $('.torclogrefresh').addClass('hidden');
@@ -250,7 +250,7 @@ $(document).ready(function() {
             function () { // setup
                 $('#' + modalid + ' h4').replaceWith('<button type="button" class="btn btn-info hidden torclogtoggle">' + torc.FollowTr + '</button>');
                 $('#' + modalid + ' .modal-footer').prepend('<button type="button" class="btn btn-info hidden torclogtoggle">' + torc.FollowTr + '</button>');
-                $('.torclogtoggle').click(function() {
+                $('.torclogtoggle').on("click", function() {
                     if (following) {
                         following = false;
                         $('.torclogtoggle').text(torc.FollowTr);

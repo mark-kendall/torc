@@ -198,7 +198,7 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
             var batchresult;
 
             // parse the JSON result
-            var data = $.parseJSON(event.data);
+            var data = JSON.parse(event.data);
 
             if ($.isArray(data)) {
                 // array of objects (batch)

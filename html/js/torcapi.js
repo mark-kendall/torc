@@ -57,7 +57,7 @@ var TorcAPI = function ($, torc) {
             // iterate over services
             Object.getOwnPropertyNames(servicelist).forEach( function(service) {
                 // make service collapse buttons dynamic (up/down)
-                var button = $('button[data-target=#api-detail-' + service + ']');
+                var button = $('button[data-target="#api-detail-' + service + '"]');
                 $('#api-detail-' + service).on('hide.bs.collapse', function() {
                     button.html(template(theme.APICollapseShow));
                 });
