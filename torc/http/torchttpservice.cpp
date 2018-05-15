@@ -46,7 +46,8 @@ class MethodParameters
         m_names(),
         m_types(),
         m_allowedRequestTypes(AllowedRequestTypes),
-        m_returnType(ReturnType)
+        m_returnType(ReturnType),
+        m_method(Method)
     {
         // statically initialise the list of unsupported types (either non-serialisable (QHash)
         // or nonsensical (pointer types)
@@ -238,6 +239,7 @@ class MethodParameters
     QVector<int>        m_types;
     int                 m_allowedRequestTypes;
     QString             m_returnType;
+    QMetaMethod         m_method;
 };
 
 /*! \class TorcHTTPService
@@ -275,76 +277,9 @@ TorcHTTPService::TorcHTTPService(QObject *Parent, const QString &Signature, cons
     else
         LOG(VB_GENERAL, LOG_WARNING, QString("Service '%1' is missing version information").arg(Name));
 
-    // analyse available methods
-    for (int i = 0; i < m_metaObject.methodCount(); ++i)
-    {
-        QMetaMethod method = m_metaObject.method(i);
-
-        if ((method.methodType() == QMetaMethod::Slot) &&
-            (method.access()     == QMetaMethod::Public))
-        {
-            QString name(method.methodSignature());
-            name = name.section('(', 0, 0);
-
-            // discard unwanted slots
-            if (name == "deleteLater" || name == "SubscriberDeleted" || blacklist.contains(name))
-                continue;
-
-            // any Q_CLASSINFO for this method?
-            // current 'schema' allows specification of allowed HTTP methods (PUT, GET etc)
-            // and custom return types, which are used to improve the usability of maps and
-            // lists when returned via XML, JSON, PLIST etc
-            QString returntype;
-            int customallowed = HTTPUnknownType;
-
-            int index = m_metaObject.indexOfClassInfo(name.toLatin1());
-            if (index > -1)
-            {
-                QStringList infos = QString(m_metaObject.classInfo(index).value()).split(",", QString::SkipEmptyParts);
-                foreach (QString info, infos)
-                {
-                    if (info.startsWith("methods="))
-                        customallowed = TorcHTTPRequest::StringToAllowed(info.mid(8));
-                    else if (info.startsWith("type="))
-                        returntype = info.mid(5);
-                }
-            }
-
-            // determine allowed request types
-            int allowed = HTTPOptions;
-            if (customallowed != HTTPUnknownType)
-            {
-                allowed |= customallowed;
-            }
-            else if (name.startsWith("Get", Qt::CaseInsensitive))
-            {
-                allowed += HTTPGet | HTTPHead;
-            }
-            else if (name.startsWith("Set", Qt::CaseInsensitive))
-            {
-                // TODO Put or Post?? How to handle head requests for setters...
-                allowed += HTTPPut;
-            }
-            else
-            {
-                LOG(VB_GENERAL, LOG_ERR, QString("Unable to determine request types of method '%1' for '%2' - ignoring").arg(name).arg(m_name));
-                continue;
-            }
-
-            MethodParameters *parameters = new MethodParameters(i, method, allowed, returntype);
-
-            if (parameters->m_valid)
-                m_methods.insert(name, parameters);
-            else
-                delete parameters;
-        }
-    }
-
-    // analyse properties
+    // build a list of metaobjects from all superclasses as well.
     QList<const QMetaObject*> metas;
     metas.append(&m_metaObject);
-
-    // recursively search for superclass meta objects. This picks up QMetaProperty's in the base classes.
     const QMetaObject* super = m_metaObject.superClass();
     while (super)
     {
@@ -352,6 +287,100 @@ TorcHTTPService::TorcHTTPService(QObject *Parent, const QString &Signature, cons
         super = super->superClass();
     }
 
+    // analyse available methods. Build the list from the top superclass 'down' to ensure we pick up
+    // overriden slots and discard duplicates
+    QListIterator<const QMetaObject*> it(metas);
+    it.toBack();
+    while (it.hasPrevious())
+    {
+        const QMetaObject *meta = it.previous();
+
+        for (int i = 0; i < meta->methodCount(); ++i)
+        {
+            QMetaMethod method = meta->method(i);
+
+            if ((method.methodType() == QMetaMethod::Slot) &&
+                (method.access()     == QMetaMethod::Public))
+            {
+                QString name(method.methodSignature());
+                name = name.section('(', 0, 0);
+
+                // discard unwanted slots
+                if (name == "deleteLater" || name == "SubscriberDeleted" || blacklist.contains(name))
+                    continue;
+
+                // any Q_CLASSINFO for this method?
+                // current 'schema' allows specification of allowed HTTP methods (PUT, GET etc)
+                // and custom return types, which are used to improve the usability of maps and
+                // lists when returned via XML, JSON, PLIST etc
+                QString returntype;
+                int customallowed = HTTPUnknownType;
+
+                // use the actual class metaObject - not the superclass
+                int index = m_metaObject.indexOfClassInfo(name.toLatin1());
+                if (index > -1)
+                {
+                    QStringList infos = QString(m_metaObject.classInfo(index).value()).split(",", QString::SkipEmptyParts);
+                    foreach (QString info, infos)
+                    {
+                        if (info.startsWith("methods="))
+                            customallowed = TorcHTTPRequest::StringToAllowed(info.mid(8));
+                        else if (info.startsWith("type="))
+                            returntype = info.mid(5);
+                    }
+                }
+
+                // determine allowed request types
+                int allowed = HTTPOptions;
+                if (customallowed != HTTPUnknownType)
+                {
+                    allowed |= customallowed;
+                }
+                else if (name.startsWith("Get", Qt::CaseInsensitive))
+                {
+                    allowed += HTTPGet | HTTPHead;
+                }
+                else if (name.startsWith("Set", Qt::CaseInsensitive))
+                {
+                    // TODO Put or Post?? How to handle head requests for setters...
+                    allowed += HTTPPut;
+                }
+                else
+                {
+                    LOG(VB_GENERAL, LOG_ERR, QString("Unable to determine request types of method '%1' for '%2' - ignoring").arg(name).arg(m_name));
+                    continue;
+                }
+
+                MethodParameters *parameters = new MethodParameters(i, method, allowed, returntype);
+
+                if (parameters->m_valid)
+                {
+                    // check whether method has already been identified from superclass - need to match whole 'signature'
+                    // not just name
+                    if (m_methods.contains(name))
+                    {
+                        MethodParameters *existing = m_methods.value(name);
+                        if (existing->m_method.methodSignature() == method.methodSignature() &&
+                            existing->m_method.returnType()      == method.returnType())
+                        {
+                            LOG(VB_GENERAL, LOG_DEBUG, QString("Method '%1' in class '%2' already found in superclass - overriding")
+                                .arg(method.methodSignature().constData()).arg(meta->className()));
+                            existing = m_methods.take(name);
+                            delete existing;
+                        }
+                    }
+
+                    m_methods.insert(name, parameters);
+                }
+                else
+                {
+                    delete parameters;
+                }
+            }
+        }
+    }
+
+    // analyse properties from the full list of metaobjects
     int invalidindex = -1;
     foreach (const QMetaObject* meta, metas)
     {
