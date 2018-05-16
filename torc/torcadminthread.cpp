@@ -143,11 +143,12 @@ void TorcAdminObject::CreateObjects(void)
 {
     QMutexLocker lock(gTorcAdminObjectsLock);
 
-    // only call this once
-    static bool objectscreated = false;
-    if (objectscreated)
+    // guard against multiple concurrent use
+    if (!gTorcAdminObjects.isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_CRIT, "Trying to create admin objects but they already exist!");
         return;
-    objectscreated = true;
+    }
 
     // create a list of static objects that can be sorted by priority.
     // Dynamically created objects will be appended to this list.
@@ -182,5 +183,6 @@ void TorcAdminObject::DestroyObjects(void)
         --it;
         (*it)->Destroy();
     }
+    gTorcAdminObjects.clear();
 }
 
