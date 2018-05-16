@@ -50,19 +50,21 @@ var TorcAPI = function ($, torc) {
         if (typeof servicelist === 'object' && typeof returnformats === 'object' && typeof websocketprotos === 'object') {
             // build the API page
             $('.' + theme.APIModalContentID).html(template(theme.APIServiceList, { "services": servicelist, "formats": returnformats, "subprotocols": websocketprotos }));
-            // ensure only one service is not collapsed (i.e. show one at a time)
-            $('.collapse, .collapse-api').on('show.bs.collapse', function () {
-                $('.collapse.in').collapse('hide');
-            });
             // iterate over services
             Object.getOwnPropertyNames(servicelist).forEach( function(service) {
                 // make service collapse buttons dynamic (up/down)
                 var button = $('button[data-target="#api-detail-' + service + '"]');
                 $('#api-detail-' + service).on('hide.bs.collapse', function() {
                     button.html(template(theme.APICollapseShow));
+                    $('#api-detail2-' + service).removeClass('bg-secondary');
                 });
                 $('#api-detail-' + service).on('show.bs.collapse', function() {
+                    $('#api-detail2-' + service).addClass('bg-secondary');
                     button.html(template(theme.APICollapseHide));
+                    // scroll to top of selected service
+                    // TODO make this animated - the scrollTop(0) is a hack that breaks animation
+                    $('#torc-api-modal').scrollTop(0);
+                    $('#torc-api-modal').scrollTop($('#api-detail2-' + service).offset().top);
                 });
 
                 // load method/property details
@@ -95,12 +97,12 @@ var TorcAPI = function ($, torc) {
         clearAPI();
 
         // add the modal
-        $('.navbar-fixed-top').after(template(theme.APIModal, { "title": torc.ViewAPITitleTr }));
+        $('.torc-navbar').after(template(theme.APIModal, { "title": torc.ViewAPITitleTr }));
 
         // and the menu item to display the modal
         var item = template(theme.DropdownItemWithIcon, { "icon": "github", "text": torc.ViewAPITr });
         $('.torc-central-menu').append(template(theme.NavbarDropdownItem, {"id": theme.APIModalID + "-menu", "link": "#" + theme.APIModalID, "text": item }));
-        $('.' + theme.APIModalID + '-menu > a').attr('data-toggle', 'modal');
+        $('.' + theme.APIModalID + '-menu').attr('data-toggle', 'modal');
 
         load();
     };
