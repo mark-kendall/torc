@@ -155,10 +155,19 @@ class MethodParameters
         if (Object->qt_metacall(QMetaObject::InvokeMetaMethod, m_index, parameters) > -1)
             LOG(VB_GENERAL, LOG_ERR, "qt_metacall error");
 
+        // handle QVariant return type where we don't want to lose visibility of the underlying type
+        int type = m_types[0];
+        if (type == QMetaType::QVariant)
+        {
+            int newtype = static_cast<int>(reinterpret_cast<QVariant*>(parameters[0])->type());
+            if (newtype != type)
+                type = newtype;
+        }
+
         // we cannot create a QVariant that is void and an invalid QVariant signals an error state,
         // so flag directly
-        VoidResult      = m_types[0] == QMetaType::Void;
-        QVariant result = m_types[0] == QMetaType::Void ? QVariant() : QVariant(m_types[0], parameters[0]);
+        VoidResult      = type == QMetaType::Void;
+        QVariant result = type == QMetaType::Void ? QVariant() : QVariant(type, parameters[0]);
 
         // free allocated parameters
         for (int i = 0; i < size; ++i)
