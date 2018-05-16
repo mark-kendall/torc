@@ -184,7 +184,7 @@ void TorcNetworkService::Connect(void)
 
     LOG(VB_GENERAL, LOG_INFO, QString("Trying to connect to %1").arg(m_debugString));
 
-    m_webSocketThread = new TorcWebSocketThread(m_addresses.at(m_preferredAddressIndex), port, secure, true);
+    m_webSocketThread = new TorcWebSocketThread(m_addresses.at(m_preferredAddressIndex), port, secure);
     connect(m_webSocketThread, SIGNAL(Finished()),              this, SLOT(Disconnected()));
     connect(m_webSocketThread, SIGNAL(ConnectionEstablished()), this, SLOT(Connected()));
 

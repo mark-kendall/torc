@@ -13,7 +13,7 @@ class TorcWebSocketThread : public TorcQThread
 
   public:
     TorcWebSocketThread (qintptr SocketDescriptor, bool Secure);
-    TorcWebSocketThread (const QHostAddress &Address, quint16 Port, bool Secure, bool Authenticate = false,
+    TorcWebSocketThread (const QHostAddress &Address, quint16 Port, bool Secure,
                          TorcWebSocketReader::WSSubProtocol Protocol = TorcWebSocketReader::SubProtocolJSONRPC);
     ~TorcWebSocketThread();
 
@@ -37,7 +37,6 @@ class TorcWebSocketThread : public TorcQThread
     // outgoing
     const QHostAddress  m_address;
     quint16             m_port;
-    bool                m_authenticate;
     TorcWebSocketReader::WSSubProtocol m_protocol;
 
   private:
