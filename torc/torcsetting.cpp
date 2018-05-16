@@ -382,6 +382,14 @@ void TorcSetting::SetHelpText(const QString &HelpText)
 
 QVariant TorcSetting::GetValue(void)
 {
+    switch (type)
+    {
+        case Integer:    return value.toInt();
+        case Bool:       return value.toBool();
+        case String:     return value.toString();
+        case StringList: return value.toStringList();
+    }
+
     return value;
 }
 
