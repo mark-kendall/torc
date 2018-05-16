@@ -343,7 +343,6 @@ TorcNetwork::TorcNetwork()
     connect(this, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)), this, SLOT(Authenticate(QNetworkReply*,QAuthenticator*)), Qt::DirectConnection);
 
     // set initial state
-    setConfiguration(m_manager.defaultConfiguration());
     UpdateConfiguration(true);
 }
 

@@ -40,13 +40,11 @@ class TorcOutput : public TorcDevice, public TorcHTTPService
 
     bool             HasOwner               (void);
     bool             SetOwner               (QObject *Owner);
-    QString          GetUIName              (void);
+    QString          GetUIName              (void) Q_DECL_OVERRIDE;
 
   public slots:
     // TorcHTTPService
     void             SubscriberDeleted         (QObject *Subscriber);
-
-    void             SetValid                  (bool Valid);
 
   private:
     QObject         *m_owner;

@@ -350,9 +350,10 @@ TorcWebSocketThread* TorcHTTPServer::TakeSocket(TorcWebSocketThread *Socket)
 */
 void TorcHTTPServer::Authorise(const QString &Host, TorcHTTPRequest &Request, bool ForceCheck)
 {
-    // We allow unauthenticated access to anything that doesn't alter state.
+    // We allow unauthenticated access to anything that doesn't alter state unless auth is specifically
+    // requested in the service (see TorcHTTPServices::GetWebSocketToken).
     // N.B. If a rogue peer posts to a 'setter' type function using a GET type request, the request
-    // will fail during processing - so don't validate the method here as it may lead to fall positives.
+    // will fail during processing - so don't validate the method here as it may lead to false positives.
     // ForceCheck is used to process any authentication headers for WebSocket upgrade requests.
     HTTPRequestType type = Request.GetHTTPRequestType();
     bool authenticate = type == HTTPPost || type == HTTPPut || type == HTTPDelete || type == HTTPUnknownType;
@@ -384,6 +385,11 @@ void TorcHTTPServer::Authorise(const QString &Host, TorcHTTPRequest &Request, bo
     if (Request.IsAuthorised() == HTTPAuthorised)
         return;
 
+    AddAuthenticationHeader(Request);
+}
+
+void TorcHTTPServer::AddAuthenticationHeader(TorcHTTPRequest &Request)
+{
     Request.SetResponseType(HTTPResponseNone);
     Request.SetStatus(HTTP_Unauthorized);
 

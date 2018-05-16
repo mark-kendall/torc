@@ -1,41 +1,33 @@
 var theme = {
 
 "Navbar":
-'<div class="navbar navbar-inverse navbar-fixed-top torc-navbar" role="navigation">' +
-'  <div class="container">' +
-'    <div class="navbar-header">' +
-'      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">' +
-'        <span class="icon-bar"></span>' +
-'        <span class="icon-bar"></span>' +
-'        <span class="icon-bar"></span>' +
-'      </button>' +
-'      <a class="navbar-brand torc-application-name" href="#"><%=torc%></a>' +
-'    </div>' +
-'    <div class="collapse navbar-collapse navbar-right">' +
-'      <ul class="nav navbar-nav">' +
-'      </ul>' +
-'    </div>' +
+'<nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark torc-navbar">' +
+'  <a class="navbar-brand torc-application-name" href="#"><%=torc%></a>' +
+'  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">' +
+'    <span class="navbar-toggler-icon"></span>' +
+'  </button>' +
+'  <div class="collapse navbar-collapse" id="navbarSupportedContent">' +
+'    <ul class="navbar-nav ml-auto">' +
+'    </ul>' +
 '  </div>' +
-'</div>',
+'</nav>',
 
 "NavbarDropdown":
-'<li class="dropdown <%=ddclass%>">' +
-'  <a class="dropdown-toggle" href="#" data-toggle="dropdown">' +
+'<li class="nav-item dropdown <%=ddclass%>">' +
+'  <a class="nav-link" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
 '    <i class="fa fa-<%=icon%> fa-lg"></i>' +
 '  </a>' +
-'  <ul class="dropdown-menu <%=menuclass%>" role="menu"></ul>' +
+'  <div class="dropdown-menu dropdown-menu-right <%=menuclass%>" aria-labelledby="navbarDropdown"></div>' +
 '</li>',
 
 "NavbarDropdownDivider":
-'<li class="divider <%=id%>"></li>',
+'<div class="dropdown-divider <%=id%>"></div>',
 
 "NavbarDropdownItem":
-'<li class="<%=id%>">' +
-'  <a href="<%=link%>"><%=text%></a>' +
-'</li>',
+'<a class="dropdown-item <%=id%>" href="<%=link%>"><%=text%></a>',
 
 "DropdownItemWithIcon":
-'<i class="fa fa-<%=icon%>">&nbsp;</i><%=text%>',
+'<i class="fa fa-<%=icon%>"></i>&nbsp;<%=text%>',
 
 "StategraphContainer":
 '<div id="torc-central"></div>',
@@ -48,8 +40,10 @@ var theme = {
 '  <div class="modal-dialog modal-lg">' +
 '    <div class="modal-content">' +
 '      <div class="modal-header">' +
-'        <button type="button" class="close" data-dismiss="modal">&times;</button>' +
 '        <h4 class="modal-title"><%=title%></h4>' +
+'        <button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
+'          <span aria-hidden="true">&times;</span>' +
+'        </button>' +
 '      </div>' +
 '      <div class="modal-body">' +
 '        <pre id="<%=contentid%>"></pre>' +
@@ -72,8 +66,10 @@ var theme = {
 '  <div class="modal-dialog modal-lg">' +
 '    <div class="modal-content">' +
 '      <div class="modal-header">' +
-'        <button type="button" class="close" data-dismiss="modal">&times;</button>' +
 '        <h4 class="modal-title"><%=title%></h4>' +
+'        <button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
+'          <span aria-hidden="true">&times;</span>' +
+'        </button>' +
 '      </div>' +
 '      <div class="modal-body torc-api-modal-content"></div>' +
 '      <div class="modal-footer">' +
@@ -93,16 +89,17 @@ var theme = {
 'torc-api-service-detail-',
 
 "APIServiceList":
-'  <ul class="nav nav-tabs">' +
-'    <li class="active"><a data-toggle="tab" href="#torc-available-services">Services</a></li>' +
-'    <li><a data-toggle="tab" href="#torc-return-formats">Return formats</a></li>' +
-'    <li><a data-toggle="tab" href="#torc-websoc-formats">WebSockets</a></li>' +
+'  <ul class="nav nav-tabs" role="tablist">' +
+'    <li class="nav-item"><a class="nav-link active show" role="tab" id="torc-avail-services-tab" data-toggle="tab" aria-controls="torc-avail-services" href="#torc-avail-services">Services</a></li>' +
+'    <li class="nav-item"><a class="nav-link" role="tab" id="torc-return-formats-tab" data-toggle="tab" aria-controls="torc-return-formats" href="#torc-return-formats">Return formats</a></li>' +
+'    <li class="nav-item"><a class="nav-link" role="tab" id="torc-websoc-formats-tab" data-toggle="tab" aria-controls="torc-websoc-formats" href="#torc-websoc-formats">WebSockets</a></li>' +
 '  </ul>' +
 '<div class="tab-content">' +
 
-'<div class="panel panel-default tab-pane fade in active" id="torc-available-services">' +
-'  <div class="panel-heading" >Available services</div>' +
-'  <div class="panel-body">' +
+'<div class="tab-pane fade active show" role="tabpanel" aria-labelledby="torc-avail-services-tab" id="torc-avail-services">' +
+'  <div class="card" >' +
+'  <div class="card-body">' +
+'    <div class="card-title">Available services</div>' +
 '    <table class="table table-striped table-hover table-condensed">' +
 '      <thead>' +
 '        <tr>' +
@@ -112,15 +109,15 @@ var theme = {
 '          <th>Details</th>' +
 '        </tr>' +
 '      </thead>' +
-'      <tbody' +
+'      <tbody id="service-accordion">' +
 '<% Object.getOwnPropertyNames(services).forEach( function(prop) { %>' +
-'        <tr>' +
+'        <tr id="api-detail2-<%=prop%>">' +
 '          <td><%=prop%></td>' +
 '          <td><%=services[prop].name%></td>' +
 '          <td><%=services[prop].path%></td>' +
-'          <td><button type="button" class="btn btn-primary btn-xs" data-toggle="collapse" data-target="#api-detail-<%=prop%>"><i class="fa fa-chevron-down"></i></button></td>' +
+'          <td><button type="button" class="btn btn-primary btn-xs" data-toggle="collapse" aria-controls="api-detail-<%=prop%>" data-target="#api-detail-<%=prop%>"><i class="fa fa-chevron-down"></i></button></td>' +
 '        </tr>' +
-'        <tr id="api-detail-<%=prop%>" class="collapse collapse-api">' +
+'        <tr id="api-detail-<%=prop%>" class="collapse" data-parent="#service-accordion" aria-labelledby="api-detail2-<%=prop%>">' +
 '          <td colspan="4">' +
 '                <div id="torc-api-service-detail-<%=prop%>"</div>' +
 '          </td>' +
@@ -129,11 +126,12 @@ var theme = {
 '      </tbody>' +
 '    </table>' +
 '  </div>' +
-'</div>' +
+'</div></div>' +
 
-'<div class="panel panel-default tab-pane fade" id="torc-return-formats">' +
-'  <div class="panel-heading">Supported HTTP return formats</div>' +
-'  <div class="panel-body">' +
+'<div class="tab-pane fade" role="tabpanel" aria-labelledby="torc-return-formats-tab" id="torc-return-formats">' +
+'  <div class="card" >' +
+'  <div class="card-body">' +
+'    <div class="card-title">Supported HTTP return formats</div>' +
 '    <table class="table table-striped table-hover table-condensed">' +
 '      <thead>' +
 '        <tr>' +
@@ -151,11 +149,12 @@ var theme = {
 '      </tbody>' +
 '    </table>' +
 '  </div>' +
-'</div>' +
+'</div></div>' +
 
-'<div class="panel panel-default tab-pane fade" id="torc-websoc-formats">' +
-'  <div class="panel-heading">Supported WebSocket subprotocols</div>' +
-'  <div class="panel-body">' +
+'<div class="tab-pane fade" role="tabpanel" aria-labelledby="torc-websoc-formats-tab" id="torc-websoc-formats">' +
+'  <div class="card" >' +
+'  <div class="card-body">' +
+'    <div class="card-title">Supported WebSocket subprotocols</div>' +
 '    <table class="table table-striped table-hover table-condensed">' +
 '      <thead>' +
 '        <tr>' +

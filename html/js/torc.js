@@ -35,7 +35,7 @@ $(document).ready(function() {
 
     function addDropdownMenuItem(menu, identifier, link, text, click, hide) {
         $('.' + menu).append(template(theme.NavbarDropdownItem, {"id": identifier, "link": link, "text": text }));
-        if (typeof click === 'function') { $('.' + identifier).click(click); }
+        if (typeof click === 'function') { $('.' + identifier).on("click", click); }
     }
 
     function peerListChanged(name, value) {
@@ -48,12 +48,12 @@ $(document).ready(function() {
             if ($.isArray(value) && value.length) {
                 addDropdownMenuItem('torc-peer-menu', 'torc-peer-status', '#', '');
                 qsTranslate('TorcNetworkedContext', '%n other Torc device(s) discovered', '', value.length,
-                            function(result) { $(".torc-peer-status a").html(result); });
+                            function(result) { $(".torc-peer-status").html(result); });
                 addDropdownMenuDivider('torc-peer-menu', 'torc-peer');
                 value.forEach( function (element, index) {
                     addDropdownMenuItem('torc-peer-menu', 'torc-peer torc-peer' + index, 'http://' + element.address + ':' + element.port + '/index.html', '');
                     qsTranslate('TorcNetworkedContext', 'Connect to %1', '', 0,
-                                function(result) { $(".torc-peer" + index + " a").html(template(theme.DropdownItemWithIcon, { "icon": "external-link-square", "text": result.replace("%1", element.name) })); });
+                                function(result) { $(".torc-peer" + index).html(template(theme.DropdownItemWithIcon, { "icon": "external-link-square", "text": result.replace("%1", element.name) })); });
                 });
             } else {
                 addDropdownMenuItem('torc-peer-menu', 'torc-peer-status', '#', torc.NoPeers);
@@ -95,7 +95,7 @@ $(document).ready(function() {
             // this should happen when the socket status transitions to Connected but we don't have the
             // translation service at that point
             qsTranslate('TorcNetworkedContext', 'Connected to %1', '', 0,
-                        function (result) { $(".torc-socket-status-text a").html(result.replace('%1', window.location.host)); });
+                        function (result) { $(".torc-socket-status-text").html(result.replace('%1', window.location.host)); });
             $.each(properties, function (key, value) {
                 languageChanged(key, value.value); });
         }
@@ -116,10 +116,10 @@ $(document).ready(function() {
             } else {
                 translatedName = template(theme.DropdownItemWithIcon, { "icon": "tachometer", "text": value + '%' });
                 qsTranslate('TorcPower', 'Battery %n%', '', value,
-                            function (result) { $('.torc-power-status a').html(template(theme.DropdownItemWithIcon, { "icon": "tachometer", "text": result })); });
+                            function (result) { $('.torc-power-status').html(template(theme.DropdownItemWithIcon, { "icon": "tachometer", "text": result })); });
             }
 
-            $('.torc-power-status a').html(translatedName);
+            $('.torc-power-status').html(translatedName);
             return;
         }
 
@@ -195,13 +195,13 @@ $(document).ready(function() {
         var modalid     = name    + 'torcmodal';
         var contentid   = modalid + 'content';
         var menuid      = modalid + 'menu';
-        $('.navbar-fixed-top').after(template(theme.FileModal, { "id": modalid, "title": title, "contentid": contentid }));
+        $('.torc-navbar').after(template(theme.FileModal, { "id": modalid, "title": title, "contentid": contentid }));
         var item = template(theme.DropdownItemWithIcon, { "icon": "file-text-o", "text": menu });
         addDropdownMenuItem('torc-central-menu', menuid, '#' + modalid, item,
                             contentSource !== '' ?
                                 function () { $.ajax({ url: contentSource, dataType: contentType, xhrFields: { withCredentials: true }})
                                               .done(function (ignore, ignore2, xhr) { $('#' + contentid).text(xhr.responseText); }); } : '');
-        $('.' + menuid + ' > a').attr('data-toggle', 'modal');
+        $('.' + menuid + '').attr('data-toggle', 'modal');
     }
 
     function addComplexModal(name, title, menu, setup, shown, hidden) {
@@ -221,23 +221,23 @@ $(document).ready(function() {
         };
         addComplexModal(name, title, menu,
             function() { // setup
-                $('#' + modalid + ' h4').replaceWith('<button type="button" class="btn btn-info hidden torclogrefresh">' + torc.RefreshTr + '</button>');
-                $('#' + modalid + ' .modal-footer').prepend('<button type="button" class="btn btn-info hidden torclogrefresh">' + torc.RefreshTr + '</button>');
-                $('.torclogrefresh').click(
+                $('#' + modalid + ' h4').replaceWith('<button type="button" class="btn btn-info invisible torclogrefresh">' + torc.RefreshTr + '</button>');
+                $('#' + modalid + ' .modal-footer').prepend('<button type="button" class="btn btn-info invisible torclogrefresh">' + torc.RefreshTr + '</button>');
+                $('.torclogrefresh').on("click",
                     function () {
                         load();
-                        $('.torclogrefresh').addClass('hidden');
+                        $('.torclogrefresh').addClass('invisible');
                     });
             },
             function () { // show
                 torcconnection.subscribe('log', ['log'],
                     function (name, value) {
-                        if (name === 'log') { $('.torclogrefresh').removeClass('hidden'); }
+                        if (name === 'log') { $('.torclogrefresh').removeClass('invisible'); }
                     });
                 load();
             },
-            function () { // hidden
-                $('.torclogrefresh').addClass('hidden');
+            function () { // invisible
+                $('.torclogrefresh').addClass('invisible');
                 torcconnection.unsubscribe('log');
             });
     }
@@ -248,9 +248,9 @@ $(document).ready(function() {
         var following = false;
         addComplexModal(name, title, menu,
             function () { // setup
-                $('#' + modalid + ' h4').replaceWith('<button type="button" class="btn btn-info hidden torclogtoggle">' + torc.FollowTr + '</button>');
-                $('#' + modalid + ' .modal-footer').prepend('<button type="button" class="btn btn-info hidden torclogtoggle">' + torc.FollowTr + '</button>');
-                $('.torclogtoggle').click(function() {
+                $('#' + modalid + ' h4').replaceWith('<button type="button" class="btn btn-info invisible torclogtoggle">' + torc.FollowTr + '</button>');
+                $('#' + modalid + ' .modal-footer').prepend('<button type="button" class="btn btn-info invisible torclogtoggle">' + torc.FollowTr + '</button>');
+                $('.torclogtoggle').on("click", function() {
                     if (following) {
                         following = false;
                         $('.torclogtoggle').text(torc.FollowTr);
@@ -268,7 +268,7 @@ $(document).ready(function() {
                         if (name === 'tail') {
                             var current = $('#' + contentid).text();
                             $('#' + contentid).text(current + value);
-                            if ($('#' + modalid)[0].scrollHeight > $('#' + modalid).height()) { $('.torclogtoggle').removeClass('hidden'); };
+                            if ($('#' + modalid)[0].scrollHeight > $('#' + modalid).height()) { $('.torclogtoggle').removeClass('invisible'); };
                             if (following === true) { $('#' + modalid).scrollTop($('#' + modalid)[0].scrollHeight - $('#' + modalid).height()); };
                         };
                     },
@@ -280,9 +280,9 @@ $(document).ready(function() {
                         });
                     });
             },
-            function () { // hidden
+            function () { // invisible
                 following = false;
-                $('.torclogtoggle').addClass('hidden').text(torc.FollowTr);
+                $('.torclogtoggle').addClass('invisible').text(torc.FollowTr);
                 torcconnection.unsubscribe('log');
             });
     }
@@ -309,7 +309,7 @@ $(document).ready(function() {
 
     function timeChanged(name, value) {
         if (name === 'currentTime') {
-            $('.torc-time-value a').html(value);
+            $('.torc-time-value').html(value);
         }
     }
 
@@ -329,7 +329,7 @@ $(document).ready(function() {
     function statusChanged (status) {
         if (status === torc.SocketNotConnected) {
             $(".torc-socket-status-icon").removeClass("fa-check fa-check-circle-o-circle-o fa-question-circle").addClass("fa-exclamation-circle");
-            $(".torc-socket-status-text a").html(torc.SocketNotConnected);
+            $(".torc-socket-status-text").html(torc.SocketNotConnected);
             // remove modals
             $("#xsdtorcmodal").remove();
             $("#configtorcmodal").remove();
@@ -341,7 +341,7 @@ $(document).ready(function() {
             $('.modal-backdrop').remove();
         } else if (status === torc.SocketConnecting) {
             $(".torc-socket-status-icon").removeClass("fa-check fa-check-circle-o fa-exclamation-circle").addClass("fa-question-circle");
-            $(".torc-socket-status-text a").html(torc.SocketConnecting);
+            $(".torc-socket-status-text").html(torc.SocketConnecting);
         } else if (status === torc.SocketConnected) {
             $(".torc-socket-status-icon").removeClass("fa-exclamation-circle fa-check-circle-o fa-question-circle").addClass("fa-check");
         } else if (status === torc.SocketReady) {

@@ -198,7 +198,7 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
             var batchresult;
 
             // parse the JSON result
-            var data = $.parseJSON(event.data);
+            var data = JSON.parse(event.data);
 
             if ($.isArray(data)) {
                 // array of objects (batch)
@@ -229,7 +229,7 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
         // start the connection by requesting a token. If authentication is not required, it will be silently ignored.
         $.ajax({ url: torc.ServicesPath + 'GetWebSocketToken',
                  dataType: "json",
-                 type: 'PUT',
+                 type: 'GET',
                  xhrFields: { withCredentials: true },
                  success: function(result) { connect(result.accesstoken); },
                  error: function() { setSocketStatus(torc.SocketNotConnected); }

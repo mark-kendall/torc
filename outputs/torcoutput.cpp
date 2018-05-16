@@ -25,7 +25,7 @@
 #include "torcoutputs.h"
 #include "torcoutput.h"
 
-#define BLACKLIST QString("")
+#define BLACKLIST QString("SetValue,SetValid")
 
 QString TorcOutput::TypeToString(TorcOutput::Type Type)
 {
@@ -96,15 +96,6 @@ bool TorcOutput::SetOwner(QObject *Owner)
 void TorcOutput::SubscriberDeleted(QObject *Subscriber)
 {
     TorcHTTPService::HandleSubscriberDeleted(Subscriber);
-}
-
-void TorcOutput::SetValid(bool Valid)
-{
-    QMutexLocker locker(&lock);
-
-    if (!Valid)
-        SetValue(defaultValue);
-    TorcDevice::SetValid(Valid);
 }
 
 TorcOutput::~TorcOutput()

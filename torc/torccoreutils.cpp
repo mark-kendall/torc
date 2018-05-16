@@ -111,7 +111,7 @@ QString TorcCoreUtils::EnumsToScript(const QMetaObject &MetaObject)
 */
 void TorcCoreUtils::QtMessage(QtMsgType Type, const QMessageLogContext &Context, const QString &Message)
 {
-    QString message = QString("(%1:%2) %3").arg(Context.file).arg(Context.line).arg(Message);
+    QString message = QString("%1 (%2:%3) %4").arg(Context.function).arg(Context.file).arg(Context.line).arg(Message);
 
     switch (Type)
     {

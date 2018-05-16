@@ -144,8 +144,8 @@ void TorcOutputs::RemoveOutput(TorcOutput *Output)
         return;
     }
 
+    LOG(VB_GENERAL, LOG_INFO, QString("Output %1 deregistered").arg(Output->GetUniqueId()));
     Output->DownRef();
     outputList.removeOne(Output);
-    LOG(VB_GENERAL, LOG_INFO, QString("Output %1 deregistered").arg(Output->GetUniqueId()));
     emit OutputsChanged();
 }

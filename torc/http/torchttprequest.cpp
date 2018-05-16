@@ -904,6 +904,7 @@ int TorcHTTPRequest::StringToAllowed(const QString &Allowed)
     if (Allowed.contains("PUT",     Qt::CaseInsensitive)) allowed += HTTPPut;
     if (Allowed.contains("DELETE",  Qt::CaseInsensitive)) allowed += HTTPDelete;
     if (Allowed.contains("OPTIONS", Qt::CaseInsensitive)) allowed += HTTPOptions;
+    if (Allowed.contains("AUTH",    Qt::CaseInsensitive)) allowed += HTTPAuth;
 
     return allowed;
 }

@@ -85,8 +85,12 @@ void TorcHTTPServices::ProcessHTTPRequest(const QString &PeerAddress, int PeerPo
                 Request.SetResponseType(HTTPResponseDefault);
                 Request.SetAllowed(HTTPGet | HTTPOptions);
             }
-            else if (type == HTTPPut)
+            else if (type == HTTPGet)
             {
+                // force authentication
+                if (!TorcHTTPService::MethodIsAuthorised(Request, HTTPAuth))
+                    return;
+
                 Request.SetStatus(HTTP_OK);
                 TorcSerialiser *serialiser = Request.GetSerialiser();
                 Request.SetResponseType(serialiser->ResponseType());

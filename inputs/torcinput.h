@@ -16,10 +16,10 @@ class TorcInput : public TorcDevice, public TorcHTTPService
     Q_OBJECT
     Q_ENUMS(Type)
     Q_CLASSINFO("Version", "1.0.0")
-    Q_PROPERTY(double   operatingRangeMin       READ GetOperatingRangeMin()       CONSTANT);
-    Q_PROPERTY(double   operatingRangeMax       READ GetOperatingRangeMax()       CONSTANT);
-    Q_PROPERTY(bool     outOfRangeLow           READ GetOutOfRangeLow()           NOTIFY   OutOfRangeLowChanged());
-    Q_PROPERTY(bool     outOfRangeHigh          READ GetOutOfRangeHigh()          NOTIFY   OutOfRangeHighChanged());
+    Q_PROPERTY(double   operatingRangeMin       READ GetOperatingRangeMin       CONSTANT)
+    Q_PROPERTY(double   operatingRangeMax       READ GetOperatingRangeMax       CONSTANT)
+    Q_PROPERTY(bool     outOfRangeLow           READ GetOutOfRangeLow           NOTIFY   OutOfRangeLowChanged)
+    Q_PROPERTY(bool     outOfRangeHigh          READ GetOutOfRangeHigh          NOTIFY   OutOfRangeHighChanged)
 
   public:
     enum Type
@@ -42,8 +42,8 @@ class TorcInput : public TorcDevice, public TorcHTTPService
 
 
     virtual TorcInput::Type  GetType           (void) = 0;
-    virtual void             Start             (void);
-    QString                  GetUIName         (void);
+    virtual void             Start             (void) Q_DECL_OVERRIDE;
+    QString                  GetUIName         (void) Q_DECL_OVERRIDE;
 
   protected:
     virtual ~TorcInput();
@@ -56,8 +56,8 @@ class TorcInput : public TorcDevice, public TorcHTTPService
     // TorcHTTPService
     void             SubscriberDeleted         (QObject *Subscriber);
 
-    void             SetValue                  (double Value);
-    void             SetValid                  (bool Valid);
+    void             SetValue                  (double Value) Q_DECL_OVERRIDE;
+    void             SetValid                  (bool Valid)   Q_DECL_FINAL;
 
     double           GetOperatingRangeMin      (void);
     double           GetOperatingRangeMax      (void);

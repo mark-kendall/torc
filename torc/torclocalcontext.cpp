@@ -195,7 +195,7 @@ bool TorcLocalContextPriv::Init(void)
         uuid = uuid.mid(1);
     if (uuid.endsWith('}'))
         uuid.chop(1);
-    TorcSetting* uuidsaved = new TorcSetting(NULL, QString("uuid"),QString("UUID"), TorcSetting::Bool, true, QVariant(uuid));
+    TorcSetting* uuidsaved = new TorcSetting(NULL, QString("uuid"),QString("UUID"), TorcSetting::String, true, QVariant(uuid));
     m_uuid = uuidsaved->GetValue().toString();
     uuidsaved->Remove();
     uuidsaved->DownRef();

@@ -743,6 +743,7 @@ void StopLogging(void)
         QMutexLocker locker(&gLoggerListLock);
         foreach (LoggerBase* logger, gLoggerList)
             delete logger;
+        gLoggerList.clear();
     }
 
     // this cleans up the last thread name - the logging thread itself - which is deregistered
@@ -752,7 +753,15 @@ void StopLogging(void)
         QHash<uint64_t, char *>::iterator it = gLogThreadHash.begin();
         for ( ; it != gLogThreadHash.end(); ++it)
             free(it.value());
+        gLogThreadHash.clear();
     }
+
+    {
+        QMutexLocker locker(&gLogThreadTidLock);
+        gLogThreadtidHash.clear();
+    }
+
+    gLogThreadFinished = false; // is this safe? required to restart logging
 }
 
 void RegisterLoggingThread(void)

@@ -29,7 +29,8 @@ typedef enum
     HTTPPut         = (1 << 3),
     HTTPDelete      = (1 << 4),
     HTTPOptions     = (1 << 5),
-    HTTPDisabled    = (1 << 6)
+    HTTPDisabled    = (1 << 6),
+    HTTPAuth        = (1 << 7)  // require authentication
 } HTTPRequestType;
 
 typedef enum
