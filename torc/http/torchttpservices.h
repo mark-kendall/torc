@@ -20,10 +20,11 @@ class TorcHTTPServices : public QObject, public TorcHTTPService
     Q_CLASSINFO("GetPriority",       "type=priority")
     Q_CLASSINFO("GetUuid",           "type=uuid")
     Q_CLASSINFO("GetDetails",        "type=details")
-    Q_CLASSINFO("GetWebSocketToken", "type=accesstoken,method=GET+AUTH") // force authentication (even though it is handled manually)
+    Q_CLASSINFO("GetWebSocketToken", "type=accesstoken,methods=GET+AUTH")
+    Q_CLASSINFO("IsSecure",          "type=secure,methods=GET")
 
-    Q_PROPERTY(QMap serviceList READ GetServiceList   NOTIFY ServiceListChanged)
-    Q_PROPERTY(QVariantList returnFormats READ GetReturnFormats CONSTANT)
+    Q_PROPERTY(QMap         serviceList        READ GetServiceList        NOTIFY ServiceListChanged)
+    Q_PROPERTY(QVariantList returnFormats      READ GetReturnFormats      CONSTANT)
     Q_PROPERTY(QVariantList webSocketProtocols READ GetWebSocketProtocols CONSTANT)
 
   public:
@@ -47,6 +48,7 @@ class TorcHTTPServices : public QObject, public TorcHTTPService
     int            GetPriority          (void);
     QString        GetUuid              (void);
     QString        GetWebSocketToken    (void);
+    bool           IsSecure             (void);
     void           HandlersChanged      (void);
 
   private:

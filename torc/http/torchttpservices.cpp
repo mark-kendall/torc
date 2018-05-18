@@ -75,8 +75,10 @@ void TorcHTTPServices::ProcessHTTPRequest(const QString &PeerAddress, int PeerPo
     // handle own service
     if (!Request.GetMethod().isEmpty())
     {
-        // we handle GetWebSocketToken manually as it needs access to the authentication headers.`
-        if (Request.GetMethod() == "GetWebSocketToken")
+        // we handle GetWebSocketToken/IsSecure and IsAuthenticated manually as they need access to the authentication headers.
+        // and they have no value internally (hence dummy implementations)
+        QString method = Request.GetMethod();
+        if (method == "GetWebSocketToken" || method == "IsSecure")
         {
             HTTPRequestType type = Request.GetHTTPRequestType();
             if (type == HTTPOptions)
@@ -87,14 +89,26 @@ void TorcHTTPServices::ProcessHTTPRequest(const QString &PeerAddress, int PeerPo
             }
             else if (type == HTTPGet)
             {
-                // force authentication
-                if (!TorcHTTPService::MethodIsAuthorised(Request, HTTPAuth))
-                    return;
+                QVariant result;
+                QString type;
+                if (method == "GetWebSocketToken")
+                {
+                    // force authentication
+                    if (!TorcHTTPService::MethodIsAuthorised(Request, HTTPAuth))
+                        return;
+                    result = TorcWebSocketToken::GetWebSocketToken(PeerAddress);
+                    type   = "accesstoken";
+                }
+                else if (method == "IsSecure")
+                {
+                    result = Request.GetSecure();
+                    type   = "secure";
+                }
 
                 Request.SetStatus(HTTP_OK);
                 TorcSerialiser *serialiser = Request.GetSerialiser();
                 Request.SetResponseType(serialiser->ResponseType());
-                Request.SetResponseContent(serialiser->Serialise(TorcWebSocketToken::GetWebSocketToken(PeerAddress), "accesstoken"));
+                Request.SetResponseContent(serialiser->Serialise(result, type));
                 delete serialiser;
             }
             else
@@ -190,6 +204,11 @@ QString TorcHTTPServices::GetUuid(void)
 QString TorcHTTPServices::GetWebSocketToken(void)
 {
     return QString("");
+}
+
+bool TorcHTTPServices::IsSecure(void)
+{
+    return false; // dummy - as for GetWebSocketToken
 }
 
 void TorcHTTPServices::HandlersChanged(void)
