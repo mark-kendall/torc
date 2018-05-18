@@ -35,11 +35,15 @@ var TorcConnection = function ($, torc, statusChanged) {
     var that = this;
 
     this.call = function(serviceName, method, params, success, failure) {
+        // call to a subscribed service
         if (socket !== undefined && subscriptions[serviceName] && subscriptions[serviceName].methods[method]) {
             socket.call(serviceList[serviceName].path + method, params, success, failure);
             return;
+        // just a call, no subscription
+        } else if (socket !== undefined && serviceList.hasOwnProperty(serviceName)) {
+            socket.call(serviceList[serviceName].path + method, params, success, failure);
+            return;
         }
-
         console.log('Failed to call ' + serviceName + method);
     };
 
