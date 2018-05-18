@@ -339,14 +339,10 @@ $(document).ready(function() {
             $(".torc-socket-status-icon").removeClass("fa-check fa-check-circle-o-circle-o fa-question-circle fa-lock").addClass("fa-exclamation-circle");
             $(".torc-socket-status-text").html(torc.SocketNotConnected);
             // remove modals
-            $("#xsdtorcmodal").remove();
-            $("#configtorcmodal").remove();
-            $("#dottorcmodal").remove();
+            $('.torcmodal').remove();
             // remove state graph
             torcstategraph.cleanup();
             torcapi.cleanup();
-            // NB this should remove the backdrop for all modals...
-            $('.modal-backdrop').remove();
         } else if (status === torc.SocketConnecting) {
             $(".torc-socket-status-icon").removeClass("fa-check fa-check-circle-o fa-exclamation-circle").addClass("fa-question-circle");
             $(".torc-socket-status-text").html(torc.SocketConnecting);

@@ -36,7 +36,7 @@ var theme = {
 '<div class="row text-center"><i class="fa fa-5x fa-exclamation-circle"></i>&nbsp;<%=text%></div>',
 
 "FileModal":
-'<div id="<%=id%>" class="modal fade" role="dialog">' +
+'<div id="<%=id%>" class="modal fade torcmodal" role="dialog">' +
 '  <div class="modal-dialog modal-lg">' +
 '    <div class="modal-content">' +
 '      <div class="modal-header">' +
@@ -62,7 +62,7 @@ var theme = {
 "torc-api-modal-content",
 
 "APIModal":
-'<div id="torc-api-modal" class="modal fade" role="dialog">' +
+'<div id="torc-api-modal" class="modal fade torcmodal" role="dialog">' +
 '  <div class="modal-dialog modal-lg">' +
 '    <div class="modal-content">' +
 '      <div class="modal-header">' +
