@@ -547,7 +547,7 @@ bool TorcHTTPServer::Open(void)
 
     if (!waslistening)
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Web server listening on port %1").arg(port));
+        LOG(VB_GENERAL, LOG_INFO, QString("Web server listening for %1secure connections on port %2").arg(m_secure->GetValue().toBool() ? "" : "in").arg(port));
         UpdateOriginWhitelist(m_port->GetValue().toInt());
     }
 
