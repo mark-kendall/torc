@@ -7,6 +7,7 @@ var theme;
 $(document).ready(function() {
     "use strict";
 
+    var secure         = false;
     var language       = undefined;
     var torcconnection = undefined;
     var torcstategraph = new TorcStateGraph($, torc);
@@ -94,8 +95,15 @@ $(document).ready(function() {
         if (version !== undefined && typeof properties === 'object') {
             // this should happen when the socket status transitions to Connected but we don't have the
             // translation service at that point
-            qsTranslate('TorcNetworkedContext', 'Connected to %1', '', 0,
-                        function (result) { $(".torc-socket-status-text").html(result.replace('%1', window.location.host)); });
+            torcconnection.call('services', 'IsSecure', {},
+                                function (secure) {
+                                    if (secure.secure === true) {
+                                        secure = true;
+                                        $(".torc-socket-status-icon").removeClass("fa-check fa-exclamation-circle fa-question-circle-o fa-check-circle-o").addClass("fa-lock");
+                                    }
+                                    qsTranslate('TorcNetworkedContext', secure ? 'Connected securely to %1' : 'Connected to %1', '', 0,
+                                                function (result) { $(".torc-socket-status-text").html(result.replace('%1', window.location.hostname)); });
+                                });
             $.each(properties, function (key, value) {
                 languageChanged(key, value.value); });
         }
@@ -351,7 +359,6 @@ $(document).ready(function() {
             torcconnection.subscribe('power', ['canShutdown', 'canSuspend', 'canRestart', 'canHibernate', 'batteryLevel'], powerChanged, powerSubscriptionChanged);
             torcconnection.subscribe('central', ['canRestartTorc'], centralChanged, centralSubscriptionChanged);
             torcconnection.subscribe('time', ['currentTime'], timeChanged, timeSubscriptionChanged);
-
             torcstategraph.setup(torcconnection);
         }
     }

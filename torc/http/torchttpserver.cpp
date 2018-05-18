@@ -543,7 +543,7 @@ bool TorcHTTPServer::Open(void)
             m_torcBonjourReference = TorcBonjour::Instance()->Register(port, "_torc._tcp", name, map);
     }
 
-    TorcSSDP::Announce(m_secure);
+    TorcSSDP::Announce(m_secure->GetValue().toBool());
 
     if (!waslistening)
     {
@@ -638,6 +638,7 @@ class TorcHTTPServerObject : public TorcAdminObject, public TorcStringFactory
         Strings.insert("SocketReady",             QCoreApplication::translate("TorcHTTPServer", "Ready"));
         Strings.insert("SocketDisconnecting",     QCoreApplication::translate("TorcHTTPServer", "Disconnecting"));
         Strings.insert("ConnectedTo",             QCoreApplication::translate("TorcHTTPServer", "Connected to"));
+        Strings.insert("ConnectedSecureTo",       QCoreApplication::translate("TorcHTTPServer", "Connected securely to"));
         Strings.insert("ConnectTo",               QCoreApplication::translate("TorcHTTPServer", "Connect to"));
 
         Strings.insert("SocketReconnectAfterMs",  10000); // try and reconnect every 10 seconds
