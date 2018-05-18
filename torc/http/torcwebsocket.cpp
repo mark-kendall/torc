@@ -413,6 +413,11 @@ void TorcWebSocket::SSLErrors(const QList<QSslError> &Errors)
         LOG(VB_GENERAL, LOG_INFO, QString("Ssl Error: %1").arg(error.errorString()));
 }
 
+bool TorcWebSocket::IsSecure(void)
+{
+    return m_secure;
+}
+
 ///\brief Initialise the websocket once its parent thread is ready.
 void TorcWebSocket::Start(void)
 {

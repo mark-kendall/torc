@@ -70,12 +70,34 @@ QString TorcHTTPServices::GetUIName(void)
     return tr("Services");
 }
 
+QVariantMap TorcHTTPServices::ProcessRequest(const QString &Method, const QVariant &Parameters, QObject *Connection, bool Authenticated)
+{
+    // N.B. this returns a result associated with the actual state of the underlying websocket and
+    // not what the browser etc think is the correct state.
+    if (Method.endsWith("IsSecure"))
+    {
+        QVariant sec((bool)false);
+        TorcWebSocket *connection = qobject_cast<TorcWebSocket*>(Connection);
+        if (connection && connection->IsSecure())
+            sec = true;
+
+        QVariantMap result;
+        QVariantMap secure;
+        secure.insert("secure", sec);
+        result.insert("result", secure);
+        return result;
+    }
+
+    return TorcHTTPService::ProcessRequest(Method, Parameters, Connection, Authenticated);
+}
+
+
 void TorcHTTPServices::ProcessHTTPRequest(const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest &Request)
 {
     // handle own service
     if (!Request.GetMethod().isEmpty())
     {
-        // we handle GetWebSocketToken/IsSecure and IsAuthenticated manually as they need access to the authentication headers.
+        // we handle GetWebSocketToken/IsSecure manually as they need access to the authentication headers.
         // and they have no value internally (hence dummy implementations)
         QString method = Request.GetMethod();
         if (method == "GetWebSocketToken" || method == "IsSecure")

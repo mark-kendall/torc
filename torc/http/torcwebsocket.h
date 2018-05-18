@@ -42,7 +42,8 @@ class TorcWebSocket : public QSslSocket
                   TorcWebSocketReader::WSSubProtocol Protocol = TorcWebSocketReader::SubProtocolJSONRPC);
     ~TorcWebSocket();
 
-    static QVariantList         GetSupportedSubProtocols (void);
+    static QVariantList GetSupportedSubProtocols (void);
+    bool            IsSecure              (void);
 
   signals:
     void            ConnectionEstablished (void);
