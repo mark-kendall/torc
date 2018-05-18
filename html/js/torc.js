@@ -96,8 +96,8 @@ $(document).ready(function() {
             // this should happen when the socket status transitions to Connected but we don't have the
             // translation service at that point
             torcconnection.call('services', 'IsSecure', {},
-                                function (secure) {
-                                    if (secure.secure === true) {
+                                function (result) {
+                                    if (result.secure === true) {
                                         secure = true;
                                         $(".torc-socket-status-icon").removeClass("fa-check fa-exclamation-circle fa-question-circle-o fa-check-circle-o").addClass("fa-lock");
                                     }
@@ -336,7 +336,7 @@ $(document).ready(function() {
 
     function statusChanged (status) {
         if (status === torc.SocketNotConnected) {
-            $(".torc-socket-status-icon").removeClass("fa-check fa-check-circle-o-circle-o fa-question-circle").addClass("fa-exclamation-circle");
+            $(".torc-socket-status-icon").removeClass("fa-check fa-check-circle-o-circle-o fa-question-circle fa-lock").addClass("fa-exclamation-circle");
             $(".torc-socket-status-text").html(torc.SocketNotConnected);
             // remove modals
             $("#xsdtorcmodal").remove();
