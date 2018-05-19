@@ -7,11 +7,12 @@ var theme;
 $(document).ready(function() {
     "use strict";
 
+    var usermenu       = 'torc-user-menu';
     var secure         = false;
     var language       = undefined;
     var torcconnection = undefined;
     var torcstategraph = new TorcStateGraph($, torc);
-    var torcapi        = new TorcAPI($, torc);
+    var torcapi        = new TorcAPI($, torc, usermenu);
 
     function qsTranslate(context, string, disambiguation, plural, callback) {
         if (disambiguation === undefined) { disambiguation = ''; }
@@ -173,7 +174,7 @@ $(document).ready(function() {
         removeNavbarDropdown('torc-power-dropdown');
     }
 
-    function centralChanged(name, value) {
+    function userChanged(name, value) {
         var translatedName;
         var translatedConfirmation;
         var method;
@@ -183,18 +184,18 @@ $(document).ready(function() {
             translatedConfirmation = torc.ConfirmRestartTorc;
             method = 'RestartTorc';
         } else if (name === 'canStopTorc') {
-            translatedName = template(theme.DropdownItemWithIcon, { "icon": "refresh", "text": 'Stop Torc' });
-            translatedConfirmation = 'Are you sure you want to stop Torc?';
+            translatedName = template(theme.DropdownItemWithIcon, { "icon": "refresh", "text": torc.StopTorcTr });
+            translatedConfirmation = torc.ConfirmStopTorc;
             method = 'StopTorc';
         } else { return; }
 
         if (value === false || value === undefined) {
             $('.torc-' + name).remove();
         } else {
-            addDropdownMenuItem('torc-central-menu', 'torc-' + name, '#', translatedName,
+            addDropdownMenuItem(usermenu, 'torc-' + name, '#', translatedName,
                                 function () {
                                     bootbox.confirm(translatedConfirmation, function(result) {
-                                    if (result === true) { torcconnection.call('central', method); }
+                                    if (result === true) { torcconnection.call('user', method); }
                                 }); });
         }
     }
@@ -205,7 +206,7 @@ $(document).ready(function() {
         var menuid      = modalid + 'menu';
         $('.torc-navbar').after(template(theme.FileModal, { "id": modalid, "title": title, "contentid": contentid }));
         var item = template(theme.DropdownItemWithIcon, { "icon": "file-text-o", "text": menu });
-        addDropdownMenuItem('torc-central-menu', menuid, '#' + modalid, item,
+        addDropdownMenuItem(usermenu, menuid, '#' + modalid, item,
                             contentSource !== '' ?
                                 function () { $.ajax({ url: contentSource, dataType: contentType, xhrFields: { withCredentials: true }})
                                               .done(function (ignore, ignore2, xhr) { $('#' + contentid).text(xhr.responseText); }); } : '');
@@ -295,24 +296,24 @@ $(document).ready(function() {
             });
     }
 
-    function centralSubscriptionChanged(version, ignore, properties) {
+    function userSubscriptionChanged(version, ignore, properties) {
         if (version !== undefined && typeof properties === 'object') {
-            addNavbarDropdown('torc-central-dropdown', 'cog', 'torc-central-menu');
-            $.each(properties, function (key, value) {
-                centralChanged(key, value.value); });
-
-            // we need the central menu before adding other options
-            // NB centralSubscriptionChanged should only ever be called once...
+            addNavbarDropdown('torc-user-dropdown', 'user', usermenu);
+            // we need the user menu before adding other options
+            // NB userSubscriptionChanged should only ever be called once...
             addFileModal('config',  torc.ViewConfigTitleTr, torc.ViewConfigTr, '/content/torc.xml',       'xml');
             addFileModal('xsd',     torc.ViewXSDTitleTr,    torc.ViewXSDTr,    '/content/torc.xsd',       'xml');
             addFileModal('dot',     torc.ViewDOTTitleTr,    torc.ViewDOTTr,    '/content/stategraph.dot', 'text');
             addLogModal('log', '',  torc.ViewLogTr);
             addLogtailModal('logtail', '', torc.FollowLogTr);
             torcapi.setup(torcconnection);
+            addDropdownMenuDivider(usermenu, '');
+            $.each(properties, function (key, value) {
+                userChanged(key, value.value); });
             return;
         }
 
-        removeNavbarDropdown('torc-central-dropdown');
+        removeNavbarDropdown('torc-user-dropdown');
     }
 
     function timeChanged(name, value) {
@@ -353,7 +354,7 @@ $(document).ready(function() {
             torcconnection.subscribe('languages', ['languageString', 'languageCode', 'languages'], languageChanged, languageSubscriptionChanged);
             torcconnection.subscribe('peers', ['peers'], peerListChanged, peerSubscriptionChanged);
             torcconnection.subscribe('power', ['canShutdown', 'canSuspend', 'canRestart', 'canHibernate', 'batteryLevel'], powerChanged, powerSubscriptionChanged);
-            torcconnection.subscribe('central', ['canRestartTorc'], centralChanged, centralSubscriptionChanged);
+            torcconnection.subscribe('user', ['canRestartTorc'], userChanged, userSubscriptionChanged);
             torcconnection.subscribe('time', ['currentTime'], timeChanged, timeSubscriptionChanged);
             torcstategraph.setup(torcconnection);
         }

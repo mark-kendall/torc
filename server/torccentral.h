@@ -22,10 +22,6 @@ class TorcCentral : public QObject, public TorcHTTPService
 
     Q_OBJECT
     Q_CLASSINFO("Version",     "1.0.0")
-    Q_CLASSINFO("RestartTorc", "methods=PUT")
-    Q_CLASSINFO("StopTorc",    "methods=PUT")
-    Q_PROPERTY(bool canRestartTorc      READ GetCanRestartTorc() CONSTANT)
-    Q_PROPERTY(bool canStopTorc         READ GetCanStopTorc      CONSTANT)
     Q_PROPERTY(QString temperatureUnits READ GetTemperatureUnits CONSTANT)
 
   public:
@@ -42,10 +38,6 @@ class TorcCentral : public QObject, public TorcHTTPService
     // TorcHTTPService
     void            SubscriberDeleted     (QObject *Subscriber);
 
-    bool            GetCanRestartTorc     (void);
-    void            RestartTorc           (void);
-    void            StopTorc              (void);
-    bool            GetCanStopTorc        (void);
     QString         GetTemperatureUnits   (void) const;
 
   protected:
@@ -58,8 +50,7 @@ class TorcCentral : public QObject, public TorcHTTPService
     QMutex          m_lock;
     QVariantMap     m_config;
     QByteArray      m_graph;
-    bool            canRestartTorc;
-    bool            canStopTorc;
+
     QString         temperatureUnits;
 };
 
