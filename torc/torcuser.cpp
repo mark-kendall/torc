@@ -104,10 +104,6 @@ class TorcUserObject : public TorcAdminObject, public TorcStringFactory
         Strings.insert("FollowLogTr",        QCoreApplication::translate("TorcUser", "Follow Log"));
         Strings.insert("FollowTr",           QCoreApplication::translate("TorcUser", "Follow"));
         Strings.insert("UnfollowTr",         QCoreApplication::translate("TorcUser", "Unfollow"));
-        Strings.insert("CelsiusTr",          QCoreApplication::translate("TorcUser", "Celsius"));
-        Strings.insert("CelsiusUnitsTr",     QCoreApplication::translate("TorcUser", "°C"));
-        Strings.insert("FahrenheitTr",       QCoreApplication::translate("TorcUser", "Fahrenheit"));
-        Strings.insert("FahrenheitUnitsTr",  QCoreApplication::translate("TorcUser", "°F"));
         Strings.insert("Value",              QCoreApplication::translate("TorcUser", "Value"));
         Strings.insert("Valid",              QCoreApplication::translate("TorcUser", "Valid"));
     }
