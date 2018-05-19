@@ -394,7 +394,7 @@ void TorcHTTPServer::AddAuthenticationHeader(TorcHTTPRequest &Request)
     Request.SetStatus(HTTP_Unauthorized);
 
     // HTTP 1.1 should support Digest
-    if (Request.GetHTTPProtocol() > HTTPOneDotZero)
+    if (true /*Request.GetHTTPProtocol() > HTTPOneDotZero*/)
     {
         TorcHTTPServerNonce::ProcessDigestAuth(Request);
     }
@@ -435,16 +435,15 @@ void TorcHTTPServer::AuthenticateUser(TorcHTTPRequest &Request)
     {
         TorcHTTPServerNonce::ProcessDigestAuth(Request, username, password);
     }
+    /* Don't use Basic. It is utterly insecure, everyone supports Digest and we store the username/password as a Digest compatible hash.
     else if (header.startsWith("Basic", Qt::CaseInsensitive))
     {
-        /* enable this once Digest authentication is enabled for Torc to Torc websocket connections (TorcNetworkedContext)
-
         // only accept Basic authentication if using < HTTP 1.1
         if (Request.GetHTTPProtocol() > HTTPOneDotZero)
         {
             LOG(VB_GENERAL, LOG_WARNING, "Disallowing basic authentication for HTTP 1.1 client");
         }
-        else */
+        else
         {
             // remove leading 'Basic' and split off token
             QString authentication = header.mid(5).trimmed();
@@ -453,6 +452,7 @@ void TorcHTTPServer::AuthenticateUser(TorcHTTPRequest &Request)
                 Request.Authorise(HTTPAuthorised);
         }
     }
+    */
 }
 
 /*! \brief Create the 'Origin' whitelist for cross domain requests
