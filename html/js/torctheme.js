@@ -33,7 +33,7 @@ var theme = {
 '<div id="torc-central"></div>',
 
 "StategraphNoConnection":
-'<div class="row text-center"><i class="fa fa-5x fa-exclamation-circle"></i>&nbsp;<%=text%></div>',
+'<div class="text-center"><i class="fa fa-5x fa-exclamation-circle"></i></div><div class="text-center"><%=text%></div>',
 
 "FileModal":
 '<div id="<%=id%>" class="modal fade torcmodal" role="dialog">' +
