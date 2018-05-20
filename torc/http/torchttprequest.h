@@ -97,8 +97,9 @@ typedef enum
 typedef enum
 {
     HTTPNotAuthorised       = 0,
-    HTTPAuthorised          = 1,
-    HTTPAuthorisedStale     = 2
+    HTTPPreAuthorised       = 1,
+    HTTPAuthorised          = 2,
+    HTTPAuthorisedStale     = 3
 } HTTPAuthorisation;
 
 #define READ_CHUNK_SIZE (1024 *64)

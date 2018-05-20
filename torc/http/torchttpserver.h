@@ -9,7 +9,7 @@
 #include <QReadWriteLock>
 
 // Torc
-#include "torcsetting.h"
+#include "torcuser.h"
 #include "torchtmlhandler.h"
 #include "torchttpservices.h"
 #include "torchtmlstaticcontent.h"
@@ -18,6 +18,7 @@
 #include "torcwebsocketpool.h"
 #include "torcwebsocketthread.h"
 
+class TorcSetting;
 class TorcHTTPHandler;
 
 class TorcHTTPServer : public QTcpServer
@@ -72,6 +73,7 @@ class TorcHTTPServer : public QTcpServer
   private:
     TorcSetting                      *m_port;
     TorcSetting                      *m_secure;
+    TorcUser                          m_user;
     TorcHTMLHandler                   m_defaultHandler;
     TorcHTTPServices                  m_servicesHandler;
     TorcHTMLStaticContent             m_staticContent;

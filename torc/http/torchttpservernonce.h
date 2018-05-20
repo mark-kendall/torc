@@ -15,7 +15,7 @@
 class TorcHTTPServerNonce
 {
   public:
-    static void ProcessDigestAuth (TorcHTTPRequest &Request, const QString &Username = QString(),  const QString &Password = QString());
+    static void ProcessDigestAuth (TorcHTTPRequest &Request, bool Check = false);
 
     TorcHTTPServerNonce();
     TorcHTTPServerNonce(const QDateTime &Time);

@@ -30,6 +30,7 @@
 #include "torclocalcontext.h"
 #include "torclanguage.h"
 #include "torclogging.h"
+#include "torcsetting.h"
 #include "torcadminthread.h"
 #include "torcnetwork.h"
 #include "torchttprequest.h"
@@ -76,8 +77,11 @@ void TorcHTTPServer::RegisterHandler(TorcHTTPHandler *Handler)
         }
     }
 
-    if (changed && gWebServer)
-        emit gWebServer->HandlersChanged();
+    {
+        QMutexLocker locker(&gWebServerLock);
+        if (changed && gWebServer)
+            emit gWebServer->HandlersChanged();
+    }
 }
 
 void TorcHTTPServer::DeregisterHandler(TorcHTTPHandler *Handler)
@@ -102,8 +106,11 @@ void TorcHTTPServer::DeregisterHandler(TorcHTTPHandler *Handler)
         }
     }
 
-    if (changed && gWebServer)
-        emit gWebServer->HandlersChanged();
+    {
+        QMutexLocker locker(&gWebServerLock);
+        if (changed && gWebServer)
+            emit gWebServer->HandlersChanged();
+    }
 }
 
 void TorcHTTPServer::HandleRequest(const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort,  TorcHTTPRequest &Request)
@@ -271,6 +278,7 @@ TorcHTTPServer::TorcHTTPServer()
   : QTcpServer(),
     m_port(NULL),
     m_secure(NULL),
+    m_user(),
     m_defaultHandler("", QCoreApplication::applicationName()), // default top level handler
     m_servicesHandler(this),                                   // services 'helper' service for '/services'
     m_staticContent(),                                         // static files - for /css /fonts /js /img etc
@@ -350,6 +358,32 @@ TorcWebSocketThread* TorcHTTPServer::TakeSocket(TorcWebSocketThread *Socket)
 */
 void TorcHTTPServer::Authorise(const QString &Host, TorcHTTPRequest &Request, bool ForceCheck)
 {
+    // N.B. the order of the following checks is critical. Always check the Authorization header
+    // first and accesstokens before PreAuthorisations as PreAuthorisations are not checked again.
+
+    // explicit authorization header
+    // N.B. This will also authorise websocket clients who send authorisation headers with
+    // the upgrade request i.e. there is no need to use the accesstoken route IF the correct headers
+    // are sent. Use GetWebSocketToken, which requires authorisation, to force
+    // clients to authenticate (i.e. browsers).
+    TorcHTTPServer::AuthenticateUser(Request);
+    if (Request.IsAuthorised() == HTTPAuthorised)
+        return;
+
+    // authentication token supplied in the url (WebSocket)
+    // do this before 'standard' authentication to ensure token is checked and expired
+    // NB ensure method is empty to stop attempts to access other resources - although
+    // upgrade requests are handled before anything else, so the method should be ignored
+    if (Request.Queries().contains("accesstoken") && Request.GetMethod().isEmpty())
+    {
+        QString token = Request.Queries().value("accesstoken");
+        if (token == TorcWebSocketToken::GetWebSocketToken(Host, token))
+        {
+            Request.Authorise(HTTPAuthorised);
+            return;
+        }
+    }
+
     // We allow unauthenticated access to anything that doesn't alter state unless auth is specifically
     // requested in the service (see TorcHTTPServices::GetWebSocketToken).
     // N.B. If a rogue peer posts to a 'setter' type function using a GET type request, the request
@@ -360,30 +394,9 @@ void TorcHTTPServer::Authorise(const QString &Host, TorcHTTPRequest &Request, bo
 
     if (!authenticate && !ForceCheck)
     {
-        Request.Authorise(HTTPAuthorised);
+        Request.Authorise(HTTPPreAuthorised);
         return;
     }
-
-    // authentication token supplied in the url (WebSocket)
-    // do this before 'standard' authentication to ensure token is checked and expired
-    if (Request.Queries().contains("accesstoken"))
-    {
-        QString token = Request.Queries().value("accesstoken");
-        if (token == TorcWebSocketToken::GetWebSocketToken(Host, token))
-        {
-            Request.Authorise(HTTPAuthorised);
-            return;
-        }
-    }
-
-    // explicit authorization header
-    // N.B. This will also authorise websocket clients who send authorisation headers with
-    // the upgrade request i.e. there is no need to use the accesstoken route IF the correct headers
-    // are sent. Use GetWebSocketToken (which is a PUT operation and requires authorisation) to force
-    // clients to authenticate (i.e. browsers).
-    TorcHTTPServer::AuthenticateUser(Request);
-    if (Request.IsAuthorised() == HTTPAuthorised)
-        return;
 
     AddAuthenticationHeader(Request);
 }
@@ -427,13 +440,11 @@ void TorcHTTPServer::AuthenticateUser(TorcHTTPRequest &Request)
         return;
 
     QString header = Request.Headers()->value("Authorization");
-    static QString username("admin");
-    static QString password("1234");
 
     // most clients will support Digest Access Authentication, so try that first
     if (header.startsWith("Digest", Qt::CaseInsensitive))
     {
-        TorcHTTPServerNonce::ProcessDigestAuth(Request, username, password);
+        TorcHTTPServerNonce::ProcessDigestAuth(Request, true);
     }
     /* Don't use Basic. It is utterly insecure, everyone supports Digest and we store the username/password as a Digest compatible hash.
     else if (header.startsWith("Basic", Qt::CaseInsensitive))

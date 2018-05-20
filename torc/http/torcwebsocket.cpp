@@ -640,7 +640,7 @@ void TorcWebSocket::ReadHTTP(void)
         }
         else
         {
-            if (request.IsAuthorised() == HTTPAuthorised)
+            if (request.IsAuthorised() == HTTPAuthorised || request.IsAuthorised() == HTTPPreAuthorised)
             {
                 TorcHTTPServer::HandleRequest(peerAddress().toString(), peerPort(),
                                               localAddress().toString(), localPort(), request);

@@ -835,7 +835,7 @@ QVariant TorcHTTPService::GetProperty(int Index)
  */
 bool TorcHTTPService::MethodIsAuthorised(TorcHTTPRequest &Request, int Allowed)
 {
-    if (Request.IsAuthorised() != HTTPAuthorised && (Allowed & HTTPAuth))
+    if ((Request.IsAuthorised() != HTTPAuthorised) && (Allowed & HTTPAuth))
     {
         TorcHTTPServer::AddAuthenticationHeader(Request);
         return false;

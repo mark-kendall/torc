@@ -21,25 +21,67 @@
 */
 
 // Qt
+#include <QRegExp>
 #include <QMutex>
 
 // Torc
+#include "torclogging.h"
 #include "torclocalcontext.h"
 #include "torcadminthread.h"
 #include "torclanguage.h"
 #include "torcuser.h"
 
+QByteArray TorcUser::gCredentials = QByteArray();
+QMutex     TorcUser::gCredentialsLock(QMutex::Recursive);
+
 TorcUser::TorcUser()
  : QObject(),
    TorcHTTPService(this, "user", "user", TorcUser::staticMetaObject, ""),
-   canRestartTorc(true),
-   canStopTorc(true),
+   m_user(new TorcSetting(NULL, "UserCredentials", "Authentication string", TorcSetting::String, true, QVariant(QString("f0f825afb7ee5ca70ba178463f360d4b")))),
+   m_canRestartTorc(true),
+   m_canStopTorc(true),
    m_lock(QMutex::Recursive)
 {
+    {
+        QMutexLocker locker(&gCredentialsLock);
+        gCredentials = m_user->GetValue().toString().toLower().toLatin1();
+    }
+    connect(m_user, SIGNAL(ValueChanged(QString)), this, SLOT(UpdateCredentials(QString)));
 }
 
 TorcUser::~TorcUser()
 {
+    m_user->Remove();
+    m_user->DownRef();
+    m_user = NULL;
+}
+
+QByteArray TorcUser::GetCredentials(void)
+{
+    QMutexLocker locker(&gCredentialsLock);
+    return gCredentials;
+}
+
+void TorcUser::UpdateCredentials(const QString &Credentials)
+{
+    QMutexLocker locker(&gCredentialsLock);
+    gCredentials = Credentials.toLower().toLatin1();
+}
+
+bool TorcUser::SetUserCredentials(const QString &Credentials)
+{
+    QMutexLocker locker(&m_lock);
+
+    // N.B. MD5 credentials are a hexadecimal representation of a binary. As such they can
+    // contain either upper or lower case digits.
+    static QRegExp gReg("[0-9a-fA-F]{32}");
+    if (!gReg.exactMatch(Credentials))
+        return false;
+
+    // but an MD5 hash with upper case letters produces different results when
+    // rehashed... so set to lower
+    m_user->SetValue(QString(Credentials.toLower()));
+    return true;
 }
 
 void TorcUser::SubscriberDeleted(QObject *Subscriber)
@@ -55,7 +97,7 @@ void TorcUser::StopTorc(void)
 bool TorcUser::GetCanStopTorc(void)
 {
     QMutexLocker locker(&m_lock);
-    return canStopTorc;
+    return m_canStopTorc;
 }
 
 void TorcUser::RestartTorc(void)
@@ -67,7 +109,7 @@ void TorcUser::RestartTorc(void)
 bool TorcUser::GetCanRestartTorc(void)
 {
     QMutexLocker locker(&m_lock);
-    return canRestartTorc;
+    return m_canRestartTorc;
 }
 
 class TorcUserObject : public TorcAdminObject, public TorcStringFactory
@@ -75,9 +117,7 @@ class TorcUserObject : public TorcAdminObject, public TorcStringFactory
     Q_DECLARE_TR_FUNCTIONS(TorcUserObject)
 
   public:
-    TorcUserObject()
-      : TorcAdminObject(TORC_ADMIN_LOW_PRIORITY),
-        m_object(NULL)
+    TorcUserObject() : TorcAdminObject(TORC_ADMIN_LOW_PRIORITY)
     {
     }
 
@@ -110,17 +150,9 @@ class TorcUserObject : public TorcAdminObject, public TorcStringFactory
 
     void Create(void)
     {
-        Destroy();
-        m_object = new TorcUser();
     }
 
     void Destroy(void)
     {
-        delete m_object;
-        m_object = NULL;
     }
-
-  private:
-    Q_DISABLE_COPY(TorcUserObject)
-    TorcUser *m_object;
 } TorcUserObject;
