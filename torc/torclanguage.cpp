@@ -79,7 +79,8 @@ TorcLanguage::TorcLanguage()
     QString language = m_locale.name(); // somewhat circular
     if (language.isEmpty())
         language = "en_GB";
-    m_languageSetting = new TorcSetting(NULL, "language", tr("Language"), TorcSetting::String, true, QVariant(language));
+    m_languageSetting = new TorcSetting(NULL, "language", tr("Language"), TorcSetting::String,
+                                        TorcSetting::Persistent | TorcSetting::Public, QVariant(language));
     SetLanguageCode(language);
 }
 

@@ -16,6 +16,7 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
 {
 
     Q_ENUMS(Type)
+    Q_ENUMS(Role)
 
   public:
     enum Type
@@ -26,10 +27,19 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
         StringList
     };
 
+    enum Role
+    {
+        None       = (0 << 0),
+        Persistent = (1 << 0),
+        Public     = (1 << 1)
+    };
+
+    Q_DECLARE_FLAGS(Roles, Role)
+
   public:
     static QString TypeToString(Type type);
     TorcSetting(TorcSetting *Parent, const QString &DBName, const QString &UIName,
-                Type SettingType, bool Persistent, const QVariant &Default);
+                Type SettingType, Roles SettingRoles, const QVariant &Default);
 
   public:
     Q_OBJECT
@@ -39,7 +49,6 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
     Q_PROPERTY (QString  description  READ GetDescription()  CONSTANT                    )
     Q_PROPERTY (QString  helpText     READ GetHelpText()     CONSTANT                    )
     Q_PROPERTY (QVariant defaultValue READ GetDefaultValue() CONSTANT                    )
-    Q_PROPERTY (bool     persistent   READ GetPersistent()   CONSTANT                    )
     Q_PROPERTY (bool     isActive     READ GetIsActive()     NOTIFY ActiveChanged()      )
     Q_PROPERTY (QString  settingType  READ GetSettingType()  CONSTANT                    )
 
@@ -67,7 +76,6 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
     QString                GetDescription       (void);
     QString                GetHelpText          (void);
     QVariant               GetDefaultValue      (void);
-    bool                   GetPersistent        (void);
     QString                GetSettingType       (void);
 
     // Checkbox
@@ -98,7 +106,7 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
     TorcSetting           *m_parent;
     Type                   type;
     QString                settingType;
-    bool                   persistent;
+    Roles                  roles;
     QString                m_dbName;
     QString                uiName;
     QString                description;
@@ -119,12 +127,14 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
     QMutex                *m_childrenLock;
 };
 
+Q_DECLARE_OPERATORS_FOR_FLAGS(TorcSetting::Roles)
+
 class TorcSettingGroup : public TorcSetting
 {
   public:
     TorcSettingGroup(TorcSetting *Parent, const QString &UIName);
 };
 
-Q_DECLARE_METATYPE(TorcSetting*);
+Q_DECLARE_METATYPE(TorcSetting*)
 
 #endif // TORCSETTING_H

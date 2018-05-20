@@ -37,7 +37,7 @@ QMutex     TorcUser::gCredentialsLock(QMutex::Recursive);
 TorcUser::TorcUser()
  : QObject(),
    TorcHTTPService(this, "user", "user", TorcUser::staticMetaObject, ""),
-   m_user(new TorcSetting(NULL, "UserCredentials", "Authentication string", TorcSetting::String, true, QVariant(QString("f0f825afb7ee5ca70ba178463f360d4b")))),
+   m_user(new TorcSetting(NULL, "UserCredentials", "Authentication string", TorcSetting::String, TorcSetting::Persistent, QVariant(QString("f0f825afb7ee5ca70ba178463f360d4b")))),
    m_canRestartTorc(true),
    m_canStopTorc(true),
    m_lock(QMutex::Recursive)

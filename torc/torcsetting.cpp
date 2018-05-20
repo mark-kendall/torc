@@ -59,13 +59,14 @@ QString TorcSetting::TypeToString(Type type)
 }
 
 TorcSetting::TorcSetting(TorcSetting *Parent, const QString &DBName, const QString &UIName,
-                         Type SettingType, bool Persistent, const QVariant &Default)
+                         Type SettingType, Roles SettingRoles, const QVariant &Default)
   : QObject(),
-    TorcHTTPService(this, "settings/" + DBName, DBName, TorcSetting::staticMetaObject, "SetActive,SetTrue,SetFalse"),
+    TorcHTTPService(this, "settings/" + DBName, (SettingRoles & Public) ? DBName : "",
+                    TorcSetting::staticMetaObject, "SetActive,SetTrue,SetFalse"),
     m_parent(Parent),
     type(SettingType),
     settingType(TypeToString(SettingType)),
-    persistent(Persistent),
+    roles(SettingRoles),
     m_dbName(DBName),
     uiName(UIName),
     description(),
@@ -90,19 +91,19 @@ TorcSetting::TorcSetting(TorcSetting *Parent, const QString &DBName, const QStri
 
     if (vtype == QVariant::Int && type == Integer)
     {
-        value = persistent ? gLocalContext->GetSetting(m_dbName, (int)defaultValue.toInt()) : defaultValue.toInt();
+        value = (roles & Persistent) ? gLocalContext->GetSetting(m_dbName, (int)defaultValue.toInt()) : defaultValue.toInt();
     }
     else if (vtype == QVariant::Bool && type == Bool)
     {
-        value = persistent ? gLocalContext->GetSetting(m_dbName, (bool)defaultValue.toBool()) : defaultValue.toBool();
+        value = (roles & Persistent) ? gLocalContext->GetSetting(m_dbName, (bool)defaultValue.toBool()) : defaultValue.toBool();
     }
     else if (vtype == QVariant::String)
     {
-        value = persistent ? gLocalContext->GetSetting(m_dbName, (QString)defaultValue.toString()) : defaultValue.toString();
+        value = (roles & Persistent) ? gLocalContext->GetSetting(m_dbName, (QString)defaultValue.toString()) : defaultValue.toString();
     }
     else if (vtype == QVariant::StringList)
     {
-        if (persistent)
+        if (roles & Persistent)
         {
             QString svalue = gLocalContext->GetSetting(m_dbName, (QString)defaultValue.toString());
             value = QVariant(svalue.split(","));
@@ -239,11 +240,6 @@ QVariant TorcSetting::GetDefaultValue(void)
     return defaultValue;
 }
 
-bool TorcSetting::GetPersistent(void)
-{
-    return persistent;
-}
-
 QString TorcSetting::GetSettingType(void)
 {
     return settingType;
@@ -324,7 +320,7 @@ void TorcSetting::SetValue(const QVariant &Value)
         int ivalue = value.toInt();
         if (ivalue >= m_begin && ivalue <= m_end)
         {
-            if (persistent)
+            if (roles & Persistent)
                 gLocalContext->SetSetting(m_dbName, (int)ivalue);
             emit ValueChanged(ivalue);
         }
@@ -332,7 +328,7 @@ void TorcSetting::SetValue(const QVariant &Value)
     else if (vtype == QVariant::Bool)
     {
         bool bvalue = value.toBool();
-        if (persistent)
+        if (roles & Persistent)
             gLocalContext->SetSetting(m_dbName, (bool)bvalue);
 
         emit ValueChanged(bvalue);
@@ -340,14 +336,14 @@ void TorcSetting::SetValue(const QVariant &Value)
     else if (vtype == QVariant::String)
     {
         QString svalue = value.toString();
-        if (persistent)
+        if (roles & Persistent)
             gLocalContext->SetSetting(m_dbName, svalue);
         emit ValueChanged(svalue);
     }
     else if (vtype == QVariant::StringList)
     {
         QStringList svalue = value.toStringList();
-        if (persistent)
+        if (roles & Persistent)
             gLocalContext->SetSetting(m_dbName, svalue.join(","));
         emit ValueChanged(svalue);
     }
@@ -400,7 +396,7 @@ QVariant TorcSetting::GetValue(void)
 */
 
 TorcSettingGroup::TorcSettingGroup(TorcSetting *Parent, const QString &UIName)
-  : TorcSetting(Parent, UIName, UIName, Bool, false, QVariant())
+  : TorcSetting(Parent, UIName, UIName, Bool, None, QVariant())
 {
     SetActiveThreshold(0);
 }

@@ -291,8 +291,10 @@ TorcHTTPServer::TorcHTTPServer()
     // if app is running with root privilges (e.g. Raspberry Pi) then try and default to sensible port settings
     // when first run. No point in trying 443 for secure sockets as SSL is not enabled by default (would require
     // additional setup step).
-    m_port   = new TorcSetting(NULL, "WebServerPort",   tr("HTTP Port"),      TorcSetting::Integer, true, QVariant((int)(geteuid() ? 4840 : 80)));
-    m_secure = new TorcSetting(NULL, "WebServerSecure", tr("Secure sockets"), TorcSetting::Bool,    true, QVariant((bool)false));
+    m_port   = new TorcSetting(NULL, "WebServerPort",   tr("HTTP Port"),      TorcSetting::Integer,
+                               TorcSetting::Persistent | TorcSetting::Public, QVariant((int)(geteuid() ? 4840 : 80)));
+    m_secure = new TorcSetting(NULL, "WebServerSecure", tr("Secure sockets"), TorcSetting::Bool,
+                               TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)false));
 
     // initialise platform name
     static bool initialised = false;
