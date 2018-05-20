@@ -299,15 +299,15 @@ void TorcDB::SetSetting(const QString &Name, const QString &Value)
     QSqlQuery query(db);
     query.prepare("DELETE FROM settings where name=:NAME;");
     query.bindValue(":NAME", Name);
-    if (query.exec())
-        DebugError(&query);
+    query.exec();
+    DebugError(&query);
 
     query.prepare("INSERT INTO settings (name, value) "
                   "VALUES (:NAME, :VALUE);");
     query.bindValue(":NAME", Name);
     query.bindValue(":VALUE", Value);
-    if (query.exec())
-        DebugError(&query);
+    query.exec();
+    DebugError(&query);
 }
 
 /*! \fn    TorcDB::SetPreference
@@ -331,13 +331,13 @@ void TorcDB::SetPreference(const QString &Name, const QString &Value)
     QSqlQuery query(db);
     query.prepare("DELETE FROM preferences where name=:NAME;");
     query.bindValue(":NAME", Name);
-    if (query.exec())
-        DebugError(&query);
+    query.exec();
+    DebugError(&query);
 
     query.prepare("INSERT INTO preferences (name, value) "
                   "VALUES (:NAME, :VALUE);");
     query.bindValue(":NAME", Name);
     query.bindValue(":VALUE", Value);
-    if (query.exec())
-        DebugError(&query);
+    query.exec();
+    DebugError(&query);
 }
