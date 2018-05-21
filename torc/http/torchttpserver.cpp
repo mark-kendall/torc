@@ -610,6 +610,11 @@ bool TorcHTTPServer::event(QEvent *Event)
                 case Torc::NetworkHostNamesChanged:
                     UpdateOriginWhitelist(m_port->GetValue().toInt());
                     break;
+                case Torc::UserChanged:
+                    LOG(VB_GENERAL, LOG_INFO, "User name/credentials changed - restarting webserver");
+                    Close();
+                    Open();
+                    break;
                 default:
                     break;
             }

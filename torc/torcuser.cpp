@@ -120,6 +120,8 @@ bool TorcUser::SetUserCredentials(const QString &Name, const QString &Credential
     // rehashed... so set to lower
     m_userNameSetting->SetValue(QString(Name));
     m_userCredentials->SetValue(QString(Credentials.toLower()));
+
+    TorcLocalContext::NotifyEvent(Torc::UserChanged);
     return true;
 }
 
