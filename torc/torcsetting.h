@@ -112,12 +112,11 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
     int                    m_end;
     int                    m_step;
 
-  private:
     bool                   isActive;
     int                    m_active;
     int                    m_activeThreshold;
     QList<TorcSetting*>    m_children;
-    QMutex                 m_childrenLock;
+    QMutex                 m_lock;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(TorcSetting::Roles)

@@ -80,8 +80,10 @@ TorcSetting::TorcSetting(TorcSetting *Parent, const QString &DBName, const QStri
     m_active(0),
     m_activeThreshold(1),
     m_children(),
-    m_childrenLock(QMutex::Recursive)
+    m_lock(QMutex::Recursive)
 {
+    QMutexLocker locker(&m_lock);
+
     setObjectName(DBName);
 
     if (m_parent)
@@ -132,11 +134,10 @@ void TorcSetting::SubscriberDeleted(QObject *Subscriber)
 
 void TorcSetting::AddChild(TorcSetting *Child)
 {
+    QMutexLocker locker(&m_lock);
     if (Child)
     {
         {
-            QMutexLocker locker(&m_childrenLock);
-
             int position = m_children.size();
             m_children.insert(position, Child);
         }
@@ -146,11 +147,10 @@ void TorcSetting::AddChild(TorcSetting *Child)
 }
 void TorcSetting::RemoveChild(TorcSetting *Child)
 {
+    QMutexLocker locker(&m_lock);
     if (Child)
     {
         {
-            QMutexLocker locker(&m_childrenLock);
-
             for (int i = 0; i < m_children.size(); ++i)
             {
                 if (m_children.at(i) == Child)
@@ -167,6 +167,7 @@ void TorcSetting::RemoveChild(TorcSetting *Child)
 
 void TorcSetting::Remove(void)
 {
+    QMutexLocker locker(&m_lock);
     if (m_parent)
         m_parent->RemoveChild(this);
 
@@ -175,7 +176,7 @@ void TorcSetting::Remove(void)
 
 TorcSetting* TorcSetting::FindChild(const QString &Child, bool Recursive /*=false*/)
 {
-    QMutexLocker locker(&m_childrenLock);
+    QMutexLocker locker(&m_lock);
 
     foreach (TorcSetting* setting, m_children)
         if (setting->objectName() == Child)
@@ -198,64 +199,74 @@ QSet<TorcSetting*> TorcSetting::GetChildren(void)
 {
     QSet<TorcSetting*> result;
 
-    m_childrenLock.lock();
+    m_lock.lock();
     foreach (TorcSetting* setting, m_children)
     {
         result << setting;
         setting->UpRef();
     }
-    m_childrenLock.unlock();
+    m_lock.unlock();
 
     return result;
 }
 
 bool TorcSetting::GetIsActive(void)
 {
+    QMutexLocker locker(&m_lock);
     return isActive;
 }
 
 QString TorcSetting::GetUiName(void)
 {
+    QMutexLocker locker(&m_lock);
     return uiName;
 }
 
 QString TorcSetting::GetDescription(void)
 {
+    QMutexLocker locker(&m_lock);
     return description;
 }
 
 QString TorcSetting::GetHelpText(void)
 {
+    QMutexLocker locker(&m_lock);
     return helpText;
 }
 
 QVariant TorcSetting::GetDefaultValue(void)
 {
+    QMutexLocker locker(&m_lock);
     return defaultValue;
 }
 
 QString TorcSetting::GetSettingType(void)
 {
+    QMutexLocker locker(&m_lock);
     return settingType;
 }
 
 int TorcSetting::GetBegin(void)
 {
+    QMutexLocker locker(&m_lock);
     return m_begin;
 }
 
 int TorcSetting::GetEnd(void)
 {
+    QMutexLocker locker(&m_lock);
     return m_end;
 }
 
 int TorcSetting::GetStep(void)
 {
+    QMutexLocker locker(&m_lock);
     return m_step;
 }
 
 void TorcSetting::SetActive(bool Value)
 {
+    QMutexLocker locker(&m_lock);
     bool wasactive = isActive;
     m_active += Value ? 1 : -1;
     isActive = m_active >= m_activeThreshold;
@@ -266,6 +277,7 @@ void TorcSetting::SetActive(bool Value)
 
 void TorcSetting::SetActiveThreshold(int Threshold)
 {
+    QMutexLocker locker(&m_lock);
     bool wasactive = isActive;
     m_activeThreshold = Threshold;
     isActive = m_active >= m_activeThreshold;
@@ -276,6 +288,7 @@ void TorcSetting::SetActiveThreshold(int Threshold)
 
 void TorcSetting::SetValue(const QVariant &Value)
 {
+    QMutexLocker locker(&m_lock);
     if (value == Value)
         return;
 
@@ -319,6 +332,7 @@ void TorcSetting::SetValue(const QVariant &Value)
 
 void TorcSetting::SetRange(int Begin, int End, int Step)
 {
+    QMutexLocker locker(&m_lock);
     if (type != Integer)
         return;
 
@@ -336,16 +350,19 @@ void TorcSetting::SetRange(int Begin, int End, int Step)
 
 void TorcSetting::SetDescription(const QString &Description)
 {
+    QMutexLocker locker(&m_lock);
     description = Description;
 }
 
 void TorcSetting::SetHelpText(const QString &HelpText)
 {
+    QMutexLocker locker(&m_lock);
     helpText = HelpText;
 }
 
 QVariant TorcSetting::GetValue(void)
 {
+    QMutexLocker locker(&m_lock);
     switch (type)
     {
         case Integer:    return value.toInt();
