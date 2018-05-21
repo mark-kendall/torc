@@ -130,11 +130,6 @@ void TorcSetting::SubscriberDeleted(QObject *Subscriber)
     return TorcHTTPService::HandleSubscriberDeleted(Subscriber);
 }
 
-QVariant::Type TorcSetting::GetStorageType(void)
-{
-    return defaultValue.type();
-}
-
 void TorcSetting::AddChild(TorcSetting *Child)
 {
     if (Child)
@@ -244,20 +239,6 @@ QString TorcSetting::GetSettingType(void)
     return settingType;
 }
 
-TorcSetting::Type TorcSetting::GetType(void)
-{
-    return type;
-}
-
-TorcSetting* TorcSetting::GetChildByIndex(int Index)
-{
-    // TODO does this need locking
-    if (Index < 0 || Index >= m_children.size())
-        return NULL;
-
-    return m_children.at(Index);
-}
-
 int TorcSetting::GetBegin(void)
 {
     return m_begin;
@@ -291,18 +272,6 @@ void TorcSetting::SetActiveThreshold(int Threshold)
 
     if (wasactive != isActive)
         emit ActiveChanged(isActive);
-}
-
-void TorcSetting::SetTrue(void)
-{
-    if (defaultValue.type() == QVariant::Bool)
-        SetValue(QVariant((bool)true));
-}
-
-void TorcSetting::SetFalse(void)
-{
-    if (defaultValue.type() == QVariant::Bool)
-        SetValue(QVariant((bool)false));
 }
 
 void TorcSetting::SetValue(const QVariant &Value)

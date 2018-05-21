@@ -53,18 +53,11 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
     Q_PROPERTY (QString  settingType  READ GetSettingType()  CONSTANT                    )
 
   public:
-    QVariant::Type         GetStorageType       (void);
-    void                   AddChild             (TorcSetting *Child);
-    void                   RemoveChild          (TorcSetting *Child);
     void                   Remove               (void);
-    TorcSetting*           FindChild            (const QString &Child, bool Recursive = false);
-    QSet<TorcSetting*>     GetChildren          (void);
-    TorcSetting*           GetChildByIndex      (int Index);
     void                   SetActiveThreshold   (int  Threshold);
     void                   SetDescription       (const QString &Description);
     void                   SetHelpText          (const QString &HelpText);
     void                   SetRange             (int Begin, int End, int Step);
-    Type                   GetType              (void);
 
   public slots:
     void                   SubscriberDeleted    (QObject *Subscriber);
@@ -77,10 +70,6 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
     QString                GetHelpText          (void);
     QVariant               GetDefaultValue      (void);
     QString                GetSettingType       (void);
-
-    // Checkbox
-    void                   SetTrue              (void);
-    void                   SetFalse             (void);
 
     // Integer
     int                    GetBegin             (void);
@@ -98,9 +87,13 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
 
   protected:
     virtual               ~TorcSetting();
+    TorcSetting*           FindChild            (const QString &Child, bool Recursive = false);
+    QSet<TorcSetting*>     GetChildren          (void);
+    void                   AddChild             (TorcSetting *Child);
+    void                   RemoveChild          (TorcSetting *Child);
 
   private:
-    Q_DISABLE_COPY(TorcSetting);
+    Q_DISABLE_COPY(TorcSetting)
 
   private:
     TorcSetting           *m_parent;
