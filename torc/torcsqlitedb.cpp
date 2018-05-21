@@ -48,6 +48,7 @@ TorcSQLiteDB::TorcSQLiteDB(const QString &DatabaseName)
 */
 bool TorcSQLiteDB::InitDatabase(void)
 {
+    QMutexLocker locker(&m_lock);
     LOG(VB_GENERAL, LOG_INFO, QString("Attempting to open '%1'")
         .arg(m_databaseName));
 
