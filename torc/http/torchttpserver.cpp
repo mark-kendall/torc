@@ -54,13 +54,13 @@ QString                        gServicesDirectory(SERVICES_DIRECTORY);
 
 void TorcHTTPServer::RegisterHandler(TorcHTTPHandler *Handler)
 {
-    if (!Handler)
-        return;
-
     bool changed = false;
 
     {
         QWriteLocker locker(gHandlersLock);
+
+        if (!Handler)
+            return;
 
         foreach (QString signature, Handler->Signature().split(","))
         {
@@ -86,13 +86,13 @@ void TorcHTTPServer::RegisterHandler(TorcHTTPHandler *Handler)
 
 void TorcHTTPServer::DeregisterHandler(TorcHTTPHandler *Handler)
 {
-    if (!Handler)
-        return;
-
     bool changed = false;
 
     {
         QWriteLocker locker(gHandlersLock);
+
+        if (!Handler)
+            return;
 
         foreach (QString signature, Handler->Signature().split(","))
         {
