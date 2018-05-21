@@ -80,7 +80,7 @@ TorcSetting::TorcSetting(TorcSetting *Parent, const QString &DBName, const QStri
     m_active(0),
     m_activeThreshold(1),
     m_children(),
-    m_childrenLock(new QMutex(QMutex::Recursive))
+    m_childrenLock(QMutex::Recursive)
 {
     setObjectName(DBName);
 
@@ -123,7 +123,6 @@ TorcSetting::TorcSetting(TorcSetting *Parent, const QString &DBName, const QStri
 
 TorcSetting::~TorcSetting()
 {
-    delete m_childrenLock;
 }
 
 void TorcSetting::SubscriberDeleted(QObject *Subscriber)
@@ -141,7 +140,7 @@ void TorcSetting::AddChild(TorcSetting *Child)
     if (Child)
     {
         {
-            QMutexLocker locker(m_childrenLock);
+            QMutexLocker locker(&m_childrenLock);
 
             int position = m_children.size();
             m_children.insert(position, Child);
@@ -155,7 +154,7 @@ void TorcSetting::RemoveChild(TorcSetting *Child)
     if (Child)
     {
         {
-            QMutexLocker locker(m_childrenLock);
+            QMutexLocker locker(&m_childrenLock);
 
             for (int i = 0; i < m_children.size(); ++i)
             {
@@ -181,7 +180,7 @@ void TorcSetting::Remove(void)
 
 TorcSetting* TorcSetting::FindChild(const QString &Child, bool Recursive /*=false*/)
 {
-    QMutexLocker locker(m_childrenLock);
+    QMutexLocker locker(&m_childrenLock);
 
     foreach (TorcSetting* setting, m_children)
         if (setting->objectName() == Child)
@@ -204,13 +203,13 @@ QSet<TorcSetting*> TorcSetting::GetChildren(void)
 {
     QSet<TorcSetting*> result;
 
-    m_childrenLock->lock();
+    m_childrenLock.lock();
     foreach (TorcSetting* setting, m_children)
     {
         result << setting;
         setting->UpRef();
     }
-    m_childrenLock->unlock();
+    m_childrenLock.unlock();
 
     return result;
 }
