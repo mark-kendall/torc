@@ -31,46 +31,84 @@
 #include "torclanguage.h"
 #include "torcuser.h"
 
-QByteArray TorcUser::gCredentials = QByteArray();
-QMutex     TorcUser::gCredentialsLock(QMutex::Recursive);
+#define TORC_DEFAULT_USERNAME    QString("admin")
+#define TORC_DEFAULT_CREDENTIALS QString("f0f825afb7ee5ca70ba178463f360d4b")
+
+QString    TorcUser::gUserName = QString();
+QByteArray TorcUser::gUserCredentials = QByteArray();
+QMutex     TorcUser::gUserCredentialsLock(QMutex::Recursive);
 
 TorcUser::TorcUser()
  : QObject(),
    TorcHTTPService(this, "user", "user", TorcUser::staticMetaObject, ""),
-   m_user(new TorcSetting(NULL, "UserCredentials", "Authentication string", TorcSetting::String, TorcSetting::Persistent, QVariant(QString("f0f825afb7ee5ca70ba178463f360d4b")))),
+   m_userName(),
+   m_userNameSetting(new TorcSetting(NULL, "UserName", "User name", TorcSetting::String, TorcSetting::Persistent, QVariant(TORC_DEFAULT_USERNAME))),
+   m_userCredentials(new TorcSetting(NULL, "UserCredentials", "Authentication string", TorcSetting::String, TorcSetting::Persistent, QVariant(TORC_DEFAULT_CREDENTIALS))),
    m_canRestartTorc(true),
    m_canStopTorc(true),
    m_lock(QMutex::Recursive)
 {
     {
-        QMutexLocker locker(&gCredentialsLock);
-        gCredentials = m_user->GetValue().toString().toLower().toLatin1();
+        QMutexLocker locker(&gUserCredentialsLock);
+        gUserName = m_userNameSetting->GetValue().toString();
+        gUserCredentials = m_userCredentials->GetValue().toString().toLower().toLatin1();
+        m_userName = gUserName;
     }
-    connect(m_user, SIGNAL(ValueChanged(QString)), this, SLOT(UpdateCredentials(QString)));
+
+    connect(m_userNameSetting, SIGNAL(ValueChanged(QString)), this, SLOT(UpdateUserName(QString)));
+    connect(m_userCredentials, SIGNAL(ValueChanged(QString)), this, SLOT(UpdateCredentials(QString)));
 }
 
 TorcUser::~TorcUser()
 {
-    m_user->Remove();
-    m_user->DownRef();
-    m_user = NULL;
+    m_userNameSetting->Remove();
+    m_userNameSetting->DownRef();
+    m_userNameSetting = NULL;
+    m_userCredentials->Remove();
+    m_userCredentials->DownRef();
+    m_userCredentials = NULL;
+}
+
+QString TorcUser::GetName(void)
+{
+    QMutexLocker locker(&gUserCredentialsLock);
+    return gUserName;
+}
+
+QString TorcUser::GetUserName(void)
+{
+    QMutexLocker locker(&gUserCredentialsLock);
+    return m_userName;
 }
 
 QByteArray TorcUser::GetCredentials(void)
 {
-    QMutexLocker locker(&gCredentialsLock);
-    return gCredentials;
+    QMutexLocker locker(&gUserCredentialsLock);
+    return gUserCredentials;
+}
+
+void TorcUser::UpdateUserName(const QString &Name)
+{
+    QMutexLocker locker(&gUserCredentialsLock);
+    m_userName = Name;
+    gUserName  = Name;
 }
 
 void TorcUser::UpdateCredentials(const QString &Credentials)
 {
-    QMutexLocker locker(&gCredentialsLock);
-    gCredentials = Credentials.toLower().toLatin1();
+    QMutexLocker locker(&gUserCredentialsLock);
+    gUserCredentials = Credentials.toLower().toLatin1();
 }
 
-bool TorcUser::SetUserCredentials(const QString &Credentials)
+bool TorcUser::SetUserCredentials(const QString &Name, const QString &Credentials)
 {
     QMutexLocker locker(&m_lock);
+
+    if (Name == gUserName && Credentials.toLower() == GetCredentials())
+        return false;
+
+    if (Name.isEmpty())
+        return false;
 
     // N.B. MD5 credentials are a hexadecimal representation of a binary. As such they can
     // contain either upper or lower case digits.
@@ -80,7 +118,8 @@ bool TorcUser::SetUserCredentials(const QString &Credentials)
 
     // but an MD5 hash with upper case letters produces different results when
     // rehashed... so set to lower
-    m_user->SetValue(QString(Credentials.toLower()));
+    m_userNameSetting->SetValue(QString(Name));
+    m_userCredentials->SetValue(QString(Credentials.toLower()));
     return true;
 }
 
@@ -127,6 +166,7 @@ class TorcUserObject : public TorcAdminObject, public TorcStringFactory
 
     void GetStrings(QVariantMap &Strings)
     {
+        Strings.insert("LoggedInUserTr",     QCoreApplication::translate("TorcUser", "Logged in as %1"));
         Strings.insert("RestartTorcTr",      QCoreApplication::translate("TorcUser", "Restart Torc"));
         Strings.insert("ConfirmRestartTorc", QCoreApplication::translate("TorcUser", "Are you sure you want to restart Torc?"));
         Strings.insert("StopTorcTr",         QCoreApplication::translate("TorcUser", "Stop Torc"));

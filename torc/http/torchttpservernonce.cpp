@@ -127,6 +127,13 @@ void TorcHTTPServerNonce::ProcessDigestAuth(TorcHTTPRequest &Request, bool Check
             return;
         }
 
+        // username must match
+        if (TorcUser::GetName() != params.value("username"))
+        {
+            LOG(VB_GENERAL, LOG_WARNING, QString("Expected '%1' username, got '%2'").arg(TorcUser::GetName()).arg(params.value("username")));
+            return;
+        }
+
         // we check the digest early, even though it is an expensive operation, as it will automatically
         // confirm a number of the params are correct and if the respone is calculated correctly but the nonce
         // is not recognised (i.e. stale), we can respond with stale="true', as per the spec, and the client

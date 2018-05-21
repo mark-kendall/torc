@@ -301,6 +301,8 @@ $(document).ready(function() {
             addNavbarDropdown('torc-user-dropdown', 'user', usermenu);
             // we need the user menu before adding other options
             // NB userSubscriptionChanged should only ever be called once...
+            addDropdownMenuItem(usermenu, usermenu + '-user', '#', torc.LoggedInUserTr.replace("%1", properties.userName.value));
+            addDropdownMenuDivider(usermenu, '');
             addFileModal('config',  torc.ViewConfigTitleTr, torc.ViewConfigTr, '/content/torc.xml',       'xml');
             addFileModal('xsd',     torc.ViewXSDTitleTr,    torc.ViewXSDTr,    '/content/torc.xsd',       'xml');
             addFileModal('dot',     torc.ViewDOTTitleTr,    torc.ViewDOTTr,    '/content/stategraph.dot', 'text');
