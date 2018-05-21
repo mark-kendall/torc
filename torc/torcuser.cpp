@@ -188,6 +188,7 @@ class TorcUserObject : public TorcAdminObject, public TorcStringFactory
         Strings.insert("UnfollowTr",         QCoreApplication::translate("TorcUser", "Unfollow"));
         Strings.insert("Value",              QCoreApplication::translate("TorcUser", "Value"));
         Strings.insert("Valid",              QCoreApplication::translate("TorcUser", "Valid"));
+        Strings.insert("CloseTr",            QCoreApplication::translate("TorcUser", "Close"));
     }
 
     void Create(void)
