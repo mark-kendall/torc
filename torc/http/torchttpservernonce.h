@@ -6,9 +6,9 @@
 #include <QDateTime>
 
 // Torc
+#include "torclocaldefs.h"
 #include "torchttprequest.h"
 
-#define TORC_REALM QString("Torc")         // N.B. do NOT change
 #define DEFAULT_NONCE_LIFETIME_SECONDS  10 // expire 10 seconds after issue or last use
 #define DEFAULT_NONCE_LIFETIME_REQUESTS 0  // unlimited uses
 

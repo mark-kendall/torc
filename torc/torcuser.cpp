@@ -40,7 +40,7 @@ QMutex     TorcUser::gUserCredentialsLock(QMutex::Recursive);
 
 TorcUser::TorcUser()
  : QObject(),
-   TorcHTTPService(this, "user", "user", TorcUser::staticMetaObject, ""),
+   TorcHTTPService(this, TORC_USER_SERVICE, "user", TorcUser::staticMetaObject, ""),
    m_userName(),
    m_userNameSetting(new TorcSetting(NULL, "UserName", "User name", TorcSetting::String, TorcSetting::Persistent, QVariant(TORC_DEFAULT_USERNAME))),
    m_userCredentials(new TorcSetting(NULL, "UserCredentials", "Authentication string", TorcSetting::String, TorcSetting::Persistent, QVariant(TORC_DEFAULT_CREDENTIALS))),
@@ -105,16 +105,27 @@ bool TorcUser::SetUserCredentials(const QString &Name, const QString &Credential
     QMutexLocker locker(&m_lock);
 
     if (Name == gUserName && Credentials.toLower() == GetCredentials())
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "New credentials match old - not changing");
         return false;
+    }
 
-    if (Name.isEmpty())
+    // enforce minimum size (4) and alphanumeric and underscore
+    static QRegExp gReg1("[\\w]{4,}");
+    if (!gReg1.exactMatch(Name))
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Password unacceptable");
         return false;
+    }
 
     // N.B. MD5 credentials are a hexadecimal representation of a binary. As such they can
     // contain either upper or lower case digits.
-    static QRegExp gReg("[0-9a-fA-F]{32}");
-    if (!gReg.exactMatch(Credentials))
+    static QRegExp gReg2("[0-9a-fA-F]{32}");
+    if (!gReg2.exactMatch(Credentials))
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "User credentials hash unacceptable");
         return false;
+    }
 
     // but an MD5 hash with upper case letters produces different results when
     // rehashed... so set to lower
@@ -189,6 +200,15 @@ class TorcUserObject : public TorcAdminObject, public TorcStringFactory
         Strings.insert("Value",              QCoreApplication::translate("TorcUser", "Value"));
         Strings.insert("Valid",              QCoreApplication::translate("TorcUser", "Valid"));
         Strings.insert("CloseTr",            QCoreApplication::translate("TorcUser", "Close"));
+        Strings.insert("SettingsTr",         QCoreApplication::translate("TorcUser", "Settings"));
+        Strings.insert("ConfirmTr",          QCoreApplication::translate("TorcUser", "Confirm"));
+        Strings.insert("CancelTr",           QCoreApplication::translate("TorcUser", "Cancel"));
+        Strings.insert("ChangeCredsTr",      QCoreApplication::translate("TorcUser", "Change username and password"));
+        Strings.insert("UsernameTr",         QCoreApplication::translate("TorcUser", "Username"));
+        Strings.insert("PasswordTr",         QCoreApplication::translate("TorcUser", "Password"));
+        Strings.insert("Username2Tr",        QCoreApplication::translate("TorcUser", "Confirm username"));
+        Strings.insert("Password2Tr",        QCoreApplication::translate("TorcUser", "Confirm password"));
+        Strings.insert("CredentialsHelpTr",  QCoreApplication::translate("TorcUser", "Usernames and passwords must be at least 4 characters long and can only contain letters, numbers and \'_\' (underscore)."));
     }
 
     void Create(void)

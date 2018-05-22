@@ -222,7 +222,84 @@ var theme = {
 '      </body>' +
 '    </table>' +
 '  </div>' +
-'</div>'
+'</div>',
+
+"SettingsModalID":
+"torc-settings-modal",
+
+"SettingsModalContentID":
+"torc-settings-modal-content",
+
+"SettingsModal":
+'<div id="torc-settings-modal" class="modal fade torcmodal" role="dialog">' +
+'  <div class="modal-dialog modal-lg">' +
+'    <div class="modal-content">' +
+'      <div class="modal-header">' +
+'        <h4 class="modal-title"><%=title%></h4>' +
+'        <button type="button" class="close" data-dismiss="modal" aria-label="' + torc.CloseTr + '">' +
+'          <span aria-hidden="true">&times;</span>' +
+'        </button>' +
+'      </div>' +
+'      <div class="modal-body torc-settings-modal-content"></div>' +
+'      <div class="modal-footer">' +
+'        <button type="button" class="btn btn-default" data-dismiss="modal">' + torc.CloseTr + '</button>' +
+'      </div>' +
+'    </div>' +
+'  </div>' +
+'</div>',
+
+"SettingsCredentialsButtonId":
+'torc-settings-credentials-button',
+
+"SettingsCredentialsButton":
+'<div class="card">' +
+'  <div class="card-body">' +
+'    <h5 class="card-title">' + torc.ChangeCredsTr + '</h5>' +
+'    <a id="torc-settings-credentials-button" href="#" class="btn btn-primary">Update</a>' +
+'  </div>' +
+'</div>',
+
+"SettingsCredentialsFormID":
+'torc-settings-credentials-form',
+"SettingsUsername1":
+'torc-settings-username1',
+"SettingsUsername2":
+'torc-settings-username2',
+"SettingsPassword1":
+'torc-settings-password1',
+"SettingsPassword2":
+'torc-settings-password2',
+
+"SettingsCredentialsForm":
+'<div class="card bg-light border-warning mb-3"><div class="card-body"><p class="card-text">' + torc.CredentialsHelpTr + '</p></div></div>' +
+'<div class="card"><div class="card-body">' +
+'<form id="torc-settings-credentials-form">' +
+'  <div class="form-group row">' +
+'    <label for="torc-settings-username1" class="col-sm-3 col-form-label">' + torc.UsernameTr + '</label>' +
+'    <div class="col-sm-9">' +
+'      <input type="text" class="form-control" id="torc-settings-username1" />' +
+'    </div>' +
+'  </div>' +
+'  <div class="form-group row">' +
+'    <label for="torc-settings-username2" class="col-sm-3 col-form-label">' + torc.Username2Tr + '</label>' +
+'    <div class="col-sm-9">' +
+'      <input type="text" class="form-control" id="torc-settings-username2" />' +
+'    </div>' +
+'  </div>' +
+'  <div class="form-group row">' +
+'    <label for="torc-settings-password1" class="col-sm-3 col-form-label">' + torc.PasswordTr + '</label>' +
+'    <div class="col-sm-9">' +
+'      <input type="password" class="form-control" id="torc-settings-password1" />' +
+'    </div>' +
+'  </div>' +
+'  <div class="form-group row">' +
+'    <label for="torc-settings-password2" class="col-sm-3 col-form-label">' + torc.Password2Tr + '</label>' +
+'    <div class="col-sm-9">' +
+'      <input type="password" class="form-control" id="torc-settings-password2" />' +
+'    </div>' +
+'  </div>' +
+'</form>' +
+'</div></div>'
 };
 
 if (Object.freeze) { Object.freeze(theme); }

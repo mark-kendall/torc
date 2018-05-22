@@ -49,7 +49,7 @@
 
 QMap<QString,TorcHTTPHandler*> gHandlers;
 QReadWriteLock*                gHandlersLock = new QReadWriteLock(QReadWriteLock::Recursive);
-QString                        gServicesDirectory(SERVICES_DIRECTORY);
+QString                        gServicesDirectory(TORC_SERVICES_DIR);
 
 
 void TorcHTTPServer::RegisterHandler(TorcHTTPHandler *Handler)
@@ -371,6 +371,12 @@ void TorcHTTPServer::Authorise(const QString &Host, TorcHTTPRequest &Request, bo
     TorcHTTPServer::AuthenticateUser(Request);
     if (Request.IsAuthorised() == HTTPAuthorised)
         return;
+
+    if (Request.IsAuthorised() == HTTPAuthorisedStale)
+    {
+        AddAuthenticationHeader(Request);
+        return;
+    }
 
     // authentication token supplied in the url (WebSocket)
     // do this before 'standard' authentication to ensure token is checked and expired

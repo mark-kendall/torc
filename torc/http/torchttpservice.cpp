@@ -29,6 +29,7 @@
 #include <QDateTime>
 
 // Torc
+#include "torclocaldefs.h"
 #include "torclogging.h"
 #include "torcnetwork.h"
 #include "torchttpserver.h"
@@ -258,7 +259,7 @@ class MethodParameters
 */
 TorcHTTPService::TorcHTTPService(QObject *Parent, const QString &Signature, const QString &Name,
                                  const QMetaObject &MetaObject, const QString &Blacklist)
-  : TorcHTTPHandler(SERVICES_DIRECTORY + Signature, Name),
+  : TorcHTTPHandler(TORC_SERVICES_DIR + Signature, Name),
     m_parent(Parent),
     m_version("Unknown"),
     m_metaObject(MetaObject),

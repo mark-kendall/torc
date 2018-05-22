@@ -186,7 +186,7 @@ bool TorcLocalContextPriv::Init(void)
     }
 
     // Create the root settings object
-    gRootSetting = new TorcSettingGroup(NULL, QString("RootSetting"));
+    gRootSetting = new TorcSettingGroup(NULL, TORC_ROOT_SETTING);
 
     // create/load the UUID - make this persistent to ensure peers do not think
     // there are multiple devices after a number of restarts.

@@ -381,7 +381,7 @@ QVariant TorcSetting::GetValue(void)
 */
 
 TorcSettingGroup::TorcSettingGroup(TorcSetting *Parent, const QString &UIName)
-  : TorcSetting(Parent, UIName, UIName, Bool, None, QVariant())
+  : TorcSetting(Parent, UIName, UIName, Bool, Public, QVariant())
 {
     SetActiveThreshold(0);
 }

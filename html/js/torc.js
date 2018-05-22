@@ -13,6 +13,7 @@ $(document).ready(function() {
     var torcconnection = undefined;
     var torcstategraph = new TorcStateGraph($, torc);
     var torcapi        = new TorcAPI($, torc, usermenu);
+    var torcsettings   = new TorcSettings($, torc, usermenu);
 
     function qsTranslate(context, string, disambiguation, plural, callback) {
         if (disambiguation === undefined) { disambiguation = ''; }
@@ -195,7 +196,7 @@ $(document).ready(function() {
             addDropdownMenuItem(usermenu, 'torc-' + name, '#', translatedName,
                                 function () {
                                     bootbox.confirm(translatedConfirmation, function(result) {
-                                    if (result === true) { torcconnection.call('user', method); }
+                                    if (result === true) { torcconnection.call(torc.UserService, method); }
                                 }); });
         }
     }
@@ -298,7 +299,7 @@ $(document).ready(function() {
 
     function userSubscriptionChanged(version, ignore, properties) {
         if (version !== undefined && typeof properties === 'object') {
-            addNavbarDropdown('torc-user-dropdown', 'user', usermenu);
+            addNavbarDropdown('torc-user-dropdown', torc.UserService, usermenu);
             // we need the user menu before adding other options
             // NB userSubscriptionChanged should only ever be called once...
             addDropdownMenuItem(usermenu, usermenu + '-user', '#', torc.LoggedInUserTr.replace("%1", properties.userName.value));
@@ -309,6 +310,7 @@ $(document).ready(function() {
             addLogModal('log', '',  torc.ViewLogTr);
             addLogtailModal('logtail', '', torc.FollowLogTr);
             torcapi.setup(torcconnection);
+            torcsettings.setup(torcconnection);
             addDropdownMenuDivider(usermenu, '');
             $.each(properties, function (key, value) {
                 userChanged(key, value.value); });
@@ -343,9 +345,11 @@ $(document).ready(function() {
             $(".torc-socket-status-text").html(torc.SocketNotConnected);
             // remove modals
             $('.torcmodal').remove();
+            $('.modal-backdrop').remove();
             // remove state graph
             torcstategraph.cleanup();
             torcapi.cleanup();
+            torcsettings.cleanup();
         } else if (status === torc.SocketConnecting) {
             $(".torc-socket-status-icon").removeClass("fa-check fa-check-circle-o fa-exclamation-circle").addClass("fa-question-circle");
             $(".torc-socket-status-text").html(torc.SocketConnecting);
@@ -356,7 +360,7 @@ $(document).ready(function() {
             torcconnection.subscribe('languages', ['languageString', 'languageCode', 'languages'], languageChanged, languageSubscriptionChanged);
             torcconnection.subscribe('peers', ['peers'], peerListChanged, peerSubscriptionChanged);
             torcconnection.subscribe('power', ['canShutdown', 'canSuspend', 'canRestart', 'canHibernate', 'batteryLevel'], powerChanged, powerSubscriptionChanged);
-            torcconnection.subscribe('user', ['canRestartTorc'], userChanged, userSubscriptionChanged);
+            torcconnection.subscribe(torc.UserService, ['canRestartTorc'], userChanged, userSubscriptionChanged);
             torcconnection.subscribe('time', ['currentTime'], timeChanged, timeSubscriptionChanged);
             torcstategraph.setup(torcconnection);
         }
