@@ -90,23 +90,23 @@ var theme = {
 
 "APIServiceList":
 '  <ul class="nav nav-tabs" role="tablist">' +
-'    <li class="nav-item"><a class="nav-link active show" role="tab" id="torc-avail-services-tab" data-toggle="tab" aria-controls="torc-avail-services" href="#torc-avail-services">Services</a></li>' +
-'    <li class="nav-item"><a class="nav-link" role="tab" id="torc-return-formats-tab" data-toggle="tab" aria-controls="torc-return-formats" href="#torc-return-formats">Return formats</a></li>' +
-'    <li class="nav-item"><a class="nav-link" role="tab" id="torc-websoc-formats-tab" data-toggle="tab" aria-controls="torc-websoc-formats" href="#torc-websoc-formats">WebSockets</a></li>' +
+'    <li class="nav-item"><a class="nav-link active show" role="tab" id="torc-avail-services-tab" data-toggle="tab" aria-controls="torc-avail-services" href="#torc-avail-services">' + torc.ServicesTr + '</a></li>' +
+'    <li class="nav-item"><a class="nav-link" role="tab" id="torc-return-formats-tab" data-toggle="tab" aria-controls="torc-return-formats" href="#torc-return-formats">' + torc.ReturnformatsTr + '</a></li>' +
+'    <li class="nav-item"><a class="nav-link" role="tab" id="torc-websoc-formats-tab" data-toggle="tab" aria-controls="torc-websoc-formats" href="#torc-websoc-formats">' + torc.WebSocketsTr + '</a></li>' +
 '  </ul>' +
 '<div class="tab-content">' +
 
 '<div class="tab-pane fade active show" role="tabpanel" aria-labelledby="torc-avail-services-tab" id="torc-avail-services">' +
 '  <div class="card" >' +
 '  <div class="card-body">' +
-'    <div class="card-title">Available services</div>' +
+'    <div class="card-title">' + torc.AvailableservicesTr + '</div>' +
 '    <table class="table table-striped table-hover table-condensed">' +
 '      <thead>' +
 '        <tr>' +
-'          <th>ID</th>' +
-'          <th>Name</th>' +
-'          <th>Path</th>' +
-'          <th>Details</th>' +
+'          <th>' + torc.IDTr + '</th>' +
+'          <th>' + torc.NameTr + '</th>' +
+'          <th>' + torc.PathTr + '</th>' +
+'          <th>' + torc.DetailsTr + '</th>' +
 '        </tr>' +
 '      </thead>' +
 '      <tbody id="service-accordion">' +
@@ -131,12 +131,12 @@ var theme = {
 '<div class="tab-pane fade" role="tabpanel" aria-labelledby="torc-return-formats-tab" id="torc-return-formats">' +
 '  <div class="card" >' +
 '  <div class="card-body">' +
-'    <div class="card-title">Supported HTTP return formats</div>' +
+'    <div class="card-title">'+ torc.HTTPreturnformatsTr + '</div>' +
 '    <table class="table table-striped table-hover table-condensed">' +
 '      <thead>' +
 '        <tr>' +
-'          <th>Name</th>' +
-'          <th>Content type</th>' +
+'          <th>' + torc.NameTr + '</th>' +
+'          <th>' + torc.ContenttypeTr + '</th>' +
 '        </tr>' +
 '      </thead>' +
 '      <tbody>' +
@@ -154,12 +154,12 @@ var theme = {
 '<div class="tab-pane fade" role="tabpanel" aria-labelledby="torc-websoc-formats-tab" id="torc-websoc-formats">' +
 '  <div class="card" >' +
 '  <div class="card-body">' +
-'    <div class="card-title">Supported WebSocket subprotocols</div>' +
+'    <div class="card-title">' + torc.WSsubprotocolsTr + '</div>' +
 '    <table class="table table-striped table-hover table-condensed">' +
 '      <thead>' +
 '        <tr>' +
-'          <th>Name</th>' +
-'          <th>Description</th>' +
+'          <th>' + torc.NameTr + '</th>' +
+'          <th>' + torc.DescriptionTr + '</th>' +
 '        </tr>' +
 '      </thead>' +
 '      <tbody>' +
@@ -178,14 +178,14 @@ var theme = {
 
 "APIServiceMethods":
 '<div class="panel panel-default">' +
-'  <div class="panel-heading">Method list</div>' +
+'  <div class="panel-heading">' + torc.MethodlistTr + '</div>' +
 '  <div class="panel-body">' +
 '    <table class="table table-striped table-hover table-condensed">' +
 '      <thead>' +
 '        <tr>' +
 '          <th></th>' +
-'          <th>Parameters</th>' +
-'          <th>Javascript return type</th>' +
+'          <th>' + torc.ParametersTr + '</th>' +
+'          <th>' + torc.JSreturntypeTr + '</th>' +
 '        </tr>' +
 '      </thead>' +
 '      <tbody>' +
@@ -207,8 +207,8 @@ var theme = {
 '      <thead>' +
 '        <tr>' +
 '          <th></th>' +
-'          <th>Getter</th>' +
-'          <th>Notification</th>' +
+'          <th>' + torc.GetterTr + '</th>' +
+'          <th>' + torc.NotificationTr + '</th>' +
 '        </tr>' +
 '      </thead>' +
 '      <tbody>' +
@@ -255,7 +255,7 @@ var theme = {
 '<div class="card">' +
 '  <div class="card-body">' +
 '    <h5 class="card-title">' + torc.ChangeCredsTr + '</h5>' +
-'    <a id="torc-settings-credentials-button" href="#" class="btn btn-primary">Update</a>' +
+'    <a id="torc-settings-credentials-button" href="#" class="btn btn-primary">' + torc.UpdateTr + '</a>' +
 '  </div>' +
 '</div>',
 

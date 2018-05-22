@@ -209,6 +209,24 @@ class TorcUserObject : public TorcAdminObject, public TorcStringFactory
         Strings.insert("Username2Tr",        QCoreApplication::translate("TorcUser", "Confirm username"));
         Strings.insert("Password2Tr",        QCoreApplication::translate("TorcUser", "Confirm password"));
         Strings.insert("CredentialsHelpTr",  QCoreApplication::translate("TorcUser", "Usernames and passwords must be at least 4 characters long and can only contain letters, numbers and \'_\' (underscore)."));
+        Strings.insert("ServicesTr",         QCoreApplication::translate("TorcUser", "Services"));
+        Strings.insert("ReturnformatsTr",    QCoreApplication::translate("TorcUser", "Return formats"));
+        Strings.insert("WebSocketsTr",       QCoreApplication::translate("TorcUser", "WebSockets"));
+        Strings.insert("AvailableservicesTr",QCoreApplication::translate("TorcUser", "Available services"));
+        Strings.insert("IDTr",               QCoreApplication::translate("TorcUser", "ID"));
+        Strings.insert("NameTr",             QCoreApplication::translate("TorcUser", "Name"));
+        Strings.insert("PathTr",             QCoreApplication::translate("TorcUser", "Path"));
+        Strings.insert("DetailsTr",          QCoreApplication::translate("TorcUser", "Details"));
+        Strings.insert("HTTPreturnformatsTr",QCoreApplication::translate("TorcUser", "Supported HTTP return formats"));
+        Strings.insert("ContenttypeTr",      QCoreApplication::translate("TorcUser", "Content type"));
+        Strings.insert("WSsubprotocolsTr",   QCoreApplication::translate("TorcUser", "Supported WebSocket subprotocols"));
+        Strings.insert("DescriptionTr",      QCoreApplication::translate("TorcUser", "Description"));
+        Strings.insert("ParametersTr",       QCoreApplication::translate("TorcUser", "Parameters"));
+        Strings.insert("JSreturntypeTr",     QCoreApplication::translate("TorcUser", "Javascript return type"));
+        Strings.insert("MethodlistTr",       QCoreApplication::translate("TorcUser", "Method list"));
+        Strings.insert("GetterTr",           QCoreApplication::translate("TorcUser", "Getter"));
+        Strings.insert("NotificationTr",     QCoreApplication::translate("TorcUser", "Notification"));
+        Strings.insert("UpdateTr",           QCoreApplication::translate("TorcUser", "Update"));
     }
 
     void Create(void)
