@@ -14,8 +14,6 @@
 class TorcHTTPServer;
 class MethodParameters;
 
-#define SERVICES_DIRECTORY QString("/services/")
-
 class TorcHTTPService : public TorcHTTPHandler
 {
     Q_DECLARE_TR_FUNCTIONS(TorcHTTPService)

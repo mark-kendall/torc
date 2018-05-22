@@ -59,13 +59,14 @@ QString TorcSetting::TypeToString(Type type)
 }
 
 TorcSetting::TorcSetting(TorcSetting *Parent, const QString &DBName, const QString &UIName,
-                         Type SettingType, bool Persistent, const QVariant &Default)
+                         Type SettingType, Roles SettingRoles, const QVariant &Default)
   : QObject(),
-    TorcHTTPService(this, "settings/" + DBName, DBName, TorcSetting::staticMetaObject, "SetActive,SetTrue,SetFalse"),
+    TorcHTTPService(this, "settings/" + DBName, (SettingRoles & Public) ? DBName : "",
+                    TorcSetting::staticMetaObject, "SetActive,SetTrue,SetFalse"),
     m_parent(Parent),
     type(SettingType),
     settingType(TypeToString(SettingType)),
-    persistent(Persistent),
+    roles(SettingRoles),
     m_dbName(DBName),
     uiName(UIName),
     description(),
@@ -79,8 +80,10 @@ TorcSetting::TorcSetting(TorcSetting *Parent, const QString &DBName, const QStri
     m_active(0),
     m_activeThreshold(1),
     m_children(),
-    m_childrenLock(new QMutex(QMutex::Recursive))
+    m_lock(QMutex::Recursive)
 {
+    QMutexLocker locker(&m_lock);
+
     setObjectName(DBName);
 
     if (m_parent)
@@ -90,19 +93,19 @@ TorcSetting::TorcSetting(TorcSetting *Parent, const QString &DBName, const QStri
 
     if (vtype == QVariant::Int && type == Integer)
     {
-        value = persistent ? gLocalContext->GetSetting(m_dbName, (int)defaultValue.toInt()) : defaultValue.toInt();
+        value = (roles & Persistent) ? gLocalContext->GetSetting(m_dbName, (int)defaultValue.toInt()) : defaultValue.toInt();
     }
     else if (vtype == QVariant::Bool && type == Bool)
     {
-        value = persistent ? gLocalContext->GetSetting(m_dbName, (bool)defaultValue.toBool()) : defaultValue.toBool();
+        value = (roles & Persistent) ? gLocalContext->GetSetting(m_dbName, (bool)defaultValue.toBool()) : defaultValue.toBool();
     }
     else if (vtype == QVariant::String)
     {
-        value = persistent ? gLocalContext->GetSetting(m_dbName, (QString)defaultValue.toString()) : defaultValue.toString();
+        value = (roles & Persistent) ? gLocalContext->GetSetting(m_dbName, (QString)defaultValue.toString()) : defaultValue.toString();
     }
     else if (vtype == QVariant::StringList)
     {
-        if (persistent)
+        if (roles & Persistent)
         {
             QString svalue = gLocalContext->GetSetting(m_dbName, (QString)defaultValue.toString());
             value = QVariant(svalue.split(","));
@@ -122,7 +125,6 @@ TorcSetting::TorcSetting(TorcSetting *Parent, const QString &DBName, const QStri
 
 TorcSetting::~TorcSetting()
 {
-    delete m_childrenLock;
 }
 
 void TorcSetting::SubscriberDeleted(QObject *Subscriber)
@@ -130,18 +132,12 @@ void TorcSetting::SubscriberDeleted(QObject *Subscriber)
     return TorcHTTPService::HandleSubscriberDeleted(Subscriber);
 }
 
-QVariant::Type TorcSetting::GetStorageType(void)
-{
-    return defaultValue.type();
-}
-
 void TorcSetting::AddChild(TorcSetting *Child)
 {
+    QMutexLocker locker(&m_lock);
     if (Child)
     {
         {
-            QMutexLocker locker(m_childrenLock);
-
             int position = m_children.size();
             m_children.insert(position, Child);
         }
@@ -151,11 +147,10 @@ void TorcSetting::AddChild(TorcSetting *Child)
 }
 void TorcSetting::RemoveChild(TorcSetting *Child)
 {
+    QMutexLocker locker(&m_lock);
     if (Child)
     {
         {
-            QMutexLocker locker(m_childrenLock);
-
             for (int i = 0; i < m_children.size(); ++i)
             {
                 if (m_children.at(i) == Child)
@@ -172,6 +167,7 @@ void TorcSetting::RemoveChild(TorcSetting *Child)
 
 void TorcSetting::Remove(void)
 {
+    QMutexLocker locker(&m_lock);
     if (m_parent)
         m_parent->RemoveChild(this);
 
@@ -180,7 +176,7 @@ void TorcSetting::Remove(void)
 
 TorcSetting* TorcSetting::FindChild(const QString &Child, bool Recursive /*=false*/)
 {
-    QMutexLocker locker(m_childrenLock);
+    QMutexLocker locker(&m_lock);
 
     foreach (TorcSetting* setting, m_children)
         if (setting->objectName() == Child)
@@ -203,83 +199,74 @@ QSet<TorcSetting*> TorcSetting::GetChildren(void)
 {
     QSet<TorcSetting*> result;
 
-    m_childrenLock->lock();
+    m_lock.lock();
     foreach (TorcSetting* setting, m_children)
     {
         result << setting;
         setting->UpRef();
     }
-    m_childrenLock->unlock();
+    m_lock.unlock();
 
     return result;
 }
 
 bool TorcSetting::GetIsActive(void)
 {
+    QMutexLocker locker(&m_lock);
     return isActive;
 }
 
 QString TorcSetting::GetUiName(void)
 {
+    QMutexLocker locker(&m_lock);
     return uiName;
 }
 
 QString TorcSetting::GetDescription(void)
 {
+    QMutexLocker locker(&m_lock);
     return description;
 }
 
 QString TorcSetting::GetHelpText(void)
 {
+    QMutexLocker locker(&m_lock);
     return helpText;
 }
 
 QVariant TorcSetting::GetDefaultValue(void)
 {
+    QMutexLocker locker(&m_lock);
     return defaultValue;
-}
-
-bool TorcSetting::GetPersistent(void)
-{
-    return persistent;
 }
 
 QString TorcSetting::GetSettingType(void)
 {
+    QMutexLocker locker(&m_lock);
     return settingType;
-}
-
-TorcSetting::Type TorcSetting::GetType(void)
-{
-    return type;
-}
-
-TorcSetting* TorcSetting::GetChildByIndex(int Index)
-{
-    // TODO does this need locking
-    if (Index < 0 || Index >= m_children.size())
-        return NULL;
-
-    return m_children.at(Index);
 }
 
 int TorcSetting::GetBegin(void)
 {
+    QMutexLocker locker(&m_lock);
     return m_begin;
 }
 
 int TorcSetting::GetEnd(void)
 {
+    QMutexLocker locker(&m_lock);
     return m_end;
 }
 
 int TorcSetting::GetStep(void)
 {
+    QMutexLocker locker(&m_lock);
     return m_step;
 }
 
 void TorcSetting::SetActive(bool Value)
 {
+    QMutexLocker locker(&m_lock);
     bool wasactive = isActive;
     m_active += Value ? 1 : -1;
     isActive = m_active >= m_activeThreshold;
@@ -290,6 +277,7 @@ void TorcSetting::SetActive(bool Value)
 
 void TorcSetting::SetActiveThreshold(int Threshold)
 {
+    QMutexLocker locker(&m_lock);
     bool wasactive = isActive;
     m_activeThreshold = Threshold;
     isActive = m_active >= m_activeThreshold;
@@ -298,20 +286,9 @@ void TorcSetting::SetActiveThreshold(int Threshold)
         emit ActiveChanged(isActive);
 }
 
-void TorcSetting::SetTrue(void)
-{
-    if (defaultValue.type() == QVariant::Bool)
-        SetValue(QVariant((bool)true));
-}
-
-void TorcSetting::SetFalse(void)
-{
-    if (defaultValue.type() == QVariant::Bool)
-        SetValue(QVariant((bool)false));
-}
-
 void TorcSetting::SetValue(const QVariant &Value)
 {
+    QMutexLocker locker(&m_lock);
     if (value == Value)
         return;
 
@@ -324,7 +301,7 @@ void TorcSetting::SetValue(const QVariant &Value)
         int ivalue = value.toInt();
         if (ivalue >= m_begin && ivalue <= m_end)
         {
-            if (persistent)
+            if (roles & Persistent)
                 gLocalContext->SetSetting(m_dbName, (int)ivalue);
             emit ValueChanged(ivalue);
         }
@@ -332,7 +309,7 @@ void TorcSetting::SetValue(const QVariant &Value)
     else if (vtype == QVariant::Bool)
     {
         bool bvalue = value.toBool();
-        if (persistent)
+        if (roles & Persistent)
             gLocalContext->SetSetting(m_dbName, (bool)bvalue);
 
         emit ValueChanged(bvalue);
@@ -340,14 +317,14 @@ void TorcSetting::SetValue(const QVariant &Value)
     else if (vtype == QVariant::String)
     {
         QString svalue = value.toString();
-        if (persistent)
+        if (roles & Persistent)
             gLocalContext->SetSetting(m_dbName, svalue);
         emit ValueChanged(svalue);
     }
     else if (vtype == QVariant::StringList)
     {
         QStringList svalue = value.toStringList();
-        if (persistent)
+        if (roles & Persistent)
             gLocalContext->SetSetting(m_dbName, svalue.join(","));
         emit ValueChanged(svalue);
     }
@@ -355,6 +332,7 @@ void TorcSetting::SetValue(const QVariant &Value)
 
 void TorcSetting::SetRange(int Begin, int End, int Step)
 {
+    QMutexLocker locker(&m_lock);
     if (type != Integer)
         return;
 
@@ -372,16 +350,19 @@ void TorcSetting::SetRange(int Begin, int End, int Step)
 
 void TorcSetting::SetDescription(const QString &Description)
 {
+    QMutexLocker locker(&m_lock);
     description = Description;
 }
 
 void TorcSetting::SetHelpText(const QString &HelpText)
 {
+    QMutexLocker locker(&m_lock);
     helpText = HelpText;
 }
 
 QVariant TorcSetting::GetValue(void)
 {
+    QMutexLocker locker(&m_lock);
     switch (type)
     {
         case Integer:    return value.toInt();
@@ -400,7 +381,7 @@ QVariant TorcSetting::GetValue(void)
 */
 
 TorcSettingGroup::TorcSettingGroup(TorcSetting *Parent, const QString &UIName)
-  : TorcSetting(Parent, UIName, UIName, Bool, false, QVariant())
+  : TorcSetting(Parent, UIName, UIName, Bool, Public, QVariant())
 {
     SetActiveThreshold(0);
 }

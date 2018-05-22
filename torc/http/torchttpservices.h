@@ -20,10 +20,11 @@ class TorcHTTPServices : public QObject, public TorcHTTPService
     Q_CLASSINFO("GetPriority",       "type=priority")
     Q_CLASSINFO("GetUuid",           "type=uuid")
     Q_CLASSINFO("GetDetails",        "type=details")
-    Q_CLASSINFO("GetWebSocketToken", "type=accesstoken,method=GET+AUTH") // force authentication (even though it is handled manually)
+    Q_CLASSINFO("GetWebSocketToken", "type=accesstoken,methods=GET+AUTH")
+    Q_CLASSINFO("IsSecure",          "type=secure,methods=GET")
 
-    Q_PROPERTY(QMap serviceList READ GetServiceList   NOTIFY ServiceListChanged)
-    Q_PROPERTY(QVariantList returnFormats READ GetReturnFormats CONSTANT)
+    Q_PROPERTY(QMap         serviceList        READ GetServiceList        NOTIFY ServiceListChanged)
+    Q_PROPERTY(QVariantList returnFormats      READ GetReturnFormats      CONSTANT)
     Q_PROPERTY(QVariantList webSocketProtocols READ GetWebSocketProtocols CONSTANT)
 
   public:
@@ -31,6 +32,7 @@ class TorcHTTPServices : public QObject, public TorcHTTPService
     virtual ~TorcHTTPServices();
 
     void           ProcessHTTPRequest   (const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest &Request) Q_DECL_OVERRIDE;
+    QVariantMap    ProcessRequest       (const QString &Method, const QVariant &Parameters, QObject *Connection, bool Authenticated) Q_DECL_OVERRIDE;
     QString        GetUIName            (void) Q_DECL_OVERRIDE;
 
   signals:
@@ -47,6 +49,7 @@ class TorcHTTPServices : public QObject, public TorcHTTPService
     int            GetPriority          (void);
     QString        GetUuid              (void);
     QString        GetWebSocketToken    (void);
+    bool           IsSecure             (void);
     void           HandlersChanged      (void);
 
   private:

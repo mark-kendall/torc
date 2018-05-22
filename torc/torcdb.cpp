@@ -59,6 +59,7 @@ TorcDB::TorcDB(const QString &DatabaseName, const QString &DatabaseType)
 
 TorcDB::~TorcDB()
 {
+    QMutexLocker locker(&m_lock);
     m_databaseValid = false;
     CloseConnections();
 }
@@ -66,8 +67,9 @@ TorcDB::~TorcDB()
 /*! \fn    TorcDB::IsValid
  *  \brief Returns true if the datbase has been opened/created.
 */
-bool TorcDB::IsValid(void) const
+bool TorcDB::IsValid(void)
 {
+    QMutexLocker locker(&m_lock);
     return m_databaseValid;
 }
 
@@ -237,6 +239,7 @@ bool TorcDB::DebugError(QSqlDatabase *Database)
 */
 void TorcDB::LoadSettings(QMap<QString, QString> &Settings)
 {
+    QMutexLocker locker(&m_lock);
     QSqlDatabase db = QSqlDatabase::database(GetThreadConnection());
     DebugError(&db);
     if (!db.isValid() || !db.isOpen())
@@ -263,6 +266,7 @@ void TorcDB::LoadSettings(QMap<QString, QString> &Settings)
 */
 void TorcDB::LoadPreferences(QMap<QString, QString> &Preferences)
 {
+    QMutexLocker locker(&m_lock);
     QSqlDatabase db = QSqlDatabase::database(GetThreadConnection());
     DebugError(&db);
     if (!db.isValid() || !db.isOpen())
@@ -285,6 +289,7 @@ void TorcDB::LoadPreferences(QMap<QString, QString> &Preferences)
 */
 void TorcDB::SetSetting(const QString &Name, const QString &Value)
 {
+    QMutexLocker locker(&m_lock);
     if (Name.isEmpty())
         return;
 
@@ -299,15 +304,15 @@ void TorcDB::SetSetting(const QString &Name, const QString &Value)
     QSqlQuery query(db);
     query.prepare("DELETE FROM settings where name=:NAME;");
     query.bindValue(":NAME", Name);
-    if (query.exec())
-        DebugError(&query);
+    query.exec();
+    DebugError(&query);
 
     query.prepare("INSERT INTO settings (name, value) "
                   "VALUES (:NAME, :VALUE);");
     query.bindValue(":NAME", Name);
     query.bindValue(":VALUE", Value);
-    if (query.exec())
-        DebugError(&query);
+    query.exec();
+    DebugError(&query);
 }
 
 /*! \fn    TorcDB::SetPreference
@@ -317,6 +322,7 @@ void TorcDB::SetSetting(const QString &Name, const QString &Value)
 */
 void TorcDB::SetPreference(const QString &Name, const QString &Value)
 {
+    QMutexLocker locker(&m_lock);
     if (Name.isEmpty())
         return;
 
@@ -331,13 +337,13 @@ void TorcDB::SetPreference(const QString &Name, const QString &Value)
     QSqlQuery query(db);
     query.prepare("DELETE FROM preferences where name=:NAME;");
     query.bindValue(":NAME", Name);
-    if (query.exec())
-        DebugError(&query);
+    query.exec();
+    DebugError(&query);
 
     query.prepare("INSERT INTO preferences (name, value) "
                   "VALUES (:NAME, :VALUE);");
     query.bindValue(":NAME", Name);
     query.bindValue(":VALUE", Value);
-    if (query.exec())
-        DebugError(&query);
+    query.exec();
+    DebugError(&query);
 }

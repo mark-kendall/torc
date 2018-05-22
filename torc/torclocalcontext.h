@@ -30,6 +30,7 @@ class Torc
         Start,
         Stop,
         RestartTorc,
+        UserChanged,
         // Power management
         Shutdown = 1000,
         Suspend,

@@ -68,7 +68,6 @@ TorcWebSocket::TorcWebSocket(TorcWebSocketThread* Parent, qintptr SocketDescript
     m_watchdogTimer(),
     m_reader(),
     m_wsReader(*this, TorcWebSocketReader::SubProtocolNone, true),
-    m_authenticate(false),
     m_authenticated(false),
     m_challengeResponse(),
     m_address(QHostAddress()),
@@ -85,8 +84,7 @@ TorcWebSocket::TorcWebSocket(TorcWebSocketThread* Parent, qintptr SocketDescript
     m_watchdogTimer.start(HTTP_SOCKET_TIMEOUT);
 }
 
-TorcWebSocket::TorcWebSocket(TorcWebSocketThread* Parent, const QHostAddress &Address, quint16 Port, bool Secure,
-                             bool Authenticate, TorcWebSocketReader::WSSubProtocol Protocol)
+TorcWebSocket::TorcWebSocket(TorcWebSocketThread* Parent, const QHostAddress &Address, quint16 Port, bool Secure, TorcWebSocketReader::WSSubProtocol Protocol)
   : QSslSocket(),
     m_parent(Parent),
     m_secure(Secure),
@@ -95,7 +93,6 @@ TorcWebSocket::TorcWebSocket(TorcWebSocketThread* Parent, const QHostAddress &Ad
     m_watchdogTimer(),
     m_reader(),
     m_wsReader(*this, Protocol, false),
-    m_authenticate(Authenticate),
     m_authenticated(false),
     m_challengeResponse(),
     m_address(Address),
@@ -416,6 +413,11 @@ void TorcWebSocket::SSLErrors(const QList<QSslError> &Errors)
         LOG(VB_GENERAL, LOG_INFO, QString("Ssl Error: %1").arg(error.errorString()));
 }
 
+bool TorcWebSocket::IsSecure(void)
+{
+    return m_secure;
+}
+
 ///\brief Initialise the websocket once its parent thread is ready.
 void TorcWebSocket::Start(void)
 {
@@ -638,7 +640,7 @@ void TorcWebSocket::ReadHTTP(void)
         }
         else
         {
-            if (request.IsAuthorised() == HTTPAuthorised)
+            if (request.IsAuthorised() == HTTPAuthorised || request.IsAuthorised() == HTTPPreAuthorised)
             {
                 TorcHTTPServer::HandleRequest(peerAddress().toString(), peerPort(),
                                               localAddress().toString(), localPort(), request);
@@ -782,8 +784,6 @@ void TorcWebSocket::SendHandshake(void)
     stream << "Torc-Port: " << QString::number(TorcHTTPServer::GetPort()) << "\r\n";
     if (m_subProtocol != TorcWebSocketReader::SubProtocolNone)
         stream << "Sec-WebSocket-Protocol: " << TorcWebSocketReader::SubProtocolsToString(m_subProtocol) << "\r\n";
-    if (m_authenticate)
-        stream << "Authorization: " << QByteArray("Basic " + QByteArray("admin:1234").toBase64()) << "\r\n";
     stream << "\r\n";
     stream.flush();
 

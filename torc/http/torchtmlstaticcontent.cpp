@@ -21,6 +21,7 @@
 */
 
 // Torc
+#include "torclocaldefs.h"
 #include "torclogging.h"
 #include "torclanguage.h"
 #include "torcdirectories.h"
@@ -88,7 +89,10 @@ void TorcHTMLStaticContent::GetJavascriptConfiguration(TorcHTTPRequest &Request)
     QVariantMap strings = TorcStringFactory::GetTorcStrings();
 
     // generate dynamic variables
-    strings.insert("ServicesPath", SERVICES_DIRECTORY);
+    strings.insert("ServicesPath", TORC_SERVICES_DIR);
+    strings.insert("RootSetting",  TORC_ROOT_SETTING);
+    strings.insert("UserService",  TORC_USER_SERVICE);
+    strings.insert("TorcRealm",    TORC_REALM);
 
     // and generate javascript
     QJsonObject json = QJsonObject::fromVariantMap(strings);

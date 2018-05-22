@@ -30,6 +30,7 @@
 #include "torclocalcontext.h"
 #include "torclanguage.h"
 #include "torclogging.h"
+#include "torcsetting.h"
 #include "torcadminthread.h"
 #include "torcnetwork.h"
 #include "torchttprequest.h"
@@ -48,18 +49,18 @@
 
 QMap<QString,TorcHTTPHandler*> gHandlers;
 QReadWriteLock*                gHandlersLock = new QReadWriteLock(QReadWriteLock::Recursive);
-QString                        gServicesDirectory(SERVICES_DIRECTORY);
+QString                        gServicesDirectory(TORC_SERVICES_DIR);
 
 
 void TorcHTTPServer::RegisterHandler(TorcHTTPHandler *Handler)
 {
-    if (!Handler)
-        return;
-
     bool changed = false;
 
     {
         QWriteLocker locker(gHandlersLock);
+
+        if (!Handler)
+            return;
 
         foreach (QString signature, Handler->Signature().split(","))
         {
@@ -76,19 +77,22 @@ void TorcHTTPServer::RegisterHandler(TorcHTTPHandler *Handler)
         }
     }
 
-    if (changed && gWebServer)
-        emit gWebServer->HandlersChanged();
+    {
+        QMutexLocker locker(&gWebServerLock);
+        if (changed && gWebServer)
+            emit gWebServer->HandlersChanged();
+    }
 }
 
 void TorcHTTPServer::DeregisterHandler(TorcHTTPHandler *Handler)
 {
-    if (!Handler)
-        return;
-
     bool changed = false;
 
     {
         QWriteLocker locker(gHandlersLock);
+
+        if (!Handler)
+            return;
 
         foreach (QString signature, Handler->Signature().split(","))
         {
@@ -102,8 +106,11 @@ void TorcHTTPServer::DeregisterHandler(TorcHTTPHandler *Handler)
         }
     }
 
-    if (changed && gWebServer)
-        emit gWebServer->HandlersChanged();
+    {
+        QMutexLocker locker(&gWebServerLock);
+        if (changed && gWebServer)
+            emit gWebServer->HandlersChanged();
+    }
 }
 
 void TorcHTTPServer::HandleRequest(const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort,  TorcHTTPRequest &Request)
@@ -271,6 +278,7 @@ TorcHTTPServer::TorcHTTPServer()
   : QTcpServer(),
     m_port(NULL),
     m_secure(NULL),
+    m_user(),
     m_defaultHandler("", QCoreApplication::applicationName()), // default top level handler
     m_servicesHandler(this),                                   // services 'helper' service for '/services'
     m_staticContent(),                                         // static files - for /css /fonts /js /img etc
@@ -283,8 +291,10 @@ TorcHTTPServer::TorcHTTPServer()
     // if app is running with root privilges (e.g. Raspberry Pi) then try and default to sensible port settings
     // when first run. No point in trying 443 for secure sockets as SSL is not enabled by default (would require
     // additional setup step).
-    m_port   = new TorcSetting(NULL, "WebServerPort",   tr("HTTP Port"),      TorcSetting::Integer, true, QVariant((int)(geteuid() ? 4840 : 80)));
-    m_secure = new TorcSetting(NULL, "WebServerSecure", tr("Secure sockets"), TorcSetting::Bool,    true, QVariant((bool)false));
+    m_port   = new TorcSetting(NULL, "WebServerPort",   tr("HTTP Port"),      TorcSetting::Integer,
+                               TorcSetting::Persistent | TorcSetting::Public, QVariant((int)(geteuid() ? 4840 : 80)));
+    m_secure = new TorcSetting(NULL, "WebServerSecure", tr("Secure sockets"), TorcSetting::Bool,
+                               TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)false));
 
     // initialise platform name
     static bool initialised = false;
@@ -350,6 +360,38 @@ TorcWebSocketThread* TorcHTTPServer::TakeSocket(TorcWebSocketThread *Socket)
 */
 void TorcHTTPServer::Authorise(const QString &Host, TorcHTTPRequest &Request, bool ForceCheck)
 {
+    // N.B. the order of the following checks is critical. Always check the Authorization header
+    // first and accesstokens before PreAuthorisations as PreAuthorisations are not checked again.
+
+    // explicit authorization header
+    // N.B. This will also authorise websocket clients who send authorisation headers with
+    // the upgrade request i.e. there is no need to use the accesstoken route IF the correct headers
+    // are sent. Use GetWebSocketToken, which requires authorisation, to force
+    // clients to authenticate (i.e. browsers).
+    TorcHTTPServer::AuthenticateUser(Request);
+    if (Request.IsAuthorised() == HTTPAuthorised)
+        return;
+
+    if (Request.IsAuthorised() == HTTPAuthorisedStale)
+    {
+        AddAuthenticationHeader(Request);
+        return;
+    }
+
+    // authentication token supplied in the url (WebSocket)
+    // do this before 'standard' authentication to ensure token is checked and expired
+    // NB ensure method is empty to stop attempts to access other resources - although
+    // upgrade requests are handled before anything else, so the method should be ignored
+    if (Request.Queries().contains("accesstoken") && Request.GetMethod().isEmpty())
+    {
+        QString token = Request.Queries().value("accesstoken");
+        if (token == TorcWebSocketToken::GetWebSocketToken(Host, token))
+        {
+            Request.Authorise(HTTPAuthorised);
+            return;
+        }
+    }
+
     // We allow unauthenticated access to anything that doesn't alter state unless auth is specifically
     // requested in the service (see TorcHTTPServices::GetWebSocketToken).
     // N.B. If a rogue peer posts to a 'setter' type function using a GET type request, the request
@@ -360,30 +402,9 @@ void TorcHTTPServer::Authorise(const QString &Host, TorcHTTPRequest &Request, bo
 
     if (!authenticate && !ForceCheck)
     {
-        Request.Authorise(HTTPAuthorised);
+        Request.Authorise(HTTPPreAuthorised);
         return;
     }
-
-    // authentication token supplied in the url (WebSocket)
-    // do this before 'standard' authentication to ensure token is checked and expired
-    if (Request.Queries().contains("accesstoken"))
-    {
-        QString token = Request.Queries().value("accesstoken");
-        if (token == TorcWebSocketToken::GetWebSocketToken(Host, token))
-        {
-            Request.Authorise(HTTPAuthorised);
-            return;
-        }
-    }
-
-    // explicit authorization header
-    // N.B. This will also authorise websocket clients who send authorisation headers with
-    // the upgrade request i.e. there is no need to use the accesstoken route IF the correct headers
-    // are sent. Use GetWebSocketToken (which is a PUT operation and requires authorisation) to force
-    // clients to authenticate (i.e. browsers).
-    TorcHTTPServer::AuthenticateUser(Request);
-    if (Request.IsAuthorised() == HTTPAuthorised)
-        return;
 
     AddAuthenticationHeader(Request);
 }
@@ -394,7 +415,7 @@ void TorcHTTPServer::AddAuthenticationHeader(TorcHTTPRequest &Request)
     Request.SetStatus(HTTP_Unauthorized);
 
     // HTTP 1.1 should support Digest
-    if (Request.GetHTTPProtocol() > HTTPOneDotZero)
+    if (true /*Request.GetHTTPProtocol() > HTTPOneDotZero*/)
     {
         TorcHTTPServerNonce::ProcessDigestAuth(Request);
     }
@@ -427,24 +448,21 @@ void TorcHTTPServer::AuthenticateUser(TorcHTTPRequest &Request)
         return;
 
     QString header = Request.Headers()->value("Authorization");
-    static QString username("admin");
-    static QString password("1234");
 
     // most clients will support Digest Access Authentication, so try that first
     if (header.startsWith("Digest", Qt::CaseInsensitive))
     {
-        TorcHTTPServerNonce::ProcessDigestAuth(Request, username, password);
+        TorcHTTPServerNonce::ProcessDigestAuth(Request, true);
     }
+    /* Don't use Basic. It is utterly insecure, everyone supports Digest and we store the username/password as a Digest compatible hash.
     else if (header.startsWith("Basic", Qt::CaseInsensitive))
     {
-        /* enable this once Digest authentication is enabled for Torc to Torc websocket connections (TorcNetworkedContext)
-
         // only accept Basic authentication if using < HTTP 1.1
         if (Request.GetHTTPProtocol() > HTTPOneDotZero)
         {
             LOG(VB_GENERAL, LOG_WARNING, "Disallowing basic authentication for HTTP 1.1 client");
         }
-        else */
+        else
         {
             // remove leading 'Basic' and split off token
             QString authentication = header.mid(5).trimmed();
@@ -453,6 +471,7 @@ void TorcHTTPServer::AuthenticateUser(TorcHTTPRequest &Request)
                 Request.Authorise(HTTPAuthorised);
         }
     }
+    */
 }
 
 /*! \brief Create the 'Origin' whitelist for cross domain requests
@@ -543,11 +562,11 @@ bool TorcHTTPServer::Open(void)
             m_torcBonjourReference = TorcBonjour::Instance()->Register(port, "_torc._tcp", name, map);
     }
 
-    TorcSSDP::Announce(m_secure);
+    TorcSSDP::Announce(m_secure->GetValue().toBool());
 
     if (!waslistening)
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Web server listening on port %1").arg(port));
+        LOG(VB_GENERAL, LOG_INFO, QString("Web server listening for %1secure connections on port %2").arg(m_secure->GetValue().toBool() ? "" : "in").arg(port));
         UpdateOriginWhitelist(m_port->GetValue().toInt());
     }
 
@@ -597,6 +616,11 @@ bool TorcHTTPServer::event(QEvent *Event)
                 case Torc::NetworkHostNamesChanged:
                     UpdateOriginWhitelist(m_port->GetValue().toInt());
                     break;
+                case Torc::UserChanged:
+                    LOG(VB_GENERAL, LOG_INFO, "User name/credentials changed - restarting webserver");
+                    Close();
+                    Open();
+                    break;
                 default:
                     break;
             }
@@ -638,6 +662,7 @@ class TorcHTTPServerObject : public TorcAdminObject, public TorcStringFactory
         Strings.insert("SocketReady",             QCoreApplication::translate("TorcHTTPServer", "Ready"));
         Strings.insert("SocketDisconnecting",     QCoreApplication::translate("TorcHTTPServer", "Disconnecting"));
         Strings.insert("ConnectedTo",             QCoreApplication::translate("TorcHTTPServer", "Connected to"));
+        Strings.insert("ConnectedSecureTo",       QCoreApplication::translate("TorcHTTPServer", "Connected securely to"));
         Strings.insert("ConnectTo",               QCoreApplication::translate("TorcHTTPServer", "Connect to"));
 
         Strings.insert("SocketReconnectAfterMs",  10000); // try and reconnect every 10 seconds

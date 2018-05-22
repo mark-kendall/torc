@@ -48,6 +48,7 @@ TorcSQLiteDB::TorcSQLiteDB(const QString &DatabaseName)
 */
 bool TorcSQLiteDB::InitDatabase(void)
 {
+    QMutexLocker locker(&m_lock);
     LOG(VB_GENERAL, LOG_INFO, QString("Attempting to open '%1'")
         .arg(m_databaseName));
 
@@ -67,24 +68,8 @@ bool TorcSQLiteDB::InitDatabase(void)
 
     QSqlQuery query(db);
 
-    // ensure this is the only application accessing this database
-    query.exec("PRAGMA locking_mode = EXCLUSIVE");
+    query.exec("PRAGMA locking_mode = NORMAL");
     if (DebugError(&query))
-        return false;
-
-    query.exec("BEGIN EXCLUSIVE");
-    if (DebugError(&query))
-    {
-        LOG(VB_GENERAL, LOG_ERR, "\r\n***************************************"
-                                 "\r\nThe database is already in use by another instance of this application. "
-                                 "Please run additional instances as a different user or override the database location "
-                                 "with the db/database command line option."
-                                 "\r\n***************************************");
-        return false;
-    }
-
-    db.commit();
-    if (DebugError(&db))
         return false;
 
     // Create the settings table if it doesn't exist

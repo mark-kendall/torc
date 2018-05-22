@@ -26,6 +26,7 @@
 
 // Torc
 #include "torclogging.h"
+#include "torcuser.h"
 #include "torchttpservernonce.h"
 
 /*! \brief A server nonce for Digest Access Authentication
@@ -42,7 +43,7 @@
 // count to something reasonable/manageable. (maybe an implementation issue that is causing the browser
 // to re-issue)
 
-void TorcHTTPServerNonce::ProcessDigestAuth(TorcHTTPRequest &Request, const QString &Username, const QString &Password)
+void TorcHTTPServerNonce::ProcessDigestAuth(TorcHTTPRequest &Request, bool Check /*=false*/)
 {
     static QHash<QString,TorcHTTPServerNonce> nonces;
     static QByteArray token = QUuid::createUuid().toByteArray();
@@ -52,7 +53,7 @@ void TorcHTTPServerNonce::ProcessDigestAuth(TorcHTTPRequest &Request, const QStr
     QDateTime current = QDateTime::currentDateTime();
 
     // Set digest authentication headers
-    if (Username.isEmpty() || Password.isEmpty())
+    if (!Check)
     {
         // try and build a unique nonce
         QByteArray tag = QByteArray::number(current.toMSecsSinceEpoch()) + Request.GetCache().toLocal8Bit() + token;
@@ -126,6 +127,13 @@ void TorcHTTPServerNonce::ProcessDigestAuth(TorcHTTPRequest &Request, const QStr
             return;
         }
 
+        // username must match
+        if (TorcUser::GetName() != params.value("username"))
+        {
+            LOG(VB_GENERAL, LOG_WARNING, QString("Expected '%1' username, got '%2'").arg(TorcUser::GetName()).arg(params.value("username")));
+            return;
+        }
+
         // we check the digest early, even though it is an expensive operation, as it will automatically
         // confirm a number of the params are correct and if the respone is calculated correctly but the nonce
         // is not recognised (i.e. stale), we can respond with stale="true', as per the spec, and the client
@@ -134,9 +142,8 @@ void TorcHTTPServerNonce::ProcessDigestAuth(TorcHTTPRequest &Request, const QStr
         QString       URI = Request.GetUrl();
         QString  noncestr = params.value("nonce");
         QString    ncstr  = params.value("nc");
-        QString    first  = QString("%1:%2:%3").arg(Username).arg(TORC_REALM).arg(Password);
         QString    second = QString("%1:%2").arg(TorcHTTPRequest::RequestTypeToString(Request.GetHTTPRequestType())).arg(URI);
-        QByteArray hash1  = QCryptographicHash::hash(first.toLatin1(), QCryptographicHash::Md5).toHex();
+        QByteArray hash1  = TorcUser::GetCredentials();
         QByteArray hash2  = QCryptographicHash::hash(second.toLatin1(), QCryptographicHash::Md5).toHex();
         QString    third  = QString("%1:%2:%3:%4:%5:%6").arg(QString(hash1)).arg(noncestr).arg(ncstr).arg(params.value("cnonce")).arg("auth").arg(QString(hash2));
         QByteArray hash3  = QCryptographicHash::hash(third.toLatin1(), QCryptographicHash::Md5).toHex();

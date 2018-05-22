@@ -51,7 +51,10 @@ TorcHTTPHandler::TorcHTTPHandler(const QString &Signature, const QString &Name)
     if (!m_signature.endsWith("/"))
         m_signature += "/";
 
-    TorcHTTPServer::RegisterHandler(this);
+    if (m_name.isEmpty())
+        LOG(VB_GENERAL, LOG_DEBUG, QString("Not registering '%1' as a handler").arg(m_signature));
+    else
+        TorcHTTPServer::RegisterHandler(this);
 }
 
 TorcHTTPHandler::~TorcHTTPHandler()

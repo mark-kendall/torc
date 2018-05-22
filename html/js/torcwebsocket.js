@@ -171,7 +171,7 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
     }
 
     function connect(token) {
-        var url = (window.location.protocol === 'https' ? 'wss://' : 'ws://') + window.location.host + '?accesstoken=' + token;
+        var url = (window.location.protocol.includes('https') ? 'wss://' : 'ws://') + window.location.host + '?accesstoken=' + token;
         socket = (typeof MozWebSocket === 'function') ? new MozWebSocket(url, 'torc.json-rpc') : new WebSocket(url, 'torc.json-rpc');
 
         // socket error

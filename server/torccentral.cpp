@@ -78,8 +78,6 @@ TorcCentral::TorcCentral()
     m_lock(QMutex::Recursive),
     m_config(QVariantMap()),
     m_graph(),
-    canRestartTorc(true),
-    canStopTorc(true),
     temperatureUnits("celsius")
 {
     // reset state graph and clear out old files
@@ -248,32 +246,9 @@ QString TorcCentral::GetUIName(void)
     return tr("Central");
 }
 
-void TorcCentral::RestartTorc(void)
-{
-    // NB could be called from any thread
-    TorcLocalContext::NotifyEvent(Torc::RestartTorc);
-}
-
-void TorcCentral::StopTorc(void)
-{
-    TorcLocalContext::NotifyEvent(Torc::Stop);
-}
-
-bool TorcCentral::GetCanStopTorc(void)
-{
-    QMutexLocker locker(&m_lock);
-    return canStopTorc;
-}
-
 QString TorcCentral::GetTemperatureUnits(void) const
 {
     return temperatureUnits;
-}
-
-bool TorcCentral::GetCanRestartTorc(void)
-{
-    QMutexLocker locker(&m_lock);
-    return canRestartTorc;
 }
 
 void TorcCentral::SubscriberDeleted(QObject *Subscriber)
@@ -504,27 +479,10 @@ class TorcCentralObject : public TorcAdminObject, public TorcStringFactory
 
     void GetStrings(QVariantMap &Strings)
     {
-        Strings.insert("RestartTorcTr",      QCoreApplication::translate("TorcCentral", "Restart Torc"));
-        Strings.insert("ConfirmRestartTorc", QCoreApplication::translate("TorcCentral", "Are you sure you want to restart Torc?"));
-        Strings.insert("ViewConfigTr",       QCoreApplication::translate("TorcCentral", "View configuration"));
-        Strings.insert("ViewConfigTitleTr",  QCoreApplication::translate("TorcCentral", "Current configuration"));
-        Strings.insert("ViewDOTTr",          QCoreApplication::translate("TorcCentral", "View DOT"));
-        Strings.insert("ViewDOTTitleTr",     QCoreApplication::translate("TorcCentral", "Stategraph Description"));
-        Strings.insert("ViewXSDTr",          QCoreApplication::translate("TorcCentral", "View XSD"));
-        Strings.insert("ViewXSDTitleTr",     QCoreApplication::translate("TorcCentral", "Configuration schema"));
-        Strings.insert("ViewAPITr",          QCoreApplication::translate("TorcCentral", "View API"));
-        Strings.insert("ViewAPITitleTr",     QCoreApplication::translate("TorcCentral", "API reference"));
-        Strings.insert("ViewLogTr",          QCoreApplication::translate("TorcCentral", "View Log"));
-        Strings.insert("RefreshTr",          QCoreApplication::translate("TorcCentral", "Refresh"));
-        Strings.insert("FollowLogTr",        QCoreApplication::translate("TorcCentral", "Follow Log"));
-        Strings.insert("FollowTr",           QCoreApplication::translate("TorcCentral", "Follow"));
-        Strings.insert("UnfollowTr",         QCoreApplication::translate("TorcCentral", "Unfollow"));
         Strings.insert("CelsiusTr",          QCoreApplication::translate("TorcCentral", "Celsius"));
         Strings.insert("CelsiusUnitsTr",     QCoreApplication::translate("TorcCentral", "°C"));
         Strings.insert("FahrenheitTr",       QCoreApplication::translate("TorcCentral", "Fahrenheit"));
         Strings.insert("FahrenheitUnitsTr",  QCoreApplication::translate("TorcCentral", "°F"));
-        Strings.insert("Value",              QCoreApplication::translate("TorcCentral", "Value"));
-        Strings.insert("Valid",              QCoreApplication::translate("TorcCentral", "Valid"));
     }
 
     void Create(void)

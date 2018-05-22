@@ -56,20 +56,17 @@ TorcWebSocketThread::TorcWebSocketThread(qintptr SocketDescriptor, bool Secure)
     m_socketDescriptor(SocketDescriptor),
     m_address(QHostAddress::Null),
     m_port(0),
-    m_authenticate(false),
     m_protocol(TorcWebSocketReader::SubProtocolNone)
 {
 }
 
-TorcWebSocketThread::TorcWebSocketThread(const QHostAddress &Address, quint16 Port, bool Secure,
-                                         bool Authenticate, TorcWebSocketReader::WSSubProtocol Protocol)
+TorcWebSocketThread::TorcWebSocketThread(const QHostAddress &Address, quint16 Port, bool Secure, TorcWebSocketReader::WSSubProtocol Protocol)
   : TorcQThread("SocketOut"),
     m_webSocket(NULL),
     m_secure(Secure),
     m_socketDescriptor(0),
     m_address(Address),
     m_port(Port),
-    m_authenticate(Authenticate),
     m_protocol(Protocol)
 {
 }
@@ -144,7 +141,7 @@ void TorcWebSocketThread::Start(void)
     if (m_socketDescriptor)
         m_webSocket = new TorcWebSocket(this, m_socketDescriptor, m_secure);
     else
-        m_webSocket = new TorcWebSocket(this, m_address, m_port, m_secure, m_authenticate, m_protocol);
+        m_webSocket = new TorcWebSocket(this, m_address, m_port, m_secure, m_protocol);
 
     connect(m_webSocket, SIGNAL(ConnectionEstablished()), this, SIGNAL(ConnectionEstablished()));
     connect(m_webSocket, SIGNAL(Disconnected()),          this, SLOT(quit()));

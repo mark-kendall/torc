@@ -30,7 +30,7 @@ class TorcSSDPSearchResponse
         Device = (1 << 2)
     };
 
-    Q_DECLARE_FLAGS(ResponseTypes, ResponseType);
+    Q_DECLARE_FLAGS(ResponseTypes, ResponseType)
 
     TorcSSDPSearchResponse(const QHostAddress &Address, const ResponseTypes Types, int Port);
     TorcSSDPSearchResponse(void);

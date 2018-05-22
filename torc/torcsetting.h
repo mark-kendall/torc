@@ -16,6 +16,7 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
 {
 
     Q_ENUMS(Type)
+    Q_ENUMS(Role)
 
   public:
     enum Type
@@ -26,10 +27,19 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
         StringList
     };
 
+    enum Role
+    {
+        None       = (0 << 0),
+        Persistent = (1 << 0),
+        Public     = (1 << 1)
+    };
+
+    Q_DECLARE_FLAGS(Roles, Role)
+
   public:
     static QString TypeToString(Type type);
     TorcSetting(TorcSetting *Parent, const QString &DBName, const QString &UIName,
-                Type SettingType, bool Persistent, const QVariant &Default);
+                Type SettingType, Roles SettingRoles, const QVariant &Default);
 
   public:
     Q_OBJECT
@@ -39,23 +49,15 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
     Q_PROPERTY (QString  description  READ GetDescription()  CONSTANT                    )
     Q_PROPERTY (QString  helpText     READ GetHelpText()     CONSTANT                    )
     Q_PROPERTY (QVariant defaultValue READ GetDefaultValue() CONSTANT                    )
-    Q_PROPERTY (bool     persistent   READ GetPersistent()   CONSTANT                    )
     Q_PROPERTY (bool     isActive     READ GetIsActive()     NOTIFY ActiveChanged()      )
     Q_PROPERTY (QString  settingType  READ GetSettingType()  CONSTANT                    )
 
   public:
-    QVariant::Type         GetStorageType       (void);
-    void                   AddChild             (TorcSetting *Child);
-    void                   RemoveChild          (TorcSetting *Child);
     void                   Remove               (void);
-    TorcSetting*           FindChild            (const QString &Child, bool Recursive = false);
-    QSet<TorcSetting*>     GetChildren          (void);
-    TorcSetting*           GetChildByIndex      (int Index);
     void                   SetActiveThreshold   (int  Threshold);
     void                   SetDescription       (const QString &Description);
     void                   SetHelpText          (const QString &HelpText);
     void                   SetRange             (int Begin, int End, int Step);
-    Type                   GetType              (void);
 
   public slots:
     void                   SubscriberDeleted    (QObject *Subscriber);
@@ -67,12 +69,7 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
     QString                GetDescription       (void);
     QString                GetHelpText          (void);
     QVariant               GetDefaultValue      (void);
-    bool                   GetPersistent        (void);
     QString                GetSettingType       (void);
-
-    // Checkbox
-    void                   SetTrue              (void);
-    void                   SetFalse             (void);
 
     // Integer
     int                    GetBegin             (void);
@@ -90,15 +87,19 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
 
   protected:
     virtual               ~TorcSetting();
+    TorcSetting*           FindChild            (const QString &Child, bool Recursive = false);
+    QSet<TorcSetting*>     GetChildren          (void);
+    void                   AddChild             (TorcSetting *Child);
+    void                   RemoveChild          (TorcSetting *Child);
 
   private:
-    Q_DISABLE_COPY(TorcSetting);
+    Q_DISABLE_COPY(TorcSetting)
 
   private:
     TorcSetting           *m_parent;
     Type                   type;
     QString                settingType;
-    bool                   persistent;
+    Roles                  roles;
     QString                m_dbName;
     QString                uiName;
     QString                description;
@@ -111,13 +112,14 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
     int                    m_end;
     int                    m_step;
 
-  private:
     bool                   isActive;
     int                    m_active;
     int                    m_activeThreshold;
     QList<TorcSetting*>    m_children;
-    QMutex                *m_childrenLock;
+    QMutex                 m_lock;
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(TorcSetting::Roles)
 
 class TorcSettingGroup : public TorcSetting
 {
@@ -125,6 +127,6 @@ class TorcSettingGroup : public TorcSetting
     TorcSettingGroup(TorcSetting *Parent, const QString &UIName);
 };
 
-Q_DECLARE_METATYPE(TorcSetting*);
+Q_DECLARE_METATYPE(TorcSetting*)
 
 #endif // TORCSETTING_H

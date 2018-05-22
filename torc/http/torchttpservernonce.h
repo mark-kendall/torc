@@ -6,16 +6,16 @@
 #include <QDateTime>
 
 // Torc
+#include "torclocaldefs.h"
 #include "torchttprequest.h"
 
-#define TORC_REALM QString("Torc")
 #define DEFAULT_NONCE_LIFETIME_SECONDS  10 // expire 10 seconds after issue or last use
 #define DEFAULT_NONCE_LIFETIME_REQUESTS 0  // unlimited uses
 
 class TorcHTTPServerNonce
 {
   public:
-    static void ProcessDigestAuth (TorcHTTPRequest &Request, const QString &Username = QString(),  const QString &Password = QString());
+    static void ProcessDigestAuth (TorcHTTPRequest &Request, bool Check = false);
 
     TorcHTTPServerNonce();
     TorcHTTPServerNonce(const QDateTime &Time);

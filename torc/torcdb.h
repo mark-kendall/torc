@@ -14,9 +14,7 @@ class TorcDB
     TorcDB(const QString &DatabaseName, const QString &DatabaseType);
     virtual ~TorcDB();
 
-    static bool  DebugError             (QSqlQuery *Query);
-    static bool  DebugError             (QSqlDatabase *Database);
-    bool         IsValid                (void) const;
+    bool         IsValid                (void);
     void         CloseThreadConnection  (void);
 
     void         LoadSettings           (QMap<QString,QString> &Settings);
@@ -25,6 +23,8 @@ class TorcDB
     void         SetPreference          (const QString &Name, const QString &Value);
 
   protected:
+    static bool  DebugError             (QSqlQuery *Query);
+    static bool  DebugError             (QSqlDatabase *Database);
     virtual bool InitDatabase           (void) = 0;
     QString      GetThreadConnection    (void);
     void         CloseConnections       (void);

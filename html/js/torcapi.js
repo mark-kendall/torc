@@ -27,7 +27,7 @@
 var theme;
 var template;
 
-var TorcAPI = function ($, torc) {
+var TorcAPI = function ($, torc, menu) {
     "use strict";
 
     var torcconnection  = undefined;
@@ -101,7 +101,7 @@ var TorcAPI = function ($, torc) {
 
         // and the menu item to display the modal
         var item = template(theme.DropdownItemWithIcon, { "icon": "github", "text": torc.ViewAPITr });
-        $('.torc-central-menu').append(template(theme.NavbarDropdownItem, {"id": theme.APIModalID + "-menu", "link": "#" + theme.APIModalID, "text": item }));
+        $('.' + menu).append(template(theme.NavbarDropdownItem, {"id": theme.APIModalID + "-menu", "link": "#" + theme.APIModalID, "text": item }));
         $('.' + theme.APIModalID + '-menu').attr('data-toggle', 'modal');
 
         load();
