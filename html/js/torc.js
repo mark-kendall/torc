@@ -185,7 +185,7 @@ $(document).ready(function() {
             translatedConfirmation = torc.ConfirmRestartTorc;
             method = 'RestartTorc';
         } else if (name === 'canStopTorc') {
-            translatedName = template(theme.DropdownItemWithIcon, { "icon": "refresh", "text": torc.StopTorcTr });
+            translatedName = template(theme.DropdownItemWithIcon, { "icon": "times", "text": torc.StopTorcTr });
             translatedConfirmation = torc.ConfirmStopTorc;
             method = 'StopTorc';
         } else { return; }
