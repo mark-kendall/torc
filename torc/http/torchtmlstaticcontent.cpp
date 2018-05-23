@@ -90,8 +90,9 @@ void TorcHTMLStaticContent::GetJavascriptConfiguration(TorcHTTPRequest &Request)
 
     // generate dynamic variables
     strings.insert("ServicesPath", TORC_SERVICES_DIR);
-    strings.insert("RootSetting",  TORC_ROOT_SETTING);
     strings.insert("UserService",  TORC_USER_SERVICE);
+    strings.insert("SettingsPath", TORC_SETTINGS_DIR);
+    strings.insert("RootSetting",  TORC_ROOT_SETTING);
     strings.insert("TorcRealm",    TORC_REALM);
 
     // and generate javascript

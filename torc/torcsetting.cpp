@@ -54,6 +54,7 @@ QString TorcSetting::TypeToString(Type type)
         case Integer:    return QString("integer");
         case String:     return QString("string");
         case StringList: return QString("stringlist");
+        case Group:      return QString("group");
     }
     return QString("erRor");
 }
@@ -61,7 +62,7 @@ QString TorcSetting::TypeToString(Type type)
 TorcSetting::TorcSetting(TorcSetting *Parent, const QString &DBName, const QString &UIName,
                          Type SettingType, Roles SettingRoles, const QVariant &Default)
   : QObject(),
-    TorcHTTPService(this, "settings/" + DBName, (SettingRoles & Public) ? DBName : "",
+    TorcHTTPService(this, TORC_SETTINGS_DIR + DBName, (SettingRoles & Public) ? DBName : "",
                     TorcSetting::staticMetaObject, "SetActive,SetTrue,SetFalse"),
     m_parent(Parent),
     type(SettingType),
@@ -130,6 +131,33 @@ TorcSetting::~TorcSetting()
 void TorcSetting::SubscriberDeleted(QObject *Subscriber)
 {
     return TorcHTTPService::HandleSubscriberDeleted(Subscriber);
+}
+
+QMap<QString,QVariant> TorcSetting::GetChildList(void)
+{
+    QMutexLocker locker(&m_lock);
+
+    QMap<QString,QVariant> result;
+    (void)GetChildList(result);
+    return result;
+}
+
+QString TorcSetting::GetChildList(QMap<QString,QVariant> &Children)
+{
+    QMutexLocker locker(&m_lock);
+
+    Children.insert("name", m_dbName);
+    Children.insert("uiname", uiName);
+    Children.insert("type", TypeToString(type));
+    QMap<QString,QVariant> children;
+    foreach (TorcSetting* child, m_children)
+    {
+        QMap<QString,QVariant> childd;
+        QString name = child->GetChildList(childd);
+        children.insert(name, childd);
+    }
+    Children.insert("children", children);
+    return m_dbName;
 }
 
 void TorcSetting::AddChild(TorcSetting *Child)
@@ -369,6 +397,7 @@ QVariant TorcSetting::GetValue(void)
         case Bool:       return value.toBool();
         case String:     return value.toString();
         case StringList: return value.toStringList();
+        case Group:      return QVariant();
     }
 
     return value;
@@ -381,7 +410,7 @@ QVariant TorcSetting::GetValue(void)
 */
 
 TorcSettingGroup::TorcSettingGroup(TorcSetting *Parent, const QString &UIName)
-  : TorcSetting(Parent, UIName, UIName, Bool, Public, QVariant())
+  : TorcSetting(Parent, UIName, UIName, Group, Public, QVariant())
 {
     SetActiveThreshold(0);
 }

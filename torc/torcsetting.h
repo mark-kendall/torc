@@ -24,7 +24,8 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
         Bool,
         Integer,
         String,
-        StringList
+        StringList,
+        Group
     };
 
     enum Role
@@ -43,14 +44,16 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
 
   public:
     Q_OBJECT
-    Q_CLASSINFO("Version",   "1.0.0")
-    Q_PROPERTY (QVariant value        READ GetValue()        NOTIFY ValueChanged()       )
-    Q_PROPERTY (QString  uiName       READ GetUiName()       CONSTANT                    )
-    Q_PROPERTY (QString  description  READ GetDescription()  CONSTANT                    )
-    Q_PROPERTY (QString  helpText     READ GetHelpText()     CONSTANT                    )
-    Q_PROPERTY (QVariant defaultValue READ GetDefaultValue() CONSTANT                    )
-    Q_PROPERTY (bool     isActive     READ GetIsActive()     NOTIFY ActiveChanged()      )
-    Q_PROPERTY (QString  settingType  READ GetSettingType()  CONSTANT                    )
+    Q_CLASSINFO("Version", "1.0.0")
+    Q_CLASSINFO("Secure",  "")
+    Q_CLASSINFO("GetChildList", "type=settings,methods=AUTH")
+    Q_PROPERTY (QVariant value        READ GetValue()        NOTIFY ValueChanged  )
+    Q_PROPERTY (QString  uiName       READ GetUiName()       CONSTANT             )
+    Q_PROPERTY (QString  description  READ GetDescription()  CONSTANT             )
+    Q_PROPERTY (QString  helpText     READ GetHelpText()     CONSTANT             )
+    Q_PROPERTY (QVariant defaultValue READ GetDefaultValue() CONSTANT             )
+    Q_PROPERTY (bool     isActive     READ GetIsActive()     NOTIFY ActiveChanged )
+    Q_PROPERTY (QString  settingType  READ GetSettingType()  CONSTANT             )
 
   public:
     void                   Remove               (void);
@@ -61,6 +64,7 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
 
   public slots:
     void                   SubscriberDeleted    (QObject *Subscriber);
+    QMap<QString,QVariant> GetChildList         (void);
     void                   SetValue             (const QVariant &Value);
     bool                   GetIsActive          (void);
     void                   SetActive            (bool Value);
@@ -87,6 +91,7 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
 
   protected:
     virtual               ~TorcSetting();
+    QString                GetChildList         (QMap<QString,QVariant> &Children);
     TorcSetting*           FindChild            (const QString &Child, bool Recursive = false);
     QSet<TorcSetting*>     GetChildren          (void);
     void                   AddChild             (TorcSetting *Child);
