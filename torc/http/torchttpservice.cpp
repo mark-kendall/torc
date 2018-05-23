@@ -186,6 +186,7 @@ class MethodParameters
 
         switch (Type)
         {
+            case QMetaType::QVariant:   *((QVariant*)Pointer)      = QVariant(Value); return;
             case QMetaType::Char:       *((char*)Pointer)          = Value.isEmpty() ? 0 : Value.at(0).toLatin1(); return;
             case QMetaType::UChar:      *((unsigned char*)Pointer) = Value.isEmpty() ? 0 :Value.at(0).toLatin1();  return;
             case QMetaType::QChar:      *((QChar*)Pointer)         = Value.isEmpty() ? 0 : Value.at(0);            return;
