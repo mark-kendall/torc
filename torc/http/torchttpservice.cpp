@@ -287,6 +287,9 @@ TorcHTTPService::TorcHTTPService(QObject *Parent, const QString &Signature, cons
     else
         LOG(VB_GENERAL, LOG_WARNING, QString("Service '%1' is missing version information").arg(Name));
 
+    // is this a secure service (all methods require authentication)
+    bool secure = MetaObject.indexOfClassInfo("Secure") > -1;
+
     // build a list of metaobjects from all superclasses as well.
     QList<const QMetaObject*> metas;
     metas.append(&m_metaObject);
@@ -342,24 +345,29 @@ TorcHTTPService::TorcHTTPService(QObject *Parent, const QString &Signature, cons
 
                 // determine allowed request types
                 int allowed = HTTPOptions;
+                if (secure)
+                    allowed |= HTTPAuth;
                 if (customallowed != HTTPUnknownType)
                 {
                     allowed |= customallowed;
                 }
                 else if (name.startsWith("Get", Qt::CaseInsensitive))
                 {
-                    allowed += HTTPGet | HTTPHead;
+                    allowed |= HTTPGet | HTTPHead;
                 }
                 else if (name.startsWith("Set", Qt::CaseInsensitive))
                 {
                     // TODO Put or Post?? How to handle head requests for setters...
-                    allowed += HTTPPut;
+                    allowed |= HTTPPut;
                 }
                 else
                 {
                     LOG(VB_GENERAL, LOG_ERR, QString("Unable to determine request types of method '%1' for '%2' - ignoring").arg(name).arg(m_name));
                     continue;
                 }
+
+                if (allowed & HTTPAuth)
+                    LOG(VB_GENERAL, LOG_DEBUG, QString("%1 requires authentication").arg(Signature + name));
 
                 MethodParameters *parameters = new MethodParameters(i, method, allowed, returntype);
 
