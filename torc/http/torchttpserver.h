@@ -71,6 +71,7 @@ class TorcHTTPServer : public QTcpServer
     static void     UpdateOriginWhitelist (int Port);
 
   private:
+    TorcSettingGroup                 *m_serverSettings;
     TorcSetting                      *m_port;
     TorcSetting                      *m_secure;
     TorcUser                          m_user;

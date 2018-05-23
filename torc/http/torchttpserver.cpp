@@ -276,6 +276,7 @@ QReadWriteLock  TorcHTTPServer::gOriginWhitelistLock(QReadWriteLock::Recursive);
 
 TorcHTTPServer::TorcHTTPServer()
   : QTcpServer(),
+    m_serverSettings(NULL),
     m_port(NULL),
     m_secure(NULL),
     m_user(),
@@ -291,10 +292,13 @@ TorcHTTPServer::TorcHTTPServer()
     // if app is running with root privilges (e.g. Raspberry Pi) then try and default to sensible port settings
     // when first run. No point in trying 443 for secure sockets as SSL is not enabled by default (would require
     // additional setup step).
-    m_port   = new TorcSetting(NULL, "WebServerPort",   tr("HTTP Port"),      TorcSetting::Integer,
+    m_serverSettings = new TorcSettingGroup(gRootSetting, tr("Server"));
+    m_port   = new TorcSetting(m_serverSettings, "WebServerPort",   tr("HTTP Port"),      TorcSetting::Integer,
                                TorcSetting::Persistent | TorcSetting::Public, QVariant((int)(geteuid() ? 4840 : 80)));
-    m_secure = new TorcSetting(NULL, "WebServerSecure", tr("Secure sockets"), TorcSetting::Bool,
+    m_port->SetActive(true);
+    m_secure = new TorcSetting(m_serverSettings, "WebServerSecure", tr("Secure sockets"), TorcSetting::Bool,
                                TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)false));
+    m_secure->SetActive(true);
 
     // initialise platform name
     static bool initialised = false;
@@ -338,6 +342,13 @@ TorcHTTPServer::~TorcHTTPServer()
         m_secure->Remove();
         m_secure->DownRef();
         m_secure = NULL;
+    }
+
+    if (m_serverSettings)
+    {
+        m_serverSettings->Remove();
+        m_serverSettings->DownRef();
+        m_serverSettings = NULL;
     }
 }
 
