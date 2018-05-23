@@ -31,7 +31,7 @@ class TorcLanguage : public QObject, public TorcHTTPService
     static QLocale::Language From3CharCode         (const QString &Code);
 
   public:
-    TorcLanguage();
+    explicit TorcLanguage(TorcSetting *SettingParent);
     virtual ~TorcLanguage();
 
     QLocale                  GetLocale             (void);

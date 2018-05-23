@@ -54,7 +54,7 @@ QMap<QString,int> TorcLanguage::gLanguageMap;
  * \todo Check whether QTranslator::load is thread safe.
  * \todo Add support for multiple translation files (e.g. plugins as well ).
 */
-TorcLanguage::TorcLanguage()
+TorcLanguage::TorcLanguage(TorcSetting *SettingParent)
   : QObject(),
     TorcHTTPService(this, "languages", "languages", TorcLanguage::staticMetaObject, BLACKLIST),
     m_languageSetting(NULL), // Don't initialise setting until we have a local default
@@ -79,7 +79,7 @@ TorcLanguage::TorcLanguage()
     QString language = m_locale.name(); // somewhat circular
     if (language.isEmpty())
         language = "en_GB";
-    m_languageSetting = new TorcSetting(NULL, "language", tr("Language"), TorcSetting::String,
+    m_languageSetting = new TorcSetting(SettingParent, "Language", tr("Language"), TorcSetting::String,
                                         TorcSetting::Persistent | TorcSetting::Public, QVariant(language));
     SetLanguageCode(language);
 }
