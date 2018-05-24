@@ -620,13 +620,13 @@ void TorcHTTPServer::Close(void)
 void TorcHTTPServer::PortChanged(int Port)
 {
     LOG(VB_GENERAL, LOG_INFO, QString("Port changed to %1 - restarting").arg(Port));
-    Restart();
+    QTimer::singleShot(10, this, SLOT(Restart()));
 }
 
 void TorcHTTPServer::SecureChanged(bool Secure)
 {
     LOG(VB_GENERAL, LOG_INFO, QString("Secure changed to '%1secure - restarting").arg(Secure ? "" : "in"));
-    Restart();
+    QTimer::singleShot(10, this, SLOT(Restart()));
 }
 
 void TorcHTTPServer::Restart(void)
