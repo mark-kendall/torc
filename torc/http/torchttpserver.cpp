@@ -293,11 +293,15 @@ TorcHTTPServer::TorcHTTPServer()
     // when first run. No point in trying 443 for secure sockets as SSL is not enabled by default (would require
     // additional setup step).
     m_serverSettings = new TorcSettingGroup(gRootSetting, tr("Server"));
-    m_port   = new TorcSetting(m_serverSettings, "WebServerPort",   tr("HTTP Port"),      TorcSetting::Integer,
-                               TorcSetting::Persistent | TorcSetting::Public, QVariant((int)(geteuid() ? 4840 : 80)));
+    bool root = !geteuid();
+    m_port   = new TorcSetting(m_serverSettings, "WebServerPort",   tr("Port"),      TorcSetting::Integer,
+                               TorcSetting::Persistent | TorcSetting::Public, QVariant((int)(root ? 80 : 4840)));
+    m_port->SetRange(root ? 1 : 1024, 65535, 1);
     m_port->SetActive(true);
+    m_port->SetHelpText(tr("The port the server will listen on for incoming connections"));
     m_secure = new TorcSetting(m_serverSettings, "WebServerSecure", tr("Secure sockets"), TorcSetting::Bool,
                                TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)false));
+    m_secure->SetHelpText(tr("Use encrypted (SSL/TLS) connections to the server"));
     m_secure->SetActive(true);
 
     // initialise platform name
