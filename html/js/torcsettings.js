@@ -40,52 +40,42 @@ var TorcSettings = function ($, torc, menu) {
         var servicelist = torcconnection.getServiceList();
         if (servicelist.hasOwnProperty(torc.UserService)) {
             $('.' + theme.SettingsModalContentID).html(theme.SettingsCredentialsButton);
-            $('#' + theme.SettingsCredentialsButtonId).on('click', function () {
-                function togglevalid (a,b) {
-                    if (regex.test(a.val()) && a.val() === b.val()) {
-                        a.removeClass("is-invalid").addClass("is-valid");
-                        b.removeClass("is-invalid").addClass("is-valid");
-                    } else {
-                        a.removeClass("is-valid").addClass("is-invalid");
-                        b.removeClass("is-valid").addClass("is-invalid");
-                    }
+            $('#' + theme.SettingsCredentialsButtonId).on('click', function () { $('#' + theme.SettingsCredentialsFormID).collapse('toggle'); });
+            $('#' + theme.SettingsCredentialsFormID).on('show.bs.collapse', function() { $('#' + theme.SettingsCredentialsButtonId).text(torc.CloseTr); });
+            $('#' + theme.SettingsCredentialsFormID).on('hide.bs.collapse', function() {
+                $('#' + theme.SettingsCredentialsButtonId).text(torc.UpdateTr);
+                $('#' + theme.SettingsUsername1).val('').removeClass('is-invalid');
+                $('#' + theme.SettingsUsername2).val('').removeClass('is-invalid');
+                $('#' + theme.SettingsPassword1).val('').removeClass('is-invalid');
+                $('#' + theme.SettingsPassword2).val('').removeClass('is-invalid');
+            });
+            var regex = /^\w{4,}$/;
+            function togglevalid (a,b) {
+                if (regex.test(a.val()) && a.val() === b.val()) {
+                    a.removeClass("is-invalid").addClass("is-valid");
+                    b.removeClass("is-invalid").addClass("is-valid");
+                } else {
+                    a.removeClass("is-valid").addClass("is-invalid");
+                    b.removeClass("is-valid").addClass("is-invalid");
                 }
+            }
+            $('#' + theme.SettingsUsername1).on('input', function () { togglevalid($(this), $('#' + theme.SettingsUsername2)); });
+            $('#' + theme.SettingsUsername2).on('input', function () { togglevalid($(this), $('#' + theme.SettingsUsername1)); });
+            $('#' + theme.SettingsPassword1).on('input', function () { togglevalid($(this), $('#' + theme.SettingsPassword2)); });
+            $('#' + theme.SettingsPassword2).on('input', function () { togglevalid($(this), $('#' + theme.SettingsPassword1)); });
 
-                var regex = /^\w{4,}$/;
-                var creds = bootbox.dialog({
-                    className: 'torcmodal',
-                    title: ' ',//torc.ChangeCredsTr,
-                    message: theme.SettingsCredentialsForm,
-                    buttons: {
-                        cancel: {
-                            label: torc.CancelTr
-                        },
-                        ok: {
-                            label: torc.ConfirmTr,
-                            className: 'btn-danger',
-                            callback: function (result) {
-                                var user1 = $('#' + theme.SettingsUsername1).val();
-                                var user2 = $('#' + theme.SettingsUsername2).val();
-                                var pwd1  = $('#' + theme.SettingsPassword1).val();
-                                var pwd2  = $('#' + theme.SettingsPassword2).val();
-                                if (!(user1 === user2 && pwd1 === pwd2 && regex.test(user1) && regex.test(pwd1))) {
-                                    // highlight errored fields
-                                    togglevalid($('#' + theme.SettingsUsername1), $('#' + theme.SettingsUsername2));
-                                    togglevalid($('#' + theme.SettingsPassword1), $('#' + theme.SettingsPassword2));
-                                    return false; }
-                                torcconnection.call(torc.UserService, 'SetUserCredentials',
-                                                    { 'Name' : user1, 'Credentials': md5(user1 + ':' + torc.TorcRealm + ':' + pwd1) });
-                                }
-                            }
-                        }
-                    });
-
-                creds.init( function () {
-                    $('#' + theme.SettingsUsername1).on('input', function () { togglevalid($(this), $('#' + theme.SettingsUsername2)); });
-                    $('#' + theme.SettingsUsername2).on('input', function () { togglevalid($(this), $('#' + theme.SettingsUsername1)); });
-                    $('#' + theme.SettingsPassword1).on('input', function () { togglevalid($(this), $('#' + theme.SettingsPassword2)); });
-                    $('#' + theme.SettingsPassword2).on('input', function () { togglevalid($(this), $('#' + theme.SettingsPassword1)); });
-                    });
+            $('#' + theme.SettingsCredentialsConfirmID).on('click', function () {
+                var user1 = $('#' + theme.SettingsUsername1).val();
+                var user2 = $('#' + theme.SettingsUsername2).val();
+                var pwd1  = $('#' + theme.SettingsPassword1).val();
+                var pwd2  = $('#' + theme.SettingsPassword2).val();
+                if (!(user1 === user2 && pwd1 === pwd2 && regex.test(user1) && regex.test(pwd1))) {
+                    // highlight errored fields
+                    togglevalid($('#' + theme.SettingsUsername1), $('#' + theme.SettingsUsername2));
+                    togglevalid($('#' + theme.SettingsPassword1), $('#' + theme.SettingsPassword2));
+                    return false; }
+                torcconnection.call(torc.UserService, 'SetUserCredentials',
+                                    { 'Name' : user1, 'Credentials': md5(user1 + ':' + torc.TorcRealm + ':' + pwd1) });
                 });
             }
 

@@ -250,17 +250,10 @@ var theme = {
 
 "SettingsCredentialsButtonId":
 'torc-settings-credentials-button',
-
-"SettingsCredentialsButton":
-'<div class="card">' +
-'  <div class="card-body">' +
-'    <h5 class="card-title">' + torc.ChangeCredsTr + '</h5>' +
-'    <a id="torc-settings-credentials-button" href="#" class="btn btn-primary">' + torc.UpdateTr + '</a>' +
-'  </div>' +
-'</div>',
-
 "SettingsCredentialsFormID":
 'torc-settings-credentials-form',
+"SettingsCredentialsConfirmID":
+'torc-settings-credentials-confirm',
 "SettingsUsername1":
 'torc-settings-username1',
 "SettingsUsername2":
@@ -270,10 +263,15 @@ var theme = {
 "SettingsPassword2":
 'torc-settings-password2',
 
-"SettingsCredentialsForm":
+"SettingsCredentialsButton":
+'<div class="card">' +
+'  <div class="card-body">' +
+'    <div class="card-title">' + torc.ChangeCredsTr + '</div>' +
+'    <a id="torc-settings-credentials-button" href="#" class="btn btn-primary">' + torc.UpdateTr + '</a>' +
+'<div id="torc-settings-credentials-form" class="collapse">' +
 '<div class="card bg-light border-warning mb-3"><div class="card-body"><p class="card-text">' + torc.CredentialsHelpTr + '</p></div></div>' +
 '<div class="card"><div class="card-body">' +
-'<form id="torc-settings-credentials-form">' +
+'<form>' +
 '  <div class="form-group row">' +
 '    <label for="torc-settings-username1" class="col-sm-3 col-form-label">' + torc.UsernameTr + '</label>' +
 '    <div class="col-sm-9">' +
@@ -299,7 +297,10 @@ var theme = {
 '    </div>' +
 '  </div>' +
 '</form>' +
-'</div></div>',
+'</div><div class="card-footer"><a id="torc-settings-credentials-confirm" href="#" class="btn btn-primary btn-danger">' + torc.ConfirmTr + '</a></div>' +
+'</div></div>' +
+'  </div>' +
+'</div>',
 
 "SettingsListHelpText":
 '<small class="form-text text-muted"><%=Help%></small>',
