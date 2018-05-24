@@ -298,11 +298,14 @@ TorcHTTPServer::TorcHTTPServer()
                                TorcSetting::Persistent | TorcSetting::Public, QVariant((int)(root ? 80 : 4840)));
     m_port->SetRange(root ? 1 : 1024, 65535, 1);
     m_port->SetActive(true);
+    connect(m_port, SIGNAL(ValueChanged(int)), this, SLOT(PortChanged(int)));
+
     m_port->SetHelpText(tr("The port the server will listen on for incoming connections"));
     m_secure = new TorcSetting(m_serverSettings, "WebServerSecure", tr("Secure sockets"), TorcSetting::Bool,
                                TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)false));
     m_secure->SetHelpText(tr("Use encrypted (SSL/TLS) connections to the server"));
     m_secure->SetActive(true);
+    connect(m_secure, SIGNAL(ValueChanged(bool)), this, SLOT(SecureChanged(bool)));
 
     // initialise platform name
     static bool initialised = false;
@@ -614,6 +617,24 @@ void TorcHTTPServer::Close(void)
     LOG(VB_GENERAL, LOG_INFO, "Webserver closed");
 }
 
+void TorcHTTPServer::PortChanged(int Port)
+{
+    LOG(VB_GENERAL, LOG_INFO, QString("Port changed to %1 - restarting").arg(Port));
+    Restart();
+}
+
+void TorcHTTPServer::SecureChanged(bool Secure)
+{
+    LOG(VB_GENERAL, LOG_INFO, QString("Secure changed to '%1secure - restarting").arg(Secure ? "" : "in"));
+    Restart();
+}
+
+void TorcHTTPServer::Restart(void)
+{
+    Close();
+    Open();
+}
+
 bool TorcHTTPServer::event(QEvent *Event)
 {
     if (Event->type() == TorcEvent::TorcEventType)
@@ -633,8 +654,7 @@ bool TorcHTTPServer::event(QEvent *Event)
                     break;
                 case Torc::UserChanged:
                     LOG(VB_GENERAL, LOG_INFO, "User name/credentials changed - restarting webserver");
-                    Close();
-                    Open();
+                    Restart();
                     break;
                 default:
                     break;
