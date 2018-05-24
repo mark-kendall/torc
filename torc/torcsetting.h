@@ -49,7 +49,6 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
     Q_CLASSINFO("GetChildList", "type=settings,methods=AUTH")
     Q_PROPERTY (QVariant    value        READ GetValue        NOTIFY ValueChanged  )
     Q_PROPERTY (QString     uiName       READ GetUiName       CONSTANT             )
-    Q_PROPERTY (QString     description  READ GetDescription  CONSTANT             )
     Q_PROPERTY (QString     helpText     READ GetHelpText     CONSTANT             )
     Q_PROPERTY (QVariant    defaultValue READ GetDefaultValue CONSTANT             )
     Q_PROPERTY (bool        isActive     READ GetIsActive     NOTIFY ActiveChanged )
@@ -59,7 +58,6 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
   public:
     void                   Remove               (void);
     void                   SetActiveThreshold   (int  Threshold);
-    void                   SetDescription       (const QString &Description);
     void                   SetHelpText          (const QString &HelpText);
     void                   SetRange             (int Begin, int End, int Step);
     void                   SetSelections        (QVariantMap &Selections);
@@ -72,7 +70,6 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
     void                   SetActive            (bool Value);
     QVariant               GetValue             (void);
     QString                GetUiName            (void);
-    QString                GetDescription       (void);
     QString                GetHelpText          (void);
     QVariant               GetDefaultValue      (void);
     QString                GetSettingType       (void);
@@ -110,7 +107,6 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
     Roles                  roles;
     QString                m_dbName;
     QString                uiName;
-    QString                description;
     QString                helpText;
     QVariant               value;
     QVariant               defaultValue;

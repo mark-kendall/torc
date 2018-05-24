@@ -70,7 +70,6 @@ TorcSetting::TorcSetting(TorcSetting *Parent, const QString &DBName, const QStri
     roles(SettingRoles),
     m_dbName(DBName),
     uiName(UIName),
-    description(),
     helpText(),
     value(),
     defaultValue(Default),
@@ -263,12 +262,6 @@ QString TorcSetting::GetUiName(void)
     return uiName;
 }
 
-QString TorcSetting::GetDescription(void)
-{
-    QMutexLocker locker(&m_lock);
-    return description;
-}
-
 QString TorcSetting::GetHelpText(void)
 {
     QMutexLocker locker(&m_lock);
@@ -405,12 +398,6 @@ void TorcSetting::SetRange(int Begin, int End, int Step)
     m_begin = Begin;
     m_end   = End;
     m_step  = Step;
-}
-
-void TorcSetting::SetDescription(const QString &Description)
-{
-    QMutexLocker locker(&m_lock);
-    description = Description;
 }
 
 void TorcSetting::SetHelpText(const QString &HelpText)
