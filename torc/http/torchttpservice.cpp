@@ -841,18 +841,6 @@ QVariant TorcHTTPService::GetProperty(int Index)
     return result;
 }
 
-/*! \brief Check the current request is authorised and set the authentication header if not.
- */
-bool TorcHTTPService::MethodIsAuthorised(TorcHTTPRequest &Request, int Allowed)
-{
-    if ((Request.IsAuthorised() != HTTPAuthorised) && (Allowed & HTTPAuth))
-    {
-        TorcHTTPServer::AddAuthenticationHeader(Request);
-        return false;
-    }
-    return true;
-}
-
 /*! \brief Enable the given method.
  *
  *  Used to enable a method previously disabled with DisableMethod.

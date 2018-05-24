@@ -116,7 +116,7 @@ void TorcHTTPServices::ProcessHTTPRequest(const QString &PeerAddress, int PeerPo
                 if (method == "GetWebSocketToken")
                 {
                     // force authentication
-                    if (!TorcHTTPService::MethodIsAuthorised(Request, HTTPAuth))
+                    if (!TorcHTTPHandler::MethodIsAuthorised(Request, HTTPAuth))
                         return;
                     result = TorcWebSocketToken::GetWebSocketToken(PeerAddress);
                     type   = "accesstoken";

@@ -32,7 +32,6 @@ class TorcHTTPService : public TorcHTTPHandler
     virtual QString GetUIName             (void);
 
   protected:
-    static bool  MethodIsAuthorised       (TorcHTTPRequest &Request, int Allowed);
     void         EnableMethod             (const QString &Method);
     void         DisableMethod            (const QString &Method);
     void         HandleSubscriberDeleted  (QObject* Subscriber);

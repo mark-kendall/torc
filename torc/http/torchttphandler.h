@@ -27,6 +27,7 @@ class TorcHTTPHandler
     virtual QVariantMap ProcessRequest     (const QString &Method, const QVariant &Parameters, QObject *Connection, bool Authenticated);
 
   protected:
+    static bool         MethodIsAuthorised (TorcHTTPRequest &Request, int Allowed);
     static void         HandleOptions      (TorcHTTPRequest &Request, int Allowed);
     static void         HandleFile         (TorcHTTPRequest &Request, const QString &Filename, int Cache);
 
