@@ -41,6 +41,7 @@ class TorcLanguage : public QObject, public TorcHTTPService
     void                     LanguageStringChanged (QString String);
 
   public slots:
+    void                     LanguageSettingChanged(const QString &Language);
     void                     SetLanguageCode       (const QString &Language);
     QString                  GetLanguageCode       (void);
     QString                  GetLanguageString     (void);
