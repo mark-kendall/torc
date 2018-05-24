@@ -299,7 +299,39 @@ var theme = {
 '    </div>' +
 '  </div>' +
 '</form>' +
-'</div></div>'
+'</div></div>',
+
+"SettingsListHelpText":
+'<small class="form-text text-muted"><%=Help%></small>',
+
+"SettingsListSelect":
+'<select class="form-control" id="<%=ID%>">' +
+'  <% Object.getOwnPropertyNames(Selections).forEach(function (selection) {%>' +
+'    <option value="<%=selection%>"><%=Selections[selection]%></option><%});%>' +
+'</select>',
+
+"SettingsList":
+'<div class="card">' +
+'  <div class="card-body">' +
+'    <% function recursive (setting) {' +
+'         if (setting.hasOwnProperty("uiname") && setting.hasOwnProperty("name") &&' +
+'             setting.hasOwnProperty("type")) { ' +
+'           var id  = "torc-settings-" + setting.name;' +
+'           var bid = "torc-settings-button-" + setting.name;' +
+'           var cid = "torc-settings-button-col-" + setting.name; %>' +
+'           <li class="list-group-item"><%' +
+'           if (setting.type === "bool")    {%><div class="form-check"><input class="form-check-input" type="checkbox" id="<%=id%>"><label class="form-check-label" for="<%=id%>"><%=setting.uiname%></label><div class="collapse" id="<%=cid%>"><button type="button" class="btn btn-danger" id="<%=bid%>">' + torc.ConfirmTr +'</button></div></div><%}' +
+'           if (setting.type === "string")  {%><form onsubmit="return false"><div class="form-group"><label for="<%=id%>"><%=setting.uiname%></label><input class="form-control" type="text" id="<%=id%>"><div class="collapse" id="<%=cid%>"><button type="button" class="btn btn-danger" id="<%=bid%>">' + torc.ConfirmTr +'</button></div></div></form><%}' +
+'           if (setting.type === "integer") {%><form onsubmit="return false"><div class="form-group"><label for="<%=id%>"><%=setting.uiname%></label><input class="form-control" type="number" pattern="\d+" id="<%=id%>"><div class="collapse" id="<%=cid%>"><button type="button" class="btn btn-danger" id="<%=bid%>">' + torc.ConfirmTr +'</button></div></div></form><%}' +
+'           if (setting.type === "group")   {%><h5><%=setting.uiname%></h5><%}' +
+'           if (setting.hasOwnProperty("children") && !$.isEmptyObject(setting.children)) {%>' +
+'             <ul class="list-group"><%' +
+'               Object.getOwnPropertyNames(setting.children).forEach(function (child) { recursive(setting.children[child]); }); %></ul><%' +
+'           }%></li><%' +
+'         }' +
+'       }; recursive(Settings); %>' +
+'  </div>' +
+'</div>'
 };
 
 if (Object.freeze) { Object.freeze(theme); }
