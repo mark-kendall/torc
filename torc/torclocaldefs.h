@@ -13,6 +13,7 @@
 #define TORC_SSL_SERVICE  QString("ServerSecure")
 #define TORC_SETTINGS_DIR QString("settings/")
 #define TORC_ROOT_SETTING QString("Settings")
+#define TORC_CONFIG_FILE  QString("torc.xml")
 #define TORC_REALM        QString("Torc")       // N.B. do NOT change
 
 #endif // TORCLOCALDEFS_H

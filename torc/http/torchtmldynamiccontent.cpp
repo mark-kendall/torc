@@ -25,6 +25,7 @@
 
 // Torc
 #include "torclogging.h"
+#include "torclocaldefs.h"
 #include "torcdirectories.h"
 #include "torchttprequest.h"
 #include "torchtmldynamiccontent.h"
@@ -63,6 +64,13 @@ void TorcHTMLDynamicContent::ProcessHTTPRequest(const QString &PeerAddress, int 
     {
         HandleOptions(Request, HTTPHead | HTTPGet | HTTPOptions);
         return;
+    }
+
+    // restrict access to config file - require authentication
+    if (Request.GetUrl().trimmed().endsWith(TORC_CONFIG_FILE))
+    {
+        if (!TorcHTTPHandler::MethodIsAuthorised(Request, HTTPAuth))
+            return;
     }
 
     // get the requested file subpath

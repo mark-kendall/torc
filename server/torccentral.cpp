@@ -84,8 +84,8 @@ TorcCentral::TorcCentral()
     // content directory should already have been created by TorcHTMLDynamicContent
     QString graphdot = GetTorcConfigDir() + DYNAMIC_DIRECTORY + "stategraph.dot";
     QString graphsvg = GetTorcConfigDir() + DYNAMIC_DIRECTORY + "stategraph.svg";
-    QString config   = GetTorcConfigDir() + DYNAMIC_DIRECTORY + "torc.xml";
-    QString current  = GetTorcConfigDir() + "/torc.xml";
+    QString config   = GetTorcConfigDir() + DYNAMIC_DIRECTORY + TORC_CONFIG_FILE;
+    QString current  = GetTorcConfigDir() + "/" + TORC_CONFIG_FILE;
 
     if (QFile::exists(graphdot))
         QFile::remove(graphdot);
@@ -268,7 +268,7 @@ bool TorcCentral::LoadConfig(void)
     }
 #endif
 
-    QString xml = GetTorcConfigDir() + "/torc.xml";
+    QString xml = GetTorcConfigDir() + "/" + TORC_CONFIG_FILE;
     QFileInfo config(xml);
     if (!skipvalidation && !config.exists())
     {

@@ -96,6 +96,7 @@ void TorcHTMLStaticContent::GetJavascriptConfiguration(TorcHTTPRequest &Request)
     strings.insert("TorcRealm",    TORC_REALM);
     strings.insert("PortSetting",  TORC_PORT_SERVICE);
     strings.insert("SecureSetting",TORC_SSL_SERVICE);
+    strings.insert("TorcConFile"  , DYNAMIC_DIRECTORY + TORC_CONFIG_FILE);
 
     // and generate javascript
     QJsonObject json = QJsonObject::fromVariantMap(strings);
