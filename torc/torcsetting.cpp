@@ -314,48 +314,53 @@ void TorcSetting::SetActiveThreshold(int Threshold)
         emit ActiveChanged(isActive);
 }
 
-void TorcSetting::SetValue(const QVariant &Value)
+bool TorcSetting::SetValue(const QVariant &Value)
 {
     QMutexLocker locker(&m_lock);
     if (value == Value)
-        return;
-
-    value = Value;
+        return true;
 
     QVariant::Type vtype = defaultValue.type();
-
     if (vtype == QVariant::Int)
     {
-        int ivalue = value.toInt();
+        int ivalue = Value.toInt();
         if (ivalue >= m_begin && ivalue <= m_end)
         {
             if (roles & Persistent)
                 gLocalContext->SetSetting(m_dbName, (int)ivalue);
+            value = Value;
             emit ValueChanged(ivalue);
+            return true;
         }
     }
     else if (vtype == QVariant::Bool)
     {
-        bool bvalue = value.toBool();
+        bool bvalue = Value.toBool();
         if (roles & Persistent)
             gLocalContext->SetSetting(m_dbName, (bool)bvalue);
-
+        value = Value;
         emit ValueChanged(bvalue);
+        return true;
     }
     else if (vtype == QVariant::String)
     {
-        QString svalue = value.toString();
+        QString svalue = Value.toString();
         if (roles & Persistent)
             gLocalContext->SetSetting(m_dbName, svalue);
+        value = Value;
         emit ValueChanged(svalue);
+        return true;
     }
     else if (vtype == QVariant::StringList)
     {
-        QStringList svalue = value.toStringList();
+        QStringList svalue = Value.toStringList();
         if (roles & Persistent)
             gLocalContext->SetSetting(m_dbName, svalue.join(","));
+        value = Value;
         emit ValueChanged(svalue);
+        return true;
     }
+    return false;
 }
 
 void TorcSetting::SetRange(int Begin, int End, int Step)

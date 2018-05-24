@@ -65,7 +65,7 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
   public slots:
     void                   SubscriberDeleted    (QObject *Subscriber);
     QMap<QString,QVariant> GetChildList         (void);
-    void                   SetValue             (const QVariant &Value);
+    bool                   SetValue             (const QVariant &Value);
     bool                   GetIsActive          (void);
     void                   SetActive            (bool Value);
     QVariant               GetValue             (void);
