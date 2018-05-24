@@ -74,6 +74,7 @@ TorcSetting::TorcSetting(TorcSetting *Parent, const QString &DBName, const QStri
     helpText(),
     value(),
     defaultValue(Default),
+    selections(),
     m_begin(0),
     m_end(1),
     m_step(1),
@@ -133,31 +134,43 @@ void TorcSetting::SubscriberDeleted(QObject *Subscriber)
     return TorcHTTPService::HandleSubscriberDeleted(Subscriber);
 }
 
-QMap<QString,QVariant> TorcSetting::GetChildList(void)
+QVariantMap TorcSetting::GetChildList(void)
 {
     QMutexLocker locker(&m_lock);
 
-    QMap<QString,QVariant> result;
+    QVariantMap result;
     (void)GetChildList(result);
     return result;
 }
 
-QString TorcSetting::GetChildList(QMap<QString,QVariant> &Children)
+QString TorcSetting::GetChildList(QVariantMap &Children)
 {
     QMutexLocker locker(&m_lock);
 
     Children.insert("name", m_dbName);
     Children.insert("uiname", uiName);
     Children.insert("type", TypeToString(type));
-    QMap<QString,QVariant> children;
+    QVariantMap children;
     foreach (TorcSetting* child, m_children)
     {
-        QMap<QString,QVariant> childd;
+        QVariantMap childd;
         QString name = child->GetChildList(childd);
         children.insert(name, childd);
     }
     Children.insert("children", children);
     return m_dbName;
+}
+
+QVariantMap TorcSetting::GetSelections(void)
+{
+    QMutexLocker locker(&m_lock);
+    return selections;
+}
+
+void TorcSetting::SetSelections(QVariantMap &Selections)
+{
+    QMutexLocker locker(&m_lock);
+    selections = Selections;
 }
 
 void TorcSetting::AddChild(TorcSetting *Child)
@@ -324,7 +337,17 @@ bool TorcSetting::SetValue(const QVariant &Value)
     if (vtype == QVariant::Int)
     {
         int ivalue = Value.toInt();
-        if (ivalue >= m_begin && ivalue <= m_end)
+        bool valid = false;
+        if (!selections.isEmpty())
+        {
+            valid = selections.contains(QString::number(ivalue));
+        }
+        else if (ivalue >= m_begin && ivalue <= m_end)
+        {
+            valid = true;
+        }
+
+        if (valid)
         {
             if (roles & Persistent)
                 gLocalContext->SetSetting(m_dbName, (int)ivalue);
@@ -345,11 +368,14 @@ bool TorcSetting::SetValue(const QVariant &Value)
     else if (vtype == QVariant::String)
     {
         QString svalue = Value.toString();
-        if (roles & Persistent)
-            gLocalContext->SetSetting(m_dbName, svalue);
-        value = Value;
-        emit ValueChanged(svalue);
-        return true;
+        if (selections.isEmpty() ? true : selections.contains(svalue))
+        {
+            if (roles & Persistent)
+                gLocalContext->SetSetting(m_dbName, svalue);
+            value = Value;
+            emit ValueChanged(svalue);
+            return true;
+        }
     }
     else if (vtype == QVariant::StringList)
     {

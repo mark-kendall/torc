@@ -47,13 +47,14 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
     Q_CLASSINFO("Version", "1.0.0")
     Q_CLASSINFO("Secure",  "")
     Q_CLASSINFO("GetChildList", "type=settings,methods=AUTH")
-    Q_PROPERTY (QVariant value        READ GetValue()        NOTIFY ValueChanged  )
-    Q_PROPERTY (QString  uiName       READ GetUiName()       CONSTANT             )
-    Q_PROPERTY (QString  description  READ GetDescription()  CONSTANT             )
-    Q_PROPERTY (QString  helpText     READ GetHelpText()     CONSTANT             )
-    Q_PROPERTY (QVariant defaultValue READ GetDefaultValue() CONSTANT             )
-    Q_PROPERTY (bool     isActive     READ GetIsActive()     NOTIFY ActiveChanged )
-    Q_PROPERTY (QString  settingType  READ GetSettingType()  CONSTANT             )
+    Q_PROPERTY (QVariant    value        READ GetValue        NOTIFY ValueChanged  )
+    Q_PROPERTY (QString     uiName       READ GetUiName       CONSTANT             )
+    Q_PROPERTY (QString     description  READ GetDescription  CONSTANT             )
+    Q_PROPERTY (QString     helpText     READ GetHelpText     CONSTANT             )
+    Q_PROPERTY (QVariant    defaultValue READ GetDefaultValue CONSTANT             )
+    Q_PROPERTY (bool        isActive     READ GetIsActive     NOTIFY ActiveChanged )
+    Q_PROPERTY (QString     settingType  READ GetSettingType  CONSTANT             )
+    Q_PROPERTY (QVariantMap selections   READ GetSelections   CONSTANT             )
 
   public:
     void                   Remove               (void);
@@ -61,10 +62,11 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
     void                   SetDescription       (const QString &Description);
     void                   SetHelpText          (const QString &HelpText);
     void                   SetRange             (int Begin, int End, int Step);
+    void                   SetSelections        (QVariantMap &Selections);
 
   public slots:
     void                   SubscriberDeleted    (QObject *Subscriber);
-    QMap<QString,QVariant> GetChildList         (void);
+    QVariantMap            GetChildList         (void);
     bool                   SetValue             (const QVariant &Value);
     bool                   GetIsActive          (void);
     void                   SetActive            (bool Value);
@@ -74,6 +76,7 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
     QString                GetHelpText          (void);
     QVariant               GetDefaultValue      (void);
     QString                GetSettingType       (void);
+    QVariantMap            GetSelections        (void);
 
     // Integer
     int                    GetBegin             (void);
@@ -111,6 +114,7 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
     QString                helpText;
     QVariant               value;
     QVariant               defaultValue;
+    QVariantMap            selections;
 
     // Integer
     int                    m_begin;
