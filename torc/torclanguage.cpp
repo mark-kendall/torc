@@ -32,7 +32,7 @@
 
 QMap<QString,int> TorcLanguage::gLanguageMap;
 
-#define BLACKLIST QString("submit,revert")
+#define BLACKLIST QString("submit,revert,SetLanguageCode")
 
 /*! \class TorcLanguage
  *  \brief A class to track and manage language and locale settings and available translations.
@@ -62,10 +62,11 @@ TorcLanguage::TorcLanguage(TorcSetting *SettingParent)
     languageString(),
     m_locale(),
     m_languages(),
-    languages(),
     m_translator(),
     m_lock(QReadWriteLock::Recursive)
 {
+    QWriteLocker locker(&m_lock);
+
     QCoreApplication::installTranslator(&m_translator);
 
     LOG(VB_GENERAL, LOG_INFO, QString("System language: %1 (%2) (%3)(env - %4)")
@@ -81,7 +82,13 @@ TorcLanguage::TorcLanguage(TorcSetting *SettingParent)
         language = "en_GB";
     m_languageSetting = new TorcSetting(SettingParent, "Language", tr("Language"), TorcSetting::String,
                                         TorcSetting::Persistent | TorcSetting::Public, QVariant(language));
-    SetLanguageCode(language);
+    m_languageSetting->SetActive(true);
+    QVariantMap selections;
+    foreach (QLocale locale, m_languages)
+        selections.insert(locale.name(), locale.nativeLanguageName());
+    m_languageSetting->SetSelections(selections);
+    SetLanguageCode(m_languageSetting->GetValue().toString());
+    connect(m_languageSetting, SIGNAL(ValueChanged(QString)), this, SLOT(SetLanguageCode(QString)));
 }
 
 TorcLanguage::~TorcLanguage()
@@ -160,16 +167,6 @@ QString TorcLanguage::GetLanguageString(void)
 {
     QReadLocker locker(&m_lock);
     return languageString;
-}
-
-QVariantMap TorcLanguage::GetLanguages(void)
-{
-    QReadLocker locker(&m_lock);
-
-    QVariantMap results;
-    for (int i = 0; i < m_languages.size(); ++i)
-        results.insert(m_languages.at(i).name(), m_languages.at(i).nativeLanguageName());
-    return results;
 }
 
 QString TorcLanguage::GetTranslation(const QString &Context, const QString &String, const QString &Disambiguation, int Number)

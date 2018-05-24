@@ -18,9 +18,8 @@ class TorcLanguage : public QObject, public TorcHTTPService
 {
     Q_OBJECT
     Q_CLASSINFO("Version",   "1.0.0")
-    Q_PROPERTY(QString languageCode   READ GetLanguageCode   WRITE SetLanguageCode NOTIFY LanguageCodeChanged)
+    Q_PROPERTY(QString languageCode   READ GetLanguageCode   NOTIFY LanguageCodeChanged)
     Q_PROPERTY(QString languageString READ GetLanguageString NOTIFY LanguageStringChanged)
-    Q_PROPERTY(QVariantMap languages  READ GetLanguages      CONSTANT)
 
   public:
     static QMap<QString,int> gLanguageMap;
@@ -45,7 +44,6 @@ class TorcLanguage : public QObject, public TorcHTTPService
     void                     SetLanguageCode       (const QString &Language);
     QString                  GetLanguageCode       (void);
     QString                  GetLanguageString     (void);
-    QVariantMap              GetLanguages          (void);
     QString                  GetTranslation        (const QString &Context, const QString &String,
                                                     const QString &Disambiguation, int Number);
     void                     SubscriberDeleted     (QObject *Subscriber);
@@ -61,7 +59,6 @@ class TorcLanguage : public QObject, public TorcHTTPService
     QString                  languageString;
     QLocale                  m_locale;
     QList<QLocale>           m_languages;
-    QVariantMap              languages; // dummy
     QTranslator              m_translator;
     QReadWriteLock           m_lock;
 };
