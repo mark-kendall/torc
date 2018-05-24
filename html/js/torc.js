@@ -87,7 +87,7 @@ $(document).ready(function() {
                     // simple, unambiguous strings are listed in the torc var. This needs to be
                     // reloaded if the language changes.
                     console.log("Language changed - reloading");
-                    location.reload();
+                    location.reload(true);
                 }
             }
         }
