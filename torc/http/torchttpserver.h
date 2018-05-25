@@ -49,6 +49,11 @@ class TorcHTTPServer : public QTcpServer
   public:
     virtual       ~TorcHTTPServer     ();
 
+  public slots:
+    void           PortChanged        (int Port);
+    void           SecureChanged      (bool Secure);
+    void           Restart            (void);
+
   signals:
     void           HandlersChanged    (void);
 
@@ -71,6 +76,7 @@ class TorcHTTPServer : public QTcpServer
     static void     UpdateOriginWhitelist (int Port);
 
   private:
+    TorcSettingGroup                 *m_serverSettings;
     TorcSetting                      *m_port;
     TorcSetting                      *m_secure;
     TorcUser                          m_user;

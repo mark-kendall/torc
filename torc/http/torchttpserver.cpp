@@ -276,6 +276,7 @@ QReadWriteLock  TorcHTTPServer::gOriginWhitelistLock(QReadWriteLock::Recursive);
 
 TorcHTTPServer::TorcHTTPServer()
   : QTcpServer(),
+    m_serverSettings(NULL),
     m_port(NULL),
     m_secure(NULL),
     m_user(),
@@ -291,10 +292,20 @@ TorcHTTPServer::TorcHTTPServer()
     // if app is running with root privilges (e.g. Raspberry Pi) then try and default to sensible port settings
     // when first run. No point in trying 443 for secure sockets as SSL is not enabled by default (would require
     // additional setup step).
-    m_port   = new TorcSetting(NULL, "WebServerPort",   tr("HTTP Port"),      TorcSetting::Integer,
-                               TorcSetting::Persistent | TorcSetting::Public, QVariant((int)(geteuid() ? 4840 : 80)));
-    m_secure = new TorcSetting(NULL, "WebServerSecure", tr("Secure sockets"), TorcSetting::Bool,
+    m_serverSettings = new TorcSettingGroup(gRootSetting, tr("Server"));
+    bool root = !geteuid();
+    m_port   = new TorcSetting(m_serverSettings, TORC_PORT_SERVICE, tr("Port"), TorcSetting::Integer,
+                               TorcSetting::Persistent | TorcSetting::Public, QVariant((int)(root ? 80 : 4840)));
+    m_port->SetRange(root ? 1 : 1024, 65535, 1);
+    m_port->SetActive(true);
+    connect(m_port, SIGNAL(ValueChanged(int)), this, SLOT(PortChanged(int)));
+
+    m_port->SetHelpText(tr("The port the server will listen on for incoming connections"));
+    m_secure = new TorcSetting(m_serverSettings, TORC_SSL_SERVICE, tr("Secure sockets"), TorcSetting::Bool,
                                TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)false));
+    m_secure->SetHelpText(tr("Use encrypted (SSL/TLS) connections to the server"));
+    m_secure->SetActive(true);
+    connect(m_secure, SIGNAL(ValueChanged(bool)), this, SLOT(SecureChanged(bool)));
 
     // initialise platform name
     static bool initialised = false;
@@ -338,6 +349,13 @@ TorcHTTPServer::~TorcHTTPServer()
         m_secure->Remove();
         m_secure->DownRef();
         m_secure = NULL;
+    }
+
+    if (m_serverSettings)
+    {
+        m_serverSettings->Remove();
+        m_serverSettings->DownRef();
+        m_serverSettings = NULL;
     }
 }
 
@@ -599,6 +617,24 @@ void TorcHTTPServer::Close(void)
     LOG(VB_GENERAL, LOG_INFO, "Webserver closed");
 }
 
+void TorcHTTPServer::PortChanged(int Port)
+{
+    LOG(VB_GENERAL, LOG_INFO, QString("Port changed to %1 - restarting").arg(Port));
+    QTimer::singleShot(10, this, SLOT(Restart()));
+}
+
+void TorcHTTPServer::SecureChanged(bool Secure)
+{
+    LOG(VB_GENERAL, LOG_INFO, QString("Secure changed to '%1secure - restarting").arg(Secure ? "" : "in"));
+    QTimer::singleShot(10, this, SLOT(Restart()));
+}
+
+void TorcHTTPServer::Restart(void)
+{
+    Close();
+    Open();
+}
+
 bool TorcHTTPServer::event(QEvent *Event)
 {
     if (Event->type() == TorcEvent::TorcEventType)
@@ -618,8 +654,7 @@ bool TorcHTTPServer::event(QEvent *Event)
                     break;
                 case Torc::UserChanged:
                     LOG(VB_GENERAL, LOG_INFO, "User name/credentials changed - restarting webserver");
-                    Close();
-                    Open();
+                    Restart();
                     break;
                 default:
                     break;

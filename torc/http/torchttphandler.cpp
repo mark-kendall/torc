@@ -87,6 +87,18 @@ QVariantMap TorcHTTPHandler::ProcessRequest(const QString &Method, const QVarian
     return QVariantMap();
 }
 
+/*! \brief Check the current request is authorised and set the authentication header if not.
+ */
+bool TorcHTTPHandler::MethodIsAuthorised(TorcHTTPRequest &Request, int Allowed)
+{
+    if ((Request.IsAuthorised() != HTTPAuthorised) && (Allowed & HTTPAuth))
+    {
+        TorcHTTPServer::AddAuthenticationHeader(Request);
+        return false;
+    }
+    return true;
+}
+
 void TorcHTTPHandler::HandleOptions(TorcHTTPRequest &Request, int Allowed)
 {
     Request.SetAllowed(Allowed);

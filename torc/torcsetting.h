@@ -24,7 +24,8 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
         Bool,
         Integer,
         String,
-        StringList
+        StringList,
+        Group
     };
 
     enum Role
@@ -43,33 +44,36 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
 
   public:
     Q_OBJECT
-    Q_CLASSINFO("Version",   "1.0.0")
-    Q_PROPERTY (QVariant value        READ GetValue()        NOTIFY ValueChanged()       )
-    Q_PROPERTY (QString  uiName       READ GetUiName()       CONSTANT                    )
-    Q_PROPERTY (QString  description  READ GetDescription()  CONSTANT                    )
-    Q_PROPERTY (QString  helpText     READ GetHelpText()     CONSTANT                    )
-    Q_PROPERTY (QVariant defaultValue READ GetDefaultValue() CONSTANT                    )
-    Q_PROPERTY (bool     isActive     READ GetIsActive()     NOTIFY ActiveChanged()      )
-    Q_PROPERTY (QString  settingType  READ GetSettingType()  CONSTANT                    )
+    Q_CLASSINFO("Version", "1.0.0")
+    Q_CLASSINFO("Secure",  "")
+    Q_CLASSINFO("GetChildList", "type=settings,methods=AUTH")
+    Q_PROPERTY (QVariant    value        READ GetValue        NOTIFY ValueChanged  )
+    Q_PROPERTY (QString     uiName       READ GetUiName       CONSTANT             )
+    Q_PROPERTY (QString     helpText     READ GetHelpText     CONSTANT             )
+    Q_PROPERTY (QVariant    defaultValue READ GetDefaultValue CONSTANT             )
+    Q_PROPERTY (bool        isActive     READ GetIsActive     NOTIFY ActiveChanged )
+    Q_PROPERTY (QString     settingType  READ GetSettingType  CONSTANT             )
+    Q_PROPERTY (QVariantMap selections   READ GetSelections   CONSTANT             )
 
   public:
     void                   Remove               (void);
     void                   SetActiveThreshold   (int  Threshold);
-    void                   SetDescription       (const QString &Description);
     void                   SetHelpText          (const QString &HelpText);
     void                   SetRange             (int Begin, int End, int Step);
+    void                   SetSelections        (QVariantMap &Selections);
 
   public slots:
     void                   SubscriberDeleted    (QObject *Subscriber);
-    void                   SetValue             (const QVariant &Value);
+    QVariantMap            GetChildList         (void);
+    bool                   SetValue             (const QVariant &Value);
     bool                   GetIsActive          (void);
     void                   SetActive            (bool Value);
     QVariant               GetValue             (void);
     QString                GetUiName            (void);
-    QString                GetDescription       (void);
     QString                GetHelpText          (void);
     QVariant               GetDefaultValue      (void);
     QString                GetSettingType       (void);
+    QVariantMap            GetSelections        (void);
 
     // Integer
     int                    GetBegin             (void);
@@ -87,6 +91,7 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
 
   protected:
     virtual               ~TorcSetting();
+    QString                GetChildList         (QMap<QString,QVariant> &Children);
     TorcSetting*           FindChild            (const QString &Child, bool Recursive = false);
     QSet<TorcSetting*>     GetChildren          (void);
     void                   AddChild             (TorcSetting *Child);
@@ -102,10 +107,10 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
     Roles                  roles;
     QString                m_dbName;
     QString                uiName;
-    QString                description;
     QString                helpText;
     QVariant               value;
     QVariant               defaultValue;
+    QVariantMap            selections;
 
     // Integer
     int                    m_begin;

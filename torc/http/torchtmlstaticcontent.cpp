@@ -90,9 +90,13 @@ void TorcHTMLStaticContent::GetJavascriptConfiguration(TorcHTTPRequest &Request)
 
     // generate dynamic variables
     strings.insert("ServicesPath", TORC_SERVICES_DIR);
-    strings.insert("RootSetting",  TORC_ROOT_SETTING);
     strings.insert("UserService",  TORC_USER_SERVICE);
+    strings.insert("SettingsPath", TORC_SETTINGS_DIR);
+    strings.insert("RootSetting",  TORC_ROOT_SETTING);
     strings.insert("TorcRealm",    TORC_REALM);
+    strings.insert("PortSetting",  TORC_PORT_SERVICE);
+    strings.insert("SecureSetting",TORC_SSL_SERVICE);
+    strings.insert("TorcConFile"  , DYNAMIC_DIRECTORY + TORC_CONFIG_FILE);
 
     // and generate javascript
     QJsonObject json = QJsonObject::fromVariantMap(strings);

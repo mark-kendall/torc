@@ -32,7 +32,7 @@
 
 QMap<QString,int> TorcLanguage::gLanguageMap;
 
-#define BLACKLIST QString("submit,revert")
+#define BLACKLIST QString("submit,revert,SetLanguageCode")
 
 /*! \class TorcLanguage
  *  \brief A class to track and manage language and locale settings and available translations.
@@ -54,7 +54,7 @@ QMap<QString,int> TorcLanguage::gLanguageMap;
  * \todo Check whether QTranslator::load is thread safe.
  * \todo Add support for multiple translation files (e.g. plugins as well ).
 */
-TorcLanguage::TorcLanguage()
+TorcLanguage::TorcLanguage(TorcSetting *SettingParent)
   : QObject(),
     TorcHTTPService(this, "languages", "languages", TorcLanguage::staticMetaObject, BLACKLIST),
     m_languageSetting(NULL), // Don't initialise setting until we have a local default
@@ -62,10 +62,11 @@ TorcLanguage::TorcLanguage()
     languageString(),
     m_locale(),
     m_languages(),
-    languages(),
     m_translator(),
     m_lock(QReadWriteLock::Recursive)
 {
+    QWriteLocker locker(&m_lock);
+
     QCoreApplication::installTranslator(&m_translator);
 
     LOG(VB_GENERAL, LOG_INFO, QString("System language: %1 (%2) (%3)(env - %4)")
@@ -79,9 +80,15 @@ TorcLanguage::TorcLanguage()
     QString language = m_locale.name(); // somewhat circular
     if (language.isEmpty())
         language = "en_GB";
-    m_languageSetting = new TorcSetting(NULL, "language", tr("Language"), TorcSetting::String,
+    m_languageSetting = new TorcSetting(SettingParent, "Language", tr("Language"), TorcSetting::String,
                                         TorcSetting::Persistent | TorcSetting::Public, QVariant(language));
-    SetLanguageCode(language);
+    m_languageSetting->SetActive(true);
+    QVariantMap selections;
+    foreach (QLocale locale, m_languages)
+        selections.insert(locale.name(), locale.nativeLanguageName());
+    m_languageSetting->SetSelections(selections);
+    SetLanguageCode(m_languageSetting->GetValue().toString());
+    connect(m_languageSetting, SIGNAL(ValueChanged(QString)), this, SLOT(LanguageSettingChanged(QString)));
 }
 
 TorcLanguage::~TorcLanguage()
@@ -90,6 +97,12 @@ TorcLanguage::~TorcLanguage()
     QCoreApplication::removeTranslator(&m_translator);
     m_languageSetting->Remove();
     m_languageSetting->DownRef();
+}
+
+void TorcLanguage::LanguageSettingChanged(const QString &Language)
+{
+    LOG(VB_GENERAL, LOG_ALERT, QString("Language setting changed to '%1' - restarting").arg(Language));
+    TorcLocalContext::NotifyEvent(Torc::RestartTorc);
 }
 
 QString TorcLanguage::GetUIName(void)
@@ -160,16 +173,6 @@ QString TorcLanguage::GetLanguageString(void)
 {
     QReadLocker locker(&m_lock);
     return languageString;
-}
-
-QVariantMap TorcLanguage::GetLanguages(void)
-{
-    QReadLocker locker(&m_lock);
-
-    QVariantMap results;
-    for (int i = 0; i < m_languages.size(); ++i)
-        results.insert(m_languages.at(i).name(), m_languages.at(i).nativeLanguageName());
-    return results;
 }
 
 QString TorcLanguage::GetTranslation(const QString &Context, const QString &String, const QString &Disambiguation, int Number)

@@ -54,6 +54,7 @@ QString TorcSetting::TypeToString(Type type)
         case Integer:    return QString("integer");
         case String:     return QString("string");
         case StringList: return QString("stringlist");
+        case Group:      return QString("group");
     }
     return QString("erRor");
 }
@@ -61,7 +62,7 @@ QString TorcSetting::TypeToString(Type type)
 TorcSetting::TorcSetting(TorcSetting *Parent, const QString &DBName, const QString &UIName,
                          Type SettingType, Roles SettingRoles, const QVariant &Default)
   : QObject(),
-    TorcHTTPService(this, "settings/" + DBName, (SettingRoles & Public) ? DBName : "",
+    TorcHTTPService(this, TORC_SETTINGS_DIR + DBName, (SettingRoles & Public) ? DBName : "",
                     TorcSetting::staticMetaObject, "SetActive,SetTrue,SetFalse"),
     m_parent(Parent),
     type(SettingType),
@@ -69,10 +70,10 @@ TorcSetting::TorcSetting(TorcSetting *Parent, const QString &DBName, const QStri
     roles(SettingRoles),
     m_dbName(DBName),
     uiName(UIName),
-    description(),
     helpText(),
     value(),
     defaultValue(Default),
+    selections(),
     m_begin(0),
     m_end(1),
     m_step(1),
@@ -130,6 +131,45 @@ TorcSetting::~TorcSetting()
 void TorcSetting::SubscriberDeleted(QObject *Subscriber)
 {
     return TorcHTTPService::HandleSubscriberDeleted(Subscriber);
+}
+
+QVariantMap TorcSetting::GetChildList(void)
+{
+    QMutexLocker locker(&m_lock);
+
+    QVariantMap result;
+    (void)GetChildList(result);
+    return result;
+}
+
+QString TorcSetting::GetChildList(QVariantMap &Children)
+{
+    QMutexLocker locker(&m_lock);
+
+    Children.insert("name", m_dbName);
+    Children.insert("uiname", uiName);
+    Children.insert("type", TypeToString(type));
+    QVariantMap children;
+    foreach (TorcSetting* child, m_children)
+    {
+        QVariantMap childd;
+        QString name = child->GetChildList(childd);
+        children.insert(name, childd);
+    }
+    Children.insert("children", children);
+    return m_dbName;
+}
+
+QVariantMap TorcSetting::GetSelections(void)
+{
+    QMutexLocker locker(&m_lock);
+    return selections;
+}
+
+void TorcSetting::SetSelections(QVariantMap &Selections)
+{
+    QMutexLocker locker(&m_lock);
+    selections = Selections;
 }
 
 void TorcSetting::AddChild(TorcSetting *Child)
@@ -222,12 +262,6 @@ QString TorcSetting::GetUiName(void)
     return uiName;
 }
 
-QString TorcSetting::GetDescription(void)
-{
-    QMutexLocker locker(&m_lock);
-    return description;
-}
-
 QString TorcSetting::GetHelpText(void)
 {
     QMutexLocker locker(&m_lock);
@@ -286,48 +320,66 @@ void TorcSetting::SetActiveThreshold(int Threshold)
         emit ActiveChanged(isActive);
 }
 
-void TorcSetting::SetValue(const QVariant &Value)
+bool TorcSetting::SetValue(const QVariant &Value)
 {
     QMutexLocker locker(&m_lock);
     if (value == Value)
-        return;
-
-    value = Value;
+        return true;
 
     QVariant::Type vtype = defaultValue.type();
-
     if (vtype == QVariant::Int)
     {
-        int ivalue = value.toInt();
-        if (ivalue >= m_begin && ivalue <= m_end)
+        int ivalue = Value.toInt();
+        bool valid = false;
+        if (!selections.isEmpty())
+        {
+            valid = selections.contains(QString::number(ivalue));
+        }
+        else if (ivalue >= m_begin && ivalue <= m_end)
+        {
+            valid = true;
+        }
+
+        if (valid)
         {
             if (roles & Persistent)
                 gLocalContext->SetSetting(m_dbName, (int)ivalue);
+            value = Value;
             emit ValueChanged(ivalue);
+            return true;
         }
     }
     else if (vtype == QVariant::Bool)
     {
-        bool bvalue = value.toBool();
+        bool bvalue = Value.toBool();
         if (roles & Persistent)
             gLocalContext->SetSetting(m_dbName, (bool)bvalue);
-
+        value = Value;
         emit ValueChanged(bvalue);
+        return true;
     }
     else if (vtype == QVariant::String)
     {
-        QString svalue = value.toString();
-        if (roles & Persistent)
-            gLocalContext->SetSetting(m_dbName, svalue);
-        emit ValueChanged(svalue);
+        QString svalue = Value.toString();
+        if (selections.isEmpty() ? true : selections.contains(svalue))
+        {
+            if (roles & Persistent)
+                gLocalContext->SetSetting(m_dbName, svalue);
+            value = Value;
+            emit ValueChanged(svalue);
+            return true;
+        }
     }
     else if (vtype == QVariant::StringList)
     {
-        QStringList svalue = value.toStringList();
+        QStringList svalue = Value.toStringList();
         if (roles & Persistent)
             gLocalContext->SetSetting(m_dbName, svalue.join(","));
+        value = Value;
         emit ValueChanged(svalue);
+        return true;
     }
+    return false;
 }
 
 void TorcSetting::SetRange(int Begin, int End, int Step)
@@ -348,12 +400,6 @@ void TorcSetting::SetRange(int Begin, int End, int Step)
     m_step  = Step;
 }
 
-void TorcSetting::SetDescription(const QString &Description)
-{
-    QMutexLocker locker(&m_lock);
-    description = Description;
-}
-
 void TorcSetting::SetHelpText(const QString &HelpText)
 {
     QMutexLocker locker(&m_lock);
@@ -369,6 +415,7 @@ QVariant TorcSetting::GetValue(void)
         case Bool:       return value.toBool();
         case String:     return value.toString();
         case StringList: return value.toStringList();
+        case Group:      return QVariant();
     }
 
     return value;
@@ -381,7 +428,7 @@ QVariant TorcSetting::GetValue(void)
 */
 
 TorcSettingGroup::TorcSettingGroup(TorcSetting *Parent, const QString &UIName)
-  : TorcSetting(Parent, UIName, UIName, Bool, Public, QVariant())
+  : TorcSetting(Parent, UIName, UIName, Group, Public, QVariant())
 {
     SetActiveThreshold(0);
 }

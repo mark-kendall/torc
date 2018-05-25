@@ -87,7 +87,7 @@ $(document).ready(function() {
                     // simple, unambiguous strings are listed in the torc var. This needs to be
                     // reloaded if the language changes.
                     console.log("Language changed - reloading");
-                    location.reload();
+                    location.reload(true);
                 }
             }
         }
@@ -185,7 +185,7 @@ $(document).ready(function() {
             translatedConfirmation = torc.ConfirmRestartTorc;
             method = 'RestartTorc';
         } else if (name === 'canStopTorc') {
-            translatedName = template(theme.DropdownItemWithIcon, { "icon": "refresh", "text": torc.StopTorcTr });
+            translatedName = template(theme.DropdownItemWithIcon, { "icon": "times", "text": torc.StopTorcTr });
             translatedConfirmation = torc.ConfirmStopTorc;
             method = 'StopTorc';
         } else { return; }
@@ -304,7 +304,7 @@ $(document).ready(function() {
             // NB userSubscriptionChanged should only ever be called once...
             addDropdownMenuItem(usermenu, usermenu + '-user', '#', torc.LoggedInUserTr.replace("%1", properties.userName.value));
             addDropdownMenuDivider(usermenu, '');
-            addFileModal('config',  torc.ViewConfigTitleTr, torc.ViewConfigTr, '/content/torc.xml',       'xml');
+            addFileModal('config',  torc.ViewConfigTitleTr, torc.ViewConfigTr, torc.TorcConfFile,         'xml');
             addFileModal('xsd',     torc.ViewXSDTitleTr,    torc.ViewXSDTr,    '/content/torc.xsd',       'xml');
             addFileModal('dot',     torc.ViewDOTTitleTr,    torc.ViewDOTTr,    '/content/stategraph.dot', 'text');
             addLogModal('log', '',  torc.ViewLogTr);

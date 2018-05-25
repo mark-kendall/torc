@@ -204,7 +204,7 @@ bool TorcLocalContextPriv::Init(void)
     LOG(VB_GENERAL, LOG_INFO, QString("UUID: %1").arg(m_uuid));
 
     // Load language and translation preferences
-    m_language = new TorcLanguage();
+    m_language = new TorcLanguage(gRootSetting);
 
     /* We no longer use QRunnables, so ignore this for now at least
     // don't expire threads

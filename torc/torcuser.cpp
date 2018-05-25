@@ -208,7 +208,7 @@ class TorcUserObject : public TorcAdminObject, public TorcStringFactory
         Strings.insert("PasswordTr",         QCoreApplication::translate("TorcUser", "Password"));
         Strings.insert("Username2Tr",        QCoreApplication::translate("TorcUser", "Confirm username"));
         Strings.insert("Password2Tr",        QCoreApplication::translate("TorcUser", "Confirm password"));
-        Strings.insert("CredentialsHelpTr",  QCoreApplication::translate("TorcUser", "Usernames and passwords must be at least 4 characters long and can only contain letters, numbers and \'_\' (underscore)."));
+        Strings.insert("CredentialsHelpTr",  QCoreApplication::translate("TorcUser", "Usernames and passwords are case sensitive, must be at least 4 characters long and can only contain letters, numbers and \'_\' (underscore)."));
         Strings.insert("ServicesTr",         QCoreApplication::translate("TorcUser", "Services"));
         Strings.insert("ReturnformatsTr",    QCoreApplication::translate("TorcUser", "Return formats"));
         Strings.insert("WebSocketsTr",       QCoreApplication::translate("TorcUser", "WebSockets"));
