@@ -3,27 +3,25 @@
 
 // Qt
 #include <QVariant>
-#include <QMultiMap>
 #include <QXmlStreamReader>
-
-typedef QMultiMap<QString,QVariant> QVariantMultiMap;
 
 class TorcXMLReader
 {
   public:
     explicit TorcXMLReader(const QString &File);
+    explicit TorcXMLReader(QByteArray &Data);
    ~TorcXMLReader();
 
     bool              IsValid     (QString &Message) const;
-    QVariantMultiMap  GetResult   (void) const;
+    QVariantMap       GetResult   (void) const;
 
   private:
     bool              ReadXML     (void);
-    bool              ReadElement (QVariantMultiMap *Map);
+    bool              ReadElement (QVariantMap &Map);
 
   private:
     QXmlStreamReader  m_reader;
-    QVariantMultiMap  m_map;
+    QVariantMap       m_map;
     bool              m_valid;
     QString           m_message;
 };
