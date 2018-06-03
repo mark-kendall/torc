@@ -171,12 +171,15 @@ linux-rasp-pi-g++ | !isEmpty(pi) {
     SOURCES += outputs/platforms/torcpipwmoutput.cpp
     SOURCES += inputs/platforms/torcpiswitchinput.cpp
 
-    openmax    = true
-    DEFINES   += USING_LIBOPENMAXIL
-    DEFINES   += "TORC_OMX_LIB=\"\\\"openmaxil\\\"\""
-    #CONFIG    += link_pkgconfig
-    #PKGCONFIG += libomxil-bellagio
-    message("Linking to OpenMaxIL library (Raspberry Pi")
+    openmax      = true
+    LIBS        += -L/opt/vc/lib -lbcm_host
+    DEFINES     += USING_LIBOPENMAXIL
+    DEFINES     += "TORC_OMX_LIB=\"\\\"openmaxil\\\"\""
+    INCLUDEPATH += /opt/vc/include
+    INCLUDEPATH += /opt/vc/include/IL
+    INCLUDEPATH += /opt/vc/include/interface/vcos/pthreads
+    INCLUDEPATH += /opt/vc/include/interface/vmcs_host/linux
+    message("Linking to OpenMaxIL library (Raspberry Pi)")
 
     # install with suid permissions on Pi
     # this allows access to I2C and GPIO
