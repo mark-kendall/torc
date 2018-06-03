@@ -160,10 +160,11 @@ TorcOMXCore::TorcOMXCore(const QString &Library)
 
     if (m_omxInit)
     {
-        m_initialised = m_omxInit() == OMX_ErrorNone;
+        OMX_ERRORTYPE error = m_omxInit();
+        m_initialised = error == OMX_ErrorNone;
 
         if (!m_initialised)
-            LOG(VB_GENERAL, LOG_ERR, "Failed to initialise OMXCore");
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to initialise OMXCore (Error '%1')").arg(ErrorToString(error)));
     }
 
     if (IsValid())
