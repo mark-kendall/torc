@@ -412,4 +412,19 @@ SOURCES += server/torcdevice.cpp
 SOURCES += server/torcdevicehandler.cpp
 SOURCES += server/torcxsdtest.cpp
 
+test {
+    message("Building tests")
+    QMAKE_CXXFLAGS -= -O2
+    QMAKE_CXXFLAGS += -fprofile-arcs -ftest-coverage
+    LIBS += -lgcov
+    QT += testlib
+    TARGET = torc-tests
+    target.path = ./
+    INSTALLS = target
+    SOURCES -= server/main.cpp
+    SOURCES += test/main.cpp
+    HEADERS += test/testserialisers.h
+    SOURCES += test/testserialisers.cpp
+}
+
 QMAKE_CLEAN += $(TARGET)
