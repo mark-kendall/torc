@@ -10,6 +10,8 @@ libgvc = $$(TORC_LIBGVC)
 libxml2 = $$(TORC_LIBXML2)
 # Force Pi build due to incorrect Raspbian makespec
 pi = $$(TORC_PI)
+# OpenMax - disabled by default
+openmax =
 
 TEMPLATE    = app
 CONFIG     += thread console
@@ -58,7 +60,7 @@ else
 QMAKE_CXXFLAGS += -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE
 
 DEPENDPATH  += ./torc ./torc/http ./torc/upnp ./inputs ./inputs/platforms ./server
-DEPENDPATH  += ./outputs ./outputs/platforms
+DEPENDPATH  += ./outputs ./outputs/platforms ./torc/openmax
 INCLUDEPATH += $$DEPENDPATH
 
 # use graphviz via library or executable?
@@ -115,17 +117,26 @@ qtHaveModule(xmlpatterns_XX) {
     message("QtXmlPatterns available")
 }
 
-# linux power support
 linux {
+    # linux power support
     qtHaveModule(dbus) {
         QT += dbus
         HEADERS += torc/platforms/torcpowerunixdbus.h
         SOURCES += torc/platforms/torcpowerunixdbus.cpp
         DEFINES += USING_QTDBUS
         message("QtDBus available for power support")
-   } else {
+    } else {
         message("No QtDBus support for power support")
-   }
+    }
+    # OpenMax Bellagio (test) NB install components package as well for test components
+    packagesExist(libomxil-bellagio) {
+        openmax    = true
+        DEFINES   += USING_LIBOMXIL_BELLAGIO
+        DEFINES   += "TORC_OMX_LIB=\"\\\"libomxil-bellagio\\\"\""
+        CONFIG    += link_pkgconfig
+        PKGCONFIG += libomxil-bellagio
+        message("Linking to OpenMax Bellagio library")
+    }
 }
 
 # OS X power support
@@ -160,6 +171,13 @@ linux-rasp-pi-g++ | !isEmpty(pi) {
     SOURCES += outputs/platforms/torcpipwmoutput.cpp
     SOURCES += inputs/platforms/torcpiswitchinput.cpp
 
+    openmax    = true
+    DEFINES   += USING_LIBOPENMAXIL
+    DEFINES   += "TORC_OMX_LIB=\"\\\"openmaxil\\\"\""
+    #CONFIG    += link_pkgconfig
+    #PKGCONFIG += libomxil-bellagio
+    message("Linking to OpenMaxIL library (Raspberry Pi")
+
     # install with suid permissions on Pi
     # this allows access to I2C and GPIO
     setpriv.target       = setpriv
@@ -170,6 +188,19 @@ linux-rasp-pi-g++ | !isEmpty(pi) {
     INSTALLS            += setpriv
 
     message("Building for Raspberry Pi")
+}
+
+!isEmpty(openmax) {
+    HEADERS += torc/openmax/torcomxtest.h
+    HEADERS += torc/openmax/torcomxcore.h
+    HEADERS += torc/openmax/torcomxport.h
+    HEADERS += torc/openmax/torcomxcomponent.h
+    HEADERS += torc/openmax/torcomxtunnel.h
+    SOURCES += torc/openmax/torcomxtest.cpp
+    SOURCES += torc/openmax/torcomxcore.cpp
+    SOURCES += torc/openmax/torcomxport.cpp
+    SOURCES += torc/openmax/torcomxcomponent.cpp
+    SOURCES += torc/openmax/torcomxtunnel.cpp
 }
 
 # Bonjour is not available on windows
