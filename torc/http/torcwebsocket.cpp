@@ -366,12 +366,15 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest &Request)
     {
         // stop the watchdog timer for peers
         m_watchdogTimer.stop();
-        QString name;
-        QString agent = Request.Headers()->value("User-Agent").trimmed();
-        int index = agent.indexOf(',');
-        if (index > -1)
-            name = agent.left(index);
-        TorcNetworkedContext::PeerConnected(m_parent, Request.Headers()->value("Torc-UUID"), Request.Headers()->value("Torc-Port").toInt(), name, peerAddress());
+        QVariantMap data;
+        data.insert("uuid", Request.Headers()->value("Torc-UUID"));
+        data.insert("name", Request.Headers()->value("Torc-Name"));
+        data.insert("port", Request.Headers()->value("Torc-Port"));
+        data.insert("priority", Request.Headers()->value("Torc-Priority"));
+        data.insert("starttime", Request.Headers()->value("Torc-Starttime"));
+        data.insert("apiversion", Request.Headers()->value("Torc-APIVersion"));
+        data.insert("address", peerAddress().toString());
+        TorcNetworkedContext::PeerConnected(m_parent, data);
     }
     else
     {
@@ -782,6 +785,10 @@ void TorcWebSocket::SendHandshake(void)
     stream << "Sec-WebSocket-Key: " << nonce.data() << "\r\n";
     stream << "Torc-UUID: " << gLocalContext->GetUuid() << "\r\n";
     stream << "Torc-Port: " << QString::number(TorcHTTPServer::GetPort()) << "\r\n";
+    stream << "Torc-Name: " << TorcHTTPServer::ServerDescription() << "\r\n";
+    stream << "Torc-Priority:" << gLocalContext->GetPriority() << "\r\n";
+    stream << "Torc-Starttime:" << gLocalContext->GetStartTime() << "\r\n";
+    stream << "Torc-APIVersion:" << TorcHTTPServices::GetVersion() << "\r\n";
     if (m_subProtocol != TorcWebSocketReader::SubProtocolNone)
         stream << "Sec-WebSocket-Protocol: " << TorcWebSocketReader::SubProtocolsToString(m_subProtocol) << "\r\n";
     stream << "\r\n";

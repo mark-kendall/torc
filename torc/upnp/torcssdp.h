@@ -86,7 +86,7 @@ class TorcSSDP : public QObject
     void             Start              (void);
     void             Stop               (void);
     void             Refresh            (void);
-    void             ProcessDevice      (const QString &USN, const QString &Location, qint64 Expires, bool Add);
+    void             ProcessDevice      (const QMap<QString,QString> &Headers, qint64 Expires, bool Add);
     qint64           GetExpiryTime      (const QString &Expires);
     void             StartSearch        (void);
     void             StopSearch         (void);

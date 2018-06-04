@@ -501,7 +501,11 @@ void TorcSSDP::SendAnnounce(bool IPv6, bool Alive)
                                 "NT: %5\r\n"
                                 "NTS: ssdp:%6\r\n"
                                 "SERVER: %7\r\n"
-                                "USN: %8\r\n\r\n");
+                                "USN: %8\r\n\""
+                                "NAME: %9\r\n"
+                                "APIVERSION: %10\r\n"
+                                "STARTTIME: %11\r\n"
+                                "PRIORITY: %12\r\n\r\n");
 
     QString ip           = IPv6 ? TORC_IPV6_UDP_MULTICAST_URL : TORC_IPV4_UDP_MULTICAST_URL;
     QHostAddress address = IPv6 ? m_ipv6LinkGroupBaseAddress : m_ipv4GroupAddress;
@@ -510,9 +514,16 @@ void TorcSSDP::SendAnnounce(bool IPv6, bool Alive)
     QString url          = IPv6 ? m_ipv6Address : m_ipv4Address;
     int port             = TorcHTTPServer::GetPort();
     QString    secure    = m_secure ? "s" : "";
-    QByteArray packet1   = QString(notify).arg(secure).arg(ip).arg(url).arg(port).arg("upnp:rootdevice").arg(alive).arg(m_serverString).arg(uuid + "::upnp::rootdevice").toLocal8Bit();
-    QByteArray packet2   = QString(notify).arg(secure).arg(ip).arg(url).arg(port).arg(uuid).arg(alive).arg(m_serverString).arg(uuid).toLocal8Bit();
-    QByteArray packet3   = QString(notify).arg(secure).arg(ip).arg(url).arg(port).arg(TORC_ROOT_UPNP_DEVICE).arg(alive).arg(m_serverString).arg(uuid + "::" + TORC_ROOT_UPNP_DEVICE).toLocal8Bit();
+    QString name         = TorcHTTPServer::ServerDescription();
+    QString apiversion   = TorcHTTPServices::GetVersion();
+    QString starttime    = QString::number(gLocalContext->GetStartTime());
+    QString priority     = QString::number(gLocalContext->GetPriority());
+    QByteArray packet1   = QString(notify).arg(secure).arg(ip).arg(url).arg(port).arg("upnp:rootdevice").arg(alive).arg(m_serverString).arg(uuid + "::upnp::rootdevice")
+                                          .arg(name).arg(apiversion).arg(starttime).arg(priority).toLocal8Bit();
+    QByteArray packet2   = QString(notify).arg(secure).arg(ip).arg(url).arg(port).arg(uuid).arg(alive).arg(m_serverString).arg(uuid)
+                                          .arg(name).arg(apiversion).arg(starttime).arg(priority).toLocal8Bit();
+    QByteArray packet3   = QString(notify).arg(secure).arg(ip).arg(url).arg(port).arg(TORC_ROOT_UPNP_DEVICE).arg(alive).arg(m_serverString).arg(uuid + "::" + TORC_ROOT_UPNP_DEVICE)
+                                          .arg(name).arg(apiversion).arg(starttime).arg(priority).toLocal8Bit();
 
     socket->setSocketOption(QAbstractSocket::MulticastTtlOption, 4);
     qint64 sent = socket->writeDatagram(packet1, address, TORC_SSDP_UDP_MULTICAST_PORT);
@@ -641,7 +652,7 @@ void TorcSSDP::Read(void)
             {
                 qint64 expires = GetExpiryTime(headers.value("cache-control"));
                 if (expires > 0)
-                    ProcessDevice(headers.value("usn"), headers.value("location"), expires, true/*add*/);
+                    ProcessDevice(headers, expires, true/*add*/);
             }
         }
         else if (type.startsWith("NOTIFY", Qt::CaseInsensitive))
@@ -657,12 +668,12 @@ void TorcSSDP::Read(void)
                     {
                         qint64 expires = GetExpiryTime(headers.value("cache-control"));
                         if (expires > 0)
-                            ProcessDevice(headers.value("usn"), headers.value("location"), expires, true/*add*/);
+                            ProcessDevice(headers, expires, true/*add*/);
                     }
                 }
                 else
                 {
-                    ProcessDevice(headers.value("usn"), headers.value("location"), 1, false/*remove*/);
+                    ProcessDevice(headers, 1, false/*remove*/);
                 }
             }
         }
@@ -838,10 +849,13 @@ void TorcSSDP::Refresh(void)
     LOG(VB_NETWORK, LOG_INFO, QString("Removed %1 stale cache entries").arg(removed.size()));
 }
 
-void TorcSSDP::ProcessDevice(const QString &USN, const QString &Location, qint64 Expires, bool Add)
+void TorcSSDP::ProcessDevice(const QMap<QString,QString> &Headers, qint64 Expires, bool Add)
 {
-    if (USN.isEmpty() || Location.isEmpty() || Expires < 1)
+    if (!Headers.contains("usn") || !Headers.contains("location") || Expires < 1)
         return;
+
+    QString USN = Headers.value("usn");
+    QString location = Headers.value("location");
 
     if (!USN.contains(TORC_ROOT_UPNP_DEVICE))
         return;
@@ -855,7 +869,7 @@ void TorcSSDP::ProcessDevice(const QString &USN, const QString &Location, qint64
         {
             notify = false;
             (void)m_discoveredDevices.remove(USN);
-            m_discoveredDevices.insert(USN, TorcUPNPDescription(USN, Location, Expires));
+            m_discoveredDevices.insert(USN, TorcUPNPDescription(USN, location, Expires));
         }
         else
         {
@@ -864,7 +878,7 @@ void TorcSSDP::ProcessDevice(const QString &USN, const QString &Location, qint64
     }
     else if (Add)
     {
-        m_discoveredDevices.insert(USN, TorcUPNPDescription(USN, Location, Expires));
+        m_discoveredDevices.insert(USN, TorcUPNPDescription(USN, location, Expires));
     }
 
     // update interested parties
@@ -872,7 +886,11 @@ void TorcSSDP::ProcessDevice(const QString &USN, const QString &Location, qint64
     {
         QVariantMap data;
         data.insert("usn", USN);
-        data.insert("address", Location);
+        data.insert("address", location);
+        data.insert("name", Headers.value("name"));
+        data.insert("apiversion", Headers.value("apiversion"));
+        data.insert("startime", Headers.value("starttime"));
+        data.insert("priority", Headers.value("priority"));
         TorcEvent event(Add ? Torc::ServiceDiscovered : Torc::ServiceWentAway, data);
         gLocalContext->Notify(event);
     }

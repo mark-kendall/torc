@@ -595,7 +595,7 @@ TorcNetworkedContext::TorcNetworkedContext()
     // connect signals
     connect(this, SIGNAL(NewRequest(QString,TorcRPCRequest*)), this, SLOT(HandleNewRequest(QString,TorcRPCRequest*)));
     connect(this, SIGNAL(RequestCancelled(QString,TorcRPCRequest*)), this, SLOT(HandleCancelRequest(QString,TorcRPCRequest*)));
-    connect(this, SIGNAL(NewPeer(TorcWebSocketThread*,QString,int,QString,QHostAddress)), this, SLOT(HandleNewPeer(TorcWebSocketThread*,QString,int,QString,QHostAddress)));
+    connect(this, SIGNAL(NewPeer(TorcWebSocketThread*,QVariantMap)), this, SLOT(HandleNewPeer(TorcWebSocketThread*,QVariantMap)));
 
     // always create the global instance
     TorcBonjour::Instance();
@@ -726,7 +726,7 @@ bool TorcNetworkedContext::event(QEvent *Event)
                             }
                             else
                             {
-                                QByteArray name = event->Data().value("name").toByteArray();
+                                QString name = event->Data().value("name").toString();
                                 QByteArray txtrecords = event->Data().value("txtrecords").toByteArray();
                                 QMap<QByteArray,QByteArray> map = TorcBonjour::TxtRecordToMap(txtrecords);
                                 QString version       = QString(map.value("apiversion"));
@@ -788,10 +788,15 @@ bool TorcNetworkedContext::event(QEvent *Event)
                     {
                         // need name, uuid, port, hosts, apiversion, priority, starttime, host?
                         QUrl location(event->Data().value("address").toString());
+                        QString name = event->Data().value("name").toString();
                         bool secure = location.scheme().toLower() == "https";
                         QList<QHostAddress> hosts;
                         hosts << QHostAddress(location.host());
-                        TorcNetworkService *service = new TorcNetworkService("TorcUPnP", uuid, location.port(), secure, hosts);
+                        TorcNetworkService *service = new TorcNetworkService(name, uuid, location.port(), secure, hosts);
+                        service->SetAPIVersion(event->Data().value("apiversion").toString());
+                        service->SetPriority(event->Data().value("priority").toInt());
+                        service->SetStartTime(event->Data().value("starttime").toULongLong());
+                        service->SetHost(location.host());
                         service->SetSource(TorcNetworkService::UPnP);
                         Add(service);
                         emit service->TryConnect();
@@ -809,7 +814,7 @@ bool TorcNetworkedContext::event(QEvent *Event)
  * \sa TorcWebSocket
  * \sa TorcHTTPServer::UpgradeSocket
 */
-void TorcNetworkedContext::PeerConnected(TorcWebSocketThread* Thread, const QString UUID, int Port, const QString Name, const QHostAddress Address)
+void TorcNetworkedContext::PeerConnected(TorcWebSocketThread* Thread, const QVariantMap & Data)
 {
     if (!Thread)
         return;
@@ -821,7 +826,7 @@ void TorcNetworkedContext::PeerConnected(TorcWebSocketThread* Thread, const QStr
     }
 
     // and create the WebSocket in the correct thread
-    emit gNetworkedContext->NewPeer(Thread, UUID, Port, Name, Address);
+    emit gNetworkedContext->NewPeer(Thread, Data);
 }
 
 /// \brief Pass Request to the remote connection identified by UUID
@@ -914,14 +919,17 @@ void TorcNetworkedContext::SubscriberDeleted(QObject *Subscriber)
     TorcHTTPService::HandleSubscriberDeleted(Subscriber);
 }
 
-void TorcNetworkedContext::HandleNewPeer(TorcWebSocketThread *Thread, const QString UUID, int Port, const QString Name, const QHostAddress Address)
+void TorcNetworkedContext::HandleNewPeer(TorcWebSocketThread *Thread, const QVariantMap &Data)
 {
     if (!Thread)
         return;
 
+    QString UUID = Data.value("uuid").toString();
+    QString name = Data.value("name").toString();
+
     if (UUID.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Received WebSocket for peer without UUID (%1) - closing").arg(Name));
+        LOG(VB_GENERAL, LOG_INFO, QString("Received WebSocket for peer without UUID (%1) - closing").arg(name));
         Thread->quit(); // is this safe?
         return;
     }
@@ -941,19 +949,25 @@ void TorcNetworkedContext::HandleNewPeer(TorcWebSocketThread *Thread, const QStr
         }
     }
 
+    QHostAddress address(Data.value("address").toString());
+    int port = Data.value("port").toInt();
+
     TorcWebSocketThread* thread = TorcHTTPServer::TakeSocket(Thread);
     if (Thread == thread)
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Received WebSocket for new peer ('%1' %2)").arg(Name).arg(UUID));
-        QList<QHostAddress> address;
-        address << Address;
-        TorcNetworkService *service = new TorcNetworkService(Name, UUID, Port, thread->IsSecure(), address);
+        LOG(VB_GENERAL, LOG_INFO, QString("Received WebSocket for new peer ('%1' %2)").arg(name).arg(UUID));
+        QList<QHostAddress> addresses;
+        addresses << address;
+        TorcNetworkService *service = new TorcNetworkService(name, UUID, port, thread->IsSecure(), addresses);
         service->SetWebSocketThread(thread);
+        service->SetAPIVersion(Data.value("apiversion").toString());
+        service->SetPriority(Data.value("priority").toInt());
+        service->SetStartTime(Data.value("starttime").toULongLong());
         Add(service);
         return;
     }
 
-    LOG(VB_GENERAL, LOG_ERR, QString("Failed to take ownership of WebSocket from %1").arg(TorcNetwork::IPAddressToLiteral(Address, Port)));
+    LOG(VB_GENERAL, LOG_ERR, QString("Failed to take ownership of WebSocket from %1").arg(TorcNetwork::IPAddressToLiteral(address, port)));
 }
 
 void TorcNetworkedContext::Add(TorcNetworkService *Peer)
