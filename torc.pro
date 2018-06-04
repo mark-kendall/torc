@@ -35,6 +35,10 @@ QT         -= gui
 QMAKE_CXXFLAGS += -Wall -Wextra -Weffc++ -Werror
 
 # explicitly add SSL - this may need more work
+macx {
+    QT_CONFIG -= no-pkg-config
+}
+CONFIG    += link_pkgconfig
 PKGCONFIG += openssl
 
 # debug builds
