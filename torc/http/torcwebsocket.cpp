@@ -614,7 +614,10 @@ void TorcWebSocket::ReadHTTP(void)
     {
         // read data
         if (!m_reader.Read(this))
+        {
+            SetState(SocketState::ErroredSt);
             break;
+        }
 
         if (!m_reader.IsReady())
             continue;

@@ -117,6 +117,13 @@ bool TorcHTTPReader::Read(QTcpSocket *Socket)
         {
             QByteArray line = Socket->readLine().trimmed();
 
+            // an unusually long header is likely to mean this is not a valid HTTP message
+            if (line.size() > 1000)
+            {
+                LOG(VB_GENERAL, LOG_ERR, "Header is too long - aborting");
+                return false;
+            }
+
             if (line.isEmpty())
             {
                 m_headersRead = 0;
