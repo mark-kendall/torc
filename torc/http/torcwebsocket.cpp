@@ -666,9 +666,19 @@ void TorcWebSocket::ReadyRead(void)
     if (m_watchdogTimer.isActive())
         m_watchdogTimer.start();
 
+    // Guard against spurious socket activity/connections e.g. a client trying to connect using SSL when
+    // the server is not expecting secure sockets. TorcHTTPReader will be expecting a complete line but no additional
+    // data is received so we loop continuously. So count retries while the available bytes remains unchanged and introduce
+    // a micro sleep when available bytes does not change during the loop.
+    static const int maxUnchanged   = 5000;
+    static const int unchangedSleep = 1000; // microseconds (1ms) - for a total timeout of 5 seconds
+    int unchangedCount = 0;
+
     while ((m_socketState == SocketState::ConnectedTo || m_socketState == SocketState::Upgrading || m_socketState == SocketState::Upgraded) &&
             bytesAvailable())
     {
+        qint64 available = bytesAvailable();
+
         if (m_socketState == SocketState::ConnectedTo)
         {
             ReadHTTP();
@@ -705,6 +715,19 @@ void TorcWebSocket::ReadyRead(void)
                 ProcessPayload(m_wsReader.GetPayload());
                 m_wsReader.Reset();
             }
+        }
+
+        // pause if necessary
+        if (bytesAvailable() == available)
+        {
+            unchangedCount++;
+            if (unchangedCount > maxUnchanged)
+            {
+                LOG(VB_GENERAL, LOG_WARNING, QString("Socket time out waiting for valid data - closing"));
+                SetState(SocketState::Disconnecting);
+                break;
+            }
+            TorcQThread::usleep(unchangedSleep);
         }
     }
 }
