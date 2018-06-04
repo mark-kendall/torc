@@ -31,6 +31,13 @@
 #include "torcdirectories.h"
 #include "torcwebsocketthread.h"
 
+// SSL
+#include <openssl/pem.h>
+#include <openssl/x509.h>
+
+// STL - for chmod
+#include <sys/stat.h>
+
 /*! \class TorcWebSocketThread
  *  \brief Wraps a TorcQThread around a TorcWebsocket
  *
@@ -75,68 +82,176 @@ TorcWebSocketThread::~TorcWebSocketThread()
 {
 }
 
+bool TorcWebSocketThread::CreateCerts(const QString &CertFile, const QString &KeyFile)
+{
+    LOG(VB_GENERAL, LOG_INFO, "Generating RSA key");
+
+    EVP_PKEY *privatekey = EVP_PKEY_new();
+    RSA      *rsa = RSA_generate_key(4096, RSA_F4, NULL, NULL);
+    if(!EVP_PKEY_assign_RSA(privatekey, rsa))
+    {
+        EVP_PKEY_free(privatekey);
+        LOG(VB_GENERAL, LOG_ERR, "Failed to create RSA key");
+        return false;
+    }
+
+    LOG(VB_GENERAL, LOG_INFO, "Generating X509 certificate");
+    X509 *x509 = X509_new();
+    ASN1_INTEGER_set(X509_get_serialNumber(x509), 1);
+    X509_gmtime_adj(X509_get_notBefore(x509), 0);
+    X509_gmtime_adj(X509_get_notAfter(x509), 315360000L); // valid for 10 years!
+    X509_set_pubkey(x509, privatekey);
+    X509_NAME *name = X509_get_subject_name(x509);
+    X509_NAME_add_entry_by_txt(name, "C",  MBSTRING_ASC, (unsigned char *)"GB",           -1, -1, 0);
+    X509_NAME_add_entry_by_txt(name, "O",  MBSTRING_ASC, (unsigned char *)"SelfSignedCo", -1, -1, 0);
+    X509_NAME_add_entry_by_txt(name, "OU", MBSTRING_ASC, (unsigned char *)"SelfSignedCo", -1, -1, 0);
+    X509_NAME_add_entry_by_txt(name, "CN", MBSTRING_ASC, (unsigned char *)"localhost",    -1, -1, 0);
+    X509_set_issuer_name(x509, name);
+    if(!X509_sign(x509, privatekey, EVP_sha256()))
+    {
+        X509_free(x509);
+        EVP_PKEY_free(privatekey);
+        LOG(VB_GENERAL, LOG_ERR, "Failed to sign certificate");
+        return false;
+    }
+
+    FILE* certfile = fopen(CertFile.toLocal8Bit().constData(), "wb");
+    if (!certfile)
+    {
+        X509_free(x509);
+        EVP_PKEY_free(privatekey);
+        LOG(VB_GENERAL, LOG_ERR, QString("Failed to open '%1' for writing").arg(CertFile));
+        return false;
+    }
+    bool success = PEM_write_X509(certfile, x509);
+    fclose(certfile);
+    if (!success)
+    {
+        X509_free(x509);
+        EVP_PKEY_free(privatekey);
+        LOG(VB_GENERAL, LOG_ERR, QString("Failed to write to '%1'").arg(CertFile));
+        return false;
+    }
+
+    FILE* keyfile = fopen(KeyFile.toLocal8Bit().constData(), "wb");
+    if (!keyfile)
+    {
+        X509_free(x509);
+        EVP_PKEY_free(privatekey);
+        LOG(VB_GENERAL, LOG_ERR, QString("Failed to open '%1' for writing").arg(KeyFile));
+        return false;
+    }
+
+    success = PEM_write_PrivateKey(keyfile, privatekey, NULL, NULL, 0, NULL, NULL);
+    fclose(keyfile);
+    if (!success)
+    {
+        X509_free(x509);
+        EVP_PKEY_free(privatekey);
+        LOG(VB_GENERAL, LOG_ERR, QString("Failed to write to '%1'").arg(KeyFile));
+        return false;
+    }
+
+    LOG(VB_GENERAL, LOG_INFO, QString("Cert file saved as '%1'").arg(CertFile));
+    LOG(VB_GENERAL, LOG_INFO, QString("Key file saved as '%1'").arg(KeyFile));
+
+    if (chmod(CertFile.toLocal8Bit().constData(), S_IRUSR | S_IWUSR) != 0)
+        LOG(VB_GENERAL, LOG_WARNING, QString("Failed to set permissions for '%1' - this is not fatal but may present a security risk").arg(CertFile));
+    if (chmod(KeyFile.toLocal8Bit().constData(),  S_IRUSR | S_IWUSR) != 0)
+        LOG(VB_GENERAL, LOG_WARNING, QString("Failed to set permissions for '%1' - this is not fatal but may present a security risk").arg(CertFile));
+    return true;
+}
+
+void TorcWebSocketThread::SetupSSL(void)
+{
+    static bool SSLDefaultsSet = false;
+    if (SSLDefaultsSet)
+        return;
+
+    SSLDefaultsSet = true;
+    QSslConfiguration config;
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
+    config.setProtocol(QSsl::TlsV1_2OrLater);
+    config.setCiphers(QSslConfiguration::supportedCiphers());
+#else
+    config.setProtocol(QSsl::TlsV1_0);
+    config.setCiphers(QSslSocket::supportedCiphers());
+#endif
+
+    QString certlocation = GetTorcConfigDir() + "/torc.cert";
+    LOG(VB_GENERAL, LOG_INFO, QString("SSL: looking for cert in '%1'").arg(certlocation));
+    QString keylocation  = GetTorcConfigDir() + "/torc.key";
+    LOG(VB_GENERAL, LOG_INFO, QString("SSL: looking for key in '%1'").arg(keylocation));
+
+    bool create = false;
+    if (!QFile::exists(certlocation))
+    {
+        create = true;
+        LOG(VB_GENERAL, LOG_WARNING, "Failed to find cert");
+    }
+    if (!QFile::exists(keylocation))
+    {
+        create = true;
+        LOG(VB_GENERAL, LOG_WARNING, "Failed to find key");
+        create = true;
+    }
+
+    if (create && !CreateCerts(certlocation, keylocation))
+    {
+        LOG(VB_GENERAL, LOG_ERR, "SSL key/cert creation failed - server connections will fail");
+        return;
+    }
+
+    QFile certFile(certlocation);
+    certFile.open(QIODevice::ReadOnly);
+    if (certFile.isOpen())
+    {
+        QSslCertificate certificate(&certFile, QSsl::Pem);
+        if (!certificate.isNull())
+        {
+            config.setLocalCertificate(certificate);
+            LOG(VB_GENERAL, LOG_INFO, "SSL: cert loaded");
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_ERR, "SSL: error loading/reading cert file");
+        }
+        certFile.close();
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, "SSL: failed to open cert file for reading");
+    }
+
+    QFile keyFile(keylocation);
+    keyFile.open(QIODevice::ReadOnly);
+    if (keyFile.isOpen())
+    {
+        QSslKey key(&keyFile, QSsl::Rsa, QSsl::Pem);
+        if (!key.isNull())
+        {
+            config.setPrivateKey(key);
+            LOG(VB_GENERAL, LOG_INFO, "SSL: key loaded");
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_ERR, "SSL: error loading/reading key file");
+        }
+        keyFile.close();
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, "SSL: failed to open key file for reading");
+    }
+    QSslConfiguration::setDefaultConfiguration(config);
+}
+
 void TorcWebSocketThread::Start(void)
 {
     // one off SSL default configuration
-    static bool SSLDefaultsSet = false;
-    if (!SSLDefaultsSet && m_secure)
-    {
-        SSLDefaultsSet = true;
-        QSslConfiguration config;
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
-        config.setProtocol(QSsl::TlsV1_2OrLater);
-        config.setCiphers(QSslConfiguration::supportedCiphers());
-#else
-        config.setProtocol(QSsl::TlsV1_0);
-        config.setCiphers(QSslSocket::supportedCiphers());
-#endif
-        QString certlocation = GetTorcConfigDir() + "/torc.cert";
-        LOG(VB_GENERAL, LOG_INFO, QString("SSL: looking for cert in '%1'").arg(certlocation));
-        QFile certFile(certlocation);
-        certFile.open(QIODevice::ReadOnly);
-        if (certFile.isOpen())
-        {
-            QSslCertificate certificate(&certFile, QSsl::Pem);
-            if (!certificate.isNull())
-            {
-                config.setLocalCertificate(certificate);
-                LOG(VB_GENERAL, LOG_INFO, "SSL: cert loaded");
-            }
-            else
-            {
-                LOG(VB_GENERAL, LOG_ERR, "SSL: error loading/reading cert file");
-            }
-            certFile.close();
-        }
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR, "SSL: failed to open cert file for reading");
-        }
-
-        QString keylocation  = GetTorcConfigDir() + "/torc.key";
-        LOG(VB_GENERAL, LOG_INFO, QString("SSL: looking for key in '%1'").arg(keylocation));
-        QFile keyFile(keylocation);
-        keyFile.open(QIODevice::ReadOnly);
-        if (keyFile.isOpen())
-        {
-            QSslKey key(&keyFile, QSsl::Rsa, QSsl::Pem);
-            if (!key.isNull())
-            {
-                config.setPrivateKey(key);
-                LOG(VB_GENERAL, LOG_INFO, "SSL: key loaded");
-            }
-            else
-            {
-                LOG(VB_GENERAL, LOG_ERR, "SSL: error loading/reading key file");
-            }
-            keyFile.close();
-        }
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR, "SSL: failed to open key file for reading");
-        }
-        QSslConfiguration::setDefaultConfiguration(config);
-    }
+    if (m_secure)
+        SetupSSL();
 
     if (m_socketDescriptor)
         m_webSocket = new TorcWebSocket(this, m_socketDescriptor, m_secure);

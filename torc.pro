@@ -34,6 +34,9 @@ QT         -= gui
 
 QMAKE_CXXFLAGS += -Wall -Wextra -Weffc++ -Werror
 
+# explicitly add SSL - this may need more work
+PKGCONFIG += openssl
+
 # debug builds
 #CONFIG     += debug
 CONFIG(debug, debug|release) {

@@ -29,6 +29,10 @@ class TorcWebSocketThread : public TorcQThread
     void                CancelRequestSignal   (TorcRPCRequest *Request);
 
   private:
+    static void         SetupSSL              (void);
+    static bool         CreateCerts           (const QString &CertFile, const QString &KeyFile);
+
+  private:
     TorcWebSocket      *m_webSocket;
     bool                m_secure;
     // incoming
