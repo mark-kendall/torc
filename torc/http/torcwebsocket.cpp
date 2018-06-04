@@ -371,7 +371,7 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest &Request)
         int index = agent.indexOf(',');
         if (index > -1)
             name = agent.left(index);
-        TorcNetworkedContext::PeerConnected(m_parent, Request.Headers()->value("Torc-UUID"), peerPort(), name, peerAddress());
+        TorcNetworkedContext::PeerConnected(m_parent, Request.Headers()->value("Torc-UUID"), Request.Headers()->value("Torc-Port").toInt(), name, peerAddress());
     }
     else
     {
