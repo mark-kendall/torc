@@ -113,6 +113,24 @@ bool TorcHTTPReader::Read(QTcpSocket *Socket)
     // read headers
     if (!m_headersComplete)
     {
+        // filter out invalid HTTP early
+        if (!m_requestStarted && Socket->bytesAvailable() >= 7 /*OPTIONS is longest valid type*/)
+        {
+            QByteArray buf(7, ' ');
+            (void)Socket->peek(buf.data(), 7);
+            if (!buf.startsWith("HTTP"))
+                if (!buf.startsWith("GET"))
+                    if (!buf.startsWith("PUT"))
+                        if(!buf.startsWith("POST"))
+                            if(!buf.startsWith("OPTIONS"))
+                                if (!buf.startsWith("HEAD"))
+                                    if (!buf.startsWith("DELETE"))
+                                    {
+                                        LOG(VB_GENERAL, LOG_ERR, QString("Invalid HTTP start ('%1')- aborting").arg(buf.constData()));
+                                        return false;
+                                    }
+        }
+
         while (Socket->canReadLine() && m_headersRead < 200)
         {
             QByteArray line = Socket->readLine().trimmed();
