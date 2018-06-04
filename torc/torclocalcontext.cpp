@@ -166,7 +166,7 @@ bool TorcLocalContextPriv::Init(void)
 
     // Open the local database
     if (m_dbName.isEmpty())
-        m_dbName = configdir + "/" + QCoreApplication::applicationName() + "-settings.sqlite";
+        m_dbName = configdir + "/" + TORC_TORC + "-settings.sqlite";
 
     m_sqliteDB = new TorcSQLiteDB(m_dbName);
 
@@ -351,7 +351,7 @@ TorcLocalContext::TorcLocalContext(TorcCommandLine* CommandLine)
     // Start logging at the first opportunity
     QString logfile = CommandLine->GetValue("logfile").toString();
     if (logfile.isEmpty())
-        logfile = QString(GetTorcConfigDir() + "/" + QCoreApplication::applicationName() + ".log");
+        logfile = QString(GetTorcConfigDir() + "/" + TORC_TORC + ".log");
 
     ParseVerboseArgument(CommandLine->GetValue("l").toString());
 

@@ -5,6 +5,8 @@
 #define _WIN32_WINNT 0x0502 // XP SP 2
 #endif
 
+#define TORC_TORC         QString("torc") // N.B. do NOT change
+#define TORC_REALM        QString("Torc") // N.B. do NOT change
 #define TORC_MAIN_THREAD  QString("MainLoop")
 #define TORC_ADMIN_THREAD QString("AdminLoop")
 #define TORC_SERVICES_DIR QString("/services/")
@@ -13,7 +15,6 @@
 #define TORC_SSL_SERVICE  QString("ServerSecure")
 #define TORC_SETTINGS_DIR QString("settings/")
 #define TORC_ROOT_SETTING QString("Settings")
-#define TORC_CONFIG_FILE  QString("torc.xml")
-#define TORC_REALM        QString("Torc")       // N.B. do NOT change
+#define TORC_CONFIG_FILE  (TORC_TORC + QString(".xml"))
 
 #endif // TORCLOCALDEFS_H

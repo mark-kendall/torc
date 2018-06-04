@@ -280,11 +280,11 @@ TorcHTTPServer::TorcHTTPServer()
     m_port(NULL),
     m_secure(NULL),
     m_user(),
-    m_defaultHandler("", QCoreApplication::applicationName()), // default top level handler
-    m_servicesHandler(this),                                   // services 'helper' service for '/services'
-    m_staticContent(),                                         // static files - for /css /fonts /js /img etc
-    m_dynamicContent(),                                        // dynamic files - for config files etc (typically served from ~/.torc/content)
-    m_upnpContent(),                                           // upnp - device description
+    m_defaultHandler("", TORC_TORC), // default top level handler
+    m_servicesHandler(this),         // services 'helper' service for '/services'
+    m_staticContent(),               // static files - for /css /fonts /js /img etc
+    m_dynamicContent(),              // dynamic files - for config files etc (typically served from ~/.torc/content)
+    m_upnpContent(),                 // upnp - device description
     m_httpBonjourReference(0),
     m_torcBonjourReference(0),
     m_webSocketPool()
@@ -312,7 +312,7 @@ TorcHTTPServer::TorcHTTPServer()
     if (!initialised)
     {
         initialised = true;
-        gPlatform = QString("%1, Version: %2 ").arg(QCoreApplication::applicationName()).arg(GIT_VERSION);
+        gPlatform = QString("%1, Version: %2 ").arg(TORC_TORC).arg(GIT_VERSION);
 #ifdef Q_OS_WIN
         gPlatform += QString("(Windows %1.%2)").arg(LOBYTE(LOWORD(GetVersion()))).arg(HIBYTE(LOWORD(GetVersion())));
 #else

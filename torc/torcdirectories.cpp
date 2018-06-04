@@ -25,6 +25,7 @@
 
 // Torc
 #include "torclogging.h"
+#include "torclocaldefs.h"
 #include "torcdirectories.h"
 
 static QString gInstallDir = QString("");
@@ -55,9 +56,9 @@ void InitialiseTorcDirectories(void)
     initialised = true;
 
     gInstallDir = QString(PREFIX) + "/";
-    gPluginDir  = QString(PREFIX) + "/lib/torc/plugins";
-    gShareDir   = QString(RUNPREFIX) + "/share/torc";
-    gConfDir    = QDir::homePath() + "/.torc";
+    gPluginDir  = QString(PREFIX) + "/lib/" + TORC_TORC + "/plugins";
+    gShareDir   = QString(RUNPREFIX) + "/share/" + TORC_TORC;
+    gConfDir    = QDir::homePath() + "/." + TORC_TORC;
     gTransDir   = gShareDir + "/i18n/";
 }
 
