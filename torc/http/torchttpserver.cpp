@@ -559,25 +559,20 @@ bool TorcHTTPServer::Open(void)
     // advertise service if not already doing so
     if (!m_httpBonjourReference || !m_torcBonjourReference)
     {
-        // add the 'root' apiversion, as would be returned by '/services/GetServiceVersion'
-        int index = TorcHTTPServices::staticMetaObject.indexOfClassInfo("Version");
-
         QMap<QByteArray,QByteArray> map;
         map.insert("uuid", gLocalContext->GetUuid().toLatin1());
-        map.insert("apiversion", (index > -1) ? TorcHTTPServices::staticMetaObject.classInfo(index).value() : "unknown");
+        map.insert("apiversion", TorcHTTPServices::GetVersion().toLocal8Bit().constData());
         map.insert("priority",   QByteArray::number(gLocalContext->GetPriority()));
         map.insert("starttime",  QByteArray::number(gLocalContext->GetStartTime()));
         map.insert("secure",     m_secure->GetValue().toBool() ? "yes" : "no");
 
-        QByteArray name(QCoreApplication::applicationName().toLatin1());
-        name.append(" on ");
-        name.append(QHostInfo::localHostName());
+        QString name = ServerDescription();
 
         if (!m_httpBonjourReference)
-            m_httpBonjourReference = TorcBonjour::Instance()->Register(port, m_secure->GetValue().toBool() ? "_https._tcp" : "_http._tcp", name, map);
+            m_httpBonjourReference = TorcBonjour::Instance()->Register(port, m_secure->GetValue().toBool() ? "_https._tcp" : "_http._tcp", name.toLocal8Bit().constData(), map);
 
         if (!m_torcBonjourReference)
-            m_torcBonjourReference = TorcBonjour::Instance()->Register(port, "_torc._tcp", name, map);
+            m_torcBonjourReference = TorcBonjour::Instance()->Register(port, "_torc._tcp", name.toLocal8Bit().constData(), map);
     }
 
     TorcSSDP::Announce(m_secure->GetValue().toBool());
@@ -589,6 +584,14 @@ bool TorcHTTPServer::Open(void)
     }
 
     return true;
+}
+
+QString TorcHTTPServer::ServerDescription(void)
+{
+    QString host = QHostInfo::localHostName();
+    if (host.isEmpty())
+        host = tr("Unknown");
+    return QString("%1@%2").arg(QCoreApplication::applicationName()).arg(host);
 }
 
 void TorcHTTPServer::Close(void)
