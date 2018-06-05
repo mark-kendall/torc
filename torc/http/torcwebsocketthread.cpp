@@ -186,7 +186,7 @@ void TorcWebSocketThread::SetupSSL(void)
     config.setProtocol(QSsl::TlsV1_2OrLater);
     config.setCiphers(QSslConfiguration::supportedCiphers());
 #else
-    config.setProtocol(QSsl::TlsV1_0);
+    config.setProtocol(QSsl::TlsV1_2);
     config.setCiphers(QSslSocket::supportedCiphers());
 #endif
 
