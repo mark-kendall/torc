@@ -440,7 +440,7 @@ void TorcNetworkService::QueryPeerDetails(void)
         LOG(VB_GENERAL, LOG_INFO, "Querying peer details over HTTP");
 
         QUrl url;
-        url.setScheme("http");
+        url.setScheme(secure ? "https" : "http");
         url.setPort(port);
         url.setHost(m_addresses[m_preferredAddressIndex].toString());
         url.setPath("/services/GetDetails");
