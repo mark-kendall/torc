@@ -518,7 +518,8 @@ QVariant TorcNetworkService::ToMap(void)
     result.insert("uiAddress", uiAddress);
     result.insert("address",   m_addresses.isEmpty() ? "INValid" : TorcNetwork::IPAddressToLiteral(m_addresses[m_preferredAddressIndex], 0));
     result.insert("host",      host);
-    result.insert("secure",    secure ? "yes"  : "no");
+    if (secure)
+        result.insert("secure", "yes");
     return result;
 }
 
