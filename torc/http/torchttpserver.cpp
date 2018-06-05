@@ -237,11 +237,7 @@ int TorcHTTPServer::GetPort(void)
 bool TorcHTTPServer::IsSecure(void)
 {
     QMutexLocker locker(&gWebServerLock);
-
-    if (gWebServer)
-        return gWebServer->GetSecure();
-
-    return false;
+    return gWebServerSecure;
 }
 
 bool TorcHTTPServer::IsListening(void)
@@ -283,6 +279,7 @@ QMutex          TorcHTTPServer::gWebServerLock(QMutex::Recursive);
 QString         TorcHTTPServer::gPlatform = QString("");
 QString         TorcHTTPServer::gOriginWhitelist = QString("");
 QReadWriteLock  TorcHTTPServer::gOriginWhitelistLock(QReadWriteLock::Recursive);
+bool            TorcHTTPServer::gWebServerSecure = false;
 
 TorcHTTPServer::TorcHTTPServer()
   : QTcpServer(),
@@ -315,6 +312,7 @@ TorcHTTPServer::TorcHTTPServer()
                                TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)false));
     m_secure->SetHelpText(tr("Use encrypted (SSL/TLS) connections to the server"));
     m_secure->SetActive(true);
+    gWebServerSecure = m_secure->GetValue().toBool();
     connect(m_secure, SIGNAL(ValueChanged(bool)), this, SLOT(SecureChanged(bool)));
 
     // initialise platform name
@@ -605,14 +603,6 @@ QString TorcHTTPServer::ServerDescription(void)
     return QString("%1@%2").arg(QCoreApplication::applicationName()).arg(host);
 }
 
-bool TorcHTTPServer::GetSecure(void)
-{
-    QMutexLocker locker(&gWebServerLock);
-    if (m_secure)
-        return m_secure->GetValue().toBool();
-    return false;
-}
-
 void TorcHTTPServer::Close(void)
 {
     // stop advertising
@@ -647,6 +637,10 @@ void TorcHTTPServer::PortChanged(int Port)
 
 void TorcHTTPServer::SecureChanged(bool Secure)
 {
+    {
+        QMutexLocker lock(&gWebServerLock);
+        gWebServerSecure = m_secure->GetValue().toBool();
+    }
     LOG(VB_GENERAL, LOG_INFO, QString("Secure changed to '%1secure - restarting").arg(Secure ? "" : "in"));
     QTimer::singleShot(10, this, SLOT(Restart()));
 }

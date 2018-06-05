@@ -65,7 +65,6 @@ class TorcHTTPServer : public QTcpServer
     bool           event              (QEvent *Event) Q_DECL_OVERRIDE Q_DECL_FINAL;
     bool           Open               (void);
     void           Close              (void);
-    bool           GetSecure          (void);
     TorcWebSocketThread* TakeSocketPriv(TorcWebSocketThread *Socket);
 
   protected:
@@ -74,6 +73,7 @@ class TorcHTTPServer : public QTcpServer
     static QString                    gPlatform;
     static QString                    gOriginWhitelist;
     static QReadWriteLock             gOriginWhitelistLock;
+    static bool                       gWebServerSecure;
 
   private:
     static void     UpdateOriginWhitelist (int Port);
