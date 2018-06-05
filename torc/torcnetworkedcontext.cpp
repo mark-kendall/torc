@@ -122,11 +122,28 @@ TorcNetworkService::~TorcNetworkService()
     }
 }
 
+/*! \brief Determine whether we (the local device) should be the server for peer to peer communications.
+ *
+ * The server is the instance with:
+ *  - higher priority
+ *  - same priority but earlier start time
+ *  - same priority and start time but 'bigger' UUID
+*/
+bool TorcNetworkService::WeActAsServer(int Priority, qint64 StartTime, const QString &UUID)
+{
+    if (Priority != gLocalContext->GetPriority())
+        return Priority < gLocalContext->GetPriority();
+    if (StartTime != gLocalContext->GetStartTime())
+        return StartTime > gLocalContext->GetStartTime();
+    if (UUID != gLocalContext->GetUuid())
+        return UUID < gLocalContext->GetUuid();
+    return false; // at least both devices will try and connect...
+}
+
 /*! \brief Establish a WebSocket connection to the peer if necessary.
  *
  * A connection is only established if we have the necessary details (address, API version, priority,
- * start time etc) and this application should act as the client. If we have an address and port only
- * (e.g. as provided by an SSDP search response), then perform an HTTP query for the peer details.
+ * start time etc) and this application should act as the client.
  *
  * A client has a lower priority or later start time in the event of matching priorities.
 */
@@ -142,12 +159,8 @@ void TorcNetworkService::Connect(void)
         return;
     }
 
-    // do we have details for this peer
-    // 3 current possibilities:
-    //  - the result of Bonjour browser - we wil have all the details from the txt records and can create a WebSocket if needed.
-    //  - the result of SSDP discovery - we will have no details, so perform HTTP query and then create WebSocket if needed.
-    //  - an incoming client peer WebSocket - we will have no details, so peform RPC call over WebSocket to retrieve details.
-
+    // NB all connection methods should now provide all necessary peer data. QueryPeerDetails should now be
+    // redundant.
     if (startTime == 0 || apiVersion.isEmpty() || priority < 0)
     {
         QueryPeerDetails();
@@ -167,18 +180,9 @@ void TorcNetworkService::Connect(void)
         return;
     }
 
-    // lower priority peers should initiate the connection
-    if (priority < gLocalContext->GetPriority())
+    if (WeActAsServer(priority, startTime, uuid))
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Not connecting to %1 - we have higher priority").arg(m_debugString));
-        return;
-    }
-
-    // matching priority, longer running app acts as the server.
-    // In the unlikely event that the start times are the same, use the UUID
-    if (priority == gLocalContext->GetPriority() && (startTime > gLocalContext->GetStartTime() || (startTime == gLocalContext->GetStartTime() && uuid > gLocalContext->GetUuid())))
-    {
-        LOG(VB_GENERAL, LOG_INFO, QString("Not connecting to %1 - we started earlier").arg(m_debugString));
+        LOG(VB_GENERAL, LOG_INFO, QString("Not connecting to %1 - we have priority").arg(m_debugString));
         return;
     }
 
@@ -925,13 +929,18 @@ void TorcNetworkedContext::HandleNewPeer(TorcWebSocketThread *Thread, const QVar
     if (!Thread)
         return;
 
-    QString UUID = Data.value("uuid").toString();
-    QString name = Data.value("name").toString();
+    QString UUID       = Data.value("uuid").toString();
+    QString name       = Data.value("name").toString();
+    int     port       = Data.value("port").toInt();
+    QString apiversion = Data.value("apiversion").toString();
+    int     priority   = Data.value("priority").toInt();
+    qint64  starttime  = Data.value("starttime").toULongLong();
+    QHostAddress address(Data.value("address").toString());
 
     if (UUID.isEmpty())
     {
         LOG(VB_GENERAL, LOG_INFO, QString("Received WebSocket for peer without UUID (%1) - closing").arg(name));
-        Thread->quit(); // is this safe?
+        Thread->quit();
         return;
     }
 
@@ -940,9 +949,9 @@ void TorcNetworkedContext::HandleNewPeer(TorcWebSocketThread *Thread, const QVar
         // no locking required - discovered services are changed in this thread.
         for (int i = 0; i < m_discoveredServices.size(); ++i)
         {
-            if (m_discoveredServices[i]->GetUuid() == UUID)
+            if (m_discoveredServices[i]->GetUuid() == UUID && !TorcNetworkService::WeActAsServer(priority, starttime, UUID))
             {
-                LOG(VB_GENERAL, LOG_INFO, QString("Received WebSocket for known peer ('%1') %2 - closing")
+                LOG(VB_GENERAL, LOG_INFO, QString("Received unexpected WebSocket from peer '%1' (%2) - closing")
                     .arg(m_discoveredServices[i]->GetName()).arg(UUID));
                 Thread->quit();
                 return;
@@ -950,20 +959,17 @@ void TorcNetworkedContext::HandleNewPeer(TorcWebSocketThread *Thread, const QVar
         }
     }
 
-    QHostAddress address(Data.value("address").toString());
-    int port = Data.value("port").toInt();
-
     TorcWebSocketThread* thread = TorcHTTPServer::TakeSocket(Thread);
     if (Thread == thread)
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Received WebSocket for new peer ('%1' %2)").arg(name).arg(UUID));
+        LOG(VB_GENERAL, LOG_INFO, QString("Received WebSocket for new peer '%1' (%2)").arg(name).arg(UUID));
         QList<QHostAddress> addresses;
         addresses << address;
         TorcNetworkService *service = new TorcNetworkService(name, UUID, port, Data.contains("secure"), addresses);
         service->SetWebSocketThread(thread);
-        service->SetAPIVersion(Data.value("apiversion").toString());
-        service->SetPriority(Data.value("priority").toInt());
-        service->SetStartTime(Data.value("starttime").toULongLong());
+        service->SetAPIVersion(apiversion);
+        service->SetPriority(priority);
+        service->SetStartTime(starttime);
         Add(service);
         return;
     }
@@ -996,7 +1002,7 @@ void TorcNetworkedContext::Remove(const QString &UUID, TorcNetworkService::Servi
             {
                 if (m_discoveredServices.at(i)->GetUuid() == UUID)
                 {
-                    // remove the source first - this acts as a form a reference counting
+                    // remove the source first - this acts as a form of reference counting
                     m_discoveredServices.at(i)->RemoveSource(Source);
 
                     // don't delete if the service is still advertised by other means

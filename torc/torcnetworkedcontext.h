@@ -30,9 +30,10 @@ class TorcNetworkService : public QObject
         UPnP        = (1 << 1)
     };
 
-    Q_DECLARE_FLAGS(ServiceSources, ServiceSource);
+    Q_DECLARE_FLAGS(ServiceSources, ServiceSource)
 
   public:
+    static bool WeActAsServer (int Priority, qint64 StartTime, const QString &UUID);
     TorcNetworkService(const QString &Name, const QString &UUID, int Port, bool Secure, const QList<QHostAddress> &Addresses);
     ~TorcNetworkService();
 
@@ -113,8 +114,8 @@ class TorcNetworkService : public QObject
     int                     m_retryInterval;
 };
 
-Q_DECLARE_METATYPE(TorcNetworkService*);
-Q_DECLARE_OPERATORS_FOR_FLAGS(TorcNetworkService::ServiceSources);
+Q_DECLARE_METATYPE(TorcNetworkService*)
+Q_DECLARE_OPERATORS_FOR_FLAGS(TorcNetworkService::ServiceSources)
 
 class TorcNetworkedContext: public QObject, public TorcHTTPService
 {
@@ -169,7 +170,7 @@ class TorcNetworkedContext: public QObject, public TorcHTTPService
     QReadWriteLock             m_discoveredServicesLock;
     QList<QString>             m_serviceList;
     quint32                    m_bonjourBrowserReference;
-    QVariantMap                peers; // dummy
+    QVariantList               peers; // dummy
 };
 
 extern TorcNetworkedContext *gNetworkedContext;
