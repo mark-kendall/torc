@@ -322,7 +322,7 @@ TorcHTTPServer::TorcHTTPServer()
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
         gPlatform += QString("(%1 %2)").arg(QSysInfo::kernelType()).arg(QSysInfo::kernelVersion());
 #else
-        gPlatform += QString("(OldTorc OldVersion)")
+        gPlatform += QString("(OldTorc OldVersion)");
 #endif
 #endif
     }
