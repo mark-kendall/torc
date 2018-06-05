@@ -367,13 +367,15 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest &Request)
         // stop the watchdog timer for peers
         m_watchdogTimer.stop();
         QVariantMap data;
-        data.insert("uuid", Request.Headers()->value("Torc-UUID"));
-        data.insert("name", Request.Headers()->value("Torc-Name"));
-        data.insert("port", Request.Headers()->value("Torc-Port"));
-        data.insert("priority", Request.Headers()->value("Torc-Priority"));
-        data.insert("starttime", Request.Headers()->value("Torc-Starttime"));
+        data.insert("uuid",       Request.Headers()->value("Torc-UUID"));
+        data.insert("name",       Request.Headers()->value("Torc-Name"));
+        data.insert("port",       Request.Headers()->value("Torc-Port"));
+        data.insert("priority",   Request.Headers()->value("Torc-Priority"));
+        data.insert("starttime",  Request.Headers()->value("Torc-Starttime"));
         data.insert("apiversion", Request.Headers()->value("Torc-APIVersion"));
-        data.insert("address", peerAddress().toString());
+        data.insert("address",    peerAddress().toString());
+        if (Request.Headers()->contains("Torc-Secure"))
+            data.insert("secure", "yes");
         TorcNetworkedContext::PeerConnected(m_parent, data);
     }
     else
@@ -809,14 +811,16 @@ void TorcWebSocket::SendHandshake(void)
     stream << "Connection: Upgrade\r\n";
     stream << "Sec-WebSocket-Version: 13\r\n";
     stream << "Sec-WebSocket-Key: " << nonce.data() << "\r\n";
+    if (m_subProtocol != TorcWebSocketReader::SubProtocolNone)
+        stream << "Sec-WebSocket-Protocol: " << TorcWebSocketReader::SubProtocolsToString(m_subProtocol) << "\r\n";
     stream << "Torc-UUID: " << gLocalContext->GetUuid() << "\r\n";
     stream << "Torc-Port: " << QString::number(TorcHTTPServer::GetPort()) << "\r\n";
     stream << "Torc-Name: " << TorcHTTPServer::ServerDescription() << "\r\n";
     stream << "Torc-Priority:" << gLocalContext->GetPriority() << "\r\n";
     stream << "Torc-Starttime:" << gLocalContext->GetStartTime() << "\r\n";
     stream << "Torc-APIVersion:" << TorcHTTPServices::GetVersion() << "\r\n";
-    if (m_subProtocol != TorcWebSocketReader::SubProtocolNone)
-        stream << "Sec-WebSocket-Protocol: " << TorcWebSocketReader::SubProtocolsToString(m_subProtocol) << "\r\n";
+    if (TorcHTTPServer::IsSecure())
+        stream << "Torc-Secure: yes\r\n";
     stream << "\r\n";
     stream.flush();
 

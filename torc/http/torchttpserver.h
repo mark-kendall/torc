@@ -30,6 +30,7 @@ class TorcHTTPServer : public QTcpServer
   public:
     // Content/service handlers
     static QString ServerDescription  (void);
+    static bool    IsSecure           (void);
     static void    Authorise          (const QString &Host, TorcHTTPRequest &Request, bool ForceCheck);
     static void    AuthenticateUser   (TorcHTTPRequest &Request);
     static void    AddAuthenticationHeader(TorcHTTPRequest &Request);
@@ -64,6 +65,7 @@ class TorcHTTPServer : public QTcpServer
     bool           event              (QEvent *Event) Q_DECL_OVERRIDE Q_DECL_FINAL;
     bool           Open               (void);
     void           Close              (void);
+    bool           GetSecure          (void);
     TorcWebSocketThread* TakeSocketPriv(TorcWebSocketThread *Socket);
 
   protected:

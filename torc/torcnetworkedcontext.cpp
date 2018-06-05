@@ -732,7 +732,7 @@ bool TorcNetworkedContext::event(QEvent *Event)
                                 QString version       = QString(map.value("apiversion"));
                                 qint64 starttime      = map.value("starttime").toULongLong();
                                 int priority          = map.value("priority").toInt();
-                                bool secure = map.contains("secure") ? (map.value("secure").trimmed() == "yes" ? true : false) : false;
+                                bool secure           = map.contains("secure");
 
                                 // create the new peer
                                 TorcNetworkService *service = new TorcNetworkService(name, uuid, event->Data().value("port").toInt(),
@@ -789,7 +789,7 @@ bool TorcNetworkedContext::event(QEvent *Event)
                         // need name, uuid, port, hosts, apiversion, priority, starttime, host?
                         QUrl location(event->Data().value("address").toString());
                         QString name = event->Data().value("name").toString();
-                        bool secure = location.scheme().toLower() == "https";
+                        bool secure = event->Data().contains("secure");
                         QList<QHostAddress> hosts;
                         hosts << QHostAddress(location.host());
                         TorcNetworkService *service = new TorcNetworkService(name, uuid, location.port(), secure, hosts);
@@ -958,7 +958,7 @@ void TorcNetworkedContext::HandleNewPeer(TorcWebSocketThread *Thread, const QVar
         LOG(VB_GENERAL, LOG_INFO, QString("Received WebSocket for new peer ('%1' %2)").arg(name).arg(UUID));
         QList<QHostAddress> addresses;
         addresses << address;
-        TorcNetworkService *service = new TorcNetworkService(name, UUID, port, thread->IsSecure(), addresses);
+        TorcNetworkService *service = new TorcNetworkService(name, UUID, port, Data.contains("secure"), addresses);
         service->SetWebSocketThread(thread);
         service->SetAPIVersion(Data.value("apiversion").toString());
         service->SetPriority(Data.value("priority").toInt());

@@ -234,6 +234,16 @@ int TorcHTTPServer::GetPort(void)
     return 0;
 }
 
+bool TorcHTTPServer::IsSecure(void)
+{
+    QMutexLocker locker(&gWebServerLock);
+
+    if (gWebServer)
+        return gWebServer->GetSecure();
+
+    return false;
+}
+
 bool TorcHTTPServer::IsListening(void)
 {
     QMutexLocker locker(&gWebServerLock);
@@ -564,7 +574,8 @@ bool TorcHTTPServer::Open(void)
         map.insert("apiversion", TorcHTTPServices::GetVersion().toLocal8Bit().constData());
         map.insert("priority",   QByteArray::number(gLocalContext->GetPriority()));
         map.insert("starttime",  QByteArray::number(gLocalContext->GetStartTime()));
-        map.insert("secure",     m_secure->GetValue().toBool() ? "yes" : "no");
+        if (m_secure->GetValue().toBool())
+            map.insert("secure", "yes");
 
         QString name = ServerDescription();
 
@@ -592,6 +603,14 @@ QString TorcHTTPServer::ServerDescription(void)
     if (host.isEmpty())
         host = tr("Unknown");
     return QString("%1@%2").arg(QCoreApplication::applicationName()).arg(host);
+}
+
+bool TorcHTTPServer::GetSecure(void)
+{
+    QMutexLocker locker(&gWebServerLock);
+    if (m_secure)
+        return m_secure->GetValue().toBool();
+    return false;
 }
 
 void TorcHTTPServer::Close(void)
