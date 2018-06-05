@@ -902,7 +902,7 @@ void TorcSSDP::ProcessDevice(const QMap<QString,QString> &Headers, qint64 Expire
         data.insert("address", location);
         data.insert("name", Headers.value("name"));
         data.insert("apiversion", Headers.value("apiversion"));
-        data.insert("startime", Headers.value("starttime"));
+        data.insert("starttime", Headers.value("starttime"));
         data.insert("priority", Headers.value("priority"));
         if (Headers.contains("secure"))
             data.insert("secure", "yes");
