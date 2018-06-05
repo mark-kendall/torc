@@ -90,12 +90,11 @@ TorcSSDP::TorcSSDP()
     m_responseTimer(),
     m_responseQueue()
 {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
-    m_serverString = QString("%1/%2 UPnP/1.0 Torc/0.1").arg(QSysInfo::productType()).arg(QSysInfo::productVersion());
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
+    m_serverString = QString("%1/%2 UPnP/1.0 Torc/0.1").arg(QSysInfo::kernelType()).arg(QSysInfo::kernelVersion());
 #else
     m_serverString = QString("OldTorc/OldVersion UPnP/1.0 Torc/0.1");
 #endif
-
     gLocalContext->AddObserver(this);
 
     if (TorcNetwork::IsAvailable())

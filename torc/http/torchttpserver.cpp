@@ -43,14 +43,9 @@
 #include "torcwebsockettoken.h"
 #include "torchttpservernonce.h"
 
-#ifndef Q_OS_WIN
-#include <sys/utsname.h>
-#endif
-
 QMap<QString,TorcHTTPHandler*> gHandlers;
 QReadWriteLock*                gHandlersLock = new QReadWriteLock(QReadWriteLock::Recursive);
 QString                        gServicesDirectory(TORC_SERVICES_DIR);
-
 
 void TorcHTTPServer::RegisterHandler(TorcHTTPHandler *Handler)
 {
@@ -324,9 +319,11 @@ TorcHTTPServer::TorcHTTPServer()
 #ifdef Q_OS_WIN
         gPlatform += QString("(Windows %1.%2)").arg(LOBYTE(LOWORD(GetVersion()))).arg(HIBYTE(LOWORD(GetVersion())));
 #else
-        struct utsname info;
-        uname(&info);
-        gPlatform += QString("(%1 %2)").arg(info.sysname).arg(info.release);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
+        gPlatform += QString("(%1 %2)").arg(QSysInfo::kernelType()).arg(QSysInfo::kernelVersion());
+#else
+        gPlatform += QString("(OldTorc OldVersion)")
+#endif
 #endif
     }
 
