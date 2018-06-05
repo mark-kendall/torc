@@ -518,11 +518,11 @@ void TorcSSDP::SendAnnounce(bool IPv6, bool Alive)
     QString apiversion   = TorcHTTPServices::GetVersion();
     QString starttime    = QString::number(gLocalContext->GetStartTime());
     QString priority     = QString::number(gLocalContext->GetPriority());
-    QByteArray packet1   = QString(notify).arg(secure).arg(ip).arg(url).arg(port).arg("upnp:rootdevice").arg(alive).arg(m_serverString).arg(uuid + "::upnp::rootdevice")
+    QByteArray packet1   = QString(notify).arg(ip).arg(secure).arg(url).arg(port).arg("upnp:rootdevice").arg(alive).arg(m_serverString).arg(uuid + "::upnp::rootdevice")
                                           .arg(name).arg(apiversion).arg(starttime).arg(priority).arg(secure2).toLocal8Bit();
-    QByteArray packet2   = QString(notify).arg(secure).arg(ip).arg(url).arg(port).arg(uuid).arg(alive).arg(m_serverString).arg(uuid)
+    QByteArray packet2   = QString(notify).arg(ip).arg(secure).arg(url).arg(port).arg(uuid).arg(alive).arg(m_serverString).arg(uuid)
                                           .arg(name).arg(apiversion).arg(starttime).arg(priority).arg(secure2).toLocal8Bit();
-    QByteArray packet3   = QString(notify).arg(secure).arg(ip).arg(url).arg(port).arg(TORC_ROOT_UPNP_DEVICE).arg(alive).arg(m_serverString).arg(uuid + "::" + TORC_ROOT_UPNP_DEVICE)
+    QByteArray packet3   = QString(notify).arg(ip).arg(secure).arg(url).arg(port).arg(TORC_ROOT_UPNP_DEVICE).arg(alive).arg(m_serverString).arg(uuid + "::" + TORC_ROOT_UPNP_DEVICE)
                                           .arg(name).arg(apiversion).arg(starttime).arg(priority).arg(secure2).toLocal8Bit();
 
     socket->setSocketOption(QAbstractSocket::MulticastTtlOption, 4);
