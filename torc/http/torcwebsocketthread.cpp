@@ -28,6 +28,7 @@
 
 // Torc
 #include "torclogging.h"
+#include "torclocaldefs.h"
 #include "torcdirectories.h"
 #include "torcwebsocketthread.h"
 
@@ -97,7 +98,17 @@ bool TorcWebSocketThread::CreateCerts(const QString &CertFile, const QString &Ke
 
     LOG(VB_GENERAL, LOG_INFO, "Generating X509 certificate");
     X509 *x509 = X509_new();
-    ASN1_INTEGER_set(X509_get_serialNumber(x509), 1);
+    // we need a unique serial number (or more strictly a unique combination of CA and serial number)
+    QString timenow = QString::number(QDateTime::currentMSecsSinceEpoch());
+    LOG(VB_GENERAL, LOG_INFO, QString("New cert serial number: %1").arg(timenow));
+    BIGNUM *bn = BN_new();
+    if (BN_dec2bn(&bn, timenow.toLatin1().constData()) != timenow.size())
+        LOG(VB_GENERAL, LOG_WARNING, "Conversion error");
+    ASN1_INTEGER *sno = ASN1_INTEGER_new();
+    sno = BN_to_ASN1_INTEGER(bn, sno);
+    X509_set_serialNumber(x509, sno);
+    BN_free(bn);
+    ASN1_INTEGER_free(sno);
     X509_gmtime_adj(X509_get_notBefore(x509), 0);
     X509_gmtime_adj(X509_get_notAfter(x509), 315360000L); // valid for 10 years!
     X509_set_pubkey(x509, privatekey);
@@ -179,9 +190,9 @@ void TorcWebSocketThread::SetupSSL(void)
     config.setCiphers(QSslSocket::supportedCiphers());
 #endif
 
-    QString certlocation = GetTorcConfigDir() + "/torc.cert";
+    QString certlocation = GetTorcConfigDir() + "/" + TORC_TORC + ".cert";
     LOG(VB_GENERAL, LOG_INFO, QString("SSL: looking for cert in '%1'").arg(certlocation));
-    QString keylocation  = GetTorcConfigDir() + "/torc.key";
+    QString keylocation  = GetTorcConfigDir() + "/" + TORC_TORC + ".key";
     LOG(VB_GENERAL, LOG_INFO, QString("SSL: looking for key in '%1'").arg(keylocation));
 
     bool create = false;
