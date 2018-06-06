@@ -282,6 +282,7 @@ TorcHTTPServer::TorcHTTPServer()
     m_port(NULL),
     m_secure(NULL),
     m_upnp(NULL),
+    m_bonjour(NULL),
     m_user(),
     m_defaultHandler("", TORC_TORC), // default top level handler
     m_servicesHandler(this),         // services 'helper' service for '/services'
@@ -317,6 +318,12 @@ TorcHTTPServer::TorcHTTPServer()
     m_upnp->SetActive(true);
     connect(m_upnp, SIGNAL(ValueChanged(bool)), this, SLOT(UPnPChanged(bool)));
 
+    m_bonjour = new TorcSetting(m_serverSettings, "ServerBonjour", tr("Bonjour discovery"), TorcSetting::Bool,
+                                TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true));
+    m_bonjour->SetHelpText(tr("Use Bonjour to advertise this device and search for similar devices"));
+    m_bonjour->SetActive(true);
+    connect(m_bonjour, SIGNAL(ValueChanged(bool)), this, SLOT(BonjourChanged(bool)));
+
     // initialise platform name
     static bool initialised = false;
     if (!initialised)
@@ -348,6 +355,13 @@ TorcHTTPServer::~TorcHTTPServer()
     gLocalContext->RemoveObserver(this);
 
     Close();
+
+    if (m_bonjour)
+    {
+        m_bonjour->Remove();
+        m_bonjour->DownRef();
+        m_bonjour = NULL;
+    }
 
     if (m_upnp)
     {
@@ -536,6 +550,52 @@ void TorcHTTPServer::UpdateOriginWhitelist(int Port)
     LOG(VB_NETWORK, LOG_INFO, "Origin whitelist: " + gOriginWhitelist);
 }
 
+void TorcHTTPServer::StartBonjour(void)
+{
+    if (!m_httpBonjourReference || !m_torcBonjourReference)
+    {
+        int port = m_port->GetValue().toInt();
+        QMap<QByteArray,QByteArray> map;
+        map.insert("uuid", gLocalContext->GetUuid().toLatin1());
+        map.insert("apiversion", TorcHTTPServices::GetVersion().toLocal8Bit().constData());
+        map.insert("priority",   QByteArray::number(gLocalContext->GetPriority()));
+        map.insert("starttime",  QByteArray::number(gLocalContext->GetStartTime()));
+        if (m_secure->GetValue().toBool())
+            map.insert("secure", "yes");
+
+        QString name = ServerDescription();
+
+        if (!m_httpBonjourReference)
+            m_httpBonjourReference = TorcBonjour::Instance()->Register(port, m_secure->GetValue().toBool() ? "_https._tcp" : "_http._tcp", name.toLocal8Bit().constData(), map);
+
+        if (!m_torcBonjourReference)
+            m_torcBonjourReference = TorcBonjour::Instance()->Register(port, "_torc._tcp", name.toLocal8Bit().constData(), map);
+    }
+}
+
+void TorcHTTPServer::StopBonjour(void)
+{
+    if (m_httpBonjourReference)
+    {
+        TorcBonjour::Instance()->Deregister(m_httpBonjourReference);
+        m_httpBonjourReference = 0;
+    }
+
+    if (m_torcBonjourReference)
+    {
+        TorcBonjour::Instance()->Deregister(m_torcBonjourReference);
+        m_torcBonjourReference = 0;
+    }
+}
+
+void TorcHTTPServer::BonjourChanged(bool Bonjour)
+{
+    if (Bonjour)
+        StartBonjour();
+    else
+        StopBonjour();
+}
+
 bool TorcHTTPServer::Open(void)
 {
     int port = m_port->GetValue().toInt();
@@ -562,38 +622,12 @@ bool TorcHTTPServer::Open(void)
         m_port->SetValue(QVariant((int)port));
 
         // re-advertise if the port has changed
-        if (m_httpBonjourReference)
-        {
-            TorcBonjour::Instance()->Deregister(m_httpBonjourReference);
-            m_httpBonjourReference = 0;
-        }
-
-        if (m_torcBonjourReference)
-        {
-            TorcBonjour::Instance()->Deregister(m_torcBonjourReference);
-            m_torcBonjourReference = 0;
-        }
+        StopBonjour();
     }
 
     // advertise service if not already doing so
-    if (!m_httpBonjourReference || !m_torcBonjourReference)
-    {
-        QMap<QByteArray,QByteArray> map;
-        map.insert("uuid", gLocalContext->GetUuid().toLatin1());
-        map.insert("apiversion", TorcHTTPServices::GetVersion().toLocal8Bit().constData());
-        map.insert("priority",   QByteArray::number(gLocalContext->GetPriority()));
-        map.insert("starttime",  QByteArray::number(gLocalContext->GetStartTime()));
-        if (m_secure->GetValue().toBool())
-            map.insert("secure", "yes");
-
-        QString name = ServerDescription();
-
-        if (!m_httpBonjourReference)
-            m_httpBonjourReference = TorcBonjour::Instance()->Register(port, m_secure->GetValue().toBool() ? "_https._tcp" : "_http._tcp", name.toLocal8Bit().constData(), map);
-
-        if (!m_torcBonjourReference)
-            m_torcBonjourReference = TorcBonjour::Instance()->Register(port, "_torc._tcp", name.toLocal8Bit().constData(), map);
-    }
+    if (m_bonjour->GetValue().toBool())
+        StartBonjour();
 
     if (m_upnp->GetValue().toBool())
         TorcSSDP::Announce(m_secure->GetValue().toBool());
@@ -618,17 +652,7 @@ QString TorcHTTPServer::ServerDescription(void)
 void TorcHTTPServer::Close(void)
 {
     // stop advertising
-    if (m_httpBonjourReference)
-    {
-        TorcBonjour::Instance()->Deregister(m_httpBonjourReference);
-        m_httpBonjourReference = 0;
-    }
-
-    if (m_torcBonjourReference)
-    {
-        TorcBonjour::Instance()->Deregister(m_torcBonjourReference);
-        m_torcBonjourReference = 0;
-    }
+    StopBonjour();
 
     if (m_upnp->GetValue().toBool())
         TorcSSDP::CancelAnnounce();

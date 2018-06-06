@@ -55,6 +55,7 @@ class TorcHTTPServer : public QTcpServer
     void           PortChanged        (int Port);
     void           SecureChanged      (bool Secure);
     void           UPnPChanged        (bool UPnP);
+    void           BonjourChanged     (bool Bonjour);
     void           Restart            (void);
 
   signals:
@@ -78,12 +79,15 @@ class TorcHTTPServer : public QTcpServer
 
   private:
     static void     UpdateOriginWhitelist (int Port);
+    void            StartBonjour      (void);
+    void            StopBonjour       (void);
 
   private:
     TorcSettingGroup                 *m_serverSettings;
     TorcSetting                      *m_port;
     TorcSetting                      *m_secure;
     TorcSetting                      *m_upnp;
+    TorcSetting                      *m_bonjour;
     TorcUser                          m_user;
     TorcHTMLHandler                   m_defaultHandler;
     TorcHTTPServices                  m_servicesHandler;
