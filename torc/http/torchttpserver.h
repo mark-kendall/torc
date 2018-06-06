@@ -54,6 +54,7 @@ class TorcHTTPServer : public QTcpServer
   public slots:
     void           PortChanged        (int Port);
     void           SecureChanged      (bool Secure);
+    void           UPnPChanged        (bool UPnP);
     void           Restart            (void);
 
   signals:
@@ -82,6 +83,7 @@ class TorcHTTPServer : public QTcpServer
     TorcSettingGroup                 *m_serverSettings;
     TorcSetting                      *m_port;
     TorcSetting                      *m_secure;
+    TorcSetting                      *m_upnp;
     TorcUser                          m_user;
     TorcHTMLHandler                   m_defaultHandler;
     TorcHTTPServices                  m_servicesHandler;

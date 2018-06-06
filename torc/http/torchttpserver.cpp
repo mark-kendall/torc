@@ -281,6 +281,7 @@ TorcHTTPServer::TorcHTTPServer()
     m_serverSettings(NULL),
     m_port(NULL),
     m_secure(NULL),
+    m_upnp(NULL),
     m_user(),
     m_defaultHandler("", TORC_TORC), // default top level handler
     m_servicesHandler(this),         // services 'helper' service for '/services'
@@ -301,14 +302,20 @@ TorcHTTPServer::TorcHTTPServer()
     m_port->SetRange(root ? 1 : 1024, 65535, 1);
     m_port->SetActive(true);
     connect(m_port, SIGNAL(ValueChanged(int)), this, SLOT(PortChanged(int)));
-
     m_port->SetHelpText(tr("The port the server will listen on for incoming connections"));
+
     m_secure = new TorcSetting(m_serverSettings, TORC_SSL_SERVICE, tr("Secure sockets"), TorcSetting::Bool,
                                TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)false));
     m_secure->SetHelpText(tr("Use encrypted (SSL/TLS) connections to the server"));
     m_secure->SetActive(true);
     gWebServerSecure = m_secure->GetValue().toBool();
     connect(m_secure, SIGNAL(ValueChanged(bool)), this, SLOT(SecureChanged(bool)));
+
+    m_upnp =  new TorcSetting(m_serverSettings, "ServerUPnP", tr("UPnP Discovery"), TorcSetting::Bool,
+                              TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true));
+    m_upnp->SetHelpText(tr("Use UPnP to advertise this device and search for similar devices"));
+    m_upnp->SetActive(true);
+    connect(m_upnp, SIGNAL(ValueChanged(bool)), this, SLOT(UPnPChanged(bool)));
 
     // initialise platform name
     static bool initialised = false;
@@ -341,6 +348,13 @@ TorcHTTPServer::~TorcHTTPServer()
     gLocalContext->RemoveObserver(this);
 
     Close();
+
+    if (m_upnp)
+    {
+        m_upnp->Remove();
+        m_upnp->DownRef();
+        m_upnp = NULL;
+    }
 
     if (m_port)
     {
@@ -581,7 +595,8 @@ bool TorcHTTPServer::Open(void)
             m_torcBonjourReference = TorcBonjour::Instance()->Register(port, "_torc._tcp", name.toLocal8Bit().constData(), map);
     }
 
-    TorcSSDP::Announce(m_secure->GetValue().toBool());
+    if (m_upnp->GetValue().toBool())
+        TorcSSDP::Announce(m_secure->GetValue().toBool());
 
     if (!waslistening)
     {
@@ -615,7 +630,8 @@ void TorcHTTPServer::Close(void)
         m_torcBonjourReference = 0;
     }
 
-    TorcSSDP::CancelAnnounce();
+    if (m_upnp->GetValue().toBool())
+        TorcSSDP::CancelAnnounce();
 
     // close connections
     m_webSocketPool.CloseSockets();
@@ -640,6 +656,14 @@ void TorcHTTPServer::SecureChanged(bool Secure)
     }
     LOG(VB_GENERAL, LOG_INFO, QString("Secure changed to '%1secure - restarting").arg(Secure ? "" : "in"));
     QTimer::singleShot(10, this, SLOT(Restart()));
+}
+
+void TorcHTTPServer::UPnPChanged(bool UPnP)
+{
+    if (UPnP)
+        TorcSSDP::Announce(m_secure->GetValue().toBool());
+    else
+        TorcSSDP::CancelAnnounce();
 }
 
 void TorcHTTPServer::Restart(void)
