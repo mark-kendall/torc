@@ -102,8 +102,8 @@ class TorcHTTPServer : public QTcpServer
     Q_DISABLE_COPY(TorcHTTPServer)
 };
 
-Q_DECLARE_METATYPE(TorcHTTPRequest*);
-Q_DECLARE_METATYPE(QTcpSocket*);
-Q_DECLARE_METATYPE(QHostAddress);
+Q_DECLARE_METATYPE(TorcHTTPRequest*)
+Q_DECLARE_METATYPE(QTcpSocket*)
+Q_DECLARE_METATYPE(QHostAddress)
 
 #endif // TORCHTTPSERVER_H
