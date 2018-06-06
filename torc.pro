@@ -37,7 +37,7 @@ QMAKE_CXXFLAGS += -Wall -Wextra -Weffc++ -Werror
 # explicitly add SSL - this may need more work
 macx {
     # NB this is a brew workaround
-    LIBS        += -L/usr/local/opt/openssl/lib -lopenssl
+    LIBS        += -L/usr/local/opt/openssl/lib -lssl
     INCLUDEPATH += /usr/local/opt/openssl/include
 }
 CONFIG    += link_pkgconfig
