@@ -529,23 +529,28 @@ void TorcHTTPServer::AuthenticateUser(TorcHTTPRequest &Request)
  *
  * \note This assumes the server is listening on all interfaces (currently true).
 */
-void TorcHTTPServer::UpdateOriginWhitelist(int Port)
+void TorcHTTPServer::UpdateOriginWhitelist(int Port, bool Secure)
 {
     QWriteLocker locker(&gOriginWhitelistLock);
 
+    QString protocol = Secure ? "https://" : "http://";
+
     // localhost first
-    gOriginWhitelist = "http://localhost:" + QString::number(Port) + " ";
+    gOriginWhitelist = protocol + "localhost:" + QString::number(Port) + " ";
 
     // all known raw IP addresses
     QList<QHostAddress> addresses = QNetworkInterface::allAddresses();
     for (int i = 0; i < addresses.size(); ++i)
-        gOriginWhitelist += QString("%1%2 ").arg("http://").arg(TorcNetwork::IPAddressToLiteral(addresses[i], Port, false));
+        gOriginWhitelist += QString("%1%2 ").arg(protocol).arg(TorcNetwork::IPAddressToLiteral(addresses[i], Port, false));
 
     // and any known host names
     QStringList hosts = TorcNetwork::GetHostNames();
     foreach (QString host, hosts)
-        if (!host.isEmpty())
-            gOriginWhitelist += QString("%1%2:%3 ").arg("http://").arg(host).arg(Port);
+    {
+        QString newhost = QString("%1%2:%3 ").arg(protocol).arg(host).arg(Port);
+        if (!host.isEmpty() && !gOriginWhitelist.contains(newhost))
+            gOriginWhitelist += newhost;
+    }
 
     LOG(VB_NETWORK, LOG_INFO, "Origin whitelist: " + gOriginWhitelist);
 }
@@ -635,7 +640,7 @@ bool TorcHTTPServer::Open(void)
     if (!waslistening)
     {
         LOG(VB_GENERAL, LOG_INFO, QString("Web server listening for %1secure connections on port %2").arg(m_secure->GetValue().toBool() ? "" : "in").arg(port));
-        UpdateOriginWhitelist(m_port->GetValue().toInt());
+        UpdateOriginWhitelist(m_port->GetValue().toInt(), m_secure->GetValue().toBool());
     }
 
     return true;
@@ -711,7 +716,7 @@ bool TorcHTTPServer::event(QEvent *Event)
                 case Torc::NetworkUnavailable:
                 case Torc::NetworkChanged:
                 case Torc::NetworkHostNamesChanged:
-                    UpdateOriginWhitelist(m_port->GetValue().toInt());
+                    UpdateOriginWhitelist(m_port->GetValue().toInt(), m_secure->GetValue().toBool());
                     break;
                 case Torc::UserChanged:
                     LOG(VB_GENERAL, LOG_INFO, "User name/credentials changed - restarting webserver");

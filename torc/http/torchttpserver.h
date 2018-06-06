@@ -78,9 +78,9 @@ class TorcHTTPServer : public QTcpServer
     static bool                       gWebServerSecure;
 
   private:
-    static void     UpdateOriginWhitelist (int Port);
-    void            StartBonjour      (void);
-    void            StopBonjour       (void);
+    static void    UpdateOriginWhitelist (int Port, bool Secure);
+    void           StartBonjour       (void);
+    void           StopBonjour        (void);
 
   private:
     TorcSettingGroup                 *m_serverSettings;
