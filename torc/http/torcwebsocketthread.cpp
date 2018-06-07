@@ -205,7 +205,6 @@ void TorcWebSocketThread::SetupSSL(void)
     {
         create = true;
         LOG(VB_GENERAL, LOG_WARNING, "Failed to find key");
-        create = true;
     }
 
     if (create && !CreateCerts(certlocation, keylocation))
