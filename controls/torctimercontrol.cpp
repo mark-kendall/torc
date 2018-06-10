@@ -176,7 +176,7 @@ QStringList TorcTimerControl::GetDescription(void)
         result.append(tr("Frequency %1").arg(frequency));
         result.append(tr("Duration %1").arg(length));
     }
-    else if (TorcTimerControl::Minutely == m_timerType ||)
+    else if (TorcTimerControl::Minutely == m_timerType)
     {
         result.append(tr("Minutely Timer"));
         result.append(tr("Start %1").arg(time.toString(QString("hh:mm.ss"))));
