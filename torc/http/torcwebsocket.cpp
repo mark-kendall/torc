@@ -414,24 +414,7 @@ void TorcWebSocket::Encrypted(void)
 
 void TorcWebSocket::SSLErrors(const QList<QSslError> &Errors)
 {
-    QList<QSslError> allowed;
-    foreach (QSslError error, Errors)
-    {
-        if (error.error() == QSslError::SelfSignedCertificate)
-        {
-            LOG(VB_GENERAL, LOG_INFO, "Allowing self signed certificate");
-            allowed << error;
-        }
-        else if (error.error() == QSslError::HostNameMismatch)
-        {
-            LOG(VB_GENERAL, LOG_INFO, "Allowing host name mismatch");
-            allowed << error;
-        }
-        else
-        {
-            LOG(VB_GENERAL, LOG_INFO, QString("Ssl Error: %1").arg(error.errorString()));
-        }
-    }
+    QList<QSslError> allowed = TorcNetwork::AllowableSslErrors(Errors);
     if (!allowed.isEmpty())
         ignoreSslErrors(allowed);
 }
