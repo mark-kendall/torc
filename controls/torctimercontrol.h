@@ -43,19 +43,15 @@ class TorcTimerControl : public TorcControl
 
   private:
     void              CalculateOutput (void);
-    quint64           GetMaxDuration  (void) const;
+    quint64           GetPeriodDuration(void) const;
+    quint64           MsecsSincePeriodStart (void);
 
   private:
     TorcTimerControl::TimerType m_timerType;
-
-    QTime             m_startTime;
     int               m_startDay;
-    quint64           m_startDuration;
-
+    quint64           m_startTime;
     quint64           m_duration;
-    QTime             m_durationTime;
     int               m_durationDay;
-
     QTimer            m_timer;
     bool              m_firstTrigger;
 };
