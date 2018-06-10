@@ -11,6 +11,7 @@ class TorcQThread : public QThread
   public:
     static void     SetMainThread    (void);
     static bool     IsMainThread     (void);
+    static void     InitRand         (void);
 
   public:
     explicit TorcQThread(const QString &Name);

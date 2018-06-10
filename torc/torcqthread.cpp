@@ -45,6 +45,7 @@ static QThread *gMainThread  = NULL;
 void TorcQThread::SetMainThread(void)
 {
     gMainThread = QThread::currentThread();
+    InitRand();
     QThread::currentThread()->setObjectName("MainLoop");
 }
 
@@ -53,6 +54,11 @@ bool TorcQThread::IsMainThread(void)
     if (gMainThread)
         return QThread::currentThread() == gMainThread;
     return QThread::currentThread()->objectName() == TORC_MAIN_THREAD;
+}
+
+void TorcQThread::InitRand(void)
+{
+    qsrand(QDateTime::currentDateTime().toTime_t() ^ QTime::currentTime().msec());
 }
 
 TorcQThread::TorcQThread(const QString &Name)
@@ -77,7 +83,7 @@ void TorcQThread::run(void)
 void TorcQThread::Initialise(void)
 {
     RegisterLoggingThread();
-    qsrand(QDateTime::currentDateTime().toTime_t() ^ QTime::currentTime().msec());
+    InitRand();
 
     Start();
 
