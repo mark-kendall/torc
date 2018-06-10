@@ -32,7 +32,7 @@
 
 QMap<QString,int> TorcLanguage::gLanguageMap;
 
-#define BLACKLIST QString("submit,revert,SetLanguageCode")
+#define BLACKLIST QString("SetLanguageCode,LanguageSettingChanged")
 
 /*! \class TorcLanguage
  *  \brief A class to track and manage language and locale settings and available translations.
