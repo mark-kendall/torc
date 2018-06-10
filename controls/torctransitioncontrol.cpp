@@ -355,8 +355,10 @@ void TorcTransitionControl::CalculateOutput(void)
 /// Our main output, value, is read only. So the animation operates on a proxy, animationValue.
 void TorcTransitionControl::SetAnimationValue(double Value)
 {
-    animationValue = Value;
-    SetValue(Value);
+    QMutexLocker locker(&lock);
+    double rounded = ((qint64)(Value * 100)) / 100.0;
+    animationValue = rounded;
+    SetValue(rounded);
 }
 
 double TorcTransitionControl::GetAnimationValue(void)
