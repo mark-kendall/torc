@@ -587,7 +587,7 @@ void TorcTimerControl::GenerateTimings(void)
         m_duration   += 1; // range 1<->period-1
         m_duration   *= 1000;
         m_durationDay = m_duration / kMSecsInDay;
-        LOG(VB_GENERAL, LOG_INFO, QString("Timer %1 - new random duration %2").arg(uniqueId).arg(DurationToString(m_durationDay, m_duration / 1000)));
+        LOG(VB_GENERAL, LOG_DEBUG, QString("Timer %1 - new random duration %2").arg(uniqueId).arg(DurationToString(m_durationDay, m_duration / 1000)));
     }
     else if (m_randomStart)
     {
@@ -595,7 +595,7 @@ void TorcTimerControl::GenerateTimings(void)
         m_startTime = qrand() % (mod); // range 0<->period-1
         m_startTime *= 1000;
         m_startDay = m_startTime / kMSecsInDay;
-        LOG(VB_GENERAL, LOG_INFO, QString("Timer %1 - new random start %2").arg(uniqueId).arg(DurationToString(m_startDay, m_startTime / 1000)));
+        LOG(VB_GENERAL, LOG_DEBUG, QString("Timer %1 - new random start %2").arg(uniqueId).arg(DurationToString(m_startDay, m_startTime / 1000)));
     }
 }
 
