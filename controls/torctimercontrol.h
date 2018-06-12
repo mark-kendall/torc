@@ -42,6 +42,7 @@ class TorcTimerControl : public TorcControl
     void              TimerTimeout    (void);
 
   private:
+    void              GenerateTimings (void);
     void              CalculateOutput (void);
     quint64           GetPeriodDuration(void) const;
     quint64           MsecsSincePeriodStart (void);
@@ -52,8 +53,14 @@ class TorcTimerControl : public TorcControl
     quint64           m_startTime;
     quint64           m_duration;
     int               m_durationDay;
+    int               m_periodDay;
+    quint64           m_periodTime;
     QTimer            m_timer;
     bool              m_firstTrigger;
+    bool              m_randomStart;
+    bool              m_randomDuration;
+    quint64           m_lastElapsed;
+    bool              m_newRandom;
 };
 
 #endif // TORCTIMERCONTROL_H
