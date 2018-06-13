@@ -4,7 +4,7 @@
 // Torc
 #include "torcphoutput.h"
 
-class TorcNetworkpHOutput : public TorcpHOutput
+class TorcNetworkpHOutput Q_DECL_FINAL : public TorcpHOutput
 {
     Q_OBJECT
 
@@ -12,7 +12,7 @@ class TorcNetworkpHOutput : public TorcpHOutput
     TorcNetworkpHOutput(double Default, const QVariantMap &Details);
     ~TorcNetworkpHOutput();
 
-    QStringList GetDescription(void);
+    QStringList GetDescription(void) Q_DECL_OVERRIDE;
 };
 
 #endif // TORCNETWORKPHOUTPUT_H

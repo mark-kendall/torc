@@ -10,7 +10,7 @@ class TorcPWMOutput : public TorcOutput
     TorcPWMOutput(double Value, const QString &ModelId, const QVariantMap &Details);
     virtual ~TorcPWMOutput();
 
-    TorcOutput::Type GetType (void);
+    TorcOutput::Type GetType (void) Q_DECL_OVERRIDE;
 };
 
 #endif // TORCPWMOUTPUT_H
