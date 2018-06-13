@@ -42,11 +42,6 @@ TorcNotifier::~TorcNotifier()
 {
 }
 
-bool TorcNotifier::event(QEvent *Event)
-{
-    return TorcDevice::event(Event);
-}
-
 TorcNotifierFactory* TorcNotifierFactory::gTorcNotifierFactory = NULL;
 
 TorcNotifierFactory::TorcNotifierFactory()
