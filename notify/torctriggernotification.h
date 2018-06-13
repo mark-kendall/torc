@@ -6,7 +6,7 @@
 
 class TorcDevice;
 
-class TorcTriggerNotification : public TorcNotification
+class TorcTriggerNotification Q_DECL_FINAL : public TorcNotification
 {
     Q_OBJECT
 

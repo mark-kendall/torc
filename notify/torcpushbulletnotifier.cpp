@@ -185,9 +185,9 @@ void TorcPushbulletNotifier::ResetTimerTimeout(void)
     SetValid(!m_accessToken.isEmpty());
 }
 
-class TorcPushbulletNotifierFactory : public TorcNotifierFactory
+class TorcPushbulletNotifierFactory Q_DECL_FINAL : public TorcNotifierFactory
 {
-    TorcNotifier* Create(const QString &Type, const QVariantMap &Details)
+    TorcNotifier* Create(const QString &Type, const QVariantMap &Details) Q_DECL_OVERRIDE
     {
         if (Type == "pushbullet" && Details.contains("accesstoken"))
             return new TorcPushbulletNotifier(Details);
