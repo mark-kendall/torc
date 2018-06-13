@@ -55,7 +55,7 @@ QString DomainToString  (OMX_INDEXTYPE Domain);
 #define OMX_CHECKX(Error, Component, Message) \
     if (OMX_ErrorNone != Error) { OMX_ERROR(Error, Component, Message); }
 
-class TorcOMXCore : public QLibrary
+class TorcOMXCore Q_DECL_FINAL : public QLibrary
 {
   public:
     TorcOMXCore(const QString &Library);

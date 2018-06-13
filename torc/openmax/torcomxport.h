@@ -14,7 +14,7 @@
 #include "OMX_Core.h"
 #include "OMX_Component.h"
 
-class TorcOMXPort
+class TorcOMXPort Q_DECL_FINAL
 {
   public:
     TorcOMXPort(TorcOMXComponent *Parent, OMX_HANDLETYPE Handle, OMX_U32 Port, OMX_INDEXTYPE Domain);

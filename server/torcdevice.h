@@ -18,12 +18,12 @@ class TorcDevice : public QObject, public TorcReferenceCounter
     friend class TorcCentral;
 
     Q_OBJECT
-    Q_PROPERTY(bool     valid                   READ GetValid()                   NOTIFY   ValidChanged());
-    Q_PROPERTY(double   value                   READ GetValue()                   NOTIFY   ValueChanged());
-    Q_PROPERTY(QString  modelId                 READ GetModelId()                 CONSTANT);
-    Q_PROPERTY(QString  uniqueId                READ GetUniqueId()                CONSTANT);
-    Q_PROPERTY(QString  userName                READ GetUserName()                WRITE    SetUserName()        NOTIFY UserNameChanged());
-    Q_PROPERTY(QString  userDescription         READ GetUserDescription()         WRITE    SetUserDescription() NOTIFY UserDescriptionChanged());
+    Q_PROPERTY(bool     valid                   READ GetValid()                   NOTIFY   ValidChanged(Valid))
+    Q_PROPERTY(double   value                   READ GetValue()                   NOTIFY   ValueChanged(Value))
+    Q_PROPERTY(QString  modelId                 READ GetModelId()                 CONSTANT)
+    Q_PROPERTY(QString  uniqueId                READ GetUniqueId()                CONSTANT)
+    Q_PROPERTY(QString  userName                READ GetUserName()                WRITE    SetUserName(Name)               NOTIFY UserNameChanged(Name))
+    Q_PROPERTY(QString  userDescription         READ GetUserDescription()         WRITE    SetUserDescription(Description) NOTIFY UserDescriptionChanged(Description))
 
   public:
     TorcDevice(bool Valid, double Value, double Default,

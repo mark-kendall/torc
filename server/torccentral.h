@@ -10,7 +10,7 @@
 #include "torcdevice.h"
 #include "http/torchttpservice.h"
 
-class TorcCentral : public QObject, public TorcHTTPService
+class TorcCentral Q_DECL_FINAL : public QObject, public TorcHTTPService
 {
   public:
     enum TemperatureUnits
@@ -28,8 +28,8 @@ class TorcCentral : public QObject, public TorcHTTPService
     TorcCentral();
     ~TorcCentral();
 
-    QString         GetUIName             (void);
-    bool            event                 (QEvent *Event);
+    QString         GetUIName             (void) Q_DECL_OVERRIDE;
+    bool            event                 (QEvent *Event) Q_DECL_OVERRIDE;
     static QByteArray GetCustomisedXSD    (const QString &BaseXSDFile);
     static TemperatureUnits GetGlobalTemperatureUnits (void);
     static QString   TemperatureUnitsToString(TemperatureUnits Units);
