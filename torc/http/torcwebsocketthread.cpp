@@ -269,6 +269,7 @@ void TorcWebSocketThread::Start(void)
         m_webSocket = new TorcWebSocket(this, m_address, m_port, m_secure, m_protocol);
 
     connect(m_webSocket, SIGNAL(ConnectionEstablished()), this, SIGNAL(ConnectionEstablished()));
+    connect(m_webSocket, SIGNAL(ConnectionUpgraded()),    this, SIGNAL(ConnectionUpgraded()));
     connect(m_webSocket, SIGNAL(Disconnected()),          this, SLOT(quit()));
     // the websocket is created in its own thread so these signals will be delivered into the correct thread.
     connect(this, SIGNAL(RemoteRequestSignal(TorcRPCRequest*)), m_webSocket, SLOT(RemoteRequest(TorcRPCRequest*)));

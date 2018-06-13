@@ -1024,7 +1024,7 @@ void TorcWebSocket::SetState(SocketState State)
     }
 
     if (m_socketState == SocketState::Upgraded)
-        emit ConnectionEstablished();
+        emit ConnectionUpgraded();
 }
 
 void TorcWebSocket::ProcessPayload(const QByteArray &Payload)

@@ -25,6 +25,7 @@ class TorcWebSocketThread : public TorcQThread
 
   signals:
     void                ConnectionEstablished (void);
+    void                ConnectionUpgraded    (void);
     void                RemoteRequestSignal   (TorcRPCRequest *Request);
     void                CancelRequestSignal   (TorcRPCRequest *Request);
 
