@@ -23,9 +23,8 @@
 // Torc
 #include "torctime.h"
 #include "torclogging.h"
+#include "torclocalcontext.h"
 #include "torcadminthread.h"
-
-#define TORC_TIME_FORMAT QString("dd.MM.yyyy hh:mm:ss")
 
 /*! \class TorcTime
  *  \brief A simple time service to confirm the time (and date) the system is currently operating with.
@@ -40,8 +39,12 @@
 TorcTime::TorcTime()
   : QObject(), TorcHTTPService(this, "time", "time", TorcTime::staticMetaObject, "Tick"),
     currentTime(),
-    m_timer()
+    m_lastTime(QDateTime::currentDateTime()),
+    m_timer(),
+    m_dateTimeFormat()
 {
+    // NB if the language changes, the device will be restarted so no need to worry about format changes
+    m_dateTimeFormat = gLocalContext->GetLocale().dateTimeFormat(QLocale::LongFormat);
     m_timer.setInterval(1000);
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(Tick()));
     m_timer.start();
@@ -53,12 +56,21 @@ TorcTime::~TorcTime()
 
 QString TorcTime::GetCurrentTime(void)
 {
-    return QDateTime::currentDateTime().toString(TORC_TIME_FORMAT);
+    return m_lastTime.toString(m_dateTimeFormat);
 }
 
 void TorcTime::Tick(void)
 {
-    emit currentTimeChanged(GetCurrentTime());
+    QDateTime timenow = QDateTime::currentDateTime();
+    qint64 difference = timenow.secsTo(m_lastTime);
+    m_lastTime = timenow;
+    if (abs(difference) > 2)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Detected change in system time");
+        gLocalContext->NotifyEvent(Torc::SystemTimeChanged);
+    }
+
+    emit currentTimeChanged(m_lastTime.toString(m_dateTimeFormat));
 }
 
 void TorcTime::SubscriberDeleted(QObject *Subscriber)
