@@ -69,7 +69,7 @@ $(document).ready(function() {
     function peerSubscriptionChanged(version, ignore, properties) {
         if (version !== undefined && typeof properties === 'object' && properties.hasOwnProperty('peers') &&
             properties.peers.hasOwnProperty('value') && $.isArray(properties.peers.value)) {
-            addNavbarDropdown('torc-peer-dropdown', 'link', 'torc-peer-menu');
+            addNavbarDropdown('torc-peer-dropdown', 'sitemap', 'torc-peer-menu');
             $.each(properties, function (key, value) {
                 peerListChanged(key, value.value); });
             return;
