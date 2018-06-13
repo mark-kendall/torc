@@ -33,8 +33,6 @@
  * heartbeat over the websocket connection to the remote interface.
  *
  *  \todo Allow customisation of the time format.
- *  \todo Add a check for time changes - which may happen after Torc has started and the system has connected
- *        to an ntp server or local real time clock.
 */
 TorcTime::TorcTime()
   : QObject(), TorcHTTPService(this, "time", "time", TorcTime::staticMetaObject, "Tick"),
