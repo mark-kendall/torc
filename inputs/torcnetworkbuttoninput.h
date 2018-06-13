@@ -7,7 +7,7 @@
 // Torc
 #include "torcnetworkswitchinput.h"
 
-class TorcNetworkButtonInput : public TorcNetworkSwitchInput
+class TorcNetworkButtonInput Q_DECL_FINAL : public TorcNetworkSwitchInput
 {
     Q_OBJECT
 
