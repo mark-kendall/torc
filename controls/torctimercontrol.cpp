@@ -217,10 +217,13 @@ TorcTimerControl::TorcTimerControl(const QString &Type, const QVariantMap &Detai
 
     // everything appears to be valid at this stage
     m_parsed = true;
+
+    gLocalContext->AddObserver(this);
 }
 
 TorcTimerControl::~TorcTimerControl()
 {
+    gLocalContext->RemoveObserver(this);
 }
 
 TorcControl::Type TorcTimerControl::GetType(void) const
@@ -307,6 +310,24 @@ void TorcTimerControl::Start(void)
 bool TorcTimerControl::AllowInputs(void) const
 {
     return false;
+}
+
+bool TorcTimerControl::event(QEvent *Event)
+{
+    if (Event && Event->type() == TorcEvent::TorcEventType)
+    {
+        TorcEvent *event = static_cast<TorcEvent*>(Event);
+        if (event && (event->GetEvent() == Torc::SystemTimeChanged))
+        {
+            LOG(VB_GENERAL, LOG_INFO, QString("Timer %1 restarting").arg(uniqueId));
+            m_timer.stop();
+            m_firstTrigger = true;
+            TimerTimeout();
+            return true;
+        }
+    }
+
+    return TorcControl::event(Event);
 }
 
 void TorcTimerControl::TimerTimeout(void)

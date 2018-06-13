@@ -11,7 +11,7 @@
 class TorcTransitionControl : public TorcControl
 {
     Q_OBJECT
-    Q_PROPERTY(double animationValue READ GetAnimationValue() WRITE SetAnimationValue());
+    Q_PROPERTY(double animationValue READ GetAnimationValue() WRITE SetAnimationValue(Value))
 
   public:
     TorcTransitionControl(const QString &Type, const QVariantMap &Details);
@@ -19,18 +19,20 @@ class TorcTransitionControl : public TorcControl
 
     static QEasingCurve::Type EasingCurveFromString (const QString &Curve);
     static QString            StringFromEasingCurve (QEasingCurve::Type Type);
-    bool                      Validate              (void);
-    TorcControl::Type         GetType               (void) const;
-    QStringList               GetDescription        (void);
+    bool                      Validate              (void) Q_DECL_OVERRIDE;
+    TorcControl::Type         GetType               (void) const Q_DECL_OVERRIDE;
+    QStringList               GetDescription        (void) Q_DECL_OVERRIDE;
 
     static qreal              LinearLEDFunction     (qreal progress);
 
   public slots:
-    void                      SetAnimationValue    (double Value);
-    double                    GetAnimationValue    (void);
+    bool                      event                 (QEvent *Event) Q_DECL_OVERRIDE;
+    void                      Restart               (void);
+    void                      SetAnimationValue     (double Value);
+    double                    GetAnimationValue     (void);
 
   private:
-    void                      CalculateOutput       (void);
+    void                      CalculateOutput       (void) Q_DECL_OVERRIDE;
 
   private:
     quint64                   m_duration;

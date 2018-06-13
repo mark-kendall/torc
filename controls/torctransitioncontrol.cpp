@@ -22,6 +22,7 @@
 
 // Torc
 #include "torclogging.h"
+#include "torclocalcontext.h"
 #include "torctimercontrol.h"
 #include "torctransitioncontrol.h"
 
@@ -183,10 +184,13 @@ TorcTransitionControl::TorcTransitionControl(const QString &Type, const QVariant
 
     // so far so good
     m_parsed = true;
+
+    gLocalContext->AddObserver(this);
 }
 
 TorcTransitionControl::~TorcTransitionControl()
 {
+    gLocalContext->RemoveObserver(this);
 }
 
 TorcControl::Type TorcTransitionControl::GetType(void) const
@@ -204,6 +208,30 @@ QStringList TorcTransitionControl::GetDescription(void)
     result.append(tr("%1 transition").arg(StringFromEasingCurve(m_type)));
     result.append(tr("Duration %1").arg(TorcControl::DurationToString(daysduration, timeduration)));
     return result;
+}
+
+bool TorcTransitionControl::event(QEvent *Event)
+{
+    if (Event && Event->type() == TorcEvent::TorcEventType)
+    {
+        TorcEvent *event = static_cast<TorcEvent*>(Event);
+        if (event && (event->GetEvent() == Torc::SystemTimeChanged))
+        {
+            // we don't know in which order this event is received, so we don't know
+            // whether any timer inputs have been reset. So wait a short period.
+            QTimer::singleShot(10, this, SLOT(Restart()));
+            return true;
+        }
+    }
+
+    return TorcControl::event(Event);
+}
+
+void TorcTransitionControl::Restart(void)
+{
+    LOG(VB_GENERAL, LOG_INFO, QString("Transition %1 restarting").arg(uniqueId));
+    m_firstTrigger = true;
+    CalculateOutput();
 }
 
 bool TorcTransitionControl::Validate(void)
