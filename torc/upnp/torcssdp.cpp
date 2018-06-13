@@ -149,7 +149,7 @@ void TorcSSDP::Start(void)
     m_ipv6Address = QString();
     m_addressess = QNetworkInterface::allAddresses();
 
-    // try and determine suitable ipv4 and ipv6 localhost addresses
+    // try and determine suitable ipv4 and ipv6 addresses
     // at the moment I cannot test 'proper' IPv6 support, so allow link local for now
     QString ipv6linklocal;
     foreach (QHostAddress address, m_addressess)
@@ -174,11 +174,17 @@ void TorcSSDP::Start(void)
     // fall back to link local for ipv6
     if (m_ipv6Address.isEmpty() && !ipv6linklocal.isEmpty())
         m_ipv6Address = ipv6linklocal;
-    if (!m_ipv6Address.startsWith("["))
+    if (!m_ipv6Address.isEmpty() && !m_ipv6Address.startsWith("["))
         m_ipv6Address = QString("[%1]").arg(m_ipv6Address);
 
-    LOG(VB_GENERAL, LOG_INFO, QString("SSDP IPv4 host url: %1").arg(m_ipv4Address));
-    LOG(VB_GENERAL, LOG_INFO, QString("SSDP IPv6 host url: %1").arg(m_ipv6Address));
+    if (m_ipv4Address.isEmpty())
+        LOG(VB_GENERAL, LOG_INFO, "Disabling SSDP IPv4 - no valid address detected");
+    else
+        LOG(VB_GENERAL, LOG_INFO, QString("SSDP IPv4 host url: %1").arg(m_ipv4Address));
+    if (m_ipv6Address.isEmpty())
+        LOG(VB_GENERAL, LOG_INFO, "Disabling SSDP IPv6 - no valid address detected");
+    else
+        LOG(VB_GENERAL, LOG_INFO, QString("SSDP IPv6 host url: %1").arg(m_ipv6Address));
 
     // create sockets
     if (interface.isValid())
@@ -390,7 +396,7 @@ void TorcSSDP::SendSearch(void)
                                 "MX: 3\r\n"
                                 "ST: %2\r\n\r\n");
 
-    if (m_ipv4MulticastSocket && m_ipv4MulticastSocket->isValid() && m_ipv4MulticastSocket->state() == QAbstractSocket::BoundState)
+    if (!m_ipv4Address.isEmpty() && m_ipv4MulticastSocket && m_ipv4MulticastSocket->isValid() && m_ipv4MulticastSocket->state() == QAbstractSocket::BoundState)
     {
         m_ipv4MulticastSocket->setSocketOption(QAbstractSocket::MulticastTtlOption, 2);
         QByteArray ipv4search = QString(search).arg(TORC_IPV4_UDP_MULTICAST_URL).arg(searchdevice).toLocal8Bit();
@@ -401,7 +407,7 @@ void TorcSSDP::SendSearch(void)
             LOG(VB_NETWORK, LOG_INFO, "Sent IPv4 SSDP global search request");
     }
 
-    if (m_ipv6LinkMulticastSocket && m_ipv6LinkMulticastSocket->isValid() && m_ipv6LinkMulticastSocket->state() == QAbstractSocket::BoundState)
+    if (!m_ipv6Address.isEmpty() && m_ipv6LinkMulticastSocket && m_ipv6LinkMulticastSocket->isValid() && m_ipv6LinkMulticastSocket->state() == QAbstractSocket::BoundState)
     {
         m_ipv6LinkMulticastSocket->setSocketOption(QAbstractSocket::MulticastTtlOption, 2);
         QByteArray ipv6search = QString(search).arg(TORC_IPV6_UDP_MULTICAST_URL).arg(searchdevice).toLocal8Bit();
@@ -483,6 +489,9 @@ void TorcSSDP::StopAnnounce(void)
 void TorcSSDP::SendAnnounce(bool IPv6, bool Alive)
 {
     QUdpSocket *socket = IPv6 ? m_ipv6LinkMulticastSocket : m_ipv4MulticastSocket;
+
+    if ((IPv6 && m_ipv6Address.isEmpty()) || (!IPv6 && m_ipv4Address.isEmpty()))
+        return;
 
     if (!socket || !socket->isValid() || socket->state() != QAbstractSocket::BoundState)
         return;
@@ -782,6 +791,8 @@ void TorcSSDP::ProcessResponse(const TorcSSDPSearchResponse &Response)
     QString date       = QDateTime::currentDateTime().toString(dateformat);
     QString uuid       = QString("uuid:") + gLocalContext->GetUuid();
     bool ipv6          = Response.m_responseAddress.protocol() == QAbstractSocket::IPv6Protocol;
+    if ((ipv6 && m_ipv6Address.isEmpty()) || (!ipv6 && m_ipv4Address.isEmpty()))
+        return;
     QUdpSocket *socket = ipv6 ? m_ipv6UnicastSocket : m_ipv4UnicastSocket;
     int port           = TorcHTTPServer::GetPort();
     QString raddress   = QString("%1:%2").arg(Response.m_responseAddress.toString()).arg(Response.m_port);
