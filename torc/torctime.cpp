@@ -62,7 +62,7 @@ void TorcTime::Tick(void)
     QDateTime timenow = QDateTime::currentDateTime();
     qint64 difference = timenow.secsTo(m_lastTime);
     m_lastTime = timenow;
-    if (std::abs(difference) > 2)
+    if (qAbs(difference) > 2)
     {
         LOG(VB_GENERAL, LOG_WARNING, "Detected change in system time");
         gLocalContext->NotifyEvent(Torc::SystemTimeChanged);
