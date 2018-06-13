@@ -24,7 +24,7 @@ class TorcOMXEvent
     OMX_U32       m_data2;
 };
 
-class TorcOMXComponent
+class TorcOMXComponent Q_DECL_FINAL
 {
   public:
     static OMX_ERRORTYPE    EventHandlerCallback    (OMX_HANDLETYPE Component, OMX_PTR OMXComponent, OMX_EVENTTYPE Event, OMX_U32 Data1, OMX_U32 Data2, OMX_PTR EventData);
