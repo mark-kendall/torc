@@ -12,8 +12,8 @@ class TorcControls : public QObject, public TorcHTTPService, public TorcDeviceHa
     Q_OBJECT
     Q_CLASSINFO("Version",        "1.0.0")
     Q_CLASSINFO("GetControlList", "type=controls")
-    Q_PROPERTY(QVariantMap controlList  READ GetControlList() NOTIFY ControlsChanged());
-    Q_PROPERTY(QStringList controlTypes READ GetControlTypes() CONSTANT);
+    Q_PROPERTY(QVariantMap controlList  READ GetControlList() NOTIFY ControlsChanged())
+    Q_PROPERTY(QStringList controlTypes READ GetControlTypes() CONSTANT)
 
   public:
     TorcControls();
@@ -21,11 +21,11 @@ class TorcControls : public QObject, public TorcHTTPService, public TorcDeviceHa
 
     static TorcControls* gControls;
 
-    void                Create                    (const QVariantMap &Details);
-    void                Destroy                   (void);
+    void                Create                    (const QVariantMap &Details) Q_DECL_OVERRIDE;
+    void                Destroy                   (void) Q_DECL_OVERRIDE;
     void                Validate                  (void);
     void                Graph                     (QByteArray* Data);
-    QString             GetUIName                 (void);
+    QString             GetUIName                 (void) Q_DECL_OVERRIDE;
 
   public slots:
     // TorcHTTPService
