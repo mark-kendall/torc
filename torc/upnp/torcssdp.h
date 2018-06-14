@@ -49,7 +49,7 @@ class TorcSSDP Q_DECL_FINAL : public QObject
     Q_OBJECT
 
   public:
-    static void      Search             (void);
+    static void      Search             (TorcHTTPServer::Status Options);
     static void      CancelSearch       (void);
     static void      Announce           (TorcHTTPServer::Status Options);
     static void      CancelAnnounce     (void);
@@ -57,6 +57,7 @@ class TorcSSDP Q_DECL_FINAL : public QObject
     static TorcSSDP                    *gSSDP;
     static QMutex                      *gSSDPLock;
     static bool                         gSearchEnabled;
+    static TorcHTTPServer::Status       gSearchOptions;
     static bool                         gAnnounceEnabled;
     static TorcHTTPServer::Status       gAnnounceOptions;
 
@@ -96,7 +97,8 @@ class TorcSSDP Q_DECL_FINAL : public QObject
     void             ProcessResponse    (const TorcSSDPSearchResponse &Response);
 
   private:
-    TorcHTTPServer::Status              m_options;
+    TorcHTTPServer::Status              m_searchOptions;
+    TorcHTTPServer::Status              m_announceOptions;
     QString                             m_serverString;
     bool                                m_searching;
     int                                 m_firstSearchTimer;

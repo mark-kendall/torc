@@ -624,6 +624,8 @@ void TorcHTTPServer::StopBonjour(void)
 
 void TorcHTTPServer::BonjourChanged(bool Bonjour)
 {
+    LOG(VB_GENERAL, LOG_INFO, QString("Bonjour %1abled").arg(Bonjour ? "en" : "dis"));
+
     if (Bonjour)
         StartBonjour();
     else
@@ -637,7 +639,7 @@ void TorcHTTPServer::IPv6Changed(bool IPv6)
         gWebServerStatus.ipv6 = IPv6;
     }
 
-    LOG(VB_GENERAL, LOG_INFO, QString("IPv6 changed to %1 - restarting").arg(IPv6));
+    LOG(VB_GENERAL, LOG_INFO, QString("IPv6 %1abled - restarting").arg(IPv6 ? "en" : "dis"));
     QTimer::singleShot(10, this, SLOT(Restart()));
 }
 
@@ -649,7 +651,13 @@ bool TorcHTTPServer::Open(void)
         Close();
     }
 
+    LOG(VB_GENERAL, LOG_INFO, QString("SSL is %1abled").arg(m_secure->GetValue().toBool() ? "en" : "dis"));
+    LOG(VB_GENERAL, LOG_INFO, QString("IPv6 is %1abled").arg(m_ipv6->GetValue().toBool() ? "en" : "dis"));
+    LOG(VB_GENERAL, LOG_INFO, QString("Bonjour is %1abled").arg(m_bonjour->GetValue().toBool() ? "en" : "dis"));
+    LOG(VB_GENERAL, LOG_INFO, QString("SSDP is %1abled").arg(m_upnp->GetValue().toBool() ? "en" : "dis"));
     int port = m_port->GetValue().toInt();
+    LOG(VB_GENERAL, LOG_INFO, QString("Attempting to listen on port %1").arg(port));
+
     m_listener = new TorcHTTPServerListener(this, QHostAddress::Any, port);
     if (!m_listener->isListening())
     {
@@ -730,7 +738,7 @@ void TorcHTTPServer::SecureChanged(bool Secure)
         gWebServerStatus.secure = m_secure->GetValue().toBool();
     }
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Secure changed to '%1secure - restarting").arg(Secure ? "" : "in"));
+    LOG(VB_GENERAL, LOG_INFO, QString("Secure %1abled - restarting").arg(Secure ? "en" : "dis"));
     QTimer::singleShot(10, this, SLOT(Restart()));
 }
 
@@ -744,7 +752,7 @@ void TorcHTTPServer::StartUPnP(void)
             m_ssdpThread->start();
         }
 
-        TorcSSDP::Search();
+        TorcSSDP::Search(TorcHTTPServer::GetStatus());
         TorcSSDP::Announce(TorcHTTPServer::GetStatus());
     }
 }
@@ -765,6 +773,8 @@ void TorcHTTPServer::StopUPnP(void)
 
 void TorcHTTPServer::UPnPChanged(bool UPnP)
 {
+    LOG(VB_GENERAL, LOG_INFO, QString("SSDP %1abled").arg(UPnP ? "en" : "dis"));
+
     if (UPnP)
         StartUPnP();
     else
