@@ -177,11 +177,7 @@ void TorcSetting::AddChild(TorcSetting *Child)
     QWriteLocker locker(&m_lock);
     if (Child)
     {
-        {
-            int position = m_children.size();
-            m_children.insert(position, Child);
-        }
-
+        m_children.append(Child);
         Child->UpRef();
     }
 }
@@ -300,24 +296,30 @@ int TorcSetting::GetStep(void)
 
 void TorcSetting::SetActive(bool Value)
 {
-    QWriteLocker locker(&m_lock);
+    m_lock.lockForWrite();
     bool wasactive = isActive;
-    m_active += Value ? 1 : -1;
-    isActive = m_active >= m_activeThreshold;
+    m_active       += Value ? 1 : -1;
+    isActive       = m_active >= m_activeThreshold;
+    bool changed   = wasactive != isActive;
+    bool newactive = isActive;
+    m_lock.unlock();
 
-    if (wasactive != isActive)
-        emit ActiveChanged(isActive);
+    if (changed)
+        emit ActiveChanged(newactive);
 }
 
 void TorcSetting::SetActiveThreshold(int Threshold)
 {
-    QWriteLocker locker(&m_lock);
-    bool wasactive = isActive;
+    m_lock.lockForWrite();
+    bool wasactive    = isActive;
     m_activeThreshold = Threshold;
-    isActive = m_active >= m_activeThreshold;
+    isActive          = m_active >= m_activeThreshold;
+    bool changed      = wasactive != isActive;
+    bool newactive    = isActive;
+    m_lock.unlock();
 
-    if (wasactive != isActive)
-        emit ActiveChanged(isActive);
+    if (changed)
+        emit ActiveChanged(newactive);
 }
 
 bool TorcSetting::SetValue(const QVariant &Value)
@@ -345,6 +347,7 @@ bool TorcSetting::SetValue(const QVariant &Value)
             if (roles & Persistent)
                 gLocalContext->SetSetting(m_dbName, (int)ivalue);
             value = Value;
+            locker.unlock();
             emit ValueChanged(ivalue);
             return true;
         }
@@ -355,6 +358,7 @@ bool TorcSetting::SetValue(const QVariant &Value)
         if (roles & Persistent)
             gLocalContext->SetSetting(m_dbName, (bool)bvalue);
         value = Value;
+        locker.unlock();
         emit ValueChanged(bvalue);
         return true;
     }
@@ -366,6 +370,7 @@ bool TorcSetting::SetValue(const QVariant &Value)
             if (roles & Persistent)
                 gLocalContext->SetSetting(m_dbName, svalue);
             value = Value;
+            locker.unlock();
             emit ValueChanged(svalue);
             return true;
         }
@@ -376,6 +381,7 @@ bool TorcSetting::SetValue(const QVariant &Value)
         if (roles & Persistent)
             gLocalContext->SetSetting(m_dbName, svalue.join(","));
         value = Value;
+        locker.unlock();
         emit ValueChanged(svalue);
         return true;
     }
