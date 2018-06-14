@@ -19,6 +19,7 @@
 
 class TorcSetting;
 class TorcHTTPHandler;
+class TorcSSDPThread;
 
 class TorcHTTPServer Q_DECL_FINAL : public QObject
 {
@@ -65,6 +66,7 @@ class TorcHTTPServer Q_DECL_FINAL : public QObject
     void           SecureChanged      (bool Secure);
     void           UPnPChanged        (bool UPnP);
     void           BonjourChanged     (bool Bonjour);
+    void           IPv6Changed        (bool IPv6);
     void           Restart            (void);
 
   signals:
@@ -89,6 +91,8 @@ class TorcHTTPServer Q_DECL_FINAL : public QObject
     static void    UpdateOriginWhitelist (TorcHTTPServer::Status Status);
     void           StartBonjour       (void);
     void           StopBonjour        (void);
+    void           StartUPnP          (void);
+    void           StopUPnP           (void);
 
   private:
     TorcSettingGroup                 *m_serverSettings;
@@ -96,6 +100,7 @@ class TorcHTTPServer Q_DECL_FINAL : public QObject
     TorcSetting                      *m_secure;
     TorcSetting                      *m_upnp;
     TorcSetting                      *m_bonjour;
+    TorcSetting                      *m_ipv6;
     TorcHTTPServerListener           *m_listener;
     TorcUser                          m_user;
     TorcHTMLHandler                   m_defaultHandler;
@@ -103,6 +108,8 @@ class TorcHTTPServer Q_DECL_FINAL : public QObject
     TorcHTMLStaticContent             m_staticContent;
     TorcHTMLDynamicContent            m_dynamicContent;
     TorcUPnPContent                   m_upnpContent;
+    TorcSSDPThread                   *m_ssdpThread;
+    quint32                           m_bonjourBrowserReference;
     quint32                           m_httpBonjourReference;
     quint32                           m_torcBonjourReference;
     TorcWebSocketPool                 m_webSocketPool;
@@ -114,6 +121,4 @@ class TorcHTTPServer Q_DECL_FINAL : public QObject
 Q_DECLARE_METATYPE(TorcHTTPRequest*)
 Q_DECLARE_METATYPE(QTcpSocket*)
 Q_DECLARE_METATYPE(QHostAddress)
-Q_DECLARE_METATYPE(TorcHTTPServer::Status)
-
 #endif // TORCHTTPSERVER_H

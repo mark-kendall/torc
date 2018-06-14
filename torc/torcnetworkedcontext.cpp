@@ -26,12 +26,12 @@
 #include "torcnetwork.h"
 #include "torcbonjour.h"
 #include "torcevent.h"
-#include "torchttpserver.h"
 #include "upnp/torcupnp.h"
-#include "upnp/torcssdp.h"
 #include "torcwebsocket.h"
 #include "torcrpcrequest.h"
 #include "torcnetworkrequest.h"
+#include "torcwebsocketthread.h"
+#include "torchttpserver.h"
 #include "torcnetworkedcontext.h"
 
 TorcNetworkedContext *gNetworkedContext = NULL;
@@ -591,7 +591,6 @@ TorcNetworkedContext::TorcNetworkedContext()
     m_discoveredServices(),
     m_discoveredServicesLock(QReadWriteLock::Recursive),
     m_serviceList(),
-    m_bonjourBrowserReference(0),
     peers()
 {
     // listen for events
@@ -605,29 +604,13 @@ TorcNetworkedContext::TorcNetworkedContext()
     // always create the global instance
     TorcBonjour::Instance();
 
-    // start browsing early for other Torc applications
-    m_bonjourBrowserReference = TorcBonjour::Instance()->Browse("_torc._tcp.");
-
-    // NB if TorcSSDP singleton isn't running yet the request will be queued
-    // announcement is triggered from TorcHTTPServer
-    TorcSSDP::Search();
+    // NB all searches are triggered from TorcHTTPServer
 }
 
 TorcNetworkedContext::~TorcNetworkedContext()
 {
     // stoplistening
     gLocalContext->RemoveObserver(this);
-
-    // cancel upnp search
-    TorcSSDP::CancelSearch();
-
-    // stop browsing for torc._tcp
-    if (m_bonjourBrowserReference)
-        TorcBonjour::Instance()->Deregister(m_bonjourBrowserReference);
-    m_bonjourBrowserReference = 0;
-
-    // N.B. We delete the global instance here
-    TorcBonjour::TearDown();
 
     {
         QWriteLocker locker(&m_discoveredServicesLock);

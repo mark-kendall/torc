@@ -264,6 +264,7 @@ TorcHTTPServer::TorcHTTPServer()
     m_secure(NULL),
     m_upnp(NULL),
     m_bonjour(NULL),
+    m_ipv6(NULL),
     m_listener(NULL),
     m_user(),
     m_defaultHandler("", TORC_TORC), // default top level handler
@@ -271,6 +272,8 @@ TorcHTTPServer::TorcHTTPServer()
     m_staticContent(),               // static files - for /css /fonts /js /img etc
     m_dynamicContent(),              // dynamic files - for config files etc (typically served from ~/.torc/content)
     m_upnpContent(),                 // upnp - device description
+    m_ssdpThread(NULL),
+    m_bonjourBrowserReference(0),
     m_httpBonjourReference(0),
     m_torcBonjourReference(0),
     m_webSocketPool()
@@ -299,17 +302,26 @@ TorcHTTPServer::TorcHTTPServer()
     m_upnp->SetActive(true);
     connect(m_upnp, SIGNAL(ValueChanged(bool)), this, SLOT(UPnPChanged(bool)));
 
-    m_bonjour = new TorcSetting(m_serverSettings, "ServerBonjour", tr("Bonjour discovery"), TorcSetting::Bool,
+    m_ipv6 = new TorcSetting(m_serverSettings, "ServerIPv6", tr("IPv6"), TorcSetting::Bool,
+                             TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true));
+    m_ipv6->SetHelpText(tr("Enable IPv6"));
+    m_ipv6->SetActive(true);
+    connect(m_ipv6, SIGNAL(ValueChanged(bool)), this, SLOT(IPv6Changed(bool)));
+
+    m_bonjour = new TorcSetting(m_ipv6, "ServerBonjour", tr("Bonjour discovery"), TorcSetting::Bool,
                                 TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true));
     m_bonjour->SetHelpText(tr("Use Bonjour to advertise this device and search for similar devices"));
-    m_bonjour->SetActive(true);
+    m_bonjour->SetActive(m_ipv6->GetValue().toBool());
     connect(m_bonjour, SIGNAL(ValueChanged(bool)), this, SLOT(BonjourChanged(bool)));
+    // bonjour is dependant on IPv6
+    connect(m_ipv6, SIGNAL(ValueChanged(bool)), m_bonjour, SLOT(SetActive(bool)));
 
     // initialise external status
     {
         QMutexLocker locker(&gWebServerLock);
         gWebServerStatus.secure = m_secure->GetValue().toBool();
         gWebServerStatus.port   = m_port->GetValue().toInt();
+        gWebServerStatus.ipv6   = m_ipv6->GetValue().toBool();
     }
 
     // initialise platform name
@@ -351,6 +363,13 @@ TorcHTTPServer::~TorcHTTPServer()
         m_bonjour = NULL;
     }
 
+    if (m_ipv6)
+    {
+        m_ipv6->Remove();
+        m_ipv6->DownRef();
+        m_ipv6 = NULL;
+    }
+
     if (m_upnp)
     {
         m_upnp->Remove();
@@ -378,6 +397,8 @@ TorcHTTPServer::~TorcHTTPServer()
         m_serverSettings->DownRef();
         m_serverSettings = NULL;
     }
+
+    TorcBonjour::TearDown();
 }
 
 TorcWebSocketThread* TorcHTTPServer::TakeSocket(TorcWebSocketThread *Socket)
@@ -545,6 +566,20 @@ void TorcHTTPServer::UpdateOriginWhitelist(TorcHTTPServer::Status Status)
 
 void TorcHTTPServer::StartBonjour(void)
 {
+    if (!m_bonjour->GetValue().toBool())
+        return;
+
+    if (!m_ipv6->GetValue().toBool())
+    {
+        LOG(VB_GENERAL, LOG_INFO, "Not using Bonjour while IPv6 is disabled");
+        StopBonjour();
+        return;
+    }
+
+    // start browsing early for other Torc applications
+    if (!m_bonjourBrowserReference)
+        m_bonjourBrowserReference = TorcBonjour::Instance()->Browse("_torc._tcp.");
+
     if (!m_httpBonjourReference || !m_torcBonjourReference)
     {
         int port = m_port->GetValue().toInt();
@@ -568,6 +603,12 @@ void TorcHTTPServer::StartBonjour(void)
 
 void TorcHTTPServer::StopBonjour(void)
 {
+    if (m_bonjourBrowserReference)
+    {
+        TorcBonjour::Instance()->Deregister(m_bonjourBrowserReference);
+        m_bonjourBrowserReference = 0;
+    }
+
     if (m_httpBonjourReference)
     {
         TorcBonjour::Instance()->Deregister(m_httpBonjourReference);
@@ -587,6 +628,17 @@ void TorcHTTPServer::BonjourChanged(bool Bonjour)
         StartBonjour();
     else
         StopBonjour();
+}
+
+void TorcHTTPServer::IPv6Changed(bool IPv6)
+{
+    {
+        QMutexLocker lock(&gWebServerLock);
+        gWebServerStatus.ipv6 = IPv6;
+    }
+
+    LOG(VB_GENERAL, LOG_INFO, QString("IPv6 changed to %1 - restarting").arg(IPv6));
+    QTimer::singleShot(10, this, SLOT(Restart()));
 }
 
 bool TorcHTTPServer::Open(void)
@@ -626,12 +678,9 @@ bool TorcHTTPServer::Open(void)
         gWebServerStatus.port = port;
     }
 
-    // advertise service
-    if (m_bonjour->GetValue().toBool())
-        StartBonjour();
-
-    if (m_upnp->GetValue().toBool())
-        TorcSSDP::Announce(TorcHTTPServer::GetStatus());
+    // advertise and search
+    StartBonjour();
+    StartUPnP();
 
     LOG(VB_GENERAL, LOG_INFO, QString("Web server listening for %1secure connections on port %2").arg(m_secure->GetValue().toBool() ? "" : "in").arg(port));
     UpdateOriginWhitelist(TorcHTTPServer::GetStatus());
@@ -648,11 +697,9 @@ QString TorcHTTPServer::ServerDescription(void)
 
 void TorcHTTPServer::Close(void)
 {
-    // stop advertising
+    // stop advertising and searching
     StopBonjour();
-
-    if (m_upnp->GetValue().toBool())
-        TorcSSDP::CancelAnnounce();
+    StopUPnP();;
 
     // close connections
     m_webSocketPool.CloseSockets();
@@ -687,12 +734,41 @@ void TorcHTTPServer::SecureChanged(bool Secure)
     QTimer::singleShot(10, this, SLOT(Restart()));
 }
 
+void TorcHTTPServer::StartUPnP(void)
+{
+    if (m_upnp->GetValue().toBool())
+    {
+        if (!m_ssdpThread)
+        {
+            m_ssdpThread = new TorcSSDPThread();
+            m_ssdpThread->start();
+        }
+
+        TorcSSDP::Search();
+        TorcSSDP::Announce(TorcHTTPServer::GetStatus());
+    }
+}
+
+void TorcHTTPServer::StopUPnP(void)
+{
+    TorcSSDP::CancelAnnounce();
+    TorcSSDP::CancelSearch();
+
+    if (m_ssdpThread)
+    {
+        m_ssdpThread->quit();
+        m_ssdpThread->wait();
+        delete m_ssdpThread;
+        m_ssdpThread = NULL;
+    }
+}
+
 void TorcHTTPServer::UPnPChanged(bool UPnP)
 {
     if (UPnP)
-        TorcSSDP::Announce(TorcHTTPServer::GetStatus());
+        StartUPnP();
     else
-        TorcSSDP::CancelAnnounce();
+        StopUPnP();
 }
 
 void TorcHTTPServer::Restart(void)
@@ -753,7 +829,6 @@ class TorcHTTPServerObject : public TorcAdminObject, public TorcStringFactory
         qRegisterMetaType<TorcHTTPService*>();
         qRegisterMetaType<QTcpSocket*>();
         qRegisterMetaType<QHostAddress>();
-        qRegisterMetaType<TorcHTTPServer::Status>();
     }
 
     void GetStrings(QVariantMap &Strings)

@@ -69,7 +69,7 @@ class TorcSSDP Q_DECL_FINAL : public QObject
   protected slots:
     void             SearchPriv         (void);
     void             CancelSearchPriv   (void);
-    void             AnnouncePriv       (TorcHTTPServer::Status Options);
+    void             AnnouncePriv       (void);
     void             CancelAnnouncePriv (void);
 
     void             SendSearch         (void);
@@ -91,7 +91,7 @@ class TorcSSDP Q_DECL_FINAL : public QObject
     qint64           GetExpiryTime      (const QString &Expires);
     void             StartSearch        (void);
     void             StopSearch         (void);
-    void             StartAnnounce      (TorcHTTPServer::Status Options);
+    void             StartAnnounce      (void);
     void             StopAnnounce       (void);
     void             ProcessResponse    (const TorcSSDPSearchResponse &Response);
 

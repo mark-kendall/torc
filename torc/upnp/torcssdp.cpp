@@ -205,14 +205,13 @@ void TorcSSDP::Start(void)
         QMutexLocker locker(gSSDPLock);
         search    = gSearchEnabled;
         announce  = gAnnounceEnabled;
-        m_options = gAnnounceOptions;
     }
 
     if (search)
         StartSearch();
 
     if (announce)
-        StartAnnounce(m_options);
+        StartAnnounce();
 
     m_started = true;
 }
@@ -300,7 +299,7 @@ void TorcSSDP::Announce(TorcHTTPServer::Status Options)
     gAnnounceEnabled = true;
     gAnnounceOptions = Options;
     if (gSSDP)
-        QMetaObject::invokeMethod(gSSDP, "AnnouncePriv", Qt::AutoConnection, Q_ARG(TorcHTTPServer::Status, Options));
+        QMetaObject::invokeMethod(gSSDP, "AnnouncePriv", Qt::AutoConnection);
 }
 
 /*! \fn    TorcSSDP::CancelAnnounce
@@ -429,11 +428,11 @@ void TorcSSDP::CancelSearchPriv(void)
     StopSearch();
 }
 
-void TorcSSDP::AnnouncePriv(TorcHTTPServer::Status Options)
+void TorcSSDP::AnnouncePriv(void)
 {
     // if we haven't started or the network is unavailable, announce will be triggered when we restart
     if (m_started && TorcNetwork::IsAvailable())
-        StartAnnounce(Options);
+        StartAnnounce();
 }
 
 void TorcSSDP::CancelAnnouncePriv(void)
@@ -441,14 +440,18 @@ void TorcSSDP::CancelAnnouncePriv(void)
     StopAnnounce();
 }
 
-void TorcSSDP::StartAnnounce(TorcHTTPServer::Status Options)
+void TorcSSDP::StartAnnounce(void)
 {
     if (!m_options.port)
         LOG(VB_GENERAL, LOG_INFO, QString("Starting SSDP announce (%1)").arg(TORC_ROOT_UPNP_DEVICE));
 
     StopAnnounce();
 
-    m_options = Options;
+    {
+        QMutexLocker locker(gSSDPLock);
+        m_options = gAnnounceOptions;
+    }
+
     // schedule first announce almost immediately
     m_firstAnnounceTimer = startTimer(100, Qt::CoarseTimer);
     // and schedule another shortly afterwards
@@ -771,7 +774,8 @@ void TorcSSDP::ProcessResponse(const TorcSSDPSearchResponse &Response)
 {
     if (!m_options.port)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Cannot send response - no port set, not advertising!");
+        LOG(VB_GENERAL, LOG_ERR, QString("Cannot send response to %1 - no port set, not advertising!")
+            .arg(Response.m_responseAddress.toString()));
         return;
     }
 
@@ -996,44 +1000,3 @@ void TorcSSDPThread::Finish(void)
     TorcSSDP::Create(true/*destroy*/);
     LOG(VB_GENERAL, LOG_INFO, "SSDP thread stopping");
 }
-
-class TorcSSDPObject : public TorcAdminObject
-{
-  public:
-    TorcSSDPObject()
-      : TorcAdminObject(TORC_ADMIN_CRIT_PRIORITY - 1), // start after network but before TorcNetworkedContext
-        m_ssdpThread(NULL)
-    {
-        qRegisterMetaType<TorcUPNPDescription>();
-    }
-
-    ~TorcSSDPObject()
-    {
-        Destroy();
-    }
-
-    void Create(void)
-    {
-        Destroy();
-
-        m_ssdpThread = new TorcSSDPThread();
-        m_ssdpThread->start();
-    }
-
-    void Destroy(void)
-    {
-        if (m_ssdpThread)
-        {
-            m_ssdpThread->quit();
-            m_ssdpThread->wait();
-            delete m_ssdpThread;
-        }
-
-        m_ssdpThread = NULL;
-    }
-
-  private:
-    Q_DISABLE_COPY(TorcSSDPObject)
-    TorcSSDPThread *m_ssdpThread;
-
-} TorcSSDPObject;
