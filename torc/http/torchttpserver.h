@@ -69,6 +69,8 @@ class TorcHTTPServer Q_DECL_FINAL : public QObject
     void           UPnPSearchChanged  (bool Search);
     void           UPnPAdvertChanged  (bool Advert);
     void           BonjourChanged     (bool Bonjour);
+    void           BonjourSearchChanged(bool Search);
+    void           BonjourAdvertChanged(bool Advert);
     void           IPv6Changed        (bool IPv6);
     void           Restart            (void);
 
@@ -94,6 +96,8 @@ class TorcHTTPServer Q_DECL_FINAL : public QObject
     static void    UpdateOriginWhitelist (TorcHTTPServer::Status Status);
     void           StartBonjour       (void);
     void           StopBonjour        (void);
+    void           StopBonjourBrowse  (void);
+    void           StopBonjourAdvert  (void);
     void           StartUPnP          (void);
     void           StopUPnP           (void);
 
@@ -105,6 +109,8 @@ class TorcHTTPServer Q_DECL_FINAL : public QObject
     TorcSetting                      *m_upnpSearch;
     TorcSetting                      *m_upnpAdvertise;
     TorcSetting                      *m_bonjour;
+    TorcSetting                      *m_bonjourSearch;
+    TorcSetting                      *m_bonjourAdvert;
     TorcSetting                      *m_ipv6;
     TorcHTTPServerListener           *m_listener;
     TorcUser                          m_user;

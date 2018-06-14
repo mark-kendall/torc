@@ -282,6 +282,8 @@ TorcHTTPServer::TorcHTTPServer()
     m_upnpSearch(NULL),
     m_upnpAdvertise(NULL),
     m_bonjour(NULL),
+    m_bonjourSearch(NULL),
+    m_bonjourAdvert(NULL),
     m_ipv6(NULL),
     m_listener(NULL),
     m_user(),
@@ -324,14 +326,14 @@ TorcHTTPServer::TorcHTTPServer()
     m_upnpSearch->SetHelpText(tr("Use UPnP to search for other devices"));
     m_upnpSearch->SetActive(m_upnp->GetValue().toBool());
     connect(m_upnpSearch, SIGNAL(ValueChanged(bool)), this, SLOT(UPnPSearchChanged(bool)));
-    connect(m_upnp, SIGNAL(ValueChanged(bool)), m_upnpSearch, SLOT(SetActive(bool)));
+    connect(m_upnp,       SIGNAL(ValueChanged(bool)), m_upnpSearch, SLOT(SetActive(bool)));
 
     m_upnpAdvertise = new TorcSetting(m_upnp, "ServerUPnpAdvert", tr("UPnP Advertisement"), TorcSetting::Bool,
                                       TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true));
     m_upnpAdvertise->SetHelpText(tr("Use UPnP to advertise this device"));
     m_upnpAdvertise->SetActive(m_upnp->GetValue().toBool());
     connect(m_upnpAdvertise, SIGNAL(ValueChanged(bool)), this, SLOT(UPnPAdvertChanged(bool)));
-    connect(m_upnp, SIGNAL(ValueChanged(bool)), m_upnpAdvertise, SLOT(SetActive(bool)));
+    connect(m_upnp,          SIGNAL(ValueChanged(bool)), m_upnpAdvertise, SLOT(SetActive(bool)));
 
     m_ipv6 = new TorcSetting(m_serverSettings, "ServerIPv6", tr("IPv6"), TorcSetting::Bool,
                              TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true));
@@ -339,12 +341,31 @@ TorcHTTPServer::TorcHTTPServer()
     m_ipv6->SetActive(true);
     connect(m_ipv6, SIGNAL(ValueChanged(bool)), this, SLOT(IPv6Changed(bool)));
 
-    m_bonjour = new TorcSetting(m_ipv6, "ServerBonjour", tr("Bonjour discovery"), TorcSetting::Bool,
+    m_bonjour = new TorcSetting(m_ipv6, "ServerBonjour", tr("Bonjour"), TorcSetting::Bool,
                                 TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true));
-    m_bonjour->SetHelpText(tr("Use Bonjour to advertise this device and search for similar devices"));
     m_bonjour->SetActive(m_ipv6->GetValue().toBool());
     connect(m_bonjour, SIGNAL(ValueChanged(bool)), this, SLOT(BonjourChanged(bool)));
-    connect(m_ipv6, SIGNAL(ValueChanged(bool)), m_bonjour, SLOT(SetActive(bool)));
+    connect(m_ipv6,    SIGNAL(ValueChanged(bool)), m_bonjour, SLOT(SetActive(bool)));
+
+    m_bonjourSearch = new TorcSetting(m_bonjour, "ServerBonjourSearch", tr("Bonjour search"), TorcSetting::Bool,
+                                      TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true));
+    m_bonjourSearch->SetHelpText(tr("Use Bonjour to search for other devices"));
+    m_bonjourSearch->SetActiveThreshold(2);
+    m_bonjourSearch->SetActive(m_bonjour->GetValue().toBool());
+    m_bonjourSearch->SetActive(m_ipv6->GetValue().toBool());
+    connect(m_bonjourSearch, SIGNAL(ValueChanged(bool)), this, SLOT(BonjourSearchChanged(bool)));
+    connect(m_bonjour,       SIGNAL(ValueChanged(bool)), m_bonjourSearch, SLOT(SetActive(bool)));
+    connect(m_ipv6,          SIGNAL(ValueChanged(bool)), m_bonjourSearch, SLOT(SetActive(bool)));
+
+    m_bonjourAdvert = new TorcSetting(m_bonjour, "ServerBonjoutAdvert", tr("Bonjour Advertisement"), TorcSetting::Bool,
+                                      TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true));
+    m_bonjourAdvert->SetHelpText(tr("Use Bonjour to advertise this device"));
+    m_bonjourAdvert->SetActiveThreshold(2);
+    m_bonjourAdvert->SetActive(m_bonjour->GetValue().toBool());
+    m_bonjourAdvert->SetActive(m_ipv6->GetValue().toBool());
+    connect(m_bonjourAdvert, SIGNAL(ValueChanged(bool)), this, SLOT(BonjourAdvertChanged(bool)));
+    connect(m_bonjour,       SIGNAL(ValueChanged(bool)), m_bonjourAdvert, SLOT(SetActive(bool)));
+    connect(m_ipv6,          SIGNAL(ValueChanged(bool)), m_bonjourAdvert, SLOT(SetActive(bool)));
 
     // initialise external status
     {
@@ -385,6 +406,20 @@ TorcHTTPServer::~TorcHTTPServer()
     gLocalContext->RemoveObserver(this);
 
     Close();
+
+    if (m_bonjourAdvert)
+    {
+        m_bonjourAdvert->Remove();
+        m_bonjourAdvert->DownRef();
+        m_bonjourAdvert = NULL;
+    }
+
+    if (m_bonjourSearch)
+    {
+        m_bonjourSearch->Remove();
+        m_bonjourSearch->DownRef();
+        m_bonjourSearch = NULL;
+    }
 
     if (m_bonjour)
     {
@@ -620,11 +655,10 @@ void TorcHTTPServer::StartBonjour(void)
         return;
     }
 
-    // start browsing early for other Torc applications
-    if (!m_bonjourBrowserReference)
+    if (!m_bonjourBrowserReference && m_bonjourSearch->GetValue().toBool())
         m_bonjourBrowserReference = TorcBonjour::Instance()->Browse("_torc._tcp.");
 
-    if (!m_httpBonjourReference || !m_torcBonjourReference)
+    if ((!m_httpBonjourReference || !m_torcBonjourReference) && m_bonjourAdvert->GetValue().toBool())
     {
         int port = m_port->GetValue().toInt();
         QMap<QByteArray,QByteArray> map;
@@ -647,12 +681,21 @@ void TorcHTTPServer::StartBonjour(void)
 
 void TorcHTTPServer::StopBonjour(void)
 {
+    StopBonjourAdvert();
+    StopBonjourBrowse();
+}
+
+void TorcHTTPServer::StopBonjourBrowse(void)
+{
     if (m_bonjourBrowserReference)
     {
         TorcBonjour::Instance()->Deregister(m_bonjourBrowserReference);
         m_bonjourBrowserReference = 0;
     }
+}
 
+void TorcHTTPServer::StopBonjourAdvert(void)
+{
     if (m_httpBonjourReference)
     {
         TorcBonjour::Instance()->Deregister(m_httpBonjourReference);
@@ -674,6 +717,24 @@ void TorcHTTPServer::BonjourChanged(bool Bonjour)
         StartBonjour();
     else
         StopBonjour();
+}
+
+void TorcHTTPServer::BonjourAdvertChanged(bool Advert)
+{
+    LOG(VB_GENERAL, LOG_INFO, QString("Bonjour advertisement %1abled").arg(Advert ? "en" : "dis"));
+    if (Advert)
+        StartBonjour();
+    else
+        StopBonjourAdvert();
+}
+
+void TorcHTTPServer::BonjourSearchChanged(bool Search)
+{
+    LOG(VB_GENERAL, LOG_INFO, QString("Bonjour search %1abled").arg(Search ? "en" : "dis"));
+    if (Search)
+        StartBonjour();
+    else
+        StopBonjourBrowse();
 }
 
 void TorcHTTPServer::IPv6Changed(bool IPv6)
@@ -698,6 +759,8 @@ bool TorcHTTPServer::Open(void)
     LOG(VB_GENERAL, LOG_INFO, QString("SSL is %1abled").arg(m_secure->GetValue().toBool() ? "en" : "dis"));
     LOG(VB_GENERAL, LOG_INFO, QString("IPv6 is %1abled").arg(m_ipv6->GetValue().toBool() ? "en" : "dis"));
     LOG(VB_GENERAL, LOG_INFO, QString("Bonjour is %1abled").arg(m_bonjour->GetValue().toBool() ? "en" : "dis"));
+    LOG(VB_GENERAL, LOG_INFO, QString("Bonjour search is %1abled").arg(m_bonjourSearch->GetValue().toBool() ? "en" : "dis"));
+    LOG(VB_GENERAL, LOG_INFO, QString("Bonjour advertisement is %1abled").arg(m_bonjourAdvert->GetValue().toBool() ? "en" : "dis"));
     LOG(VB_GENERAL, LOG_INFO, QString("SSDP is %1abled").arg(m_upnp->GetValue().toBool() ? "en" : "dis"));
     LOG(VB_GENERAL, LOG_INFO, QString("SSDP search is %1abled").arg(m_upnpSearch->GetValue().toBool() ? "en" : "dis"));
     LOG(VB_GENERAL, LOG_INFO, QString("SSDP advertisement is %1abled").arg(m_upnpAdvertise->GetValue().toBool() ? "en" : "dis"));
