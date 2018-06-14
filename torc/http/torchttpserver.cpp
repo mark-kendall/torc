@@ -658,7 +658,7 @@ bool TorcHTTPServer::Open(void)
     int port = m_port->GetValue().toInt();
     LOG(VB_GENERAL, LOG_INFO, QString("Attempting to listen on port %1").arg(port));
 
-    m_listener = new TorcHTTPServerListener(this, QHostAddress::Any, port);
+    m_listener = new TorcHTTPServerListener(this, m_ipv6->GetValue().toBool() ? QHostAddress::Any : QHostAddress::AnyIPv4, port);
     if (!m_listener->isListening())
     {
         delete m_listener;
