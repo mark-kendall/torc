@@ -219,30 +219,11 @@ QVariantMap TorcHTTPServer::GetServiceDescription(const QString &Service)
     return QVariantMap();
 }
 
-int TorcHTTPServer::GetPort(void)
+TorcHTTPServer::Status TorcHTTPServer::GetStatus(void)
 {
     QMutexLocker locker(&gWebServerLock);
-
-    if (gWebServer)
-        return gWebServer->serverPort();
-
-    return 0;
-}
-
-bool TorcHTTPServer::IsSecure(void)
-{
-    QMutexLocker locker(&gWebServerLock);
-    return gWebServerSecure;
-}
-
-bool TorcHTTPServer::IsListening(void)
-{
-    QMutexLocker locker(&gWebServerLock);
-
-    if (gWebServer)
-        return gWebServer->isListening();
-
-    return false;
+    Status result = gWebServerStatus;
+    return result;
 }
 
 QString TorcHTTPServer::PlatformName(void)
@@ -270,19 +251,20 @@ QString TorcHTTPServer::PlatformName(void)
 */
 
 TorcHTTPServer* TorcHTTPServer::gWebServer = NULL;
+TorcHTTPServer::Status TorcHTTPServer::gWebServerStatus = TorcHTTPServer::Status();
 QMutex          TorcHTTPServer::gWebServerLock(QMutex::Recursive);
 QString         TorcHTTPServer::gPlatform = QString("");
 QString         TorcHTTPServer::gOriginWhitelist = QString("");
 QReadWriteLock  TorcHTTPServer::gOriginWhitelistLock(QReadWriteLock::Recursive);
-bool            TorcHTTPServer::gWebServerSecure = false;
 
 TorcHTTPServer::TorcHTTPServer()
-  : QTcpServer(),
+  : QObject(),
     m_serverSettings(NULL),
     m_port(NULL),
     m_secure(NULL),
     m_upnp(NULL),
     m_bonjour(NULL),
+    m_listener(NULL),
     m_user(),
     m_defaultHandler("", TORC_TORC), // default top level handler
     m_servicesHandler(this),         // services 'helper' service for '/services'
@@ -309,7 +291,6 @@ TorcHTTPServer::TorcHTTPServer()
                                TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)false));
     m_secure->SetHelpText(tr("Use encrypted (SSL/TLS) connections to the server"));
     m_secure->SetActive(true);
-    gWebServerSecure = m_secure->GetValue().toBool();
     connect(m_secure, SIGNAL(ValueChanged(bool)), this, SLOT(SecureChanged(bool)));
 
     m_upnp =  new TorcSetting(m_serverSettings, "ServerUPnP", tr("UPnP Discovery"), TorcSetting::Bool,
@@ -323,6 +304,13 @@ TorcHTTPServer::TorcHTTPServer()
     m_bonjour->SetHelpText(tr("Use Bonjour to advertise this device and search for similar devices"));
     m_bonjour->SetActive(true);
     connect(m_bonjour, SIGNAL(ValueChanged(bool)), this, SLOT(BonjourChanged(bool)));
+
+    // initialise external status
+    {
+        QMutexLocker locker(&gWebServerLock);
+        gWebServerStatus.secure = m_secure->GetValue().toBool();
+        gWebServerStatus.port   = m_port->GetValue().toInt();
+    }
 
     // initialise platform name
     static bool initialised = false;
@@ -529,25 +517,25 @@ void TorcHTTPServer::AuthenticateUser(TorcHTTPRequest &Request)
  *
  * \note This assumes the server is listening on all interfaces (currently true).
 */
-void TorcHTTPServer::UpdateOriginWhitelist(int Port, bool Secure)
+void TorcHTTPServer::UpdateOriginWhitelist(TorcHTTPServer::Status Status)
 {
     QWriteLocker locker(&gOriginWhitelistLock);
 
-    QString protocol = Secure ? "https://" : "http://";
+    QString protocol = Status.secure ? "https://" : "http://";
 
     // localhost first
-    gOriginWhitelist = protocol + "localhost:" + QString::number(Port) + " ";
+    gOriginWhitelist = protocol + "localhost:" + QString::number(Status.port) + " ";
 
     // all known raw IP addresses
     QList<QHostAddress> addresses = QNetworkInterface::allAddresses();
     for (int i = 0; i < addresses.size(); ++i)
-        gOriginWhitelist += QString("%1%2 ").arg(protocol).arg(TorcNetwork::IPAddressToLiteral(addresses[i], Port, false));
+        gOriginWhitelist += QString("%1%2 ").arg(protocol).arg(TorcNetwork::IPAddressToLiteral(addresses[i], Status.port, false));
 
     // and any known host names
     QStringList hosts = TorcNetwork::GetHostNames();
     foreach (QString host, hosts)
     {
-        QString newhost = QString("%1%2:%3 ").arg(protocol).arg(host).arg(Port);
+        QString newhost = QString("%1%2:%3 ").arg(protocol).arg(host).arg(Status.port);
         if (!host.isEmpty() && !gOriginWhitelist.contains(newhost))
             gOriginWhitelist += newhost;
     }
@@ -603,17 +591,26 @@ void TorcHTTPServer::BonjourChanged(bool Bonjour)
 
 bool TorcHTTPServer::Open(void)
 {
-    int port = m_port->GetValue().toInt();
-    bool waslistening = isListening();
-
-    if (!waslistening)
+    if (m_listener)
     {
-        if (!listen(QHostAddress::Any, port))
-            if (port > 0)
-                listen();
+        LOG(VB_GENERAL, LOG_ERR, "HTTP server alreay listening - closing");
+        Close();
     }
 
-    if (!isListening())
+    int port = m_port->GetValue().toInt();
+    m_listener = new TorcHTTPServerListener(this, QHostAddress::Any, port);
+    if (!m_listener->isListening())
+    {
+        delete m_listener;
+        if (port > 0)
+        {
+            m_listener = new TorcHTTPServerListener(this, QHostAddress::Any);
+            if (!m_listener->isListening())
+                delete m_listener;
+        }
+    }
+
+    if (!m_listener)
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to open web server port");
         Close();
@@ -621,28 +618,23 @@ bool TorcHTTPServer::Open(void)
     }
 
     // try to use the same port
-    if (port != serverPort())
+    if (port != m_listener->serverPort())
     {
-        port = serverPort();
+        QMutexLocker locker(&gWebServerLock);
+        port = m_listener->serverPort();
         m_port->SetValue(QVariant((int)port));
-
-        // re-advertise if the port has changed
-        StopBonjour();
+        gWebServerStatus.port = port;
     }
 
-    // advertise service if not already doing so
+    // advertise service
     if (m_bonjour->GetValue().toBool())
         StartBonjour();
 
     if (m_upnp->GetValue().toBool())
-        TorcSSDP::Announce(m_secure->GetValue().toBool());
+        TorcSSDP::Announce(TorcHTTPServer::GetStatus());
 
-    if (!waslistening)
-    {
-        LOG(VB_GENERAL, LOG_INFO, QString("Web server listening for %1secure connections on port %2").arg(m_secure->GetValue().toBool() ? "" : "in").arg(port));
-        UpdateOriginWhitelist(m_port->GetValue().toInt(), m_secure->GetValue().toBool());
-    }
-
+    LOG(VB_GENERAL, LOG_INFO, QString("Web server listening for %1secure connections on port %2").arg(m_secure->GetValue().toBool() ? "" : "in").arg(port));
+    UpdateOriginWhitelist(TorcHTTPServer::GetStatus());
     return true;
 }
 
@@ -666,13 +658,20 @@ void TorcHTTPServer::Close(void)
     m_webSocketPool.CloseSockets();
 
     // actually close
-    close();
+    if (m_listener)
+        delete m_listener;
+    m_listener = NULL;
 
     LOG(VB_GENERAL, LOG_INFO, "Webserver closed");
 }
 
 void TorcHTTPServer::PortChanged(int Port)
 {
+    {
+        QMutexLocker lock(&gWebServerLock);
+        gWebServerStatus.port = Port;
+    }
+
     LOG(VB_GENERAL, LOG_INFO, QString("Port changed to %1 - restarting").arg(Port));
     QTimer::singleShot(10, this, SLOT(Restart()));
 }
@@ -681,8 +680,9 @@ void TorcHTTPServer::SecureChanged(bool Secure)
 {
     {
         QMutexLocker lock(&gWebServerLock);
-        gWebServerSecure = m_secure->GetValue().toBool();
+        gWebServerStatus.secure = m_secure->GetValue().toBool();
     }
+
     LOG(VB_GENERAL, LOG_INFO, QString("Secure changed to '%1secure - restarting").arg(Secure ? "" : "in"));
     QTimer::singleShot(10, this, SLOT(Restart()));
 }
@@ -690,7 +690,7 @@ void TorcHTTPServer::SecureChanged(bool Secure)
 void TorcHTTPServer::UPnPChanged(bool UPnP)
 {
     if (UPnP)
-        TorcSSDP::Announce(m_secure->GetValue().toBool());
+        TorcSSDP::Announce(TorcHTTPServer::GetStatus());
     else
         TorcSSDP::CancelAnnounce();
 }
@@ -716,11 +716,13 @@ bool TorcHTTPServer::event(QEvent *Event)
                 case Torc::NetworkUnavailable:
                 case Torc::NetworkChanged:
                 case Torc::NetworkHostNamesChanged:
-                    UpdateOriginWhitelist(m_port->GetValue().toInt(), m_secure->GetValue().toBool());
+                    UpdateOriginWhitelist(TorcHTTPServer::GetStatus());
+                    return true;
                     break;
                 case Torc::UserChanged:
                     LOG(VB_GENERAL, LOG_INFO, "User name/credentials changed - restarting webserver");
                     Restart();
+                    return true;
                     break;
                 default:
                     break;
@@ -728,7 +730,7 @@ bool TorcHTTPServer::event(QEvent *Event)
         }
     }
 
-    return QTcpServer::event(Event);
+    return QObject::event(Event);
 }
 
 TorcWebSocketThread* TorcHTTPServer::TakeSocketPriv(TorcWebSocketThread *Socket)
@@ -736,7 +738,7 @@ TorcWebSocketThread* TorcHTTPServer::TakeSocketPriv(TorcWebSocketThread *Socket)
     return m_webSocketPool.TakeSocket(Socket);
 }
 
-void TorcHTTPServer::incomingConnection(qintptr SocketDescriptor)
+void TorcHTTPServer::NewConnection(qintptr SocketDescriptor)
 {
     m_webSocketPool.IncomingConnection(SocketDescriptor, m_secure->GetValue().toBool());
 }
@@ -751,6 +753,7 @@ class TorcHTTPServerObject : public TorcAdminObject, public TorcStringFactory
         qRegisterMetaType<TorcHTTPService*>();
         qRegisterMetaType<QTcpSocket*>();
         qRegisterMetaType<QHostAddress>();
+        qRegisterMetaType<TorcHTTPServer::Status>();
     }
 
     void GetStrings(QVariantMap &Strings)

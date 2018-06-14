@@ -2,8 +2,6 @@
 #define TORCHTTPSERVER_H
 
 // Qt
-#include <QThreadPool>
-#include <QTcpServer>
 #include <QTcpSocket>
 #include <QMutex>
 #include <QReadWriteLock>
@@ -17,20 +15,32 @@
 #include "torcupnpcontent.h"
 #include "torcwebsocketpool.h"
 #include "torcwebsocketthread.h"
+#include "torchttpserverlistener.h"
 
 class TorcSetting;
 class TorcHTTPHandler;
 
-class TorcHTTPServer : public QTcpServer
+class TorcHTTPServer Q_DECL_FINAL : public QObject
 {
     Q_OBJECT
 
     friend class TorcHTTPServerObject;
 
   public:
+    class Status
+    {
+      public:
+        Status() : port(0), secure(false), ipv4(true), ipv6(true) {}
+        int  port;
+        bool secure;
+        bool ipv4;
+        bool ipv6;
+    };
+
+  public:
     // Content/service handlers
     static QString ServerDescription  (void);
-    static bool    IsSecure           (void);
+    static Status  GetStatus          (void);
     static void    Authorise          (const QString &Host, TorcHTTPRequest &Request, bool ForceCheck);
     static void    AuthenticateUser   (TorcHTTPRequest &Request);
     static void    AddAuthenticationHeader(TorcHTTPRequest &Request);
@@ -42,16 +52,15 @@ class TorcHTTPServer : public QTcpServer
     static QVariantMap GetServiceHandlers (void);
     static QVariantMap GetServiceDescription(const QString &Service);
     static TorcWebSocketThread* TakeSocket (TorcWebSocketThread *Socket);
-
-    // server status
-    static int     GetPort            (void);
-    static bool    IsListening        (void);
     static QString PlatformName       (void);
 
   public:
     virtual       ~TorcHTTPServer     ();
 
   public slots:
+    void           NewConnection      (qintptr SocketDescriptor);
+
+  protected slots:
     void           PortChanged        (int Port);
     void           SecureChanged      (bool Secure);
     void           UPnPChanged        (bool UPnP);
@@ -63,7 +72,6 @@ class TorcHTTPServer : public QTcpServer
 
   protected:
     TorcHTTPServer ();
-    void           incomingConnection (qintptr SocketDescriptor) Q_DECL_OVERRIDE Q_DECL_FINAL;
     bool           event              (QEvent *Event) Q_DECL_OVERRIDE Q_DECL_FINAL;
     bool           Open               (void);
     void           Close              (void);
@@ -71,14 +79,14 @@ class TorcHTTPServer : public QTcpServer
 
   protected:
     static TorcHTTPServer*            gWebServer;
+    static Status                     gWebServerStatus;
     static QMutex                     gWebServerLock;
     static QString                    gPlatform;
     static QString                    gOriginWhitelist;
     static QReadWriteLock             gOriginWhitelistLock;
-    static bool                       gWebServerSecure;
 
   private:
-    static void    UpdateOriginWhitelist (int Port, bool Secure);
+    static void    UpdateOriginWhitelist (TorcHTTPServer::Status Status);
     void           StartBonjour       (void);
     void           StopBonjour        (void);
 
@@ -88,6 +96,7 @@ class TorcHTTPServer : public QTcpServer
     TorcSetting                      *m_secure;
     TorcSetting                      *m_upnp;
     TorcSetting                      *m_bonjour;
+    TorcHTTPServerListener           *m_listener;
     TorcUser                          m_user;
     TorcHTMLHandler                   m_defaultHandler;
     TorcHTTPServices                  m_servicesHandler;
@@ -105,5 +114,6 @@ class TorcHTTPServer : public QTcpServer
 Q_DECLARE_METATYPE(TorcHTTPRequest*)
 Q_DECLARE_METATYPE(QTcpSocket*)
 Q_DECLARE_METATYPE(QHostAddress)
+Q_DECLARE_METATYPE(TorcHTTPServer::Status)
 
 #endif // TORCHTTPSERVER_H

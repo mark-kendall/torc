@@ -11,6 +11,7 @@
 
 #include "torcqthread.h"
 #include "upnp/torcupnp.h"
+#include "torchttpserver.h"
 
 #define TORC_SSDP_UDP_MULTICAST_PORT  1900
 #define TORC_IPV4_UDP_MULTICAST_ADDR  QString("239.255.255.250")
@@ -50,14 +51,14 @@ class TorcSSDP Q_DECL_FINAL : public QObject
   public:
     static void      Search             (void);
     static void      CancelSearch       (void);
-    static void      Announce           (bool Secure);
+    static void      Announce           (TorcHTTPServer::Status Options);
     static void      CancelAnnounce     (void);
 
     static TorcSSDP                    *gSSDP;
     static QMutex                      *gSSDPLock;
     static bool                         gSearchEnabled;
     static bool                         gAnnounceEnabled;
-    static bool                         gAnnounceSecure;
+    static TorcHTTPServer::Status       gAnnounceOptions;
 
   protected:
     TorcSSDP();
@@ -68,7 +69,7 @@ class TorcSSDP Q_DECL_FINAL : public QObject
   protected slots:
     void             SearchPriv         (void);
     void             CancelSearchPriv   (void);
-    void             AnnouncePriv       (bool Secure);
+    void             AnnouncePriv       (TorcHTTPServer::Status Options);
     void             CancelAnnouncePriv (void);
 
     void             SendSearch         (void);
@@ -90,17 +91,16 @@ class TorcSSDP Q_DECL_FINAL : public QObject
     qint64           GetExpiryTime      (const QString &Expires);
     void             StartSearch        (void);
     void             StopSearch         (void);
-    void             StartAnnounce      (bool Secure);
+    void             StartAnnounce      (TorcHTTPServer::Status Options);
     void             StopAnnounce       (void);
     void             ProcessResponse    (const TorcSSDPSearchResponse &Response);
 
   private:
-    bool                                m_secure;
+    TorcHTTPServer::Status              m_options;
     QString                             m_serverString;
     bool                                m_searching;
     int                                 m_firstSearchTimer;
     int                                 m_secondSearchTimer;
-    bool                                m_announcing;
     int                                 m_firstAnnounceTimer;
     int                                 m_secondAnnounceTimer;
     int                                 m_refreshTimer;

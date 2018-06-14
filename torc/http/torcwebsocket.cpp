@@ -804,6 +804,7 @@ void TorcWebSocket::SendHandshake(void)
     m_challengeResponse = QCryptographicHash::hash(key.toUtf8(), QCryptographicHash::Sha1).toBase64();
 
     QHostAddress host(m_address);
+    TorcHTTPServer::Status server = TorcHTTPServer::GetStatus();
 
     stream << "GET / HTTP/1.1\r\n";
     stream << "User-Agent: " << TorcHTTPServer::PlatformName() << "\r\n";
@@ -815,12 +816,12 @@ void TorcWebSocket::SendHandshake(void)
     if (m_subProtocol != TorcWebSocketReader::SubProtocolNone)
         stream << "Sec-WebSocket-Protocol: " << TorcWebSocketReader::SubProtocolsToString(m_subProtocol) << "\r\n";
     stream << "Torc-UUID: " << gLocalContext->GetUuid() << "\r\n";
-    stream << "Torc-Port: " << QString::number(TorcHTTPServer::GetPort()) << "\r\n";
+    stream << "Torc-Port: " << QString::number(server.port) << "\r\n";
     stream << "Torc-Name: " << TorcHTTPServer::ServerDescription() << "\r\n";
     stream << "Torc-Priority:" << gLocalContext->GetPriority() << "\r\n";
     stream << "Torc-Starttime:" << gLocalContext->GetStartTime() << "\r\n";
     stream << "Torc-APIVersion:" << TorcHTTPServices::GetVersion() << "\r\n";
-    if (TorcHTTPServer::IsSecure())
+    if (server.secure)
         stream << "Torc-Secure: yes\r\n";
     stream << "\r\n";
     stream.flush();
