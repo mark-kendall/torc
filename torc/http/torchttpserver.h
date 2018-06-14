@@ -31,7 +31,8 @@ class TorcHTTPServer Q_DECL_FINAL : public QObject
     class Status
     {
       public:
-        Status() : port(0), secure(false), ipv4(true), ipv6(true) {}
+        Status();
+        bool operator==(const Status &Other) const;
         int  port;
         bool secure;
         bool ipv4;
@@ -65,6 +66,8 @@ class TorcHTTPServer Q_DECL_FINAL : public QObject
     void           PortChanged        (int Port);
     void           SecureChanged      (bool Secure);
     void           UPnPChanged        (bool UPnP);
+    void           UPnPSearchChanged  (bool Search);
+    void           UPnPAdvertChanged  (bool Advert);
     void           BonjourChanged     (bool Bonjour);
     void           IPv6Changed        (bool IPv6);
     void           Restart            (void);
@@ -99,6 +102,8 @@ class TorcHTTPServer Q_DECL_FINAL : public QObject
     TorcSetting                      *m_port;
     TorcSetting                      *m_secure;
     TorcSetting                      *m_upnp;
+    TorcSetting                      *m_upnpSearch;
+    TorcSetting                      *m_upnpAdvertise;
     TorcSetting                      *m_bonjour;
     TorcSetting                      *m_ipv6;
     TorcHTTPServerListener           *m_listener;

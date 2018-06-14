@@ -47,6 +47,22 @@ QMap<QString,TorcHTTPHandler*> gHandlers;
 QReadWriteLock*                gHandlersLock = new QReadWriteLock(QReadWriteLock::Recursive);
 QString                        gServicesDirectory(TORC_SERVICES_DIR);
 
+TorcHTTPServer::Status::Status()
+  : port(0),
+    secure(false),
+    ipv4(true),
+    ipv6(true)
+{
+}
+
+bool TorcHTTPServer::Status::operator ==(const Status &Other) const
+{
+    return port   == Other.port &&
+           secure == Other.secure &&
+           ipv4   == Other.ipv4 &&
+           ipv6   == Other.ipv6;
+}
+
 void TorcHTTPServer::RegisterHandler(TorcHTTPHandler *Handler)
 {
     bool changed = false;
@@ -263,6 +279,8 @@ TorcHTTPServer::TorcHTTPServer()
     m_port(NULL),
     m_secure(NULL),
     m_upnp(NULL),
+    m_upnpSearch(NULL),
+    m_upnpAdvertise(NULL),
     m_bonjour(NULL),
     m_ipv6(NULL),
     m_listener(NULL),
@@ -296,11 +314,24 @@ TorcHTTPServer::TorcHTTPServer()
     m_secure->SetActive(true);
     connect(m_secure, SIGNAL(ValueChanged(bool)), this, SLOT(SecureChanged(bool)));
 
-    m_upnp =  new TorcSetting(m_serverSettings, "ServerUPnP", tr("UPnP Discovery"), TorcSetting::Bool,
+    m_upnp =  new TorcSetting(m_serverSettings, "ServerUPnP", tr("UPnP"), TorcSetting::Bool,
                               TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true));
-    m_upnp->SetHelpText(tr("Use UPnP to advertise this device and search for similar devices"));
     m_upnp->SetActive(true);
     connect(m_upnp, SIGNAL(ValueChanged(bool)), this, SLOT(UPnPChanged(bool)));
+
+    m_upnpSearch = new TorcSetting(m_upnp, "ServerUPnPSearch", tr("UPnP Search"), TorcSetting::Bool,
+                                   TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true));
+    m_upnpSearch->SetHelpText(tr("Use UPnP to search for other devices"));
+    m_upnpSearch->SetActive(m_upnp->GetValue().toBool());
+    connect(m_upnpSearch, SIGNAL(ValueChanged(bool)), this, SLOT(UPnPSearchChanged(bool)));
+    connect(m_upnp, SIGNAL(ValueChanged(bool)), m_upnpSearch, SLOT(SetActive(bool)));
+
+    m_upnpAdvertise = new TorcSetting(m_upnp, "ServerUPnpAdvert", tr("UPnP Advertisement"), TorcSetting::Bool,
+                                      TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true));
+    m_upnpAdvertise->SetHelpText(tr("Use UPnP to advertise this device"));
+    m_upnpAdvertise->SetActive(m_upnp->GetValue().toBool());
+    connect(m_upnpAdvertise, SIGNAL(ValueChanged(bool)), this, SLOT(UPnPAdvertChanged(bool)));
+    connect(m_upnp, SIGNAL(ValueChanged(bool)), m_upnpAdvertise, SLOT(SetActive(bool)));
 
     m_ipv6 = new TorcSetting(m_serverSettings, "ServerIPv6", tr("IPv6"), TorcSetting::Bool,
                              TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true));
@@ -313,7 +344,6 @@ TorcHTTPServer::TorcHTTPServer()
     m_bonjour->SetHelpText(tr("Use Bonjour to advertise this device and search for similar devices"));
     m_bonjour->SetActive(m_ipv6->GetValue().toBool());
     connect(m_bonjour, SIGNAL(ValueChanged(bool)), this, SLOT(BonjourChanged(bool)));
-    // bonjour is dependant on IPv6
     connect(m_ipv6, SIGNAL(ValueChanged(bool)), m_bonjour, SLOT(SetActive(bool)));
 
     // initialise external status
@@ -368,6 +398,20 @@ TorcHTTPServer::~TorcHTTPServer()
         m_ipv6->Remove();
         m_ipv6->DownRef();
         m_ipv6 = NULL;
+    }
+
+    if (m_upnpAdvertise)
+    {
+        m_upnpAdvertise->Remove();
+        m_upnpAdvertise->DownRef();
+        m_upnpAdvertise = NULL;
+    }
+
+    if (m_upnpSearch)
+    {
+        m_upnpSearch->Remove();
+        m_upnpSearch->DownRef();
+        m_upnpSearch = NULL;
     }
 
     if (m_upnp)
@@ -655,6 +699,8 @@ bool TorcHTTPServer::Open(void)
     LOG(VB_GENERAL, LOG_INFO, QString("IPv6 is %1abled").arg(m_ipv6->GetValue().toBool() ? "en" : "dis"));
     LOG(VB_GENERAL, LOG_INFO, QString("Bonjour is %1abled").arg(m_bonjour->GetValue().toBool() ? "en" : "dis"));
     LOG(VB_GENERAL, LOG_INFO, QString("SSDP is %1abled").arg(m_upnp->GetValue().toBool() ? "en" : "dis"));
+    LOG(VB_GENERAL, LOG_INFO, QString("SSDP search is %1abled").arg(m_upnpSearch->GetValue().toBool() ? "en" : "dis"));
+    LOG(VB_GENERAL, LOG_INFO, QString("SSDP advertisement is %1abled").arg(m_upnpAdvertise->GetValue().toBool() ? "en" : "dis"));
     int port = m_port->GetValue().toInt();
     LOG(VB_GENERAL, LOG_INFO, QString("Attempting to listen on port %1").arg(port));
 
@@ -707,7 +753,7 @@ void TorcHTTPServer::Close(void)
 {
     // stop advertising and searching
     StopBonjour();
-    StopUPnP();;
+    StopUPnP();
 
     // close connections
     m_webSocketPool.CloseSockets();
@@ -746,14 +792,19 @@ void TorcHTTPServer::StartUPnP(void)
 {
     if (m_upnp->GetValue().toBool())
     {
-        if (!m_ssdpThread)
+        bool search = m_upnpSearch->GetValue().toBool();
+        bool advert = m_upnpAdvertise->GetValue().toBool();
+
+        if (!m_ssdpThread && (search || advert))
         {
             m_ssdpThread = new TorcSSDPThread();
             m_ssdpThread->start();
         }
 
-        TorcSSDP::Search(TorcHTTPServer::GetStatus());
-        TorcSSDP::Announce(TorcHTTPServer::GetStatus());
+        if (search)
+            TorcSSDP::Search(TorcHTTPServer::GetStatus());
+        if (advert)
+            TorcSSDP::Announce(TorcHTTPServer::GetStatus());
     }
 }
 
@@ -779,6 +830,38 @@ void TorcHTTPServer::UPnPChanged(bool UPnP)
         StartUPnP();
     else
         StopUPnP();
+}
+
+void TorcHTTPServer::UPnPAdvertChanged(bool Advert)
+{
+    LOG(VB_GENERAL, LOG_INFO, QString("SSDP advertisement %1abled").arg(Advert ? "en" : "dis"));
+    if (Advert)
+    {
+        StartUPnP();
+    }
+    else
+    {
+        if (m_upnpSearch->GetValue().toBool())
+            TorcSSDP::CancelAnnounce();
+        else
+            StopUPnP();
+    }
+}
+
+void TorcHTTPServer::UPnPSearchChanged(bool Search)
+{
+    LOG(VB_GENERAL, LOG_INFO, QString("SSDP search %1abled").arg(Search ? "en" : "dis"));
+    if (Search)
+    {
+        StartUPnP();
+    }
+    else
+    {
+        if (m_upnpAdvertise->GetValue().toBool())
+            TorcSSDP::CancelSearch();
+        else
+            StopUPnP();
+    }
 }
 
 void TorcHTTPServer::Restart(void)

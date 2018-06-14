@@ -445,15 +445,19 @@ void TorcSSDP::CancelAnnouncePriv(void)
 
 void TorcSSDP::StartAnnounce(void)
 {
-    if (!m_announceOptions.port)
-        LOG(VB_GENERAL, LOG_INFO, QString("Starting SSDP announce (%1)").arg(TORC_ROOT_UPNP_DEVICE));
+    gSSDPLock->lock();
+    TorcHTTPServer::Status newoptions = gAnnounceOptions;
+    gSSDPLock->unlock();
+
+    if (m_announceOptions == newoptions)
+    {
+        LOG(VB_GENERAL, LOG_INFO, "SSDP announce options unchanged - not restarting");
+        return;
+    }
 
     StopAnnounce();
-
-    {
-        QMutexLocker locker(gSSDPLock);
-        m_announceOptions = gAnnounceOptions;
-    }
+    LOG(VB_GENERAL, LOG_INFO, QString("Starting SSDP announce (%1)").arg(TORC_ROOT_UPNP_DEVICE));
+    m_announceOptions = newoptions;
 
     // schedule first announce almost immediately
     m_firstAnnounceTimer = startTimer(100, Qt::CoarseTimer);
@@ -941,16 +945,20 @@ void TorcSSDP::ProcessDevice(const QMap<QString,QString> &Headers, qint64 Expire
 
 void TorcSSDP::StartSearch(void)
 {
-    if (!m_searching)
-        LOG(VB_GENERAL, LOG_INFO, QString("Starting SSDP search for %1 devices").arg(TORC_ROOT_UPNP_DEVICE));
+    gSSDPLock->lock();
+    TorcHTTPServer::Status newoptions = gSearchOptions;
+    gSSDPLock->unlock();
+
+    if (m_searching && newoptions == m_searchOptions)
+    {
+        LOG(VB_GENERAL, LOG_INFO, "SSDP search options unchanged - not restarting");
+        return;
+    }
 
     StopSearch();
 
-
-    {
-        QMutexLocker locker(gSSDPLock);
-        m_searchOptions = gSearchOptions;
-    }
+    LOG(VB_GENERAL, LOG_INFO, QString("Starting SSDP search for %1 devices").arg(TORC_ROOT_UPNP_DEVICE));
+    m_searchOptions = newoptions;
 
     // schedule first search almost immediately - this is evented to ensure subsequent searches are scheduled
     m_firstSearchTimer = startTimer(1, Qt::CoarseTimer);
