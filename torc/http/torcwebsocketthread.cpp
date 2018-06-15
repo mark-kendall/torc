@@ -271,8 +271,8 @@ void TorcWebSocketThread::SetupSSL(void)
 
 void TorcWebSocketThread::Start(void)
 {
-    // one off SSL default configuration
-    if (m_secure)
+    // one off SSL default configuration when needed
+    if (m_secure && m_socketDescriptor)
         SetupSSL();
 
     if (m_socketDescriptor)
