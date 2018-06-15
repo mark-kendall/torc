@@ -87,8 +87,19 @@ bool TorcWebSocketThread::CreateCerts(const QString &CertFile, const QString &Ke
 {
     LOG(VB_GENERAL, LOG_INFO, "Generating RSA key");
 
+    RSA *rsa = RSA_new();
+    BIGNUM *e;
+    e = BN_new();
+    BN_set_word(e, RSA_F4);
+    RSA_generate_key_ex(rsa, 4096, e, NULL);
+    BN_free(e);
+    if (NULL == rsa)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Failed to generate RSA key");
+        return false;
+    }
+
     EVP_PKEY *privatekey = EVP_PKEY_new();
-    RSA      *rsa = RSA_generate_key(4096, RSA_F4, NULL, NULL);
     if(!EVP_PKEY_assign_RSA(privatekey, rsa))
     {
         EVP_PKEY_free(privatekey);
@@ -155,10 +166,11 @@ bool TorcWebSocketThread::CreateCerts(const QString &CertFile, const QString &Ke
 
     success = PEM_write_PrivateKey(keyfile, privatekey, NULL, NULL, 0, NULL, NULL);
     fclose(keyfile);
+    X509_free(x509);
+    EVP_PKEY_free(privatekey);
+
     if (!success)
     {
-        X509_free(x509);
-        EVP_PKEY_free(privatekey);
         LOG(VB_GENERAL, LOG_ERR, QString("Failed to write to '%1'").arg(KeyFile));
         return false;
     }
@@ -169,7 +181,7 @@ bool TorcWebSocketThread::CreateCerts(const QString &CertFile, const QString &Ke
     if (chmod(CertFile.toLocal8Bit().constData(), S_IRUSR | S_IWUSR) != 0)
         LOG(VB_GENERAL, LOG_WARNING, QString("Failed to set permissions for '%1' - this is not fatal but may present a security risk").arg(CertFile));
     if (chmod(KeyFile.toLocal8Bit().constData(),  S_IRUSR | S_IWUSR) != 0)
-        LOG(VB_GENERAL, LOG_WARNING, QString("Failed to set permissions for '%1' - this is not fatal but may present a security risk").arg(CertFile));
+        LOG(VB_GENERAL, LOG_WARNING, QString("Failed to set permissions for '%1' - this is not fatal but may present a security risk").arg(KeyFile));
     return true;
 }
 
