@@ -12,6 +12,8 @@ class TorcHTTPServerListener Q_DECL_FINAL : public QTcpServer
     TorcHTTPServerListener(QObject *Parent, const QHostAddress &Address, int Port = 0);
    ~TorcHTTPServerListener();
 
+    bool Listen(const QHostAddress &Address, int Port = 0);
+
   signals:
     void NewConnection(qintptr SocketDescriptor);
 
