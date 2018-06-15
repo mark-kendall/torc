@@ -47,7 +47,7 @@ class TorcControl : public TorcDevice, public TorcHTTPService
     virtual bool           AllowInputs            (void) const;
     bool                   IsKnownInput           (const QString &Input) const;
     bool                   IsKnownOutput          (const QString &Output) const;
-    QString                GetUIName              (void);
+    QString                GetUIName              (void) Q_DECL_OVERRIDE;
 
   public slots:
     // TorcHTTPService
@@ -61,8 +61,8 @@ class TorcControl : public TorcDevice, public TorcHTTPService
     bool                   Finish                 (void);
     void                   InputValidChangedPriv  (QObject* Input, bool Valid);
     void                   CheckInputValues       (void);
-    void                   SetValue               (double Value);
-    void                   SetValid               (bool Valid);
+    void                   SetValue               (double Value) Q_DECL_OVERRIDE;
+    void                   SetValid               (bool Valid) Q_DECL_OVERRIDE;
     virtual void           CalculateOutput        (void) = 0;
     bool                   CheckForCircularReferences (const QString &UniqueId, QString Path) const;
 

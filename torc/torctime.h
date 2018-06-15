@@ -18,25 +18,27 @@ class TorcTime : public QObject, public TorcHTTPService
     Q_PROPERTY(QString currentTime  READ GetCurrentTime  NOTIFY currentTimeChanged)
 
   public:
-    virtual ~TorcTime();
+    virtual  ~TorcTime();
 
   protected:
-    explicit TorcTime();
+    explicit  TorcTime();
 
   signals:
-    void     currentTimeChanged (QString Time);
+    void      currentTimeChanged (QString Time);
 
   public slots:
     // TorcHTTPService requirement
-    void     SubscriberDeleted  (QObject *Subscriber);
+    void      SubscriberDeleted  (QObject *Subscriber);
     // internal timer
-    void     Tick               (void);
+    void      Tick               (void);
     // Actual public slot
-    QString  GetCurrentTime     (void);
+    QString   GetCurrentTime     (void);
 
   private:
-    QString  currentTime; // dummy
-    QTimer   m_timer;
+    QString   currentTime; // dummy
+    QDateTime m_lastTime;
+    QTimer    m_timer;
+    QString   m_dateTimeFormat;
 };
 
 #endif // TORCTIME_H

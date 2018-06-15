@@ -122,7 +122,9 @@ var TorcSettings = function ($, torc, menu) {
                                     if (name === torc.PortSetting) {
                                         window.location.replace(window.location.protocol + '//' + window.location.hostname + ':' + value);
                                     } else if (name === torc.SecureSetting) {
-                                        window.location.replace((value ? 'https:' : 'http:') + '//' + window.location.hostname + ':' + window.location.port);
+                                        var port = window.location.port;
+                                        if (!port || 0 === port.length) { if (window.location.protocol === 'https:') { port = 443; } else { port = 80; }}
+                                        window.location.replace((value ? 'https:' : 'http:') + '//' + window.location.hostname + ':' + port);
                                     }
                                 } else { setValid(false); }}
                         );

@@ -164,7 +164,7 @@ TorcCentral::TorcCentral()
         m_graph.append(QString("strict digraph \"%1\" {\r\n"
                                     "    rankdir=\"LR\";\r\n"
                                     "    node [shape=rect];\r\n")
-                            .arg(QCoreApplication::applicationName()));
+                            .arg(TORC_TORC));
 
         // build the graph contents
         TorcInputs::gInputs->Graph(&m_graph);

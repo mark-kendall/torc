@@ -54,7 +54,9 @@ $(document).ready(function() {
                             function(result) { $(".torc-peer-status").html(result); });
                 addDropdownMenuDivider('torc-peer-menu', 'torc-peer');
                 value.forEach( function (element, index) {
-                    addDropdownMenuItem('torc-peer-menu', 'torc-peer torc-peer' + index, 'http://' + element.address + ':' + element.port + '/index.html', '');
+                    var prot = 'http://';
+                    if (element.hasOwnProperty('secure')) { prot = "https://"; }
+                    addDropdownMenuItem('torc-peer-menu', 'torc-peer torc-peer' + index, prot + element.address + ':' + element.port + '/index.html', '');
                     qsTranslate('TorcNetworkedContext', 'Connect to %1', '', 0,
                                 function(result) { $(".torc-peer" + index).html(template(theme.DropdownItemWithIcon, { "icon": "external-link-square", "text": result.replace("%1", element.name) })); });
                 });
@@ -67,7 +69,7 @@ $(document).ready(function() {
     function peerSubscriptionChanged(version, ignore, properties) {
         if (version !== undefined && typeof properties === 'object' && properties.hasOwnProperty('peers') &&
             properties.peers.hasOwnProperty('value') && $.isArray(properties.peers.value)) {
-            addNavbarDropdown('torc-peer-dropdown', 'link', 'torc-peer-menu');
+            addNavbarDropdown('torc-peer-dropdown', 'sitemap', 'torc-peer-menu');
             $.each(properties, function (key, value) {
                 peerListChanged(key, value.value); });
             return;

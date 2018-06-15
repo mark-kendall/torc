@@ -26,16 +26,21 @@
 #include "torclocalcontext.h"
 #include "torctimercontrol.h"
 
+static const quint64 kThou  = 1000;
 static const quint64 kSixty = 60;
 static const quint64 k24    = 24;
 static const quint64 k7     = 7;
+static const quint64 kMSecsInMinute = kSixty * kThou;
+static const quint64 kMSecsInHour   = kMSecsInMinute * kSixty;
+static const quint64 kMSecsInDay    = kMSecsInHour * k24;
+static const quint64 kMSecsinWeek   = kMSecsInDay * k7;
 
 QString TorcTimerControl::TimerTypeToString(TorcTimerControl::TimerType Type)
 {
     switch (Type)
     {
         case TorcTimerControl::Custom:   return QString("Custom");
-        case TorcTimerControl::Minutely: return QString("Minutely");
+        case TorcTimerControl::Minutely: return QString("Minute");
         case TorcTimerControl::Hourly:   return QString("Hourly");
         case TorcTimerControl::Daily:    return QString("Daily");
         case TorcTimerControl::Weekly:   return QString("Weekly");
@@ -61,20 +66,79 @@ TorcTimerControl::TimerType TorcTimerControl::StringToTimerType(const QString &T
 TorcTimerControl::TorcTimerControl(const QString &Type, const QVariantMap &Details)
   : TorcControl(TorcControl::Timer, Details),
     m_timerType(StringToTimerType(Type)),
-    m_startTime(QTime()),
     m_startDay(0),
-    m_startDuration(0),
+    m_startTime(0),
     m_duration(0),
-    m_durationTime(QTime()),
     m_durationDay(0),
+    m_periodDay(0),
+    m_periodTime(0),
     m_timer(),
-    m_firstTrigger(true)
+    m_firstTrigger(true),
+    m_randomStart(false),
+    m_randomDuration(false),
+    m_lastElapsed(0),
+    m_newRandom(false)
 {
+    static bool randomcheck = true;
+    if (randomcheck)
+    {
+        randomcheck = false;
+        if (RAND_MAX < kMSecsinWeek)
+            LOG(VB_GENERAL, LOG_WARNING, QString("Maximum random number is too low for effective use (%1)").arg(RAND_MAX));
+    }
+
     if (m_timerType == TorcTimerControl::UnknownTimerType)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Unknown timer type '%1' for device '%2'").arg(Details.value("type").toString()).arg(uniqueId));
         return;
     }
+
+    int days, hours, minutes, seconds = 0;
+
+    // a custom timer needs a period
+    if (TorcTimerControl::Custom == m_timerType)
+    {
+        if (!Details.contains("period"))
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Custom timer %1 does not specify a period").arg(uniqueId));
+            return;
+        }
+
+        QString periods = Details.value("period").toString().toLower().trimmed();
+        quint64 periodtime;
+        if (!TorcControl::ParseTimeString(periods, days, hours, minutes, seconds, periodtime))
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse period from '%1'").arg(periods));
+            return;
+        }
+
+        m_periodDay  = days;
+        m_periodTime = periodtime * 1000;
+
+        // the period must be at least 2 seconds to allow for defined on and off periods
+        if (m_periodTime < 2000)
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Custom timer %1 has duration of %2seconds - needs at least 2").arg(uniqueId).arg(m_periodTime / 1000));
+            return;
+        }
+    }
+    else
+    {
+        m_periodTime = GetPeriodDuration();
+        m_periodDay  = m_periodTime / kMSecsInDay;
+    }
+
+    // Sanity checks start time and duration
+    // constraints:
+    // - we need a defined off and on period
+    // - the on period can be anywhere in the cycle (start, middle, end)
+    // - the current on period must finish before the next is due to start
+    // - so:
+    //   - start >= 0
+    //   - start < max
+    //   - duration > 0
+    //   - duration < max
+    // - should cover all eventualities...
 
     // check for start time
     if (!Details.contains("start"))
@@ -83,20 +147,32 @@ TorcTimerControl::TorcTimerControl(const QString &Type, const QVariantMap &Detai
         return;
     }
 
-    // start time must be in the format DD:HH:MM or HH:MM or MM with an optional .SS appended
-    QString start  = Details.value("start").toString();
-    int days, hours, minutes, seconds = 0;
-    quint64 startduration;
-
-    if (!TorcControl::ParseTimeString(start, days, hours, minutes, seconds, startduration))
+    // a random start time
+    QString start  = Details.value("start").toString().toLower().trimmed();
+    if (start.contains("random"))
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse start time from '%1'").arg(start));
-        return;
+        m_randomStart = true;
     }
+    else
+    {
+        // start time must be in the format DD:HH:MM or HH:MM or MM with an optional .SS appended
+        quint64 starttime;
+        if (!TorcControl::ParseTimeString(start, days, hours, minutes, seconds, starttime))
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse start time from '%1'").arg(start));
+            return;
+        }
 
-    m_startTime         = QTime(hours, minutes, seconds);
-    m_startDay          = days;
-    m_startDuration = startduration;
+        m_startDay  = days;
+        m_startTime = starttime * 1000;
+
+        if (m_startTime >= m_periodTime /*|| m_startTime < 0*/)
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Start time (%2) for %1 is invalid - must be in range 0-%3")
+                .arg(uniqueId).arg(m_startTime / 1000).arg((m_periodTime / 1000) - 1));
+            return;
+        }
+    }
 
     // check duration - format as for start time
     if (!Details.contains("duration"))
@@ -105,46 +181,49 @@ TorcTimerControl::TorcTimerControl(const QString &Type, const QVariantMap &Detai
         return;
     }
 
-    QString durations = Details.value("duration").toString();
-    quint64 duration;
-    if (!TorcControl::ParseTimeString(durations, days, hours, minutes, seconds, duration))
+    QString durations = Details.value("duration").toString().toLower().trimmed();
+    if (durations.contains("random"))
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse duration from '%1'").arg(durations));
-        return;
-    }
-
-    m_duration          = duration;
-    m_durationTime = QTime(hours, minutes, seconds);
-    m_durationDay       = days;
-
-    // sanity check start time and duration in relation to timer type
-    if (m_timerType == TorcTimerControl::Custom)
-    {
-        // the timer will trigger every 'startduration' seconds and last for 'duration'
-        // need a minimum of 1 second frequency and 1 second duration - otherwise pointless
-        if (startduration < 1 || duration < 1)
+        // a timer cannot have random start and duration
+        if (m_randomStart)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Custom timer frequency/duration is too low (%1)").arg(startduration));
+            LOG(VB_GENERAL, LOG_ERR, QString("Timer %1 cannot have random start AND duration").arg(uniqueId));
             return;
         }
+        m_randomDuration = true;
     }
     else
     {
-        quint64 maxduration = GetMaxDuration();
-        if ((startduration >= maxduration) || ((startduration + duration) > maxduration))
+        quint64 duration;
+        if (!TorcControl::ParseTimeString(durations, days, hours, minutes, seconds, duration))
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Start and/or duration invalid for time type '%1' (start '%2' duration '%3')")
-                .arg(TimerTypeToString(m_timerType)).arg(start).arg(durations));
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse duration from '%1'").arg(durations));
+            return;
+        }
+
+        m_duration    = duration * 1000;
+        m_durationDay = days;
+
+        if ((m_duration < 1000) || (m_duration >= m_periodTime))
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Duration (%1) for %2 is invalid - must be in range 1-%3")
+                .arg(m_duration / 1000).arg(uniqueId).arg((m_periodTime / 1000) - 1));
             return;
         }
     }
 
+    // generate random start/duration if necessary
+    GenerateTimings();
+
     // everything appears to be valid at this stage
     m_parsed = true;
+
+    gLocalContext->AddObserver(this);
 }
 
 TorcTimerControl::~TorcTimerControl()
 {
+    gLocalContext->RemoveObserver(this);
 }
 
 TorcControl::Type TorcTimerControl::GetType(void) const
@@ -156,49 +235,10 @@ QStringList TorcTimerControl::GetDescription(void)
 {
     QStringList result;
 
-    if (TorcTimerControl::Custom == m_timerType)
-    {
-        QString frequency = m_startDay > 0 ? QString("%1days %2").arg(m_startDay).arg(m_startTime.toString(QString("hh:mm.ss"))) :
-                                             QString("%2").arg(m_startTime.toString(QString("hh:mm.ss")));
-        QString length   = TorcControl::DurationToString(m_durationDay, m_duration);
-
-        result.append(tr("Custom Timer"));
-        result.append(tr("Frequency %1").arg(frequency));
-        result.append(tr("Duration %2").arg(length));
-    }
-    else if (TorcTimerControl::Minutely == m_timerType)
-    {
-        result.append(tr("Minutely Timer"));
-        result.append(tr("Start %1").arg(m_startTime.toString(QString("ss"))));
-        result.append(tr("Duration %2").arg(QTime(0, 0).addSecs(m_duration).toString(QString("ss"))));
-    }
-    else if (TorcTimerControl::Hourly == m_timerType)
-    {
-        result.append(tr("Hourly Timer"));
-        result.append(tr("Start %1").arg(m_startTime.toString(QString("mm.ss"))));
-        result.append(tr("Duration %2").arg(QTime(0, 0).addSecs(m_duration).toString(QString("mm.ss"))));
-    }
-    else if (TorcTimerControl::Daily == m_timerType)
-    {
-        result.append(tr("Daily Timer"));
-        result.append(tr("Start %1").arg(m_startTime.toString(QString("hh:mm.ss"))));
-        result.append(tr("Duration %2").arg(QTime(0, 0).addSecs(m_duration).toString(QString("hh:mm.ss"))));
-    }
-    else if (TorcTimerControl::Weekly == m_timerType)
-    {
-        result.append(tr("Weekly Timer"));
-        result.append(tr("Start %1 %2")
-                      .arg(gLocalContext->GetLocale().dayName(m_startDay))
-                      .arg(m_startTime.toString(QString("hh:mm.ss"))));
-        result.append(tr("Duration %3days %4")
-                      .arg(m_durationDay)
-                      .arg(QTime(0, 0).addSecs(m_duration).toString(QString("hh:mm.ss"))));
-    }
-    else
-    {
-        result.append(tr("Unknown"));
-    }
-
+    result.append(TimerTypeToString(m_timerType));
+    result.append(tr("Period") + ": " + TorcControl::DurationToString(m_periodDay, m_periodTime / 1000));
+    result.append(tr("Start") + ": " + (m_randomStart    ? tr("Random") : TorcControl::DurationToString(m_startDay, m_startTime / 1000)));
+    result.append(tr("Duration") + ": " + (m_randomDuration ? tr("Random") : TorcControl::DurationToString(m_durationDay, m_duration / 1000)));
     return result;
 }
 
@@ -235,8 +275,6 @@ bool TorcTimerControl::Validate(void)
     // debug
     LOG(VB_GENERAL, LOG_DEBUG, QString("Timer '%1': %2").arg(uniqueId).arg(GetDescription().join(",")));
 
-    // this is probably overkill - but we shouldn't have that many timers and most will
-    // have relatively long durations
     m_timer.setTimerType(Qt::PreciseTimer);
 
     // connect the timer
@@ -250,8 +288,8 @@ bool TorcTimerControl::Validate(void)
 
 /*! \brief Initialise the timer
  *
- * \note All TorcTimerControl internals operate with second accuracy and QTimer
- *       uses millisecond intervals. ALWAYS convert.
+ * \note Timers are configured and presented with second accuracy but we use
+ *       milliseconds internally.
 */
 void TorcTimerControl::Start(void)
 {
@@ -259,12 +297,6 @@ void TorcTimerControl::Start(void)
 
     if (!m_parsed || !m_validated)
         return;
-
-    // we want to start a custom timer in the off state. The default state is off and
-    // calling TimerTimeout will toggle it to the on state - so fudge to on now.
-    // 'Regular' timers will work out the correct state each time TimerTimeout is called.
-    if (m_timerType == TorcTimerControl::Custom)
-        value = 1;
 
     // trigger the timer for the next state change
     TimerTimeout();
@@ -280,6 +312,24 @@ bool TorcTimerControl::AllowInputs(void) const
     return false;
 }
 
+bool TorcTimerControl::event(QEvent *Event)
+{
+    if (Event && Event->type() == TorcEvent::TorcEventType)
+    {
+        TorcEvent *event = static_cast<TorcEvent*>(Event);
+        if (event && (event->GetEvent() == Torc::SystemTimeChanged))
+        {
+            LOG(VB_GENERAL, LOG_INFO, QString("Timer %1 restarting").arg(uniqueId));
+            m_timer.stop();
+            m_firstTrigger = true;
+            TimerTimeout();
+            return true;
+        }
+    }
+
+    return TorcControl::event(Event);
+}
+
 void TorcTimerControl::TimerTimeout(void)
 {
     QMutexLocker locker(&lock);
@@ -290,90 +340,130 @@ void TorcTimerControl::TimerTimeout(void)
     switch (m_timerType)
     {
         case TorcTimerControl::Custom:
-            // toggle our value each time the timer times out.
-            // N.B. Custom timers are really intended for relatively high frequency (at most a couple
-            // of hours) operations (e.g. circulation pumps). Using them for anything else is not recommended,
-            // not least because the behaviour is prescriptive at startup.
-            {
-                m_timer.start((value > 0 ? m_startDuration : m_duration) * 1000);
-                SetValue(value > 0 ? 0 : 1);
-                return;
-            }
-            break;
-            // for other timers, we need to establish the current time, the current state
-            // and when the next trigger is needed
         case TorcTimerControl::Minutely:
         case TorcTimerControl::Hourly:
         case TorcTimerControl::Daily:
         case TorcTimerControl::Weekly:
+            // we need to establish the current time, the current state
+            // and when the next trigger is needed.
+            // A timer that does not cross a period boundary has a pattern of
+            // off/on, off/on/off or on/off. '_-' '_-_' '-_'
+            // A timer that DOES cross a boundary will have a pattern of
+            // off/on/boundary/on/off '_-|-_' for its total cycle but within
+            // the period it looks like '-_-' for the two overlapping sequences
+            // so we have 4 total combinations to handle...
             {
-                QTime timenow = QTime::currentTime();
-                QDate datenow = QDate::currentDate();
-                int       day = datenow.dayOfWeek() - 1;
+                quint64 msecsinceperiodstart = MsecsSincePeriodStart();
+                quint64 finishtime   = m_startTime + m_duration;
+                bool    newrandom    = false;
+                bool    newvalue     = false;
+                quint64 nexttimer    = 0;
 
-                // clip hours for Hourly
-                if (TorcTimerControl::Hourly == m_timerType)
-                    timenow = QTime(0, timenow.minute(), timenow.second(), timenow.msec());
-                // clip hours and minutes for minutely
-                else if (TorcTimerControl::Minutely == m_timerType)
-                    timenow = QTime(0, 0, timenow.second(), timenow.msec());
-                // clip days for non Weekly
-                if (TorcTimerControl::Weekly != m_timerType)
-                    day = 0;
-
-                quint64 timesinceperiodstart = (day * kSixty * kSixty * k24) +
-                                                timenow.second() +
-                                                timenow.minute() * kSixty +
-                                                timenow.hour()   * kSixty * kSixty;
-                quint64 finishtime = m_startDuration + m_duration;
-
-                // hasn't started yet
-                if (timesinceperiodstart < m_startDuration)
+                // start is zero
+                // on/off -_
+                if (m_startTime == 0)
                 {
-                    SetValue(0);
-                    m_timer.start((m_startDuration - timesinceperiodstart) * 1000);
-                    return;
+                    newvalue  = msecsinceperiodstart <= m_duration;
+                    nexttimer = newvalue ? m_duration - msecsinceperiodstart : m_periodTime - msecsinceperiodstart;
+                    newrandom = value < 1.0 && newvalue; // transitioning from low to high
                 }
-                // should be on now
-                else if (timesinceperiodstart >= m_startDuration && timesinceperiodstart < finishtime)
+                // start + duration < max
+                // off/on/off _-_
+                else if (finishtime < m_periodTime)
                 {
-                    // the aim here is to guarantee the 'on' period by having one single timer from start
-                    // to end. Start times may shift due to DST changes but we will always aim to maintain
-                    // the duration.
-                    // If the timers are working correctly (excluding initial startup), then this state should be
-                    // reached on or very slightly after the start time - so check. A late timer should only
-                    // be fractions of a seconds late at most - and we operate to seconds.
-                    quint64 onduration = finishtime - timesinceperiodstart;
-                    if (!first && (onduration != m_duration))
+                    if (msecsinceperiodstart < m_startTime)
                     {
-                        LOG(VB_GENERAL, LOG_WARNING, QString("Starting timer 'On' period for %1seconds but it should be %2seconds")
-                            .arg(onduration).arg(m_duration));
+                        newvalue  = false;
+                        nexttimer = m_startTime - msecsinceperiodstart;
                     }
-                    else if (first)
+                    else if (msecsinceperiodstart > finishtime)
                     {
-                        LOG(VB_GENERAL, LOG_INFO, QString("Starting timer late - will run for %1seconds instead of %2seconds")
-                            .arg(onduration).arg(m_duration));
+                        newvalue  = false;
+                        nexttimer = m_periodTime - msecsinceperiodstart;
                     }
-                    SetValue(1);
-                    m_timer.start(onduration * 1000);
-                    return;
-                }
-                // finished
-                else if (timesinceperiodstart >= finishtime)
-                {
-                    // NB always timeout at the top of the hour/day/week. This avoids long timers,
-                    // handles drift and better accomodates complications arising from daylight savings changes.
-                    SetValue(0);
-                    if (m_timerType == TorcTimerControl::Weekly)
-                        m_timer.start(((kSixty * kSixty * k24 * k7) - timesinceperiodstart) * 1000);
-                    else if (m_timerType == TorcTimerControl::Daily)
-                        m_timer.start(((kSixty * kSixty * k24) - timesinceperiodstart) * 1000);
-                    else if (m_timerType == TorcTimerControl::Hourly)
-                        m_timer.start(((kSixty * kSixty) - timesinceperiodstart) * 1000);
                     else
-                        m_timer.start((kSixty - timesinceperiodstart) * 1000);
+                    {
+                        // m_startTime <= timesinceperiodstart <= finishtime
+                        newvalue  = true;
+                        nexttimer = finishtime - msecsinceperiodstart;
+                    }
+
+                    if (!newvalue && (value < 1.0) && (m_lastElapsed > msecsinceperiodstart)) // end of period boundary
+                        newrandom = true;
+                }
+                // start + duration = max
+                // off/on _-
+                else if (finishtime == m_periodTime)
+                {
+                    newvalue  = msecsinceperiodstart >= m_startTime;
+                    nexttimer = newvalue ? m_periodTime - msecsinceperiodstart : m_startTime - msecsinceperiodstart;
+                    newrandom = value > 0.0 && !newvalue; // transitioning from high to low
+                }
+                // on/off/on -_-
+                else if (finishtime > m_periodTime)
+                {
+                    // a random timer should never hit this condition as it becomes too involved
+                    // trying to trigger the correct timeouts
+                    if (m_randomDuration || m_randomStart)
+                    {
+                        LOG(VB_GENERAL, LOG_ERR, "Invalid condition for random timer - disabling");
+                        return;
+                    }
+
+                    quint64 firststart = finishtime - m_periodTime;
+
+                    if (msecsinceperiodstart <= firststart)
+                    {
+                        newvalue  = true;
+                        nexttimer = firststart - msecsinceperiodstart;
+                    }
+                    else if (msecsinceperiodstart >= m_startTime)
+                    {
+                        newvalue  = true;
+                        nexttimer = m_periodTime - msecsinceperiodstart;
+                    }
+                    else
+                    {
+                        newvalue  = false;
+                        nexttimer = m_startTime - msecsinceperiodstart;
+                    }
+
+                }
+
+                if (first && newvalue)
+                {
+                    LOG(VB_GENERAL, LOG_INFO, QString("Triggering timer '%1' late - will run for %2seconds instead of %3 %4")
+                        .arg(uniqueId).arg(nexttimer/1000.0).arg(m_duration/1000).arg(QDateTime::currentDateTime().toString("HH:mm:ss.zzz")));
+                }
+
+                m_lastElapsed = msecsinceperiodstart;
+
+                // the end of the 'random' sequence. Calculate next sequence and then
+                // recalculate next timeout. Don't set the value as it may momentarily be set to the incorrect value.
+                // m_newRandom prevents a potential infinite loop as a new random start/duration may immediately
+                // trigger another. Don't reset random on first trigger - it has only just been set!
+                if (!first && newrandom && !m_newRandom && (m_randomDuration || m_randomStart))
+                {
+                    m_newRandom = true;
+                    GenerateTimings();
+                    TimerTimeout();
                     return;
                 }
+
+                m_newRandom = false;
+
+                // trigger timer a little early to hone in and give sub-second accuracy
+                quint64 adjust = nexttimer / 10;
+                if (nexttimer > 100)
+                    nexttimer -= adjust;
+
+                // avoid lengthy timers - max 1 hour
+                if (nexttimer > kMSecsInHour)
+                    nexttimer = kMSecsInHour;
+
+                SetValue(newvalue);
+                m_timer.start(nexttimer);
+                return;
             }
             break;
         default:
@@ -398,10 +488,77 @@ quint64 TorcTimerControl::TimeSinceLastTransition(void)
         TorcTimerControl::UnknownTimerType == m_timerType)
         return 0;
 
-    // copied from TimerTimeout
+    quint64 msecsinceperiodstart = MsecsSincePeriodStart();
+    quint64 finishtime   = m_startTime + m_duration;
+    quint64 lasttimer    = 0;
+
+    // N.B. There can only ever be two 'reference' transitions - the last low to high
+    //      and the last high to low. A boundary is NOT a transition (unless coincidental).
+
+    // start is zero
+    // on/off -_
+    if (m_startTime == 0)
+    {
+        lasttimer = (msecsinceperiodstart <= m_duration) ? msecsinceperiodstart : msecsinceperiodstart - m_duration;
+    }
+    // start + duration < max
+    // off/on/off _-_
+    else if (finishtime < m_periodTime)
+    {
+        if (msecsinceperiodstart < m_startTime)
+        {
+            lasttimer = msecsinceperiodstart + (m_periodTime - finishtime);
+        }
+        else if (msecsinceperiodstart > finishtime)
+        {
+            lasttimer = msecsinceperiodstart - finishtime;
+        }
+        else
+        {
+            lasttimer = msecsinceperiodstart - m_startTime;
+        }
+    }
+    // start + duration = max
+    // off/on _-
+    else if (finishtime == m_periodTime)
+    {
+        lasttimer = (msecsinceperiodstart >= m_startTime) ? msecsinceperiodstart - m_startTime : msecsinceperiodstart;
+    }
+    // on/off/on -_-
+    else if (finishtime > m_periodTime)
+    {
+        quint64 firststart = finishtime - m_periodTime;
+        if (msecsinceperiodstart <= firststart)
+        {
+            lasttimer = msecsinceperiodstart + (m_periodTime - m_startTime);
+        }
+        else if (msecsinceperiodstart >= m_startTime)
+        {
+            lasttimer = msecsinceperiodstart - m_startTime;
+        }
+        else
+        {
+            lasttimer = msecsinceperiodstart - firststart;
+        }
+    }
+
+    return lasttimer;
+}
+
+quint64 TorcTimerControl::MsecsSincePeriodStart(void)
+{
     QTime timenow = QTime::currentTime();
-    QDate datenow = QDate::currentDate();
-    int       day = datenow.dayOfWeek() - 1;
+    int       day = QDate::currentDate().dayOfWeek() - 1;
+
+    if (TorcTimerControl::Custom == m_timerType)
+    {
+        // always use the same reference Date/Time to ensure long duration custom timers start consistently
+        // and to prevent drift
+        static const QDateTime reference = QDateTime::fromString("2000-01-01T00:00:00", Qt::ISODate);
+        if (m_periodTime > 0)
+            return (QDateTime::currentMSecsSinceEpoch() - reference.toMSecsSinceEpoch()) % m_periodTime;
+        return 0;
+    }
 
     // clip hours for Hourly
     if (TorcTimerControl::Hourly == m_timerType)
@@ -409,42 +566,58 @@ quint64 TorcTimerControl::TimeSinceLastTransition(void)
     // clip hours and minutes for minutely
     else if (TorcTimerControl::Minutely == m_timerType)
         timenow = QTime(0, 0, timenow.second(), timenow.msec());
-    // clip days for non Weekly
-    if (TorcTimerControl::Weekly != m_timerType)
-        day = 0;
 
-    quint64 timesinceperiodstart = (day * kSixty * kSixty * k24) +
-                                    timenow.second() +
-                                    timenow.minute() * kSixty +
-                                    timenow.hour()   * kSixty * kSixty;
-    quint64 finishtime = m_startDuration + m_duration;
-
-    if (timesinceperiodstart > finishtime)
-    {
-        return timesinceperiodstart - finishtime;
-    }
-    else if (timesinceperiodstart >= m_startDuration && timesinceperiodstart < finishtime)
-    {
-        return timesinceperiodstart - m_startDuration;
-    }
-
-    // time since start of period AND time between end of timer and end of last period
-    return timesinceperiodstart + GetMaxDuration() - finishtime;
+    quint64 msecsinceperiodstart = timenow.msecsSinceStartOfDay();
+    // add days for Weekly
+    if (TorcTimerControl::Weekly == m_timerType)
+        msecsinceperiodstart += day * kMSecsInDay;
+    return msecsinceperiodstart;
 }
 
-quint64 TorcTimerControl::GetMaxDuration(void) const
+quint64 TorcTimerControl::GetPeriodDuration(void) const
 {
     switch (m_timerType)
     {
-        case TorcTimerControl::Minutely: return kSixty;
-        case TorcTimerControl::Hourly:   return kSixty * kSixty;
-        case TorcTimerControl::Daily:    return kSixty * kSixty * k24;
-        case TorcTimerControl::Weekly:   return kSixty * kSixty * k24 * k7;
+        case TorcTimerControl::Minutely: return kMSecsInMinute;
+        case TorcTimerControl::Hourly:   return kMSecsInHour;
+        case TorcTimerControl::Daily:    return kMSecsInDay;
+        case TorcTimerControl::Weekly:   return kMSecsinWeek;
         default:
             break;
     }
-
     return 0;
+}
+
+/*! \brief Generate random start or duration for timers.
+*   \note Start or duration must be validated before calling this function.
+*/
+void TorcTimerControl::GenerateTimings(void)
+{
+    // start or duration are limited in range as we must keep the cycle within the period
+    if (m_randomDuration)
+    {
+        // for a 60 second timer, we need duration between 1 and 59 - a range of 58
+        // start is already 0-59 - a range of 59...
+        // if we clip the result, we lose the random distribution
+        // so we need to scale down the start time to restrict the range
+        // which means we need to operate to ms accuracy and round down
+        quint64 start = (quint64)((double)m_startTime * ((double)(m_periodTime - 1000) / (double)m_periodTime));
+        quint64 mod   = (m_periodTime / 1000) - (start / 1000); // range 2<->period
+                mod  -= 1; // range 1<->(period-1)
+        m_duration    = (qrand() % mod); // range 0<->period-2
+        m_duration   += 1; // range 1<->period-1
+        m_duration   *= 1000;
+        m_durationDay = m_duration / kMSecsInDay;
+        LOG(VB_GENERAL, LOG_DEBUG, QString("Timer %1 - new random duration %2").arg(uniqueId).arg(DurationToString(m_durationDay, m_duration / 1000)));
+    }
+    else if (m_randomStart)
+    {
+        quint64 mod = (m_periodTime / 1000) - (m_duration / 1000) + 1; // range 2<->period
+        m_startTime = qrand() % (mod); // range 0<->period-1
+        m_startTime *= 1000;
+        m_startDay = m_startTime / kMSecsInDay;
+        LOG(VB_GENERAL, LOG_DEBUG, QString("Timer %1 - new random start %2").arg(uniqueId).arg(DurationToString(m_startDay, m_startTime / 1000)));
+    }
 }
 
 void TorcTimerControl::CalculateOutput(void)

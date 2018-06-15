@@ -36,8 +36,9 @@
 TorcSSDP* TorcSSDP::gSSDP        = NULL;
 QMutex*   TorcSSDP::gSSDPLock    = new QMutex(QMutex::Recursive);
 bool TorcSSDP::gSearchEnabled    = false;
+TorcHTTPServer::Status TorcSSDP::gSearchOptions = TorcHTTPServer::Status();
 bool TorcSSDP::gAnnounceEnabled  = false;
-bool TorcSSDP::gAnnounceSecure   = false;
+TorcHTTPServer::Status TorcSSDP::gAnnounceOptions = TorcHTTPServer::Status();
 
 TorcSSDPSearchResponse::TorcSSDPSearchResponse(const QHostAddress &Address, const ResponseTypes Types, int Port)
   : m_responseAddress(Address),
@@ -67,12 +68,12 @@ TorcSSDPSearchResponse::TorcSSDPSearchResponse()
 
 TorcSSDP::TorcSSDP()
   : QObject(),
-    m_secure(false),
+    m_searchOptions(),
+    m_announceOptions(),
     m_serverString(),
     m_searching(false),
     m_firstSearchTimer(0),
     m_secondSearchTimer(0),
-    m_announcing(false),
     m_firstAnnounceTimer(0),
     m_secondAnnounceTimer(0),
     m_refreshTimer(0),
@@ -90,12 +91,11 @@ TorcSSDP::TorcSSDP()
     m_responseTimer(),
     m_responseQueue()
 {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
-    m_serverString = QString("%1/%2 UPnP/1.0 Torc/0.1").arg(QSysInfo::productType()).arg(QSysInfo::productVersion());
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
+    m_serverString = QString("%1/%2 UPnP/1.0 Torc/0.1").arg(QSysInfo::kernelType()).arg(QSysInfo::kernelVersion());
 #else
     m_serverString = QString("OldTorc/OldVersion UPnP/1.0 Torc/0.1");
 #endif
-
     gLocalContext->AddObserver(this);
 
     if (TorcNetwork::IsAvailable())
@@ -150,7 +150,7 @@ void TorcSSDP::Start(void)
     m_ipv6Address = QString();
     m_addressess = QNetworkInterface::allAddresses();
 
-    // try and determine suitable ipv4 and ipv6 localhost addresses
+    // try and determine suitable ipv4 and ipv6 addresses
     // at the moment I cannot test 'proper' IPv6 support, so allow link local for now
     QString ipv6linklocal;
     foreach (QHostAddress address, m_addressess)
@@ -175,11 +175,17 @@ void TorcSSDP::Start(void)
     // fall back to link local for ipv6
     if (m_ipv6Address.isEmpty() && !ipv6linklocal.isEmpty())
         m_ipv6Address = ipv6linklocal;
-    if (!m_ipv6Address.startsWith("["))
+    if (!m_ipv6Address.isEmpty() && !m_ipv6Address.startsWith("["))
         m_ipv6Address = QString("[%1]").arg(m_ipv6Address);
 
-    LOG(VB_GENERAL, LOG_INFO, QString("SSDP IPv4 host url: %1").arg(m_ipv4Address));
-    LOG(VB_GENERAL, LOG_INFO, QString("SSDP IPv6 host url: %1").arg(m_ipv6Address));
+    if (m_ipv4Address.isEmpty())
+        LOG(VB_GENERAL, LOG_INFO, "Disabling SSDP IPv4 - no valid address detected");
+    else
+        LOG(VB_GENERAL, LOG_INFO, QString("SSDP IPv4 host url: %1").arg(m_ipv4Address));
+    if (m_ipv6Address.isEmpty())
+        LOG(VB_GENERAL, LOG_INFO, "Disabling SSDP IPv6 - no valid address detected");
+    else
+        LOG(VB_GENERAL, LOG_INFO, QString("SSDP IPv6 host url: %1 (if enabled)").arg(m_ipv6Address));
 
     // create sockets
     if (interface.isValid())
@@ -197,19 +203,17 @@ void TorcSSDP::Start(void)
     // check whether search or announce was requested before we started
     bool search;
     bool announce;
-    bool secure;
     {
         QMutexLocker locker(gSSDPLock);
-        search   = gSearchEnabled;
-        announce = gAnnounceEnabled;
-        secure   = gAnnounceSecure;
+        search    = gSearchEnabled;
+        announce  = gAnnounceEnabled;
     }
 
     if (search)
         StartSearch();
 
     if (announce)
-        StartAnnounce(secure);
+        StartAnnounce();
 
     m_started = true;
 }
@@ -267,10 +271,11 @@ void TorcSSDP::Stop(void)
  *
  * \sa TorcSSDDP::CancelSearch
 */
-void TorcSSDP::Search(void)
+void TorcSSDP::Search(TorcHTTPServer::Status Options)
 {
     QMutexLocker locker(gSSDPLock);
     gSearchEnabled = true;
+    gSearchOptions = Options;
     if (gSSDP)
         QMetaObject::invokeMethod(gSSDP, "SearchPriv", Qt::AutoConnection);
 }
@@ -291,13 +296,13 @@ void TorcSSDP::CancelSearch(void)
 /*! \fn    TorcSSDP::Announce
  *  \brief Publish the device
 */
-void TorcSSDP::Announce(bool Secure)
+void TorcSSDP::Announce(TorcHTTPServer::Status Options)
 {
     QMutexLocker locker(gSSDPLock);
     gAnnounceEnabled = true;
-    gAnnounceSecure  = Secure;
+    gAnnounceOptions = Options;
     if (gSSDP)
-        QMetaObject::invokeMethod(gSSDP, "AnnouncePriv", Qt::AutoConnection, Q_ARG(bool, Secure));
+        QMetaObject::invokeMethod(gSSDP, "AnnouncePriv", Qt::AutoConnection);
 }
 
 /*! \fn    TorcSSDP::CancelAnnounce
@@ -306,7 +311,7 @@ void TorcSSDP::CancelAnnounce(void)
 {
     QMutexLocker locker(gSSDPLock);
     gAnnounceEnabled = false;
-    gAnnounceSecure  = false;
+    gAnnounceOptions.port = 0;
     if (gSSDP)
         QMetaObject::invokeMethod(gSSDP, "CancelAnnouncePriv", Qt::AutoConnection);
 }
@@ -391,7 +396,7 @@ void TorcSSDP::SendSearch(void)
                                 "MX: 3\r\n"
                                 "ST: %2\r\n\r\n");
 
-    if (m_ipv4MulticastSocket && m_ipv4MulticastSocket->isValid() && m_ipv4MulticastSocket->state() == QAbstractSocket::BoundState)
+    if (!m_ipv4Address.isEmpty() && m_ipv4MulticastSocket && m_ipv4MulticastSocket->isValid() && m_ipv4MulticastSocket->state() == QAbstractSocket::BoundState)
     {
         m_ipv4MulticastSocket->setSocketOption(QAbstractSocket::MulticastTtlOption, 2);
         QByteArray ipv4search = QString(search).arg(TORC_IPV4_UDP_MULTICAST_URL).arg(searchdevice).toLocal8Bit();
@@ -399,10 +404,10 @@ void TorcSSDP::SendSearch(void)
         if (sent != ipv4search.size())
             LOG(VB_GENERAL, LOG_ERR, QString("Error sending IPv4 search request (%1)").arg(m_ipv4MulticastSocket->errorString()));
         else
-            LOG(VB_NETWORK, LOG_INFO, "Sent IPv4 SSDP global search request");
+            LOG(VB_GENERAL, LOG_INFO, "Sent IPv4 SSDP global search request");
     }
 
-    if (m_ipv6LinkMulticastSocket && m_ipv6LinkMulticastSocket->isValid() && m_ipv6LinkMulticastSocket->state() == QAbstractSocket::BoundState)
+    if (m_searchOptions.ipv6 && !m_ipv6Address.isEmpty() && m_ipv6LinkMulticastSocket && m_ipv6LinkMulticastSocket->isValid() && m_ipv6LinkMulticastSocket->state() == QAbstractSocket::BoundState)
     {
         m_ipv6LinkMulticastSocket->setSocketOption(QAbstractSocket::MulticastTtlOption, 2);
         QByteArray ipv6search = QString(search).arg(TORC_IPV6_UDP_MULTICAST_URL).arg(searchdevice).toLocal8Bit();
@@ -410,7 +415,7 @@ void TorcSSDP::SendSearch(void)
         if (sent != ipv6search.size())
             LOG(VB_GENERAL, LOG_ERR, QString("Error sending IPv6 search request (%1)").arg(m_ipv6LinkMulticastSocket->errorString()));
         else
-            LOG(VB_NETWORK, LOG_INFO, "Sent IPv6 SSDP global search request");
+            LOG(VB_GENERAL, LOG_INFO, "Sent IPv6 SSDP global search request");
     }
 }
 
@@ -426,11 +431,11 @@ void TorcSSDP::CancelSearchPriv(void)
     StopSearch();
 }
 
-void TorcSSDP::AnnouncePriv(bool Secure)
+void TorcSSDP::AnnouncePriv(void)
 {
     // if we haven't started or the network is unavailable, announce will be triggered when we restart
     if (m_started && TorcNetwork::IsAvailable())
-        StartAnnounce(Secure);
+        StartAnnounce();
 }
 
 void TorcSSDP::CancelAnnouncePriv(void)
@@ -438,25 +443,32 @@ void TorcSSDP::CancelAnnouncePriv(void)
     StopAnnounce();
 }
 
-void TorcSSDP::StartAnnounce(bool Secure)
+void TorcSSDP::StartAnnounce(void)
 {
-    m_secure = Secure;
-    if (!m_announcing)
-        LOG(VB_GENERAL, LOG_INFO, QString("Starting SSDP announce (%1)").arg(TORC_ROOT_UPNP_DEVICE));
+    gSSDPLock->lock();
+    TorcHTTPServer::Status newoptions = gAnnounceOptions;
+    gSSDPLock->unlock();
+
+    if (m_announceOptions == newoptions)
+    {
+        LOG(VB_GENERAL, LOG_INFO, "SSDP announce options unchanged - not restarting");
+        return;
+    }
 
     StopAnnounce();
+    LOG(VB_GENERAL, LOG_INFO, QString("Starting SSDP announce (%1)").arg(TORC_ROOT_UPNP_DEVICE));
+    m_announceOptions = newoptions;
 
     // schedule first announce almost immediately
     m_firstAnnounceTimer = startTimer(100, Qt::CoarseTimer);
     // and schedule another shortly afterwards
     m_secondAnnounceTimer = startTimer(500, Qt::CoarseTimer);
 
-    m_announcing = true;
 }
 
 void TorcSSDP::StopAnnounce(void)
 {
-    if (m_announcing)
+    if (m_announceOptions.port)
         LOG(VB_GENERAL, LOG_INFO, QString("Stopping SSDP announce (%1)").arg(TORC_ROOT_UPNP_DEVICE));
 
     if (m_firstAnnounceTimer)
@@ -472,18 +484,28 @@ void TorcSSDP::StopAnnounce(void)
     }
 
     // try and send out byebye
-    if (m_announcing)
+    if (m_announceOptions.port)
     {
         SendAnnounce(false, false); // IPv4 byebye
-        SendAnnounce(true, false);  // IPv6 byebye
+        if (m_announceOptions.ipv6)
+            SendAnnounce(true, false);  // IPv6 byebye
     }
 
-    m_announcing = false;
+    m_announceOptions.port = 0;
 }
 
 void TorcSSDP::SendAnnounce(bool IPv6, bool Alive)
 {
+    if (!m_announceOptions.port)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Cannot send announce - no port set");
+        return;
+    }
+
     QUdpSocket *socket = IPv6 ? m_ipv6LinkMulticastSocket : m_ipv4MulticastSocket;
+
+    if ((IPv6 && m_ipv6Address.isEmpty()) || (!IPv6 && m_ipv4Address.isEmpty()))
+        return;
 
     if (!socket || !socket->isValid() || socket->state() != QAbstractSocket::BoundState)
         return;
@@ -501,18 +523,29 @@ void TorcSSDP::SendAnnounce(bool IPv6, bool Alive)
                                 "NT: %5\r\n"
                                 "NTS: ssdp:%6\r\n"
                                 "SERVER: %7\r\n"
-                                "USN: %8\r\n\r\n");
+                                "USN: %8\r\n"
+                                "NAME: %9\r\n"
+                                "APIVERSION: %10\r\n"
+                                "STARTTIME: %11\r\n"
+                                "PRIORITY: %12\r\n%13\r\n");
 
     QString ip           = IPv6 ? TORC_IPV6_UDP_MULTICAST_URL : TORC_IPV4_UDP_MULTICAST_URL;
     QHostAddress address = IPv6 ? m_ipv6LinkGroupBaseAddress : m_ipv4GroupAddress;
     QString uuid         = QString("uuid:") + gLocalContext->GetUuid();
     QString alive        = Alive ? "alive" : "byebye";
     QString url          = IPv6 ? m_ipv6Address : m_ipv4Address;
-    int port             = TorcHTTPServer::GetPort();
-    QString    secure    = m_secure ? "s" : "";
-    QByteArray packet1   = QString(notify).arg(secure).arg(ip).arg(url).arg(port).arg("upnp:rootdevice").arg(alive).arg(m_serverString).arg(uuid + "::upnp::rootdevice").toLocal8Bit();
-    QByteArray packet2   = QString(notify).arg(secure).arg(ip).arg(url).arg(port).arg(uuid).arg(alive).arg(m_serverString).arg(uuid).toLocal8Bit();
-    QByteArray packet3   = QString(notify).arg(secure).arg(ip).arg(url).arg(port).arg(TORC_ROOT_UPNP_DEVICE).arg(alive).arg(m_serverString).arg(uuid + "::" + TORC_ROOT_UPNP_DEVICE).toLocal8Bit();
+    QString secure       = m_announceOptions.secure ? "s" : "";
+    QString secure2      = m_announceOptions.secure ? "SECURE: yes\r\n" : "";
+    QString name         = TorcHTTPServer::ServerDescription();
+    QString apiversion   = TorcHTTPServices::GetVersion();
+    QString starttime    = QString::number(gLocalContext->GetStartTime());
+    QString priority     = QString::number(gLocalContext->GetPriority());
+    QByteArray packet1   = QString(notify).arg(ip).arg(secure).arg(url).arg(m_announceOptions.port).arg("upnp:rootdevice").arg(alive).arg(m_serverString).arg(uuid + "::upnp::rootdevice")
+                                          .arg(name).arg(apiversion).arg(starttime).arg(priority).arg(secure2).toLocal8Bit();
+    QByteArray packet2   = QString(notify).arg(ip).arg(secure).arg(url).arg(m_announceOptions.port).arg(uuid).arg(alive).arg(m_serverString).arg(uuid)
+                                          .arg(name).arg(apiversion).arg(starttime).arg(priority).arg(secure2).toLocal8Bit();
+    QByteArray packet3   = QString(notify).arg(ip).arg(secure).arg(url).arg(m_announceOptions.port).arg(TORC_ROOT_UPNP_DEVICE).arg(alive).arg(m_serverString).arg(uuid + "::" + TORC_ROOT_UPNP_DEVICE)
+                                          .arg(name).arg(apiversion).arg(starttime).arg(priority).arg(secure2).toLocal8Bit();
 
     socket->setSocketOption(QAbstractSocket::MulticastTtlOption, 4);
     qint64 sent = socket->writeDatagram(packet1, address, TORC_SSDP_UDP_MULTICAST_PORT);
@@ -569,14 +602,16 @@ bool TorcSSDP::event(QEvent *Event)
             {
                 killTimer(m_firstAnnounceTimer);
                 SendAnnounce(false, true); //IPv4 alive
-                SendAnnounce(true, true);  //IPv6 alive
+                if (m_announceOptions.ipv6)
+                    SendAnnounce(true, true);  //IPv6 alive
                 m_firstAnnounceTimer = startTimer(10 * 60 * 1000);
             }
             else if (event->timerId() == m_secondAnnounceTimer)
             {
                 killTimer(m_secondAnnounceTimer);
                 SendAnnounce(false, true);
-                SendAnnounce(true, true);
+                if (m_announceOptions.ipv6)
+                    SendAnnounce(true, true);
                 m_secondAnnounceTimer = startTimer(10 * 60 * 1000);
             }
             // refresh the cache
@@ -641,7 +676,7 @@ void TorcSSDP::Read(void)
             {
                 qint64 expires = GetExpiryTime(headers.value("cache-control"));
                 if (expires > 0)
-                    ProcessDevice(headers.value("usn"), headers.value("location"), expires, true/*add*/);
+                    ProcessDevice(headers, expires, true/*add*/);
             }
         }
         else if (type.startsWith("NOTIFY", Qt::CaseInsensitive))
@@ -657,12 +692,12 @@ void TorcSSDP::Read(void)
                     {
                         qint64 expires = GetExpiryTime(headers.value("cache-control"));
                         if (expires > 0)
-                            ProcessDevice(headers.value("usn"), headers.value("location"), expires, true/*add*/);
+                            ProcessDevice(headers, expires, true/*add*/);
                     }
                 }
                 else
                 {
-                    ProcessDevice(headers.value("usn"), headers.value("location"), 1, false/*remove*/);
+                    ProcessDevice(headers, 1, false/*remove*/);
                 }
             }
         }
@@ -747,6 +782,13 @@ void TorcSSDP::ProcessResponses(void)
 
 void TorcSSDP::ProcessResponse(const TorcSSDPSearchResponse &Response)
 {
+    if (!m_announceOptions.port)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Cannot send response to %1 - no port set, not advertising!")
+            .arg(Response.m_responseAddress.toString()));
+        return;
+    }
+
     /* As per notify (NT -> ST)
      * Root   - ST: upnp:rootdevice                             USN: uuid:device-UUID::upnp:rootdevice
      * UUID   - ST: uuid:device-UUID                            USN: uuid:device-UUID
@@ -759,22 +801,34 @@ void TorcSSDP::ProcessResponse(const TorcSSDPSearchResponse &Response)
                                "CACHE-CONTROL: max-age=1800\r\n"
                                "DATE: %1\r\n"
                                "EXT:\r\n"
-                               "LOCATION: http://%2:%3/upnp/description\r\n"
-                               "SERVER: %4\r\n"
-                               "ST: %5\r\n"
-                               "USN: %6\r\n\r\n");
+                               "LOCATION: http%2://%3:%4/upnp/description\r\n"
+                               "SERVER: %5\r\n"
+                               "ST: %6\r\n"
+                               "USN: %7\r\n"
+                               "NAME: %8\r\n"
+                               "APIVERSION: %9\r\n"
+                               "STARTTIME: %10\r\n"
+                               "PRIORITY: %11\r\n%12\r\n");
 
     QString date       = QDateTime::currentDateTime().toString(dateformat);
     QString uuid       = QString("uuid:") + gLocalContext->GetUuid();
     bool ipv6          = Response.m_responseAddress.protocol() == QAbstractSocket::IPv6Protocol;
+    if ((ipv6 && m_ipv6Address.isEmpty()) || (!ipv6 && m_ipv4Address.isEmpty()))
+        return;
     QUdpSocket *socket = ipv6 ? m_ipv6UnicastSocket : m_ipv4UnicastSocket;
-    int port           = TorcHTTPServer::GetPort();
     QString raddress   = QString("%1:%2").arg(Response.m_responseAddress.toString()).arg(Response.m_port);
+    QString secure     = m_announceOptions.secure ? "s" : "";
+    QString secure2    = m_announceOptions.secure ? "SECURE: yes\r\n" : "";
+    QString name       = TorcHTTPServer::ServerDescription();
+    QString apiversion = TorcHTTPServices::GetVersion();
+    QString starttime  = QString::number(gLocalContext->GetStartTime());
+    QString priority   = QString::number(gLocalContext->GetPriority());
     int sent;
     QByteArray packet;
     if (Response.m_responseTypes.testFlag(TorcSSDPSearchResponse::Root))
     {
-        packet = QString(reply).arg(date).arg(ipv6 ? m_ipv6Address : m_ipv4Address).arg(port).arg(m_serverString).arg("upnp:rootdevice").arg(uuid + "::upnp:rootdevice").toLocal8Bit();
+        packet = QString(reply).arg(date).arg(secure).arg(ipv6 ? m_ipv6Address : m_ipv4Address).arg(m_announceOptions.port).arg(m_serverString).arg("upnp:rootdevice")
+                               .arg(uuid + "::upnp:rootdevice").arg(name).arg(apiversion).arg(starttime).arg(priority).arg(secure2).toLocal8Bit();
         sent = socket->writeDatagram(packet, Response.m_responseAddress, Response.m_port);
         if (sent != packet.size())
             LOG(VB_GENERAL, LOG_WARNING, QString("Error sending SSDP root search response to %1 (%2)").arg(raddress).arg(socket->errorString()));
@@ -784,7 +838,8 @@ void TorcSSDP::ProcessResponse(const TorcSSDPSearchResponse &Response)
 
     if (Response.m_responseTypes.testFlag(TorcSSDPSearchResponse::UUID))
     {
-        packet = QString(reply).arg(date).arg(ipv6 ? m_ipv6Address : m_ipv4Address).arg(port).arg(m_serverString).arg(uuid).arg(uuid).toLocal8Bit();
+        packet = QString(reply).arg(date).arg(secure).arg(ipv6 ? m_ipv6Address : m_ipv4Address).arg(m_announceOptions.port).arg(m_serverString).arg(uuid)
+                               .arg(uuid).arg(name).arg(apiversion).arg(starttime).arg(priority).arg(secure2).toLocal8Bit();
         sent = socket->writeDatagram(packet, Response.m_responseAddress, Response.m_port);
         if (sent != packet.size())
             LOG(VB_GENERAL, LOG_WARNING, QString("Error sending SSDP UUID search response to %1 (%2)").arg(raddress).arg(socket->errorString()));
@@ -794,7 +849,8 @@ void TorcSSDP::ProcessResponse(const TorcSSDPSearchResponse &Response)
 
     if (Response.m_responseTypes.testFlag(TorcSSDPSearchResponse::Device))
     {
-        packet = QString(reply).arg(date).arg(ipv6 ? m_ipv6Address : m_ipv4Address).arg(port).arg(m_serverString).arg(TORC_ROOT_UPNP_DEVICE).arg(uuid + "::" + TORC_ROOT_UPNP_DEVICE).toLocal8Bit();
+        packet = QString(reply).arg(date).arg(secure).arg(ipv6 ? m_ipv6Address : m_ipv4Address).arg(m_announceOptions.port).arg(m_serverString).arg(TORC_ROOT_UPNP_DEVICE)
+                               .arg(uuid + "::" + TORC_ROOT_UPNP_DEVICE).arg(name).arg(apiversion).arg(starttime).arg(priority).arg(secure2).toLocal8Bit();
         sent = socket->writeDatagram(packet, Response.m_responseAddress, Response.m_port);
         if (sent != packet.size())
             LOG(VB_GENERAL, LOG_WARNING, QString("Error sending SSDP Device search response to %1 (%2)").arg(raddress).arg(socket->errorString()));
@@ -838,10 +894,13 @@ void TorcSSDP::Refresh(void)
     LOG(VB_NETWORK, LOG_INFO, QString("Removed %1 stale cache entries").arg(removed.size()));
 }
 
-void TorcSSDP::ProcessDevice(const QString &USN, const QString &Location, qint64 Expires, bool Add)
+void TorcSSDP::ProcessDevice(const QMap<QString,QString> &Headers, qint64 Expires, bool Add)
 {
-    if (USN.isEmpty() || Location.isEmpty() || Expires < 1)
+    if (!Headers.contains("usn") || !Headers.contains("location") || Expires < 1)
         return;
+
+    QString USN = Headers.value("usn");
+    QString location = Headers.value("location");
 
     if (!USN.contains(TORC_ROOT_UPNP_DEVICE))
         return;
@@ -855,7 +914,7 @@ void TorcSSDP::ProcessDevice(const QString &USN, const QString &Location, qint64
         {
             notify = false;
             (void)m_discoveredDevices.remove(USN);
-            m_discoveredDevices.insert(USN, TorcUPNPDescription(USN, Location, Expires));
+            m_discoveredDevices.insert(USN, TorcUPNPDescription(USN, location, Expires));
         }
         else
         {
@@ -864,7 +923,7 @@ void TorcSSDP::ProcessDevice(const QString &USN, const QString &Location, qint64
     }
     else if (Add)
     {
-        m_discoveredDevices.insert(USN, TorcUPNPDescription(USN, Location, Expires));
+        m_discoveredDevices.insert(USN, TorcUPNPDescription(USN, location, Expires));
     }
 
     // update interested parties
@@ -872,7 +931,13 @@ void TorcSSDP::ProcessDevice(const QString &USN, const QString &Location, qint64
     {
         QVariantMap data;
         data.insert("usn", USN);
-        data.insert("address", Location);
+        data.insert("address", location);
+        data.insert("name", Headers.value("name"));
+        data.insert("apiversion", Headers.value("apiversion"));
+        data.insert("starttime", Headers.value("starttime"));
+        data.insert("priority", Headers.value("priority"));
+        if (Headers.contains("secure"))
+            data.insert("secure", "yes");
         TorcEvent event(Add ? Torc::ServiceDiscovered : Torc::ServiceWentAway, data);
         gLocalContext->Notify(event);
     }
@@ -880,10 +945,20 @@ void TorcSSDP::ProcessDevice(const QString &USN, const QString &Location, qint64
 
 void TorcSSDP::StartSearch(void)
 {
-    if (!m_searching)
-        LOG(VB_GENERAL, LOG_INFO, QString("Starting SSDP search for %1 devices").arg(TORC_ROOT_UPNP_DEVICE));
+    gSSDPLock->lock();
+    TorcHTTPServer::Status newoptions = gSearchOptions;
+    gSSDPLock->unlock();
+
+    if (m_searching && newoptions == m_searchOptions)
+    {
+        LOG(VB_GENERAL, LOG_INFO, "SSDP search options unchanged - not restarting");
+        return;
+    }
 
     StopSearch();
+
+    LOG(VB_GENERAL, LOG_INFO, QString("Starting SSDP search for %1 devices").arg(TORC_ROOT_UPNP_DEVICE));
+    m_searchOptions = newoptions;
 
     // schedule first search almost immediately - this is evented to ensure subsequent searches are scheduled
     m_firstSearchTimer = startTimer(1, Qt::CoarseTimer);
@@ -945,44 +1020,3 @@ void TorcSSDPThread::Finish(void)
     TorcSSDP::Create(true/*destroy*/);
     LOG(VB_GENERAL, LOG_INFO, "SSDP thread stopping");
 }
-
-class TorcSSDPObject : public TorcAdminObject
-{
-  public:
-    TorcSSDPObject()
-      : TorcAdminObject(TORC_ADMIN_CRIT_PRIORITY - 1), // start after network but before TorcNetworkedContext
-        m_ssdpThread(NULL)
-    {
-        qRegisterMetaType<TorcUPNPDescription>();
-    }
-
-    ~TorcSSDPObject()
-    {
-        Destroy();
-    }
-
-    void Create(void)
-    {
-        Destroy();
-
-        m_ssdpThread = new TorcSSDPThread();
-        m_ssdpThread->start();
-    }
-
-    void Destroy(void)
-    {
-        if (m_ssdpThread)
-        {
-            m_ssdpThread->quit();
-            m_ssdpThread->wait();
-            delete m_ssdpThread;
-        }
-
-        m_ssdpThread = NULL;
-    }
-
-  private:
-    Q_DISABLE_COPY(TorcSSDPObject)
-    TorcSSDPThread *m_ssdpThread;
-
-} TorcSSDPObject;

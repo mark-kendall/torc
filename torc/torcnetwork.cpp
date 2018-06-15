@@ -647,17 +647,56 @@ void TorcNetwork::Error(QNetworkReply::NetworkError Code)
     }
 }
 
+QList<QSslError> TorcNetwork::AllowableSslErrors(const QList<QSslError> &Errors)
+{
+    bool selfsigned = false;
+    bool mismatched = false;
+    QSslError mismatch;
+
+    QList<QSslError> allowed;
+    foreach (QSslError error, Errors)
+    {
+        if (error.error() == QSslError::SelfSignedCertificate)
+        {
+            LOG(VB_GENERAL, LOG_INFO, "Allowing self signed certificate");
+            allowed << error;
+            selfsigned = true;
+        }
+        else if (error.error() == QSslError::HostNameMismatch)
+        {
+            mismatched = true;
+            mismatch   = error;
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_INFO, QString("Ssl Error: %1").arg(error.errorString()));
+        }
+    }
+
+    if (mismatched)
+    {
+        if (selfsigned)
+        {
+            LOG(VB_GENERAL, LOG_INFO, "Allowing host name mismatch for self signed certfificate");
+            allowed << mismatch;
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_INFO, QString("Ssl Error: %1").arg(mismatch.errorString()));
+        }
+    }
+
+    return allowed;
+}
+
 void TorcNetwork::SSLErrors(const QList<QSslError> &Errors)
 {
     QNetworkReply *reply = dynamic_cast<QNetworkReply*>(sender());
     if (reply)
     {
-        // log the errors
-        foreach(QSslError error, Errors)
-            LOG(VB_GENERAL, LOG_WARNING, QString("SSL Error: %1").arg(error.errorString()));
-
-        // and ignore them for now!
-        reply->ignoreSslErrors();
+        QList<QSslError> allowed = TorcNetwork::AllowableSslErrors(Errors);
+        if (!allowed.isEmpty())
+            reply->ignoreSslErrors(TorcNetwork::AllowableSslErrors(Errors));
     }
 }
 

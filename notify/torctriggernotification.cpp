@@ -172,9 +172,9 @@ bool TorcTriggerNotification::Setup(void)
     return TorcNotification::Setup();
 }
 
-class TorcTriggerNotificationFactory : public TorcNotificationFactory
+class TorcTriggerNotificationFactory Q_DECL_FINAL : public TorcNotificationFactory
 {
-    TorcNotification* Create(const QString &Type, const QVariantMap &Details)
+    TorcNotification* Create(const QString &Type, const QVariantMap &Details) Q_DECL_OVERRIDE
     {
         if (Type == "trigger" && Details.contains("inputs"))
             return new TorcTriggerNotification(Details);

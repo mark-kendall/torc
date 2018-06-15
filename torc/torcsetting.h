@@ -3,7 +3,7 @@
 
 // Qt
 #include <QSet>
-#include <QMutex>
+#include <QReadWriteLock>
 #include <QObject>
 #include <QVariant>
 #include <QStringList>
@@ -121,7 +121,7 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
     int                    m_active;
     int                    m_activeThreshold;
     QList<TorcSetting*>    m_children;
-    QMutex                 m_lock;
+    QReadWriteLock         m_lock;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(TorcSetting::Roles)

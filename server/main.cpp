@@ -32,7 +32,7 @@ int main(int argc, char **argv)
     do
     {
         QCoreApplication torc(argc, argv);
-        QCoreApplication::setApplicationName("torc");
+        QCoreApplication::setApplicationName("Torc");
         QThread::currentThread()->setObjectName(TORC_MAIN_THREAD);
 
         {

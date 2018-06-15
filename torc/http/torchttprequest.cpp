@@ -32,6 +32,7 @@
 
 // Torc
 #include "torccompat.h"
+#include "torclocaldefs.h"
 #include "torclogging.h"
 #include "torccoreutils.h"
 #include "torcmime.h"
@@ -334,8 +335,8 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
 
         QByteArray *result = new QByteArray();
         QTextStream stream(result);
-        stream << "<html><head><title>" << QCoreApplication::applicationName() << "</title></head>";
-        stream << "<body><h1><a href='/'>" << QCoreApplication::applicationName() << "</a></h1>";
+        stream << "<html><head><title>" << TORC_REALM << "</title></head>";
+        stream << "<body><h1><a href='/'>" << TORC_REALM << "</a></h1>";
         stream << "<p>File not found";
         stream << "</body></html>";
         this->SetResponseContent(result);

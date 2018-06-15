@@ -11,7 +11,7 @@
 
 #define NETWORK_INPUTS_STRING QString("network")
 
-class TorcNetworkInputs : public TorcDeviceHandler
+class TorcNetworkInputs Q_DECL_FINAL : public TorcDeviceHandler
 {
   public:
     TorcNetworkInputs();
@@ -19,8 +19,8 @@ class TorcNetworkInputs : public TorcDeviceHandler
 
     static TorcNetworkInputs*   gNetworkInputs;
 
-    void                        Create      (const QVariantMap &Details);
-    void                        Destroy     (void);
+    void                        Create      (const QVariantMap &Details) Q_DECL_OVERRIDE;
+    void                        Destroy     (void) Q_DECL_OVERRIDE;
 
   private:
     QMap<QString,TorcInput*>    m_inputs;

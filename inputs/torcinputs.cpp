@@ -78,7 +78,8 @@ void TorcInputs::Graph(QByteArray *Data)
         QString desc;
         QStringList source = input->GetDescription();
         foreach (QString item, source)
-            desc.append(QString(DEVICE_LINE_ITEM).arg(item));
+            if (!item.isEmpty())
+                desc.append(QString(DEVICE_LINE_ITEM).arg(item));
         desc.append(QString(DEVICE_LINE_ITEM).arg(tr("Default %1").arg(input->GetDefaultValue())));
         desc.append(QString(DEVICE_LINE_ITEM).arg(tr("Valid %1").arg(input->GetValid())));
         desc.append(QString(DEVICE_LINE_ITEM).arg(tr("Value %1").arg(input->GetValue())));

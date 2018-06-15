@@ -132,9 +132,9 @@ bool TorcSystemNotification::event(QEvent *Event)
 }
 
 /// Create instances of TorcSystemNotification.
-class TorcSystemNotificationFactory : public TorcNotificationFactory
+class TorcSystemNotificationFactory Q_DECL_FINAL : public TorcNotificationFactory
 {
-    TorcNotification* Create(const QString &Type, const QVariantMap &Details)
+    TorcNotification* Create(const QString &Type, const QVariantMap &Details) Q_DECL_OVERRIDE
     {
         if (Type == "system" && Details.contains("inputs"))
             return new TorcSystemNotification(Details);

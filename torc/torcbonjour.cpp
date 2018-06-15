@@ -28,7 +28,6 @@
 #include "torclocalcontext.h"
 #include "torcadminthread.h"
 #include "torcnetwork.h"
-#include "torchttpserver.h"
 #include "torcbonjour.h"
 
 // Std
@@ -205,7 +204,7 @@ void TorcBonjourService::Deregister(void)
         // Unregister
         if (m_serviceType == Browse)
         {
-            LOG(VB_NETWORK, LOG_INFO, QString("Cancelling browse for '%1'")
+            LOG(VB_GENERAL, LOG_INFO, QString("Cancelling browse for '%1'")
                 .arg(m_type.data()));
         }
         else if (m_serviceType == Service)
@@ -584,6 +583,7 @@ quint32 TorcBonjour::Browse(const QByteArray &Type, quint32 Reference /*=0*/)
         TorcBonjourService service(TorcBonjourService::Browse, dnssref, dummy, Type);
         m_services.insert(reference, service);
         m_services[reference].SetFileDescriptor(DNSServiceRefSockFD(dnssref), this);
+        LOG(VB_GENERAL, LOG_INFO, QString("Browsing for '%1'").arg(Type.data()));
         return reference;
     }
 

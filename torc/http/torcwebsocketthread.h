@@ -25,8 +25,13 @@ class TorcWebSocketThread : public TorcQThread
 
   signals:
     void                ConnectionEstablished (void);
+    void                ConnectionUpgraded    (void);
     void                RemoteRequestSignal   (TorcRPCRequest *Request);
     void                CancelRequestSignal   (TorcRPCRequest *Request);
+
+  private:
+    static void         SetupSSL              (void);
+    static bool         CreateCerts           (const QString &CertFile, const QString &KeyFile);
 
   private:
     TorcWebSocket      *m_webSocket;

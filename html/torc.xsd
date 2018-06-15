@@ -186,6 +186,18 @@
   </xs:choice>
 </xs:complexType>
 
+<xs:complexType name="customTimerType">
+  <xs:all>
+    <xs:element name="name"     type="deviceNameType"/>
+    <xs:element name="username" type="userNameType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="outputs"  type="deviceInputsOutputsType"/>
+    <xs:element name="start"    type="validStringType"/> <!-- TODO can we do better than string? -->
+    <xs:element name="duration" type="validStringType"/> <!-- TODO can we do better than string? -->
+    <xs:element name="period"   type="validStringType"/> <!-- TODO can we do better than string? -->
+  </xs:all>
+</xs:complexType>
+
 <xs:complexType name="timerType">
   <xs:all>
     <xs:element name="name"     type="deviceNameType"/>
@@ -199,7 +211,7 @@
 
 <xs:complexType name="timersType">
   <xs:choice minOccurs="1" maxOccurs="unbounded">
-    <xs:element name="custom"   type="timerType"/>
+    <xs:element name="custom"   type="customTimerType"/>
     <xs:element name="minutely" type="timerType"/>
     <xs:element name="hourly"   type="timerType"/>
     <xs:element name="daily"    type="timerType"/>

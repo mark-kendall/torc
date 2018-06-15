@@ -11,7 +11,7 @@ class TorcNetworkRequest;
 
 #define PUSHBULLET_PUSH_URL QString("https://api.pushbullet.com/v2/pushes")
 
-class TorcPushbulletNotifier : public TorcNotifier
+class TorcPushbulletNotifier Q_DECL_FINAL : public TorcNotifier
 {
     Q_OBJECT
 
@@ -19,8 +19,8 @@ class TorcPushbulletNotifier : public TorcNotifier
     explicit TorcPushbulletNotifier(const QVariantMap &Details);
     ~TorcPushbulletNotifier();
 
-    void Notify               (const QVariantMap &Notification);
-    QStringList GetDescription(void);
+    void Notify               (const QVariantMap &Notification) Q_DECL_OVERRIDE;
+    QStringList GetDescription(void) Q_DECL_OVERRIDE;
 
   signals:
     void StartResetTimer      (int Seconds);

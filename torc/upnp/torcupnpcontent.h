@@ -4,7 +4,7 @@
 // Torc
 #include "torchttphandler.h"
 
-class TorcUPnPContent : public TorcHTTPHandler
+class TorcUPnPContent Q_DECL_FINAL: public TorcHTTPHandler
 {
   public:
     TorcUPnPContent();

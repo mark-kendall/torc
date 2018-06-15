@@ -22,6 +22,7 @@
 
 // Qt
 #include <QFile>
+#include <QBuffer>
 
 // Torc
 #include "torclogging.h"
@@ -64,6 +65,18 @@ TorcXMLReader::TorcXMLReader(const QString &File)
     file.close();
 }
 
+TorcXMLReader::TorcXMLReader(QByteArray &Data)
+  : m_reader(),
+    m_map(),
+    m_valid(false),
+    m_message()
+{
+    QBuffer buffer(&Data);
+    buffer.open(QBuffer::ReadOnly);
+    m_reader.setDevice(&buffer);
+    m_valid = ReadXML();
+}
+
 TorcXMLReader::~TorcXMLReader()
 {
 }
@@ -74,7 +87,7 @@ bool TorcXMLReader::IsValid(QString &Message) const
     return m_valid;
 }
 
-QVariantMultiMap TorcXMLReader::GetResult(void) const
+QVariantMap TorcXMLReader::GetResult(void) const
 {
     return m_map;
 }
@@ -85,9 +98,9 @@ bool TorcXMLReader::ReadXML(void)
         return false;
 
     QString root = m_reader.name().toString();
-    QVariantMultiMap objects;
+    QVariantMap objects;
     while (m_reader.readNextStartElement())
-        if (!ReadElement(&objects))
+        if (!ReadElement(objects))
             return false;
     m_map.insert(root, objects);
     return true;
@@ -96,10 +109,10 @@ bool TorcXMLReader::ReadXML(void)
 /*! \note As noted in the class documentation, there is no support here for mixed elements.
  *        Any text will be overwritten when the child elements are saved.
 */
-bool TorcXMLReader::ReadElement(QVariantMultiMap *Map)
+bool TorcXMLReader::ReadElement(QVariantMap &Map)
 {
     QString     name = m_reader.name().toString();
-    QVariantMultiMap element;
+    QVariantMap element;
 
     bool done = false;
     while (!done)
@@ -112,10 +125,10 @@ bool TorcXMLReader::ReadElement(QVariantMultiMap *Map)
             case QXmlStreamReader::EntityReference:
             case QXmlStreamReader::Characters:
                 if (!m_reader.isWhitespace())
-                    Map->insert(name, m_reader.text().toString());
+                    Map.insertMulti(name, m_reader.text().toString());
                 break;
             case QXmlStreamReader::StartElement:
-                if (!ReadElement(&element))
+                if (!ReadElement(element))
                     return false;
                 break;
             case QXmlStreamReader::EndDocument:
@@ -131,7 +144,7 @@ bool TorcXMLReader::ReadElement(QVariantMultiMap *Map)
     }
 
     if (!element.isEmpty())
-        Map->insert(name, element);
+        Map.insertMulti(name, element);
 
     return true;
 }

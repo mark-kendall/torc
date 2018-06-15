@@ -17,10 +17,7 @@ class TorcNotifier : public TorcDevice
     Q_OBJECT
 
   public slots:
-    // QObject
-    virtual bool event            (QEvent *e);
     virtual void Notify           (const QVariantMap &Notification) = 0;
-    virtual QStringList GetDescription (void) = 0;
 
   protected:
     explicit TorcNotifier(const QVariantMap &Details);

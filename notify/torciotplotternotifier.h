@@ -4,7 +4,7 @@
 //Torc
 #include "torciotlogger.h"
 
-class TorcIoTPlotterNotifier : public TorcIOTLogger
+class TorcIoTPlotterNotifier Q_DECL_FINAL : public TorcIOTLogger
 {
     Q_OBJECT
 
@@ -12,8 +12,8 @@ class TorcIoTPlotterNotifier : public TorcIOTLogger
     explicit TorcIoTPlotterNotifier(const QVariantMap &Details);
     virtual ~TorcIoTPlotterNotifier();
 
-    virtual void ProcessRequest(TorcNetworkRequest* Request);
-    virtual TorcNetworkRequest* CreateRequest(void);
+    void ProcessRequest(TorcNetworkRequest* Request) Q_DECL_OVERRIDE;
+    TorcNetworkRequest* CreateRequest(void) Q_DECL_OVERRIDE;
 
   private:
     QString m_feedId;

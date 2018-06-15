@@ -61,12 +61,12 @@ bool TorcControl::ParseTimeString(const QString &Time, int &Days, int &Hours,
 {
     bool ok      = false;
     int  seconds = 0;
+    int  minutes = 0;
     int  hours   = 0;
     int  days    = 0;
 
     // take seconds off the end if present
     QStringList initialsplit = Time.split(".");
-
     QString dayshoursminutes = initialsplit[0];
     QString secondss = initialsplit.size() > 1 ? initialsplit[1] : QString("");
 
@@ -101,64 +101,78 @@ bool TorcControl::ParseTimeString(const QString &Time, int &Days, int &Hours,
     // days - days are from 1 to 7 (Monday to Sunday), consistent with Qt
     if (count == 3)
     {
-        int newdays = secondsplit[0].toInt(&ok);
-        if (!ok)
+        QString dayss = secondsplit[0].trimmed();
+        if (!dayss.isEmpty())
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse days from '%1'").arg(secondsplit[2]));
-            return false;
-        }
+            int newdays = dayss.toInt(&ok);
+            if (!ok)
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse days from '%1'").arg(secondsplit[2]));
+                return false;
+            }
 
-        if (newdays < 1 || newdays > 7)
-        {
-            LOG(VB_GENERAL, LOG_ERR, QString("Invalid day value '%1'").arg(newdays));
-            return false;
-        }
+            // allow 1-365 and zero
+            if (newdays < 0 || newdays > 365)
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("Invalid day value '%1'").arg(newdays));
+                return false;
+            }
 
-        days = newdays;
+            days = newdays;
+        }
     }
 
     // hours 0-23
     if (count > 1)
     {
-        int newhours = secondsplit[count - 2].toInt(&ok);
-        if (!ok)
+        QString hourss = secondsplit[count - 2].trimmed();
+        if (!hourss.isEmpty())
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse hours from '%1'").arg(secondsplit[1]));
-            return false;
-        }
+            int newhours = hourss.toInt(&ok);
+            if (!ok)
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse hours from '%1'").arg(secondsplit[1]));
+                return false;
+            }
 
-        if (newhours < 0 || newhours > 23)
-        {
-            LOG(VB_GENERAL, LOG_ERR, QString("Invalid hour value '%1'").arg(newhours));
-            return false;
-        }
+            if (newhours < 0 || newhours > 23)
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("Invalid hour value '%1'").arg(newhours));
+                return false;
+            }
 
-        hours = newhours;
+            hours = newhours;
+        }
     }
 
     // minutes 0-59
-    int newminutes = secondsplit[count - 1].toInt(&ok);
-    if (!ok)
+    QString minutess = secondsplit[count - 1].trimmed();
+    if (!minutess.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse minutes from '%1'").arg(secondsplit[0]));
-        return false;
-    }
+        int newminutes = minutess.toInt(&ok);
+        if (!ok)
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse minutes from '%1'").arg(secondsplit[0]));
+            return false;
+        }
 
-    if (newminutes < 0 || newminutes > 59)
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("Invalid minute values '%1'").arg(newminutes));
-        return false;
+        if (newminutes < 0 || newminutes > 59)
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Invalid minute values '%1'").arg(newminutes));
+            return false;
+        }
+
+        minutes = newminutes;
     }
 
     // all is good in the world
     Days    = days;
     Hours   = hours;
-    Minutes = newminutes;
+    Minutes = minutes;
     Seconds = seconds;
 
     // duration
-    DurationInSeconds = seconds + (newminutes * 60) + (hours * 60 * 60) + (days * 24 * 60 * 60);
-
+    DurationInSeconds = seconds + (minutes * 60) + (hours * 60 * 60) + (days * 24 * 60 * 60);
     return true;
 }
 
@@ -350,7 +364,8 @@ void TorcControl::Graph(QByteArray* Data)
         QString desc;
         QStringList source = GetDescription();
         foreach (QString item, source)
-            desc.append(QString(DEVICE_LINE_ITEM).arg(item));
+            if (!item.isEmpty())
+                desc.append(QString(DEVICE_LINE_ITEM).arg(item));
         desc.append(QString(DEVICE_LINE_ITEM).arg(tr("Default %1").arg(GetDefaultValue())));
         desc.append(QString(DEVICE_LINE_ITEM).arg(tr("Valid %1").arg(GetValid())));
         desc.append(QString(DEVICE_LINE_ITEM).arg(tr("Value %1").arg(GetValue())));

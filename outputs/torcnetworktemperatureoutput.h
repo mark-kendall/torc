@@ -4,7 +4,7 @@
 // Torc
 #include "torctemperatureoutput.h"
 
-class TorcNetworkTemperatureOutput : public TorcTemperatureOutput
+class TorcNetworkTemperatureOutput Q_DECL_FINAL : public TorcTemperatureOutput
 {
     Q_OBJECT
 
@@ -12,7 +12,7 @@ class TorcNetworkTemperatureOutput : public TorcTemperatureOutput
     TorcNetworkTemperatureOutput(double Default, const QVariantMap &Details);
     ~TorcNetworkTemperatureOutput();
 
-    QStringList GetDescription(void);
+    QStringList GetDescription(void) Q_DECL_OVERRIDE;
 };
 
 #endif // TORCNETWORKTEMPERATUREOUTPUT_H

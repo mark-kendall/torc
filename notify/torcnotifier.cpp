@@ -30,7 +30,7 @@
  * This is the base notifier class. Subclass it and implement Notify to send messages
  * to the world.
  *
- * \note TorcNotifier classes may operate asynchronously and may listen for evetns. They thus may
+ * \note TorcNotifier classes may operate asynchronously and may listen for events. They thus may
  *  need to run in a full QThread (and not a QRunnable).
 */
 TorcNotifier::TorcNotifier(const QVariantMap &Details)
@@ -40,11 +40,6 @@ TorcNotifier::TorcNotifier(const QVariantMap &Details)
 
 TorcNotifier::~TorcNotifier()
 {
-}
-
-bool TorcNotifier::event(QEvent *Event)
-{
-    return TorcDevice::event(Event);
 }
 
 TorcNotifierFactory* TorcNotifierFactory::gTorcNotifierFactory = NULL;

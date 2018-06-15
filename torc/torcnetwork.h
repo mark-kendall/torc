@@ -42,6 +42,7 @@ class TorcNetwork : QNetworkAccessManager
     static bool IsLinkLocal         (const QHostAddress &Address);
     static bool IsLocal             (const QHostAddress &Address);
     static bool IsGlobal            (const QHostAddress &Address);
+    static QList<QSslError> AllowableSslErrors (const QList<QSslError> &Errors);
 
   signals:
     void        NewRequest          (TorcNetworkRequest* Request);

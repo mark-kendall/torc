@@ -30,34 +30,38 @@ class TorcTimerControl : public TorcControl
     TorcTimerControl(const QString &Type, const QVariantMap &Details);
    ~TorcTimerControl();
 
-    TorcControl::Type GetType         (void) const;
-    QStringList       GetDescription  (void);
-    bool              Validate        (void);
-    void              Start           (void);
-    bool              AllowInputs     (void) const;
+    TorcControl::Type GetType         (void) const Q_DECL_OVERRIDE;
+    QStringList       GetDescription  (void) Q_DECL_OVERRIDE;
+    bool              Validate        (void) Q_DECL_OVERRIDE;
+    void              Start           (void) Q_DECL_OVERRIDE;
+    bool              AllowInputs     (void) const Q_DECL_OVERRIDE;
     quint64           TimeSinceLastTransition (void);
     TorcTimerControl::TimerType GetTimerType  (void) const;
 
   public slots:
     void              TimerTimeout    (void);
+    bool              event           (QEvent *Event) Q_DECL_OVERRIDE;
 
   private:
-    void              CalculateOutput (void);
-    quint64           GetMaxDuration  (void) const;
+    void              GenerateTimings (void);
+    void              CalculateOutput (void) Q_DECL_OVERRIDE;
+    quint64           GetPeriodDuration(void) const;
+    quint64           MsecsSincePeriodStart (void);
 
   private:
     TorcTimerControl::TimerType m_timerType;
-
-    QTime             m_startTime;
     int               m_startDay;
-    quint64           m_startDuration;
-
+    quint64           m_startTime;
     quint64           m_duration;
-    QTime             m_durationTime;
     int               m_durationDay;
-
+    int               m_periodDay;
+    quint64           m_periodTime;
     QTimer            m_timer;
     bool              m_firstTrigger;
+    bool              m_randomStart;
+    bool              m_randomDuration;
+    quint64           m_lastElapsed;
+    bool              m_newRandom;
 };
 
 #endif // TORCTIMERCONTROL_H

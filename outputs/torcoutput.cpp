@@ -87,8 +87,6 @@ bool TorcOutput::SetOwner(QObject *Owner)
     }
 
     m_owner = Owner;
-    DisableMethod("SetValue");
-    DisableMethod("SetValid");
 
     return true;
 }

@@ -30,9 +30,10 @@ class TorcNetworkService : public QObject
         UPnP        = (1 << 1)
     };
 
-    Q_DECLARE_FLAGS(ServiceSources, ServiceSource);
+    Q_DECLARE_FLAGS(ServiceSources, ServiceSource)
 
   public:
+    static bool WeActAsServer (int Priority, qint64 StartTime, const QString &UUID);
     TorcNetworkService(const QString &Name, const QString &UUID, int Port, bool Secure, const QList<QHostAddress> &Addresses);
     ~TorcNetworkService();
 
@@ -113,8 +114,8 @@ class TorcNetworkService : public QObject
     int                     m_retryInterval;
 };
 
-Q_DECLARE_METATYPE(TorcNetworkService*);
-Q_DECLARE_OPERATORS_FOR_FLAGS(TorcNetworkService::ServiceSources);
+Q_DECLARE_METATYPE(TorcNetworkService*)
+Q_DECLARE_OPERATORS_FOR_FLAGS(TorcNetworkService::ServiceSources)
 
 class TorcNetworkedContext: public QObject, public TorcHTTPService
 {
@@ -127,7 +128,7 @@ class TorcNetworkedContext: public QObject, public TorcHTTPService
     Q_PROPERTY(QVariantList peers READ GetPeers NOTIFY PeersChanged)
 
   public:
-    static void                PeerConnected       (TorcWebSocketThread* Thread, const QString UUID, int Port, const QString Name, const QHostAddress Address);
+    static void                PeerConnected       (TorcWebSocketThread* Thread, const QVariantMap &Data);
     static void                RemoteRequest       (const QString &UUID, TorcRPCRequest *Request);
     static void                CancelRequest       (const QString &UUID, TorcRPCRequest *Request, int Wait = 1000);
 
@@ -138,7 +139,7 @@ class TorcNetworkedContext: public QObject, public TorcHTTPService
     void                       PeersChanged        (void);
     void                       PeerConnected       (QString Name, QString UUID);
     void                       PeerDisconnected    (QString Name, QString UUID);
-    void                       NewPeer             (TorcWebSocketThread* Socket, const QString UUID, int Port, const QString Name, const QHostAddress Address);
+    void                       NewPeer             (TorcWebSocketThread* Socket, const QVariantMap &Data);
     void                       NewRequest          (const QString &UUID, TorcRPCRequest *Request);
     void                       RequestCancelled    (const QString &UUID, TorcRPCRequest *Request);
 
@@ -147,7 +148,7 @@ class TorcNetworkedContext: public QObject, public TorcHTTPService
     void                       SubscriberDeleted   (QObject *Subscriber);
 
   protected slots:
-    void                       HandleNewPeer       (TorcWebSocketThread *Thread, const QString UUID, int Port, const QString Name, const QHostAddress Address);
+    void                       HandleNewPeer       (TorcWebSocketThread *Thread, const QVariantMap &Data);
     void                       HandleNewRequest    (const QString &UUID, TorcRPCRequest *Request);
     void                       HandleCancelRequest (const QString &UUID, TorcRPCRequest *Request);
 
@@ -168,8 +169,7 @@ class TorcNetworkedContext: public QObject, public TorcHTTPService
     QList<TorcNetworkService*> m_discoveredServices;
     QReadWriteLock             m_discoveredServicesLock;
     QList<QString>             m_serviceList;
-    quint32                    m_bonjourBrowserReference;
-    QVariantMap                peers; // dummy
+    QVariantList               peers; // dummy
 };
 
 extern TorcNetworkedContext *gNetworkedContext;

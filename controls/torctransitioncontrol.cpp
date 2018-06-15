@@ -22,6 +22,7 @@
 
 // Torc
 #include "torclogging.h"
+#include "torclocalcontext.h"
 #include "torctimercontrol.h"
 #include "torctransitioncontrol.h"
 
@@ -183,10 +184,13 @@ TorcTransitionControl::TorcTransitionControl(const QString &Type, const QVariant
 
     // so far so good
     m_parsed = true;
+
+    gLocalContext->AddObserver(this);
 }
 
 TorcTransitionControl::~TorcTransitionControl()
 {
+    gLocalContext->RemoveObserver(this);
 }
 
 TorcControl::Type TorcTransitionControl::GetType(void) const
@@ -204,6 +208,30 @@ QStringList TorcTransitionControl::GetDescription(void)
     result.append(tr("%1 transition").arg(StringFromEasingCurve(m_type)));
     result.append(tr("Duration %1").arg(TorcControl::DurationToString(daysduration, timeduration)));
     return result;
+}
+
+bool TorcTransitionControl::event(QEvent *Event)
+{
+    if (Event && Event->type() == TorcEvent::TorcEventType)
+    {
+        TorcEvent *event = static_cast<TorcEvent*>(Event);
+        if (event && (event->GetEvent() == Torc::SystemTimeChanged))
+        {
+            // we don't know in which order this event is received, so we don't know
+            // whether any timer inputs have been reset. So wait a short period.
+            QTimer::singleShot(10, this, SLOT(Restart()));
+            return true;
+        }
+    }
+
+    return TorcControl::event(Event);
+}
+
+void TorcTransitionControl::Restart(void)
+{
+    LOG(VB_GENERAL, LOG_INFO, QString("Transition %1 restarting").arg(uniqueId));
+    m_firstTrigger = true;
+    CalculateOutput();
 }
 
 bool TorcTransitionControl::Validate(void)
@@ -309,15 +337,11 @@ void TorcTransitionControl::CalculateOutput(void)
         TorcTimerControl *timerinput = qobject_cast<TorcTimerControl*>(m_inputs.firstKey());
         if (timerinput)
         {
-            // NB for a custom timer with transition, this will force the output to 'on' initially.
-            // While this may seem counterintuitive, it is the expected behaviour - as the output
-            // would normally be transitioning from the last 'on' to 'off' at time 0. Changing
-            // the custom timer behaviour would produce unexpected results for timers with no transition.
-            timesincelasttransition = timerinput->TimeSinceLastTransition();
+            timesincelasttransition = timerinput->TimeSinceLastTransition() / 1000;
 
             if (timesincelasttransition > m_duration)
             {
-                LOG(VB_GENERAL, LOG_DEBUG, QString("Transition '%1' is initially inactive (value '%2')").arg(uniqueId).arg(newvalue));
+                LOG(VB_GENERAL, LOG_INFO, QString("Transition '%1' is initially inactive (value '%2')").arg(uniqueId).arg(newvalue));
                 SetValue(newvalue);
                 return;
             }
@@ -325,8 +349,8 @@ void TorcTransitionControl::CalculateOutput(void)
             // if we are part way through the transition, the animation will expect the value to have started
             // from the previous transition value !:)
             SetValue(newvalue > 0 ? 0 : 1);
-            LOG(VB_GENERAL, LOG_DEBUG, QString("Forcing transition '%1' time to %2% complete").arg(uniqueId)
-                .arg(((double)timesincelasttransition / (double)m_duration) * 100.0));
+            LOG(VB_GENERAL, LOG_INFO, QString("Forcing transition '%1' to %2% complete (%3)").arg(uniqueId)
+                .arg(((double)timesincelasttransition / (double)m_duration) * 100.0).arg(newvalue ? "rising" : "falling"));
 
             if (newvalue < 1) // time can run backwards :)
                 timesincelasttransition = m_duration - timesincelasttransition;
@@ -356,9 +380,9 @@ void TorcTransitionControl::CalculateOutput(void)
 void TorcTransitionControl::SetAnimationValue(double Value)
 {
     QMutexLocker locker(&lock);
-
-    animationValue = Value;
-    SetValue(Value);
+    double rounded = ((qint64)(Value * 100)) / 100.0;
+    animationValue = rounded;
+    SetValue(rounded);
 }
 
 double TorcTransitionControl::GetAnimationValue(void)

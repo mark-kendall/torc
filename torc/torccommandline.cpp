@@ -297,7 +297,7 @@ int TorcCommandLine::Evaluate(int argc, const char * const *argv, bool &Exit)
 
     if (printhelp)
     {
-        std::cout << "Command line options for " << QCoreApplication::applicationName().toLocal8Bit().constData() << ":" << std::endl << std::endl;
+        std::cout << "Command line options:" << std::endl << std::endl;
 
         QHash<QString,QString>::iterator it = m_help.begin();
         for ( ; it != m_help.end(); ++it)

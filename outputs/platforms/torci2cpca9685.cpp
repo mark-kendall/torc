@@ -57,7 +57,7 @@ TorcI2CPCA9685Channel::~TorcI2CPCA9685Channel()
 
 QStringList TorcI2CPCA9685Channel::GetDescription(void)
 {
-    return QStringList() << tr("I2C") << tr("PCA9685 16 Channel PWM") << tr("Channel %1").arg(m_channelNumber);
+    return QStringList() << tr("I2C") << tr("PCA9685 16 Channel PWM") << QString("%1 %2").arg(tr("Channel")).arg(m_channelNumber);
 }
 
 void TorcI2CPCA9685Channel::SetValue(double Value)

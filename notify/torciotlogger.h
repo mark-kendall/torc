@@ -19,11 +19,11 @@ class TorcIOTLogger : public TorcNotifier
     explicit TorcIOTLogger(const QVariantMap &Details);
     virtual ~ TorcIOTLogger();
 
-    virtual QStringList GetDescription(void);
+    QStringList GetDescription(void) Q_DECL_OVERRIDE Q_DECL_FINAL;
 
   public slots:
-    void         Notify        (const QVariantMap &Notification);
-    virtual void DoNotify      (void);
+    void         Notify        (const QVariantMap &Notification) Q_DECL_OVERRIDE;
+    void         DoNotify      (void);
     void         RequestReady  (TorcNetworkRequest* Request);
 
   signals:

@@ -65,6 +65,12 @@ TorcHTTPServices::~TorcHTTPServices()
 {
 }
 
+QString TorcHTTPServices::GetVersion(void)
+{
+    int index = TorcHTTPServices::staticMetaObject.indexOfClassInfo("Version");
+    return (index > -1) ? TorcHTTPServices::staticMetaObject.classInfo(index).value() : "unknown";
+}
+
 QString TorcHTTPServices::GetUIName(void)
 {
     return tr("Services");
@@ -172,8 +178,7 @@ QVariantMap TorcHTTPServices::GetDetails(void)
     // NB keys here match those of the relevant stand alone methods. Take care not to break them.
     QVariantMap results;
 
-    int index = TorcHTTPServices::staticMetaObject.indexOfClassInfo("Version");
-    results.insert("version",   index > -1 ? TorcHTTPServices::staticMetaObject.classInfo(index).value() : "unknown");
+    results.insert("version",   TorcHTTPServices::GetVersion());
     results.insert("services",  GetServiceList());
     results.insert("starttime", GetStartTime());
     results.insert("priority",  GetPriority());

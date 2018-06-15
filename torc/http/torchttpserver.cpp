@@ -43,14 +43,25 @@
 #include "torcwebsockettoken.h"
 #include "torchttpservernonce.h"
 
-#ifndef Q_OS_WIN
-#include <sys/utsname.h>
-#endif
-
 QMap<QString,TorcHTTPHandler*> gHandlers;
 QReadWriteLock*                gHandlersLock = new QReadWriteLock(QReadWriteLock::Recursive);
 QString                        gServicesDirectory(TORC_SERVICES_DIR);
 
+TorcHTTPServer::Status::Status()
+  : port(0),
+    secure(false),
+    ipv4(true),
+    ipv6(true)
+{
+}
+
+bool TorcHTTPServer::Status::operator ==(const Status &Other) const
+{
+    return port   == Other.port &&
+           secure == Other.secure &&
+           ipv4   == Other.ipv4 &&
+           ipv6   == Other.ipv6;
+}
 
 void TorcHTTPServer::RegisterHandler(TorcHTTPHandler *Handler)
 {
@@ -224,24 +235,11 @@ QVariantMap TorcHTTPServer::GetServiceDescription(const QString &Service)
     return QVariantMap();
 }
 
-int TorcHTTPServer::GetPort(void)
+TorcHTTPServer::Status TorcHTTPServer::GetStatus(void)
 {
     QMutexLocker locker(&gWebServerLock);
-
-    if (gWebServer)
-        return gWebServer->serverPort();
-
-    return 0;
-}
-
-bool TorcHTTPServer::IsListening(void)
-{
-    QMutexLocker locker(&gWebServerLock);
-
-    if (gWebServer)
-        return gWebServer->isListening();
-
-    return false;
+    Status result = gWebServerStatus;
+    return result;
 }
 
 QString TorcHTTPServer::PlatformName(void)
@@ -269,22 +267,33 @@ QString TorcHTTPServer::PlatformName(void)
 */
 
 TorcHTTPServer* TorcHTTPServer::gWebServer = NULL;
+TorcHTTPServer::Status TorcHTTPServer::gWebServerStatus = TorcHTTPServer::Status();
 QMutex          TorcHTTPServer::gWebServerLock(QMutex::Recursive);
 QString         TorcHTTPServer::gPlatform = QString("");
 QString         TorcHTTPServer::gOriginWhitelist = QString("");
 QReadWriteLock  TorcHTTPServer::gOriginWhitelistLock(QReadWriteLock::Recursive);
 
 TorcHTTPServer::TorcHTTPServer()
-  : QTcpServer(),
+  : QObject(),
     m_serverSettings(NULL),
     m_port(NULL),
     m_secure(NULL),
+    m_upnp(NULL),
+    m_upnpSearch(NULL),
+    m_upnpAdvertise(NULL),
+    m_bonjour(NULL),
+    m_bonjourSearch(NULL),
+    m_bonjourAdvert(NULL),
+    m_ipv6(NULL),
+    m_listener(NULL),
     m_user(),
-    m_defaultHandler("", QCoreApplication::applicationName()), // default top level handler
-    m_servicesHandler(this),                                   // services 'helper' service for '/services'
-    m_staticContent(),                                         // static files - for /css /fonts /js /img etc
-    m_dynamicContent(),                                        // dynamic files - for config files etc (typically served from ~/.torc/content)
-    m_upnpContent(),                                           // upnp - device description
+    m_defaultHandler("", TORC_TORC), // default top level handler
+    m_servicesHandler(this),         // services 'helper' service for '/services'
+    m_staticContent(),               // static files - for /css /fonts /js /img etc
+    m_dynamicContent(),              // dynamic files - for config files etc (typically served from ~/.torc/content)
+    m_upnpContent(),                 // upnp - device description
+    m_ssdpThread(NULL),
+    m_bonjourBrowserReference(0),
     m_httpBonjourReference(0),
     m_torcBonjourReference(0),
     m_webSocketPool()
@@ -299,26 +308,87 @@ TorcHTTPServer::TorcHTTPServer()
     m_port->SetRange(root ? 1 : 1024, 65535, 1);
     m_port->SetActive(true);
     connect(m_port, SIGNAL(ValueChanged(int)), this, SLOT(PortChanged(int)));
-
     m_port->SetHelpText(tr("The port the server will listen on for incoming connections"));
+
     m_secure = new TorcSetting(m_serverSettings, TORC_SSL_SERVICE, tr("Secure sockets"), TorcSetting::Bool,
                                TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)false));
     m_secure->SetHelpText(tr("Use encrypted (SSL/TLS) connections to the server"));
     m_secure->SetActive(true);
     connect(m_secure, SIGNAL(ValueChanged(bool)), this, SLOT(SecureChanged(bool)));
 
+    m_upnp =  new TorcSetting(m_serverSettings, "ServerUPnP", tr("UPnP"), TorcSetting::Bool,
+                              TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true));
+    m_upnp->SetActive(true);
+    connect(m_upnp, SIGNAL(ValueChanged(bool)), this, SLOT(UPnPChanged(bool)));
+
+    m_upnpSearch = new TorcSetting(m_upnp, "ServerUPnPSearch", tr("UPnP Search"), TorcSetting::Bool,
+                                   TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true));
+    m_upnpSearch->SetHelpText(tr("Use UPnP to search for other devices"));
+    m_upnpSearch->SetActive(m_upnp->GetValue().toBool());
+    connect(m_upnpSearch, SIGNAL(ValueChanged(bool)), this, SLOT(UPnPSearchChanged(bool)));
+    connect(m_upnp,       SIGNAL(ValueChanged(bool)), m_upnpSearch, SLOT(SetActive(bool)));
+
+    m_upnpAdvertise = new TorcSetting(m_upnp, "ServerUPnpAdvert", tr("UPnP Advertisement"), TorcSetting::Bool,
+                                      TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true));
+    m_upnpAdvertise->SetHelpText(tr("Use UPnP to advertise this device"));
+    m_upnpAdvertise->SetActive(m_upnp->GetValue().toBool());
+    connect(m_upnpAdvertise, SIGNAL(ValueChanged(bool)), this, SLOT(UPnPAdvertChanged(bool)));
+    connect(m_upnp,          SIGNAL(ValueChanged(bool)), m_upnpAdvertise, SLOT(SetActive(bool)));
+
+    m_ipv6 = new TorcSetting(m_serverSettings, "ServerIPv6", tr("IPv6"), TorcSetting::Bool,
+                             TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true));
+    m_ipv6->SetHelpText(tr("Enable IPv6"));
+    m_ipv6->SetActive(true);
+    connect(m_ipv6, SIGNAL(ValueChanged(bool)), this, SLOT(IPv6Changed(bool)));
+
+    m_bonjour = new TorcSetting(m_ipv6, "ServerBonjour", tr("Bonjour"), TorcSetting::Bool,
+                                TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true));
+    m_bonjour->SetActive(m_ipv6->GetValue().toBool());
+    connect(m_bonjour, SIGNAL(ValueChanged(bool)), this, SLOT(BonjourChanged(bool)));
+    connect(m_ipv6,    SIGNAL(ValueChanged(bool)), m_bonjour, SLOT(SetActive(bool)));
+
+    m_bonjourSearch = new TorcSetting(m_bonjour, "ServerBonjourSearch", tr("Bonjour search"), TorcSetting::Bool,
+                                      TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true));
+    m_bonjourSearch->SetHelpText(tr("Use Bonjour to search for other devices"));
+    m_bonjourSearch->SetActiveThreshold(2);
+    m_bonjourSearch->SetActive(m_bonjour->GetValue().toBool());
+    m_bonjourSearch->SetActive(m_ipv6->GetValue().toBool());
+    connect(m_bonjourSearch, SIGNAL(ValueChanged(bool)), this, SLOT(BonjourSearchChanged(bool)));
+    connect(m_bonjour,       SIGNAL(ValueChanged(bool)), m_bonjourSearch, SLOT(SetActive(bool)));
+    connect(m_ipv6,          SIGNAL(ValueChanged(bool)), m_bonjourSearch, SLOT(SetActive(bool)));
+
+    m_bonjourAdvert = new TorcSetting(m_bonjour, "ServerBonjoutAdvert", tr("Bonjour Advertisement"), TorcSetting::Bool,
+                                      TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true));
+    m_bonjourAdvert->SetHelpText(tr("Use Bonjour to advertise this device"));
+    m_bonjourAdvert->SetActiveThreshold(2);
+    m_bonjourAdvert->SetActive(m_bonjour->GetValue().toBool());
+    m_bonjourAdvert->SetActive(m_ipv6->GetValue().toBool());
+    connect(m_bonjourAdvert, SIGNAL(ValueChanged(bool)), this, SLOT(BonjourAdvertChanged(bool)));
+    connect(m_bonjour,       SIGNAL(ValueChanged(bool)), m_bonjourAdvert, SLOT(SetActive(bool)));
+    connect(m_ipv6,          SIGNAL(ValueChanged(bool)), m_bonjourAdvert, SLOT(SetActive(bool)));
+
+    // initialise external status
+    {
+        QMutexLocker locker(&gWebServerLock);
+        gWebServerStatus.secure = m_secure->GetValue().toBool();
+        gWebServerStatus.port   = m_port->GetValue().toInt();
+        gWebServerStatus.ipv6   = m_ipv6->GetValue().toBool();
+    }
+
     // initialise platform name
     static bool initialised = false;
     if (!initialised)
     {
         initialised = true;
-        gPlatform = QString("%1, Version: %2 ").arg(QCoreApplication::applicationName()).arg(GIT_VERSION);
+        gPlatform = QString("%1, Version: %2 ").arg(TORC_TORC).arg(GIT_VERSION);
 #ifdef Q_OS_WIN
         gPlatform += QString("(Windows %1.%2)").arg(LOBYTE(LOWORD(GetVersion()))).arg(HIBYTE(LOWORD(GetVersion())));
 #else
-        struct utsname info;
-        uname(&info);
-        gPlatform += QString("(%1 %2)").arg(info.sysname).arg(info.release);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
+        gPlatform += QString("(%1 %2)").arg(QSysInfo::kernelType()).arg(QSysInfo::kernelVersion());
+#else
+        gPlatform += QString("(OldTorc OldVersion)");
+#endif
 #endif
     }
 
@@ -336,6 +406,55 @@ TorcHTTPServer::~TorcHTTPServer()
     gLocalContext->RemoveObserver(this);
 
     Close();
+
+    if (m_bonjourAdvert)
+    {
+        m_bonjourAdvert->Remove();
+        m_bonjourAdvert->DownRef();
+        m_bonjourAdvert = NULL;
+    }
+
+    if (m_bonjourSearch)
+    {
+        m_bonjourSearch->Remove();
+        m_bonjourSearch->DownRef();
+        m_bonjourSearch = NULL;
+    }
+
+    if (m_bonjour)
+    {
+        m_bonjour->Remove();
+        m_bonjour->DownRef();
+        m_bonjour = NULL;
+    }
+
+    if (m_ipv6)
+    {
+        m_ipv6->Remove();
+        m_ipv6->DownRef();
+        m_ipv6 = NULL;
+    }
+
+    if (m_upnpAdvertise)
+    {
+        m_upnpAdvertise->Remove();
+        m_upnpAdvertise->DownRef();
+        m_upnpAdvertise = NULL;
+    }
+
+    if (m_upnpSearch)
+    {
+        m_upnpSearch->Remove();
+        m_upnpSearch->DownRef();
+        m_upnpSearch = NULL;
+    }
+
+    if (m_upnp)
+    {
+        m_upnp->Remove();
+        m_upnp->DownRef();
+        m_upnp = NULL;
+    }
 
     if (m_port)
     {
@@ -357,6 +476,8 @@ TorcHTTPServer::~TorcHTTPServer()
         m_serverSettings->DownRef();
         m_serverSettings = NULL;
     }
+
+    TorcBonjour::TearDown();
 }
 
 TorcWebSocketThread* TorcHTTPServer::TakeSocket(TorcWebSocketThread *Socket)
@@ -496,104 +617,85 @@ void TorcHTTPServer::AuthenticateUser(TorcHTTPRequest &Request)
  *
  * \note This assumes the server is listening on all interfaces (currently true).
 */
-void TorcHTTPServer::UpdateOriginWhitelist(int Port)
+void TorcHTTPServer::UpdateOriginWhitelist(TorcHTTPServer::Status Status)
 {
     QWriteLocker locker(&gOriginWhitelistLock);
 
+    QString protocol = Status.secure ? "https://" : "http://";
+
     // localhost first
-    gOriginWhitelist = "http://localhost:" + QString::number(Port) + " ";
+    gOriginWhitelist = protocol + "localhost:" + QString::number(Status.port) + " ";
 
     // all known raw IP addresses
     QList<QHostAddress> addresses = QNetworkInterface::allAddresses();
     for (int i = 0; i < addresses.size(); ++i)
-        gOriginWhitelist += QString("%1%2 ").arg("http://").arg(TorcNetwork::IPAddressToLiteral(addresses[i], Port, false));
+        gOriginWhitelist += QString("%1%2 ").arg(protocol).arg(TorcNetwork::IPAddressToLiteral(addresses[i], Status.port, false));
 
     // and any known host names
     QStringList hosts = TorcNetwork::GetHostNames();
     foreach (QString host, hosts)
-        if (!host.isEmpty())
-            gOriginWhitelist += QString("%1%2:%3 ").arg("http://").arg(host).arg(Port);
+    {
+        QString newhost = QString("%1%2:%3 ").arg(protocol).arg(host).arg(Status.port);
+        if (!host.isEmpty() && !gOriginWhitelist.contains(newhost))
+            gOriginWhitelist += newhost;
+    }
 
     LOG(VB_NETWORK, LOG_INFO, "Origin whitelist: " + gOriginWhitelist);
 }
 
-bool TorcHTTPServer::Open(void)
+void TorcHTTPServer::StartBonjour(void)
 {
-    int port = m_port->GetValue().toInt();
-    bool waslistening = isListening();
+    if (!m_bonjour->GetValue().toBool())
+        return;
 
-    if (!waslistening)
+    if (!m_ipv6->GetValue().toBool())
     {
-        if (!listen(QHostAddress::Any, port))
-            if (port > 0)
-                listen();
+        LOG(VB_GENERAL, LOG_INFO, "Not using Bonjour while IPv6 is disabled");
+        StopBonjour();
+        return;
     }
 
-    if (!isListening())
+    if (!m_bonjourBrowserReference && m_bonjourSearch->GetValue().toBool())
+        m_bonjourBrowserReference = TorcBonjour::Instance()->Browse("_torc._tcp.");
+
+    if ((!m_httpBonjourReference || !m_torcBonjourReference) && m_bonjourAdvert->GetValue().toBool())
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to open web server port");
-        Close();
-        return false;
-    }
-
-    // try to use the same port
-    if (port != serverPort())
-    {
-        port = serverPort();
-        m_port->SetValue(QVariant((int)port));
-
-        // re-advertise if the port has changed
-        if (m_httpBonjourReference)
-        {
-            TorcBonjour::Instance()->Deregister(m_httpBonjourReference);
-            m_httpBonjourReference = 0;
-        }
-
-        if (m_torcBonjourReference)
-        {
-            TorcBonjour::Instance()->Deregister(m_torcBonjourReference);
-            m_torcBonjourReference = 0;
-        }
-    }
-
-    // advertise service if not already doing so
-    if (!m_httpBonjourReference || !m_torcBonjourReference)
-    {
-        // add the 'root' apiversion, as would be returned by '/services/GetServiceVersion'
-        int index = TorcHTTPServices::staticMetaObject.indexOfClassInfo("Version");
-
+        int port = m_port->GetValue().toInt();
         QMap<QByteArray,QByteArray> map;
         map.insert("uuid", gLocalContext->GetUuid().toLatin1());
-        map.insert("apiversion", (index > -1) ? TorcHTTPServices::staticMetaObject.classInfo(index).value() : "unknown");
+        map.insert("apiversion", TorcHTTPServices::GetVersion().toLocal8Bit().constData());
         map.insert("priority",   QByteArray::number(gLocalContext->GetPriority()));
         map.insert("starttime",  QByteArray::number(gLocalContext->GetStartTime()));
-        map.insert("secure",     m_secure->GetValue().toBool() ? "yes" : "no");
+        if (m_secure->GetValue().toBool())
+            map.insert("secure", "yes");
 
-        QByteArray name(QCoreApplication::applicationName().toLatin1());
-        name.append(" on ");
-        name.append(QHostInfo::localHostName());
+        QString name = ServerDescription();
 
         if (!m_httpBonjourReference)
-            m_httpBonjourReference = TorcBonjour::Instance()->Register(port, m_secure->GetValue().toBool() ? "_https._tcp" : "_http._tcp", name, map);
+            m_httpBonjourReference = TorcBonjour::Instance()->Register(port, m_secure->GetValue().toBool() ? "_https._tcp" : "_http._tcp", name.toLocal8Bit().constData(), map);
 
         if (!m_torcBonjourReference)
-            m_torcBonjourReference = TorcBonjour::Instance()->Register(port, "_torc._tcp", name, map);
+            m_torcBonjourReference = TorcBonjour::Instance()->Register(port, "_torc._tcp", name.toLocal8Bit().constData(), map);
     }
-
-    TorcSSDP::Announce(m_secure->GetValue().toBool());
-
-    if (!waslistening)
-    {
-        LOG(VB_GENERAL, LOG_INFO, QString("Web server listening for %1secure connections on port %2").arg(m_secure->GetValue().toBool() ? "" : "in").arg(port));
-        UpdateOriginWhitelist(m_port->GetValue().toInt());
-    }
-
-    return true;
 }
 
-void TorcHTTPServer::Close(void)
+void TorcHTTPServer::StopBonjour(void)
 {
-    // stop advertising
+    StopBonjourAdvert();
+    StopBonjourBrowse();
+}
+
+void TorcHTTPServer::StopBonjourBrowse(void)
+{
+    if (m_bonjourBrowserReference)
+    {
+        TorcBonjour::Instance()->Deregister(m_bonjourBrowserReference);
+        m_bonjourBrowserReference = 0;
+    }
+}
+
+void TorcHTTPServer::StopBonjourAdvert(void)
+{
     if (m_httpBonjourReference)
     {
         TorcBonjour::Instance()->Deregister(m_httpBonjourReference);
@@ -605,28 +707,224 @@ void TorcHTTPServer::Close(void)
         TorcBonjour::Instance()->Deregister(m_torcBonjourReference);
         m_torcBonjourReference = 0;
     }
+}
 
-    TorcSSDP::CancelAnnounce();
+void TorcHTTPServer::BonjourChanged(bool Bonjour)
+{
+    LOG(VB_GENERAL, LOG_INFO, QString("Bonjour %1abled").arg(Bonjour ? "en" : "dis"));
+
+    if (Bonjour)
+        StartBonjour();
+    else
+        StopBonjour();
+}
+
+void TorcHTTPServer::BonjourAdvertChanged(bool Advert)
+{
+    LOG(VB_GENERAL, LOG_INFO, QString("Bonjour advertisement %1abled").arg(Advert ? "en" : "dis"));
+    if (Advert)
+        StartBonjour();
+    else
+        StopBonjourAdvert();
+}
+
+void TorcHTTPServer::BonjourSearchChanged(bool Search)
+{
+    LOG(VB_GENERAL, LOG_INFO, QString("Bonjour search %1abled").arg(Search ? "en" : "dis"));
+    if (Search)
+        StartBonjour();
+    else
+        StopBonjourBrowse();
+}
+
+void TorcHTTPServer::IPv6Changed(bool IPv6)
+{
+    {
+        QMutexLocker lock(&gWebServerLock);
+        gWebServerStatus.ipv6 = IPv6;
+    }
+
+    LOG(VB_GENERAL, LOG_INFO, QString("IPv6 %1abled - restarting").arg(IPv6 ? "en" : "dis"));
+    QTimer::singleShot(10, this, SLOT(Restart()));
+}
+
+bool TorcHTTPServer::Open(void)
+{
+    if (m_listener)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "HTTP server alreay listening - closing");
+        Close();
+    }
+
+    LOG(VB_GENERAL, LOG_INFO, QString("SSL is %1abled").arg(m_secure->GetValue().toBool() ? "en" : "dis"));
+    LOG(VB_GENERAL, LOG_INFO, QString("IPv6 is %1abled").arg(m_ipv6->GetValue().toBool() ? "en" : "dis"));
+    LOG(VB_GENERAL, LOG_INFO, QString("Bonjour is %1abled").arg(m_bonjour->GetValue().toBool() ? "en" : "dis"));
+    LOG(VB_GENERAL, LOG_INFO, QString("Bonjour search is %1abled").arg(m_bonjourSearch->GetValue().toBool() ? "en" : "dis"));
+    LOG(VB_GENERAL, LOG_INFO, QString("Bonjour advertisement is %1abled").arg(m_bonjourAdvert->GetValue().toBool() ? "en" : "dis"));
+    LOG(VB_GENERAL, LOG_INFO, QString("SSDP is %1abled").arg(m_upnp->GetValue().toBool() ? "en" : "dis"));
+    LOG(VB_GENERAL, LOG_INFO, QString("SSDP search is %1abled").arg(m_upnpSearch->GetValue().toBool() ? "en" : "dis"));
+    LOG(VB_GENERAL, LOG_INFO, QString("SSDP advertisement is %1abled").arg(m_upnpAdvertise->GetValue().toBool() ? "en" : "dis"));
+    int port = m_port->GetValue().toInt();
+    LOG(VB_GENERAL, LOG_INFO, QString("Attempting to listen on port %1").arg(port));
+
+    m_listener = new TorcHTTPServerListener(this, m_ipv6->GetValue().toBool() ? QHostAddress::Any : QHostAddress::AnyIPv4, port);
+    if (!m_listener->isListening())
+    {
+        delete m_listener;
+        if (port > 0)
+        {
+            m_listener = new TorcHTTPServerListener(this, QHostAddress::Any);
+            if (!m_listener->isListening())
+                delete m_listener;
+        }
+    }
+
+    if (!m_listener)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Failed to open web server port");
+        Close();
+        return false;
+    }
+
+    // try to use the same port
+    if (port != m_listener->serverPort())
+    {
+        QMutexLocker locker(&gWebServerLock);
+        port = m_listener->serverPort();
+        m_port->SetValue(QVariant((int)port));
+        gWebServerStatus.port = port;
+    }
+
+    // advertise and search
+    StartBonjour();
+    StartUPnP();
+
+    LOG(VB_GENERAL, LOG_INFO, QString("Web server listening for %1secure connections on port %2").arg(m_secure->GetValue().toBool() ? "" : "in").arg(port));
+    UpdateOriginWhitelist(TorcHTTPServer::GetStatus());
+    return true;
+}
+
+QString TorcHTTPServer::ServerDescription(void)
+{
+    QString host = QHostInfo::localHostName();
+    if (host.isEmpty())
+        host = tr("Unknown");
+    return QString("%1@%2").arg(QCoreApplication::applicationName()).arg(host);
+}
+
+void TorcHTTPServer::Close(void)
+{
+    // stop advertising and searching
+    StopBonjour();
+    StopUPnP();
 
     // close connections
     m_webSocketPool.CloseSockets();
 
     // actually close
-    close();
+    if (m_listener)
+        delete m_listener;
+    m_listener = NULL;
 
     LOG(VB_GENERAL, LOG_INFO, "Webserver closed");
 }
 
 void TorcHTTPServer::PortChanged(int Port)
 {
+    {
+        QMutexLocker lock(&gWebServerLock);
+        gWebServerStatus.port = Port;
+    }
+
     LOG(VB_GENERAL, LOG_INFO, QString("Port changed to %1 - restarting").arg(Port));
     QTimer::singleShot(10, this, SLOT(Restart()));
 }
 
 void TorcHTTPServer::SecureChanged(bool Secure)
 {
-    LOG(VB_GENERAL, LOG_INFO, QString("Secure changed to '%1secure - restarting").arg(Secure ? "" : "in"));
+    {
+        QMutexLocker lock(&gWebServerLock);
+        gWebServerStatus.secure = m_secure->GetValue().toBool();
+    }
+
+    LOG(VB_GENERAL, LOG_INFO, QString("Secure %1abled - restarting").arg(Secure ? "en" : "dis"));
     QTimer::singleShot(10, this, SLOT(Restart()));
+}
+
+void TorcHTTPServer::StartUPnP(void)
+{
+    if (m_upnp->GetValue().toBool())
+    {
+        bool search = m_upnpSearch->GetValue().toBool();
+        bool advert = m_upnpAdvertise->GetValue().toBool();
+
+        if (!m_ssdpThread && (search || advert))
+        {
+            m_ssdpThread = new TorcSSDPThread();
+            m_ssdpThread->start();
+        }
+
+        if (search)
+            TorcSSDP::Search(TorcHTTPServer::GetStatus());
+        if (advert)
+            TorcSSDP::Announce(TorcHTTPServer::GetStatus());
+    }
+}
+
+void TorcHTTPServer::StopUPnP(void)
+{
+    TorcSSDP::CancelAnnounce();
+    TorcSSDP::CancelSearch();
+
+    if (m_ssdpThread)
+    {
+        m_ssdpThread->quit();
+        m_ssdpThread->wait();
+        delete m_ssdpThread;
+        m_ssdpThread = NULL;
+    }
+}
+
+void TorcHTTPServer::UPnPChanged(bool UPnP)
+{
+    LOG(VB_GENERAL, LOG_INFO, QString("SSDP %1abled").arg(UPnP ? "en" : "dis"));
+
+    if (UPnP)
+        StartUPnP();
+    else
+        StopUPnP();
+}
+
+void TorcHTTPServer::UPnPAdvertChanged(bool Advert)
+{
+    LOG(VB_GENERAL, LOG_INFO, QString("SSDP advertisement %1abled").arg(Advert ? "en" : "dis"));
+    if (Advert)
+    {
+        StartUPnP();
+    }
+    else
+    {
+        if (m_upnpSearch->GetValue().toBool())
+            TorcSSDP::CancelAnnounce();
+        else
+            StopUPnP();
+    }
+}
+
+void TorcHTTPServer::UPnPSearchChanged(bool Search)
+{
+    LOG(VB_GENERAL, LOG_INFO, QString("SSDP search %1abled").arg(Search ? "en" : "dis"));
+    if (Search)
+    {
+        StartUPnP();
+    }
+    else
+    {
+        if (m_upnpAdvertise->GetValue().toBool())
+            TorcSSDP::CancelSearch();
+        else
+            StopUPnP();
+    }
 }
 
 void TorcHTTPServer::Restart(void)
@@ -650,11 +948,13 @@ bool TorcHTTPServer::event(QEvent *Event)
                 case Torc::NetworkUnavailable:
                 case Torc::NetworkChanged:
                 case Torc::NetworkHostNamesChanged:
-                    UpdateOriginWhitelist(m_port->GetValue().toInt());
+                    UpdateOriginWhitelist(TorcHTTPServer::GetStatus());
+                    return true;
                     break;
                 case Torc::UserChanged:
                     LOG(VB_GENERAL, LOG_INFO, "User name/credentials changed - restarting webserver");
                     Restart();
+                    return true;
                     break;
                 default:
                     break;
@@ -662,7 +962,7 @@ bool TorcHTTPServer::event(QEvent *Event)
         }
     }
 
-    return QTcpServer::event(Event);
+    return QObject::event(Event);
 }
 
 TorcWebSocketThread* TorcHTTPServer::TakeSocketPriv(TorcWebSocketThread *Socket)
@@ -670,7 +970,7 @@ TorcWebSocketThread* TorcHTTPServer::TakeSocketPriv(TorcWebSocketThread *Socket)
     return m_webSocketPool.TakeSocket(Socket);
 }
 
-void TorcHTTPServer::incomingConnection(qintptr SocketDescriptor)
+void TorcHTTPServer::NewConnection(qintptr SocketDescriptor)
 {
     m_webSocketPool.IncomingConnection(SocketDescriptor, m_secure->GetValue().toBool());
 }

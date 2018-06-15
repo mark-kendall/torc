@@ -47,6 +47,7 @@ class TorcWebSocket : public QSslSocket
 
   signals:
     void            ConnectionEstablished (void);
+    void            ConnectionUpgraded    (void);
     void            Disconnected          (void);
     void            Disconnect            (void);
 

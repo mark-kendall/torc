@@ -50,6 +50,8 @@ class Torc
         // service discovery
         ServiceDiscovered = 3000,
         ServiceWentAway,
+        // system time
+        SystemTimeChanged = 4000,
         // end of predefined
         MaxTorc = 60000,
         // plugins etc

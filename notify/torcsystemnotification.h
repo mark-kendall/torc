@@ -4,7 +4,7 @@
 // Torc
 #include "torcnotification.h"
 
-class TorcSystemNotification : public TorcNotification
+class TorcSystemNotification Q_DECL_FINAL : public TorcNotification
 {
     Q_OBJECT
 
@@ -12,12 +12,12 @@ class TorcSystemNotification : public TorcNotification
     explicit TorcSystemNotification(const QVariantMap &Details);
     ~TorcSystemNotification();
 
-    QStringList GetDescription (void);
-    void        Graph          (QByteArray *Data);
+    QStringList GetDescription (void) Q_DECL_OVERRIDE;
+    void        Graph          (QByteArray *Data) Q_DECL_OVERRIDE;
 
   public slots:
     // QObject
-    bool         event (QEvent *Event);
+    bool         event (QEvent *Event) Q_DECL_OVERRIDE;
 
   private:
     QStringList  m_events;

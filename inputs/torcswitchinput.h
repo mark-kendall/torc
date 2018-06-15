@@ -10,7 +10,7 @@ class TorcSwitchInput : public TorcInput
     TorcSwitchInput(double Default, const QString &ModelId, const QVariantMap &Details);
     virtual ~TorcSwitchInput();
 
-    TorcInput::Type  GetType    (void);
+    TorcInput::Type  GetType    (void) Q_DECL_OVERRIDE;
     double           ScaleValue (double Value);
 };
 
