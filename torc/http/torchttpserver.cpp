@@ -768,18 +768,7 @@ bool TorcHTTPServer::Open(void)
     LOG(VB_GENERAL, LOG_INFO, QString("Attempting to listen on port %1").arg(port));
 
     m_listener = new TorcHTTPServerListener(this, m_ipv6->GetValue().toBool() ? QHostAddress::Any : QHostAddress::AnyIPv4, port);
-    if (!m_listener->isListening())
-    {
-        delete m_listener;
-        if (port > 0)
-        {
-            m_listener = new TorcHTTPServerListener(this, QHostAddress::Any);
-            if (!m_listener->isListening())
-                delete m_listener;
-        }
-    }
-
-    if (!m_listener)
+    if (!m_listener->isListening() && !m_listener->Listen(m_ipv6->GetValue().toBool() ? QHostAddress::Any : QHostAddress::AnyIPv4))
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to open web server port");
         Close();
