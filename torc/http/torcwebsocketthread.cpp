@@ -109,7 +109,11 @@ bool TorcWebSocketThread::CreateCerts(const QString &CertFile, const QString &Ke
     BIGNUM *e;
     e = BN_new();
     BN_set_word(e, RSA_F4);
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
+    RSA_generate_key_ex(rsa, 4096, e, &cb);
+#else
     RSA_generate_key_ex(rsa, 4096, e, cb);
+#endif
     BN_free(e);
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
     BN_GENCB_free(cb);
