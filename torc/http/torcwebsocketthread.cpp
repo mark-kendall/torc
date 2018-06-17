@@ -22,6 +22,7 @@
 
 // Qt
 #include <QFile>
+#include <QMutex>
 #include <QSslKey>
 #include <QSslCipher>
 #include <QSslConfiguration>
@@ -35,6 +36,7 @@
 // SSL
 #include <openssl/pem.h>
 #include <openssl/x509.h>
+#include <openssl/bn.h>
 
 // STL - for chmod
 #include <sys/stat.h>
@@ -83,16 +85,35 @@ TorcWebSocketThread::~TorcWebSocketThread()
 {
 }
 
+int SSLCallback(int, int, BN_GENCB*)
+{
+    static int count = 0;
+    if (!(++count % 20))
+        LOG(VB_GENERAL, LOG_INFO, "Key generation...");
+    return 1;
+}
+
 bool TorcWebSocketThread::CreateCerts(const QString &CertFile, const QString &KeyFile)
 {
     LOG(VB_GENERAL, LOG_INFO, "Generating RSA key");
 
     RSA *rsa = RSA_new();
+
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
+    BN_GENCB cb;
+    BN_GENCB_set(&cb, &SSLCallback, NULL);
+#else
+    BN_GENCB *cb = BN_GENCB_new();
+    BN_GENCB_set(cb, &SSLCallback, NULL);
+#endif
     BIGNUM *e;
     e = BN_new();
     BN_set_word(e, RSA_F4);
-    RSA_generate_key_ex(rsa, 4096, e, NULL);
+    RSA_generate_key_ex(rsa, 4096, e, cb);
     BN_free(e);
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+    BN_GENCB_free(cb);
+#endif
     if (NULL == rsa)
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to generate RSA key");
@@ -187,7 +208,11 @@ bool TorcWebSocketThread::CreateCerts(const QString &CertFile, const QString &Ke
 
 void TorcWebSocketThread::SetupSSL(void)
 {
-    static bool SSLDefaultsSet = false;
+    static bool   SSLDefaultsSet = false;
+    static QMutex SSLDefaultsLock(QMutex::Recursive);
+
+    // block any incoming sockets until cert creation is complete - it can take a few seconds
+    QMutexLocker locker(&SSLDefaultsLock);
     if (SSLDefaultsSet)
         return;
 
