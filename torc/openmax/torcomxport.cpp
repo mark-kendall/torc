@@ -55,7 +55,7 @@ OMX_INDEXTYPE TorcOMXPort::GetDomain(void)
     return m_domain;
 }
 
-OMX_ERRORTYPE TorcOMXPort::EnablePort(bool Enable)
+OMX_ERRORTYPE TorcOMXPort::EnablePort(bool Enable, bool Wait /*=true*/)
 {
     if (!m_handle || !m_parent)
         return OMX_ErrorUndefined;
@@ -72,14 +72,20 @@ OMX_ERRORTYPE TorcOMXPort::EnablePort(bool Enable)
         LOG(VB_GENERAL, LOG_INFO, QString("%1: Enabling port %2").arg(m_parent->GetName()).arg(m_port));
         error = OMX_SendCommand(m_handle, OMX_CommandPortEnable, m_port, NULL);
         OMX_CHECK(error, m_parent->GetName(), "Failed to send command");
-        return m_parent->WaitForResponse(OMX_CommandPortEnable, m_port, 1000);
+        if (Wait)
+            return m_parent->WaitForResponse(OMX_CommandPortEnable, m_port, 1000);
+        else
+            return OMX_ErrorNone;
     }
     else if (portdefinition.bEnabled == OMX_TRUE && !Enable)
     {
         LOG(VB_GENERAL, LOG_INFO, QString("%1: Disabling port %2").arg(m_parent->GetName()).arg(m_port));
         error = OMX_SendCommand(m_handle, OMX_CommandPortDisable, m_port, NULL);
         OMX_CHECK(error, m_parent->GetName(), "Failed to send command");
-        return m_parent->WaitForResponse(OMX_CommandPortDisable, m_port, 1000);
+        if (Wait)
+            return m_parent->WaitForResponse(OMX_CommandPortDisable, m_port, 1000);
+        else
+            return OMX_ErrorNone;
     }
 
     return OMX_ErrorNone;

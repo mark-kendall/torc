@@ -322,13 +322,13 @@ OMX_U32 TorcOMXComponent::GetPort(OMX_DIRTYPE Direction, OMX_U32 Index, OMX_INDE
     return 0;
 }
 
-OMX_ERRORTYPE TorcOMXComponent::EnablePort(OMX_DIRTYPE Direction, OMX_U32 Index, bool Enable, OMX_INDEXTYPE Domain)
+OMX_ERRORTYPE TorcOMXComponent::EnablePort(OMX_DIRTYPE Direction, OMX_U32 Index, bool Enable, OMX_INDEXTYPE Domain, bool Wait /*=true*/)
 {
     QMutexLocker locker(&m_lock);
 
     TorcOMXPort* port = FindPort(Direction, Index, Domain);
     if (port)
-        return port->EnablePort(Enable);
+        return port->EnablePort(Enable, Wait);
 
     return OMX_ErrorUndefined;
 }

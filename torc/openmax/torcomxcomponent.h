@@ -45,7 +45,7 @@ class TorcOMXComponent Q_DECL_FINAL
     OMX_ERRORTYPE           SetConfig               (OMX_INDEXTYPE Index, OMX_PTR Structure);
     OMX_ERRORTYPE           GetConfig               (OMX_INDEXTYPE Index, OMX_PTR Structure);
     OMX_U32                 GetPort                 (OMX_DIRTYPE Direction, OMX_U32 Index, OMX_INDEXTYPE Domain);
-    OMX_ERRORTYPE           EnablePort              (OMX_DIRTYPE Direction, OMX_U32 Index, bool Enable, OMX_INDEXTYPE Domain);
+    OMX_ERRORTYPE           EnablePort              (OMX_DIRTYPE Direction, OMX_U32 Index, bool Enable, OMX_INDEXTYPE Domain, bool Wait = true);
     OMX_ERRORTYPE           DisablePorts            (OMX_INDEXTYPE Domain);
     OMX_U32                 GetAvailableBuffers     (OMX_DIRTYPE Direction, OMX_U32 Index, OMX_INDEXTYPE Domain);
     OMX_ERRORTYPE           EmptyThisBuffer         (OMX_BUFFERHEADERTYPE *Buffer);
