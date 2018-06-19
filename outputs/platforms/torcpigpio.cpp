@@ -30,6 +30,11 @@
 // wiringPi
 #include "wiringPi.h"
 
+// Broadcom
+#ifdef USING_LIBOPENMAXIL
+#include "bcm_host.h"
+#endif
+
 /*!
 * \page pi Torc on the Raspberry Pi
 * \section pitorc Introduction
@@ -149,10 +154,18 @@ TorcPiGPIO::TorcPiGPIO()
 {
     if (wiringPiSetup() > -1)
         m_setup = true;
+
+#ifdef USING_LIBOPENMAXIL
+    // we initialise the OpenMax hardware here as this is a static class
+    bcm_host_init();
+#endif
 }
 
 TorcPiGPIO::~TorcPiGPIO()
 {
+#ifdef USING_LIBOPENMAXIL
+    bcm_host_deinit();
+#endif
 }
 
 void TorcPiGPIO::Create(const QVariantMap &GPIO)
