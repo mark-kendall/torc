@@ -28,7 +28,7 @@ TorcOMXTunnel::TorcOMXTunnel(TorcOMXCore *Core, TorcOMXComponent *Source, OMX_U3
                              TorcOMXComponent *Destination, OMX_U32 DestinationIndex, OMX_INDEXTYPE DestinationDomain)
   : m_connected(false),
     m_core(Core),
-    m_lock(QMutex::Recursive),
+    m_lock(QMutex::NonRecursive),
     m_source(Source),
     m_sourceIndex(SourceIndex),
     m_sourceDomain(SourceDomain),

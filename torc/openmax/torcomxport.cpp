@@ -32,7 +32,7 @@ TorcOMXPort::TorcOMXPort(TorcOMXComponent *Parent, OMX_HANDLETYPE Handle, OMX_U3
     m_handle(Handle),
     m_port(Port),
     m_domain(Domain),
-    m_lock(QMutex::Recursive),
+    m_lock(QMutex::NonRecursive),
     m_wait(),
     m_buffers(),
     m_availableBuffers(),

@@ -41,12 +41,12 @@ TorcOMXComponent::TorcOMXComponent(TorcOMXCore *Core, OMX_STRING Component)
   : m_valid(false),
     m_core(Core),
     m_handle(NULL),
-    m_lock(QMutex::Recursive),
+    m_lock(QMutex::NonRecursive),
     m_componentName(Component),
     m_inputPorts(),
     m_outputPorts(),
     m_eventQueue(),
-    m_eventQueueLock(QMutex::Recursive),
+    m_eventQueueLock(QMutex::NonRecursive),
     m_eventQueueWait()
 {
     // set the global callbacks
@@ -54,7 +54,7 @@ TorcOMXComponent::TorcOMXComponent(TorcOMXCore *Core, OMX_STRING Component)
     gCallbacks.EmptyBufferDone = &EmptyBufferDoneCallback;
     gCallbacks.FillBufferDone  = &FillBufferDoneCallback;
 
-    if (!m_core)
+    if (!m_core || (m_core && !m_core->IsValid()))
         return;
 
     // get handle
@@ -170,18 +170,16 @@ TorcOMXPort* TorcOMXComponent::FindPort(OMX_DIRTYPE Direction, OMX_U32 Index, OM
 
 TorcOMXComponent::~TorcOMXComponent()
 {
-    {
-        QMutexLocker locker(&m_lock);
+    QMutexLocker locker(&m_lock);
 
-        while (!m_inputPorts.isEmpty())
-            delete m_inputPorts.takeLast();
-        while (!m_outputPorts.isEmpty())
-            delete m_outputPorts.takeLast();
+    while (!m_inputPorts.isEmpty())
+        delete m_inputPorts.takeLast();
+    while (!m_outputPorts.isEmpty())
+        delete m_outputPorts.takeLast();
 
-        if (m_core && m_handle)
-            m_core->m_omxFreeHandle(m_handle);
-        m_handle       = NULL;
-    }
+    if (m_core && m_handle)
+        m_core->m_omxFreeHandle(m_handle);
+    m_handle = NULL;
 }
 
 bool TorcOMXComponent::IsValid(void)
@@ -384,9 +382,9 @@ OMX_ERRORTYPE TorcOMXComponent::DestroyBuffers(OMX_DIRTYPE Direction, OMX_U32 In
     return OMX_ErrorUndefined;
 }
 
-OMX_BUFFERHEADERTYPE* TorcOMXComponent::GetInputBuffer(OMX_U32 Index, OMX_U32 Timeout, OMX_INDEXTYPE Domain)
+OMX_BUFFERHEADERTYPE* TorcOMXComponent::GetBuffer(OMX_DIRTYPE Direction, OMX_U32 Index, OMX_U32 Timeout, OMX_INDEXTYPE Domain)
 {
-    TorcOMXPort *port = FindPort(OMX_DirInput, Index, Domain);
+    TorcOMXPort *port = FindPort(Direction, Index, Domain);
     if (port)
         return port->GetBuffer(Timeout);
 
@@ -477,6 +475,13 @@ OMX_ERRORTYPE TorcOMXComponent::WaitForResponse(OMX_U32 Command, OMX_U32 Data2, 
         {
             if ((*it).m_type == OMX_EventCmdComplete && (*it).m_data1 == Command && (*it).m_data2 == Data2)
             {
+                m_eventQueue.erase(it);
+                m_eventQueueLock.unlock();
+                return OMX_ErrorNone;
+            }
+	    else if ((*it).m_type == Command)
+            {
+                LOG(VB_GENERAL, LOG_DEBUG, QString("1 %1 2 %2").arg((*it).m_data1).arg((*it).m_data2));
                 m_eventQueue.erase(it);
                 m_eventQueueLock.unlock();
                 return OMX_ErrorNone;
