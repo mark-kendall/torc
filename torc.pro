@@ -192,6 +192,16 @@ linux-rasp-pi-g++ | !isEmpty(pi) {
     INCLUDEPATH += /opt/vc/include/interface/vmcs_host/linux
     message("Linking to OpenMaxIL library (Raspberry Pi)")
 
+    DEFINES     += USING_FFMPEG
+    CONFIG      += link_pkgconfig
+    PKGCONFIG   += libavformat
+    PKGCONFIG   += libavcodec
+    PKGCONFIG   += libavutil
+    HEADERS     += torc/ffmpeg/torcmpegts.h
+    SOURCES     += torc/ffmpeg/torcmpegts.cpp
+    INCLUDEPATH += ./torc/ffmpeg
+    message("Linking to ffmpeg")
+
     # install with suid permissions on Pi
     # this allows access to I2C and GPIO
     setpriv.target       = setpriv

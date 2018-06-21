@@ -26,10 +26,15 @@
 
 // Torc
 #include "torclogging.h"
+#include "torcmpegts.h"
 #include "torcpicamera.h"
 
-// Broadcom
+// OpenMax
+#include "OMX_Video.h"
 #include "OMX_Broadcom.h"
+
+// FFmpeg
+#include <libavcodec/avcodec.h>
 
 #define BROADCOM_CAMERA                "OMX.broadcom.camera"
 #define BROADCOM_ENCODER               "OMX.broadcom.video_encode"
@@ -61,16 +66,17 @@
 #define CAMERA_ROI_WIDTH               100
 #define CAMERA_ROI_HEIGHT              100
 #define CAMERA_DRC                     OMX_DynRangeExpOff
-#define ENCODER_BITRATE                17000000
+#define ENCODER_BITRATE                10000000
 #define ENCODER_QP                     OMX_FALSE
 #define ENCODER_QP_I                   0
 #define ENCODER_QP_P                   0
-#define ENCODER_IDR_PERIOD             120 // once every 2 seconds?
+#define ENCODER_IDR_PERIOD             60 // once every second
 #define ENCODER_SEI                    OMX_FALSE
 #define ENCODER_EEDE                   OMX_FALSE
 #define ENCODER_EEDE_LOSS_RATE         0
 #define ENCODER_PROFILE                OMX_VIDEO_AVCProfileHigh
 #define ENCODER_INLINE_HEADERS         OMX_TRUE
+#define ENCODER_SPS_TIMING             OMX_TRUE
 #define VIDEO_WIDTH                    1280
 #define VIDEO_HEIGHT                   720
 #define VIDEO_FRAMERATE                60
@@ -178,52 +184,128 @@ bool TorcPiCamera::Start(void)
     if (m_camera->SetConfig(OMX_IndexConfigPortCapturing, &capture))
         return false;
 
-    // record for 10 seconds
-    QFile output("test.h264");
-    if (!output.open(QIODevice::Append | QIODevice::Truncate | QIODevice::WriteOnly))
+    // record in 10 second segments.
+    // try 3 segments for now
+    int segmentcount      = 0;
+    int totalsegments     = 3;
+    int secondspersegment = 10;
+    
+    int profile  = FF_PROFILE_H264_BASELINE;
+    switch (ENCODER_PROFILE)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to open output file");
+        case OMX_VIDEO_AVCProfileBaseline: profile = FF_PROFILE_H264_BASELINE; break;
+        case OMX_VIDEO_AVCProfileMain:     profile = FF_PROFILE_H264_MAIN;     break;
+        case OMX_VIDEO_AVCProfileExtended: profile = FF_PROFILE_H264_EXTENDED; break;
+        case OMX_VIDEO_AVCProfileHigh:     profile = FF_PROFILE_H264_HIGH;     break;
+        case OMX_VIDEO_AVCProfileHigh10:   profile = FF_PROFILE_H264_HIGH_10;  break;
+        case OMX_VIDEO_AVCProfileHigh422:  profile = FF_PROFILE_H264_HIGH_422; break;
+        case OMX_VIDEO_AVCProfileHigh444:  profile = FF_PROFILE_H264_HIGH_444; break;
+        default:
+            LOG(VB_GENERAL, LOG_WARNING, "Unknown H264 profile. Defaulting to baseline");
     }
-    else
+    
+    do
     {
-        LOG(VB_GENERAL, LOG_INFO, "Opened output file");
-    }
+        QTime time = QTime::currentTime();
+        time.start();
 
-    int pframes = 0;
-    QTime time = QTime::currentTime();
-    time.start();
-    while (time.elapsed() < 10000)
-    {
-        OMX_BUFFERHEADERTYPE* buffer = m_encoder->GetBuffer(OMX_DirOutput, 0, 1000, OMX_IndexParamVideoInit);
-	if (!buffer)
+        QString segmentname = QString("test%1.ts").arg(segmentcount);
+        TorcMPEGTS *muxer = new TorcMPEGTS(segmentname);
+        if (!muxer)
             break;
 
-	if(m_encoder->FillThisBuffer(buffer))
-	    break;
+        int stream = muxer->AddH264Stream(VIDEO_WIDTH, VIDEO_HEIGHT, VIDEO_FRAMERATE, profile, ENCODER_BITRATE);
+        if (!muxer->IsValid())
+            break;
+        
+        int framecount = 0;
+        AVPacket *bufferedpacket = NULL;
 
-	// HACK ALERT
-	while (m_encoder->GetAvailableBuffers(OMX_DirOutput, 0, OMX_IndexParamVideoInit) < 1)
-        { /*LOG(VB_GENERAL, LOG_INFO, "Waiting for buffer");*/ }
+        while (framecount < (secondspersegment * VIDEO_FRAMERATE))
+        {
+            OMX_BUFFERHEADERTYPE* buffer = m_encoder->GetBuffer(OMX_DirOutput, 0, 1000, OMX_IndexParamVideoInit);
+	        if (!buffer)
+                break;
 
-        LOG(VB_GENERAL, LOG_INFO, QString("Wrote %1 bytes").arg(output.write(reinterpret_cast<const char *>(buffer->pBuffer) + buffer->nOffset, buffer->nFilledLen)));
-	//LOG(VB_GENERAL, LOG_INFO, QString("tickcount %1 timestamp 0x%2%3 flags 0x%4 port %5")
-	//		.arg(buffer->nTickCount).arg(QString::number(buffer->nTimeStamp.nHighPart, 16)).arg(QString::number(buffer->nTimeStamp.nLowPart, 16))
-	//		.arg(QString::number(buffer->nFlags, 16)).arg(buffer->nOutputPortIndex));
-	if (buffer->nFlags & OMX_BUFFERFLAG_CODECCONFIG && buffer->nFlags & OMX_BUFFERFLAG_ENDOFFRAME)
-		LOG(VB_GENERAL, LOG_INFO, "SPS");
-	else if (buffer->nFlags & OMX_BUFFERFLAG_ENDOFFRAME && buffer->nFlags & OMX_BUFFERFLAG_SYNCFRAME)
-	{
-		LOG(VB_GENERAL, LOG_INFO, "IDR");
-		pframes = 0;
-	}
-	else if (buffer->nFlags & OMX_BUFFERFLAG_ENDOFFRAME)
-	{
-		pframes++;
-		LOG(VB_GENERAL, LOG_INFO, QString("Pframe %1").arg(pframes));
-	}
-    }
+            if(m_encoder->FillThisBuffer(buffer))
+                break;
 
-    output.close();    
+            // HACK ALERT
+            while (m_encoder->GetAvailableBuffers(OMX_DirOutput, 0, OMX_IndexParamVideoInit) < 1)
+                QThread::usleep(500);
+
+            bool idr      = buffer->nFlags & OMX_BUFFERFLAG_SYNCFRAME;
+            bool complete = buffer->nFlags & OMX_BUFFERFLAG_ENDOFFRAME;
+            bool sps      = buffer->nFlags & OMX_BUFFERFLAG_CODECCONFIG;
+
+            if (!sps && complete)
+                framecount++;
+
+            // this increases the pts monotonically based on actual complete frames received
+            qint64 pts = ((segmentcount * secondspersegment * VIDEO_FRAMERATE) + framecount) * (90000.0 / (float)VIDEO_FRAMERATE);
+            // sps is not considered a frame but muxer will complain if the pts does not increase
+            if (sps)
+                pts++;
+ 
+            if (bufferedpacket)
+            {
+                quint32 offset = bufferedpacket->size;
+                av_grow_packet(bufferedpacket, buffer->nFilledLen);
+                memcpy(bufferedpacket->data + offset, reinterpret_cast<uint8_t*>(buffer->pBuffer) + buffer->nOffset, buffer->nFilledLen);
+            }
+
+            if (complete)
+            {
+                AVPacket *packet = bufferedpacket;
+                if (!packet)
+                {
+                    packet = av_packet_alloc();
+                    av_init_packet(packet);
+                    packet->size = buffer->nFilledLen;
+                    packet->data = reinterpret_cast<uint8_t*>(buffer->pBuffer) + buffer->nOffset;
+                }
+
+                packet->stream_index = stream;
+                packet->pts          = pts;
+                packet->dts          = pts;
+                packet->flags       |= idr ? AV_PKT_FLAG_KEY : 0;
+                muxer->AddPacket(packet, sps);
+
+                if (bufferedpacket)
+                    av_free(bufferedpacket->data);
+                packet->data = NULL;
+                av_packet_free(&packet);
+                bufferedpacket = NULL;
+            }
+            else
+            {
+                if (!bufferedpacket)
+                {
+                    bufferedpacket = av_packet_alloc();
+                    av_init_packet(bufferedpacket);
+                    bufferedpacket->size = buffer->nFilledLen;
+                    bufferedpacket->data = (uint8_t*)av_malloc(buffer->nFilledLen);
+                    memcpy(bufferedpacket->data, reinterpret_cast<uint8_t*>(buffer->pBuffer) + buffer->nOffset, buffer->nFilledLen);
+                    bufferedpacket->flags |= idr ? AV_PKT_FLAG_KEY : 0;
+                }
+            }
+        }
+
+        if (bufferedpacket)
+        {
+            LOG(VB_GENERAL, LOG_ERR, "End of sequence but have buffered packet");
+            if (bufferedpacket->data)
+                av_free(bufferedpacket->data);
+            bufferedpacket->data = NULL;
+            av_packet_free(&bufferedpacket);
+            bufferedpacket = NULL;
+        }
+
+        LOG(VB_GENERAL, LOG_INFO, QString("Sent %1 frames to muxer for %2 (%3ms)").arg(framecount).arg(segmentname).arg(time.elapsed()));
+        muxer->Finish();
+        delete muxer;
+    } while (++segmentcount < totalsegments);
+  
     return true;
 }
 
@@ -491,7 +573,7 @@ bool TorcPiCamera::ConfigureEncoder(void)
     if (!m_encoder || !m_encoderOutputPort)
         return false;
 
-    // Encoder input
+    // Encoder output
     OMX_PARAM_PORTDEFINITIONTYPE encoderport;
     OMX_INITSTRUCTURE(encoderport);
     encoderport.nPortIndex = m_encoderOutputPort;
@@ -509,7 +591,6 @@ bool TorcPiCamera::ConfigureEncoder(void)
 
     LOG(VB_GENERAL, LOG_INFO, "Set encoder output parameters");
 
-    // encoder output
     if (!ENCODER_QP)
     {
       OMX_VIDEO_PARAM_BITRATETYPE bitrate;
@@ -609,5 +690,38 @@ bool TorcPiCamera::ConfigureEncoder(void)
 
     LOG(VB_GENERAL, LOG_INFO, "Set encoder output SPS/PPS");
 
+    // SPS timing
+    OMX_CONFIG_PORTBOOLEANTYPE timing;
+    OMX_INITSTRUCTURE(timing);
+    timing.nPortIndex =  m_encoderOutputPort;
+    timing.bEnabled   = ENCODER_SPS_TIMING;
+    if (m_encoder->SetParameter(OMX_IndexParamBrcmVideoAVCSPSTimingEnable, &timing))
+        return false;
+
+    LOG(VB_GENERAL, LOG_INFO, "Set encoder SPS timings");
     return true;
 }
+
+TorcPiCameraThread::TorcPiCameraThread()
+  : TorcQThread("Camera"),
+    m_camera(NULL)
+{
+}
+
+TorcPiCameraThread::~TorcPiCameraThread()
+{
+}
+
+void TorcPiCameraThread::Start(void)
+{
+    m_camera = new TorcPiCamera();
+}
+
+void TorcPiCameraThread::Finish(void)
+{
+    if (m_camera)
+        delete m_camera;
+    m_camera = NULL;
+}
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

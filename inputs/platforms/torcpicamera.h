@@ -1,15 +1,23 @@
 #ifndef TORCPICAMERA_H
 #define TORCPICAMERA_H
 
+// Qt
+#include <QObject>
+
 // Torc
+#include "torcqthread.h"
 #include "torcomxcore.h"
 #include "torcomxport.h"
 #include "torcomxcomponent.h"
 #include "torcomxtunnel.h"
 
+class TorcPiCameraThread;
+
 class TorcPiCamera
 {
-  public:
+    friend class TorcPiCameraThread;
+
+  protected:
     TorcPiCamera();
    ~TorcPiCamera();
 
@@ -35,6 +43,22 @@ class TorcPiCamera
     OMX_U32                  m_encoderOutputPort;
     TorcOMXTunnel           *m_videoTunnel;
     TorcOMXTunnel           *m_previewTunnel;
+};
+
+class TorcPiCameraThread : public TorcQThread
+{
+    Q_OBJECT
+
+  public:
+    TorcPiCameraThread();
+    ~TorcPiCameraThread();
+
+    void Start  (void) Q_DECL_OVERRIDE Q_DECL_FINAL;
+    void Finish (void) Q_DECL_OVERRIDE Q_DECL_FINAL;
+
+  private:
+    Q_DISABLE_COPY(TorcPiCameraThread)
+    TorcPiCamera *m_camera;
 };
 
 #endif // TORCPICAMERA_H
