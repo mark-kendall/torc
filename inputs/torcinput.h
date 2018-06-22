@@ -24,7 +24,7 @@ class TorcInput : public TorcDevice, public TorcHTTPService
   public:
     enum Type
     {
-        Unknown     = 0,
+        Unknown = 0,
         Temperature,
         pH,
         Switch,
@@ -34,7 +34,7 @@ class TorcInput : public TorcDevice, public TorcHTTPService
     };
 
     static QString          TypeToString(TorcInput::Type Type);
-    static TorcInput::Type StringToType(const QString &Type);
+    static TorcInput::Type  StringToType(const QString &Type);
 
   public:
     TorcInput(TorcInput::Type Type, double Value, double RangeMinimum, double RangeMaximum,
