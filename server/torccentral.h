@@ -66,6 +66,7 @@ class TorcCentral Q_DECL_FINAL : public QObject, public TorcHTTPService
 #define XSD_NOTIFICATIONTYPES QString("<!--TORC_XSD_NOTIFICATIONYPES-->")
 #define XSD_NOTIFICATIONS     QString("<!--TORC_XSD_NOTIFICATIONS-->")
 #define XSD_UNIQUE            QString("<!--TORC_XSD_UNIQUE-->")
+#define XSD_CAMERATYPES       QString("<!--TORC_XSD_CAMERATYPES-->")
 
 class TorcXSDFactory
 {

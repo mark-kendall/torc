@@ -80,6 +80,37 @@
     <xs:pattern value="0x[0-9a-fA-F]+"/>
   </xs:restriction>
 </xs:simpleType>
+
+<xs:simpleType name="videoWidthType">
+  <xs:restriction base="xs:integer">
+    <xs:minInclusive value="640"/>
+    <xs:maxInclusive value="1920"/>
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="videoHeightType">
+  <xs:restriction base="xs:integer">
+    <xs:minInclusive value="480"/>
+    <xs:maxInclusive value="1080"/>
+  </xs:restriction>
+</xs:simpleType>
+
+<!-- this needs to account for fractional framerates where the denominator is used as well -->
+<!-- e.g 30000/1001 for ntsc -->
+<xs:simpleType name="videoFrameRateType">
+  <xs:restriction base="xs:integer">
+    <xs:minInclusive value="1"/>
+    <xs:maxInclusive value="100000"/>
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="videoBitRateType">
+  <xs:restriction base="xs:integer">
+    <xs:minInclusive value="128000"/>
+    <xs:maxInclusive value="50000000"/>
+  </xs:restriction>
+</xs:simpleType>
+
 <!--TORC_XSD_TYPES-->
 <!-- input definitions -->
 <xs:complexType name="networkSwitchType">
@@ -289,10 +320,32 @@
 
 <!-- outputs definitions -->
 <!--TORC_XSD_OUTPUTTYPES-->
+<xs:complexType name="cameraType">
+  <xs:all>
+    <xs:element name="name"            type="deviceNameType"/>
+    <xs:element name="username"        type="userNameType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="model"           type="validStringType"/>
+    <xs:element name="width"           type="videoWidthType"/>
+    <xs:element name="height"          type="videoHeightType"/>
+    <xs:element name="framerate"       type="videoFrameRateType"/>
+    <xs:element name="frameratediv"    type="videoFrameRateType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="bitrate"         type="videoBitRateType"/>
+  </xs:all>
+</xs:complexType>
+
+<xs:complexType name="camerasType">
+  <xs:choice minOccurs="1" maxOccurs="unbounded">
+    <xs:element name="dummy" type="cameraType"/>
+    <!--TORC_XSD_CAMERATYPES-->
+  </xs:choice>
+</xs:complexType>
+
 <xs:complexType name="outputsType">
   <xs:all>
     <!-- 0 or 1 instances of these types -->
     <xs:element minOccurs="0" maxOccurs="1" name="network" type="networkType"/>
+    <xs:element minOccurs="0" maxOccurs="1" name="cameras" type="camerasType"/>
 <!--TORC_XSD_OUTPUTS-->
   </xs:all>
 </xs:complexType>
