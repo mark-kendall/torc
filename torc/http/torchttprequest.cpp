@@ -863,6 +863,8 @@ QString TorcHTTPRequest::ResponseTypeToString(HTTPResponseType Response)
         case HTTPResponsePListApple:       return QString("text/x-apple-plist+xml");
         case HTTPResponseBinaryPListApple: return QString("application/x-apple-binary-plist");
         case HTTPResponsePlainText:        return QString("text/plain");
+        case HTTPResponseM3U8:             return QString("application/vnd.apple.mpegurl");
+        case HTTPResponseMPEGTS:           return QString("video/MP2T");
         default: break;
     }
 

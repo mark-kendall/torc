@@ -46,7 +46,9 @@ typedef enum
     HTTPResponseBinaryPList,
     HTTPResponsePListApple,
     HTTPResponseBinaryPListApple,
-    HTTPResponsePlainText
+    HTTPResponsePlainText,
+    HTTPResponseM3U8,
+    HTTPResponseMPEGTS
 } HTTPResponseType;
 
 typedef enum
