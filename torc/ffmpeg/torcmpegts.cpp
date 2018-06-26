@@ -32,12 +32,58 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 }
 
+#define FFMPEG_BUFFER_SIZE 64*1024
+
+TorcMPEGTS::TorcMPEGTS(TorcSegmentedRingBuffer *Buffer)
+  : m_formatCtx(NULL),
+    m_created(false),
+    m_started(false),
+    m_outputFile(),
+    m_ringBuffer(Buffer),
+    m_ioContext(NULL)
+{
+    SetupContext();
+    SetupIO();
+}
+
 TorcMPEGTS::TorcMPEGTS(const QString &File)
   : m_formatCtx(NULL),
     m_created(false),
-    m_started(false)
+    m_started(false),
+    m_outputFile(File),
+    m_ringBuffer(NULL),
+    m_ioContext(NULL)
 {
+    SetupContext();
+    SetupIO();
+}
+
+TorcMPEGTS::~TorcMPEGTS()
+{
+    // TODO check whether this is safe with file output
+    if (m_ioContext)
+    {
+        if (m_ioContext->buffer)
+        {
+            av_free(m_ioContext->buffer);
+            m_ioContext->buffer = NULL;
+        }
+        av_free(m_ioContext);
+        m_ioContext = NULL;
+    }
+
+    if (m_formatCtx)
+    {
+        avformat_free_context(m_formatCtx);
+        m_formatCtx = NULL;
+    }
+}
+
+void TorcMPEGTS::SetupContext(void)
+{
+    // TODO can this be called once
     av_register_all();
+
     AVOutputFormat *format = av_guess_format("mpegts", NULL, NULL);
     if (!format)
     {
@@ -53,20 +99,54 @@ TorcMPEGTS::TorcMPEGTS(const QString &File)
         return;
     }
     m_formatCtx->oformat = format;
+}
 
-    // create output file
-    if (avio_open(&m_formatCtx->pb, File.toLocal8Bit().constData(), AVIO_FLAG_WRITE) < 0)
+void TorcMPEGTS::SetupIO(void)
+{
+    if (!m_formatCtx)
+        return;
+
+    if (!m_outputFile.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to open '%1' for output").arg(File));
+        // create output file
+        if (avio_open(&m_formatCtx->pb, m_outputFile.toLocal8Bit().constData(), AVIO_FLAG_WRITE) < 0)
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to open '%1' for output").arg(m_outputFile));
+            return;
+        }
+        m_created = true;
         return;
     }
 
-    m_created = true;
+    if (m_ringBuffer)
+    {
+        uint8_t* iobuffer  = (uint8_t *)av_malloc(FFMPEG_BUFFER_SIZE);
+        m_ioContext        = avio_alloc_context(iobuffer, FFMPEG_BUFFER_SIZE, 1, this, NULL, &AVWritePacket, NULL);
+        m_formatCtx->pb    = m_ioContext;
+        m_formatCtx->flags = AVFMT_FLAG_CUSTOM_IO;
+        m_created = true;
+        return;
+    }
 }
 
-TorcMPEGTS::~TorcMPEGTS()
+int TorcMPEGTS::AVWritePacket(void *Opaque, uint8_t *Buffer, int Size)
 {
-    avformat_free_context(m_formatCtx);
+    TorcMPEGTS* muxer = static_cast<TorcMPEGTS*>(Opaque);
+    if (!muxer)
+        return -1;
+
+    return muxer->WriteAVPacket(Buffer, Size);
+}
+
+int TorcMPEGTS::WriteAVPacket(uint8_t *Buffer, int Size)
+{
+    if (!Buffer || Size < 1)
+        return -1;
+
+    if (m_ringBuffer)
+        return m_ringBuffer->Write(Buffer, Size);
+
+    return -1;
 }
 
 bool TorcMPEGTS::IsValid(void)
@@ -74,7 +154,7 @@ bool TorcMPEGTS::IsValid(void)
     return m_formatCtx && m_formatCtx->nb_streams > 0 && m_created;
 }
 
-int TorcMPEGTS::AddH264Stream(int Width, int Height, int FrameRate, int Profile, int Bitrate)
+int TorcMPEGTS::AddH264Stream(int Width, int Height, int Profile, int Bitrate)
 {
     if (!m_formatCtx)
         return -1;
@@ -83,15 +163,7 @@ int TorcMPEGTS::AddH264Stream(int Width, int Height, int FrameRate, int Profile,
     if (!h264video)
         return -1;
 
-    // NB much of the frame rate/aspect ratio setting is redundant. The muxer
-    // does not appear to use it but the output stream must have valid SPS/PPS -including SPS timing data.
-    av_stream_set_r_frame_rate(h264video, (AVRational){FrameRate, 1});
     h264video->id = m_formatCtx->nb_streams - 1;
-    h264video->avg_frame_rate                = (AVRational){1, FrameRate};
-    h264video->time_base                     = (AVRational){1, FrameRate};
-    h264video->sample_aspect_ratio           = (AVRational){1, 1};  // NB Hardcoded atm
-    h264video->display_aspect_ratio          = (AVRational){16, 9}; // NB Hardcoded atm
-    h264video->codecpar->sample_aspect_ratio = (AVRational){1, 1};  // NB Hardcoded atm
     h264video->codecpar->codec_id            = AV_CODEC_ID_H264;
     h264video->codecpar->codec_type          = AVMEDIA_TYPE_VIDEO;
     h264video->codecpar->codec_tag           = 0;
@@ -129,7 +201,16 @@ bool TorcMPEGTS::AddPacket(AVPacket *Packet, bool CodecConfig)
         }
     }
 
-    return av_write_frame(m_formatCtx, Packet) > 0;
+    if (!m_started)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Ignoring packet - stream not started (waiting for config?)");
+        return true;
+    }
+
+    int result = av_write_frame(m_formatCtx, Packet);
+    if (result < 0)
+        LOG(VB_GENERAL, LOG_ERR, "Failed to write frame");
+    return result >= 0;
 }
 
 void TorcMPEGTS::Start(void)
@@ -141,8 +222,12 @@ void TorcMPEGTS::Start(void)
 
 void TorcMPEGTS::Finish(void)
 {
-    av_write_trailer(m_formatCtx);
-    avio_close(m_formatCtx->pb);
+    if (m_formatCtx)
+    {
+        if (av_write_trailer(m_formatCtx))
+            LOG(VB_GENERAL, LOG_ERR, "Failed to write stream trailer");
+        avio_close(m_formatCtx->pb);
+    }
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
