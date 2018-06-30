@@ -184,7 +184,7 @@ TorcOMXCore::TorcOMXCore(const QString &Library)
 
 TorcOMXCore::~TorcOMXCore()
 {
-    if (IsValid())
+    if (m_omxInit && m_omxDeinit)
     {
         LOG(VB_GENERAL, LOG_INFO, "Closing OpenMax Core");
         m_omxDeinit();
