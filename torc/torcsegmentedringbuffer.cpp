@@ -36,8 +36,7 @@ TorcSegmentedRingBuffer::TorcSegmentedRingBuffer(int Size)
     m_segmentRefs(),
     m_segmentCounter(0)
 {
-    LOG(VB_GENERAL, LOG_INFO, QString("Allocated segmented ring buffer of size %1 (pt 0x%2")
-        .arg(m_size).arg(QString::number((quint64)m_data, 16)));
+    LOG(VB_GENERAL, LOG_INFO, QString("Allocated segmented ring buffer of size %1bytes").arg(m_size));
 }
 
 TorcSegmentedRingBuffer::~TorcSegmentedRingBuffer()
