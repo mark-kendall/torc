@@ -21,6 +21,7 @@
 */
 
 // Qt
+#include <QMutex>
 #include <QString>
 
 // Torc
@@ -33,6 +34,73 @@ extern "C" {
 }
 
 #define FFMPEG_BUFFER_SIZE 64*1024
+
+static void TorcAVLog(void *Ptr, int Level, const char *Fmt, va_list VAL)
+{
+    if (VERBOSE_LEVEL_NONE)
+        return;
+
+    static QString   line("");
+    static const int length = 255;
+    static QMutex    lock;
+    uint64_t         verboseMask  = VB_GENERAL;
+    int              verboseLevel = LOG_DEBUG;
+
+    // determine mythtv debug level from av log level
+    switch (Level)
+    {
+        case AV_LOG_PANIC:
+            verboseLevel = LOG_EMERG;
+            break;
+        case AV_LOG_FATAL:
+            verboseLevel = LOG_CRIT;
+            break;
+        case AV_LOG_ERROR:
+            verboseLevel = LOG_ERR;
+            break;
+        case AV_LOG_DEBUG:
+        case AV_LOG_VERBOSE:
+            verboseLevel = LOG_DEBUG;
+            break;
+        case AV_LOG_INFO:
+            verboseLevel = LOG_INFO;
+            break;
+        case AV_LOG_WARNING:
+            verboseLevel = LOG_WARNING;
+            break;
+        default:
+            return;
+    }
+
+    if (!VERBOSE_LEVEL_CHECK(verboseMask, verboseLevel))
+        return;
+
+    lock.lock();
+    if (line.isEmpty() && Ptr) {
+        AVClass* avc = *(AVClass**)Ptr;
+        line.sprintf("[%s @ %p] ", avc->item_name(Ptr), avc);
+    }
+
+    char str[length+1];
+    int bytes = vsnprintf(str, length+1, Fmt, VAL);
+
+    // check for truncated messages and fix them
+    if (bytes > length)
+    {
+        LOG(VB_GENERAL, LOG_WARNING,
+            QString("Libav log output truncated %1 of %2 bytes written")
+                .arg(length).arg(bytes));
+        str[length - 1] = '\n';
+    }
+
+    line += QString(str);
+    if (line.endsWith("\n"))
+    {
+        LOG(verboseMask, verboseLevel, line.trimmed());
+        line.truncate(0);
+    }
+    lock.unlock();
+}
 
 TorcMPEGTS::TorcMPEGTS(TorcSegmentedRingBuffer *Buffer)
   : m_formatCtx(NULL),
@@ -48,6 +116,7 @@ TorcMPEGTS::TorcMPEGTS(TorcSegmentedRingBuffer *Buffer)
     m_lastVideoPts(AV_NOPTS_VALUE),
     m_lastAudioPts(AV_NOPTS_VALUE)
 {
+    av_log_set_callback(TorcAVLog);
     SetupContext();
     SetupIO();
 }
