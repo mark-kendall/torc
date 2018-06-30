@@ -48,6 +48,8 @@ typedef enum
     HTTPResponseBinaryPListApple,
     HTTPResponsePlainText,
     HTTPResponseM3U8,
+    HTTPResponseM3U8Apple,
+    HTTPResponseMPD,
     HTTPResponseMPEGTS
 } HTTPResponseType;
 
