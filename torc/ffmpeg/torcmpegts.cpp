@@ -40,7 +40,13 @@ TorcMPEGTS::TorcMPEGTS(TorcSegmentedRingBuffer *Buffer)
     m_started(false),
     m_outputFile(),
     m_ringBuffer(Buffer),
-    m_ioContext(NULL)
+    m_ioContext(NULL),
+    m_audioContext(NULL),
+    m_audioStream(0),
+    m_audioFrame(NULL),
+    m_audioPacket(NULL),
+    m_lastVideoPts(AV_NOPTS_VALUE),
+    m_lastAudioPts(AV_NOPTS_VALUE)
 {
     SetupContext();
     SetupIO();
@@ -52,7 +58,13 @@ TorcMPEGTS::TorcMPEGTS(const QString &File)
     m_started(false),
     m_outputFile(File),
     m_ringBuffer(NULL),
-    m_ioContext(NULL)
+    m_ioContext(NULL),
+    m_audioContext(NULL),
+    m_audioStream(0),
+    m_audioFrame(NULL),
+    m_audioPacket(NULL),
+    m_lastVideoPts(AV_NOPTS_VALUE),
+    m_lastAudioPts(AV_NOPTS_VALUE)
 {
     SetupContext();
     SetupIO();
@@ -76,6 +88,24 @@ TorcMPEGTS::~TorcMPEGTS()
     {
         avformat_free_context(m_formatCtx);
         m_formatCtx = NULL;
+    }
+
+    if (m_audioFrame)
+    {
+        av_frame_free(&m_audioFrame);
+        m_audioFrame = NULL;
+    }
+
+    if (m_audioPacket)
+    {
+        av_packet_free(&m_audioPacket);
+        m_audioPacket = NULL;
+    }
+
+    if (m_audioContext)
+    {
+        avcodec_free_context(&m_audioContext);
+        m_audioContext = NULL;
     }
 }
 
@@ -154,6 +184,108 @@ bool TorcMPEGTS::IsValid(void)
     return m_formatCtx && m_formatCtx->nb_streams > 0 && m_created;
 }
 
+int TorcMPEGTS::AddDummyAudioStream(void)
+{
+    if (!m_formatCtx)
+        return -1;
+
+    AVStream *audiostream = avformat_new_stream(m_formatCtx, 0);
+    if (!audiostream)
+        return -1;
+
+    m_audioStream                         = m_formatCtx->nb_streams - 1;
+    audiostream->id                       = m_formatCtx->nb_streams - 1;
+    audiostream->codecpar->codec_id       = AV_CODEC_ID_AAC;
+    audiostream->codecpar->codec_type     = AVMEDIA_TYPE_AUDIO;
+    audiostream->codecpar->codec_tag      = 0;
+    audiostream->codecpar->bit_rate       = 64000;
+    audiostream->codecpar->sample_rate    = 44100;
+    audiostream->codecpar->channels       = 2;
+    audiostream->codecpar->channel_layout = AV_CH_LAYOUT_STEREO;
+
+    LOG(VB_GENERAL, LOG_INFO, QString("Audio stream id %1").arg(audiostream->id));
+    AVCodec* codec = avcodec_find_encoder(audiostream->codecpar->codec_id);
+    if (!codec)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Failed to find dummy audio codec");
+        return -1;
+    }
+    LOG(VB_GENERAL, LOG_INFO, QString("Found audio codec '%1'").arg(codec->name));
+
+    m_audioContext = avcodec_alloc_context3(codec);
+    if (!m_audioContext)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Failed to create audio context");
+        return -1;
+    }
+    LOG(VB_GENERAL, LOG_INFO, "Created audio context");
+
+    avcodec_parameters_to_context(m_audioContext, audiostream->codecpar);
+    m_audioContext->sample_fmt = AV_SAMPLE_FMT_FLTP;
+    if (m_formatCtx->oformat->flags & AVFMT_GLOBALHEADER)
+        m_audioContext->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+    if (avcodec_open2(m_audioContext, codec, NULL) < 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Failed to open codec '%1'").arg(codec->name));
+        return -1;
+    }
+
+    LOG(VB_GENERAL, LOG_INFO, QString("Dummy audio: frame size %1 sample_fmt %2 sample_rate %3 bitrate %4 channels %5")
+        .arg(m_audioContext->frame_size).arg(m_audioContext->sample_fmt).arg(m_audioContext->sample_rate)
+        .arg(m_audioContext->bit_rate).arg(m_audioContext->channels));
+
+    m_audioPacket                = av_packet_alloc();
+    m_audioFrame                 = av_frame_alloc();
+    m_audioFrame->nb_samples     = m_audioContext->frame_size;
+    m_audioFrame->format         = m_audioContext->sample_fmt;
+    m_audioFrame->channel_layout = m_audioContext->channel_layout;
+    CopyExtraData(m_audioContext->extradata_size, m_audioContext->extradata, m_audioStream);
+    if (av_frame_get_buffer(m_audioFrame, 0) < 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Failed to create audio frame buffers");
+        return -1;
+    }
+    return audiostream->id;
+}
+
+void TorcMPEGTS::WriteDummyAudio(void)
+{
+    if (!m_audioContext || !m_audioFrame || !m_audioPacket || m_lastVideoPts == AV_NOPTS_VALUE || !m_formatCtx)
+        return;
+
+    while (1)
+    {
+        if (avcodec_send_frame(m_audioContext, m_audioFrame) < 0)
+        {
+            LOG(VB_GENERAL, LOG_ERR, "Error sending frame to audio encoder");
+            break;
+        }
+        else
+        {
+            int rec = avcodec_receive_packet(m_audioContext, m_audioPacket);
+            if (rec == AVERROR(EAGAIN))
+                continue;
+            if (rec < 0)
+            {
+                LOG(VB_GENERAL, LOG_ERR, "Error receiving packet from audio encoder");
+                break;
+            }
+            while ((m_lastVideoPts > m_lastAudioPts) || m_lastAudioPts == AV_NOPTS_VALUE)
+            {
+                int64_t duration = ((float)m_audioContext->frame_size / 44100.0) * 90000;
+                m_lastAudioPts = m_lastAudioPts == AV_NOPTS_VALUE ? m_lastVideoPts : m_lastAudioPts + duration;
+                m_audioPacket->pts = m_lastAudioPts;
+                m_audioPacket->dts = m_lastAudioPts;
+                m_audioPacket->stream_index = m_audioStream;
+                if (av_write_frame(m_formatCtx, m_audioPacket) < 0)
+                    LOG(VB_GENERAL, LOG_ERR, "Failed to write audio frame to muxer");
+            }
+            av_packet_unref(m_audioPacket);
+            break;
+        }
+    }
+}
+
 int TorcMPEGTS::AddH264Stream(int Width, int Height, int Profile, int Bitrate)
 {
     if (!m_formatCtx)
@@ -176,6 +308,23 @@ int TorcMPEGTS::AddH264Stream(int Width, int Height, int Profile, int Bitrate)
     return h264video->id;
 }
 
+void TorcMPEGTS::CopyExtraData(int Size, void* Source, int Stream)
+{
+    if (!m_formatCtx || !Source || Size < 1)
+        return;
+
+    if (m_formatCtx->nb_streams <= 0 || (uint)Stream >= m_formatCtx->nb_streams || Stream < 0)
+    {
+        LOG(VB_GENERAL, LOG_INFO, "Cannot copy extradata - invalid stream");
+        return;
+    }
+
+    AVStream *stream = m_formatCtx->streams[Stream];
+    stream->codecpar->extradata = (uint8_t*)av_mallocz(Size + AV_INPUT_BUFFER_PADDING_SIZE);
+    stream->codecpar->extradata_size = Size;
+    memcpy(stream->codecpar->extradata, Source, Size);
+}
+
 bool TorcMPEGTS::AddPacket(AVPacket *Packet, bool CodecConfig)
 {
     if (!m_formatCtx || !m_created || !Packet)
@@ -183,15 +332,7 @@ bool TorcMPEGTS::AddPacket(AVPacket *Packet, bool CodecConfig)
 
     if (CodecConfig)
     {
-        // copy extradata to video stream
-        if ((uint)Packet->stream_index >= m_formatCtx->nb_streams)
-        {
-            int size = Packet->size;
-            AVStream *stream = m_formatCtx->streams[Packet->stream_index];
-            stream->codecpar->extradata = (uint8_t*)av_mallocz(size + AV_INPUT_BUFFER_PADDING_SIZE);
-            stream->codecpar->extradata_size = size;
-            memcpy(stream->codecpar->extradata, Packet->data, size);
-        }
+        CopyExtraData(Packet->size, Packet->data, Packet->stream_index);
 
         // and start muxer if needed
         if (!m_started)
@@ -209,24 +350,40 @@ bool TorcMPEGTS::AddPacket(AVPacket *Packet, bool CodecConfig)
 
     int result = av_write_frame(m_formatCtx, Packet);
     if (result < 0)
-        LOG(VB_GENERAL, LOG_ERR, "Failed to write frame");
+        LOG(VB_GENERAL, LOG_ERR, "Failed to write video frame");
+    else
+        m_lastVideoPts = Packet->pts;
+
+    WriteDummyAudio();
+
     return result >= 0;
 }
 
 void TorcMPEGTS::Start(void)
 {
     if (m_formatCtx)
+    {
+        av_dump_format(m_formatCtx, 0, "stdout", 1);
         if (avformat_write_header(m_formatCtx, NULL))
             LOG(VB_GENERAL, LOG_ERR, "Failed to write stream header");
+    }
 }
 
 void TorcMPEGTS::Finish(void)
 {
+    if (m_audioContext && m_audioPacket)
+    {
+        // flush
+        avcodec_send_frame(m_audioContext, NULL);
+        while (avcodec_receive_packet(m_audioContext, m_audioPacket) >= 0)
+            av_packet_unref(m_audioPacket);
+    }
+
     if (m_formatCtx)
     {
         if (av_write_trailer(m_formatCtx))
             LOG(VB_GENERAL, LOG_ERR, "Failed to write stream trailer");
-        avio_close(m_formatCtx->pb);
+        //avio_close(m_formatCtx->pb);
     }
 }
 
