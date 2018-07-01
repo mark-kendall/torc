@@ -428,6 +428,12 @@ bool TorcMPEGTS::AddPacket(AVPacket *Packet, bool CodecConfig)
     return result >= 0;
 }
 
+void TorcMPEGTS::FinishSegment(void)
+{
+    if (m_formatCtx)
+        av_write_frame(m_formatCtx, NULL);
+}
+
 void TorcMPEGTS::Start(void)
 {
     if (m_formatCtx)
