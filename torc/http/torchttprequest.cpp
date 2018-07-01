@@ -83,6 +83,7 @@ TorcHTTPRequest::TorcHTTPRequest(TorcHTTPReader *Reader)
     m_content(NULL),
     m_secure(false),
     m_allowGZip(false),
+    m_allowCORS(false),
     m_allowed(0),
     m_authorised(HTTPNotAuthorised),
     m_responseType(HTTPResponseUnknown),
@@ -245,6 +246,16 @@ void TorcHTTPRequest::SetAllowed(int Allowed)
 void TorcHTTPRequest::SetAllowGZip(bool Allowed)
 {
     m_allowGZip = Allowed;
+}
+
+void TorcHTTPRequest::SetAllowCORS(bool Allowed)
+{
+    m_allowCORS = Allowed;
+}
+
+bool TorcHTTPRequest::GetAllowCORS(void) const
+{
+    return m_allowCORS;
 }
 
 /*! \brief Set the caching behaviour for this response.
