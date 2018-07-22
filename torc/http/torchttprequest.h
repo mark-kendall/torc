@@ -50,7 +50,8 @@ typedef enum
     HTTPResponseM3U8,
     HTTPResponseM3U8Apple,
     HTTPResponseMPD,
-    HTTPResponseMPEGTS
+    HTTPResponseMPEGTS,
+    HTTPResponseMP4
 } HTTPResponseType;
 
 typedef enum

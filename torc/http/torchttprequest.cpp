@@ -878,6 +878,7 @@ QString TorcHTTPRequest::ResponseTypeToString(HTTPResponseType Response)
         case HTTPResponseM3U8Apple:        return QString("application/vnd.apple.mpegurl");
         case HTTPResponseMPD:              return QString("application/dash+xml");
         case HTTPResponseMPEGTS:           return QString("video/mp2t");
+        case HTTPResponseMP4:              return QString("video/mp4");
         default: break;
     }
 
