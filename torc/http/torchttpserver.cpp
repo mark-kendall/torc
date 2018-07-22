@@ -575,13 +575,20 @@ void TorcHTTPServer::AddAuthenticationHeader(TorcHTTPRequest &Request)
 void TorcHTTPServer::ValidateOrigin(TorcHTTPRequest &Request)
 {
     gOriginWhitelistLock.lockForRead();
-    if (Request.Headers()->contains("Origin") && (gOriginWhitelist.contains(Request.Headers()->value("Origin"), Qt::CaseInsensitive) || Request.GetAllowCORS()))
+    bool origin = gOriginWhitelist.contains(Request.Headers()->value("Origin"), Qt::CaseInsensitive);
+    gOriginWhitelistLock.unlock();
+
+    if (Request.Headers()->contains("Origin") && (origin || Request.GetAllowCORS()))
     {
         Request.SetResponseHeader("Access-Control-Allow-Origin", Request.Headers()->value("Origin"));
         if (Request.Headers()->contains("Access-Control-Allow-Credentials"))
             Request.SetResponseHeader("Access-Control-Allow-Credentials", "true");
+        if (Request.Headers()->contains("Access-Control-Request-Headers"))
+            Request.SetResponseHeader("Access-Control-Request-Headers", "Origin, X-Requested-With, Content-Type, Accept, Range");
+        if (Request.Headers()->contains("Access-Control-Request-Method"))
+            Request.SetResponseHeader("Access-Control-Request-Method", TorcHTTPRequest::AllowedToString(HTTPGet | HTTPOptions | HTTPHead));
+        Request.SetResponseHeader("Access-Control-Max-Age", "86400");
     }
-    gOriginWhitelistLock.unlock();
 }
 
 void TorcHTTPServer::AuthenticateUser(TorcHTTPRequest &Request)
