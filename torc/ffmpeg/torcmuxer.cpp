@@ -26,7 +26,7 @@
 
 // Torc
 #include "torclogging.h"
-#include "torcmpegts.h"
+#include "torcmuxer.h"
 
 // FFmpeg
 extern "C" {
