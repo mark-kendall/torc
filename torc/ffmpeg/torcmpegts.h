@@ -1,5 +1,5 @@
-#ifndef TORCMPEGTS_H
-#define TORCMPEGTS_H
+#ifndef TORCMUXER_H
+#define TORCMUXER_H
 
 // Qt
 #include <QtGlobal>
@@ -12,14 +12,14 @@ extern "C" {
 #include <libavformat/avformat.h>
 }
 
-class TorcMPEGTS
+class TorcMuxer
 {
   public:
     static int AVWritePacket(void *Opaque, uint8_t *Buffer, int Size);
 
-    explicit TorcMPEGTS     (const QString &File);
-    explicit TorcMPEGTS     (TorcSegmentedRingBuffer *Buffer);
-    ~TorcMPEGTS();
+    explicit TorcMuxer      (const QString &File);
+    explicit TorcMuxer      (TorcSegmentedRingBuffer *Buffer);
+    ~TorcMuxer();
 
     bool IsValid            (void);
     int  AddH264Stream      (int Width, int Height, int Profile, int Bitrate);
@@ -37,7 +37,7 @@ class TorcMPEGTS
     void CopyExtraData      (int Size, void* Source, int Stream);
 
   private:
-    Q_DISABLE_COPY(TorcMPEGTS)
+    Q_DISABLE_COPY(TorcMuxer)
     // Output muxer
     AVFormatContext         *m_formatCtx;
     bool                     m_created;
@@ -56,4 +56,4 @@ class TorcMPEGTS
     int64_t                  m_lastAudioPts;
 };
 
-#endif // TORCMPEGTS_H
+#endif // TORCMUXER_H

@@ -1,4 +1,4 @@
-/* Class TorcMPEGTS
+/* Class TorcMuxer
 *
 * This file is part of the Torc project.
 *
@@ -101,7 +101,7 @@ static void TorcAVLog(void *Ptr, int Level, const char *Fmt, va_list VAL)
     lock.unlock();
 }
 
-TorcMPEGTS::TorcMPEGTS(TorcSegmentedRingBuffer *Buffer)
+TorcMuxer::TorcMuxer(TorcSegmentedRingBuffer *Buffer)
   : m_formatCtx(NULL),
     m_created(false),
     m_started(false),
@@ -120,7 +120,7 @@ TorcMPEGTS::TorcMPEGTS(TorcSegmentedRingBuffer *Buffer)
     SetupIO();
 }
 
-TorcMPEGTS::TorcMPEGTS(const QString &File)
+TorcMuxer::TorcMuxer(const QString &File)
   : m_formatCtx(NULL),
     m_created(false),
     m_started(false),
@@ -138,7 +138,7 @@ TorcMPEGTS::TorcMPEGTS(const QString &File)
     SetupIO();
 }
 
-TorcMPEGTS::~TorcMPEGTS()
+TorcMuxer::~TorcMuxer()
 {
     // TODO check whether this is safe with file output
     if (m_ioContext)
@@ -177,7 +177,7 @@ TorcMPEGTS::~TorcMPEGTS()
     }
 }
 
-void TorcMPEGTS::SetupContext(void)
+void TorcMuxer::SetupContext(void)
 {
     // TODO can this be called once
     av_register_all();
@@ -199,7 +199,7 @@ void TorcMPEGTS::SetupContext(void)
     m_formatCtx->oformat = format;
 }
 
-void TorcMPEGTS::SetupIO(void)
+void TorcMuxer::SetupIO(void)
 {
     if (!m_formatCtx)
         return;
@@ -227,16 +227,16 @@ void TorcMPEGTS::SetupIO(void)
     }
 }
 
-int TorcMPEGTS::AVWritePacket(void *Opaque, uint8_t *Buffer, int Size)
+int TorcMuxer::AVWritePacket(void *Opaque, uint8_t *Buffer, int Size)
 {
-    TorcMPEGTS* muxer = static_cast<TorcMPEGTS*>(Opaque);
+    TorcMuxer* muxer = static_cast<TorcMuxer*>(Opaque);
     if (!muxer)
         return -1;
 
     return muxer->WriteAVPacket(Buffer, Size);
 }
 
-int TorcMPEGTS::WriteAVPacket(uint8_t *Buffer, int Size)
+int TorcMuxer::WriteAVPacket(uint8_t *Buffer, int Size)
 {
     if (!Buffer || Size < 1)
         return -1;
@@ -247,12 +247,12 @@ int TorcMPEGTS::WriteAVPacket(uint8_t *Buffer, int Size)
     return -1;
 }
 
-bool TorcMPEGTS::IsValid(void)
+bool TorcMuxer::IsValid(void)
 {
     return m_formatCtx && m_formatCtx->nb_streams > 0 && m_created;
 }
 
-int TorcMPEGTS::AddDummyAudioStream(void)
+int TorcMuxer::AddDummyAudioStream(void)
 {
     if (!m_formatCtx)
         return -1;
@@ -316,7 +316,7 @@ int TorcMPEGTS::AddDummyAudioStream(void)
     return audiostream->id;
 }
 
-void TorcMPEGTS::WriteDummyAudio(void)
+void TorcMuxer::WriteDummyAudio(void)
 {
     if (!m_audioContext || !m_audioFrame || !m_audioPacket || m_lastVideoPts == AV_NOPTS_VALUE || !m_formatCtx)
         return;
@@ -354,7 +354,7 @@ void TorcMPEGTS::WriteDummyAudio(void)
     }
 }
 
-int TorcMPEGTS::AddH264Stream(int Width, int Height, int Profile, int Bitrate)
+int TorcMuxer::AddH264Stream(int Width, int Height, int Profile, int Bitrate)
 {
     if (!m_formatCtx)
         return -1;
@@ -376,7 +376,7 @@ int TorcMPEGTS::AddH264Stream(int Width, int Height, int Profile, int Bitrate)
     return h264video->id;
 }
 
-void TorcMPEGTS::CopyExtraData(int Size, void* Source, int Stream)
+void TorcMuxer::CopyExtraData(int Size, void* Source, int Stream)
 {
     if (!m_formatCtx || !Source || Size < 1)
         return;
@@ -393,7 +393,7 @@ void TorcMPEGTS::CopyExtraData(int Size, void* Source, int Stream)
     memcpy(stream->codecpar->extradata, Source, Size);
 }
 
-bool TorcMPEGTS::AddPacket(AVPacket *Packet, bool CodecConfig)
+bool TorcMuxer::AddPacket(AVPacket *Packet, bool CodecConfig)
 {
     if (!m_formatCtx || !m_created || !Packet)
         return false;
@@ -426,7 +426,7 @@ bool TorcMPEGTS::AddPacket(AVPacket *Packet, bool CodecConfig)
     return result >= 0;
 }
 
-void TorcMPEGTS::FinishSegment(bool Init)
+void TorcMuxer::FinishSegment(bool Init)
 {
     if (m_formatCtx)
     {
@@ -436,7 +436,7 @@ void TorcMPEGTS::FinishSegment(bool Init)
     }
 }
 
-void TorcMPEGTS::Start(void)
+void TorcMuxer::Start(void)
 {
     if (m_formatCtx)
     {
@@ -449,7 +449,7 @@ void TorcMPEGTS::Start(void)
     }
 }
 
-void TorcMPEGTS::Finish(void)
+void TorcMuxer::Finish(void)
 {
     if (m_audioContext && m_audioPacket)
     {
