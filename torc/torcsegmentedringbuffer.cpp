@@ -34,7 +34,8 @@ TorcSegmentedRingBuffer::TorcSegmentedRingBuffer(int Size)
     m_segmentsLock(QReadWriteLock::Recursive),
     m_segments(),
     m_segmentRefs(),
-    m_segmentCounter(0)
+    m_segmentCounter(0),
+    m_initSegment(NULL)
 {
     LOG(VB_GENERAL, LOG_INFO, QString("Allocated segmented ring buffer of size %1bytes").arg(m_size));
 }
@@ -45,6 +46,8 @@ TorcSegmentedRingBuffer::~TorcSegmentedRingBuffer()
     m_segments.clear();
     m_segmentRefs.clear();
     free(m_data);
+    if (m_initSegment)
+        delete m_initSegment;
 }
 
 inline int TorcSegmentedRingBuffer::GetBytesFree(void)
@@ -75,12 +78,15 @@ int TorcSegmentedRingBuffer::GetSegmentsAvail(int &TailRef)
     return result;
 }
 
-int TorcSegmentedRingBuffer::FinishSegment(void)
+int TorcSegmentedRingBuffer::FinishSegment(bool Init)
 {
     QWriteLocker locker(&m_segmentsLock);
     int result = -1;
     if (m_writePosition == m_currentStartPosition || m_currentSize < 1)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Cannot finish segment - nothing written");
         return result;
+    }
 
     //LOG(VB_GENERAL, LOG_INFO, QString("Finished segmentref %1 start %2 size %3 (segments %4)")
     //    .arg(m_segmentCounter).arg(m_currentStartPosition).arg(m_currentSize).arg(m_segments.size() + 1));
@@ -91,7 +97,10 @@ int TorcSegmentedRingBuffer::FinishSegment(void)
     m_currentStartPosition = m_writePosition;
     m_currentSize = 0;
     m_segmentCounter++;
-    emit SegmentReady(result);
+    if (Init)
+        SaveInitSegment();
+    else
+        emit SegmentReady(result);
     return result;
 }
 
@@ -187,6 +196,41 @@ int TorcSegmentedRingBuffer::ReadSegment(QIODevice *Dst, int SegmentRef)
     return segment.second;
 }
 
+void TorcSegmentedRingBuffer::SaveInitSegment(void)
+{
+    QWriteLocker locker(&m_segmentsLock);
+    if (m_segments.size() != 1)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Cannot retrieve init segment - zero or >1 segments");
+        return;
+    }
+
+    // sanity check
+    if (m_initSegment)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Already have init segment - deleting");
+        delete m_initSegment;
+    }
+
+    // copy the segment
+    QPair<int,int> segment = m_segments.dequeue();
+    m_initSegment = new QByteArray(segment.second, '0');
+    int read = qMin(segment.second, m_size - segment.first);
+    memcpy(m_initSegment->data(), m_data + segment.first, read);
+    if (read < segment.second)
+        memcpy(m_initSegment->data() + read, m_data, segment.second - read);
+
+    // reset the ringbuffer
+    LOG(VB_GENERAL, LOG_INFO, QString("Init segment saved (%1 bytes) - resetting ringbuffer").arg(m_initSegment->size()));
+    m_segments.clear();
+    m_segmentRefs.clear();
+    m_readPosition   = 0;
+    m_writePosition  = 1;
+    m_currentSize    = 0;
+    m_currentStartPosition = 1;
+    m_segmentCounter = 0;
+}
+
 QByteArray* TorcSegmentedRingBuffer::GetSegment(int SegmentRef)
 {
     if (SegmentRef < 0)
@@ -204,4 +248,12 @@ QByteArray* TorcSegmentedRingBuffer::GetSegment(int SegmentRef)
     if (read < segment.second)
         memcpy(result->data() + read, m_data, segment.second - read);
     return result;
+}
+
+QByteArray* TorcSegmentedRingBuffer::GetInitSegment(void)
+{
+    QReadLocker locker(&m_segmentsLock);
+    if (!m_initSegment)
+        return NULL;
+    return new QByteArray(m_initSegment->constData(), m_initSegment->size());
 }
