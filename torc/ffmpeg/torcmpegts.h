@@ -25,7 +25,7 @@ class TorcMPEGTS
     int  AddH264Stream      (int Width, int Height, int Profile, int Bitrate);
     int  AddDummyAudioStream(void);
     bool AddPacket          (AVPacket *Packet, bool CodecConfig);
-    void FinishSegment      (void);
+    void FinishSegment      (bool Init);
     void Finish             (void);
     int  WriteAVPacket      (uint8_t* Buffer, int Size);
 

@@ -46,7 +46,6 @@ static void TorcAVLog(void *Ptr, int Level, const char *Fmt, va_list VAL)
     uint64_t         verboseMask  = VB_GENERAL;
     int              verboseLevel = LOG_DEBUG;
 
-    // determine mythtv debug level from av log level
     switch (Level)
     {
         case AV_LOG_PANIC:
@@ -183,7 +182,7 @@ void TorcMPEGTS::SetupContext(void)
     // TODO can this be called once
     av_register_all();
 
-    AVOutputFormat *format = av_guess_format("mpegts", NULL, NULL);
+    AVOutputFormat *format = av_guess_format("mp4", NULL, NULL);
     if (!format)
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to find MPEGTS muxer");
@@ -424,14 +423,17 @@ bool TorcMPEGTS::AddPacket(AVPacket *Packet, bool CodecConfig)
         m_lastVideoPts = Packet->pts;
 
     WriteDummyAudio();
-
     return result >= 0;
 }
 
-void TorcMPEGTS::FinishSegment(void)
+void TorcMPEGTS::FinishSegment(bool Init)
 {
     if (m_formatCtx)
+    {
         av_write_frame(m_formatCtx, NULL);
+        if (m_ringBuffer)
+            m_ringBuffer->FinishSegment(Init);
+    }
 }
 
 void TorcMPEGTS::Start(void)
@@ -439,8 +441,11 @@ void TorcMPEGTS::Start(void)
     if (m_formatCtx)
     {
         av_dump_format(m_formatCtx, 0, "stdout", 1);
-        if (avformat_write_header(m_formatCtx, NULL))
-            LOG(VB_GENERAL, LOG_ERR, "Failed to write stream header");
+        AVDictionary *opts = NULL;
+        av_dict_set(&opts, "movflags", "frag_custom+dash+delay_moov", 0);
+        if (avformat_write_header(m_formatCtx, &opts))
+            LOG(VB_GENERAL, LOG_ERR, "Failed to set demuxer options");
+        av_dict_free(&opts);
     }
 }
 
