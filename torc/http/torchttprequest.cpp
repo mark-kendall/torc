@@ -65,7 +65,7 @@
 */
 
 QRegExp gRegExp = QRegExp("[ \r\n][ \r\n]*");
-char TorcHTTPRequest::DateFormat[] = "ddd, dd MMM yyyy HH:mm:ss 'GMT'";
+char TorcHTTPRequest::DateFormat[] = "ddd, dd MMM yyyy HH:mm:ss 'UTC'";
 
 TorcHTTPRequest::TorcHTTPRequest(TorcHTTPReader *Reader)
   : m_fullUrl(),
