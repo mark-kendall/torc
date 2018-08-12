@@ -236,6 +236,45 @@ int TorcMuxer::AVWritePacket(void *Opaque, uint8_t *Buffer, int Size)
     return muxer->WriteAVPacket(Buffer, Size);
 }
 
+/*! \brief Determine the 3 byte H.264 codec descriptor string
+ *
+ * \note This code is very much targetted at the output of the Raspberry Pi
+ *       camera module. It may require modification for use with other devices.
+*/
+QString TorcMuxer::GetAVCCodec(const QByteArray &Packet)
+{
+    int size = Packet.size();
+    if (size < 7) // 3 (or 4) byte start code, 1 byte NALU, 1 byte IDC, 1 byte constraints and 1 byte level
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Cannot retrieve AVC1 codec data from packet - too short");
+        return QString();
+    }
+
+    bool found = false;
+    int index = 0;
+    for (; index < 2; index++)
+    {
+        if (Packet[index] == 0 && Packet[index + 1] == 0 && Packet[index + 2] == 1)
+        {
+            found = true;
+            break;
+        }
+    }
+
+    if (!found)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Failed to find start code");
+        return QString();
+    }
+
+    index += 3;
+    if ((Packet[index] & 0x1f) == 7) // SPS NAL UNIT
+        return QString("%1%2%3").arg(Packet[index + 1], 2, 16, QChar('0')).arg(Packet[index + 2], 2, 16, QChar('0')).arg(Packet[index + 3], 2, 16, QChar('0'));
+
+    LOG(VB_GENERAL, LOG_WARNING, "Failed to find SPS");
+    return QString();
+}
+
 int TorcMuxer::WriteAVPacket(uint8_t *Buffer, int Size)
 {
     if (!Buffer || Size < 1)

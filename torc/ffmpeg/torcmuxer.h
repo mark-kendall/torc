@@ -16,7 +16,7 @@ class TorcMuxer
 {
   public:
     static int AVWritePacket(void *Opaque, uint8_t *Buffer, int Size);
-
+    static QString GetAVCCodec (const QByteArray &Packet);
     explicit TorcMuxer      (const QString &File);
     explicit TorcMuxer      (TorcSegmentedRingBuffer *Buffer);
     ~TorcMuxer();
