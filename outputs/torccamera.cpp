@@ -231,14 +231,20 @@ void TorcCameraThread::Start(void)
         {
             m_cameraLock.unlock();
             while (!m_stop)
+            {
                 if (!m_camera->WriteFrame())
+                {
+                    LOG(VB_GENERAL, LOG_WARNING, "Camera returned error from WriteFrame()");
                     break;
+                }
+            }
             m_cameraLock.lockForWrite();
             m_camera->Stop();
             m_camera->disconnect();
-            delete m_camera;
-            m_camera = NULL;
         }
+
+	delete m_camera;
+	m_camera = NULL;
     }
 
     m_cameraLock.unlock();
