@@ -531,7 +531,7 @@ void TorcXSDFactory::CustomiseXSD(QByteArray &XSD)
     QStringList identifiers;
     identifiers << XSD_TYPES << XSD_INPUTTYPES << XSD_INPUTS << XSD_CONTROLTYPES << XSD_CONTROLS;
     identifiers << XSD_OUTPUTTYPES << XSD_OUTPUTS << XSD_NOTIFIERTYPES << XSD_NOTIFIERS;
-    identifiers << XSD_NOTIFICATIONTYPES << XSD_NOTIFICATIONS << XSD_UNIQUE;
+    identifiers << XSD_NOTIFICATIONTYPES << XSD_NOTIFICATIONS << XSD_UNIQUE << XSD_CAMERATYPES;
 
     QMultiMap<QString,QString> xsds;
     TorcXSDFactory* factory = TorcXSDFactory::GetTorcXSDFactory();
