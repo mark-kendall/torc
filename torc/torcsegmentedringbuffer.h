@@ -2,6 +2,7 @@
 #define TORCSEGMENTEDRINGBUFFER_H
 
 // Qt
+#include <QPair>
 #include <QQueue>
 #include <QIODevice>
 #include <QReadWriteLock>
