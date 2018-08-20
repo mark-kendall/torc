@@ -230,6 +230,7 @@ void TorcCameraThread::Start(void)
         if (m_camera->Setup())
         {
             m_cameraLock.unlock();
+            m_cameraLock.lockForRead();
             while (!m_stop)
             {
                 if (!m_camera->WriteFrame())
@@ -238,13 +239,14 @@ void TorcCameraThread::Start(void)
                     break;
                 }
             }
+            m_cameraLock.unlock();
             m_cameraLock.lockForWrite();
             m_camera->Stop();
-            m_camera->disconnect();
         }
 
-	delete m_camera;
-	m_camera = NULL;
+        m_camera->disconnect();
+        delete m_camera;
+        m_camera = NULL;
     }
 
     m_cameraLock.unlock();
