@@ -27,7 +27,6 @@
 // Torc
 #include "torclogging.h"
 #include "torccentral.h"
-#include "torcmuxer.h"
 #include "torcpicamera.h"
 
 // OpenMax
@@ -105,12 +104,18 @@ TorcPiCamera::~TorcPiCamera()
 {
     Stop();
 
-    delete m_videoTunnel;
-    delete m_previewTunnel;
-    delete m_nullSink;
-    delete m_encoder;
-    delete m_camera;
-    delete m_core;
+    if (m_videoTunnel)
+        delete m_videoTunnel;
+    if (m_previewTunnel)
+        delete m_previewTunnel;
+    if (m_nullSink)
+        delete m_nullSink;
+    if (m_encoder)
+        delete m_encoder;
+    if (m_camera)
+        delete m_camera;
+    if (m_core)
+        delete m_core;
 }
 
 bool TorcPiCamera::Setup(void)
@@ -184,7 +189,7 @@ bool TorcPiCamera::Setup(void)
     if (m_camera->SetConfig(OMX_IndexConfigPortCapturing, &capture))
         return false;
 
-    int profile  = FF_PROFILE_H264_BASELINE;
+    int profile = FF_PROFILE_H264_BASELINE;
     switch (ENCODER_PROFILE)
     {
         case OMX_VIDEO_AVCProfileBaseline: profile = FF_PROFILE_H264_BASELINE; break;
@@ -231,7 +236,7 @@ bool TorcPiCamera::WriteFrame(void)
         return false;
     }
 
-    if(m_encoder->FillThisBuffer(buffer))
+    if (m_encoder->FillThisBuffer(buffer))
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to fill OMX buffer");
         return false;
@@ -281,6 +286,16 @@ bool TorcPiCamera::WriteFrame(void)
         packet->flags       |= idr ? AV_PKT_FLAG_KEY : 0;
         m_muxer->AddPacket(packet, sps);
 
+        if (sps && !m_haveInitSegment)
+        {
+            m_haveInitSegment = true;
+            m_muxer->FinishSegment(true);
+        }
+        else if (!sps && !(m_frameCount % (VIDEO_FRAMERATE * VIDEO_SEGMENT_TARGET)))
+        {
+            m_muxer->FinishSegment(false);
+        }
+
         if (m_bufferedPacket)
         {
             av_packet_free(&m_bufferedPacket);
@@ -302,26 +317,6 @@ bool TorcPiCamera::WriteFrame(void)
             av_packet_from_data(m_bufferedPacket, data, buffer->nFilledLen);
             memcpy(m_bufferedPacket->data, reinterpret_cast<uint8_t*>(buffer->pBuffer) + buffer->nOffset, buffer->nFilledLen);
             m_bufferedPacket->flags |= idr ? AV_PKT_FLAG_KEY : 0;
-        }
-    }
-
-    if (complete)
-    {
-        if (sps && !m_haveInitSegment)
-        {
-            m_haveInitSegment = true;
-            m_muxer->FinishSegment(true);
-        }
-        else if (!sps && !(m_frameCount % (VIDEO_FRAMERATE * VIDEO_SEGMENT_TARGET)))
-        {
-            if (m_bufferedPacket)
-            {
-                LOG(VB_GENERAL, LOG_ERR, "End of sequence but have buffered packet");
-                av_packet_free(&m_bufferedPacket);
-                m_bufferedPacket = NULL;
-            }
-
-            m_muxer->FinishSegment(false);
         }
     }
 
@@ -781,4 +776,5 @@ class TorcPiCameraFactory Q_DECL_FINAL : public TorcCameraFactory
         return NULL;
     }
 } TorcPiCameraFactory;
+
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

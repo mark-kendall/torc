@@ -6,7 +6,7 @@
 #include "torcomxport.h"
 #include "torcomxcomponent.h"
 #include "torcomxtunnel.h"
-#include "torcmuxer.h"
+#include "ffmpeg/torcmuxer.h"
 #include "torccamera.h"
 
 // FFmpeg
