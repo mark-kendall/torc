@@ -33,16 +33,16 @@ class TorcPiCamera Q_DECL_FINAL : public TorcCameraDevice
   private:
     Q_DISABLE_COPY(TorcPiCamera)
 
-    TorcOMXCore             *m_core;
-    TorcOMXComponent        *m_camera;
-    TorcOMXComponent        *m_encoder;
-    TorcOMXComponent        *m_nullSink;
+    TorcOMXCore              m_core;
+    TorcOMXComponent         m_camera;
+    TorcOMXComponent         m_encoder;
+    TorcOMXComponent         m_nullSink;
     OMX_U32                  m_cameraPreviewPort;
     OMX_U32                  m_cameraVideoPort;
     OMX_U32                  m_encoderInputPort;
     OMX_U32                  m_encoderOutputPort;
-    TorcOMXTunnel           *m_videoTunnel;
-    TorcOMXTunnel           *m_previewTunnel;
+    TorcOMXTunnel            m_videoTunnel;
+    TorcOMXTunnel            m_previewTunnel;
 
     TorcMuxer               *m_muxer;
     int                      m_videoStream;

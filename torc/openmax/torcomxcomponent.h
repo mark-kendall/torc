@@ -32,7 +32,7 @@ class TorcOMXComponent Q_DECL_FINAL
     static OMX_ERRORTYPE    FillBufferDoneCallback  (OMX_HANDLETYPE Component, OMX_PTR OMXComponent, OMX_BUFFERHEADERTYPE *Buffer);
 
   public:
-    TorcOMXComponent(TorcOMXCore *Core, OMX_STRING Component);
+    TorcOMXComponent(OMX_STRING Component);
    ~TorcOMXComponent();
 
     bool                    IsValid                 (void);
@@ -66,7 +66,6 @@ class TorcOMXComponent Q_DECL_FINAL
 
   protected:
     bool                    m_valid;
-    TorcOMXCore            *m_core;
     OMX_HANDLETYPE          m_handle;
     QMutex                  m_lock;
     QString                 m_componentName;

@@ -24,10 +24,9 @@
 #include "torclogging.h"
 #include "torcomxtunnel.h"
 
-TorcOMXTunnel::TorcOMXTunnel(TorcOMXCore *Core, TorcOMXComponent *Source, OMX_U32 SourceIndex, OMX_INDEXTYPE SourceDomain,
+TorcOMXTunnel::TorcOMXTunnel(TorcOMXComponent *Source, OMX_U32 SourceIndex, OMX_INDEXTYPE SourceDomain,
                              TorcOMXComponent *Destination, OMX_U32 DestinationIndex, OMX_INDEXTYPE DestinationDomain)
   : m_connected(false),
-    m_core(Core),
     m_lock(QMutex::NonRecursive),
     m_source(Source),
     m_sourceIndex(SourceIndex),
@@ -71,17 +70,17 @@ OMX_ERRORTYPE TorcOMXTunnel::Create(void)
 {
     // TODO add error checking to EnablePort calls
 
-    if (!m_source || !m_destination || !m_core)
+    if (!m_source || !m_destination)
         return OMX_ErrorUndefined;
 
-    if (!m_source->GetHandle() || !m_destination->GetHandle() || !m_core->m_omxSetupTunnel)
+    if (!m_source->GetHandle() || !m_destination->GetHandle())
         return OMX_ErrorUndefined;
 
     QMutexLocker locker(&m_lock);
     m_connected = false;
     QString description = QString("%1:%2->%3:%4").arg(m_source->GetName()).arg(m_sourcePort).arg(m_destination->GetName()).arg(m_destinationPort);
 
-    OMX_CHECK(m_core->m_omxSetupTunnel(m_source->GetHandle(), m_sourcePort, m_destination->GetHandle(), m_destinationPort), "", QString("Failed to create tunnel: " + description));
+    OMX_CHECK(OMX_SetupTunnel(m_source->GetHandle(), m_sourcePort, m_destination->GetHandle(), m_destinationPort), "", QString("Failed to create tunnel: " + description));
 
     LOG(VB_GENERAL, LOG_INFO, QString("Created tunnel: %1").arg(description));
 
@@ -91,7 +90,7 @@ OMX_ERRORTYPE TorcOMXTunnel::Create(void)
 
 OMX_ERRORTYPE TorcOMXTunnel::Destroy(void)
 {
-    if (!m_source || !m_destination || !m_core)
+    if (!m_source || !m_destination)
         return OMX_ErrorUndefined;
 
     if (!m_source->GetHandle() || !m_destination->GetHandle() )
@@ -104,11 +103,11 @@ OMX_ERRORTYPE TorcOMXTunnel::Destroy(void)
     m_source->EnablePort(OMX_DirOutput, m_sourceIndex, false, m_sourceDomain);
     m_destination->EnablePort(OMX_DirInput, m_destinationIndex, false, m_destinationDomain);
 
-    OMX_ERRORTYPE error = m_core->m_omxSetupTunnel(m_source->GetHandle(), m_sourcePort, NULL, 0);
+    OMX_ERRORTYPE error = OMX_SetupTunnel(m_source->GetHandle(), m_sourcePort, NULL, 0);
     if (OMX_ErrorNone != error)
         OMX_ERROR(error, m_source->GetName(), "Failed to destroy tunnel input");
 
-    error = m_core->m_omxSetupTunnel(m_destination->GetHandle(), m_destinationPort, NULL, 0);
+    error = OMX_SetupTunnel(m_destination->GetHandle(), m_destinationPort, NULL, 0);
     if (OMX_ErrorNone != error)
         OMX_ERROR(error, m_destination->GetName(), "Failed to destroy tunnel output");
 

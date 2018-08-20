@@ -11,8 +11,7 @@ class TorcOMXTest Q_DECL_FINAL
    ~TorcOMXTest();
 
   private:
-    Q_DISABLE_COPY(TorcOMXTest)
-    TorcOMXCore *m_core;
+    TorcOMXCore m_core;
 };
 
 #endif // TORCOMXTEST_H

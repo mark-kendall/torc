@@ -141,7 +141,6 @@ linux {
     packagesExist(libomxil-bellagio) {
         openmax    = true
         DEFINES   += USING_LIBOMXIL_BELLAGIO
-        DEFINES   += "TORC_OMX_LIB=\"\\\"libomxil-bellagio\\\"\""
         CONFIG    += link_pkgconfig
         PKGCONFIG += libomxil-bellagio
         message("Linking to OpenMax Bellagio library")
@@ -183,9 +182,8 @@ linux-rasp-pi-g++ | !isEmpty(pi) {
     SOURCES += outputs/platforms/torcpicamera.cpp
 
     openmax      = true
-    LIBS        += -L/opt/vc/lib -lbcm_host
+    LIBS        += -L/opt/vc/lib -lbcm_host -lopenmaxil
     DEFINES     += USING_LIBOPENMAXIL
-    DEFINES     += "TORC_OMX_LIB=\"\\\"openmaxil\\\"\""
     INCLUDEPATH += /opt/vc/include
     INCLUDEPATH += /opt/vc/include/IL
     INCLUDEPATH += /opt/vc/include/interface/vcos/pthreads

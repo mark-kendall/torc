@@ -37,9 +37,8 @@ TorcOMXEvent::TorcOMXEvent(OMX_EVENTTYPE Type, OMX_U32 Data1, OMX_U32 Data2)
 
 static OMX_CALLBACKTYPE gCallbacks;
 
-TorcOMXComponent::TorcOMXComponent(TorcOMXCore *Core, OMX_STRING Component)
+TorcOMXComponent::TorcOMXComponent(OMX_STRING Component)
   : m_valid(false),
-    m_core(Core),
     m_handle(NULL),
     m_lock(QMutex::NonRecursive),
     m_componentName(Component),
@@ -54,11 +53,8 @@ TorcOMXComponent::TorcOMXComponent(TorcOMXCore *Core, OMX_STRING Component)
     gCallbacks.EmptyBufferDone = &EmptyBufferDoneCallback;
     gCallbacks.FillBufferDone  = &FillBufferDoneCallback;
 
-    if (!m_core || (m_core && !m_core->IsValid()))
-        return;
-
     // get handle
-    OMX_ERRORTYPE status = m_core->m_omxGetHandle(&m_handle, Component, this, &gCallbacks);
+    OMX_ERRORTYPE status = OMX_GetHandle(&m_handle, Component, this, &gCallbacks);
     if (status != OMX_ErrorNone || !m_handle)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("%1: Failed to get handle").arg(m_componentName));
@@ -177,8 +173,8 @@ TorcOMXComponent::~TorcOMXComponent()
     while (!m_outputPorts.isEmpty())
         delete m_outputPorts.takeLast();
 
-    if (m_core && m_handle)
-        m_core->m_omxFreeHandle(m_handle);
+    if (m_handle)
+        OMX_FreeHandle(m_handle);
     m_handle = NULL;
 }
 

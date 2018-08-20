@@ -82,16 +82,16 @@
 
 TorcPiCamera::TorcPiCamera(const TorcCameraParams &Params)
   : TorcCameraDevice(Params),
-    m_core(NULL),
-    m_camera(NULL),
-    m_encoder(NULL),
-    m_nullSink(NULL),
+    m_core(),
+    m_camera((char*)BROADCOM_CAMERA),
+    m_encoder((char*)BROADCOM_ENCODER),
+    m_nullSink((char*)BROADCOM_NULLSINK),
     m_cameraPreviewPort(0),
     m_cameraVideoPort(0),
     m_encoderInputPort(0),
     m_encoderOutputPort(0),
-    m_videoTunnel(NULL),
-    m_previewTunnel(NULL),
+    m_videoTunnel(&m_camera, 1, OMX_IndexParamVideoInit, &m_encoder,  0, OMX_IndexParamVideoInit),
+    m_previewTunnel(&m_camera, 0, OMX_IndexParamVideoInit, &m_nullSink, 0, OMX_IndexParamVideoInit),
     m_muxer(NULL),
     m_videoStream(0),
     m_frameCount(0),
@@ -103,35 +103,13 @@ TorcPiCamera::TorcPiCamera(const TorcCameraParams &Params)
 TorcPiCamera::~TorcPiCamera()
 {
     Stop();
-
-    if (m_videoTunnel)
-        delete m_videoTunnel;
-    if (m_previewTunnel)
-        delete m_previewTunnel;
-    if (m_nullSink)
-        delete m_nullSink;
-    if (m_encoder)
-        delete m_encoder;
-    if (m_camera)
-        delete m_camera;
-    if (m_core)
-        delete m_core;
 }
 
 bool TorcPiCamera::Setup(void)
 {
     // NB Pi hardware is initialised in TorcPiGPIO as it is static
 
-    // create components
-    m_core     = new TorcOMXCore(TORC_OMX_LIB);
-    m_camera   = new TorcOMXComponent(m_core, (char*)BROADCOM_CAMERA);
-    m_encoder  = new TorcOMXComponent(m_core, (char*)BROADCOM_ENCODER);
-    m_nullSink = new TorcOMXComponent(m_core, (char*)BROADCOM_NULLSINK);
-
-    if (!m_core || !m_camera || !m_encoder || !m_nullSink)
-        return false;
-
-    if (!m_core->IsValid() || !m_camera->IsValid() || !m_encoder->IsValid() || !m_nullSink->IsValid())
+    if (!m_camera.IsValid() || !m_encoder.IsValid() || !m_nullSink.IsValid())
         return false;
 
     // load drivers - Broadcom specific
@@ -139,10 +117,10 @@ bool TorcPiCamera::Setup(void)
         return false;
 
     // retrieve port numbers
-    m_cameraPreviewPort = m_camera->GetPort(OMX_DirOutput,  0, OMX_IndexParamVideoInit);
-    m_cameraVideoPort   = m_camera->GetPort(OMX_DirOutput,  1, OMX_IndexParamVideoInit);
-    m_encoderInputPort  = m_encoder->GetPort(OMX_DirInput,  0, OMX_IndexParamVideoInit);
-    m_encoderOutputPort = m_encoder->GetPort(OMX_DirOutput, 0, OMX_IndexParamVideoInit);
+    m_cameraPreviewPort = m_camera.GetPort(OMX_DirOutput,  0, OMX_IndexParamVideoInit);
+    m_cameraVideoPort   = m_camera.GetPort(OMX_DirOutput,  1, OMX_IndexParamVideoInit);
+    m_encoderInputPort  = m_encoder.GetPort(OMX_DirInput,  0, OMX_IndexParamVideoInit);
+    m_encoderOutputPort = m_encoder.GetPort(OMX_DirOutput, 0, OMX_IndexParamVideoInit);
 
     if (!m_cameraVideoPort || !m_cameraPreviewPort || !m_encoderInputPort || !m_encoderOutputPort)
         return false;
@@ -156,37 +134,35 @@ bool TorcPiCamera::Setup(void)
         return false;
 
     // create tunnels
-    m_videoTunnel   = new TorcOMXTunnel(m_core, m_camera, 1, OMX_IndexParamVideoInit, m_encoder,  0, OMX_IndexParamVideoInit);
-    m_previewTunnel = new TorcOMXTunnel(m_core, m_camera, 0, OMX_IndexParamVideoInit, m_nullSink, 0, OMX_IndexParamVideoInit);
-    if (m_videoTunnel->Create() || m_previewTunnel->Create())
+    if (m_videoTunnel.Create() || m_previewTunnel.Create())
         return false;
 
     // set to idle
-    m_camera->SetState(OMX_StateIdle);
-    m_encoder->SetState(OMX_StateIdle);
-    m_nullSink->SetState(OMX_StateIdle);
+    m_camera.SetState(OMX_StateIdle);
+    m_encoder.SetState(OMX_StateIdle);
+    m_nullSink.SetState(OMX_StateIdle);
 
     // TODO add error checking to these calls
     // enable ports
-    m_camera->EnablePort(OMX_DirOutput, 0, true, OMX_IndexParamVideoInit);
-    m_camera->EnablePort(OMX_DirOutput, 1, true, OMX_IndexParamVideoInit);
-    m_encoder->EnablePort(OMX_DirInput, 0, true, OMX_IndexParamVideoInit);
-    m_encoder->EnablePort(OMX_DirOutput, 0, true, OMX_IndexParamVideoInit, false);
-    m_encoder->CreateBuffers(OMX_DirOutput, 0, OMX_IndexParamVideoInit);
-    m_encoder->WaitForResponse(OMX_CommandPortEnable, m_encoderOutputPort, 1000);
-    m_nullSink->EnablePort(OMX_DirInput, 0, true, OMX_IndexParamVideoInit);
+    m_camera.EnablePort(OMX_DirOutput, 0, true, OMX_IndexParamVideoInit);
+    m_camera.EnablePort(OMX_DirOutput, 1, true, OMX_IndexParamVideoInit);
+    m_encoder.EnablePort(OMX_DirInput, 0, true, OMX_IndexParamVideoInit);
+    m_encoder.EnablePort(OMX_DirOutput, 0, true, OMX_IndexParamVideoInit, false);
+    m_encoder.CreateBuffers(OMX_DirOutput, 0, OMX_IndexParamVideoInit);
+    m_encoder.WaitForResponse(OMX_CommandPortEnable, m_encoderOutputPort, 1000);
+    m_nullSink.EnablePort(OMX_DirInput, 0, true, OMX_IndexParamVideoInit);
 
     // set state to execute
-    m_camera->SetState(OMX_StateExecuting);
-    m_encoder->SetState(OMX_StateExecuting);
-    m_nullSink->SetState(OMX_StateExecuting);
+    m_camera.SetState(OMX_StateExecuting);
+    m_encoder.SetState(OMX_StateExecuting);
+    m_nullSink.SetState(OMX_StateExecuting);
 
     // enable
     OMX_CONFIG_PORTBOOLEANTYPE capture;
     OMX_INITSTRUCTURE(capture);
     capture.nPortIndex = m_cameraVideoPort;
     capture.bEnabled   = OMX_TRUE;
-    if (m_camera->SetConfig(OMX_IndexConfigPortCapturing, &capture))
+    if (m_camera.SetConfig(OMX_IndexConfigPortCapturing, &capture))
         return false;
 
     int profile = FF_PROFILE_H264_BASELINE;
@@ -226,23 +202,23 @@ bool TorcPiCamera::Setup(void)
 
 bool TorcPiCamera::WriteFrame(void)
 {
-    if (!m_encoder || !m_muxer)
+    if (!m_muxer)
         return false;
 
-    OMX_BUFFERHEADERTYPE* buffer = m_encoder->GetBuffer(OMX_DirOutput, 0, 1000, OMX_IndexParamVideoInit);
+    OMX_BUFFERHEADERTYPE* buffer = m_encoder.GetBuffer(OMX_DirOutput, 0, 1000, OMX_IndexParamVideoInit);
     if (!buffer)
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to retrieve OMX buffer");
         return false;
     }
 
-    if (m_encoder->FillThisBuffer(buffer))
+    if (m_encoder.FillThisBuffer(buffer))
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to fill OMX buffer");
         return false;
     }
 
-    while (m_encoder->GetAvailableBuffers(OMX_DirOutput, 0, OMX_IndexParamVideoInit) < 1)
+    while (m_encoder.GetAvailableBuffers(OMX_DirOutput, 0, OMX_IndexParamVideoInit) < 1)
         QThread::usleep(500);
 
     bool idr      = buffer->nFlags & OMX_BUFFERFLAG_SYNCFRAME;
@@ -349,55 +325,41 @@ bool TorcPiCamera::Stop(void)
     m_haveInitSegment = false;
 
     // stop camera
-    if (m_camera)
-    {
-        OMX_CONFIG_PORTBOOLEANTYPE capture;
-        OMX_INITSTRUCTURE(capture);
-        capture.nPortIndex = m_cameraVideoPort;
-        capture.bEnabled   = OMX_FALSE;
-        m_camera->SetConfig(OMX_IndexConfigPortCapturing, &capture);
-    }
+    OMX_CONFIG_PORTBOOLEANTYPE capture;
+    OMX_INITSTRUCTURE(capture);
+    capture.nPortIndex = m_cameraVideoPort;
+    capture.bEnabled   = OMX_FALSE;
+    m_camera.SetConfig(OMX_IndexConfigPortCapturing, &capture);
 
     // set state to idle
-    if (m_camera)
-        m_camera->SetState(OMX_StateIdle);
-    if (m_encoder)
-        m_encoder->SetState(OMX_StateIdle);
-    if (m_nullSink)
-        m_nullSink->SetState(OMX_StateIdle);
+    m_camera.SetState(OMX_StateIdle);
+    m_encoder.SetState(OMX_StateIdle);
+    m_nullSink.SetState(OMX_StateIdle);
 
     // disable encoder output port
-    if (m_encoder)
-    {
-        m_encoder->EnablePort(OMX_DirOutput, 0, false, OMX_IndexParamVideoInit, false);
-        m_encoder->DestroyBuffers(OMX_DirOutput, 0, OMX_IndexParamVideoInit);
-        m_encoder->WaitForResponse(OMX_CommandPortDisable, m_encoderOutputPort, 1000);
-    }
+    m_encoder.EnablePort(OMX_DirOutput, 0, false, OMX_IndexParamVideoInit, false);
+    m_encoder.DestroyBuffers(OMX_DirOutput, 0, OMX_IndexParamVideoInit);
+    m_encoder.WaitForResponse(OMX_CommandPortDisable, m_encoderOutputPort, 1000);
 
     // disable remaining ports
-    if (m_camera)        
-        m_camera->DisablePorts(OMX_IndexParamVideoInit);
-    if (m_encoder)
-        m_encoder->DisablePorts(OMX_IndexParamVideoInit);
-    if (m_nullSink)
-        m_nullSink->DisablePorts(OMX_IndexParamVideoInit);
+    m_camera.DisablePorts(OMX_IndexParamVideoInit);
+    m_encoder.DisablePorts(OMX_IndexParamVideoInit);
+    m_nullSink.DisablePorts(OMX_IndexParamVideoInit);
+
+    // destroy tunnels
+    m_videoTunnel.Destroy();
+    m_previewTunnel.Destroy();
 
     // set state to loaded
-    if (m_camera)
-        m_camera->SetState(OMX_StateLoaded);
-    if (m_encoder)
-        m_encoder->SetState(OMX_StateLoaded);
-    if (m_nullSink)
-        m_nullSink->SetState(OMX_StateLoaded);
+    m_camera.SetState(OMX_StateLoaded);
+    m_encoder.SetState(OMX_StateLoaded);
+    m_nullSink.SetState(OMX_StateLoaded);
 
     return true;
 }
 
 bool TorcPiCamera::LoadDrivers(void)
 {
-    if (!m_camera)
-        return false;
-
     LOG(VB_GENERAL, LOG_INFO, "Trying to load Broadcom drivers");
 
     // request a callback
@@ -406,7 +368,7 @@ bool TorcPiCamera::LoadDrivers(void)
     callback.nPortIndex = OMX_ALL;
     callback.nIndex     = OMX_IndexParamCameraDeviceNumber;
     callback.bEnable    = OMX_TRUE;
-    if (m_camera->SetConfig(OMX_IndexConfigRequestCallback, &callback))
+    if (m_camera.SetConfig(OMX_IndexConfigRequestCallback, &callback))
         return false;
 
     // and set the camera device number. Once we have a response, the relevant
@@ -415,9 +377,9 @@ bool TorcPiCamera::LoadDrivers(void)
     OMX_INITSTRUCTURE(device);
     device.nPortIndex = OMX_ALL;
     device.nU32       = 0;
-    if (m_camera->SetConfig(OMX_IndexParamCameraDeviceNumber, &device))
+    if (m_camera.SetConfig(OMX_IndexParamCameraDeviceNumber, &device))
         return false;
-    if (m_camera->WaitForResponse(OMX_EventParamOrConfigChanged, 0, 10000))
+    if (m_camera.WaitForResponse(OMX_EventParamOrConfigChanged, 0, 10000))
         return false;
 
     LOG(VB_GENERAL, LOG_INFO, "Broadcom drivers loaded");
@@ -426,7 +388,7 @@ bool TorcPiCamera::LoadDrivers(void)
 
 bool TorcPiCamera::LoadCameraSettings(void)
 {
-    if (!m_camera || !m_cameraVideoPort)
+    if (!m_cameraVideoPort)
         return false;
 
     // Sharpness
@@ -434,7 +396,7 @@ bool TorcPiCamera::LoadCameraSettings(void)
     OMX_INITSTRUCTURE(sharpness);
     sharpness.nPortIndex = OMX_ALL;
     sharpness.nSharpness = CAMERA_SHARPNESS;
-    if (m_camera->SetConfig(OMX_IndexConfigCommonSharpness, &sharpness))
+    if (m_camera.SetConfig(OMX_IndexConfigCommonSharpness, &sharpness))
         return false;
 
     // Contrast
@@ -442,7 +404,7 @@ bool TorcPiCamera::LoadCameraSettings(void)
     OMX_INITSTRUCTURE(contrast);
     contrast.nPortIndex = OMX_ALL;
     contrast.nContrast  = CAMERA_CONTRAST;
-    if (m_camera->SetConfig(OMX_IndexConfigCommonContrast, &contrast))
+    if (m_camera.SetConfig(OMX_IndexConfigCommonContrast, &contrast))
         return false;
 
     // Saturation
@@ -450,7 +412,7 @@ bool TorcPiCamera::LoadCameraSettings(void)
     OMX_INITSTRUCTURE(saturation);
     saturation.nPortIndex  = OMX_ALL;
     saturation.nSaturation = CAMERA_SATURATION;
-    if (m_camera->SetConfig(OMX_IndexConfigCommonSaturation, &saturation))
+    if (m_camera.SetConfig(OMX_IndexConfigCommonSaturation, &saturation))
         return false;
 
     // Brightness
@@ -458,7 +420,7 @@ bool TorcPiCamera::LoadCameraSettings(void)
     OMX_INITSTRUCTURE(brightness);
     brightness.nPortIndex  = OMX_ALL;
     brightness.nBrightness = CAMERA_BRIGHTNESS;
-    if (m_camera->SetConfig(OMX_IndexConfigCommonBrightness, &brightness))
+    if (m_camera.SetConfig(OMX_IndexConfigCommonBrightness, &brightness))
         return false;
 
     // Exposure
@@ -471,7 +433,7 @@ bool TorcPiCamera::LoadCameraSettings(void)
     exposure.bAutoShutterSpeed = CAMERA_SHUTTER_SPEED_AUTO;
     exposure.nSensitivity      = CAMERA_ISO;
     exposure.bAutoSensitivity  = CAMERA_ISO_AUTO;
-    if (m_camera->SetConfig(OMX_IndexConfigCommonExposureValue, &exposure))
+    if (m_camera.SetConfig(OMX_IndexConfigCommonExposureValue, &exposure))
         return false;
 
     // Exposure control
@@ -479,7 +441,7 @@ bool TorcPiCamera::LoadCameraSettings(void)
     OMX_INITSTRUCTURE(commonexposure);
     commonexposure.nPortIndex       = OMX_ALL;
     commonexposure.eExposureControl = CAMERA_EXPOSURE;
-    if (m_camera->SetConfig(OMX_IndexConfigCommonExposure, &commonexposure))
+    if (m_camera.SetConfig(OMX_IndexConfigCommonExposure, &commonexposure))
         return false;
 
     // Frame stabilisation
@@ -487,7 +449,7 @@ bool TorcPiCamera::LoadCameraSettings(void)
     OMX_INITSTRUCTURE(framestabilisation);
     framestabilisation.nPortIndex = OMX_ALL;
     framestabilisation.bStab      = CAMERA_FRAME_STABILIZATION;
-    if (m_camera->SetConfig(OMX_IndexConfigCommonFrameStabilisation, &framestabilisation))
+    if (m_camera.SetConfig(OMX_IndexConfigCommonFrameStabilisation, &framestabilisation))
         return false;
 
     // White balance
@@ -495,7 +457,7 @@ bool TorcPiCamera::LoadCameraSettings(void)
     OMX_INITSTRUCTURE(whitebalance);
     whitebalance.nPortIndex       = OMX_ALL;
     whitebalance.eWhiteBalControl = CAMERA_WHITE_BALANCE;
-    if (m_camera->SetConfig(OMX_IndexConfigCommonWhiteBalance, &whitebalance))
+    if (m_camera.SetConfig(OMX_IndexConfigCommonWhiteBalance, &whitebalance))
         return false;
 
     // White balance gain
@@ -505,7 +467,7 @@ bool TorcPiCamera::LoadCameraSettings(void)
       OMX_INITSTRUCTURE(whitebalancegain);
       whitebalancegain.xGainR = (CAMERA_WHITE_BALANCE_RED_GAIN << 16) / 1000;
       whitebalancegain.xGainB = (CAMERA_WHITE_BALANCE_BLUE_GAIN << 16) / 1000;
-      if (m_camera->SetConfig(OMX_IndexConfigCustomAwbGains, &whitebalancegain))
+      if (m_camera.SetConfig(OMX_IndexConfigCustomAwbGains, &whitebalancegain))
           return false;
     }
 
@@ -514,7 +476,7 @@ bool TorcPiCamera::LoadCameraSettings(void)
     OMX_INITSTRUCTURE(imagefilter);
     imagefilter.nPortIndex   = OMX_ALL;
     imagefilter.eImageFilter = CAMERA_IMAGE_FILTER;
-    if (m_camera->SetConfig(OMX_IndexConfigCommonImageFilter, &imagefilter))
+    if (m_camera.SetConfig(OMX_IndexConfigCommonImageFilter, &imagefilter))
         return false;
 
     // Mirror
@@ -522,7 +484,7 @@ bool TorcPiCamera::LoadCameraSettings(void)
     OMX_INITSTRUCTURE(mirror);
     mirror.nPortIndex = m_cameraVideoPort;
     mirror.eMirror    = CAMERA_MIRROR;
-    if (m_camera->SetConfig(OMX_IndexConfigCommonMirror, &mirror))
+    if (m_camera.SetConfig(OMX_IndexConfigCommonMirror, &mirror))
         return false;
 
     // Rotation
@@ -530,7 +492,7 @@ bool TorcPiCamera::LoadCameraSettings(void)
     OMX_INITSTRUCTURE(rotation);
     rotation.nPortIndex = m_cameraVideoPort;
     rotation.nRotation  = CAMERA_ROTATION;
-    if (m_camera->SetConfig(OMX_IndexConfigCommonRotate, &rotation))
+    if (m_camera.SetConfig(OMX_IndexConfigCommonRotate, &rotation))
         return false;
 
     // Color enhancement
@@ -540,14 +502,14 @@ bool TorcPiCamera::LoadCameraSettings(void)
     color_enhancement.bColorEnhancement = CAMERA_COLOR_ENABLE;
     color_enhancement.nCustomizedU      = CAMERA_COLOR_U;
     color_enhancement.nCustomizedV      = CAMERA_COLOR_V;
-    if (m_camera->SetConfig(OMX_IndexConfigCommonColorEnhancement, &color_enhancement))
+    if (m_camera.SetConfig(OMX_IndexConfigCommonColorEnhancement, &color_enhancement))
         return false;
 
     // Denoise
     OMX_CONFIG_BOOLEANTYPE denoise;
     OMX_INITSTRUCTURE(denoise);
     denoise.bEnabled = CAMERA_NOISE_REDUCTION;
-    if (m_camera->SetConfig(OMX_IndexConfigStillColourDenoiseEnable, &denoise))
+    if (m_camera.SetConfig(OMX_IndexConfigStillColourDenoiseEnable, &denoise))
         return false;
 
     //ROI
@@ -558,14 +520,14 @@ bool TorcPiCamera::LoadCameraSettings(void)
     roi.xTop       = (CAMERA_ROI_TOP << 16) / 100;
     roi.xWidth     = (CAMERA_ROI_WIDTH << 16) / 100;
     roi.xHeight    = (CAMERA_ROI_HEIGHT << 16) / 100;
-    if (m_camera->SetConfig(OMX_IndexConfigInputCropPercentages, &roi))
+    if (m_camera.SetConfig(OMX_IndexConfigInputCropPercentages, &roi))
         return false;
 
     //DRC
     OMX_CONFIG_DYNAMICRANGEEXPANSIONTYPE drc;
     OMX_INITSTRUCTURE(drc);
     drc.eMode = CAMERA_DRC;
-    if (m_camera->SetConfig(OMX_IndexConfigDynamicRangeExpansion, &drc))
+    if (m_camera.SetConfig(OMX_IndexConfigDynamicRangeExpansion, &drc))
         return false;
 
     return true;
@@ -580,7 +542,7 @@ bool TorcPiCamera::ConfigureCamera(void)
     OMX_PARAM_PORTDEFINITIONTYPE videoport;
     OMX_INITSTRUCTURE(videoport);
     videoport.nPortIndex = m_cameraVideoPort;
-    if (m_camera->GetParameter(OMX_IndexParamPortDefinition, &videoport))
+    if (m_camera.GetParameter(OMX_IndexParamPortDefinition, &videoport))
         return false;
 
     videoport.format.video.nFrameWidth        = VIDEO_WIDTH;
@@ -589,12 +551,12 @@ bool TorcPiCamera::ConfigureCamera(void)
     videoport.format.video.xFramerate         = VIDEO_FRAMERATE << 16;
     videoport.format.video.eCompressionFormat = OMX_VIDEO_CodingUnused;
     videoport.format.video.eColorFormat       = OMX_COLOR_FormatYUV420PackedPlanar;
-    if (m_camera->SetParameter(OMX_IndexParamPortDefinition, &videoport))
+    if (m_camera.SetParameter(OMX_IndexParamPortDefinition, &videoport))
         return false;
 
     // and the same for the preview port
     videoport.nPortIndex = m_cameraPreviewPort;
-    if (m_camera->SetParameter(OMX_IndexParamPortDefinition, &videoport))
+    if (m_camera.SetParameter(OMX_IndexParamPortDefinition, &videoport))
         return false;
 
     // configure video frame rate
@@ -602,12 +564,12 @@ bool TorcPiCamera::ConfigureCamera(void)
     OMX_INITSTRUCTURE(framerate);
     framerate.nPortIndex = m_cameraVideoPort;
     framerate.xEncodeFramerate = videoport.format.video.xFramerate;
-    if (m_camera->SetConfig(OMX_IndexConfigVideoFramerate, &framerate))
+    if (m_camera.SetConfig(OMX_IndexConfigVideoFramerate, &framerate))
         return false;
 
     // and same again for preview port
     framerate.nPortIndex = m_cameraPreviewPort;
-    if (m_camera->SetConfig(OMX_IndexConfigVideoFramerate, &framerate))
+    if (m_camera.SetConfig(OMX_IndexConfigVideoFramerate, &framerate))
         return false;
 
     // camera settings
@@ -619,14 +581,14 @@ bool TorcPiCamera::ConfigureCamera(void)
 
 bool TorcPiCamera::ConfigureEncoder(void)
 {
-    if (!m_encoder || !m_encoderOutputPort)
+    if (!m_encoderOutputPort)
         return false;
 
     // Encoder output
     OMX_PARAM_PORTDEFINITIONTYPE encoderport;
     OMX_INITSTRUCTURE(encoderport);
     encoderport.nPortIndex = m_encoderOutputPort;
-    if (m_encoder->GetParameter(OMX_IndexParamPortDefinition, &encoderport))
+    if (m_encoder.GetParameter(OMX_IndexParamPortDefinition, &encoderport))
         return false;
 
     encoderport.format.video.nFrameWidth        = VIDEO_WIDTH;
@@ -635,35 +597,35 @@ bool TorcPiCamera::ConfigureEncoder(void)
     encoderport.format.video.xFramerate         = VIDEO_FRAMERATE << 16;
     encoderport.format.video.nBitrate           = ENCODER_QP ? 0 : ENCODER_BITRATE;
     encoderport.format.video.eCompressionFormat = OMX_VIDEO_CodingAVC;
-    if (m_encoder->SetParameter(OMX_IndexParamPortDefinition, &encoderport))
+    if (m_encoder.SetParameter(OMX_IndexParamPortDefinition, &encoderport))
         return false;
 
     LOG(VB_GENERAL, LOG_INFO, "Set encoder output parameters");
 
     if (!ENCODER_QP)
     {
-      OMX_VIDEO_PARAM_BITRATETYPE bitrate;
-      OMX_INITSTRUCTURE(bitrate);
-      bitrate.eControlRate   = OMX_Video_ControlRateVariable;
-      bitrate.nTargetBitrate = ENCODER_BITRATE;
-      bitrate.nPortIndex     = m_encoderOutputPort;
-      if (m_encoder->SetParameter(OMX_IndexParamVideoBitrate, &bitrate))
-          return false;
+        OMX_VIDEO_PARAM_BITRATETYPE bitrate;
+        OMX_INITSTRUCTURE(bitrate);
+        bitrate.eControlRate   = OMX_Video_ControlRateVariable;
+        bitrate.nTargetBitrate = ENCODER_BITRATE;
+        bitrate.nPortIndex     = m_encoderOutputPort;
+        if (m_encoder.SetParameter(OMX_IndexParamVideoBitrate, &bitrate))
+            return false;
 
-      LOG(VB_GENERAL, LOG_INFO, "Set encoder output bitrate");
+        LOG(VB_GENERAL, LOG_INFO, "Set encoder output bitrate");
     }
     else
     {
-      // quantization
-      OMX_VIDEO_PARAM_QUANTIZATIONTYPE quantization;
-      OMX_INITSTRUCTURE(quantization);
-      quantization.nPortIndex = m_encoderOutputPort;
-      quantization.nQpI       = ENCODER_QP_I;
-      quantization.nQpP       = ENCODER_QP_P;
-      if (m_encoder->SetParameter(OMX_IndexParamVideoQuantization, &quantization))
-          return false;
+        // quantization
+        OMX_VIDEO_PARAM_QUANTIZATIONTYPE quantization;
+        OMX_INITSTRUCTURE(quantization);
+        quantization.nPortIndex = m_encoderOutputPort;
+        quantization.nQpI       = ENCODER_QP_I;
+        quantization.nQpP       = ENCODER_QP_P;
+        if (m_encoder.SetParameter(OMX_IndexParamVideoQuantization, &quantization))
+            return false;
 
-      LOG(VB_GENERAL, LOG_INFO, "Set encoder output quantization");
+        LOG(VB_GENERAL, LOG_INFO, "Set encoder output quantization");
     }
 
     // codec
@@ -671,7 +633,7 @@ bool TorcPiCamera::ConfigureEncoder(void)
     OMX_INITSTRUCTURE(format);
     format.nPortIndex         = m_encoderOutputPort;
     format.eCompressionFormat = OMX_VIDEO_CodingAVC;
-    if (m_encoder->SetParameter(OMX_IndexParamVideoPortFormat, &format))
+    if (m_encoder.SetParameter(OMX_IndexParamVideoPortFormat, &format))
         return false;
 
     LOG(VB_GENERAL, LOG_INFO, "Set encoder output format");
@@ -680,10 +642,10 @@ bool TorcPiCamera::ConfigureEncoder(void)
     OMX_VIDEO_CONFIG_AVCINTRAPERIOD idr;
     OMX_INITSTRUCTURE(idr);
     idr.nPortIndex = m_encoderOutputPort;
-    if (m_encoder->GetConfig(OMX_IndexConfigVideoAVCIntraPeriod, &idr))
+    if (m_encoder.GetConfig(OMX_IndexConfigVideoAVCIntraPeriod, &idr))
         return false;
     idr.nIDRPeriod = ENCODER_IDR_PERIOD;
-    if (m_encoder->SetConfig(OMX_IndexConfigVideoAVCIntraPeriod, &idr))
+    if (m_encoder.SetConfig(OMX_IndexConfigVideoAVCIntraPeriod, &idr))
         return false;
 
     LOG(VB_GENERAL, LOG_INFO, "Set encoder output IDR");
@@ -693,7 +655,7 @@ bool TorcPiCamera::ConfigureEncoder(void)
     OMX_INITSTRUCTURE(sei);
     sei.nPortIndex = m_encoderOutputPort;
     sei.bEnable    = ENCODER_SEI;
-    if (m_encoder->SetParameter(OMX_IndexParamBrcmVideoAVCSEIEnable, &sei))
+    if (m_encoder.SetParameter(OMX_IndexParamBrcmVideoAVCSEIEnable, &sei))
         return false;
 
     LOG(VB_GENERAL, LOG_INFO, "Set encoder output SEI");
@@ -703,7 +665,7 @@ bool TorcPiCamera::ConfigureEncoder(void)
     OMX_INITSTRUCTURE(eede);
     eede.nPortIndex = m_encoderOutputPort;
     eede.enable     = ENCODER_EEDE;
-    if (m_encoder->SetParameter(OMX_IndexParamBrcmEEDEEnable, &eede))
+    if (m_encoder.SetParameter(OMX_IndexParamBrcmEEDEEnable, &eede))
         return false;
 
     LOG(VB_GENERAL, LOG_INFO, "Set endcoder output EEDE");
@@ -712,7 +674,7 @@ bool TorcPiCamera::ConfigureEncoder(void)
     OMX_INITSTRUCTURE(eede_loss_rate);
     eede_loss_rate.nPortIndex = m_encoderOutputPort;
     eede_loss_rate.loss_rate  = ENCODER_EEDE_LOSS_RATE;
-    if (m_encoder->SetParameter(OMX_IndexParamBrcmEEDELossRate, &eede_loss_rate))
+    if (m_encoder.SetParameter(OMX_IndexParamBrcmEEDELossRate, &eede_loss_rate))
         return false;
 
     LOG(VB_GENERAL, LOG_INFO, "Set encoder output EEDE loss rate");
@@ -721,10 +683,10 @@ bool TorcPiCamera::ConfigureEncoder(void)
     OMX_VIDEO_PARAM_AVCTYPE avc;
     OMX_INITSTRUCTURE(avc);
     avc.nPortIndex = m_encoderOutputPort;
-    if (m_encoder->GetParameter(OMX_IndexParamVideoAvc, &avc))
+    if (m_encoder.GetParameter(OMX_IndexParamVideoAvc, &avc))
         return false;
     avc.eProfile = ENCODER_PROFILE;
-    if (m_encoder->SetParameter(OMX_IndexParamVideoAvc, &avc))
+    if (m_encoder.SetParameter(OMX_IndexParamVideoAvc, &avc))
         return false;
 
     LOG(VB_GENERAL, LOG_INFO, "Set encoder output profile");
@@ -734,7 +696,7 @@ bool TorcPiCamera::ConfigureEncoder(void)
     OMX_INITSTRUCTURE(headers);
     headers.nPortIndex = m_encoderOutputPort;
     headers.bEnabled   = ENCODER_INLINE_HEADERS;
-    if (m_encoder->SetParameter(OMX_IndexParamBrcmVideoAVCInlineHeaderEnable, &headers))
+    if (m_encoder.SetParameter(OMX_IndexParamBrcmVideoAVCInlineHeaderEnable, &headers))
         return false;
 
     LOG(VB_GENERAL, LOG_INFO, "Set encoder output SPS/PPS");
@@ -744,7 +706,7 @@ bool TorcPiCamera::ConfigureEncoder(void)
     OMX_INITSTRUCTURE(timing);
     timing.nPortIndex =  m_encoderOutputPort;
     timing.bEnabled   = ENCODER_SPS_TIMING;
-    if (m_encoder->SetParameter(OMX_IndexParamBrcmVideoAVCSPSTimingEnable, &timing))
+    if (m_encoder.SetParameter(OMX_IndexParamBrcmVideoAVCSPSTimingEnable, &timing))
         return false;
 
     LOG(VB_GENERAL, LOG_INFO, "Set encoder SPS timings");
