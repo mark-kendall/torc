@@ -535,7 +535,7 @@ bool TorcPiCamera::LoadCameraSettings(void)
 
 bool TorcPiCamera::ConfigureCamera(void)
 {
-    if (!m_camera || !m_cameraPreviewPort || !m_cameraVideoPort)
+    if (!m_cameraPreviewPort || !m_cameraVideoPort)
         return false;
 
     // configure camera video port
