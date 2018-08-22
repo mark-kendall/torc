@@ -540,15 +540,15 @@ void TorcCameraOutput::ProcessHTTPRequest(const QString &PeerAddress, int PeerPo
 QByteArray* TorcCameraOutput::GetPlayerPage(void)
 {
     static const QString player("<html>\r\n"
-                                "  <script src=\"js/vendor/dash-2.9.0.all.min.js\"></script>\r\n"
+                                "  <script src=\"/js/vendor/dash-2.9.0.all.min.js\"></script>\r\n"
                                 "  <body>\r\n"
                                 "    <div>\r\n"
-                                "      <video data-dashjs-player autoplay src=\"%1\"></video>\r\n"
+                                "      <video data-dashjs-player autoplay src=\"%1\" controls></video>\r\n"
                                 "    </div>\r\n"
                                 "  </body>\r\n"
                                 "</html>\r\n");
 
-    return new QByteArray(player.arg(m_signature + DASH_PLAYLIST).toLocal8Bit());
+    return new QByteArray(player.arg(DASH_PLAYLIST).toLocal8Bit());
 }
 
 QByteArray* TorcCameraOutput::GetMasterPlaylist(void)
