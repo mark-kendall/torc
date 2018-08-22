@@ -685,18 +685,22 @@ void TorcCameraOutputs::Create(const QVariantMap &Details)
 
                         // NB TorcCameraFactory checks that the underlying class can handle the specified camera
                         // which ensures the TorcCameraOutput instance will be able to create the camera.
+                        QString model = camera.value("model").toString();
+                        TorcCameraOutput *newcamera = NULL;
                         TorcCameraFactory* factory = TorcCameraFactory::GetTorcCameraFactory();
                         TorcCameraParams params(Details);
                         for ( ; factory; factory = factory->NextFactory())
                         {
                             if (factory->CanHandle(it.key(), params))
                             {
-                                TorcCameraOutput *newcamera = new TorcCameraOutput(camera.value("model").toString(), camera);
-                                m_cameras.insertMulti(camera.value("model").toString(), newcamera);
-                                LOG(VB_GENERAL, LOG_INFO, QString("New camera '%1'").arg(newcamera->GetUniqueId()));
+                                newcamera = new TorcCameraOutput(model, camera);
+                                m_cameras.insertMulti(model, newcamera);
+                                LOG(VB_GENERAL, LOG_INFO, QString("New '%1' camera '%2'").arg(model).arg(newcamera->GetUniqueId()));
                                 break;
                             }
                         }
+                        if (NULL == newcamera)
+                            LOG(VB_GENERAL, LOG_WARNING, QString("Failed to find handler for camera '%1'").arg(model));
                     }
                 }
             }
