@@ -213,12 +213,12 @@ linux-rasp-pi-g++ | !isEmpty(pi) {
 }
 
 !isEmpty(openmax) {
-    HEADERS += torc/openmax/torcomxtest.h
+    #HEADERS += torc/openmax/torcomxtest.h
     HEADERS += torc/openmax/torcomxcore.h
     HEADERS += torc/openmax/torcomxport.h
     HEADERS += torc/openmax/torcomxcomponent.h
     HEADERS += torc/openmax/torcomxtunnel.h
-    SOURCES += torc/openmax/torcomxtest.cpp
+    #SOURCES += torc/openmax/torcomxtest.cpp
     SOURCES += torc/openmax/torcomxcore.cpp
     SOURCES += torc/openmax/torcomxport.cpp
     SOURCES += torc/openmax/torcomxcomponent.cpp
