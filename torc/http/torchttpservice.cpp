@@ -436,6 +436,11 @@ QString TorcHTTPService::GetUIName(void)
     return Name();
 }
 
+QString TorcHTTPService::GetPresentationURL(void)
+{
+    return QString();
+}
+
 void TorcHTTPService::ProcessHTTPRequest(const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest &Request)
 {
     (void)PeerAddress;

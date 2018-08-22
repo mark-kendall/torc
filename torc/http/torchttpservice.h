@@ -30,6 +30,7 @@ class TorcHTTPService : public TorcHTTPHandler
     QVariantMap  GetServiceDetails        (void);
 
     virtual QString GetUIName             (void);
+    virtual QString GetPresentationURL    (void);
 
   protected:
     void         EnableMethod             (const QString &Method);

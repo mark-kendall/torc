@@ -304,6 +304,11 @@ TorcOutput::Type TorcCameraOutput::GetType(void)
     return TorcOutput::Camera;
 }
 
+QString TorcCameraOutput::GetPresentationURL(void)
+{
+    return QString("%1%2").arg(m_signature).arg(VIDEO_PAGE);
+}
+
 void TorcCameraOutput::Start(void)
 {
     Stop();

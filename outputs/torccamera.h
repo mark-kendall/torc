@@ -122,6 +122,7 @@ class TorcCameraOutput Q_DECL_FINAL : public TorcOutput
     TorcOutput::Type GetType            (void) Q_DECL_OVERRIDE;
     void             Start              (void) Q_DECL_OVERRIDE;
     void             Stop               (void) Q_DECL_OVERRIDE;
+    QString          GetPresentationURL (void) Q_DECL_OVERRIDE;
 
   public slots:
     void             ProcessHTTPRequest (const QString &PeerAddress, int PeerPort, const QString &LocalAddress,
