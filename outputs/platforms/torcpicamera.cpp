@@ -77,7 +77,6 @@
 #define ENCODER_INLINE_HEADERS         OMX_TRUE
 #define ENCODER_SPS_TIMING             OMX_TRUE
 #define VIDEO_WIDTH                    1280
-#define VIDEO_FRAMERATE                30
 
 TorcPiCamera::TorcPiCamera(const TorcCameraParams &Params)
   : TorcCameraDevice(Params),
@@ -229,7 +228,7 @@ bool TorcPiCamera::WriteFrame(void)
 
     // TODO wrap pts
     // this increases the pts monotonically based on actual complete frames received
-    qint64 pts = m_frameCount * (90000.0 / (float)VIDEO_FRAMERATE);
+    qint64 pts = m_frameCount * (90000.0 / (float)m_params.m_frameRate);
     // sps is not considered a frame but muxer will complain if the pts does not increase
     if (sps)
         pts++;
@@ -266,7 +265,7 @@ bool TorcPiCamera::WriteFrame(void)
             m_haveInitSegment = true;
             m_muxer->FinishSegment(true);
         }
-        else if (!sps && !(m_frameCount % (VIDEO_FRAMERATE * VIDEO_SEGMENT_TARGET)))
+        else if (!sps && !(m_frameCount % (m_params.m_frameRate * VIDEO_SEGMENT_TARGET)))
         {
             m_muxer->FinishSegment(false);
         }
@@ -547,7 +546,7 @@ bool TorcPiCamera::ConfigureCamera(void)
     videoport.format.video.nFrameWidth        = VIDEO_WIDTH;
     videoport.format.video.nFrameHeight       = m_params.m_height;
     videoport.format.video.nStride            = VIDEO_WIDTH;
-    videoport.format.video.xFramerate         = VIDEO_FRAMERATE << 16;
+    videoport.format.video.xFramerate         = m_params.m_frameRate << 16;
     videoport.format.video.eCompressionFormat = OMX_VIDEO_CodingUnused;
     videoport.format.video.eColorFormat       = OMX_COLOR_FormatYUV420PackedPlanar;
     if (m_camera.SetParameter(OMX_IndexParamPortDefinition, &videoport))
@@ -593,7 +592,7 @@ bool TorcPiCamera::ConfigureEncoder(void)
     encoderport.format.video.nFrameWidth        = VIDEO_WIDTH;
     encoderport.format.video.nFrameHeight       = m_params.m_height;
     encoderport.format.video.nStride            = VIDEO_WIDTH;
-    encoderport.format.video.xFramerate         = VIDEO_FRAMERATE << 16;
+    encoderport.format.video.xFramerate         = m_params.m_frameRate << 16;
     encoderport.format.video.nBitrate           = ENCODER_QP ? 0 : m_params.m_bitrate;
     encoderport.format.video.eCompressionFormat = OMX_VIDEO_CodingAVC;
     if (m_encoder.SetParameter(OMX_IndexParamPortDefinition, &encoderport))
