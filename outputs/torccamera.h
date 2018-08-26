@@ -40,7 +40,7 @@ class TorcCameraParams
     bool    m_valid;
     int     m_width;
     int     m_height;
-    int     m_frameRateNum;
+    int     m_frameRate;
     int     m_bitrate;
     int     m_timebase;
     int     m_segmentLength;
