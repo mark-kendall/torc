@@ -69,7 +69,6 @@
 #define ENCODER_QP                     OMX_FALSE
 #define ENCODER_QP_I                   0
 #define ENCODER_QP_P                   0
-#define ENCODER_IDR_PERIOD             30 // once every second
 #define ENCODER_SEI                    OMX_FALSE
 #define ENCODER_EEDE                   OMX_FALSE
 #define ENCODER_EEDE_LOSS_RATE         0
@@ -641,11 +640,11 @@ bool TorcPiCamera::ConfigureEncoder(void)
     idr.nPortIndex = m_encoderOutputPort;
     if (m_encoder.GetConfig(OMX_IndexConfigVideoAVCIntraPeriod, &idr))
         return false;
-    idr.nIDRPeriod = ENCODER_IDR_PERIOD;
+    idr.nIDRPeriod = m_params.m_frameRate * VIDEO_GOPDURA_TARGET;
     if (m_encoder.SetConfig(OMX_IndexConfigVideoAVCIntraPeriod, &idr))
         return false;
 
-    LOG(VB_GENERAL, LOG_INFO, "Set encoder output IDR");
+    LOG(VB_GENERAL, LOG_INFO, QString("Set encoder output IDR to %1").arg(m_params.m_frameRate * VIDEO_GOPDURA_TARGET));
 
     // SEI
     OMX_PARAM_BRCMVIDEOAVCSEIENABLETYPE sei;
