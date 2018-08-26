@@ -18,9 +18,9 @@
 #define VIDEO_FRAMERATE_MAX  60
 #define VIDEO_BITRATE_MIN    128000
 #define VIDEO_BITRATE_MAX    25000000
-#define VIDEO_SEGMENT_TARGET 2
-#define VIDEO_GOPDURA_TARGET 1 //2 second segment with IDR every second
-#define VIDEO_SEGMENT_NUMBER 10
+#define VIDEO_SEGMENT_TARGET 2  // 2 second segments
+#define VIDEO_GOPDURA_TARGET 1  // with IDR every second
+#define VIDEO_SEGMENT_NUMBER 10 // 10 segments for a total of 20 buffered seconds
 #define VIDEO_TIMEBASE       90000
 
 #define DASH_PLAYLIST        QString("dash.mpd")
