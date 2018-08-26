@@ -33,7 +33,7 @@ TorcCameraParams::TorcCameraParams(void)
     m_height(0),
     m_frameRate(1),
     m_bitrate(0),
-    m_timebase(0),
+    m_timebase(VIDEO_TIMEBASE),
     m_segmentLength(0),
     m_gopSize(0),
     m_model(),
@@ -47,7 +47,7 @@ TorcCameraParams::TorcCameraParams(const QVariantMap &Details)
     m_height(0),
     m_frameRate(1),
     m_bitrate(0),
-    m_timebase(0),
+    m_timebase(VIDEO_TIMEBASE),
     m_segmentLength(0),
     m_gopSize(0),
     m_model(),
@@ -105,7 +105,6 @@ TorcCameraParams::TorcCameraParams(const QVariantMap &Details)
 
     m_segmentLength = m_frameRate * VIDEO_SEGMENT_TARGET;
     m_gopSize       = m_frameRate * VIDEO_GOPDURA_TARGET;
-    m_timebase      = 90000;
 
     LOG(VB_GENERAL, LOG_INFO, QString("Segment length: %1frames %2seconds").arg(m_segmentLength).arg(m_segmentLength / m_frameRate));
     LOG(VB_GENERAL, LOG_INFO, QString("GOP     length: %1frames %2seconds").arg(m_gopSize).arg(m_gopSize / m_frameRate));

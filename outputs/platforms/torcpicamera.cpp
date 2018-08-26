@@ -228,7 +228,7 @@ bool TorcPiCamera::WriteFrame(void)
 
     // TODO wrap pts
     // this increases the pts monotonically based on actual complete frames received
-    qint64 pts = m_frameCount * (90000.0 / (float)m_params.m_frameRate);
+    qint64 pts = m_frameCount * ((float)m_params.m_timebase / (float)m_params.m_frameRate);
     // sps is not considered a frame but muxer will complain if the pts does not increase
     if (sps)
         pts++;

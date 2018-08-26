@@ -21,6 +21,7 @@
 #define VIDEO_SEGMENT_TARGET 2
 #define VIDEO_GOPDURA_TARGET 1 //2 second segment with IDR every second
 #define VIDEO_SEGMENT_NUMBER 10
+#define VIDEO_TIMEBASE       90000
 
 #define DASH_PLAYLIST        QString("dash.mpd")
 #define HLS_PLAYLIST_MAST    QString("master.m3u8")
