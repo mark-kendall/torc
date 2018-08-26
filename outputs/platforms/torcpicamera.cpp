@@ -77,7 +77,6 @@
 #define ENCODER_INLINE_HEADERS         OMX_TRUE
 #define ENCODER_SPS_TIMING             OMX_TRUE
 #define VIDEO_WIDTH                    1280
-#define VIDEO_HEIGHT                   720
 #define VIDEO_FRAMERATE                30
 
 TorcPiCamera::TorcPiCamera(const TorcCameraParams &Params)
@@ -185,7 +184,7 @@ bool TorcPiCamera::Setup(void)
     if (!m_muxer)
         return false;
 
-    m_videoStream = m_muxer->AddH264Stream(VIDEO_WIDTH, VIDEO_HEIGHT, profile, m_params.m_bitrate);
+    m_videoStream = m_muxer->AddH264Stream(VIDEO_WIDTH, m_params.m_height, profile, m_params.m_bitrate);
     if (!m_muxer->IsValid())
         return false;
 
@@ -546,7 +545,7 @@ bool TorcPiCamera::ConfigureCamera(void)
         return false;
 
     videoport.format.video.nFrameWidth        = VIDEO_WIDTH;
-    videoport.format.video.nFrameHeight       = VIDEO_HEIGHT;
+    videoport.format.video.nFrameHeight       = m_params.m_height;
     videoport.format.video.nStride            = VIDEO_WIDTH;
     videoport.format.video.xFramerate         = VIDEO_FRAMERATE << 16;
     videoport.format.video.eCompressionFormat = OMX_VIDEO_CodingUnused;
@@ -592,7 +591,7 @@ bool TorcPiCamera::ConfigureEncoder(void)
         return false;
 
     encoderport.format.video.nFrameWidth        = VIDEO_WIDTH;
-    encoderport.format.video.nFrameHeight       = VIDEO_HEIGHT;
+    encoderport.format.video.nFrameHeight       = m_params.m_height;
     encoderport.format.video.nStride            = VIDEO_WIDTH;
     encoderport.format.video.xFramerate         = VIDEO_FRAMERATE << 16;
     encoderport.format.video.nBitrate           = ENCODER_QP ? 0 : m_params.m_bitrate;
