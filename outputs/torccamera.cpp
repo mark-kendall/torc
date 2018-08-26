@@ -66,6 +66,14 @@ TorcCameraParams::TorcCameraParams(const QVariantMap &Details)
     m_bitrate   = Details.value("bitrate").toInt();
     m_model     = Details.value("model").toString();
 
+    // most h264 streams will expect 16 pixel aligned video so round up
+    int pitch = (m_width + 15) & ~15;
+    if (pitch != m_width)
+    {
+        LOG(VB_GENERAL, LOG_INFO, QString("Rounding video width up to %1 from %2").arg(pitch).arg(m_width));
+        m_width = pitch;
+    }
+
     bool forcemin = m_width < VIDEO_WIDTH_MIN || m_height < VIDEO_HEIGHT_MIN;
     bool forcemax = m_width > VIDEO_WIDTH_MAX || m_height > VIDEO_HEIGHT_MAX;
     if (forcemin)
