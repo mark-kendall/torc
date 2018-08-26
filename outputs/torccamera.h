@@ -41,7 +41,6 @@ class TorcCameraParams
     int     m_width;
     int     m_height;
     int     m_frameRateNum;
-    int     m_frameRateDiv;
     int     m_bitrate;
     int     m_timebase;
     int     m_segmentLength;

@@ -178,7 +178,7 @@ bool TorcPiCamera::Setup(void)
             LOG(VB_GENERAL, LOG_WARNING, "Unknown H264 profile. Defaulting to baseline");
     }
 
-    int buffersize = (m_params.m_bitrate * (m_params.m_segmentLength / (m_params.m_frameRateNum / m_params.m_frameRateDiv)) * VIDEO_SEGMENT_NUMBER) / 8;
+    int buffersize = (m_params.m_bitrate * (m_params.m_segmentLength / m_params.m_frameRateNum) * VIDEO_SEGMENT_NUMBER) / 8;
     m_ringBuffer   = new TorcSegmentedRingBuffer(buffersize);    
     m_muxer        = new TorcMuxer(m_ringBuffer);
     if (!m_muxer)

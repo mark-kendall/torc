@@ -95,12 +95,10 @@
   </xs:restriction>
 </xs:simpleType>
 
-<!-- this needs to account for fractional framerates where the denominator is used as well -->
-<!-- e.g 30000/1001 for ntsc -->
 <xs:simpleType name="videoFrameRateType">
   <xs:restriction base="xs:integer">
     <xs:minInclusive value="1"/>
-    <xs:maxInclusive value="100000"/>
+    <xs:maxInclusive value="240"/>
   </xs:restriction>
 </xs:simpleType>
 
@@ -329,7 +327,6 @@
     <xs:element name="width"           type="videoWidthType"/>
     <xs:element name="height"          type="videoHeightType"/>
     <xs:element name="framerate"       type="videoFrameRateType"/>
-    <xs:element name="frameratediv"    type="videoFrameRateType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="bitrate"         type="videoBitRateType"/>
   </xs:all>
 </xs:complexType>

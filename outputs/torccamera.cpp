@@ -32,7 +32,6 @@ TorcCameraParams::TorcCameraParams(void)
     m_width(0),
     m_height(0),
     m_frameRateNum(1),
-    m_frameRateDiv(1),
     m_bitrate(0),
     m_timebase(0),
     m_segmentLength(0),
@@ -47,7 +46,6 @@ TorcCameraParams::TorcCameraParams(const QVariantMap &Details)
     m_width(0),
     m_height(0),
     m_frameRateNum(1),
-    m_frameRateDiv(1),
     m_bitrate(0),
     m_timebase(0),
     m_segmentLength(0),
@@ -67,14 +65,6 @@ TorcCameraParams::TorcCameraParams(const QVariantMap &Details)
     m_frameRateNum = Details.value("framerate").toInt();
     m_bitrate      = Details.value("bitrate").toInt();
     m_model        = Details.value("model").toString();
-    if (Details.contains("frameratediv"))
-        m_frameRateDiv = Details.value("frameratediv").toInt();
-
-    if (m_frameRateDiv < 1)
-    {
-        LOG(VB_GENERAL, LOG_ERR, "Framerate denominator is too low - invalid");
-        return;
-    }
 
     bool forcemin = m_width < VIDEO_WIDTH_MIN || m_height < VIDEO_HEIGHT_MIN;
     bool forcemax = m_width > VIDEO_WIDTH_MAX || m_height > VIDEO_HEIGHT_MAX;
@@ -91,17 +81,14 @@ TorcCameraParams::TorcCameraParams(const QVariantMap &Details)
         LOG(VB_GENERAL, LOG_WARNING, QString("Video too large - forcing output to %1x%2").arg(m_width).arg(m_height));
     }
 
-    double framerate = m_frameRateNum / m_frameRateDiv;
-    if (framerate < VIDEO_FRAMERATE_MIN)
+    if (m_frameRateNum < VIDEO_FRAMERATE_MIN)
     {
         m_frameRateNum = VIDEO_FRAMERATE_MIN;
-        m_frameRateDiv = 1;
         LOG(VB_GENERAL, LOG_WARNING, QString("Video framerate too low - forcing to %1").arg(m_frameRateNum));
     }
-    else if (framerate > VIDEO_FRAMERATE_MAX)
+    else if (m_frameRateNum > VIDEO_FRAMERATE_MAX)
     {
         m_frameRateNum = VIDEO_FRAMERATE_MAX;
-        m_frameRateDiv = 1;
         LOG(VB_GENERAL, LOG_WARNING, QString("Video framerate too high - forcing to %1").arg(m_frameRateNum));
     }
 
@@ -116,13 +103,13 @@ TorcCameraParams::TorcCameraParams(const QVariantMap &Details)
         LOG(VB_GENERAL, LOG_WARNING, QString("Video bitrate too high - forcing to %1").arg(m_bitrate));
     }
 
-    m_segmentLength = framerate * VIDEO_SEGMENT_TARGET;
-    m_gopSize       = framerate * VIDEO_GOPDURA_TARGET;
+    m_segmentLength = m_frameRateNum * VIDEO_SEGMENT_TARGET;
+    m_gopSize       = m_frameRateNum * VIDEO_GOPDURA_TARGET;
     m_timebase      = 90000;
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Segment length: %1frames %2seconds").arg(m_segmentLength).arg(m_segmentLength / framerate));
-    LOG(VB_GENERAL, LOG_INFO, QString("GOP     length: %1frames %2seconds").arg(m_gopSize).arg(m_gopSize / framerate));
-    LOG(VB_GENERAL, LOG_INFO, QString("Camera video  : %1x%2@%3fps bitrate %4").arg(m_width).arg(m_height).arg(framerate).arg(m_bitrate));
+    LOG(VB_GENERAL, LOG_INFO, QString("Segment length: %1frames %2seconds").arg(m_segmentLength).arg(m_segmentLength / m_frameRateNum));
+    LOG(VB_GENERAL, LOG_INFO, QString("GOP     length: %1frames %2seconds").arg(m_gopSize).arg(m_gopSize / m_frameRateNum));
+    LOG(VB_GENERAL, LOG_INFO, QString("Camera video  : %1x%2@%3fps bitrate %4").arg(m_width).arg(m_height).arg(m_frameRateNum).arg(m_bitrate));
 
     m_valid = true;
 }
@@ -132,7 +119,6 @@ TorcCameraParams::TorcCameraParams(const TorcCameraParams &Other)
       m_width(Other.m_width),
       m_height(Other.m_height),
       m_frameRateNum(Other.m_frameRateNum),
-      m_frameRateDiv(Other.m_frameRateDiv),
       m_bitrate(Other.m_bitrate),
       m_timebase(Other.m_timebase),
       m_segmentLength(Other.m_segmentLength),
@@ -575,7 +561,7 @@ QByteArray* TorcCameraOutput::GetHLSPlaylist(void)
                                   "#EXT-X-MEDIA-SEQUENCE:%2\r\n"
                                   "#EXT-X-MAP:URI=\"initSegment.mp4\"\r\n");
 
-    QString duration = QString::number(m_params.m_segmentLength * ((float)m_params.m_frameRateDiv / m_params.m_frameRateNum), 'f', 2);
+    QString duration = QString::number(m_params.m_segmentLength / (float) m_params.m_frameRateNum, 'f', 2);
     m_segmentLock.lockForRead();
     QString result = playlist.arg(duration).arg(m_segments.first());
     foreach (int segment, m_segments)
@@ -603,7 +589,7 @@ QByteArray* TorcCameraOutput::GetDashPlaylist(void)
         "  </Period>\r\n"
         "</MPD>\r\n");
 
-    float duration = m_params.m_segmentLength * ((float)m_params.m_frameRateDiv / m_params.m_frameRateNum);
+    float duration = m_params.m_segmentLength / (float)m_params.m_frameRateNum;
     return new QByteArray(dash.arg(m_cameraStartTime.toString(Qt::ISODate))
                               .arg(QString::number(duration * 5, 'f', 2))
                               .arg(QString::number(duration * 4, 'f', 2))
@@ -614,7 +600,7 @@ QByteArray* TorcCameraOutput::GetDashPlaylist(void)
                               .arg(m_params.m_bitrate)
                               .arg(QString("%1").arg(VIDEO_CODEC_ISO))
                               //.arg(QString("%1,%2").arg(VIDEO_CODEC_ISO).arg(AUDIO_CODEC_ISO))
-                              .arg(QString("%1/%2").arg(m_params.m_frameRateNum).arg(m_params.m_frameRateDiv))
+                              .arg(QString("%1").arg(m_params.m_frameRateNum))
                               .arg(duration * m_params.m_timebase)
                               .arg(m_params.m_timebase).toLocal8Bit());
 }
