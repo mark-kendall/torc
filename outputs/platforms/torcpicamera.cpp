@@ -65,7 +65,7 @@
 #define CAMERA_ROI_WIDTH               100
 #define CAMERA_ROI_HEIGHT              100
 #define CAMERA_DRC                     OMX_DynRangeExpOff // Off/Low/Medium/High
-#define ENCODER_BITRATE                4000000
+
 #define ENCODER_QP                     OMX_FALSE
 #define ENCODER_QP_I                   0
 #define ENCODER_QP_P                   0
@@ -185,7 +185,7 @@ bool TorcPiCamera::Setup(void)
     if (!m_muxer)
         return false;
 
-    m_videoStream = m_muxer->AddH264Stream(VIDEO_WIDTH, VIDEO_HEIGHT, profile, ENCODER_BITRATE);
+    m_videoStream = m_muxer->AddH264Stream(VIDEO_WIDTH, VIDEO_HEIGHT, profile, m_params.m_bitrate);
     if (!m_muxer->IsValid())
         return false;
 
@@ -595,7 +595,7 @@ bool TorcPiCamera::ConfigureEncoder(void)
     encoderport.format.video.nFrameHeight       = VIDEO_HEIGHT;
     encoderport.format.video.nStride            = VIDEO_WIDTH;
     encoderport.format.video.xFramerate         = VIDEO_FRAMERATE << 16;
-    encoderport.format.video.nBitrate           = ENCODER_QP ? 0 : ENCODER_BITRATE;
+    encoderport.format.video.nBitrate           = ENCODER_QP ? 0 : m_params.m_bitrate;
     encoderport.format.video.eCompressionFormat = OMX_VIDEO_CodingAVC;
     if (m_encoder.SetParameter(OMX_IndexParamPortDefinition, &encoderport))
         return false;
@@ -607,7 +607,7 @@ bool TorcPiCamera::ConfigureEncoder(void)
         OMX_VIDEO_PARAM_BITRATETYPE bitrate;
         OMX_INITSTRUCTURE(bitrate);
         bitrate.eControlRate   = OMX_Video_ControlRateVariable;
-        bitrate.nTargetBitrate = ENCODER_BITRATE;
+        bitrate.nTargetBitrate = m_params.m_bitrate;
         bitrate.nPortIndex     = m_encoderOutputPort;
         if (m_encoder.SetParameter(OMX_IndexParamVideoBitrate, &bitrate))
             return false;
