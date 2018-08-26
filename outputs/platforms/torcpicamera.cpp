@@ -76,7 +76,6 @@
 #define ENCODER_PROFILE                OMX_VIDEO_AVCProfileMain
 #define ENCODER_INLINE_HEADERS         OMX_TRUE
 #define ENCODER_SPS_TIMING             OMX_TRUE
-#define VIDEO_WIDTH                    1280
 
 TorcPiCamera::TorcPiCamera(const TorcCameraParams &Params)
   : TorcCameraDevice(Params),
@@ -183,7 +182,7 @@ bool TorcPiCamera::Setup(void)
     if (!m_muxer)
         return false;
 
-    m_videoStream = m_muxer->AddH264Stream(VIDEO_WIDTH, m_params.m_height, profile, m_params.m_bitrate);
+    m_videoStream = m_muxer->AddH264Stream(m_params.m_width, m_params.m_height, profile, m_params.m_bitrate);
     if (!m_muxer->IsValid())
         return false;
 
@@ -543,9 +542,9 @@ bool TorcPiCamera::ConfigureCamera(void)
     if (m_camera.GetParameter(OMX_IndexParamPortDefinition, &videoport))
         return false;
 
-    videoport.format.video.nFrameWidth        = VIDEO_WIDTH;
+    videoport.format.video.nFrameWidth        = m_params.m_width;
     videoport.format.video.nFrameHeight       = m_params.m_height;
-    videoport.format.video.nStride            = VIDEO_WIDTH;
+    videoport.format.video.nStride            = m_params.m_width;
     videoport.format.video.xFramerate         = m_params.m_frameRate << 16;
     videoport.format.video.eCompressionFormat = OMX_VIDEO_CodingUnused;
     videoport.format.video.eColorFormat       = OMX_COLOR_FormatYUV420PackedPlanar;
@@ -589,9 +588,9 @@ bool TorcPiCamera::ConfigureEncoder(void)
     if (m_encoder.GetParameter(OMX_IndexParamPortDefinition, &encoderport))
         return false;
 
-    encoderport.format.video.nFrameWidth        = VIDEO_WIDTH;
+    encoderport.format.video.nFrameWidth        = m_params.m_width;
     encoderport.format.video.nFrameHeight       = m_params.m_height;
-    encoderport.format.video.nStride            = VIDEO_WIDTH;
+    encoderport.format.video.nStride            = m_params.m_width;
     encoderport.format.video.xFramerate         = m_params.m_frameRate << 16;
     encoderport.format.video.nBitrate           = ENCODER_QP ? 0 : m_params.m_bitrate;
     encoderport.format.video.eCompressionFormat = OMX_VIDEO_CodingAVC;
