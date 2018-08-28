@@ -187,6 +187,7 @@ bool TorcPiCamera::Setup(void)
 
     connect(m_ringBuffer, SIGNAL(SegmentReady(int)),    this, SIGNAL(SegmentReady(int)));
     connect(m_ringBuffer, SIGNAL(SegmentRemoved(int)),  this, SIGNAL(SegmentRemoved(int)));
+    connect(m_ringBuffer, SIGNAL(InitSegmentReady()),   this, SIGNAL(InitSegmentReady()));
 
     m_frameCount      = 0;
     m_bufferedPacket  = NULL;

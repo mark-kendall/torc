@@ -67,6 +67,7 @@ class TorcCameraDevice : public QObject
 
   signals:
     void             SegmentRemoved  (int Segment);
+    void             InitSegmentReady(void);
     void             SegmentReady    (int Segment);
     void             SetErrored      (bool Errored);
 
@@ -131,6 +132,7 @@ class TorcCameraOutput Q_DECL_FINAL : public TorcOutput
     void             WritingStopped     (void);
     void             CameraErrored      (bool Errored);
     void             SegmentRemoved     (int Segment);
+    void             InitSegmentReady   (void);
     void             SegmentReady       (int Segment);
 
   private:

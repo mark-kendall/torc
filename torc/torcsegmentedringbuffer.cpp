@@ -229,6 +229,7 @@ void TorcSegmentedRingBuffer::SaveInitSegment(void)
     m_currentSize    = 0;
     m_currentStartPosition = 1;
     m_segmentCounter = 0;
+    emit InitSegmentReady();
 }
 
 QByteArray* TorcSegmentedRingBuffer::GetSegment(int SegmentRef)

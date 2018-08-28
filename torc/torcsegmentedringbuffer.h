@@ -27,6 +27,7 @@ class TorcSegmentedRingBuffer : public QObject
     void                    SaveInitSegment  (void);
 
   signals:
+    void                    InitSegmentReady (void);
     void                    SegmentReady     (int Segment);
     void                    SegmentRemoved   (int Segment);
 

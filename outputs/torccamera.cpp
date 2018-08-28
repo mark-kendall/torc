@@ -206,7 +206,6 @@ void TorcCameraThread::Start(void)
         return;
 
     LOG(VB_GENERAL, LOG_INFO, "Camera thread starting");
-    emit WritingStarted();
 
     m_cameraLock.lockForWrite();
     m_camera = TorcCameraFactory::GetCamera(m_type, m_params);
@@ -215,6 +214,7 @@ void TorcCameraThread::Start(void)
     {
         if (m_parent)
         {
+            connect(m_camera, SIGNAL(InitSegmentReady()),  m_parent, SLOT(InitSegmentReady()));
             connect(m_camera, SIGNAL(SegmentReady(int)),   m_parent, SLOT(SegmentReady(int)));
             connect(m_camera, SIGNAL(SegmentRemoved(int)), m_parent, SLOT(SegmentRemoved(int)));
             connect(m_camera, SIGNAL(SetErrored(bool)),    m_parent, SLOT(CameraErrored(bool)));
@@ -223,6 +223,7 @@ void TorcCameraThread::Start(void)
         if (m_camera->Setup())
         {
             m_cameraLock.unlock();
+            emit WritingStarted();
             m_cameraLock.lockForRead();
             while (!m_stop)
             {
@@ -312,13 +313,21 @@ void TorcCameraOutput::Start(void)
     m_threadLock.unlock();
 }
 
+void TorcCameraOutput::InitSegmentReady(void)
+{
+    QReadLocker locker(&m_threadLock);
+    if (m_thread)
+    {
+        m_params = m_thread->GetParams();
+        LOG(VB_GENERAL, LOG_INFO, QString("Initial segment ready - codec '%1'").arg(m_params.m_videoCodec));
+        // allow remote clients to start reading once the init segment is saved and hence codec information
+        // is available
+        m_cameraStartTime = QDateTime::currentDateTimeUtc();
+    }
+}
+
 void TorcCameraOutput::WritingStarted(void)
 {
-    m_threadLock.lockForRead();
-    if (m_thread)
-        m_params.m_timebase = m_thread->GetParams().m_timebase;
-    m_threadLock.unlock();
-    m_cameraStartTime = QDateTime::currentDateTimeUtc();
     SetValue(1);
     LOG(VB_GENERAL, LOG_INFO, "Camera started");
 }
@@ -558,7 +567,7 @@ QByteArray* TorcCameraOutput::GetMasterPlaylist(void)
                                   "%4\r\n");
 
     return new QByteArray(playlist.arg(m_params.m_bitrate).arg(m_params.m_width).arg(m_params.m_height)
-                                  .arg(HLS_PLAYLIST).arg(VIDEO_CODEC_ISO)/*.arg(AUDIO_CODEC_ISO)*/.toLocal8Bit());
+                                  .arg(HLS_PLAYLIST).arg(m_params.m_videoCodec)/*.arg(AUDIO_CODEC_ISO)*/.toLocal8Bit());
 }
 
 QByteArray* TorcCameraOutput::GetHLSPlaylist(void)
@@ -606,7 +615,7 @@ QByteArray* TorcCameraOutput::GetDashPlaylist(void)
                               .arg(m_params.m_width)
                               .arg(m_params.m_height)
                               .arg(m_params.m_bitrate)
-                              .arg(QString("%1").arg(VIDEO_CODEC_ISO))
+                              .arg(QString("%1").arg(m_params.m_videoCodec))
                               //.arg(QString("%1,%2").arg(VIDEO_CODEC_ISO).arg(AUDIO_CODEC_ISO))
                               .arg(QString("%1").arg(m_params.m_frameRate))
                               .arg(duration * m_params.m_timebase)
