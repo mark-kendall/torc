@@ -269,7 +269,7 @@ QString TorcMuxer::GetAVCCodec(const QByteArray &Packet)
 
     index += 3;
     if ((Packet[index] & 0x1f) == 7) // SPS NAL UNIT
-        return QString("%1%2%3").arg(Packet[index + 1], 2, 16, QChar('0')).arg(Packet[index + 2], 2, 16, QChar('0')).arg(Packet[index + 3], 2, 16, QChar('0'));
+        return QString("avc1.%1%2%3").arg(Packet[index + 1], 2, 16, QChar('0')).arg(Packet[index + 2], 2, 16, QChar('0')).arg(Packet[index + 3], 2, 16, QChar('0'));
 
     LOG(VB_GENERAL, LOG_WARNING, "Failed to find SPS");
     return QString();
