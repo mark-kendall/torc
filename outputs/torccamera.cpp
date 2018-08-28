@@ -463,28 +463,28 @@ void TorcCameraOutput::ProcessHTTPRequest(const QString &PeerAddress, int PeerPo
 
     if (hlsmaster)
     {
-        LOG(VB_GENERAL, LOG_INFO, "Sending master HLS playlist");
+        LOG(VB_GENERAL, LOG_DEBUG, "Sending master HLS playlist");
         result = GetMasterPlaylist();
         Request.SetAllowGZip(true);
         Request.SetResponseType(HTTPResponseM3U8Apple);
     }
     else if (hlsplaylist)
     {
-        LOG(VB_GENERAL, LOG_INFO, "Sending HLS playlist");
+        LOG(VB_GENERAL, LOG_DEBUG, "Sending HLS playlist");
         result = GetHLSPlaylist();
         Request.SetAllowGZip(true);
         Request.SetResponseType(HTTPResponseM3U8Apple);
     }
     else if (player)
     {
-        LOG(VB_GENERAL, LOG_INFO, "Sending video page");
+        LOG(VB_GENERAL, LOG_DEBUG, "Sending video page");
         result = GetPlayerPage();
         Request.SetAllowGZip(true);
         Request.SetResponseType(HTTPResponseHTML);
     }
     else if (dash)
     {
-        LOG(VB_GENERAL, LOG_INFO, "Sending DASH playlist");
+        LOG(VB_GENERAL, LOG_DEBUG, "Sending DASH playlist");
         result = GetDashPlaylist();
         Request.SetAllowGZip(true);
         Request.SetResponseType(HTTPResponseMPD);
@@ -498,7 +498,7 @@ void TorcCameraOutput::ProcessHTTPRequest(const QString &PeerAddress, int PeerPo
         if (ok)
         {
             QReadLocker locker(&m_threadLock);
-            LOG(VB_GENERAL, LOG_INFO, QString("Segment %1 requested").arg(num));
+            LOG(VB_GENERAL, LOG_DEBUG, QString("Segment %1 requested").arg(num));
             result = m_thread->GetSegment(num);
             if (result)
             {
@@ -520,7 +520,7 @@ void TorcCameraOutput::ProcessHTTPRequest(const QString &PeerAddress, int PeerPo
     else if (init)
     {
         QReadLocker locker(&m_threadLock);
-        LOG(VB_GENERAL, LOG_INFO, "Init segment requested");
+        LOG(VB_GENERAL, LOG_DEBUG, "Init segment requested");
         result = m_thread->GetInitSegment();
         if (result)
         {
