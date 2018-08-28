@@ -260,6 +260,8 @@ bool TorcPiCamera::WriteFrame(void)
 
         if (sps && !m_haveInitSegment)
         {
+            QByteArray config = QByteArray::fromRawData((char*)packet->data, packet->size);
+            m_params.m_videoCodec = m_muxer->GetAVCCodec(config);
             m_haveInitSegment = true;
             m_muxer->FinishSegment(true);
         }
