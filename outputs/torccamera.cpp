@@ -315,7 +315,8 @@ void TorcCameraOutput::Start(void)
 void TorcCameraOutput::WritingStarted(void)
 {
     m_threadLock.lockForRead();
-    m_params.m_timebase = m_thread->GetParams().m_timebase;
+    if (m_thread)
+        m_params.m_timebase = m_thread->GetParams().m_timebase;
     m_threadLock.unlock();
     m_cameraStartTime = QDateTime::currentDateTimeUtc();
     SetValue(1);
@@ -359,7 +360,7 @@ void TorcCameraOutput::CameraErrored(bool Errored)
 
 void TorcCameraOutput::SegmentReady(int Segment)
 {
-    LOG(VB_GENERAL, LOG_INFO, QString("Segment %1 ready").arg(Segment));
+    LOG(VB_GENERAL, LOG_DEBUG, QString("Segment %1 ready").arg(Segment));
 
     QWriteLocker locker(&m_segmentLock);
     if (!m_segments.contains(Segment))
@@ -377,13 +378,13 @@ void TorcCameraOutput::SegmentReady(int Segment)
 
 void TorcCameraOutput::SegmentRemoved(int Segment)
 {
-    LOG(VB_GENERAL, LOG_INFO, QString("Segment %1 removed").arg(Segment));
+    LOG(VB_GENERAL, LOG_DEBUG, QString("Segment %1 removed").arg(Segment));
 
     QWriteLocker locker(&m_segmentLock);
 
     if (m_segments.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, "No known segments!");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot remove segment - segments list is empty");
     }
     else
     {
@@ -455,28 +456,28 @@ void TorcCameraOutput::ProcessHTTPRequest(const QString &PeerAddress, int PeerPo
     {
         LOG(VB_GENERAL, LOG_INFO, "Sending master HLS playlist");
         result = GetMasterPlaylist();
-        //Request.SetAllowGZip(true);
+        Request.SetAllowGZip(true);
         Request.SetResponseType(HTTPResponseM3U8Apple);
     }
     else if (hlsplaylist)
     {
         LOG(VB_GENERAL, LOG_INFO, "Sending HLS playlist");
         result = GetHLSPlaylist();
-        //Request.SetAllowGZip(true);
+        Request.SetAllowGZip(true);
         Request.SetResponseType(HTTPResponseM3U8Apple);
     }
     else if (player)
     {
         LOG(VB_GENERAL, LOG_INFO, "Sending video page");
         result = GetPlayerPage();
-        //Request.SetAllowGZip(true);
+        Request.SetAllowGZip(true);
         Request.SetResponseType(HTTPResponseHTML);
     }
     else if (dash)
     {
         LOG(VB_GENERAL, LOG_INFO, "Sending DASH playlist");
         result = GetDashPlaylist();
-        //Request.SetAllowGZip(true);
+        Request.SetAllowGZip(true);
         Request.SetResponseType(HTTPResponseMPD);
     }
     else if (segment)
@@ -669,7 +670,6 @@ void TorcCameraOutputs::Create(const QVariantMap &Details)
                             LOG(VB_GENERAL, LOG_ERR, QString("Camera '%1' does not specify bitrate").arg(camera.value("name").toString()));
                             continue;
                         }
-                        // numerator is mandatory (framerate) - denominator is optional (framerateden)
                         if (!camera.contains("framerate"))
                         {
                             LOG(VB_GENERAL, LOG_ERR, QString("Camera '%1' does not specify framerate").arg(camera.value("name").toString()));
