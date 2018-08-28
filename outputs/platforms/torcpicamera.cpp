@@ -98,7 +98,18 @@ TorcPiCamera::TorcPiCamera(const TorcCameraParams &Params)
 
 TorcPiCamera::~TorcPiCamera()
 {
-    Stop();
+    if (m_bufferedPacket)
+    {
+        av_packet_free(&m_bufferedPacket);
+        m_bufferedPacket = NULL;
+    }
+
+    if (m_muxer)
+    {
+        m_muxer->Finish();
+        delete m_muxer;
+        m_muxer = NULL;
+    }
 }
 
 bool TorcPiCamera::Setup(void)
