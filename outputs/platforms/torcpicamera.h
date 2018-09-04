@@ -17,6 +17,14 @@ class TorcPiCamera Q_DECL_FINAL : public TorcCameraDevice
     Q_OBJECT
 
   public:
+    enum CameraType
+    {
+        Unknown = 0,
+        V1      = 1,
+        V2      = 2
+    };
+
+    static bool             gPiCameraDetected;
     TorcPiCamera(const TorcCameraParams &Params);
     virtual ~TorcPiCamera();
 
@@ -33,6 +41,7 @@ class TorcPiCamera Q_DECL_FINAL : public TorcCameraDevice
   private:
     Q_DISABLE_COPY(TorcPiCamera)
 
+    CameraType               m_cameraType;
     TorcOMXCore              m_core;
     TorcOMXComponent         m_camera;
     TorcOMXComponent         m_encoder;

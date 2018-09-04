@@ -33,6 +33,7 @@
 #include "OMX_Video.h"
 
 // Broadcom
+#include "bcm_host.h"
 #include "OMX_Broadcom.h"
 
 #define BROADCOM_CAMERA                "OMX.broadcom.camera"
@@ -76,8 +77,11 @@
 #define ENCODER_INLINE_HEADERS         OMX_TRUE
 #define ENCODER_SPS_TIMING             OMX_TRUE
 
+bool TorcPiCamera::gPiCameraDetected = false;
+
 TorcPiCamera::TorcPiCamera(const TorcCameraParams &Params)
   : TorcCameraDevice(Params),
+    m_cameraType(Unknown),
     m_core(),
     m_camera((char*)BROADCOM_CAMERA),
     m_encoder((char*)BROADCOM_ENCODER),
@@ -94,6 +98,21 @@ TorcPiCamera::TorcPiCamera(const TorcCameraParams &Params)
     m_bufferedPacket(NULL),
     m_haveInitSegment(false)
 {
+    if (m_params.m_frameRate > 30 && (m_params.m_width > 1280 || m_params.m_height > 720))
+    {
+        m_params.m_frameRate = 30;
+        LOG(VB_GENERAL, LOG_INFO, "Restricting camera framerate to 30fps for full HD");
+    }
+    else if (m_params.m_frameRate > 60 && (m_params.m_width > 720 || m_params.m_height > 576))
+    {
+        m_params.m_frameRate = 60;
+        LOG(VB_GENERAL, LOG_INFO, "Restricting camera framerate to 60fps for partial HD");
+    }
+    else if (m_params.m_frameRate > 90)
+    {
+        m_params.m_frameRate = 90;
+        LOG(VB_GENERAL, LOG_INFO, "Resticting camera framerate to 90fps for SD");
+    }
 }
 
 TorcPiCamera::~TorcPiCamera()
@@ -393,6 +412,20 @@ bool TorcPiCamera::LoadDrivers(void)
         return false;
 
     LOG(VB_GENERAL, LOG_INFO, "Broadcom drivers loaded");
+
+    OMX_CONFIG_CAMERAINFOTYPE info;
+    OMX_INITSTRUCTURE(info);
+    if (!m_camera.GetConfig(OMX_IndexConfigCameraInfo, &info))
+    {
+        if (qstrcmp((const char*)info.cameraname, "imx219") == 0)
+            m_cameraType = V2;
+        else if (qstrcmp((const char*)info.cameraname, "ov5647") == 0)
+            m_cameraType = V1;
+        LOG(VB_GENERAL, LOG_INFO, QString("Camera: name '%1' (Version %2)")
+            .arg((const char*)info.cameraname)
+            .arg(m_cameraType == V2 ? "2" : m_cameratype == V1 ? "V1" : "Unknown"));
+    }
+
     return true;
 }
 
@@ -735,15 +768,69 @@ class TorcPiCameraXSDFactory : public TorcXSDFactory
 class TorcPiCameraFactory Q_DECL_FINAL : public TorcCameraFactory
 {
   public:
+    TorcPiCameraFactory() : TorcCameraFactory()
+    {
+        bcm_host_init();
+
+        static bool checked = false;
+        if (!checked)
+        {
+            checked = true;
+
+            char command[32];
+            int  gpumem = 0;
+
+            if (!vc_gencmd(command, sizeof(command), "get_mem gpu"))
+                vc_gencmd_number_property(command, "gpu", &gpumem);
+
+            if (gpumem < 128)
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("Insufficent GPU memory for Pi camera - need 128Mb - have %1Mb").arg(gpumem));
+                return;
+            }
+
+            LOG(VB_GENERAL, LOG_INFO, QString("%1Mb GPU memory").arg(gpumem));
+
+            int supported = 0;
+            int detected  = 0;
+
+            if (!vc_gencmd(command, sizeof(command), "get_camera"))
+            {
+                vc_gencmd_number_property(command, "supported", &supported);
+                vc_gencmd_number_property(command, "detected",  &detected);
+            }
+
+            if (!supported)
+            {
+                LOG(VB_GENERAL, LOG_ERR, "Firmware reports that Pi camera is NOT supported");
+                return;
+            }
+
+            if (!detected)
+            {
+                LOG(VB_GENERAL, LOG_ERR, "Firmware reports that Pi camera NOT detected");
+                return;
+            }
+
+            LOG(VB_GENERAL, LOG_INFO, "Pi camera supported and detected");
+            TorcPiCamera::gPiCameraDetected = true;
+        }
+    }
+
+   virtual ~TorcPiCameraFactory()
+    {
+        bcm_host_deinit();
+    }
+
     bool CanHandle(const QString &Type, const TorcCameraParams &Params) Q_DECL_OVERRIDE
     {
         (void)Params;
-        return "pi" == Type;
+        return TorcPiCamera::gPiCameraDetected ? "pi" == Type : false;
     }
 
     TorcCameraDevice* Create(const QString &Type, const TorcCameraParams &Params) Q_DECL_OVERRIDE
     {
-        if ("pi" == Type)
+        if (("pi" == Type) && TorcPiCamera::gPiCameraDetected)
             return new TorcPiCamera(Params);
         return NULL;
     }
