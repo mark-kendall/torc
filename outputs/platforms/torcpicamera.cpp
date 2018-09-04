@@ -423,7 +423,7 @@ bool TorcPiCamera::LoadDrivers(void)
             m_cameraType = V1;
         LOG(VB_GENERAL, LOG_INFO, QString("Camera: name '%1' (Version %2)")
             .arg((const char*)info.cameraname)
-            .arg(m_cameraType == V2 ? "2" : m_cameratype == V1 ? "V1" : "Unknown"));
+            .arg(m_cameraType == V2 ? "2" : m_cameraType == V1 ? "V1" : "Unknown"));
     }
 
     return true;
