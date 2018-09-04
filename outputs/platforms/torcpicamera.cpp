@@ -771,6 +771,16 @@ class TorcPiCameraFactory Q_DECL_FINAL : public TorcCameraFactory
     TorcPiCameraFactory() : TorcCameraFactory()
     {
         bcm_host_init();
+    }
+
+   virtual ~TorcPiCameraFactory()
+    {
+        bcm_host_deinit();
+    }
+
+    bool CanHandle(const QString &Type, const TorcCameraParams &Params) Q_DECL_OVERRIDE
+    {
+        (void)Params;
 
         static bool checked = false;
         if (!checked)
@@ -786,45 +796,36 @@ class TorcPiCameraFactory Q_DECL_FINAL : public TorcCameraFactory
             if (gpumem < 128)
             {
                 LOG(VB_GENERAL, LOG_ERR, QString("Insufficent GPU memory for Pi camera - need 128Mb - have %1Mb").arg(gpumem));
-                return;
             }
-
-            LOG(VB_GENERAL, LOG_INFO, QString("%1Mb GPU memory").arg(gpumem));
-
-            int supported = 0;
-            int detected  = 0;
-
-            if (!vc_gencmd(command, sizeof(command), "get_camera"))
+            else
             {
-                vc_gencmd_number_property(command, "supported", &supported);
-                vc_gencmd_number_property(command, "detected",  &detected);
-            }
+                LOG(VB_GENERAL, LOG_INFO, QString("%1Mb GPU memory").arg(gpumem));
 
-            if (!supported)
-            {
-                LOG(VB_GENERAL, LOG_ERR, "Firmware reports that Pi camera is NOT supported");
-                return;
-            }
+                int supported = 0;
+                int detected  = 0;
 
-            if (!detected)
-            {
-                LOG(VB_GENERAL, LOG_ERR, "Firmware reports that Pi camera NOT detected");
-                return;
-            }
+                if (!vc_gencmd(command, sizeof(command), "get_camera"))
+                {
+                    vc_gencmd_number_property(command, "supported", &supported);
+                    vc_gencmd_number_property(command, "detected",  &detected);
+                }
 
-            LOG(VB_GENERAL, LOG_INFO, "Pi camera supported and detected");
-            TorcPiCamera::gPiCameraDetected = true;
+                if (!supported)
+                {
+                    LOG(VB_GENERAL, LOG_ERR, "Firmware reports that Pi camera is NOT supported");
+                }
+                else if (!detected)
+                {
+                    LOG(VB_GENERAL, LOG_ERR, "Firmware reports that Pi camera NOT detected");
+                }
+                else
+                {
+                    LOG(VB_GENERAL, LOG_INFO, "Pi camera supported and detected");
+                    TorcPiCamera::gPiCameraDetected = true;
+                }
+            }
         }
-    }
 
-   virtual ~TorcPiCameraFactory()
-    {
-        bcm_host_deinit();
-    }
-
-    bool CanHandle(const QString &Type, const TorcCameraParams &Params) Q_DECL_OVERRIDE
-    {
-        (void)Params;
         return TorcPiCamera::gPiCameraDetected ? "pi" == Type : false;
     }
 
