@@ -12,10 +12,11 @@ class TorcSystemInput Q_DECL_FINAL : public TorcInput
     TorcSystemInput(double Value, const QVariantMap &Details);
    ~TorcSystemInput();
 
-    TorcInput::Type GetType(void);
+    TorcInput::Type GetType        (void) Q_DECL_OVERRIDE;
+    QStringList     GetDescription (void) Q_DECL_OVERRIDE;
 
   public slots:
-    bool         event (QEvent *Event) Q_DECL_OVERRIDE;
+    bool            event          (QEvent *Event) Q_DECL_OVERRIDE;
 };
 
 #endif // TORCSYSTEMINPUT_H

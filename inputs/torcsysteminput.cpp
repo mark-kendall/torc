@@ -49,6 +49,11 @@ TorcInput::Type TorcSystemInput::GetType(void)
     return TorcInput::SystemStarted;
 }
 
+QStringList TorcSystemInput::GetDescription(void)
+{
+    return QStringList() << tr("System started");
+}
+
 bool TorcSystemInput::event(QEvent *Event)
 {
     if (Event && (Event->type() == TorcEvent::TorcEventType))
