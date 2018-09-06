@@ -165,11 +165,27 @@
     <xs:element name="button"      type="networkButtonType"/>
   </xs:choice>
 </xs:complexType>
+
+<xs:complexType name="systemInputStartType">
+  <xs:all>
+    <xs:element name="name"     type="deviceNameType"/>
+    <xs:element name="username" type="userNameType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+  </xs:all>
+</xs:complexType>
+
+<xs:complexType name="systemInputType">
+  <xs:choice minOccurs="1" maxOccurs="unbounded">
+    <xs:element name="started"  type="systemInputStartType"/>
+  </xs:choice>
+</xs:complexType>
+
 <!--TORC_XSD_INPUTTYPES-->
 <xs:complexType name="inputsType">
   <xs:all>
     <!-- 0 or 1 instances of each of these types in any order-->
     <xs:element minOccurs="0" maxOccurs="1" name="network" type="networkType"/>
+    <xs:element minOccurs="0" maxOccurs="1" name="system"  type="systemInputType"/>
 <!--TORC_XSD_INPUTS-->
   </xs:all>
 </xs:complexType>
