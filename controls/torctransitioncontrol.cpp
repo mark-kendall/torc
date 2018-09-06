@@ -204,8 +204,10 @@ TorcTransitionControl::TorcTransitionControl(const QString &Type, const QVariant
         if (!ok)
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse default for transition '%1'").arg(uniqueId));
+            return;
         }
     }
+
     // so far so good
     m_parsed = true;
 
@@ -378,6 +380,14 @@ void TorcTransitionControl::CalculateOutput(void)
 
             if (newvalue < 1) // time can run backwards :)
                 timesincelasttransition = m_duration - timesincelasttransition;
+        }
+        else // not a timer input - just a regular input (ideally zero or one) - don't start the timer without reason
+        {
+            if (qFuzzyCompare(GetValue() + 1.0, m_transitionValue + 1.0))
+            {
+                LOG(VB_GENERAL, LOG_INFO, QString("Transition '%1' is initially inactive (value '%2')").arg(uniqueId).arg(newvalue));
+                return;
+            }
         }
     }
     else
