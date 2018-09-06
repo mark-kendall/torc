@@ -269,6 +269,7 @@
     <xs:element name="name"     type="deviceNameType"/>
     <xs:element name="username" type="userNameType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="default"  type="switchNumberType" minOccurs="0" maxOccurs="1"/> <!-- 0 or 1 and optional-->
     <xs:element name="inputs"   type="deviceInputOutputType"/><!-- single input -->
     <xs:element name="outputs"  type="deviceInputsOutputsType"/>
     <xs:element name="duration" type="validStringType"/> <!-- TODO can we do better than string? -->
