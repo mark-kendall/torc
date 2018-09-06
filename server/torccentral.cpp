@@ -147,6 +147,7 @@ TorcCentral::TorcCentral()
         // setup notifications/notifiers
         (void)TorcNotify::gNotify->Validate();
 
+        LOG(VB_GENERAL, LOG_INFO, "Initialising state machine");
         // initialise the state machine
         {
             QMutexLocker lock(TorcDevice::gDeviceListLock);
@@ -156,6 +157,7 @@ TorcCentral::TorcCentral()
                 it.value()->Start();
         }
 
+        LOG(VB_GENERAL, LOG_INFO, "Notifying start");
         TorcLocalContext::NotifyEvent(Torc::Start);
 
         // iff we have got this far, then create the graph
