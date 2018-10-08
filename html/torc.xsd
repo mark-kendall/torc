@@ -61,6 +61,14 @@
   </xs:restriction>
 </xs:simpleType>
 
+<!-- 7 to 24bit resolution -->
+<xs:simpleType name="pwmResolutionType">
+  <xs:restriction base="xs:integer">
+    <xs:minInclusive value="128"/>
+    <xs:maxInclusive value="16777215"/>
+  </xs:restriction>
+</xs:simpleType>
+
 <xs:simpleType name="tempNumberType">
   <xs:restriction base="xs:decimal">
     <xs:minInclusive value="-100.0"/>
@@ -80,6 +88,35 @@
     <xs:pattern value="0x[0-9a-fA-F]+"/>
   </xs:restriction>
 </xs:simpleType>
+
+<xs:simpleType name="videoWidthType">
+  <xs:restriction base="xs:integer">
+    <xs:minInclusive value="640"/>
+    <xs:maxInclusive value="1920"/>
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="videoHeightType">
+  <xs:restriction base="xs:integer">
+    <xs:minInclusive value="480"/>
+    <xs:maxInclusive value="1080"/>
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="videoFrameRateType">
+  <xs:restriction base="xs:integer">
+    <xs:minInclusive value="1"/>
+    <xs:maxInclusive value="240"/>
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="videoBitRateType">
+  <xs:restriction base="xs:integer">
+    <xs:minInclusive value="128000"/>
+    <xs:maxInclusive value="50000000"/>
+  </xs:restriction>
+</xs:simpleType>
+
 <!--TORC_XSD_TYPES-->
 <!-- input definitions -->
 <xs:complexType name="networkSwitchType">
@@ -100,12 +137,22 @@
   </xs:all>
 </xs:complexType>
 
-<xs:complexType name="networkPWMType">
+<xs:complexType name="networkPWMInputType">
   <xs:all>
     <xs:element name="name"     type="deviceNameType"/>
     <xs:element name="username" type="userNameType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="default"  type="pwmNumberType"/>
+  </xs:all>
+</xs:complexType>
+
+<xs:complexType name="networkPWMOutputType">
+  <xs:all>
+    <xs:element name="name"     type="deviceNameType"/>
+    <xs:element name="username" type="userNameType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="default"  type="pwmNumberType"/>
+    <xs:element name="resolution" type="pwmResolutionType" minOccurs="0" maxOccurs="1"/>
   </xs:all>
 </xs:complexType>
 
@@ -127,20 +174,46 @@
   </xs:all>
 </xs:complexType>
 
-<xs:complexType name="networkType">
+<xs:complexType name="networkInputType">
   <xs:choice minOccurs="1" maxOccurs="unbounded">
     <xs:element name="switch"      type="networkSwitchType"/>
-    <xs:element name="pwm"         type="networkPWMType"/>
+    <xs:element name="pwm"         type="networkPWMInputType"/>
     <xs:element name="temperature" type="networkTempType"/>
     <xs:element name="ph"          type="networkpHType"/>
     <xs:element name="button"      type="networkButtonType"/>
   </xs:choice>
 </xs:complexType>
+
+<xs:complexType name="networkOutputType">
+  <xs:choice minOccurs="1" maxOccurs="unbounded">
+    <xs:element name="switch"      type="networkSwitchType"/>
+    <xs:element name="pwm"         type="networkPWMOutputType"/>
+    <xs:element name="temperature" type="networkTempType"/>
+    <xs:element name="ph"          type="networkpHType"/>
+    <xs:element name="button"      type="networkButtonType"/>
+  </xs:choice>
+</xs:complexType>
+
+<xs:complexType name="systemInputStartType">
+  <xs:all>
+    <xs:element name="name"     type="deviceNameType"/>
+    <xs:element name="username" type="userNameType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+  </xs:all>
+</xs:complexType>
+
+<xs:complexType name="systemInputType">
+  <xs:choice minOccurs="1" maxOccurs="unbounded">
+    <xs:element name="started"  type="systemInputStartType"/>
+  </xs:choice>
+</xs:complexType>
+
 <!--TORC_XSD_INPUTTYPES-->
 <xs:complexType name="inputsType">
   <xs:all>
     <!-- 0 or 1 instances of each of these types in any order-->
-    <xs:element minOccurs="0" maxOccurs="1" name="network" type="networkType"/>
+    <xs:element minOccurs="0" maxOccurs="1" name="network" type="networkInputType"/>
+    <xs:element minOccurs="0" maxOccurs="1" name="system"  type="systemInputType"/>
 <!--TORC_XSD_INPUTS-->
   </xs:all>
 </xs:complexType>
@@ -224,6 +297,7 @@
     <xs:element name="name"     type="deviceNameType"/>
     <xs:element name="username" type="userNameType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="default"  type="switchNumberType" minOccurs="0" maxOccurs="1"/> <!-- 0 or 1 and optional-->
     <xs:element name="inputs"   type="deviceInputOutputType"/><!-- single input -->
     <xs:element name="outputs"  type="deviceInputsOutputsType"/>
     <xs:element name="duration" type="validStringType"/> <!-- TODO can we do better than string? -->
@@ -289,10 +363,31 @@
 
 <!-- outputs definitions -->
 <!--TORC_XSD_OUTPUTTYPES-->
+<xs:complexType name="cameraType">
+  <xs:all>
+    <xs:element name="name"            type="deviceNameType"/>
+    <xs:element name="username"        type="userNameType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="model"           type="validStringType"/>
+    <xs:element name="width"           type="videoWidthType"/>
+    <xs:element name="height"          type="videoHeightType"/>
+    <xs:element name="framerate"       type="videoFrameRateType"/>
+    <xs:element name="bitrate"         type="videoBitRateType"/>
+  </xs:all>
+</xs:complexType>
+
+<xs:complexType name="camerasType">
+  <xs:choice minOccurs="1" maxOccurs="unbounded">
+    <xs:element name="dummy" type="cameraType"/>
+    <!--TORC_XSD_CAMERATYPES-->
+  </xs:choice>
+</xs:complexType>
+
 <xs:complexType name="outputsType">
   <xs:all>
     <!-- 0 or 1 instances of these types -->
-    <xs:element minOccurs="0" maxOccurs="1" name="network" type="networkType"/>
+    <xs:element minOccurs="0" maxOccurs="1" name="network" type="networkOutputType"/>
+    <xs:element minOccurs="0" maxOccurs="1" name="cameras" type="camerasType"/>
 <!--TORC_XSD_OUTPUTS-->
   </xs:all>
 </xs:complexType>

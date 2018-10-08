@@ -33,6 +33,9 @@ QString TorcOutput::TypeToString(TorcOutput::Type Type)
     {
         case TorcOutput::PWM:         return QString("pwm");
         case TorcOutput::Switch:      return QString("switch");
+        case TorcOutput::Temperature: return QString("temperature");
+        case TorcOutput::pH:          return QString("pH");
+        case TorcOutput::Camera:      return QString("camera");
         default: break;
     }
 
@@ -41,8 +44,12 @@ QString TorcOutput::TypeToString(TorcOutput::Type Type)
 
 TorcOutput::Type TorcOutput::StringToType(const QString &Type)
 {
-    if ("pwm" == Type)         return TorcOutput::PWM;
-    if ("switch" == Type)      return TorcOutput::Switch;
+    QString type = Type.toLower();
+    if ("pwm" == type)         return TorcOutput::PWM;
+    if ("switch" == type)      return TorcOutput::Switch;
+    if ("temperature" == type) return TorcOutput::Temperature;
+    if ("ph" == type)          return TorcOutput::pH;
+    if ("camera" == type)      return TorcOutput::Camera;
     return TorcOutput::Unknown;
 }
 

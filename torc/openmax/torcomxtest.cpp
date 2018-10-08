@@ -25,13 +25,12 @@
 #include "torcomxtest.h"
 
 TorcOMXTest::TorcOMXTest()
-  : m_core(new TorcOMXCore(TORC_OMX_LIB))
+  : m_core()
 {
 }
 
 TorcOMXTest::~TorcOMXTest()
 {
-    delete m_core;
 }
 
 static class TorcOMXTestObject : public TorcAdminObject

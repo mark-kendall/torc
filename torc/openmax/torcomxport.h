@@ -22,7 +22,7 @@ class TorcOMXPort Q_DECL_FINAL
 
     OMX_U32                       GetPort        (void);
     OMX_INDEXTYPE                 GetDomain      (void);
-    OMX_ERRORTYPE                 EnablePort     (bool Enable);
+    OMX_ERRORTYPE                 EnablePort     (bool Enable, bool Wait = true);
     OMX_U32                       GetAvailableBuffers (void);
     OMX_ERRORTYPE                 CreateBuffers  (void);
     OMX_ERRORTYPE                 DestroyBuffers (void);

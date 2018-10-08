@@ -147,6 +147,7 @@ TorcCentral::TorcCentral()
         // setup notifications/notifiers
         (void)TorcNotify::gNotify->Validate();
 
+        LOG(VB_GENERAL, LOG_INFO, "Initialising state machine");
         // initialise the state machine
         {
             QMutexLocker lock(TorcDevice::gDeviceListLock);
@@ -156,6 +157,7 @@ TorcCentral::TorcCentral()
                 it.value()->Start();
         }
 
+        LOG(VB_GENERAL, LOG_INFO, "Notifying start");
         TorcLocalContext::NotifyEvent(Torc::Start);
 
         // iff we have got this far, then create the graph
@@ -531,7 +533,7 @@ void TorcXSDFactory::CustomiseXSD(QByteArray &XSD)
     QStringList identifiers;
     identifiers << XSD_TYPES << XSD_INPUTTYPES << XSD_INPUTS << XSD_CONTROLTYPES << XSD_CONTROLS;
     identifiers << XSD_OUTPUTTYPES << XSD_OUTPUTS << XSD_NOTIFIERTYPES << XSD_NOTIFIERS;
-    identifiers << XSD_NOTIFICATIONTYPES << XSD_NOTIFICATIONS << XSD_UNIQUE;
+    identifiers << XSD_NOTIFICATIONTYPES << XSD_NOTIFICATIONS << XSD_UNIQUE << XSD_CAMERATYPES;
 
     QMultiMap<QString,QString> xsds;
     TorcXSDFactory* factory = TorcXSDFactory::GetTorcXSDFactory();

@@ -141,7 +141,6 @@ linux {
     packagesExist(libomxil-bellagio) {
         openmax    = true
         DEFINES   += USING_LIBOMXIL_BELLAGIO
-        DEFINES   += "TORC_OMX_LIB=\"\\\"libomxil-bellagio\\\"\""
         CONFIG    += link_pkgconfig
         PKGCONFIG += libomxil-bellagio
         message("Linking to OpenMax Bellagio library")
@@ -174,21 +173,32 @@ linux-rasp-pi-g++ | !isEmpty(pi) {
     HEADERS += outputs/platforms/torcpiswitchoutput.h
     HEADERS += outputs/platforms/torcpipwmoutput.h
     HEADERS += inputs/platforms/torcpiswitchinput.h
+    HEADERS += outputs/platforms/torcpicamera.h
     SOURCES += outputs/platforms/torci2cpca9685.cpp
     SOURCES += outputs/platforms/torcpigpio.cpp
     SOURCES += outputs/platforms/torcpiswitchoutput.cpp
     SOURCES += outputs/platforms/torcpipwmoutput.cpp
     SOURCES += inputs/platforms/torcpiswitchinput.cpp
+    SOURCES += outputs/platforms/torcpicamera.cpp
 
     openmax      = true
-    LIBS        += -L/opt/vc/lib -lbcm_host
+    LIBS        += -L/opt/vc/lib -lbcm_host -lopenmaxil
     DEFINES     += USING_LIBOPENMAXIL
-    DEFINES     += "TORC_OMX_LIB=\"\\\"openmaxil\\\"\""
     INCLUDEPATH += /opt/vc/include
     INCLUDEPATH += /opt/vc/include/IL
     INCLUDEPATH += /opt/vc/include/interface/vcos/pthreads
     INCLUDEPATH += /opt/vc/include/interface/vmcs_host/linux
     message("Linking to OpenMaxIL library (Raspberry Pi)")
+
+    DEFINES     += USING_FFMPEG
+    CONFIG      += link_pkgconfig
+    PKGCONFIG   += libavformat
+    PKGCONFIG   += libavcodec
+    PKGCONFIG   += libavutil
+    HEADERS     += torc/ffmpeg/torcmuxer.h
+    SOURCES     += torc/ffmpeg/torcmuxer.cpp
+    INCLUDEPATH += ./torc/ffmpeg
+    message("Linking to ffmpeg")
 
     # install with suid permissions on Pi
     # this allows access to I2C and GPIO
@@ -203,12 +213,12 @@ linux-rasp-pi-g++ | !isEmpty(pi) {
 }
 
 !isEmpty(openmax) {
-    HEADERS += torc/openmax/torcomxtest.h
+    #HEADERS += torc/openmax/torcomxtest.h
     HEADERS += torc/openmax/torcomxcore.h
     HEADERS += torc/openmax/torcomxport.h
     HEADERS += torc/openmax/torcomxcomponent.h
     HEADERS += torc/openmax/torcomxtunnel.h
-    SOURCES += torc/openmax/torcomxtest.cpp
+    #SOURCES += torc/openmax/torcomxtest.cpp
     SOURCES += torc/openmax/torcomxcore.cpp
     SOURCES += torc/openmax/torcomxport.cpp
     SOURCES += torc/openmax/torcomxcomponent.cpp
@@ -255,6 +265,7 @@ HEADERS += torc/torcbonjour.h
 HEADERS += torc/torcxmlreader.h
 HEADERS += torc/torctime.h
 HEADERS += torc/torcuser.h
+HEADERS += torc/torcsegmentedringbuffer.h
 HEADERS += torc/http/torchttprequest.h
 HEADERS += torc/http/torchttpservice.h
 HEADERS += torc/http/torchttpservices.h
@@ -293,6 +304,8 @@ HEADERS += inputs/torcnetworkphinput.h
 HEADERS += inputs/torcnetworkbuttoninput.h
 HEADERS += inputs/torcnetworkinputs.h
 HEADERS += inputs/torctemperatureinput.h
+HEADERS += inputs/torcsysteminputs.h
+HEADERS += inputs/torcsysteminput.h
 HEADERS += inputs/platforms/torc1wirebus.h
 HEADERS += inputs/platforms/torc1wireds18b20.h
 HEADERS += outputs/torcoutput.h
@@ -307,6 +320,7 @@ HEADERS += outputs/torcnetworkswitchoutput.h
 HEADERS += outputs/torcnetworktemperatureoutput.h
 HEADERS += outputs/torcnetworkphoutput.h
 HEADERS += outputs/torcnetworkbuttonoutput.h
+HEADERS += outputs/torccamera.h
 HEADERS += controls/torccontrol.h
 HEADERS += controls/torccontrols.h
 HEADERS += controls/torclogiccontrol.h
@@ -348,6 +362,7 @@ SOURCES += torc/torcmime.cpp
 SOURCES += torc/torcxmlreader.cpp
 SOURCES += torc/torctime.cpp
 SOURCES += torc/torcuser.cpp
+SOURCES += torc/torcsegmentedringbuffer.cpp
 SOURCES += torc/http/torchttprequest.cpp
 SOURCES += torc/http/torchttpserver.cpp
 SOURCES += torc/http/torchttpserverlistener.cpp
@@ -386,6 +401,8 @@ SOURCES += inputs/torcnetworktemperatureinput.cpp
 SOURCES += inputs/torcnetworkphinput.cpp
 SOURCES += inputs/torcnetworkbuttoninput.cpp
 SOURCES += inputs/torcnetworkinputs.cpp
+SOURCES += inputs/torcsysteminputs.cpp
+SOURCES += inputs/torcsysteminput.cpp
 SOURCES += inputs/platforms/torc1wirebus.cpp
 SOURCES += inputs/platforms/torc1wireds18b20.cpp
 SOURCES += outputs/torcoutput.cpp
@@ -400,6 +417,7 @@ SOURCES += outputs/torcnetworkswitchoutput.cpp
 SOURCES += outputs/torcnetworktemperatureoutput.cpp
 SOURCES += outputs/torcnetworkphoutput.cpp
 SOURCES += outputs/torcnetworkbuttonoutput.cpp
+SOURCES += outputs/torccamera.cpp
 SOURCES += controls/torccontrol.cpp
 SOURCES += controls/torccontrols.cpp
 SOURCES += controls/torclogiccontrol.cpp

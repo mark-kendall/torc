@@ -16,7 +16,7 @@
 class TorcOMXTunnel Q_DECL_FINAL
 {
   public:
-    TorcOMXTunnel(TorcOMXCore *Core, TorcOMXComponent *Source, OMX_U32 SourceIndex, OMX_INDEXTYPE SourceDomain,
+    TorcOMXTunnel(TorcOMXComponent *Source, OMX_U32 SourceIndex, OMX_INDEXTYPE SourceDomain,
                   TorcOMXComponent *Destination, OMX_U32 DestinationIndex, OMX_INDEXTYPE DestinationDomain);
    ~TorcOMXTunnel();
 
@@ -27,7 +27,6 @@ class TorcOMXTunnel Q_DECL_FINAL
 
   private:
     bool              m_connected;
-    TorcOMXCore      *m_core;
     QMutex            m_lock;
     TorcOMXComponent *m_source;
     OMX_U32           m_sourceIndex;

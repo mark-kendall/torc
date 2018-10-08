@@ -37,15 +37,24 @@
 #define LED0_OFF_HIGH 0x09
 #define PRESCALE      0xFE
 #define CLOCKFREQ     25000000.0
+#define PCA9685_RESOLUTION 4095
+#define PCA9685_RANGE 4096
 
 #include <unistd.h>
 
 TorcI2CPCA9685Channel::TorcI2CPCA9685Channel(int Number, TorcI2CPCA9685 *Parent, const QVariantMap &Details)
-  : TorcPWMOutput(0.0, PCA9685, Details),
+  : TorcPWMOutput(0.0, PCA9685, Details, PCA9685_RANGE),
     m_channelNumber(Number),
     m_channelValue(0),
     m_parent(Parent)
 {
+    // PCA9685 only operates at default 12bit accuracy
+    if (m_resolution != m_maxResolution)
+    {
+        m_resolution = m_maxResolution;
+        LOG(VB_GENERAL, LOG_WARNING, QString("Ignoring user defined resolution for PCA9685 channel - defaulting to %1").arg(m_maxResolution));
+    }
+
     m_parent->SetPWM(m_channelNumber, m_channelValue);
 }
 
@@ -57,7 +66,7 @@ TorcI2CPCA9685Channel::~TorcI2CPCA9685Channel()
 
 QStringList TorcI2CPCA9685Channel::GetDescription(void)
 {
-    return QStringList() << tr("I2C") << tr("PCA9685 16 Channel PWM") << QString("%1 %2").arg(tr("Channel")).arg(m_channelNumber);
+    return QStringList() << tr("I2C") << tr("PCA9685 16 Channel PWM") << QString("%1 %2").arg(tr("Channel")).arg(m_channelNumber) << tr("Resolution %1").arg(m_resolution);
 }
 
 void TorcI2CPCA9685Channel::SetValue(double Value)
@@ -67,11 +76,11 @@ void TorcI2CPCA9685Channel::SetValue(double Value)
     // anything that doesn't change the range sent to the device is just noise, so
     // calculate now and filter early
     double newvalue = Value;
-    if (newvalue < 0.0) newvalue = 0.0;
-    if (newvalue > 1.0) newvalue = 1.0;
+    if (!ValueIsDifferent(newvalue))
+        return;
 
     // convert 0.0 to 1.0 to 0 to 4095
-    int channelvalue = (int)((newvalue * 4095.0) + 0.5);
+    int channelvalue = (int)((newvalue * (float)PCA9685_RESOLUTION) + 0.5);
     if (channelvalue == m_channelValue)
         return;
 
@@ -107,7 +116,7 @@ TorcI2CPCA9685::TorcI2CPCA9685(int Address, const QVariantMap &Details)
     // set frequency to 1000Hz
     // stop error checking here:)
     (int)wiringPiI2CWriteReg8(m_fd, MODE1, 0x01);
-    (int)wiringPiI2CWriteReg8(m_fd, PRESCALE, (uint8_t)((CLOCKFREQ / 4096 / 1000) -1));
+    (int)wiringPiI2CWriteReg8(m_fd, PRESCALE, (uint8_t)((CLOCKFREQ / PCA9685_RANGE / 1000) - 1));
     (int)wiringPiI2CWriteReg8(m_fd, MODE1, 0x80);
     (int)wiringPiI2CWriteReg8(m_fd, MODE2, 0x04);
 
@@ -166,7 +175,6 @@ TorcI2CPCA9685::~TorcI2CPCA9685()
 
 /*! \brief Set the hardware PWM for given channel.
  *
- * \todo Randomise on time?
  * \todo check return values
  */
 bool TorcI2CPCA9685::SetPWM(int Channel, int Value)
@@ -174,11 +182,8 @@ bool TorcI2CPCA9685::SetPWM(int Channel, int Value)
     if (m_fd < 0 || Channel < 0 || Channel > 15)
         return false;
 
-    int offtime = Value;
+    int offtime = qBound(0, Value, PCA9685_RESOLUTION);
     int ontime  = 0;
-
-    if (offtime < 0)    offtime = 0;
-    if (offtime > 4095) offtime = 4095;
 
     // turn completely on or off if required
     // 'off' supercedes 'on' per spec
@@ -187,7 +192,7 @@ bool TorcI2CPCA9685::SetPWM(int Channel, int Value)
         LOG(VB_GENERAL, LOG_INFO, QString("Channel %1 turned completely OFF").arg(Channel));
         offtime |= 0x1000;
     }
-    else if (offtime > 4094)
+    else if (offtime >= PCA9685_RESOLUTION)
     {
         LOG(VB_GENERAL, LOG_INFO, QString("Channel %1 turned completely ON").arg(Channel));
         ontime |= 0x1000;

@@ -33,15 +33,6 @@ memset(&(Struct), 0, sizeof((Struct))); \
 (Struct).nVersion.s.nRevision     = OMX_VERSION_REVISION; \
 (Struct).nVersion.s.nStep         = OMX_VERSION_STEP;
 
-typedef OMX_ERRORTYPE ( * TORC_OMXINIT)                (void);
-typedef OMX_ERRORTYPE ( * TORC_OMXDEINIT)              (void);
-typedef OMX_ERRORTYPE ( * TORC_OMXCOMPONENTNAMEENUM)   (OMX_STRING, OMX_U32, OMX_U32);
-typedef OMX_ERRORTYPE ( * TORC_OMXGETHANDLE)           (OMX_HANDLETYPE, OMX_STRING, OMX_PTR, OMX_CALLBACKTYPE*);
-typedef OMX_ERRORTYPE ( * TORC_OMXFREEHANDLE)          (OMX_HANDLETYPE);
-typedef OMX_ERRORTYPE ( * TORC_OMXSETUPTUNNEL)         (OMX_HANDLETYPE, OMX_U32, OMX_HANDLETYPE, OMX_U32);
-typedef OMX_ERRORTYPE ( * TORC_OMXGETCOMPONENTSOFROLE) (OMX_STRING, OMX_U32, OMX_U8);
-typedef OMX_ERRORTYPE ( * TORC_OMXGETROLESOFCOMPONENT) (OMX_STRING, OMX_U32, OMX_U8);
-
 QString EventToString   (OMX_EVENTTYPE Event);
 QString StateToString   (OMX_STATETYPE State);
 QString ErrorToString   (OMX_ERRORTYPE Error);
@@ -55,23 +46,11 @@ QString DomainToString  (OMX_INDEXTYPE Domain);
 #define OMX_CHECKX(Error, Component, Message) \
     if (OMX_ErrorNone != Error) { OMX_ERROR(Error, Component, Message); }
 
-class TorcOMXCore Q_DECL_FINAL : public QLibrary
+class TorcOMXCore
 {
   public:
-    TorcOMXCore(const QString &Library);
+    TorcOMXCore();
    ~TorcOMXCore();
-
-    bool IsValid (void);
-
-    bool                        m_initialised;
-    TORC_OMXINIT                m_omxInit;
-    TORC_OMXDEINIT              m_omxDeinit;
-    TORC_OMXCOMPONENTNAMEENUM   m_omxComponentNameEnum;
-    TORC_OMXGETHANDLE           m_omxGetHandle;
-    TORC_OMXFREEHANDLE          m_omxFreeHandle;
-    TORC_OMXSETUPTUNNEL         m_omxSetupTunnel;
-    TORC_OMXGETCOMPONENTSOFROLE m_omxGetComponentsOfRole;
-    TORC_OMXGETROLESOFCOMPONENT m_omxGetRolesOfComponent;
 };
 
 #endif // TORCOMXCORE_H

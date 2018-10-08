@@ -65,7 +65,7 @@
 */
 
 QRegExp gRegExp = QRegExp("[ \r\n][ \r\n]*");
-char TorcHTTPRequest::DateFormat[] = "ddd, dd MMM yyyy HH:mm:ss 'GMT'";
+char TorcHTTPRequest::DateFormat[] = "ddd, dd MMM yyyy HH:mm:ss 'UTC'";
 
 TorcHTTPRequest::TorcHTTPRequest(TorcHTTPReader *Reader)
   : m_fullUrl(),
@@ -83,6 +83,7 @@ TorcHTTPRequest::TorcHTTPRequest(TorcHTTPReader *Reader)
     m_content(NULL),
     m_secure(false),
     m_allowGZip(false),
+    m_allowCORS(false),
     m_allowed(0),
     m_authorised(HTTPNotAuthorised),
     m_responseType(HTTPResponseUnknown),
@@ -245,6 +246,16 @@ void TorcHTTPRequest::SetAllowed(int Allowed)
 void TorcHTTPRequest::SetAllowGZip(bool Allowed)
 {
     m_allowGZip = Allowed;
+}
+
+void TorcHTTPRequest::SetAllowCORS(bool Allowed)
+{
+    m_allowCORS = Allowed;
+}
+
+bool TorcHTTPRequest::GetAllowCORS(void) const
+{
+    return m_allowCORS;
 }
 
 /*! \brief Set the caching behaviour for this response.
@@ -863,6 +874,11 @@ QString TorcHTTPRequest::ResponseTypeToString(HTTPResponseType Response)
         case HTTPResponsePListApple:       return QString("text/x-apple-plist+xml");
         case HTTPResponseBinaryPListApple: return QString("application/x-apple-binary-plist");
         case HTTPResponsePlainText:        return QString("text/plain");
+        case HTTPResponseM3U8:             return QString("application/x-mpegurl");
+        case HTTPResponseM3U8Apple:        return QString("application/vnd.apple.mpegurl");
+        case HTTPResponseMPD:              return QString("application/dash+xml");
+        case HTTPResponseMPEGTS:           return QString("video/mp2t");
+        case HTTPResponseMP4:              return QString("video/mp4");
         default: break;
     }
 

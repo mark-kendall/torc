@@ -32,11 +32,12 @@ QString TorcInput::TypeToString(TorcInput::Type Type)
 {
     switch (Type)
     {
-        case TorcInput::Temperature: return QString("temperature");
-        case TorcInput::pH:          return QString("pH");
-        case TorcInput::Switch:      return QString("switch");
-        case TorcInput::PWM:         return QString("pwm");
-        case TorcInput::Button:      return QString("button");
+        case TorcInput::Temperature:   return QString("temperature");
+        case TorcInput::pH:            return QString("pH");
+        case TorcInput::Switch:        return QString("switch");
+        case TorcInput::PWM:           return QString("pwm");
+        case TorcInput::Button:        return QString("button");
+        case TorcInput::SystemStarted: return QString("started");
         default: break;
     }
 
@@ -50,6 +51,7 @@ TorcInput::Type TorcInput::StringToType(const QString &Type)
     if ("ph"          == type) return TorcInput::pH;
     if ("switch"      == type) return TorcInput::Switch;
     if ("pwm"         == type) return TorcInput::PWM;
+    if ("started"     == type) return TorcInput::SystemStarted;
     return TorcInput::Unknown;
 }
 

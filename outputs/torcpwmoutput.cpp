@@ -21,11 +21,50 @@
 */
 
 // Torc
+#include "torclogging.h"
 #include "torcpwmoutput.h"
 
-TorcPWMOutput::TorcPWMOutput(double Value, const QString &ModelId, const QVariantMap &Details)
-  : TorcOutput(TorcOutput::PWM, Value, ModelId, Details)
+TorcPWMOutput::TorcPWMOutput(double Value, const QString &ModelId, const QVariantMap &Details, uint MaxResolution)
+  : TorcOutput(TorcOutput::PWM, Value, ModelId, Details),
+    m_resolution(MaxResolution),
+    m_maxResolution(MaxResolution)
 {
+    // check for user defined resolution
+    // the XSD limits this to 7 to 24bit resolution
+    QVariantMap::const_iterator it = Details.begin();
+    for ( ; it != Details.constEnd(); ++it)
+    {
+        if (it.key() == "resolution")
+        {
+            bool ok = false;
+            uint resolution = it.value().toUInt(&ok);
+            if (ok)
+            {
+                if (resolution >= 128 && resolution <= 16777215)
+                {
+                    if (resolution > m_maxResolution)
+                    {
+                        LOG(VB_GENERAL, LOG_ERR, QString("Requested resolution of %1 for '%2' exceeds maximum - defaulting to %3")
+                            .arg(resolution).arg(uniqueId).arg(m_maxResolution));
+                    }
+                    else
+                    {
+                        m_resolution = resolution;
+                        LOG(VB_GENERAL, LOG_INFO, QString("Set resolution to %1 for '%2'").arg(m_resolution).arg(uniqueId));
+                    }
+                }
+                else
+                {
+                    LOG(VB_GENERAL, LOG_ERR, QString("Requested resolution of %1 for '%2' is out of range - defaulting to %3")
+                        .arg(resolution).arg(uniqueId).arg(m_maxResolution));
+                }
+            }
+            else
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse resolution for '%1'").arg(uniqueId));
+            }
+        }
+    }
 }
 
 TorcPWMOutput::~TorcPWMOutput()
@@ -35,4 +74,28 @@ TorcPWMOutput::~TorcPWMOutput()
 TorcOutput::Type TorcPWMOutput::GetType(void)
 {
     return TorcOutput::PWM;
+}
+
+uint TorcPWMOutput::GetResolution(void)
+{
+    return m_resolution;
+}
+
+uint TorcPWMOutput::GetMaxResolution(void)
+{
+    return m_maxResolution;
+}
+
+bool TorcPWMOutput::ValueIsDifferent(double &NewValue)
+{
+    // range check
+    double newvalue = qBound(0.0, NewValue, 1.0);
+
+    // resolution check
+    if (qAbs(value - newvalue) < (1.0 / (double)m_resolution))
+        return false;
+
+    // set new value in case range check caught out of bounds
+    NewValue = newvalue;
+    return true;
 }

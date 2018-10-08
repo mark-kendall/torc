@@ -130,33 +130,34 @@ void TorcHTTPServer::HandleRequest(const QString &PeerAddress, int PeerPort, con
     if (!Request.IsAuthorised())
         return;
 
-    // verify cross domain requests
-    // should an invalid origin fail?
-    TorcHTTPServer::ValidateOrigin(Request);
-
-    QReadLocker locker(gHandlersLock);
-
-    QString path = Request.GetPath();
-
-    QMap<QString,TorcHTTPHandler*>::const_iterator it = gHandlers.find(path);
-    if (it != gHandlers.end())
     {
-        // direct path match
-        (*it)->ProcessHTTPRequest(PeerAddress, PeerPort, LocalAddress, LocalPort, Request);
-    }
-    else
-    {
-        // fully recursive handler
-        it = gHandlers.begin();
-        for ( ; it != gHandlers.end(); ++it)
+        QReadLocker locker(gHandlersLock);
+
+        QString path = Request.GetPath();
+
+        QMap<QString,TorcHTTPHandler*>::const_iterator it = gHandlers.find(path);
+        if (it != gHandlers.end())
         {
-            if ((*it)->GetRecursive() && path.startsWith(it.key()))
+            // direct path match
+            (*it)->ProcessHTTPRequest(PeerAddress, PeerPort, LocalAddress, LocalPort, Request);
+        }
+        else
+        {
+            // fully recursive handler
+            it = gHandlers.begin();
+            for ( ; it != gHandlers.end(); ++it)
             {
-                (*it)->ProcessHTTPRequest(PeerAddress, PeerPort, LocalAddress, LocalPort, Request);
-                break;
+                if ((*it)->GetRecursive() && path.startsWith(it.key()))
+                {
+                    (*it)->ProcessHTTPRequest(PeerAddress, PeerPort, LocalAddress, LocalPort, Request);
+                    break;
+                }
             }
         }
     }
+
+    // verify cross domain requests
+    TorcHTTPServer::ValidateOrigin(Request);
 }
 
 /*! \brief Process an incoming RPC request.
@@ -569,16 +570,25 @@ void TorcHTTPServer::AddAuthenticationHeader(TorcHTTPRequest &Request)
  * Cross domain requests are not common from well behaved clients/browsers. There can however be confusion
  * when the IP address is a localhost (IPv4 or IPv6) and we can never guarantee that the domain will 'look' equivalent.
  * So validate the incoming origin (which is good practice anyway) and set the outgoing headers as necessary.
+ * Override CORS behaviour using TorcHTTPRequest::SetAllowCors (e.g. MPEG-DASH players)
 */
 void TorcHTTPServer::ValidateOrigin(TorcHTTPRequest &Request)
 {
     gOriginWhitelistLock.lockForRead();
-    if (Request.Headers()->contains("Origin") && gOriginWhitelist.contains(Request.Headers()->value("Origin"), Qt::CaseInsensitive))
+    bool origin = gOriginWhitelist.contains(Request.Headers()->value("Origin"), Qt::CaseInsensitive);
+    gOriginWhitelistLock.unlock();
+
+    if (Request.Headers()->contains("Origin") && (origin || Request.GetAllowCORS()))
     {
         Request.SetResponseHeader("Access-Control-Allow-Origin", Request.Headers()->value("Origin"));
-        Request.SetResponseHeader("Access-Control-Allow-Credentials", "true");
+        if (Request.Headers()->contains("Access-Control-Allow-Credentials"))
+            Request.SetResponseHeader("Access-Control-Allow-Credentials", "true");
+        if (Request.Headers()->contains("Access-Control-Request-Headers"))
+            Request.SetResponseHeader("Access-Control-Request-Headers", "Origin, X-Requested-With, Content-Type, Accept, Range");
+        if (Request.Headers()->contains("Access-Control-Request-Method"))
+            Request.SetResponseHeader("Access-Control-Request-Method", TorcHTTPRequest::AllowedToString(HTTPGet | HTTPOptions | HTTPHead));
+        Request.SetResponseHeader("Access-Control-Max-Age", "86400");
     }
-    gOriginWhitelistLock.unlock();
 }
 
 void TorcHTTPServer::AuthenticateUser(TorcHTTPRequest &Request)

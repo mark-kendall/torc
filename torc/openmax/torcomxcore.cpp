@@ -137,62 +137,24 @@ QString DomainToString(OMX_INDEXTYPE Domain)
     return QString("Unknown");
 }
 
-TorcOMXCore::TorcOMXCore(const QString &Library)
-  : QLibrary(Library),
-    m_initialised(false),
-    m_omxInit(NULL),
-    m_omxDeinit(NULL),
-    m_omxComponentNameEnum(NULL),
-    m_omxGetHandle(NULL),
-    m_omxFreeHandle(NULL),
-    m_omxSetupTunnel(NULL),
-    m_omxGetComponentsOfRole(NULL),
-    m_omxGetRolesOfComponent(NULL)
+TorcOMXCore::TorcOMXCore()
 {
-    m_omxInit                = (TORC_OMXINIT)               resolve("OMX_Init");
-    m_omxDeinit              = (TORC_OMXDEINIT)             resolve("OMX_Deinit");
-    m_omxComponentNameEnum   = (TORC_OMXCOMPONENTNAMEENUM)  resolve("OMX_ComponentNameEnum");
-    m_omxGetHandle           = (TORC_OMXGETHANDLE)          resolve("OMX_GetHandle");
-    m_omxFreeHandle          = (TORC_OMXFREEHANDLE)         resolve("OMX_FreeHandle");
-    m_omxSetupTunnel         = (TORC_OMXSETUPTUNNEL)        resolve("OMX_SetupTunnel");
-    m_omxGetComponentsOfRole = (TORC_OMXGETCOMPONENTSOFROLE)resolve("OMX_GetComponentsOfRole");
-    m_omxGetRolesOfComponent = (TORC_OMXGETROLESOFCOMPONENT)resolve("OMX_GetRolesOfComponent");
-
-    if (m_omxInit)
+    OMX_ERRORTYPE error = OMX_Init();
+    if (OMX_ErrorNone != error)
     {
-        OMX_ERRORTYPE error = m_omxInit();
-        m_initialised = error == OMX_ErrorNone;
-
-        if (!m_initialised)
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed to initialise OMXCore (Error '%1')").arg(ErrorToString(error)));
+        LOG(VB_GENERAL, LOG_ERR, QString("Failed to initialise OMXCore (Error '%1')").arg(ErrorToString(error)));
+        return;
     }
 
-    if (IsValid())
-    {
-        LOG(VB_GENERAL, LOG_INFO, QString("Loaded OpenMaxIL library '%1'").arg(Library));
-        LOG(VB_GENERAL, LOG_INFO, "Available components:");
-        OMX_U32 index = 0;
-        char componentname[128];
-        while (m_omxComponentNameEnum(&componentname[0], 128, index++) == OMX_ErrorNone)
-            LOG(VB_GENERAL, LOG_INFO, componentname);
-    }
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to load OpenMax library '%1'").arg(Library));
-    }
+    LOG(VB_GENERAL, LOG_INFO, "Available OMX components:");
+    OMX_U32 index = 0;
+    char componentname[128];
+    while (OMX_ComponentNameEnum(&componentname[0], 128, index++) == OMX_ErrorNone)
+        LOG(VB_GENERAL, LOG_INFO, componentname);
 }
 
 TorcOMXCore::~TorcOMXCore()
 {
-    if (IsValid())
-    {
-        LOG(VB_GENERAL, LOG_INFO, "Closing OpenMax Core");
-        m_omxDeinit();
-    }
-}
-
-bool TorcOMXCore::IsValid(void)
-{
-    return isLoaded() && m_initialised && m_omxInit && m_omxDeinit && m_omxComponentNameEnum &&
-           m_omxGetHandle && m_omxFreeHandle && m_omxSetupTunnel && m_omxGetComponentsOfRole && m_omxGetRolesOfComponent;
+    LOG(VB_GENERAL, LOG_INFO, "Closing OpenMax Core");
+    OMX_Deinit();
 }

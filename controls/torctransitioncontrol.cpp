@@ -182,6 +182,32 @@ TorcTransitionControl::TorcTransitionControl(const QString &Type, const QVariant
     }
     m_duration = duration;
 
+    // a transition can have a default value (0 or 1) to force the start state properly
+    if (Details.contains("default"))
+    {
+        bool ok = false;
+        int defaultvalue = Details.value("default").toInt(&ok);
+        if (ok)
+        {
+            if (defaultvalue == 0 || defaultvalue == 1)
+            {
+                LOG(VB_GENERAL, LOG_INFO, QString("Setting default for '%1' to '%2'").arg(uniqueId).arg(defaultvalue));
+                defaultValue = defaultvalue;
+                value        = defaultvalue; // NB safe to set during constructor
+            }
+            else
+            {
+                ok = false;
+            }
+        }
+
+        if (!ok)
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse default for transition '%1'").arg(uniqueId));
+            return;
+        }
+    }
+
     // so far so good
     m_parsed = true;
 
@@ -355,6 +381,14 @@ void TorcTransitionControl::CalculateOutput(void)
             if (newvalue < 1) // time can run backwards :)
                 timesincelasttransition = m_duration - timesincelasttransition;
         }
+        else // not a timer input - just a regular input (ideally zero or one) - don't start the timer without reason
+        {
+            if (qFuzzyCompare(GetValue() + 1.0, m_transitionValue + 1.0))
+            {
+                LOG(VB_GENERAL, LOG_INFO, QString("Transition '%1' is initially inactive (value '%2')").arg(uniqueId).arg(newvalue));
+                return;
+            }
+        }
     }
     else
     {
@@ -380,9 +414,8 @@ void TorcTransitionControl::CalculateOutput(void)
 void TorcTransitionControl::SetAnimationValue(double Value)
 {
     QMutexLocker locker(&lock);
-    double rounded = ((qint64)(Value * 100)) / 100.0;
-    animationValue = rounded;
-    SetValue(rounded);
+    animationValue = Value;
+    SetValue(Value);
 }
 
 double TorcTransitionControl::GetAnimationValue(void)

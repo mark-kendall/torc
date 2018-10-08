@@ -37,16 +37,15 @@ TorcOMXEvent::TorcOMXEvent(OMX_EVENTTYPE Type, OMX_U32 Data1, OMX_U32 Data2)
 
 static OMX_CALLBACKTYPE gCallbacks;
 
-TorcOMXComponent::TorcOMXComponent(TorcOMXCore *Core, OMX_STRING Component)
+TorcOMXComponent::TorcOMXComponent(OMX_STRING Component)
   : m_valid(false),
-    m_core(Core),
     m_handle(NULL),
-    m_lock(QMutex::Recursive),
+    m_lock(QMutex::NonRecursive),
     m_componentName(Component),
     m_inputPorts(),
     m_outputPorts(),
     m_eventQueue(),
-    m_eventQueueLock(QMutex::Recursive),
+    m_eventQueueLock(QMutex::NonRecursive),
     m_eventQueueWait()
 {
     // set the global callbacks
@@ -54,11 +53,8 @@ TorcOMXComponent::TorcOMXComponent(TorcOMXCore *Core, OMX_STRING Component)
     gCallbacks.EmptyBufferDone = &EmptyBufferDoneCallback;
     gCallbacks.FillBufferDone  = &FillBufferDoneCallback;
 
-    if (!m_core)
-        return;
-
     // get handle
-    OMX_ERRORTYPE status = m_core->m_omxGetHandle(&m_handle, Component, this, &gCallbacks);
+    OMX_ERRORTYPE status = OMX_GetHandle(&m_handle, Component, this, &gCallbacks);
     if (status != OMX_ErrorNone || !m_handle)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("%1: Failed to get handle").arg(m_componentName));
@@ -170,18 +166,16 @@ TorcOMXPort* TorcOMXComponent::FindPort(OMX_DIRTYPE Direction, OMX_U32 Index, OM
 
 TorcOMXComponent::~TorcOMXComponent()
 {
-    {
-        QMutexLocker locker(&m_lock);
+    QMutexLocker locker(&m_lock);
 
-        while (!m_inputPorts.isEmpty())
-            delete m_inputPorts.takeLast();
-        while (!m_outputPorts.isEmpty())
-            delete m_outputPorts.takeLast();
+    while (!m_inputPorts.isEmpty())
+        delete m_inputPorts.takeLast();
+    while (!m_outputPorts.isEmpty())
+        delete m_outputPorts.takeLast();
 
-        if (m_core && m_handle)
-            m_core->m_omxFreeHandle(m_handle);
-        m_handle       = NULL;
-    }
+    if (m_handle)
+        OMX_FreeHandle(m_handle);
+    m_handle = NULL;
 }
 
 bool TorcOMXComponent::IsValid(void)
@@ -324,13 +318,13 @@ OMX_U32 TorcOMXComponent::GetPort(OMX_DIRTYPE Direction, OMX_U32 Index, OMX_INDE
     return 0;
 }
 
-OMX_ERRORTYPE TorcOMXComponent::EnablePort(OMX_DIRTYPE Direction, OMX_U32 Index, bool Enable, OMX_INDEXTYPE Domain)
+OMX_ERRORTYPE TorcOMXComponent::EnablePort(OMX_DIRTYPE Direction, OMX_U32 Index, bool Enable, OMX_INDEXTYPE Domain, bool Wait /*=true*/)
 {
     QMutexLocker locker(&m_lock);
 
     TorcOMXPort* port = FindPort(Direction, Index, Domain);
     if (port)
-        return port->EnablePort(Enable);
+        return port->EnablePort(Enable, Wait);
 
     return OMX_ErrorUndefined;
 }
@@ -384,9 +378,9 @@ OMX_ERRORTYPE TorcOMXComponent::DestroyBuffers(OMX_DIRTYPE Direction, OMX_U32 In
     return OMX_ErrorUndefined;
 }
 
-OMX_BUFFERHEADERTYPE* TorcOMXComponent::GetInputBuffer(OMX_U32 Index, OMX_U32 Timeout, OMX_INDEXTYPE Domain)
+OMX_BUFFERHEADERTYPE* TorcOMXComponent::GetBuffer(OMX_DIRTYPE Direction, OMX_U32 Index, OMX_U32 Timeout, OMX_INDEXTYPE Domain)
 {
-    TorcOMXPort *port = FindPort(OMX_DirInput, Index, Domain);
+    TorcOMXPort *port = FindPort(Direction, Index, Domain);
     if (port)
         return port->GetBuffer(Timeout);
 
@@ -477,6 +471,13 @@ OMX_ERRORTYPE TorcOMXComponent::WaitForResponse(OMX_U32 Command, OMX_U32 Data2, 
         {
             if ((*it).m_type == OMX_EventCmdComplete && (*it).m_data1 == Command && (*it).m_data2 == Data2)
             {
+                m_eventQueue.erase(it);
+                m_eventQueueLock.unlock();
+                return OMX_ErrorNone;
+            }
+	    else if ((*it).m_type == Command)
+            {
+                LOG(VB_GENERAL, LOG_DEBUG, QString("1 %1 2 %2").arg((*it).m_data1).arg((*it).m_data2));
                 m_eventQueue.erase(it);
                 m_eventQueueLock.unlock();
                 return OMX_ErrorNone;

@@ -46,7 +46,12 @@ typedef enum
     HTTPResponseBinaryPList,
     HTTPResponsePListApple,
     HTTPResponseBinaryPListApple,
-    HTTPResponsePlainText
+    HTTPResponsePlainText,
+    HTTPResponseM3U8,
+    HTTPResponseM3U8Apple,
+    HTTPResponseMPD,
+    HTTPResponseMPEGTS,
+    HTTPResponseMP4
 } HTTPResponseType;
 
 typedef enum
@@ -135,6 +140,7 @@ class TorcHTTPRequest
     void                   SetResponseHeader        (const QString &Header, const QString &Value);
     void                   SetAllowed               (int Allowed);
     void                   SetAllowGZip             (bool Allowed);
+    void                   SetAllowCORS             (bool Allowed);
     void                   SetCache                 (int Cache, const QString Tag = QString(""));
     void                   SetSecure                (bool Secure);
     bool                   GetSecure                (void);
@@ -148,6 +154,7 @@ class TorcHTTPRequest
     QString                GetCache                 (void) const;
     const QMap<QString,QString>* Headers            (void) const;
     const QMap<QString,QString>& Queries            (void) const;
+    bool                   GetAllowCORS             (void) const;
     void                   Respond                  (QTcpSocket *Socket);
     void                   Redirected               (const QString &Redirected);
     TorcSerialiser*        GetSerialiser            (void);
@@ -177,6 +184,7 @@ class TorcHTTPRequest
     bool                   m_secure;
 
     bool                   m_allowGZip;
+    bool                   m_allowCORS;
     int                    m_allowed;
     HTTPAuthorisation      m_authorised;
     HTTPResponseType       m_responseType;

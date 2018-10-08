@@ -34,5 +34,14 @@ TorcNetworkPWMOutput::~TorcNetworkPWMOutput()
 
 QStringList TorcNetworkPWMOutput::GetDescription(void)
 {
-    return QStringList() << tr("Network PWM");
+    return QStringList() << tr("Network PWM") << tr("Resolution %1").arg(m_resolution);
+}
+
+void TorcNetworkPWMOutput::SetValue(double Value)
+{
+    double newvalue = Value;
+    if (!ValueIsDifferent(newvalue))
+        return;
+
+    TorcPWMOutput::SetValue(newvalue);
 }

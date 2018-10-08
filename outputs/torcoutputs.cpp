@@ -63,6 +63,7 @@ void TorcOutputs::Graph(QByteArray* Data)
     {
         QString id    = output->GetUniqueId();
         QString label = output->GetUserName();
+        QString url   = output->GetPresentationURL();
         QString desc;
         QStringList source = output->GetDescription();
         foreach (QString item, source)
@@ -74,8 +75,9 @@ void TorcOutputs::Graph(QByteArray* Data)
 
         if (label.isEmpty())
             label = id;
-        Data->append(QString("        \"%1\" [shape=record id=\"%1\" label=<<B>%2</B>%3>];\r\n")
-            .arg(id).arg(label).arg(desc));
+        QString link = url.isEmpty() ? QString() : QString(" href=\"%1\"").arg(url);
+        Data->append(QString("        \"%1\" [shape=record id=\"%1\" label=<<B>%2</B>%3>%4];\r\n")
+            .arg(id).arg(label).arg(desc).arg(link));
     }
 
     Data->append("    }\r\n\r\n");
