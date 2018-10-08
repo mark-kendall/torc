@@ -36,3 +36,12 @@ QStringList TorcNetworkPWMOutput::GetDescription(void)
 {
     return QStringList() << tr("Network PWM");
 }
+
+void TorcNetworkPWMOutput::SetValue(double Value)
+{
+    double newvalue = Value;
+    if (!ValueIsDifferent(newvalue))
+        return;
+
+    TorcPWMOutput::SetValue(newvalue);
+}

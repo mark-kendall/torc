@@ -30,6 +30,7 @@
 #include "softPwm.h"
 
 #define DEFAULT_VALUE 0
+#define PI_PWM_RESOLUTION 1024
 
 /*! \class TorcPiPWMOutput
  *  \brief A device to output PWM signals on the Raspberry Pi
@@ -40,10 +41,17 @@
  * subject to jitter under load - and nobody wants flickering LEDs!).
  */
 TorcPiPWMOutput::TorcPiPWMOutput(int Pin, const QVariantMap &Details)
-  : TorcPWMOutput(DEFAULT_VALUE, "PiGPIOPWMOutput", Details),
+  : TorcPWMOutput(DEFAULT_VALUE, "PiGPIOPWMOutput", Details, PI_PWM_RESOLUTION),
     m_pin(Pin)
 {
-    int value = (int)((DEFAULT_VALUE * 1024.0) + 0.5);
+    // hardware PWM only operates at default 10bit accuracy
+    if ((m_resolution != m_maxResolution) && (m_pin == TORC_HWPWM_PIN))
+    {
+        m_resolution = m_maxResolution;
+        LOG(VB_GENERAL, LOG_WARNING, QString("Ignoring user defined resolution for hardware PWM - defaulting to %1").arg(m_maxResolution));
+    }
+
+    int value = (int)((DEFAULT_VALUE * (double)m_resolution) + 0.5);
 
     if (m_pin == TORC_HWPWM_PIN)
     {
@@ -52,7 +60,7 @@ TorcPiPWMOutput::TorcPiPWMOutput(int Pin, const QVariantMap &Details)
     }
     else
     {
-        if (softPwmCreate(m_pin, value, 1024) == 0)
+        if (softPwmCreate(m_pin, value, m_resolution) == 0)
         {
             LOG(VB_GENERAL, LOG_WARNING, QString("Using software PWM on pin %1: It MIGHT flicker...").arg(m_pin));
         }
@@ -84,16 +92,16 @@ void TorcPiPWMOutput::SetValue(double Value)
 {
     QMutexLocker locker(&lock);
 
-    // ignore same value updates
-    if (qFuzzyCompare(Value + 1.0f, value + 1.0f))
+    double newdouble = Value;
+    if (!ValueIsDifferent(newdouble))
         return;
 
-    int value = (int)((Value * 1024.0) + 0.5);
+    int newvalue = (int)((newdouble * (double)m_resolution) + 0.5);
 
     if (m_pin == TORC_HWPWM_PIN)
-        pwmWrite(m_pin, value);
+        pwmWrite(m_pin, newvalue);
     else
-        softPwmWrite(m_pin, value);
+        softPwmWrite(m_pin, newvalue);
 
     TorcPWMOutput::SetValue(Value);
 }
