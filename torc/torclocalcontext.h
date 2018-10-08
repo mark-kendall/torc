@@ -109,7 +109,7 @@ class TorcLocalContext : public QObject, public TorcObservable
     TorcSQLiteDB         *m_sqliteDB;
     QString               m_dbName;
     QMap<QString,QString> m_localSettings;
-    QReadWriteLock       *m_localSettingsLock;
+    QReadWriteLock        m_localSettingsLock;
     QObject              *m_UIObject;
     TorcAdminThread      *m_adminThread;
     TorcLanguage         *m_language;

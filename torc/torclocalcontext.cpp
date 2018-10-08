@@ -110,7 +110,7 @@ TorcLocalContext::TorcLocalContext(TorcCommandLine* CommandLine)
     m_sqliteDB(NULL),
     m_dbName(QString("")),
     m_localSettings(),
-    m_localSettingsLock(new QReadWriteLock(QReadWriteLock::Recursive)),
+    m_localSettingsLock(QReadWriteLock::Recursive),
     m_UIObject(NULL),
     m_adminThread(NULL),
     m_language(NULL),
@@ -188,10 +188,6 @@ TorcLocalContext::~TorcLocalContext()
     delete m_sqliteDB;
     m_sqliteDB = NULL;
 
-    // delete settings lock
-    delete m_localSettingsLock;
-    m_localSettingsLock = NULL;
-
     // revert to the default message handler
     qInstallMessageHandler(0);
 
@@ -225,7 +221,7 @@ bool TorcLocalContext::Init(void)
 
     // Load the settings
     {
-        QWriteLocker locker(m_localSettingsLock);
+        QWriteLocker locker(&m_localSettingsLock);
         m_sqliteDB->LoadSettings(m_localSettings);
     }
 
@@ -377,7 +373,7 @@ int TorcLocalContext::GetPriority(void)
 QString TorcLocalContext::GetDBSetting(const QString &Name, const QString &DefaultValue)
 {
     {
-        QReadLocker locker(m_localSettingsLock);
+        QReadLocker locker(&m_localSettingsLock);
         if (m_localSettings.contains(Name))
             return m_localSettings.value(Name);
     }
@@ -388,7 +384,7 @@ QString TorcLocalContext::GetDBSetting(const QString &Name, const QString &Defau
 
 void TorcLocalContext::SetDBSetting(const QString &Name, const QString &Value)
 {
-    QWriteLocker locker(m_localSettingsLock);
+    QWriteLocker locker(&m_localSettingsLock);
     if (m_sqliteDB)
         m_sqliteDB->SetSetting(Name, Value);
     m_localSettings[Name] = Value;
