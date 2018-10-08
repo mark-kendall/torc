@@ -4,11 +4,15 @@
 // Qt
 #include <QObject>
 #include <QString>
+#include <QReadWriteLock>
+#include <QMutex>
 
 // Torc
 #include "torclocaldefs.h"
 #include "torcsetting.h"
 #include "torcobservable.h"
+#include "torcsqlitedb.h"
+#include "torcadminthread.h"
 #include "torccommandline.h"
 
 #ifdef Q_OS_LINUX
@@ -62,10 +66,6 @@ class Torc
     static int     StringToAction(const QString &Action);
 };
 
-class TorcLocalContextPriv;
-class QMutex;
-class QReadWriteLock;
-
 class TorcLocalContext : public QObject, public TorcObservable
 {
     Q_OBJECT
@@ -101,10 +101,19 @@ class TorcLocalContext : public QObject, public TorcObservable
    ~TorcLocalContext();
     Q_DISABLE_COPY(TorcLocalContext)
 
-    bool          Init(void);
+    bool          Init         (void);
+    QString       GetDBSetting (const QString &Name, const QString &DefaultValue);
+    void          SetDBSetting (const QString &Name, const QString &Value);
 
   private:
-    TorcLocalContextPriv *m_priv;
+    TorcSQLiteDB         *m_sqliteDB;
+    QString               m_dbName;
+    QMap<QString,QString> m_localSettings;
+    QReadWriteLock       *m_localSettingsLock;
+    QObject              *m_UIObject;
+    TorcAdminThread      *m_adminThread;
+    TorcLanguage         *m_language;
+    QString               m_uuid;
 };
 
 extern TorcLocalContext *gLocalContext;

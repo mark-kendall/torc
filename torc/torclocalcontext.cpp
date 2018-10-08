@@ -25,11 +25,9 @@
 
 // Qt
 #include <QCoreApplication>
-#include <QReadWriteLock>
 #include <QSqlDatabase>
 #include <QThreadPool>
 #include <QDateTime>
-#include <QMutex>
 #include <QUuid>
 #include <QDir>
 #include <QMetaEnum>
@@ -40,8 +38,6 @@
 #include "torclogging.h"
 #include "torclanguage.h"
 #include "torcexitcodes.h"
-#include "torcsqlitedb.h"
-#include "torcadminthread.h"
 #include "torcpower.h"
 #include "torclocalcontext.h"
 #include "torccoreutils.h"
@@ -60,34 +56,58 @@ static void ExitHandler(int Sig)
     TorcLocalContext::NotifyEvent(Torc::Stop);
 }
 
-class TorcLocalContextPriv
+QString Torc::ActionToString(Actions Action)
 {
-  public:
-    explicit TorcLocalContextPriv(TorcCommandLine *CommandLine);
-   ~TorcLocalContextPriv();
+    const QMetaObject &mo = Torc::staticMetaObject;
+    int enum_index        = mo.indexOfEnumerator("Actions");
+    QMetaEnum metaEnum    = mo.enumerator(enum_index);
+    return metaEnum.valueToKey(Action);
+}
 
-    bool    Init                 (void);
-    QString GetSetting           (const QString &Name, const QString &DefaultValue);
-    void    SetSetting           (const QString &Name, const QString &Value);
-    QString GetUuid              (void) const;
+int Torc::StringToAction(const QString &Action)
+{
+    const QMetaObject &mo = Torc::staticMetaObject;
+    int enum_index        = mo.indexOfEnumerator("Actions");
+    QMetaEnum metaEnum    = mo.enumerator(enum_index);
+    return metaEnum.keyToValue(Action.toLatin1());
+}
 
-    TorcSQLiteDB         *m_sqliteDB;
-    QString               m_dbName;
-    QMap<QString,QString> m_localSettings;
-    QReadWriteLock       *m_localSettingsLock;
-    QObject              *m_UIObject;
-    TorcAdminThread      *m_adminThread;
-    TorcLanguage         *m_language;
-    QString               m_uuid;
+qint16 TorcLocalContext::Create(TorcCommandLine* CommandLine, bool Init /*=true*/)
+{
+    if (gLocalContext)
+        return TORC_EXIT_OK;
 
-  private:
-    // disable copy and assignment constructors
-    TorcLocalContextPriv(const TorcLocalContextPriv &) Q_DECL_EQ_DELETE;
-    TorcLocalContextPriv &operator=(const TorcLocalContextPriv &) Q_DECL_EQ_DELETE;
-};
+    gLocalContext = new TorcLocalContext(CommandLine);
+    if (gLocalContext)
+        if ((Init && gLocalContext->Init()) || !Init)
+            return TORC_EXIT_OK;
 
-TorcLocalContextPriv::TorcLocalContextPriv(TorcCommandLine *CommandLine)
-  : m_sqliteDB(NULL),
+    TearDown();
+    return TORC_EXIT_NO_CONTEXT;
+}
+
+void TorcLocalContext::TearDown(void)
+{
+    delete gLocalContext;
+    gLocalContext = NULL;
+}
+
+void TorcLocalContext::NotifyEvent(int Event)
+{
+    TorcEvent event(Event);
+    if (gLocalContext)
+        gLocalContext->Notify(event);
+}
+
+/*! \class TorcLocalContext
+ *  \brief TorcLocalContext is the core Torc object.
+ *
+ * \todo Add priority generation based on role and maybe user setting.
+ * \todo Convert Q_INVOKABLEs to public slots.
+*/
+TorcLocalContext::TorcLocalContext(TorcCommandLine* CommandLine)
+  : QObject(),
+    m_sqliteDB(NULL),
     m_dbName(QString("")),
     m_localSettings(),
     m_localSettingsLock(new QReadWriteLock(QReadWriteLock::Recursive)),
@@ -98,9 +118,44 @@ TorcLocalContextPriv::TorcLocalContextPriv(TorcCommandLine *CommandLine)
 {
     // set any custom database location
     m_dbName = CommandLine->GetValue("db").toString();
+
+    // Initialise TorcQThread FIRST
+    TorcQThread::SetMainThread();
+
+    // install our message handler
+    qInstallMessageHandler(&TorcCoreUtils::QtMessage);
+
+    setObjectName("LocalContext");
+
+    // Handle signals gracefully
+    signal(SIGINT,  ExitHandler);
+    signal(SIGTERM, ExitHandler);
+
+    // Initialise local directories
+    InitialiseTorcDirectories();
+
+    // Start logging at the first opportunity
+    QString logfile = CommandLine->GetValue("logfile").toString();
+    if (logfile.isEmpty())
+        logfile = QString(GetTorcConfigDir() + "/" + TORC_TORC + ".log");
+
+    ParseVerboseArgument(CommandLine->GetValue("l").toString());
+
+    gVerboseMask |= VB_STDIO | VB_FLUSH;
+
+    StartLogging(logfile, 0, 0, CommandLine->GetValue("v").toString(), false);
+
+    // Debug the config directory
+    LOG(VB_GENERAL, LOG_INFO, QString("Dir: Using '%1'")
+        .arg(GetTorcConfigDir()));
+
+    // Version info
+    LOG(VB_GENERAL, LOG_INFO, QString("Version: %1").arg(GIT_VERSION));
+    LOG(VB_GENERAL, LOG_NOTICE,
+        QString("Enabled verbose msgs: %1").arg(gVerboseString));
 }
 
-TorcLocalContextPriv::~TorcLocalContextPriv()
+TorcLocalContext::~TorcLocalContext()
 {
     // delete language
     delete m_language;
@@ -136,9 +191,14 @@ TorcLocalContextPriv::~TorcLocalContextPriv()
     // delete settings lock
     delete m_localSettingsLock;
     m_localSettingsLock = NULL;
+
+    // revert to the default message handler
+    qInstallMessageHandler(0);
+
+    StopLogging();
 }
 
-bool TorcLocalContextPriv::Init(void)
+bool TorcLocalContext::Init(void)
 {
     // Create the configuration directory
     QString configdir = GetTorcConfigDir();
@@ -214,202 +274,68 @@ bool TorcLocalContextPriv::Init(void)
     return true;
 }
 
-QString TorcLocalContextPriv::GetSetting(const QString &Name,
-                                         const QString &DefaultValue)
-{
-    {
-        QReadLocker locker(m_localSettingsLock);
-        if (m_localSettings.contains(Name))
-            return m_localSettings.value(Name);
-    }
-
-    SetSetting(Name, DefaultValue);
-    return DefaultValue;
-}
-
-void TorcLocalContextPriv::SetSetting(const QString &Name, const QString &Value)
-{
-    QWriteLocker locker(m_localSettingsLock);
-    if (m_sqliteDB)
-        m_sqliteDB->SetSetting(Name, Value);
-    m_localSettings[Name] = Value;
-}
-
-QString TorcLocalContextPriv::GetUuid(void) const
-{
-    return m_uuid;
-}
-
-QString Torc::ActionToString(Actions Action)
-{
-    const QMetaObject &mo = Torc::staticMetaObject;
-    int enum_index        = mo.indexOfEnumerator("Actions");
-    QMetaEnum metaEnum    = mo.enumerator(enum_index);
-    return metaEnum.valueToKey(Action);
-}
-
-int Torc::StringToAction(const QString &Action)
-{
-    const QMetaObject &mo = Torc::staticMetaObject;
-    int enum_index        = mo.indexOfEnumerator("Actions");
-    QMetaEnum metaEnum    = mo.enumerator(enum_index);
-    return metaEnum.keyToValue(Action.toLatin1());
-}
-
-qint16 TorcLocalContext::Create(TorcCommandLine* CommandLine, bool Init /*=true*/)
-{
-    if (gLocalContext)
-        return TORC_EXIT_OK;
-
-    gLocalContext = new TorcLocalContext(CommandLine);
-    if (gLocalContext)
-        if ((Init && gLocalContext->Init()) || !Init)
-            return TORC_EXIT_OK;
-
-    TearDown();
-    return TORC_EXIT_NO_CONTEXT;
-}
-
-void TorcLocalContext::TearDown(void)
-{
-    delete gLocalContext;
-    gLocalContext = NULL;
-}
-
-void TorcLocalContext::NotifyEvent(int Event)
-{
-    TorcEvent event(Event);
-    if (gLocalContext)
-        gLocalContext->Notify(event);
-}
-
-/*! \class TorcLocalContext
- *  \brief TorcLocalContext is the core Torc object.
- *
- * \todo Add priority generation based on role and maybe user setting.
- * \todo Convert Q_INVOKABLEs to public slots.
-*/
-TorcLocalContext::TorcLocalContext(TorcCommandLine* CommandLine)
-  : QObject(),
-    m_priv(new TorcLocalContextPriv(CommandLine))
-{
-    // Initialise TorcQThread FIRST
-    TorcQThread::SetMainThread();
-
-    // install our message handler
-    qInstallMessageHandler(&TorcCoreUtils::QtMessage);
-
-    setObjectName("LocalContext");
-
-    // Handle signals gracefully
-    signal(SIGINT,  ExitHandler);
-    signal(SIGTERM, ExitHandler);
-
-    // Initialise local directories
-    InitialiseTorcDirectories();
-
-    // Start logging at the first opportunity
-    QString logfile = CommandLine->GetValue("logfile").toString();
-    if (logfile.isEmpty())
-        logfile = QString(GetTorcConfigDir() + "/" + TORC_TORC + ".log");
-
-    ParseVerboseArgument(CommandLine->GetValue("l").toString());
-
-    gVerboseMask |= VB_STDIO | VB_FLUSH;
-
-    StartLogging(logfile, 0, 0, CommandLine->GetValue("v").toString(), false);
-
-    // Debug the config directory
-    LOG(VB_GENERAL, LOG_INFO, QString("Dir: Using '%1'")
-        .arg(GetTorcConfigDir()));
-
-    // Version info
-    LOG(VB_GENERAL, LOG_INFO, QString("Version: %1").arg(GIT_VERSION));
-    LOG(VB_GENERAL, LOG_NOTICE,
-        QString("Enabled verbose msgs: %1").arg(gVerboseString));
-}
-
-TorcLocalContext::~TorcLocalContext()
-{
-    delete m_priv;
-    m_priv = NULL;
-
-    // revert to the default message handler
-    qInstallMessageHandler(0);
-
-    StopLogging();
-}
-
-bool TorcLocalContext::Init(void)
-{
-    if (!m_priv->Init())
-        return false;
-
-    return true;
-}
-
 QString TorcLocalContext::GetSetting(const QString &Name, const QString &DefaultValue)
 {
-    return m_priv->GetSetting(Name, DefaultValue);
+    return GetDBSetting(Name, DefaultValue);
 }
 
 bool TorcLocalContext::GetSetting(const QString &Name, const bool &DefaultValue)
 {
-    QString value = GetSetting(Name, DefaultValue ? QString("1") : QString("0"));
+    QString value = GetDBSetting(Name, DefaultValue ? QString("1") : QString("0"));
     return value.trimmed() == "1";
 }
 
 int TorcLocalContext::GetSetting(const QString &Name, const int &DefaultValue)
 {
-    QString value = GetSetting(Name, QString::number(DefaultValue));
+    QString value = GetDBSetting(Name, QString::number(DefaultValue));
     return value.toInt();
 }
 
 void TorcLocalContext::SetSetting(const QString &Name, const QString &Value)
 {
-    m_priv->SetSetting(Name, Value);
+    SetDBSetting(Name, Value);
 }
 
 void TorcLocalContext::SetSetting(const QString &Name, const bool &Value)
 {
-    m_priv->SetSetting(Name, Value ? QString("1") : QString("0"));
+    SetDBSetting(Name, Value ? QString("1") : QString("0"));
 }
 
 void TorcLocalContext::SetSetting(const QString &Name, const int &Value)
 {
-    m_priv->SetSetting(Name, QString::number(Value));
+    SetDBSetting(Name, QString::number(Value));
 }
 
 void TorcLocalContext::SetUIObject(QObject *UI)
 {
-    if (m_priv->m_UIObject && UI)
+    if (m_UIObject && UI)
     {
         LOG(VB_GENERAL, LOG_WARNING, "Trying to register a second global UI - ignoring");
         return;
     }
 
-    m_priv->m_UIObject = UI;
+    m_UIObject = UI;
 }
 
 QObject* TorcLocalContext::GetUIObject(void)
 {
-    return m_priv->m_UIObject;
+    return m_UIObject;
 }
 
 QLocale TorcLocalContext::GetLocale(void)
 {
-    return m_priv->m_language->GetLocale();
+    return m_language->GetLocale();
 }
 
 TorcLanguage* TorcLocalContext::GetLanguage(void)
 {
-    return m_priv->m_language;
+    return m_language;
 }
 
 void TorcLocalContext::CloseDatabaseConnections(void)
 {
-    if (m_priv && m_priv->m_sqliteDB)
-        m_priv->m_sqliteDB->CloseThreadConnection();
+    if (m_sqliteDB)
+        m_sqliteDB->CloseThreadConnection();
 }
 
 /*! \brief Register a non-Torc QThread for logging and database access.
@@ -430,7 +356,7 @@ void TorcLocalContext::DeregisterQThread(void)
 
 QString TorcLocalContext::GetUuid(void) const
 {
-    return m_priv->GetUuid();
+    return m_uuid;
 }
 
 TorcSetting* TorcLocalContext::GetRootSetting(void)
@@ -446,4 +372,24 @@ qint64 TorcLocalContext::GetStartTime(void)
 int TorcLocalContext::GetPriority(void)
 {
     return 0;
+}
+
+QString TorcLocalContext::GetDBSetting(const QString &Name, const QString &DefaultValue)
+{
+    {
+        QReadLocker locker(m_localSettingsLock);
+        if (m_localSettings.contains(Name))
+            return m_localSettings.value(Name);
+    }
+
+    SetDBSetting(Name, DefaultValue);
+    return DefaultValue;
+}
+
+void TorcLocalContext::SetDBSetting(const QString &Name, const QString &Value)
+{
+    QWriteLocker locker(m_localSettingsLock);
+    if (m_sqliteDB)
+        m_sqliteDB->SetSetting(Name, Value);
+    m_localSettings[Name] = Value;
 }
