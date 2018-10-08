@@ -414,9 +414,8 @@ void TorcTransitionControl::CalculateOutput(void)
 void TorcTransitionControl::SetAnimationValue(double Value)
 {
     QMutexLocker locker(&lock);
-    double rounded = ((qint64)(Value * 100)) / 100.0;
-    animationValue = rounded;
-    SetValue(rounded);
+    animationValue = Value;
+    SetValue(Value);
 }
 
 double TorcTransitionControl::GetAnimationValue(void)
