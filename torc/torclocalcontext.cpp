@@ -111,7 +111,6 @@ TorcLocalContext::TorcLocalContext(TorcCommandLine* CommandLine)
     m_dbName(QString("")),
     m_localSettings(),
     m_localSettingsLock(QReadWriteLock::Recursive),
-    m_UIObject(NULL),
     m_adminThread(NULL),
     m_language(NULL),
     m_uuid()
@@ -300,22 +299,6 @@ void TorcLocalContext::SetSetting(const QString &Name, const bool &Value)
 void TorcLocalContext::SetSetting(const QString &Name, const int &Value)
 {
     SetDBSetting(Name, QString::number(Value));
-}
-
-void TorcLocalContext::SetUIObject(QObject *UI)
-{
-    if (m_UIObject && UI)
-    {
-        LOG(VB_GENERAL, LOG_WARNING, "Trying to register a second global UI - ignoring");
-        return;
-    }
-
-    m_UIObject = UI;
-}
-
-QObject* TorcLocalContext::GetUIObject(void)
-{
-    return m_UIObject;
 }
 
 QLocale TorcLocalContext::GetLocale(void)

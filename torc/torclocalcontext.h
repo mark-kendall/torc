@@ -81,7 +81,6 @@ class TorcLocalContext : public QObject, public TorcObservable
     Q_INVOKABLE   void       SetSetting    (const QString &Name, const QString &Value);
     Q_INVOKABLE   void       SetSetting    (const QString &Name, const bool    &Value);
     Q_INVOKABLE   void       SetSetting    (const QString &Name, const int     &Value);
-    Q_INVOKABLE   QObject*   GetUIObject   (void);
     Q_INVOKABLE   QString    GetUuid       (void) const;
     Q_INVOKABLE   TorcSetting* GetRootSetting (void);
     Q_INVOKABLE   qint64     GetStartTime  (void);
@@ -89,7 +88,6 @@ class TorcLocalContext : public QObject, public TorcObservable
 
     QLocale                  GetLocale     (void);
     TorcLanguage*            GetLanguage   (void);
-    void                     SetUIObject   (QObject* UI);
     void                     CloseDatabaseConnections (void);
 
   public slots:
@@ -110,7 +108,6 @@ class TorcLocalContext : public QObject, public TorcObservable
     QString               m_dbName;
     QMap<QString,QString> m_localSettings;
     QReadWriteLock        m_localSettingsLock;
-    QObject              *m_UIObject;
     TorcAdminThread      *m_adminThread;
     TorcLanguage         *m_language;
     QString               m_uuid;
