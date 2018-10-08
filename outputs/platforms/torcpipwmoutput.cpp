@@ -85,7 +85,7 @@ TorcPiPWMOutput::~TorcPiPWMOutput()
 
 QStringList TorcPiPWMOutput::GetDescription(void)
 {
-    return QStringList() << tr("Pin %1 PWM").arg(m_pin);
+    return QStringList() << tr("Pin %1 PWM").arg(m_pin) << tr("Resolution %1").arg(m_resolution);
 }
 
 void TorcPiPWMOutput::SetValue(double Value)
