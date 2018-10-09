@@ -4,11 +4,15 @@
 // Qt
 #include <QObject>
 #include <QString>
+#include <QReadWriteLock>
+#include <QMutex>
 
 // Torc
 #include "torclocaldefs.h"
 #include "torcsetting.h"
 #include "torcobservable.h"
+#include "torcsqlitedb.h"
+#include "torcadminthread.h"
 #include "torccommandline.h"
 
 #ifdef Q_OS_LINUX
@@ -62,10 +66,6 @@ class Torc
     static int     StringToAction(const QString &Action);
 };
 
-class TorcLocalContextPriv;
-class QMutex;
-class QReadWriteLock;
-
 class TorcLocalContext : public QObject, public TorcObservable
 {
     Q_OBJECT
@@ -81,13 +81,6 @@ class TorcLocalContext : public QObject, public TorcObservable
     Q_INVOKABLE   void       SetSetting    (const QString &Name, const QString &Value);
     Q_INVOKABLE   void       SetSetting    (const QString &Name, const bool    &Value);
     Q_INVOKABLE   void       SetSetting    (const QString &Name, const int     &Value);
-    Q_INVOKABLE   QString    GetPreference (const QString &Name, const QString &DefaultValue);
-    Q_INVOKABLE   bool       GetPreference (const QString &Name, const bool    &DefaultValue);
-    Q_INVOKABLE   int        GetPreference (const QString &Name, const int     &DefaultValue);
-    Q_INVOKABLE   void       SetPreference (const QString &Name, const QString &Value);
-    Q_INVOKABLE   void       SetPreference (const QString &Name, const bool    &Value);
-    Q_INVOKABLE   void       SetPreference (const QString &Name, const int     &Value);
-    Q_INVOKABLE   QObject*   GetUIObject   (void);
     Q_INVOKABLE   QString    GetUuid       (void) const;
     Q_INVOKABLE   TorcSetting* GetRootSetting (void);
     Q_INVOKABLE   qint64     GetStartTime  (void);
@@ -95,7 +88,6 @@ class TorcLocalContext : public QObject, public TorcObservable
 
     QLocale                  GetLocale     (void);
     TorcLanguage*            GetLanguage   (void);
-    void                     SetUIObject   (QObject* UI);
     void                     CloseDatabaseConnections (void);
 
   public slots:
@@ -107,10 +99,18 @@ class TorcLocalContext : public QObject, public TorcObservable
    ~TorcLocalContext();
     Q_DISABLE_COPY(TorcLocalContext)
 
-    bool          Init(void);
+    bool          Init         (void);
+    QString       GetDBSetting (const QString &Name, const QString &DefaultValue);
+    void          SetDBSetting (const QString &Name, const QString &Value);
 
   private:
-    TorcLocalContextPriv *m_priv;
+    TorcSQLiteDB         *m_sqliteDB;
+    QString               m_dbName;
+    QMap<QString,QString> m_localSettings;
+    QReadWriteLock        m_localSettingsLock;
+    TorcAdminThread      *m_adminThread;
+    TorcLanguage         *m_language;
+    QString               m_uuid;
 };
 
 extern TorcLocalContext *gLocalContext;

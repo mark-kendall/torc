@@ -78,12 +78,6 @@ bool TorcSQLiteDB::InitDatabase(void)
                "  value VARCHAR(16000) NOT NULL );");
     DebugError(&query);
 
-    // Create the preferences table if it doesn't exist
-    query.exec("CREATE TABLE IF NOT EXISTS preferences "
-               "( name VARCHAR(128) NOT NULL,"
-               "  value VARCHAR(16000) NOT NULL );");
-    DebugError(&query);
-
     // Check the creation date for existing installations
     query.exec("SELECT value FROM settings where name='DB_DateCreated'");
     DebugError(&query);

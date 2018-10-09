@@ -18,9 +18,7 @@ class TorcDB
     void         CloseThreadConnection  (void);
 
     void         LoadSettings           (QMap<QString,QString> &Settings);
-    void         LoadPreferences        (QMap<QString,QString> &Preferences);
     void         SetSetting             (const QString &Name, const QString &Value);
-    void         SetPreference          (const QString &Name, const QString &Value);
 
   protected:
     static bool  DebugError             (QSqlQuery *Query);

@@ -15,7 +15,7 @@ class TorcNetworkPWMOutput Q_DECL_FINAL : public TorcPWMOutput
     QStringList GetDescription(void) Q_DECL_OVERRIDE;
 
   public slots:
-    void        SetValue (double Value);
+    void        SetValue (double Value) Q_DECL_OVERRIDE;
 };
 
 #endif // TORCNETWORKPWMOUTPUT_H

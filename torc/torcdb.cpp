@@ -33,7 +33,7 @@
  *  \brief Base Sql database access class.
  *
  * TorcDB is the base implementation for Sql database access. It is currently limited
- * to setting and retrieving preferences and settings and whilst designed for generic Sql
+ * to setting and retrieving settings and whilst designed for generic Sql
  * usage, the only current concrete subclass is TorcSQliteDB. Changes may (will) be required for
  * other database types and usage.
  *
@@ -221,21 +221,12 @@ bool TorcDB::DebugError(QSqlDatabase *Database)
 /*! \fn    TorcDB::LoadSettings
  *  \brief Retrieve all persistent settings stored in the database.
  *
- * Both settings and preferences are key/value pairs (of strings).
+ * Settings are key/value pairs (of strings).
  *
  * Settings are designed as application wide configurable settings that can
  * only changed by the administrative user (if present, otherwise the default user).
  *
- * Preferences are designed as configurable, user specific behaviour that are modified
- * by the current user.
- *
- * For example, a preference might set the level of contrast while playing video content and
- * a setting would enable or disable all external network acccess (thus preventing access to
- * 'undesirable' content).
- *
  * \sa SetSetting
- * \sa SetPreference
- * \sa LoadPreferences
 */
 void TorcDB::LoadSettings(QMap<QString, QString> &Settings)
 {
@@ -255,37 +246,8 @@ void TorcDB::LoadSettings(QMap<QString, QString> &Settings)
     }
 }
 
-/*! \fn    TorcDB::LoadPreferences
- *  \brief Retrieve all persistent preferences stored in the database for the current user.
- *
- * Preferences are per user and hence this function MUST be called if the user is changed.
- *
- * \sa SetPreference
- * \sa LoadSettings
- * \sa SetSetting
-*/
-void TorcDB::LoadPreferences(QMap<QString, QString> &Preferences)
-{
-    QMutexLocker locker(&m_lock);
-    QSqlDatabase db = QSqlDatabase::database(GetThreadConnection());
-    DebugError(&db);
-    if (!db.isValid() || !db.isOpen())
-        return;
-
-    QSqlQuery query("SELECT name, value from preferences;", db);
-    DebugError(&query);
-
-    while (query.next())
-    {
-        LOG(VB_GENERAL, LOG_DEBUG, QString("'%1' : '%2'").arg(query.value(0).toString()).arg(query.value(1).toString()));
-        Preferences.insert(query.value(0).toString(), query.value(1).toString());
-    }
-}
-
 /*! \fn    TorcDB::SetSetting
  *  \brief Set the setting Name to the value Value.
- *
- * \sa SetPreference
 */
 void TorcDB::SetSetting(const QString &Name, const QString &Value)
 {
@@ -308,39 +270,6 @@ void TorcDB::SetSetting(const QString &Name, const QString &Value)
     DebugError(&query);
 
     query.prepare("INSERT INTO settings (name, value) "
-                  "VALUES (:NAME, :VALUE);");
-    query.bindValue(":NAME", Name);
-    query.bindValue(":VALUE", Value);
-    query.exec();
-    DebugError(&query);
-}
-
-/*! \fn    TorcDB::SetPreference
- *  \brief Set the preference Name to the value Value for the current user.
- *
- * \sa SetSetting
-*/
-void TorcDB::SetPreference(const QString &Name, const QString &Value)
-{
-    QMutexLocker locker(&m_lock);
-    if (Name.isEmpty())
-        return;
-
-    QSqlDatabase db = QSqlDatabase::database(GetThreadConnection());
-    DebugError(&db);
-    if (!db.isValid() || !db.isOpen())
-    {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to open database connection.");
-        return;
-    }
-
-    QSqlQuery query(db);
-    query.prepare("DELETE FROM preferences where name=:NAME;");
-    query.bindValue(":NAME", Name);
-    query.exec();
-    DebugError(&query);
-
-    query.prepare("INSERT INTO preferences (name, value) "
                   "VALUES (:NAME, :VALUE);");
     query.bindValue(":NAME", Name);
     query.bindValue(":VALUE", Value);

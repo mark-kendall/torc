@@ -38,10 +38,12 @@ QMAKE_CXXFLAGS += -Wall -Wextra -Weffc++ -Werror
 macx {
     # NB this is a brew workaround
     LIBS        += -L/usr/local/opt/openssl/lib -lssl
+    LIBS        += -L/usr/local/opt/openssl/lib -lcrypto
     INCLUDEPATH += /usr/local/opt/openssl/include
+} else {
+    CONFIG    += link_pkgconfig
+    PKGCONFIG += openssl
 }
-CONFIG    += link_pkgconfig
-PKGCONFIG += openssl
 
 # debug builds
 #CONFIG     += debug
