@@ -40,8 +40,6 @@ matrix:
           if [[ $TRAVIS_BRANCH != "coverity_scan" ]]; then
             travis_retry brew install qt5
             travis_retry brew link qt5 --force
-            travis_retry brew install openssl
-            travis_retry brew link openssl --force
           else
             echo Ignoring branch
           fi

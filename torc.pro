@@ -39,9 +39,10 @@ macx {
     # NB this is a brew workaround
     LIBS        += -L/usr/local/opt/openssl/lib -lssl
     INCLUDEPATH += /usr/local/opt/openssl/include
+} else {
+    CONFIG    += link_pkgconfig
+    PKGCONFIG += openssl
 }
-CONFIG    += link_pkgconfig
-PKGCONFIG += openssl
 
 # debug builds
 #CONFIG     += debug
