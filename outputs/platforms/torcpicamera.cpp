@@ -79,6 +79,12 @@
 
 bool TorcPiCamera::gPiCameraDetected = false;
 
+/*! \class TorcPiCamera
+ *
+ * \note Recent Pi firmware appears to have broken camera setup.
+ *       sudo rpi-update d985893ae67195d0cce632efe4437e5fcde4b64b
+ *       to revert to a working version
+*/
 TorcPiCamera::TorcPiCamera(const TorcCameraParams &Params)
   : TorcCameraDevice(Params),
     m_cameraType(Unknown),
