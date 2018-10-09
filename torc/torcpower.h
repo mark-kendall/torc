@@ -7,60 +7,7 @@
 
 // Torc
 #include "torcsetting.h"
-#include "http/torchttpservice.h"
-
-class TorcPower;
-
-class TorcPowerPriv : public QObject
-{
-    Q_OBJECT
-
-    friend class TorcPower;
-
-  public:
-    static TorcPowerPriv* Create(TorcPower *Parent);
-
-    explicit TorcPowerPriv(TorcPower *Parent);
-    virtual ~TorcPowerPriv();
-
-    virtual bool        Shutdown        (void) = 0;
-    virtual bool        Suspend         (void) = 0;
-    virtual bool        Hibernate       (void) = 0;
-    virtual bool        Restart         (void) = 0;
-    virtual void        Refresh         (void) = 0;
-
-    int                 GetBatteryLevel (void);
-    void                Debug           (void);
-
-  protected:
-    TorcSetting        *m_canShutdown;
-    TorcSetting        *m_canSuspend;
-    TorcSetting        *m_canHibernate;
-    TorcSetting        *m_canRestart;
-    int                 m_batteryLevel;
-
-  private:
-    Q_DISABLE_COPY(TorcPowerPriv)
-};
-
-class PowerFactory
-{
-  public:
-    PowerFactory();
-    virtual ~PowerFactory();
-
-    static PowerFactory*   GetPowerFactory   (void);
-    PowerFactory*          NextFactory       (void) const;
-    virtual void           Score             (int &Score) = 0;
-    virtual TorcPowerPriv* Create            (int Score, TorcPower *Parent) = 0;
-
-  protected:
-    static PowerFactory* gPowerFactory;
-    PowerFactory*        nextPowerFactory;
-
-  private:
-    Q_DISABLE_COPY(PowerFactory)
-};
+#include "torchttpservice.h"
 
 class TorcPower : public QObject, public TorcHTTPService
 {
@@ -89,7 +36,6 @@ class TorcPower : public QObject, public TorcHTTPService
     };
 
   public:
-    static QMutex *gPowerLock;
     static void    Create(void);
     static void    TearDown(void);
 
@@ -126,7 +72,6 @@ class TorcPower : public QObject, public TorcHTTPService
     void Restarting      (void);
     void WokeUp          (void);
     void LowBattery      (void);
-    void Refresh         (void);
 
   protected slots:
     void CanShutdownActiveChanged  (bool Active);
@@ -140,6 +85,17 @@ class TorcPower : public QObject, public TorcHTTPService
 
   protected:
     TorcPower();
+    void                  Debug           (void);
+    virtual bool          DoShutdown      (void) = 0;
+    virtual bool          DoSuspend       (void) = 0;
+    virtual bool          DoHibernate     (void) = 0;
+    virtual bool          DoRestart       (void) = 0;
+
+    TorcSetting          *m_canShutdown;
+    TorcSetting          *m_canSuspend;
+    TorcSetting          *m_canHibernate;
+    TorcSetting          *m_canRestart;
+    int                   m_batteryLevel;
 
   private:
     TorcSettingGroup     *m_powerGroupItem;
@@ -149,7 +105,6 @@ class TorcPower : public QObject, public TorcHTTPService
     TorcSetting          *m_allowHibernate;
     TorcSetting          *m_allowRestart;
     int                   m_lastBatteryLevel;
-    TorcPowerPriv        *m_priv;
 
     bool                  canShutdown;  // dummy
     bool                  canSuspend;   // dummy
@@ -161,6 +116,24 @@ class TorcPower : public QObject, public TorcHTTPService
     Q_DISABLE_COPY(TorcPower)
 };
 
-extern TorcPower *gPower;
+class TorcPowerFactory
+{
+  public:
+    TorcPowerFactory();
+    virtual ~TorcPowerFactory();
+
+    static TorcPower*          CreatePower         (void);
+    static TorcPowerFactory*   GetTorcPowerFactory (void);
+    TorcPowerFactory*          NextPowerFactory    (void) const;
+    virtual void               Score               (int &Score) = 0;
+    virtual TorcPower*         Create              (int Score) = 0;
+
+  protected:
+    static TorcPowerFactory*   gPowerFactory;
+    TorcPowerFactory*          nextPowerFactory;
+
+  private:
+    Q_DISABLE_COPY(TorcPowerFactory)
+};
 
 #endif // TORCPOWER_H

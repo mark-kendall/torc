@@ -9,19 +9,19 @@
 // Torc
 #include "torcpower.h"
 
-class TorcPowerOSX : public TorcPowerPriv
+class TorcPowerOSX Q_DECL_FINAL : public TorcPower
 {
     Q_OBJECT
 
   public:
-    explicit TorcPowerOSX(TorcPower *Parent);
+    TorcPowerOSX();
     virtual ~TorcPowerOSX();
 
-    bool Shutdown        (void);
-    bool Suspend         (void);
-    bool Hibernate       (void);
-    bool Restart         (void);
-    void Refresh         (void);
+    bool DoShutdown        (void) Q_DECL_OVERRIDE;
+    bool DoSuspend         (void) Q_DECL_OVERRIDE;
+    bool DoHibernate       (void) Q_DECL_OVERRIDE;
+    bool DoRestart         (void) Q_DECL_OVERRIDE;
+    void Refresh           (void);
 
   protected:
     static void PowerCallBack       (void *Reference, io_service_t Service,

@@ -44,9 +44,8 @@
 
 static OSStatus SendAppleEventToSystemProcess(AEEventID EventToSend);
 
-TorcPowerOSX::TorcPowerOSX(TorcPower *Parent)
-  : TorcPowerPriv(Parent),
-    m_powerRef(NULL),
+TorcPowerOSX::TorcPowerOSX()
+  : m_powerRef(NULL),
     m_rootPowerDomain(0),
     m_powerNotifier(MACH_PORT_NULL),
     m_powerNotifyPort(NULL)
@@ -96,6 +95,8 @@ TorcPowerOSX::TorcPowerOSX(TorcPower *Parent)
     m_canSuspend->SetValue(QVariant((bool)IOPMSleepEnabled()));
     m_canHibernate->SetValue(QVariant((bool)true));
     m_canRestart->SetValue(QVariant((bool)true));
+
+    Debug();
 }
 
 TorcPowerOSX::~TorcPowerOSX()
@@ -122,7 +123,7 @@ TorcPowerOSX::~TorcPowerOSX()
 }
 
 ///Shutdown the system.
-bool TorcPowerOSX::Shutdown(void)
+bool TorcPowerOSX::DoShutdown(void)
 {
     OSStatus error = SendAppleEventToSystemProcess(kAEShutDown);
 
@@ -138,7 +139,7 @@ bool TorcPowerOSX::Shutdown(void)
 }
 
 ///Suspend the system.
-bool TorcPowerOSX::Suspend(void)
+bool TorcPowerOSX::DoSuspend(void)
 {
     OSStatus error = SendAppleEventToSystemProcess(kAESleep);
 
@@ -153,13 +154,13 @@ bool TorcPowerOSX::Suspend(void)
 }
 
 ///Hibernate the system.
-bool TorcPowerOSX::Hibernate(void)
+bool TorcPowerOSX::DoHibernate(void)
 {
     return Suspend();
 }
 
 ///Restart the system.
-bool TorcPowerOSX::Restart(void)
+bool TorcPowerOSX::DoRestart(void)
 {
     OSStatus error = SendAppleEventToSystemProcess(kAERestart);
 
@@ -222,7 +223,7 @@ void TorcPowerOSX::Refresh(void)
     CFRelease(list);
     CFRelease(info);
 
-    ((TorcPower*)parent())->BatteryUpdated(m_batteryLevel);
+    BatteryUpdated(m_batteryLevel);
 }
 
 /*! \brief Receive notification of power status changes.
@@ -238,35 +239,34 @@ void TorcPowerOSX::PowerCallBack(void *Reference, io_service_t Service,
     (void)Service;
 
     CocoaAutoReleasePool pool;
-    TorcPowerOSX* power  = static_cast<TorcPowerOSX*>(Reference);
+    TorcPowerOSX* power = static_cast<TorcPowerOSX*>(Reference);
 
-    if (power && power->parent())
+    if (power)
     {
-        TorcPower* parent = (TorcPower*)power->parent();
         switch (Type)
         {
             case kIOMessageCanSystemPowerOff:
                 IOAllowPowerChange(power->m_rootPowerDomain, (long)Data);
-                parent->ShuttingDown();
+                power->ShuttingDown();
                 break;
             case kIOMessageCanSystemSleep:
                 IOAllowPowerChange(power->m_rootPowerDomain, (long)Data);
-                parent->Suspending();
+                power->Suspending();
                 break;
             case kIOMessageSystemWillPowerOff:
                 IOAllowPowerChange(power->m_rootPowerDomain, (long)Data);
-                parent->ShuttingDown();
+                power->ShuttingDown();
                 break;
             case kIOMessageSystemWillRestart:
                 IOAllowPowerChange(power->m_rootPowerDomain, (long)Data);
-                parent->Restarting();
+                power->Restarting();
                 break;
             case kIOMessageSystemWillSleep:
                 IOAllowPowerChange(power->m_rootPowerDomain, (long)Data);
-                parent->Suspending();
+                power->Suspending();
                 break;
             case kIOMessageSystemHasPoweredOn:
-                parent->WokeUp();
+                power->WokeUp();
                 break;
         }
     }
@@ -321,7 +321,7 @@ OSStatus SendAppleEventToSystemProcess(AEEventID EventToSend)
 }
 
 ///Create a TorcPowerOSX singleton to handle power status.
-class PowerFactoryOSX : public PowerFactory
+class TorcPowerFactoryOSX : public TorcPowerFactory
 {
     void Score(int &Score)
     {
@@ -329,14 +329,12 @@ class PowerFactoryOSX : public PowerFactory
             Score = 10;
     }
 
-    TorcPowerPriv* Create(int Score, TorcPower *Parent)
+    TorcPower* Create(int Score)
     {
-        (void)Parent;
-
         if (Score <= 10)
-            return new TorcPowerOSX(Parent);
+            return new TorcPowerOSX();
 
         return NULL;
     }
-} PowerFactoryOSX;
+} TorcPowerFactoryOSX;
 

@@ -1,4 +1,4 @@
-/* Class TorcPower/TorcPowerImpl
+/* Class TorcPower
 *
 * This file is part of the Torc project.
 *
@@ -30,28 +30,78 @@
 #include "torclanguage.h"
 #include "torcpower.h"
 
-TorcPower *gPower = NULL;
-QMutex* TorcPower::gPowerLock = new QMutex(QMutex::Recursive);
+/*! \class TorcPowerNull
+ *  \brief A dummy/default power implementation.
+*/
 
-/*! \class TorcPowerPriv
- *  \brief The base class for platform specific power implementations.
+class TorcPowerNull : public TorcPower
+{
+  public:
+    TorcPowerNull() : TorcPower() { Debug(); }
+   ~TorcPowerNull()               { }
+    bool DoShutdown        (void) { return false; }
+    bool DoSuspend         (void) { return false; }
+    bool DoHibernate       (void) { return false; }
+    bool DoRestart         (void) { return false; }
+};
+
+class TorcPowerFactoryNull : public TorcPowerFactory
+{
+    void Score(int &Score)
+    {
+        if (Score <= 1)
+            Score = 1;
+    }
+
+    TorcPower* Create(int Score)
+    {
+        if (Score <= 1)
+            return new TorcPowerNull();
+
+        return NULL;
+    }
+} TorcPowerFactoryNull;
+
+/*! \class PowerFactory
  *
  *  \sa TorcPower
 */
 
-TorcPowerPriv* TorcPowerPriv::Create(TorcPower *Parent)
+TorcPowerFactory* TorcPowerFactory::gPowerFactory = NULL;
+
+TorcPowerFactory::TorcPowerFactory()
+  : nextPowerFactory(gPowerFactory)
 {
-    TorcPowerPriv *power = NULL;
+    gPowerFactory = this;
+}
+
+TorcPowerFactory::~TorcPowerFactory()
+{
+}
+
+TorcPowerFactory* TorcPowerFactory::GetTorcPowerFactory(void)
+{
+    return gPowerFactory;
+}
+
+TorcPowerFactory* TorcPowerFactory::NextPowerFactory(void) const
+{
+    return nextPowerFactory;
+}
+
+TorcPower* TorcPowerFactory::CreatePower()
+{
+    TorcPower *power = NULL;
 
     int score = 0;
-    PowerFactory* factory = PowerFactory::GetPowerFactory();
-    for ( ; factory; factory = factory->NextFactory())
+    TorcPowerFactory* factory = TorcPowerFactory::GetTorcPowerFactory();
+    for ( ; factory; factory = factory->NextPowerFactory())
         (void)factory->Score(score);
 
-    factory = PowerFactory::GetPowerFactory();
-    for ( ; factory; factory = factory->NextFactory())
+    factory = TorcPowerFactory::GetTorcPowerFactory();
+    for ( ; factory; factory = factory->NextPowerFactory())
     {
-        power = factory->Create(score, Parent);
+        power = factory->Create(score);
         if (power)
             break;
     }
@@ -60,124 +110,6 @@ TorcPowerPriv* TorcPowerPriv::Create(TorcPower *Parent)
         LOG(VB_GENERAL, LOG_ERR, "Failed to create power implementation");
 
     return power;
-}
-
-TorcPowerPriv::TorcPowerPriv(TorcPower *Parent)
-  : QObject(static_cast<QObject*>(Parent)),
-    m_canShutdown(new TorcSetting(NULL,  QString("CanShutdown"),  QString(), TorcSetting::Bool, TorcSetting::None, QVariant((bool)false))),
-    m_canSuspend(new TorcSetting(NULL,   QString("CanSuspend"),   QString(), TorcSetting::Bool, TorcSetting::None, QVariant((bool)false))),
-    m_canHibernate(new TorcSetting(NULL, QString("CanHibernate"), QString(), TorcSetting::Bool, TorcSetting::None, QVariant((bool)false))),
-    m_canRestart(new TorcSetting(NULL,   QString("CanRestart"),   QString(), TorcSetting::Bool, TorcSetting::None, QVariant((bool)false))),
-    m_batteryLevel(TorcPower::UnknownPower)
-{
-
-}
-
-TorcPowerPriv::~TorcPowerPriv()
-{
-    if (m_canShutdown)
-        m_canShutdown->DownRef();
-
-    if (m_canSuspend)
-        m_canSuspend->DownRef();
-
-    if (m_canHibernate)
-        m_canHibernate->DownRef();
-
-    if (m_canRestart)
-        m_canRestart->DownRef();
-
-    m_canShutdown  = NULL;
-    m_canSuspend   = NULL;
-    m_canHibernate = NULL;
-    m_canRestart   = NULL;
-}
-
-int TorcPowerPriv::GetBatteryLevel(void)
-{
-    return m_batteryLevel;
-}
-
-void TorcPowerPriv::Debug(void)
-{
-    QString caps;
-
-    if (m_canShutdown->GetValue().toBool())
-        caps += "Shutdown ";
-    if (m_canSuspend->GetValue().toBool())
-        caps += "Suspend ";
-    if (m_canHibernate->GetValue().toBool())
-        caps += "Hibernate ";
-    if (m_canRestart->GetValue().toBool())
-        caps += "Restart ";
-
-    if (caps.isEmpty())
-        caps = "None";
-
-    LOG(VB_GENERAL, LOG_INFO, QString("Power support: %1").arg(caps));
-}
-
-
-/*! \class TorcPowerNull
- *  \brief A dummy power implementation.
-*/
-
-class TorcPowerNull : public TorcPowerPriv
-{
-  public:
-    TorcPowerNull() : TorcPowerPriv(NULL) { }
-   ~TorcPowerNull()      { }
-    bool Shutdown        (void) { return false; }
-    bool Suspend         (void) { return false; }
-    bool Hibernate       (void) { return false; }
-    bool Restart         (void) { return false; }
-    void Refresh         (void) {               }
-};
-
-class PowerFactoryNull : public PowerFactory
-{
-    void Score(int &Score)
-    {
-        if (Score <= 1)
-            Score = 1;
-    }
-
-    TorcPowerPriv* Create(int Score, TorcPower *Parent)
-    {
-        (void)Parent;
-
-        if (Score <= 1)
-            return new TorcPowerNull();
-
-        return NULL;
-    }
-} PowerFactoryNull;
-
-/*! \class PowerFactory
- *
- *  \sa TorcPower
-*/
-
-PowerFactory* PowerFactory::gPowerFactory = NULL;
-
-PowerFactory::PowerFactory()
-  : nextPowerFactory(gPowerFactory)
-{
-    gPowerFactory = this;
-}
-
-PowerFactory::~PowerFactory()
-{
-}
-
-PowerFactory* PowerFactory::GetPowerFactory(void)
-{
-    return gPowerFactory;
-}
-
-PowerFactory* PowerFactory::NextFactory(void) const
-{
-    return nextPowerFactory;
 }
 
 /*! \class TorcPower
@@ -196,34 +128,19 @@ PowerFactory* PowerFactory::NextFactory(void) const
  * guard against concurrent access if necessary.
  *
  * \sa PowerFactory
- * \sa TorcPowerPriv
  * \sa TorcPowerObject
  *
  * \todo Make HTTP acccess thread safe.
- * \todo TorcSetting needs a rethink:)
 */
-
-void TorcPower::Create(void)
-{
-    QMutexLocker lock(gPowerLock);
-
-    if (gPower)
-        return;
-
-    gPower = new TorcPower();
-}
-
-void TorcPower::TearDown(void)
-{
-    QMutexLocker lock(gPowerLock);
-
-    delete gPower;
-    gPower = NULL;
-}
 
 TorcPower::TorcPower()
   : QObject(),
     TorcHTTPService(this, "power", "power", TorcPower::staticMetaObject, "ShuttingDown,Suspending,Hibernating,Restarting,WokeUp,LowBattery,Refresh"),
+    m_canShutdown(new TorcSetting(NULL,  QString("CanShutdown"),  QString(), TorcSetting::Bool, TorcSetting::None, QVariant((bool)false))),
+    m_canSuspend(new TorcSetting(NULL,   QString("CanSuspend"),   QString(), TorcSetting::Bool, TorcSetting::None, QVariant((bool)false))),
+    m_canHibernate(new TorcSetting(NULL, QString("CanHibernate"), QString(), TorcSetting::Bool, TorcSetting::None, QVariant((bool)false))),
+    m_canRestart(new TorcSetting(NULL,   QString("CanRestart"),   QString(), TorcSetting::Bool, TorcSetting::None, QVariant((bool)false))),
+    m_batteryLevel(TorcPower::UnknownPower),
     m_powerGroupItem(new TorcSettingGroup(gRootSetting, tr("Power"))),
     m_powerEnabled(new TorcSetting(m_powerGroupItem, QString("EnablePower"),
                                    tr("Enable power management"),
@@ -241,7 +158,6 @@ TorcPower::TorcPower()
                                    tr("Allow Torc to restart the system"),
                                    TorcSetting::Bool, TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true))),
     m_lastBatteryLevel(UnknownPower),
-    m_priv(TorcPowerPriv::Create(this)),
     canShutdown(false),
     canSuspend(false),
     canHibernate(false),
@@ -255,13 +171,13 @@ TorcPower::TorcPower()
     m_allowHibernate->SetActiveThreshold(2);
     m_allowRestart->SetActiveThreshold(2);
 
-    if (m_priv->m_canShutdown->GetValue().toBool())
+    if (m_canShutdown->GetValue().toBool())
         m_allowShutdown->SetActive(true);
-    if (m_priv->m_canSuspend->GetValue().toBool())
+    if (m_canSuspend->GetValue().toBool())
         m_allowSuspend->SetActive(true);
-    if (m_priv->m_canHibernate->GetValue().toBool())
+    if (m_canHibernate->GetValue().toBool())
         m_allowHibernate->SetActive(true);
-    if (m_priv->m_canRestart->GetValue().toBool())
+    if (m_canRestart->GetValue().toBool())
         m_allowRestart->SetActive(true);
 
     if (m_powerEnabled->GetValue().toBool())
@@ -282,21 +198,31 @@ TorcPower::TorcPower()
     connect(m_allowRestart,  SIGNAL(ActiveChanged(bool)), this, SLOT(CanRestartActiveChanged(bool)));
     connect(m_allowRestart,  SIGNAL(ValueChanged(bool)),  this, SLOT(CanRestartValueChanged(bool)));
 
-    connect(m_priv->m_canShutdown,  SIGNAL(ValueChanged(bool)), m_allowShutdown,  SLOT(SetActive(bool)));
-    connect(m_priv->m_canSuspend,   SIGNAL(ValueChanged(bool)), m_allowSuspend,   SLOT(SetActive(bool)));
-    connect(m_priv->m_canHibernate, SIGNAL(ValueChanged(bool)), m_allowHibernate, SLOT(SetActive(bool)));
-    connect(m_priv->m_canRestart,   SIGNAL(ValueChanged(bool)), m_allowRestart,   SLOT(SetActive(bool)));
+    connect(m_canShutdown,  SIGNAL(ValueChanged(bool)), m_allowShutdown,  SLOT(SetActive(bool)));
+    connect(m_canSuspend,   SIGNAL(ValueChanged(bool)), m_allowSuspend,   SLOT(SetActive(bool)));
+    connect(m_canHibernate, SIGNAL(ValueChanged(bool)), m_allowHibernate, SLOT(SetActive(bool)));
+    connect(m_canRestart,   SIGNAL(ValueChanged(bool)), m_allowRestart,   SLOT(SetActive(bool)));
 
     connect(m_powerEnabled,         SIGNAL(ValueChanged(bool)), m_allowShutdown,  SLOT(SetActive(bool)));
     connect(m_powerEnabled,         SIGNAL(ValueChanged(bool)), m_allowSuspend,   SLOT(SetActive(bool)));
     connect(m_powerEnabled,         SIGNAL(ValueChanged(bool)), m_allowHibernate, SLOT(SetActive(bool)));
     connect(m_powerEnabled,         SIGNAL(ValueChanged(bool)), m_allowRestart,   SLOT(SetActive(bool)));
-
-    m_priv->Debug();
 }
 
 TorcPower::~TorcPower()
 {
+    if (m_canShutdown)
+        m_canShutdown->DownRef();
+
+    if (m_canSuspend)
+        m_canSuspend->DownRef();
+
+    if (m_canHibernate)
+        m_canHibernate->DownRef();
+
+    if (m_canRestart)
+        m_canRestart->DownRef();
+
     if (m_allowShutdown)
     {
         m_allowShutdown->Remove();
@@ -333,16 +259,35 @@ TorcPower::~TorcPower()
         m_powerGroupItem->DownRef();
     }
 
-    if (m_priv)
-        m_priv->deleteLater();
-
+    m_canShutdown    = NULL;
+    m_canSuspend     = NULL;
+    m_canHibernate   = NULL;
+    m_canRestart     = NULL;
     m_allowShutdown  = NULL;
     m_allowRestart   = NULL;
     m_allowHibernate = NULL;
     m_allowSuspend   = NULL;
     m_powerEnabled   = NULL;
     m_powerGroupItem = NULL;
-    m_priv           = NULL;
+}
+
+void TorcPower::Debug(void)
+{
+    QString caps;
+
+    if (m_canShutdown->GetValue().toBool())
+        caps += "Shutdown ";
+    if (m_canSuspend->GetValue().toBool())
+        caps += "Suspend ";
+    if (m_canHibernate->GetValue().toBool())
+        caps += "Hibernate ";
+    if (m_canRestart->GetValue().toBool())
+        caps += "Restart ";
+
+    if (caps.isEmpty())
+        caps = "None";
+
+    LOG(VB_GENERAL, LOG_INFO, QString("Power support: %1").arg(caps));
 }
 
 QString TorcPower::GetUIName(void)
@@ -373,22 +318,42 @@ void TorcPower::BatteryUpdated(int Level)
 
 bool TorcPower::Shutdown(void)
 {
-    return (m_allowShutdown->GetValue().toBool() && m_allowShutdown->GetIsActive()) ? m_priv->Shutdown() : false;
+    if (m_allowShutdown->GetValue().toBool() && m_allowShutdown->GetIsActive())
+    {
+        LOG(VB_GENERAL, LOG_INFO, "Shutting down");
+        return DoShutdown();
+    }
+    return false;
 }
 
 bool TorcPower::Suspend(void)
 {
-    return (m_allowSuspend->GetValue().toBool() && m_allowSuspend->GetIsActive()) ? m_priv->Suspend() : false;
+    if (m_allowSuspend->GetValue().toBool() && m_allowSuspend->GetIsActive())
+    {
+        LOG(VB_GENERAL, LOG_INFO, "Suspending");
+        return DoSuspend();
+    }
+    return false;
 }
 
 bool TorcPower::Hibernate(void)
 {
-    return (m_allowHibernate->GetValue().toBool() && m_allowHibernate->GetIsActive()) ? m_priv->Hibernate() : false;
+    if (m_allowHibernate->GetValue().toBool() && m_allowHibernate->GetIsActive())
+    {
+        LOG(VB_GENERAL, LOG_INFO, "Hibernating");
+        return DoHibernate();
+    }
+    return false;
 }
 
 bool TorcPower::Restart(void)
 {
-    return (m_allowRestart->GetValue().toBool() && m_allowRestart->GetIsActive()) ? m_priv->Restart() : false;
+    if (m_allowRestart->GetValue().toBool() && m_allowRestart->GetIsActive())
+    {
+        LOG(VB_GENERAL, LOG_INFO, "Restarting");
+        return DoRestart();
+    }
+    return false;
 }
 
 void TorcPower::SubscriberDeleted(QObject *Subscriber)
@@ -418,7 +383,7 @@ bool TorcPower::GetCanRestart(void)
 
 int TorcPower::GetBatteryLevel(void)
 {
-    return m_priv->GetBatteryLevel();
+    return m_batteryLevel;
 }
 
 void TorcPower::CanShutdownActiveChanged(bool Active)
@@ -508,12 +473,6 @@ void TorcPower::LowBattery(void)
     TorcLocalContext::NotifyEvent(Torc::LowBattery);
 }
 
-void TorcPower::Refresh(void)
-{
-    if (m_priv)
-        m_priv->Refresh();
-}
-
 /*! \class TorcPowerObject
  *  \brief A static class used to create the TorcPower singleton in the admin thread.
 */
@@ -523,8 +482,14 @@ static class TorcPowerObject : public TorcAdminObject, public TorcStringFactory
 
   public:
     TorcPowerObject()
-      : TorcAdminObject(TORC_ADMIN_MED_PRIORITY)
+      : TorcAdminObject(TORC_ADMIN_MED_PRIORITY),
+        m_power(NULL)
     {
+    }
+
+   ~TorcPowerObject()
+    {
+        Destroy();
     }
 
     void GetStrings(QVariantMap &Strings)
@@ -547,11 +512,17 @@ static class TorcPowerObject : public TorcAdminObject, public TorcStringFactory
 
     void Create(void)
     {
-        TorcPower::Create();
+        m_power = TorcPowerFactory::CreatePower();
     }
 
     void Destroy(void)
     {
-        TorcPower::TearDown();
+        if (m_power)
+            delete m_power;
+        m_power = NULL;
     }
+
+  private:
+    Q_DISABLE_COPY(TorcPowerObject)
+    TorcPower *m_power;
 } TorcPowerObject;

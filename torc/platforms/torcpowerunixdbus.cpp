@@ -61,8 +61,8 @@ bool TorcPowerUnixDBus::Available(void)
     return available;
 }
 
-TorcPowerUnixDBus::TorcPowerUnixDBus(TorcPower *Parent)
-  : TorcPowerPriv(Parent),
+TorcPowerUnixDBus::TorcPowerUnixDBus()
+  : TorcPower(),
     m_onBattery(false),
     m_devices(QMap<QString,int>()),
     m_deviceLock(QMutex::Recursive),
@@ -106,7 +106,7 @@ TorcPowerUnixDBus::TorcPowerUnixDBus(TorcPower *Parent)
     if (!QDBusConnection::systemBus().connect(
          "org.freedesktop.UPower", "/org/freedesktop/UPower",
          "org.freedesktop.UPower", "Sleeping",
-         parent(), SLOT(Suspending())))
+         this, SLOT(Suspending())))
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to register for sleep events");
     }
@@ -114,7 +114,7 @@ TorcPowerUnixDBus::TorcPowerUnixDBus(TorcPower *Parent)
     if (!QDBusConnection::systemBus().connect(
          "org.freedesktop.UPower", "/org/freedesktop/UPower",
          "org.freedesktop.UPower", "Resuming",
-         parent(), SLOT(WokeUp())))
+         this, SLOT(WokeUp())))
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to register for resume events");
     }
@@ -153,13 +153,15 @@ TorcPowerUnixDBus::TorcPowerUnixDBus(TorcPower *Parent)
 
     // set battery state
     Changed();
+
+    Debug();
 }
 
 TorcPowerUnixDBus::~TorcPowerUnixDBus()
 {
 }
 
-bool TorcPowerUnixDBus::Shutdown(void)
+bool TorcPowerUnixDBus::DoShutdown(void)
 {
     if (m_consoleInterface.isValid() && m_canShutdown->GetValue().toBool())
     {
@@ -173,7 +175,7 @@ bool TorcPowerUnixDBus::Shutdown(void)
     return false;
 }
 
-bool TorcPowerUnixDBus::Suspend(void)
+bool TorcPowerUnixDBus::DoSuspend(void)
 {
     if (m_upowerInterface.isValid() && m_canSuspend->GetValue().toBool())
     {
@@ -188,7 +190,7 @@ bool TorcPowerUnixDBus::Suspend(void)
     return false;
 }
 
-bool TorcPowerUnixDBus::Hibernate(void)
+bool TorcPowerUnixDBus::DoHibernate(void)
 {
     if (m_upowerInterface.isValid() && m_canHibernate->GetValue().toBool())
     {
@@ -203,7 +205,7 @@ bool TorcPowerUnixDBus::Hibernate(void)
     return false;
 }
 
-bool TorcPowerUnixDBus::Restart(void)
+bool TorcPowerUnixDBus::DoRestart(void)
 {
     if (m_consoleInterface.isValid() && m_canRestart->GetValue().toBool())
     {
@@ -215,10 +217,6 @@ bool TorcPowerUnixDBus::Restart(void)
     }
 
     return false;
-}
-
-void TorcPowerUnixDBus::Refresh(void)
-{
 }
 
 void TorcPowerUnixDBus::DeviceAdded(QDBusObjectPath Device)
@@ -318,7 +316,7 @@ void TorcPowerUnixDBus::UpdateBattery(void)
         m_batteryLevel = TorcPower::ACPower;
     }
 
-    ((TorcPower*)parent())->BatteryUpdated(m_batteryLevel);
+    BatteryUpdated(m_batteryLevel);
 }
 
 int TorcPowerUnixDBus::GetBatteryLevel(const QString &Path)
@@ -370,7 +368,7 @@ void TorcPowerUnixDBus::UpdateProperties(void)
     }
 }
 
-class PowerFactoryUnixDBus : public PowerFactory
+class TorcPowerFactoryUnixDBus : public TorcPowerFactory
 {
     void Score(int &Score)
     {
@@ -378,13 +376,11 @@ class PowerFactoryUnixDBus : public PowerFactory
             Score = 10;
     }
 
-    TorcPowerPriv* Create(int Score, TorcPower *Parent)
+    TorcPower* Create(int Score)
     {
-        (void)Parent;
-
         if (Score <= 10 && TorcPowerUnixDBus::Available())
-            return new TorcPowerUnixDBus(Parent);
+            return new TorcPowerUnixDBus();
 
         return NULL;
     }
-} PowerFactoryUnixDBus;
+} TorcPowerFactoryUnixDBus;
