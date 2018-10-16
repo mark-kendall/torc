@@ -113,6 +113,11 @@ TorcPiCamera::TorcPiCamera(const TorcCameraParams &Params)
         m_params.m_frameRate = 90;
         LOG(VB_GENERAL, LOG_INFO, "Resticting camera framerate to 90fps for SD");
     }
+
+    // encoder requires stride to be divisible by 32 and slice height by 16
+    m_params.m_stride      = (m_params.m_stride + 31) & ~31;
+    m_params.m_sliceHeight = (m_params.m_sliceHeight + 15) & ~15;
+    LOG(VB_GENERAL, LOG_INFO, QString("Camera encoder stride: %1 slice height: %2").arg(m_params.m_stride).arg(m_params.m_sliceHeight));
 }
 
 TorcPiCamera::~TorcPiCamera()
@@ -590,7 +595,8 @@ bool TorcPiCamera::ConfigureCamera(void)
 
     videoport.format.video.nFrameWidth        = m_params.m_width;
     videoport.format.video.nFrameHeight       = m_params.m_height;
-    videoport.format.video.nStride            = m_params.m_width;
+    videoport.format.video.nStride            = m_params.m_stride;
+    videoport.format.video.nSliceHeight       = m_params.m_sliceHeight;
     videoport.format.video.xFramerate         = m_params.m_frameRate << 16;
     videoport.format.video.eCompressionFormat = OMX_VIDEO_CodingUnused;
     videoport.format.video.eColorFormat       = OMX_COLOR_FormatYUV420PackedPlanar;
@@ -636,7 +642,8 @@ bool TorcPiCamera::ConfigureEncoder(void)
 
     encoderport.format.video.nFrameWidth        = m_params.m_width;
     encoderport.format.video.nFrameHeight       = m_params.m_height;
-    encoderport.format.video.nStride            = m_params.m_width;
+    encoderport.format.video.nStride            = m_params.m_stride;
+    encoderport.format.video.nSliceHeight       = m_params.m_sliceHeight;
     encoderport.format.video.xFramerate         = m_params.m_frameRate << 16;
     encoderport.format.video.nBitrate           = ENCODER_QP ? 0 : m_params.m_bitrate;
     encoderport.format.video.eCompressionFormat = OMX_VIDEO_CodingAVC;

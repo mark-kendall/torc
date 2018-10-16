@@ -31,6 +31,8 @@ TorcCameraParams::TorcCameraParams(void)
   : m_valid(false),
     m_width(0),
     m_height(0),
+    m_stride(0),
+    m_sliceHeight(0),
     m_frameRate(1),
     m_bitrate(0),
     m_timebase(VIDEO_TIMEBASE),
@@ -45,6 +47,8 @@ TorcCameraParams::TorcCameraParams(const QVariantMap &Details)
   : m_valid(false),
     m_width(0),
     m_height(0),
+    m_stride(0),
+    m_sliceHeight(0),
     m_frameRate(1),
     m_bitrate(0),
     m_timebase(VIDEO_TIMEBASE),
@@ -66,6 +70,7 @@ TorcCameraParams::TorcCameraParams(const QVariantMap &Details)
     m_bitrate   = Details.value("bitrate").toInt();
     m_model     = Details.value("model").toString();
 
+    // N.B. pitch and slice height may be further constrained in certain encoders and may be further adjusted
     // most h264 streams will expect 16 pixel aligned video so round up
     int pitch = (m_width + 15) & ~15;
     if (pitch != m_width)
@@ -73,6 +78,17 @@ TorcCameraParams::TorcCameraParams(const QVariantMap &Details)
         LOG(VB_GENERAL, LOG_INFO, QString("Rounding video width up to %1 from %2").arg(pitch).arg(m_width));
         m_width = pitch;
     }
+
+    // and 8 pixel macroblock height
+    int height = (m_height + 7) & ~7;
+    if (height != m_height)
+    {
+        LOG(VB_GENERAL, LOG_INFO, QString("Rounding video height up to %1 from %2").arg(height).arg(m_height));
+        m_height = height;
+    }
+
+    m_stride      = m_width;
+    m_sliceHeight = m_height;
 
     bool forcemin = m_width < VIDEO_WIDTH_MIN || m_height < VIDEO_HEIGHT_MIN;
     bool forcemax = m_width > VIDEO_WIDTH_MAX || m_height > VIDEO_HEIGHT_MAX;
@@ -125,6 +141,8 @@ TorcCameraParams::TorcCameraParams(const TorcCameraParams &Other)
     : m_valid(Other.m_valid),
       m_width(Other.m_width),
       m_height(Other.m_height),
+      m_stride(Other.m_stride),
+      m_sliceHeight(Other.m_sliceHeight),
       m_frameRate(Other.m_frameRate),
       m_bitrate(Other.m_bitrate),
       m_timebase(Other.m_timebase),
