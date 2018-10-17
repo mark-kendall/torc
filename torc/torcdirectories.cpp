@@ -29,7 +29,6 @@
 #include "torcdirectories.h"
 
 static QString gInstallDir = QString("");
-static QString gPluginDir  = QString("");
 static QString gShareDir   = QString("");
 static QString gConfDir    = QString("");
 static QString gTransDir   = QString("");
@@ -37,14 +36,12 @@ static QString gTransDir   = QString("");
 /*! \brief Statically initialise the various directories that Torc uses.
  *
  * gInstallDir will default to /usr/local
- * gPluginDir will defailt to /usr/local/lib/torc/plugins
  * gShareDir will default to  /usr/local/share/
  * gTransDir will default to  /usr/local/share/torc/i18n/
  * gConfDir will default to ~/.torc
  *
  * \sa GetTorcConfigDir
  * \sa GetTorcShareDir
- * \sa GetTorcPluginDir
  * \sa GetTorcTransDir
 */
 void InitialiseTorcDirectories(void)
@@ -56,7 +53,6 @@ void InitialiseTorcDirectories(void)
     initialised = true;
 
     gInstallDir = QString(PREFIX) + "/";
-    gPluginDir  = QString(PREFIX) + "/lib/" + TORC_TORC + "/plugins";
     gShareDir   = QString(RUNPREFIX) + "/share/" + TORC_TORC;
     gConfDir    = QDir::homePath() + "/." + TORC_TORC;
     gTransDir   = gShareDir + "/i18n/";
@@ -78,12 +74,6 @@ QString GetTorcConfigDir(void)
 QString GetTorcShareDir(void)
 {
     return gShareDir;
-}
-
-///brief Return the path to installed plugins.
-QString GetTorcPluginDir(void)
-{
-    return gPluginDir;
 }
 
 ///brief Return the path to installed translation files
