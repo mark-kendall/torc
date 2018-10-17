@@ -16,5 +16,6 @@
 #define TORC_SETTINGS_DIR QString("settings/")
 #define TORC_ROOT_SETTING QString("Settings")
 #define TORC_CONFIG_FILE  (TORC_TORC + QString(".xml"))
+#define TORC_CONTENT_DIR  QString("/content/")
 
 #endif // TORCLOCALDEFS_H

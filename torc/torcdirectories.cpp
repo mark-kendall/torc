@@ -32,6 +32,7 @@ static QString gInstallDir = QString("");
 static QString gShareDir   = QString("");
 static QString gConfDir    = QString("");
 static QString gTransDir   = QString("");
+static QString gContentDir = QString("");
 
 /*! \brief Statically initialise the various directories that Torc uses.
  *
@@ -39,10 +40,12 @@ static QString gTransDir   = QString("");
  * gShareDir will default to  /usr/local/share/
  * gTransDir will default to  /usr/local/share/torc/i18n/
  * gConfDir will default to ~/.torc
+ * gContentDir will default to ~/.torc/content/
  *
  * \sa GetTorcConfigDir
  * \sa GetTorcShareDir
  * \sa GetTorcTransDir
+ * \sa GetTorcContentDir
 */
 void InitialiseTorcDirectories(void)
 {
@@ -55,6 +58,7 @@ void InitialiseTorcDirectories(void)
     gInstallDir = QString(PREFIX) + "/";
     gShareDir   = QString(RUNPREFIX) + "/share/" + TORC_TORC;
     gConfDir    = QDir::homePath() + "/." + TORC_TORC;
+    gContentDir = gConfDir + TORC_CONTENT_DIR;
     gTransDir   = gShareDir + "/i18n/";
 }
 
@@ -80,4 +84,10 @@ QString GetTorcShareDir(void)
 QString GetTorcTransDir(void)
 {
     return gTransDir;
+}
+
+///brief Return the path to generated content
+QString GetTorcContentDir(void)
+{
+    return gContentDir;
 }

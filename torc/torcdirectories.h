@@ -8,5 +8,6 @@ void      InitialiseTorcDirectories (void);
 QString   GetTorcConfigDir          (void);
 QString   GetTorcShareDir           (void);
 QString   GetTorcTransDir           (void);
+QString   GetTorcContentDir         (void);
 
 #endif // TORCDIRECTORIES_H
