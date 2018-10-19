@@ -53,6 +53,8 @@ TorcOutput::Type TorcOutput::StringToType(const QString &Type)
     return TorcOutput::Unknown;
 }
 
+// N.B. We need to pass the staticMetaObject to TorcHTTPService as the object is not yet complete.
+//      If we pass 'this' during construction, this->metaObject() only contains details of the super class.
 TorcOutput::TorcOutput(TorcOutput::Type Type, double Value, const QString &ModelId, const QVariantMap &Details)
   : TorcDevice(true, Value, Value, ModelId, Details),
     TorcHTTPService(this, OUTPUTS_DIRECTORY + "/" + TypeToString(Type) + "/" + Details.value("name").toString(),
