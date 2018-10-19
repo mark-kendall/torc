@@ -113,8 +113,12 @@ TorcLocalContext::TorcLocalContext(TorcCommandLine* CommandLine)
     m_localSettingsLock(QReadWriteLock::Recursive),
     m_adminThread(NULL),
     m_language(NULL),
-    m_uuid()
+    m_uuid(),
+    m_shutdownDelay(0)
 {
+    // listen to ourselves:)
+    AddObserver(this);
+
     // set any custom database location
     m_dbName = CommandLine->GetValue("db").toString();
 
@@ -189,6 +193,9 @@ TorcLocalContext::~TorcLocalContext()
 
     // revert to the default message handler
     qInstallMessageHandler(0);
+
+    // stop listening to self..
+    RemoveObserver(this);
 
     StopLogging();
 }
@@ -317,6 +324,15 @@ void TorcLocalContext::CloseDatabaseConnections(void)
         m_sqliteDB->CloseThreadConnection();
 }
 
+void TorcLocalContext::SetShutdownDelay(uint Delay)
+{
+    if (Delay > m_shutdownDelay)
+    {
+        m_shutdownDelay = Delay;
+        LOG(VB_GENERAL, LOG_INFO, QString("Set shutdown delay to %1 seconds").arg(m_shutdownDelay));
+    }
+}
+
 /*! \brief Register a non-Torc QThread for logging and database access.
  *
  * \note This must be called from the relevant QThread and the QThread must already be named.
@@ -331,6 +347,31 @@ void TorcLocalContext::DeregisterQThread(void)
 {
     CloseDatabaseConnections();
     DeregisterLoggingThread();
+}
+
+bool TorcLocalContext::event(QEvent *Event)
+{
+    TorcEvent* torcevent = dynamic_cast<TorcEvent*>(Event);
+    if (torcevent)
+    {
+        int event = torcevent->GetEvent();
+        switch (event)
+        {
+            case Torc::RestartTorc:
+                LOG(VB_GENERAL, LOG_INFO, "Restarting application");
+                TorcReferenceCounter::EventLoopEnding(true);
+                QCoreApplication::exit(TORC_EXIT_RESTART);
+                return true;
+            case Torc::Stop:
+                TorcReferenceCounter::EventLoopEnding(true);
+                QCoreApplication::quit();
+                return true;
+            default:
+                break;
+        }
+    }
+
+    return QObject::event(Event);
 }
 
 QString TorcLocalContext::GetUuid(void) const

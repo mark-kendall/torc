@@ -22,7 +22,6 @@
 #include <QFileInfo>
 #include <QProcess>
 #include <QJsonDocument>
-#include <QCoreApplication>
 
 // Torc
 #include "torcexitcodes.h"
@@ -428,15 +427,6 @@ bool TorcCentral::event(QEvent *Event)
         int event = torcevent->GetEvent();
         switch (event)
         {
-            case Torc::RestartTorc:
-                LOG(VB_GENERAL, LOG_INFO, "Restarting application");
-                TorcReferenceCounter::EventLoopEnding(true);
-                QCoreApplication::exit(TORC_EXIT_RESTART);
-                break;
-            case Torc::Stop:
-                TorcReferenceCounter::EventLoopEnding(true);
-                QCoreApplication::quit();
-                break;
             case Torc::ShuttingDown:
             case Torc::Suspending:
             case Torc::Restarting:

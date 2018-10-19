@@ -89,10 +89,12 @@ class TorcLocalContext : public QObject, public TorcObservable
     QLocale                  GetLocale     (void);
     TorcLanguage*            GetLanguage   (void);
     void                     CloseDatabaseConnections (void);
+    void                     SetShutdownDelay (uint Delay);
 
   public slots:
     void                     RegisterQThread          (void);
     void                     DeregisterQThread        (void);
+    bool                     event                    (QEvent *Event) Q_DECL_OVERRIDE;
 
   private:
     explicit TorcLocalContext(TorcCommandLine* CommandLine);
@@ -111,6 +113,7 @@ class TorcLocalContext : public QObject, public TorcObservable
     TorcAdminThread      *m_adminThread;
     TorcLanguage         *m_language;
     QString               m_uuid;
+    uint                  m_shutdownDelay;
 };
 
 extern TorcLocalContext *gLocalContext;
