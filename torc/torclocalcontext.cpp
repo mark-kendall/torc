@@ -310,22 +310,26 @@ void TorcLocalContext::SetSetting(const QString &Name, const int &Value)
 
 QLocale TorcLocalContext::GetLocale(void)
 {
+    QReadLocker locker(&m_localSettingsLock);
     return m_language->GetLocale();
 }
 
 TorcLanguage* TorcLocalContext::GetLanguage(void)
 {
+    QReadLocker locker(&m_localSettingsLock);
     return m_language;
 }
 
 void TorcLocalContext::CloseDatabaseConnections(void)
 {
+    QReadLocker locker(&m_localSettingsLock);
     if (m_sqliteDB)
         m_sqliteDB->CloseThreadConnection();
 }
 
 void TorcLocalContext::SetShutdownDelay(uint Delay)
 {
+    QReadLocker locker(&m_localSettingsLock);
     if (Delay > m_shutdownDelay)
     {
         m_shutdownDelay = Delay;
@@ -381,11 +385,13 @@ QString TorcLocalContext::GetUuid(void) const
 
 TorcSetting* TorcLocalContext::GetRootSetting(void)
 {
+    QReadLocker locker(&m_localSettingsLock);
     return gRootSetting;
 }
 
 qint64 TorcLocalContext::GetStartTime(void)
 {
+    QReadLocker locker(&m_localSettingsLock);
     return gStartTime;
 }
 
