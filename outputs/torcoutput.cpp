@@ -63,6 +63,17 @@ TorcOutput::TorcOutput(TorcOutput::Type Type, double Value, const QString &Model
         TorcOutputs::gOutputs->AddOutput(this);
 }
 
+TorcOutput::TorcOutput(TorcOutput::Type Type, double Value, const QString &ModelId, const QVariantMap &Details,
+                       QObject *Output, const QMetaObject &MetaObject, const QString &Blacklist)
+  : TorcDevice(true, Value, Value, ModelId, Details),
+    TorcHTTPService(Output, OUTPUTS_DIRECTORY + "/" + TypeToString(Type) + "/" + Details.value("name").toString(),
+                    Details.value("name").toString(), MetaObject, BLACKLIST + "," + Blacklist),
+    m_owner(NULL)
+{
+    if (!uniqueId.isEmpty())
+        TorcOutputs::gOutputs->AddOutput(this);
+}
+
 bool TorcOutput::HasOwner(void)
 {
     QMutexLocker locker(&lock);
