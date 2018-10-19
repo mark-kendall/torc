@@ -358,7 +358,7 @@ TorcHTTPServer::TorcHTTPServer()
     connect(m_bonjour,       SIGNAL(ValueChanged(bool)), m_bonjourSearch, SLOT(SetActive(bool)));
     connect(m_ipv6,          SIGNAL(ValueChanged(bool)), m_bonjourSearch, SLOT(SetActive(bool)));
 
-    m_bonjourAdvert = new TorcSetting(m_bonjour, "ServerBonjoutAdvert", tr("Bonjour Advertisement"), TorcSetting::Bool,
+    m_bonjourAdvert = new TorcSetting(m_bonjour, "ServerBonjourAdvert", tr("Bonjour Advertisement"), TorcSetting::Bool,
                                       TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true));
     m_bonjourAdvert->SetHelpText(tr("Use Bonjour to advertise this device"));
     m_bonjourAdvert->SetActiveThreshold(2);
