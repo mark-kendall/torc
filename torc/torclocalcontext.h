@@ -74,17 +74,17 @@ class TorcLocalContext : public QObject, public TorcObservable
     static qint16 Create      (TorcCommandLine* CommandLine, bool Init = true);
     static void   TearDown    (void);
 
-    Q_INVOKABLE static void  NotifyEvent   (int Event);
-    Q_INVOKABLE   QString    GetSetting    (const QString &Name, const QString &DefaultValue);
-    Q_INVOKABLE   bool       GetSetting    (const QString &Name, const bool    &DefaultValue);
-    Q_INVOKABLE   int        GetSetting    (const QString &Name, const int     &DefaultValue);
-    Q_INVOKABLE   void       SetSetting    (const QString &Name, const QString &Value);
-    Q_INVOKABLE   void       SetSetting    (const QString &Name, const bool    &Value);
-    Q_INVOKABLE   void       SetSetting    (const QString &Name, const int     &Value);
-    Q_INVOKABLE   QString    GetUuid       (void) const;
-    Q_INVOKABLE   TorcSetting* GetRootSetting (void);
-    Q_INVOKABLE   qint64     GetStartTime  (void);
-    Q_INVOKABLE   int        GetPriority   (void);
+    static void              NotifyEvent   (int Event);
+    QString                  GetSetting    (const QString &Name, const QString &DefaultValue);
+    bool                     GetSetting    (const QString &Name, const bool    &DefaultValue);
+    int                      GetSetting    (const QString &Name, const int     &DefaultValue);
+    void                     SetSetting    (const QString &Name, const QString &Value);
+    void                     SetSetting    (const QString &Name, const bool    &Value);
+    void                     SetSetting    (const QString &Name, const int     &Value);
+    QString                  GetUuid       (void) const;
+    TorcSetting*             GetRootSetting(void);
+    qint64                   GetStartTime  (void);
+    int                      GetPriority   (void);
 
     QLocale                  GetLocale     (void);
     TorcLanguage*            GetLanguage   (void);
