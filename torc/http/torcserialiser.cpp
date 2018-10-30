@@ -89,7 +89,7 @@ QByteArray* TorcSerialiser::Serialise(const QVariant &Data, const QString &Type)
 {
     Prepare();
     Begin();
-    AddProperty(Type.isEmpty() ? Data.typeName() : Type, Data);
+    AddProperty(Type, Data);
     End();
 
     // pass ownership of content to caller
