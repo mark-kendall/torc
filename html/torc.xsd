@@ -117,6 +117,14 @@
   </xs:restriction>
 </xs:simpleType>
 
+<!-- 1 to 300 seconds (5 minutes) -->
+<xs:simpleType name="systemDelayType">
+  <xs:restriction base="xs:integer">
+    <xs:minInclusive value="1"/>
+    <xs:maxInclusive value="300"/>
+  </xs:restriction>
+</xs:simpleType>
+
 <!--TORC_XSD_TYPES-->
 <!-- input definitions -->
 <xs:complexType name="networkSwitchType">
@@ -199,6 +207,7 @@
     <xs:element name="name"     type="deviceNameType"/>
     <xs:element name="username" type="userNameType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="delay"    type="systemDelayType" minOccurs="0" maxOccurs="1"/>
   </xs:all>
 </xs:complexType>
 

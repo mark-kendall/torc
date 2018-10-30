@@ -35,6 +35,7 @@ class Torc
         Stop,
         RestartTorc,
         UserChanged,
+        TorcWillStop, // or restart etc
         // Power management
         Shutdown = 1000,
         Suspend,
@@ -95,6 +96,7 @@ class TorcLocalContext : public QObject, public TorcObservable
     void                     RegisterQThread     (void);
     void                     DeregisterQThread   (void);
     bool                     event               (QEvent *Event) Q_DECL_OVERRIDE;
+    void                     ShutdownTimeout     (void);
 
   private:
     explicit TorcLocalContext(TorcCommandLine* CommandLine);
@@ -104,6 +106,8 @@ class TorcLocalContext : public QObject, public TorcObservable
     bool                     Init                (void);
     QString                  GetDBSetting        (const QString &Name, const QString &DefaultValue);
     void                     SetDBSetting        (const QString &Name, const QString &Value);
+    bool                     QueueShutdownEvent  (int Event);
+    bool                     HandleShutdown      (int Event);
 
   private:
     TorcSQLiteDB            *m_sqliteDB;
@@ -114,6 +118,7 @@ class TorcLocalContext : public QObject, public TorcObservable
     TorcLanguage            *m_language;
     QString                  m_uuid;
     uint                     m_shutdownDelay;
+    int                      m_shutdownEvent;
 };
 
 extern TorcLocalContext    *gLocalContext;

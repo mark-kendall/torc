@@ -31,6 +31,7 @@
 #include <QUuid>
 #include <QDir>
 #include <QMetaEnum>
+#include <QTimer>
 
 // Torc
 #include "torcevent.h"
@@ -114,7 +115,8 @@ TorcLocalContext::TorcLocalContext(TorcCommandLine* CommandLine)
     m_adminThread(NULL),
     m_language(NULL),
     m_uuid(),
-    m_shutdownDelay(0)
+    m_shutdownDelay(0),
+    m_shutdownEvent(Torc::None)
 {
     // listen to ourselves:)
     AddObserver(this);
@@ -330,7 +332,11 @@ void TorcLocalContext::CloseDatabaseConnections(void)
 void TorcLocalContext::SetShutdownDelay(uint Delay)
 {
     QReadLocker locker(&m_localSettingsLock);
-    if (Delay > m_shutdownDelay)
+    if (Delay < 1 || Delay > 300) // set in XSD
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Not setting shutdown delay to %1: must be 1<->300 seconds").arg(Delay));
+    }
+    else if (Delay > m_shutdownDelay)
     {
         m_shutdownDelay = Delay;
         LOG(VB_GENERAL, LOG_INFO, QString("Set shutdown delay to %1 seconds").arg(m_shutdownDelay));
@@ -353,26 +359,74 @@ void TorcLocalContext::DeregisterQThread(void)
     DeregisterLoggingThread();
 }
 
+void TorcLocalContext::ShutdownTimeout(void)
+{
+    (void)HandleShutdown(m_shutdownEvent);
+}
+
+bool TorcLocalContext::QueueShutdownEvent(int Event)
+{
+    if (m_shutdownDelay < 1)
+        return false;
+
+    int newevent = Torc::None;
+    switch (Event)
+    {
+        case Torc::RestartTorc:
+        case Torc::Stop:
+            newevent = Event;
+            break;
+        default: break;
+    }
+
+    if (newevent == Torc::None)
+        return false;
+
+    if (m_shutdownEvent != Torc::None)
+    {
+        LOG(VB_GENERAL, LOG_INFO, QString("Shutdown already queued - ignoring '%1' event").arg(Torc::ActionToString((Torc::Actions)newevent)));
+        return true;
+    }
+
+    m_shutdownEvent = newevent;
+    LOG(VB_GENERAL, LOG_INFO, QString("Queued '%1' event for %2 seconds").arg(Torc::ActionToString((Torc::Actions)m_shutdownEvent)).arg(m_shutdownDelay));
+    TorcEvent torcevent(Torc::TorcWillStop);
+    Notify(torcevent);
+    QTimer::singleShot(m_shutdownDelay * 1000, this, SLOT(ShutdownTimeout()));
+    return true;
+}
+
+bool TorcLocalContext::HandleShutdown(int Event)
+{
+    int event = Event == Torc::None ? m_shutdownEvent : Event;
+    switch (event)
+    {
+        case Torc::RestartTorc:
+            LOG(VB_GENERAL, LOG_INFO, "Restarting application");
+            TorcReferenceCounter::EventLoopEnding(true);
+            QCoreApplication::exit(TORC_EXIT_RESTART);
+            return true;
+        case Torc::Stop:
+            LOG(VB_GENERAL, LOG_INFO, "Stopping application");
+            TorcReferenceCounter::EventLoopEnding(true);
+            QCoreApplication::quit();
+            return true;
+        default:
+            break;
+    }
+    return false;
+}
+
 bool TorcLocalContext::event(QEvent *Event)
 {
     TorcEvent* torcevent = dynamic_cast<TorcEvent*>(Event);
     if (torcevent)
     {
         int event = torcevent->GetEvent();
-        switch (event)
-        {
-            case Torc::RestartTorc:
-                LOG(VB_GENERAL, LOG_INFO, "Restarting application");
-                TorcReferenceCounter::EventLoopEnding(true);
-                QCoreApplication::exit(TORC_EXIT_RESTART);
-                return true;
-            case Torc::Stop:
-                TorcReferenceCounter::EventLoopEnding(true);
-                QCoreApplication::quit();
-                return true;
-            default:
-                break;
-        }
+        if (QueueShutdownEvent(event))
+            return true;
+        else if (HandleShutdown(event))
+            return true;
     }
 
     return QObject::event(Event);
