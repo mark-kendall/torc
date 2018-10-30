@@ -4,11 +4,14 @@
 
 // Torc
 #include "testserialisers.h"
+#include "testtorclocalcontext.h"
 
 int main(int argc, char** argv) {
     QCoreApplication app(argc, argv);
 
     TestSerialisers testSerialisers;
-
-    return QTest::qExec(&testSerialisers, argc, argv);
+    TestTorcLocalContext testLocalContext;
+    int status = QTest::qExec(&testSerialisers);
+    status    |= QTest::qExec(&testLocalContext);
+    return status;
 }

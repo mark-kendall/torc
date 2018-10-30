@@ -458,7 +458,9 @@ test {
     SOURCES -= server/main.cpp
     SOURCES += test/main.cpp
     HEADERS += test/testserialisers.h
+    HEADERS += test/testtorclocalcontext.h
     SOURCES += test/testserialisers.cpp
+    SOURCES += test/testtorclocalcontext.cpp
 }
 
 QMAKE_CLEAN += $(TARGET)
