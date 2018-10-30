@@ -14,7 +14,7 @@ void TestSerialisers::testJSONSerialiser(void)
     QVariant      map              = doc.toVariant();
     TorcSerialiser* jsonserialiser = TorcSerialiser::GetSerialiser("application/json");
     QVERIFY(jsonserialiser);
-    QByteArray *data               = jsonserialiser->Serialise(map, "");
+    QByteArray *data               = jsonserialiser->Serialise(map);
     delete jsonserialiser;
     QVERIFY(data);
     QJsonDocument doc2             = QJsonDocument::fromJson(*data);
@@ -35,12 +35,9 @@ void TestSerialisers::doTestXMLSerialiser(QByteArray &Data)
     QVariantMap map = reader.GetResult();
     TorcSerialiser *xmlserialiser = TorcSerialiser::GetSerialiser("application/xml");
     QVERIFY(xmlserialiser);
-    QByteArray *array2 = xmlserialiser->Serialise(map, "");
+    QByteArray *array2 = xmlserialiser->Serialise(map);
     delete xmlserialiser;
     QVERIFY(array2);
-    qWarning(Data.constData());
-    qWarning(array2->constData());
-    qWarning(QString("data %1 array2 %2").arg(Data.size()).arg(array2->size()).toLocal8Bit().constData());
     QVERIFY(Data.size() == array2->size());
     delete array2;
 }
@@ -56,7 +53,6 @@ void TestSerialisers::testXMLSerialiser(void)
     QMap<QString,QByteArray>::iterator it = tests.begin();
     for ( ; it != tests.end(); ++it)
     {
-        qInfo(QString("XML test: %1").arg(it.key()).toLocal8Bit().constData());
         QByteArray t = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + it.value() + "\n";
         doTestXMLSerialiser(t);
     }
