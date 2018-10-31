@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<torc>
+    <settings>
+        <applicationname>Unit test</applicationname>
+    </settings>
+    <inputs>
+      <system>
+        <started>
+          <name>started</name>
+          <username>System Started</username>
+          <delay>1</delay>
+        </started>
+      </system>
+    </inputs>
+    <controls>
+      <timer>
+        <custom>
+          <name>customtimer</name>
+          <username>Custom timer</username>
+          <period>0:0.40</period>
+          <start>0:0.10</start>
+          <duration>0:0.20</duration>
+          <outputs><device>transition</device></outputs>
+        </custom>
+      </timer>
+      <transition>
+        <linear>
+          <name>transition</name>
+          <username>lineartransition</username>
+          <duration>0:0.20</duration>
+          <inputs><device>customtimer</device></inputs>
+          <outputs><device>pwmout</device></outputs>
+        </linear>
+      </transition>
+    </controls>
+    <outputs>
+        <network>
+            <pwm>
+                <name>pwmout</name>
+                <username>PWM out</username>
+                <default>0</default>
+                <resolution>128</resolution>
+            </pwm>
+        </network>
+    </outputs>
+</torc>
