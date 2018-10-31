@@ -1,46 +1,105 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <torc>
-    <settings>
-        <applicationname>Unit test</applicationname>
-    </settings>
-    <inputs>
-      <system>
-        <started>
-          <name>started</name>
-          <username>System Started</username>
-          <delay>1</delay>
-        </started>
-      </system>
-    </inputs>
-    <controls>
-      <timer>
-        <custom>
-          <name>customtimer</name>
-          <username>Custom timer</username>
-          <period>0:0.40</period>
-          <start>0:0.10</start>
-          <duration>0:0.20</duration>
-          <outputs><device>transition</device></outputs>
-        </custom>
-      </timer>
-      <transition>
-        <linear>
-          <name>transition</name>
-          <username>lineartransition</username>
-          <duration>0:0.20</duration>
-          <inputs><device>customtimer</device></inputs>
-          <outputs><device>pwmout</device></outputs>
-        </linear>
-      </transition>
-    </controls>
-    <outputs>
-        <network>
-            <pwm>
-                <name>pwmout</name>
-                <username>PWM out</username>
-                <default>0</default>
-                <resolution>128</resolution>
-            </pwm>
-        </network>
-    </outputs>
+  <settings>
+    <applicationname>Unit test</applicationname>
+    <temperatureunits>metric</temperatureunits>
+  </settings>
+  <inputs>
+    <system>
+      <started>
+        <name>started</name>
+        <username>System Started</username>
+        <delay>1</delay>
+      </started>
+      <started>
+        <name>startednodelay</name>
+        <username>System Started 2</username>
+      </started>
+    </system>
+    <network>
+      <temperature>
+        <name>networkinputtemp</name>
+        <username>Network temperature input</username>
+        <default>10</default>
+      </temperature>
+      <ph>
+        <name>networkinputph</name>
+        <username>Network pH input</username>
+        <default>7.0</default>
+      </ph>
+      <pwm>
+        <name>networkpwminput</name>
+        <username>Network PWM input</username>
+        <default>0.0</default>
+      </pwm>
+      <switch>
+        <name>networkswitchinput</name>
+        <username>Network Switch input</username>
+        <default>0</default>
+      </switch>
+      <button>
+        <name>networkbuttoninput</name>
+        <username>Network Button input</username>
+        <default>1</default>
+      </button>
+    </network>
+    <wire1>
+      <ds18b20>
+        <wire1serial>28-123456789abc</wire1serial>
+        <name>ds18b20input</name>
+        <username>Dummy 1Wire DS18B20</username>
+        <userdescription>Won't work</userdescription>
+      </ds18b20>
+    </wire1>
+  </inputs>
+  <controls>
+    <timer>
+      <custom>
+        <name>customtimer</name>
+        <username>Custom timer</username>
+        <period>0:0.40</period>
+        <start>0:0.10</start>
+        <duration>0:0.20</duration>
+        <outputs><device>transition</device></outputs>
+      </custom>
+    </timer>
+    <transition>
+      <linear>
+        <name>transition</name>
+        <username>lineartransition</username>
+        <duration>0:0.20</duration>
+        <inputs><device>customtimer</device></inputs>
+        <outputs><device>networkpwmoutput</device></outputs>
+      </linear>
+    </transition>
+  </controls>
+  <outputs>
+    <network>
+      <temperature>
+        <name>networkoutputtemp</name>
+        <username>Network temperature output</username>
+        <default>10</default>
+      </temperature>
+      <ph>
+        <name>networkoutputph</name>
+        <username>Network pH output</username>
+        <default>7.0</default>
+      </ph>
+      <pwm>
+        <name>networkpwmoutput</name>
+        <username>Network PWM output</username>
+        <default>0.0</default>
+      </pwm>
+      <switch>
+        <name>networkswitchoutput</name>
+        <username>Network Switch output</username>
+        <default>0</default>
+      </switch>
+      <button>
+        <name>networkbuttonoutput</name>
+        <username>Network Button output</username>
+        <default>1</default>
+      </button>
+    </network>
+  </outputs>
 </torc>
