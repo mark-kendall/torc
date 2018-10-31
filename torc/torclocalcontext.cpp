@@ -331,7 +331,7 @@ void TorcLocalContext::CloseDatabaseConnections(void)
 
 void TorcLocalContext::SetShutdownDelay(uint Delay)
 {
-    QReadLocker locker(&m_localSettingsLock);
+    QWriteLocker locker(&m_localSettingsLock);
     if (Delay < 1 || Delay > 300) // set in XSD
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Not setting shutdown delay to %1: must be 1<->300 seconds").arg(Delay));
@@ -341,6 +341,12 @@ void TorcLocalContext::SetShutdownDelay(uint Delay)
         m_shutdownDelay = Delay;
         LOG(VB_GENERAL, LOG_INFO, QString("Set shutdown delay to %1 seconds").arg(m_shutdownDelay));
     }
+}
+
+uint TorcLocalContext::GetShutdownDelay(void)
+{
+    QReadLocker locker(&m_localSettingsLock);
+    return m_shutdownDelay;
 }
 
 /*! \brief Register a non-Torc QThread for logging and database access.
@@ -366,6 +372,8 @@ void TorcLocalContext::ShutdownTimeout(void)
 
 bool TorcLocalContext::QueueShutdownEvent(int Event)
 {
+    QWriteLocker locker(&m_localSettingsLock);
+
     if (m_shutdownDelay < 1)
         return false;
 
@@ -374,6 +382,10 @@ bool TorcLocalContext::QueueShutdownEvent(int Event)
     {
         case Torc::RestartTorc:
         case Torc::Stop:
+        case Torc::Shutdown:
+        case Torc::Restart:
+        case Torc::Hibernate:
+        case Torc::Suspend:
             newevent = Event;
             break;
         default: break;
@@ -410,6 +422,30 @@ bool TorcLocalContext::HandleShutdown(int Event)
             LOG(VB_GENERAL, LOG_INFO, "Stopping application");
             TorcReferenceCounter::EventLoopEnding(true);
             QCoreApplication::quit();
+            return true;
+        case Torc::Suspend:
+            {
+                TorcEvent event(Torc::SuspendNow);
+                Notify(event);
+            }
+            return true;
+        case Torc::Hibernate:
+            {
+                TorcEvent event(Torc::HibernateNow);
+                Notify(event);
+            }
+            return true;
+        case Torc::Shutdown:
+            {
+                TorcEvent event(Torc::ShutdownNow);
+                Notify(event);
+            }
+            return true;
+        case Torc::Restart:
+            {
+                TorcEvent event(Torc::RestartNow);
+                Notify(event);
+            }
             return true;
         default:
             break;

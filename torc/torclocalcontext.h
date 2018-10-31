@@ -47,6 +47,12 @@ class Torc
         Restarting,
         WokeUp,
         LowBattery,
+        // these are issued directly to the power object
+        // when a delayed event is issued
+        ShutdownNow,
+        SuspendNow,
+        HibernateNow,
+        RestartNow,
         // network
         NetworkAvailable = 2000,
         NetworkUnavailable,
@@ -90,7 +96,9 @@ class TorcLocalContext : public QObject, public TorcObservable
     QLocale                  GetLocale           (void);
     TorcLanguage*            GetLanguage         (void);
     void                     CloseDatabaseConnections (void);
+    bool                     QueueShutdownEvent  (int Event);
     void                     SetShutdownDelay    (uint Delay);
+    uint                     GetShutdownDelay    (void);
 
   public slots:
     void                     RegisterQThread     (void);
@@ -106,7 +114,6 @@ class TorcLocalContext : public QObject, public TorcObservable
     bool                     Init                (void);
     QString                  GetDBSetting        (const QString &Name, const QString &DefaultValue);
     void                     SetDBSetting        (const QString &Name, const QString &Value);
-    bool                     QueueShutdownEvent  (int Event);
     bool                     HandleShutdown      (int Event);
 
   private:
