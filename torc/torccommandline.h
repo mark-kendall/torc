@@ -27,7 +27,9 @@ class TorcCommandLine
         Database = (1 << 4),
         LogFile  = (1 << 5),
         XSDTest  = (1 << 6),
-        ConfDir  = (1 << 7)
+        ConfDir  = (1 << 7),
+        ShareDir = (1 << 8),
+        TransDir = (1 << 9)
     };
 
     Q_DECLARE_FLAGS(Options, Option)

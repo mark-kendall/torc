@@ -57,16 +57,22 @@ void InitialiseTorcDirectories(TorcCommandLine* CommandLine)
 
     gInstallDir = QString(PREFIX) + "/";
     gShareDir   = QString(RUNPREFIX) + "/share/" + TORC_TORC;
+    // override shared directory
+    QString sharedir = CommandLine ? CommandLine->GetValue("share").toString() : QString();
+    if (!sharedir.isEmpty())
+        gShareDir = sharedir;
+
     gTransDir   = gShareDir + "/i18n/";
+    // override translation directory - which may be done independantly of shared directory
+    QString transdir = CommandLine ? CommandLine->GetValue("trans").toString() : QString();
+    if (!transdir.isEmpty())
+        gTransDir = transdir;
 
     gConfDir    = QDir::homePath() + "/." + TORC_TORC;
     // override config directory - and by implication the content directory
-    if (CommandLine)
-    {
-        QVariant confdir = CommandLine->GetValue("config");
-        if (!confdir.isNull())
-            gConfDir = confdir.toString();
-    }
+    QString confdir = CommandLine ? CommandLine->GetValue("config").toString() : QString();
+    if (!confdir.isEmpty())
+        gConfDir = confdir;
     gContentDir = gConfDir + TORC_CONTENT_DIR;
 }
 

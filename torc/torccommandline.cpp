@@ -100,7 +100,9 @@ TorcCommandLine::TorcCommandLine(Options Flags)
     m_maxLength(0)
 {
     // always enable version, help and logging
-    TorcCommandLine::Options options = Flags | TorcCommandLine::Version | TorcCommandLine::Help | TorcCommandLine::LogLevel | TorcCommandLine::LogType | TorcCommandLine::ConfDir;
+    TorcCommandLine::Options options = Flags | TorcCommandLine::Version | TorcCommandLine::Help | TorcCommandLine::LogLevel |
+                                               TorcCommandLine::LogType | TorcCommandLine::ConfDir | TorcCommandLine::ShareDir |
+                                               TorcCommandLine::TransDir;
 
     if (options.testFlag(TorcCommandLine::Help))
         AddPriv(QString("h,help"), QVariant(), QString("Display full usage information."), TorcCommandLine::Help, true);
@@ -118,6 +120,10 @@ TorcCommandLine::TorcCommandLine(Options Flags)
         AddPriv(QString("xsdtest"), QString(""), QString("Run validation of test configuration XML files found in the given directory."), TorcCommandLine::XSDTest);
     if (options.testFlag(TorcCommandLine::ConfDir))
         AddPriv(QString("c,config"), QString(""), QString("Override the configuration directory for XML config file, database etc."));
+    if (options.testFlag(TorcCommandLine::ShareDir))
+        AddPriv(QString("s,share"), QString(""), QString("Overrride the shared directory for HTML files etc"));
+    if (options.testFlag(TorcCommandLine::TransDir))
+        AddPriv(QString("t,trans"), QString(""), QString("Override the translations directory"));
 }
 
 TorcCommandLine::~TorcCommandLine()
