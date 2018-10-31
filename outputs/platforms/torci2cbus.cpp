@@ -64,11 +64,6 @@ TorcI2CBus::TorcI2CBus()
 {
 }
 
-TorcI2CBus::~TorcI2CBus()
-{
-    Destroy();
-}
-
 void TorcI2CBus::Create(const QVariantMap &Details)
 {
     QMutexLocker locker(m_lock);

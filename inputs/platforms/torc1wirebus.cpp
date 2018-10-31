@@ -71,11 +71,6 @@ Torc1WireBus::Torc1WireBus()
 {
 }
 
-Torc1WireBus::~Torc1WireBus()
-{
-    Destroy();
-}
-
 void Torc1WireBus::Create(const QVariantMap &Details)
 {
     QMutexLocker locker(m_lock);

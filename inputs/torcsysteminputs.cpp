@@ -34,10 +34,6 @@ TorcSystemInputs::TorcSystemInputs()
 {
 }
 
-TorcSystemInputs::~TorcSystemInputs()
-{
-}
-
 void TorcSystemInputs::Create(const QVariantMap &Details)
 {
     QMutexLocker locker(m_lock);

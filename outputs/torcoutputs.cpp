@@ -38,10 +38,6 @@ TorcOutputs::TorcOutputs()
 {
 }
 
-TorcOutputs::~TorcOutputs()
-{
-}
-
 QString TorcOutputs::GetUIName(void)
 {
     return tr("Outputs");

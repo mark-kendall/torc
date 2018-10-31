@@ -40,10 +40,6 @@ TorcControls::TorcControls()
 {
 }
 
-TorcControls::~TorcControls()
-{
-}
-
 void TorcControls::Create(const QVariantMap &Details)
 {
     QMutexLocker locker(m_lock);

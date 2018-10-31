@@ -16,7 +16,6 @@ class Torc1WireBus : public TorcDeviceHandler
 {
   public:
     Torc1WireBus();
-    ~Torc1WireBus();
 
     static Torc1WireBus*        gTorc1WireBus;
 

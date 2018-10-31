@@ -11,7 +11,6 @@ class TorcSystemInputs Q_DECL_FINAL : public TorcDeviceHandler
 {
   public:
     TorcSystemInputs();
-   ~TorcSystemInputs();
 
     static TorcSystemInputs *gSystemInputs;
 
