@@ -58,11 +58,14 @@ bool TorcReferenceCounter::DownRef(void)
 {
     if (!m_refCount.deref())
     {
-        QObject* object = dynamic_cast<QObject*>(this);
-        if (object && !m_eventLoopEnding)
+        if (!m_eventLoopEnding)
         {
-            object->deleteLater();
-            return true;
+            QObject* object = dynamic_cast<QObject*>(this);
+            if (object)
+            {
+                object->deleteLater();
+                return true;
+            }
         }
 
         delete this;
