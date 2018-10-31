@@ -5,6 +5,8 @@
 // Torc
 #include "torclocalcontext.h"
 #include "testtorclocalcontext.h"
+#include "torcinputs.h"
+#include "torcoutputs.h"
 
 void TestTorcLocalContext::testTorcLocalContext(void)
 {
@@ -14,6 +16,11 @@ void TestTorcLocalContext::testTorcLocalContext(void)
     if (!exit)
     {
         TorcLocalContext::Create(cmdl);
+        (void)TorcInputs::gInputs->GetInputList();
+        (void)TorcInputs::gInputs->GetInputTypes();
+        (void)TorcOutputs::gOutputs->GetOutputList();
+        (void)TorcOutputs::gOutputs->GetOutputTypes();
+        TorcReferenceCounter::EventLoopEnding(true);
         TorcLocalContext::TearDown();
     }
     delete cmdl;
