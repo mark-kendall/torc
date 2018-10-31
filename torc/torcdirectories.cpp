@@ -47,7 +47,7 @@ static QString gContentDir = QString("");
  * \sa GetTorcTransDir
  * \sa GetTorcContentDir
 */
-void InitialiseTorcDirectories(void)
+void InitialiseTorcDirectories(TorcCommandLine* CommandLine)
 {
     static bool initialised = false;
     if (initialised)
@@ -57,9 +57,17 @@ void InitialiseTorcDirectories(void)
 
     gInstallDir = QString(PREFIX) + "/";
     gShareDir   = QString(RUNPREFIX) + "/share/" + TORC_TORC;
-    gConfDir    = QDir::homePath() + "/." + TORC_TORC;
-    gContentDir = gConfDir + TORC_CONTENT_DIR;
     gTransDir   = gShareDir + "/i18n/";
+
+    gConfDir    = QDir::homePath() + "/." + TORC_TORC;
+    // override config directory - and by implication the content directory
+    if (CommandLine)
+    {
+        QVariant confdir = CommandLine->GetValue("config");
+        if (!confdir.isNull())
+            gConfDir = confdir.toString();
+    }
+    gContentDir = gConfDir + TORC_CONTENT_DIR;
 }
 
 /*! \brief Return the path to the application configuration directory

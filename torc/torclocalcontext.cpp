@@ -137,7 +137,7 @@ TorcLocalContext::TorcLocalContext(TorcCommandLine* CommandLine)
     signal(SIGTERM, ExitHandler);
 
     // Initialise local directories
-    InitialiseTorcDirectories();
+    InitialiseTorcDirectories(CommandLine);
 
     // Start logging at the first opportunity
     QString logfile = CommandLine->GetValue("logfile").toString();

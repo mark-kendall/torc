@@ -100,7 +100,7 @@ TorcCommandLine::TorcCommandLine(Options Flags)
     m_maxLength(0)
 {
     // always enable version, help and logging
-    TorcCommandLine::Options options = Flags | TorcCommandLine::Version | TorcCommandLine::Help | TorcCommandLine::LogLevel | TorcCommandLine::LogType;
+    TorcCommandLine::Options options = Flags | TorcCommandLine::Version | TorcCommandLine::Help | TorcCommandLine::LogLevel | TorcCommandLine::LogType | TorcCommandLine::ConfDir;
 
     if (options.testFlag(TorcCommandLine::Help))
         AddPriv(QString("h,help"), QVariant(), QString("Display full usage information."), TorcCommandLine::Help, true);
@@ -116,6 +116,8 @@ TorcCommandLine::TorcCommandLine(Options Flags)
         AddPriv(QString("logfile"), QString(""), QString("Override the logfile location."));
     if (options.testFlag(TorcCommandLine::XSDTest))
         AddPriv(QString("xsdtest"), QString(""), QString("Run validation of test configuration XML files found in the given directory."), TorcCommandLine::XSDTest);
+    if (options.testFlag(TorcCommandLine::ConfDir))
+        AddPriv(QString("c,config"), QString(""), QString("Override the configuration directory for XML config file, database etc."));
 }
 
 TorcCommandLine::~TorcCommandLine()

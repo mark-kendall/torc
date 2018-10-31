@@ -4,7 +4,10 @@
 // Qt
 #include <QString>
 
-void      InitialiseTorcDirectories (void);
+// Torc
+#include "torccommandline.h"
+
+void      InitialiseTorcDirectories (TorcCommandLine* CommandLine);
 QString   GetTorcConfigDir          (void);
 QString   GetTorcShareDir           (void);
 QString   GetTorcTransDir           (void);
