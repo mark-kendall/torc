@@ -210,7 +210,7 @@ bool TorcLocalContext::Init(void)
     QDir dir(configdir);
     if (!dir.exists())
     {
-        if (!dir.mkdir(configdir))
+        if (!dir.mkpath(configdir))
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Failed to create config directory ('%1')")
                 .arg(configdir));
