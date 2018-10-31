@@ -93,7 +93,7 @@ matrix:
           if [[ $TRAVIS_BRANCH != "coverity_scan" ]]; then
             qmake CONFIG+=test torc.pro
             make
-            ./torc-tests -c ~/torc/test/config -s ~/torc/ -trans ~/torc/i18n
+            ./torc-tests -c test/config -s . -t i18n
             bash <(curl -s https://codecov.io/bash)
           else
             echo Ignoring branch
