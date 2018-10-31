@@ -9,8 +9,13 @@
 void TestTorcLocalContext::testTorcLocalContext(void)
 {
     TorcCommandLine *cmdl = new TorcCommandLine(TorcCommandLine::Database | TorcCommandLine::LogFile | TorcCommandLine::XSDTest);
-    TorcLocalContext::Create(cmdl);
-    TorcLocalContext::TearDown();
+    bool exit = false;
+    cmdl->Evaluate(mArgc, mArgv, exit);
+    if (!exit)
+    {
+        TorcLocalContext::Create(cmdl);
+        TorcLocalContext::TearDown();
+    }
     delete cmdl;
 }
 

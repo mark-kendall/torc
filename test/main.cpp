@@ -10,7 +10,7 @@ int main(int argc, char** argv) {
     QCoreApplication app(argc, argv);
 
     TestSerialisers testSerialisers;
-    TestTorcLocalContext testLocalContext;
+    TestTorcLocalContext testLocalContext(argc, argv);
     int status = QTest::qExec(&testSerialisers);
     status    |= QTest::qExec(&testLocalContext);
     return status;
