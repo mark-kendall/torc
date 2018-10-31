@@ -52,16 +52,16 @@ Torc1WireBus* Torc1WireBus::gTorc1WireBus = new Torc1WireBus();
  *
  * \code
  * <torc>
- *     <inputs>
- *         <wire1>
- *             <ds18b20>
- *                 <id>28-XXXXXXX</id>
- *                 <name>tanktemp</name>
- *                 <username>Tank temperature</username>
- *                 <userdescription>The temperature in the tank</userdescription>
- *             </ds18b20>
- *         </wire1>
- *     </inputs>
+ *   <inputs>
+ *     <wire1>
+ *       <ds18b20>
+ *         <wire1serial>28-123456789abc</wire1serial>
+ *         <name>tanktemp</name>
+ *         <username>Tank temperature</username>
+ *         <userdescription>The temperature in the tank</userdescription>
+ *       </ds18b20>
+ *     </wire1>
+ *   </inputs>
  * </torc>
  * \endcode
 */
