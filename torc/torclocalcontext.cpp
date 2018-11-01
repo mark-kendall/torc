@@ -273,7 +273,12 @@ bool TorcLocalContext::Init(void)
         .arg(qVersion()).arg(QT_VERSION_STR));
 
     // we don't use an admin thread as purely a server (i.e. no gui) - may need to revisit
+#ifdef TORC_TEST
+    m_adminThread = new TorcAdminThread();
+    m_adminThread->start();
+#else
     TorcAdminObject::CreateObjects();
+#endif
 
     return true;
 }
