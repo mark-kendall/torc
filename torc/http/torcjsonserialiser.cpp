@@ -51,10 +51,18 @@ void TorcJSONSerialiser::Begin(void)
 
 void TorcJSONSerialiser::AddProperty(const QString &Name, const QVariant &Value)
 {
-    QVariantMap map;
-    map.insert(Name, Value);
     delete m_content;
-    m_content = new QByteArray(QJsonDocument::fromVariant(map).toJson(QJsonDocument::Compact));
+
+    if (Name.isEmpty())
+    {
+        m_content = new QByteArray(QJsonDocument::fromVariant(Value).toJson(QJsonDocument::Compact));
+    }
+    else
+    {
+        QVariantMap map;
+        map.insert(Name, Value);
+        m_content = new QByteArray(QJsonDocument::fromVariant(map).toJson(QJsonDocument::Compact));
+    }
 }
 
 void TorcJSONSerialiser::End(void)

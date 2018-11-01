@@ -19,7 +19,7 @@ class TorcSerialiser
     virtual ~TorcSerialiser();
 
     static TorcSerialiser*   GetSerialiser  (const QString &MimeType);
-    QByteArray*              Serialise      (const QVariant &Data, const QString &Type);
+    QByteArray*              Serialise      (const QVariant &Data, const QString &Type = QString());
     virtual HTTPResponseType ResponseType   (void) = 0;
 
   protected:

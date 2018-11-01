@@ -53,14 +53,25 @@ TorcOutput::Type TorcOutput::StringToType(const QString &Type)
     return TorcOutput::Unknown;
 }
 
+// N.B. We need to pass the staticMetaObject to TorcHTTPService as the object is not yet complete.
+//      If we pass 'this' during construction, this->metaObject() only contains details of the super class.
 TorcOutput::TorcOutput(TorcOutput::Type Type, double Value, const QString &ModelId, const QVariantMap &Details)
   : TorcDevice(true, Value, Value, ModelId, Details),
     TorcHTTPService(this, OUTPUTS_DIRECTORY + "/" + TypeToString(Type) + "/" + Details.value("name").toString(),
                     Details.value("name").toString(), TorcOutput::staticMetaObject, BLACKLIST),
     m_owner(NULL)
 {
-    if (!uniqueId.isEmpty())
-        TorcOutputs::gOutputs->AddOutput(this);
+    TorcOutputs::gOutputs->AddOutput(this);
+}
+
+TorcOutput::TorcOutput(TorcOutput::Type Type, double Value, const QString &ModelId, const QVariantMap &Details,
+                       QObject *Output, const QMetaObject &MetaObject, const QString &Blacklist)
+  : TorcDevice(true, Value, Value, ModelId, Details),
+    TorcHTTPService(Output, OUTPUTS_DIRECTORY + "/" + TypeToString(Type) + "/" + Details.value("name").toString(),
+                    Details.value("name").toString(), MetaObject, BLACKLIST + "," + Blacklist),
+    m_owner(NULL)
+{
+    TorcOutputs::gOutputs->AddOutput(this);
 }
 
 bool TorcOutput::HasOwner(void)

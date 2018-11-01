@@ -207,10 +207,15 @@ TorcPower::TorcPower()
     connect(m_powerEnabled,         SIGNAL(ValueChanged(bool)), m_allowSuspend,   SLOT(SetActive(bool)));
     connect(m_powerEnabled,         SIGNAL(ValueChanged(bool)), m_allowHibernate, SLOT(SetActive(bool)));
     connect(m_powerEnabled,         SIGNAL(ValueChanged(bool)), m_allowRestart,   SLOT(SetActive(bool)));
+
+    // listen for delayed shutdown events
+    gLocalContext->AddObserver(this);
 }
 
 TorcPower::~TorcPower()
 {
+    gLocalContext->RemoveObserver(this);
+
     if (m_canShutdown)
         m_canShutdown->DownRef();
 
@@ -316,11 +321,35 @@ void TorcPower::BatteryUpdated(int Level)
     emit BatteryLevelChanged(m_lastBatteryLevel);
 }
 
+bool TorcPower::event(QEvent *Event)
+{
+    TorcEvent* torcevent = dynamic_cast<TorcEvent*>(Event);
+    if (torcevent)
+    {
+        int event = torcevent->GetEvent();
+        switch (event)
+        {
+            case Torc::ShutdownNow:
+                return DoShutdown();
+            case Torc::RestartNow:
+                return DoRestart();
+            case Torc::SuspendNow:
+                return DoSuspend();
+            case Torc::HibernateNow:
+                return DoHibernate();
+            default: break;
+        }
+    }
+
+    return QObject::event(Event);
+}
+
 bool TorcPower::Shutdown(void)
 {
     if (m_allowShutdown->GetValue().toBool() && m_allowShutdown->GetIsActive())
     {
-        LOG(VB_GENERAL, LOG_INFO, "Shutting down");
+        if (gLocalContext->QueueShutdownEvent(Torc::Shutdown))
+            return true;
         return DoShutdown();
     }
     return false;
@@ -330,7 +359,8 @@ bool TorcPower::Suspend(void)
 {
     if (m_allowSuspend->GetValue().toBool() && m_allowSuspend->GetIsActive())
     {
-        LOG(VB_GENERAL, LOG_INFO, "Suspending");
+        if (gLocalContext->QueueShutdownEvent(Torc::Suspend))
+            return true;
         return DoSuspend();
     }
     return false;
@@ -340,7 +370,8 @@ bool TorcPower::Hibernate(void)
 {
     if (m_allowHibernate->GetValue().toBool() && m_allowHibernate->GetIsActive())
     {
-        LOG(VB_GENERAL, LOG_INFO, "Hibernating");
+        if (gLocalContext->QueueShutdownEvent(Torc::Hibernate))
+            return true;
         return DoHibernate();
     }
     return false;
@@ -350,7 +381,8 @@ bool TorcPower::Restart(void)
 {
     if (m_allowRestart->GetValue().toBool() && m_allowRestart->GetIsActive())
     {
-        LOG(VB_GENERAL, LOG_INFO, "Restarting");
+        if (gLocalContext->QueueShutdownEvent(Torc::Restart))
+            return true;
         return DoRestart();
     }
     return false;

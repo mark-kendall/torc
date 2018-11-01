@@ -35,6 +35,7 @@ class Torc
         Stop,
         RestartTorc,
         UserChanged,
+        TorcWillStop, // or restart etc
         // Power management
         Shutdown = 1000,
         Suspend,
@@ -46,6 +47,12 @@ class Torc
         Restarting,
         WokeUp,
         LowBattery,
+        // these are issued directly to the power object
+        // when a delayed event is issued
+        ShutdownNow,
+        SuspendNow,
+        HibernateNow,
+        RestartNow,
         // network
         NetworkAvailable = 2000,
         NetworkUnavailable,
@@ -71,49 +78,57 @@ class TorcLocalContext : public QObject, public TorcObservable
     Q_OBJECT
 
   public:
-    static qint16 Create      (TorcCommandLine* CommandLine, bool Init = true);
-    static void   TearDown    (void);
+    static qint16            Create              (TorcCommandLine* CommandLine, bool Init = true);
+    static void              TearDown            (void);
 
-    Q_INVOKABLE static void  NotifyEvent   (int Event);
-    Q_INVOKABLE   QString    GetSetting    (const QString &Name, const QString &DefaultValue);
-    Q_INVOKABLE   bool       GetSetting    (const QString &Name, const bool    &DefaultValue);
-    Q_INVOKABLE   int        GetSetting    (const QString &Name, const int     &DefaultValue);
-    Q_INVOKABLE   void       SetSetting    (const QString &Name, const QString &Value);
-    Q_INVOKABLE   void       SetSetting    (const QString &Name, const bool    &Value);
-    Q_INVOKABLE   void       SetSetting    (const QString &Name, const int     &Value);
-    Q_INVOKABLE   QString    GetUuid       (void) const;
-    Q_INVOKABLE   TorcSetting* GetRootSetting (void);
-    Q_INVOKABLE   qint64     GetStartTime  (void);
-    Q_INVOKABLE   int        GetPriority   (void);
+    static void              NotifyEvent         (int Event);
+    QString                  GetSetting          (const QString &Name, const QString &DefaultValue);
+    bool                     GetSetting          (const QString &Name, const bool    &DefaultValue);
+    int                      GetSetting          (const QString &Name, const int     &DefaultValue);
+    void                     SetSetting          (const QString &Name, const QString &Value);
+    void                     SetSetting          (const QString &Name, const bool    &Value);
+    void                     SetSetting          (const QString &Name, const int     &Value);
+    QString                  GetUuid             (void) const;
+    TorcSetting*             GetRootSetting      (void);
+    qint64                   GetStartTime        (void);
+    int                      GetPriority         (void);
 
-    QLocale                  GetLocale     (void);
-    TorcLanguage*            GetLanguage   (void);
+    QLocale                  GetLocale           (void);
+    TorcLanguage*            GetLanguage         (void);
     void                     CloseDatabaseConnections (void);
+    bool                     QueueShutdownEvent  (int Event);
+    void                     SetShutdownDelay    (uint Delay);
+    uint                     GetShutdownDelay    (void);
 
   public slots:
-    void                     RegisterQThread          (void);
-    void                     DeregisterQThread        (void);
+    void                     RegisterQThread     (void);
+    void                     DeregisterQThread   (void);
+    bool                     event               (QEvent *Event) Q_DECL_OVERRIDE;
+    void                     ShutdownTimeout     (void);
 
   private:
     explicit TorcLocalContext(TorcCommandLine* CommandLine);
    ~TorcLocalContext();
     Q_DISABLE_COPY(TorcLocalContext)
 
-    bool          Init         (void);
-    QString       GetDBSetting (const QString &Name, const QString &DefaultValue);
-    void          SetDBSetting (const QString &Name, const QString &Value);
+    bool                     Init                (void);
+    QString                  GetDBSetting        (const QString &Name, const QString &DefaultValue);
+    void                     SetDBSetting        (const QString &Name, const QString &Value);
+    bool                     HandleShutdown      (int Event);
 
   private:
-    TorcSQLiteDB         *m_sqliteDB;
-    QString               m_dbName;
-    QMap<QString,QString> m_localSettings;
-    QReadWriteLock        m_localSettingsLock;
-    TorcAdminThread      *m_adminThread;
-    TorcLanguage         *m_language;
-    QString               m_uuid;
+    TorcSQLiteDB            *m_sqliteDB;
+    QString                  m_dbName;
+    QMap<QString,QString>    m_localSettings;
+    QReadWriteLock           m_localSettingsLock;
+    TorcAdminThread         *m_adminThread;
+    TorcLanguage            *m_language;
+    QString                  m_uuid;
+    uint                     m_shutdownDelay;
+    int                      m_shutdownEvent;
 };
 
-extern TorcLocalContext *gLocalContext;
-extern TorcSetting      *gRootSetting;
+extern TorcLocalContext    *gLocalContext;
+extern TorcSetting         *gRootSetting;
 
 #endif // TORCLOCALCONTEXT_H

@@ -20,7 +20,6 @@ class TorcNotify Q_DECL_FINAL : public QObject, public TorcDeviceHandler
 
   public:
     TorcNotify();
-    ~TorcNotify();
 
     bool          Validate               (void) const;
     TorcNotifier* FindNotifierByName     (const QString &Name) const;

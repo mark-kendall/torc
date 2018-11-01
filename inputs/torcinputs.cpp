@@ -50,10 +50,6 @@ TorcInputs::TorcInputs()
 {
 }
 
-TorcInputs::~TorcInputs()
-{
-}
-
 QString TorcInputs::GetUIName(void)
 {
     return tr("Inputs");

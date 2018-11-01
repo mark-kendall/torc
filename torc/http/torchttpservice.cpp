@@ -274,7 +274,7 @@ TorcHTTPService::TorcHTTPService(QObject *Parent, const QString &Signature, cons
     m_parent->setObjectName(Name);
 
     // the parent MUST implement SubscriberDeleted.
-    if (MetaObject.indexOfSlot(QMetaObject::normalizedSignature("SubscriberDeleted(QObject*)")) < 0)
+    if (m_metaObject.indexOfSlot(QMetaObject::normalizedSignature("SubscriberDeleted(QObject*)")) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Service '%1' has no SubscriberDeleted slot. This is a programmer error - exiting").arg(Name));
         QCoreApplication::exit(TORC_EXIT_UNKOWN_ERROR);
@@ -282,14 +282,14 @@ TorcHTTPService::TorcHTTPService(QObject *Parent, const QString &Signature, cons
     }
 
     // determine version
-    int index = MetaObject.indexOfClassInfo("Version");
+    int index = m_metaObject.indexOfClassInfo("Version");
     if (index > -1)
-        m_version = MetaObject.classInfo(index).value();
+        m_version = m_metaObject.classInfo(index).value();
     else
         LOG(VB_GENERAL, LOG_WARNING, QString("Service '%1' is missing version information").arg(Name));
 
     // is this a secure service (all methods require authentication)
-    bool secure = MetaObject.indexOfClassInfo("Secure") > -1;
+    bool secure = m_metaObject.indexOfClassInfo("Secure") > -1;
 
     // build a list of metaobjects from all superclasses as well.
     QList<const QMetaObject*> metas;

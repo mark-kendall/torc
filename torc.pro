@@ -71,7 +71,7 @@ else
 QMAKE_CXXFLAGS += -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE
 
 DEPENDPATH  += ./torc ./torc/http ./torc/upnp ./inputs ./inputs/platforms ./server
-DEPENDPATH  += ./outputs ./outputs/platforms ./torc/openmax
+DEPENDPATH  += ./outputs ./outputs/platforms ./torc/openmax ./controls ./notify
 INCLUDEPATH += $$DEPENDPATH
 
 # use graphviz via library or executable?
@@ -448,6 +448,7 @@ SOURCES += server/torcxsdtest.cpp
 
 test {
     message("Building tests")
+    DEFINES += TORC_TEST
     QMAKE_CXXFLAGS -= -O2
     QMAKE_CXXFLAGS += -fprofile-arcs -ftest-coverage
     LIBS += -lgcov
@@ -458,7 +459,9 @@ test {
     SOURCES -= server/main.cpp
     SOURCES += test/main.cpp
     HEADERS += test/testserialisers.h
+    HEADERS += test/testtorclocalcontext.h
     SOURCES += test/testserialisers.cpp
+    SOURCES += test/testtorclocalcontext.cpp
 }
 
 QMAKE_CLEAN += $(TARGET)

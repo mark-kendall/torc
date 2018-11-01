@@ -38,10 +38,6 @@ TorcOutputs::TorcOutputs()
 {
 }
 
-TorcOutputs::~TorcOutputs()
-{
-}
-
 QString TorcOutputs::GetUIName(void)
 {
     return tr("Outputs");
@@ -123,6 +119,9 @@ void TorcOutputs::AddOutput(TorcOutput *Output)
     if (!Output)
         return;
 
+    if (Output->GetUniqueId().isEmpty())
+        return;
+
     if (outputList.contains(Output))
     {
         LOG(VB_GENERAL, LOG_WARNING, QString("Already have output named %1 - ignoring").arg(Output->GetUniqueId()));
@@ -139,6 +138,9 @@ void TorcOutputs::RemoveOutput(TorcOutput *Output)
 {
     QMutexLocker locker(&m_lock);
     if (!Output)
+        return;
+
+    if (Output->GetUniqueId().isEmpty())
         return;
 
     if (!outputList.contains(Output))

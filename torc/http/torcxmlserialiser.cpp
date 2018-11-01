@@ -65,9 +65,11 @@ void TorcXMLSerialiser::End(void)
 
 void TorcXMLSerialiser::AddProperty(const QString &Name, const QVariant &Value)
 {
-    m_xmlStream.writeStartElement(Name);
+    if (!Name.isEmpty())
+        m_xmlStream.writeStartElement(Name);
     VariantToXML(Name, Value);
-    m_xmlStream.writeEndElement();
+    if (!Name.isEmpty())
+        m_xmlStream.writeEndElement();
 }
 
 void TorcXMLSerialiser::VariantToXML(const QString &Name, const QVariant &Value)

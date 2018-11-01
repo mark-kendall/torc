@@ -35,7 +35,7 @@
 */
 
 TorcHTMLDynamicContent::TorcHTMLDynamicContent()
-  : TorcHTTPHandler(DYNAMIC_DIRECTORY, "dynamic"),
+  : TorcHTTPHandler(TORC_CONTENT_DIR, "dynamic"),
     m_pathToContent(GetTorcConfigDir())
 {
     m_recursive = true;
@@ -44,7 +44,7 @@ TorcHTMLDynamicContent::TorcHTMLDynamicContent()
     // TorcLocalContext should already have created the config directory
     if (m_pathToContent.endsWith("/"))
         m_pathToContent.chop(1);
-    QString configdir = m_pathToContent + DYNAMIC_DIRECTORY;
+    QString configdir = GetTorcContentDir();
 
     QDir dir(configdir);
     if (!dir.exists())

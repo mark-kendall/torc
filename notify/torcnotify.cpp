@@ -37,12 +37,6 @@ TorcNotify::TorcNotify()
 {
 }
 
-TorcNotify::~TorcNotify()
-{
-    // just in case
-    Destroy();
-}
-
 bool TorcNotify::Validate(void) const
 {
     // there isn't always an app object when gNotify is created, so connect the dots here but ensure

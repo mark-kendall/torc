@@ -74,3 +74,27 @@ matrix:
           else
             echo Ignoring branch
           fi
+
+    - os: linux
+      env: TORC=linux-codecov
+      dist: xenial
+      compiler: gcc
+      before_install:
+        - |
+          if [[ $TRAVIS_BRANCH != "coverity_scan" ]]; then
+            travis_retry sudo apt-get update
+            travis_retry sudo apt-get install libgraphviz-dev libavahi-compat-libdnssd-dev qt5-default libxml2-dev libqt5sql5-sqlite
+          else
+            echo Ignoring branch
+          fi
+
+      script:
+        - |
+          if [[ $TRAVIS_BRANCH != "coverity_scan" ]]; then
+            qmake CONFIG+=test torc.pro
+            make
+            ./torc-tests -c test/config -s . -t i18n
+            bash <(curl -s https://codecov.io/bash)
+          else
+            echo Ignoring branch
+          fi

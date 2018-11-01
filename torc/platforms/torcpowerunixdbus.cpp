@@ -167,7 +167,10 @@ bool TorcPowerUnixDBus::DoShutdown(void)
     {
         QList<QVariant> dummy;
         if (m_consoleInterface.callWithCallback(QLatin1String("Stop"), dummy, (QObject*)this, SLOT(DBusCallback()), SLOT(DBusError(QDBusError))))
+        {
+            ShuttingDown();
             return true;
+        }
 
         LOG(VB_GENERAL, LOG_ERR, "Shutdown call failed");
     }
@@ -181,8 +184,13 @@ bool TorcPowerUnixDBus::DoSuspend(void)
     {
         QList<QVariant> dummy;
         if (m_upowerInterface.callWithCallback(QLatin1String("AboutToSleep"), dummy, (QObject*)this, SLOT(DBusCallback()), SLOT(DBusError(QDBusError))))
+        {
             if (m_upowerInterface.callWithCallback(QLatin1String("Suspend"), dummy, (QObject*)this, SLOT(DBusCallback()), SLOT(DBusError(QDBusError))))
+            {
+                Suspending();
                 return true;
+            }
+        }
 
         LOG(VB_GENERAL, LOG_ERR, "Suspend call failed");
     }
@@ -196,8 +204,13 @@ bool TorcPowerUnixDBus::DoHibernate(void)
     {
         QList<QVariant> dummy;
         if (m_upowerInterface.callWithCallback(QLatin1String("AboutToSleep"), dummy, (QObject*)this, SLOT(DBusCallback()), SLOT(DBusError(QDBusError))))
+        {
             if (m_upowerInterface.callWithCallback(QLatin1String("Hibernate"), dummy, (QObject*)this, SLOT(DBusCallback()), SLOT(DBusError(QDBusError))))
+            {
+                Hibernating();
                 return true;
+            }
+        }
 
         LOG(VB_GENERAL, LOG_ERR, "Hibernate call failed");
     }
@@ -211,7 +224,10 @@ bool TorcPowerUnixDBus::DoRestart(void)
     {
         QList<QVariant> dummy;
         if (m_consoleInterface.callWithCallback(QLatin1String("Restart"), dummy, (QObject*)this, SLOT(DBusCallback()), SLOT(DBusError(QDBusError))))
+        {
+            Restarting();
             return true;
+        }
 
         LOG(VB_GENERAL, LOG_ERR, "Restart call failed");
     }

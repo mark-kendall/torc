@@ -39,7 +39,8 @@ TorcTime::TorcTime()
     currentTime(),
     m_lastTime(QDateTime::currentDateTime()),
     m_timer(),
-    m_dateTimeFormat()
+    m_dateTimeFormat(),
+    m_timeLock()
 {
     // NB if the language changes, the device will be restarted so no need to worry about format changes
     m_dateTimeFormat = gLocalContext->GetLocale().dateTimeFormat(QLocale::LongFormat);
@@ -54,11 +55,19 @@ TorcTime::~TorcTime()
 
 QString TorcTime::GetCurrentTime(void)
 {
+    QReadLocker locker(&m_timeLock);
     return m_lastTime.toString(m_dateTimeFormat);
+}
+
+QString TorcTime::GetCurrentTimeUTC(void)
+{
+    QReadLocker locker(&m_timeLock);
+    return m_lastTime.toUTC().toString(Qt::ISODate);
 }
 
 void TorcTime::Tick(void)
 {
+    QWriteLocker locker(&m_timeLock);
     QDateTime timenow = QDateTime::currentDateTime();
     qint64 difference = timenow.secsTo(m_lastTime);
     m_lastTime = timenow;

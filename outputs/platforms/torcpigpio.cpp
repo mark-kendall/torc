@@ -151,10 +151,6 @@ TorcPiGPIO::TorcPiGPIO()
         m_setup = true;
 }
 
-TorcPiGPIO::~TorcPiGPIO()
-{
-}
-
 void TorcPiGPIO::Create(const QVariantMap &GPIO)
 {
     QMutexLocker locker(m_lock);

@@ -15,7 +15,6 @@ class TorcNetworkInputs Q_DECL_FINAL : public TorcDeviceHandler
 {
   public:
     TorcNetworkInputs();
-   ~TorcNetworkInputs();
 
     static TorcNetworkInputs*   gNetworkInputs;
 

@@ -44,7 +44,6 @@ class TorcI2CBus : public TorcDeviceHandler
 {
   public:
     TorcI2CBus();
-   ~TorcI2CBus();
 
     static TorcI2CBus *gTorcI2CBus;
 

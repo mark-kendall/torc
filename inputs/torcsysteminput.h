@@ -17,6 +17,9 @@ class TorcSystemInput Q_DECL_FINAL : public TorcInput
 
   public slots:
     bool            event          (QEvent *Event) Q_DECL_OVERRIDE;
+
+  private:
+    uint            m_shutdownDelay;
 };
 
 #endif // TORCSYSTEMINPUT_H

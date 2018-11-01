@@ -33,7 +33,7 @@ QString TorcInput::TypeToString(TorcInput::Type Type)
     switch (Type)
     {
         case TorcInput::Temperature:   return QString("temperature");
-        case TorcInput::pH:            return QString("pH");
+        case TorcInput::pH:            return QString("ph");
         case TorcInput::Switch:        return QString("switch");
         case TorcInput::PWM:           return QString("pwm");
         case TorcInput::Button:        return QString("button");

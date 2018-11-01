@@ -29,25 +29,25 @@
 #include "torcdirectories.h"
 
 static QString gInstallDir = QString("");
-static QString gPluginDir  = QString("");
 static QString gShareDir   = QString("");
 static QString gConfDir    = QString("");
 static QString gTransDir   = QString("");
+static QString gContentDir = QString("");
 
 /*! \brief Statically initialise the various directories that Torc uses.
  *
  * gInstallDir will default to /usr/local
- * gPluginDir will defailt to /usr/local/lib/torc/plugins
  * gShareDir will default to  /usr/local/share/
  * gTransDir will default to  /usr/local/share/torc/i18n/
  * gConfDir will default to ~/.torc
+ * gContentDir will default to ~/.torc/content/
  *
  * \sa GetTorcConfigDir
  * \sa GetTorcShareDir
- * \sa GetTorcPluginDir
  * \sa GetTorcTransDir
+ * \sa GetTorcContentDir
 */
-void InitialiseTorcDirectories(void)
+void InitialiseTorcDirectories(TorcCommandLine* CommandLine)
 {
     static bool initialised = false;
     if (initialised)
@@ -56,10 +56,24 @@ void InitialiseTorcDirectories(void)
     initialised = true;
 
     gInstallDir = QString(PREFIX) + "/";
-    gPluginDir  = QString(PREFIX) + "/lib/" + TORC_TORC + "/plugins";
     gShareDir   = QString(RUNPREFIX) + "/share/" + TORC_TORC;
-    gConfDir    = QDir::homePath() + "/." + TORC_TORC;
+    // override shared directory
+    QString sharedir = CommandLine ? CommandLine->GetValue("share").toString() : QString();
+    if (!sharedir.isEmpty())
+        gShareDir = sharedir;
+
     gTransDir   = gShareDir + "/i18n/";
+    // override translation directory - which may be done independantly of shared directory
+    QString transdir = CommandLine ? CommandLine->GetValue("trans").toString() : QString();
+    if (!transdir.isEmpty())
+        gTransDir = transdir;
+
+    gConfDir    = QDir::homePath() + "/." + TORC_TORC;
+    // override config directory - and by implication the content directory
+    QString confdir = CommandLine ? CommandLine->GetValue("config").toString() : QString();
+    if (!confdir.isEmpty())
+        gConfDir = confdir;
+    gContentDir = gConfDir + TORC_CONTENT_DIR;
 }
 
 /*! \brief Return the path to the application configuration directory
@@ -80,14 +94,14 @@ QString GetTorcShareDir(void)
     return gShareDir;
 }
 
-///brief Return the path to installed plugins.
-QString GetTorcPluginDir(void)
-{
-    return gPluginDir;
-}
-
 ///brief Return the path to installed translation files
 QString GetTorcTransDir(void)
 {
     return gTransDir;
+}
+
+///brief Return the path to generated content
+QString GetTorcContentDir(void)
+{
+    return gContentDir;
 }

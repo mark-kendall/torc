@@ -17,7 +17,6 @@ class TorcPiGPIO : public TorcDeviceHandler
 {
   public:
     TorcPiGPIO();
-   ~TorcPiGPIO();
 
     static TorcPiGPIO* gPiGPIO;
 

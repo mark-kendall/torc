@@ -29,14 +29,33 @@
  *
  * This device listens for Torc events in order to trigger changes in state
  * based on the current Torc status.
- * Currently limited to listening for Start (and Stop) events to enable, for example,
- * a soft start for dimmed lights.
+ * Currently limited to listening for Start and Stop events to enable, for example,
+ * a soft start and finish for dimmed lights.
+ *
+ * An optional delay parameter will delay stopping the application by the given number of seconds to
+ * allow for dimming etc.
 */
 TorcSystemInput::TorcSystemInput(double Value, const QVariantMap &Details)
-  : TorcInput(TorcInput::SystemStarted, Value, 0, 1, "SystemStarted", Details)
+  : TorcInput(TorcInput::SystemStarted, Value, 0, 1, "SystemStarted", Details),
+    m_shutdownDelay(0)
 {
     gLocalContext->AddObserver(this);
     SetValid(true);
+
+    if (Details.contains("delay"))
+    {
+        bool ok = false;
+        uint delay = Details.value("delay").toInt(&ok);
+        if (ok && (delay > 0))
+        {
+            gLocalContext->SetShutdownDelay(delay);
+            m_shutdownDelay = delay;
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_WARNING, "Failed to parse meaningful value for delay (>0)");
+        }
+    }
 }
 
 TorcSystemInput::~TorcSystemInput(void)
@@ -51,7 +70,7 @@ TorcInput::Type TorcSystemInput::GetType(void)
 
 QStringList TorcSystemInput::GetDescription(void)
 {
-    return QStringList() << tr("System started");
+    return QStringList() << tr("System started") << tr("Shutdown delay %1").arg(m_shutdownDelay);
 }
 
 bool TorcSystemInput::event(QEvent *Event)
@@ -61,10 +80,17 @@ bool TorcSystemInput::event(QEvent *Event)
         TorcEvent* torcevent = dynamic_cast<TorcEvent*>(Event);
         if (torcevent)
         {
-            if (torcevent->GetEvent() == Torc::Start)
-                SetValue(1.0);
-            else if (torcevent->GetEvent() == Torc::Stop)
-                SetValue(0.0);
+            switch (torcevent->GetEvent())
+            {
+                case Torc::Stop:
+                case Torc::TorcWillStop:
+                    SetValue(0.0);
+                    break;
+                case Torc::Start:
+                    SetValue(1.0);
+                    break;
+                default: break;
+            }
         }
     }
 

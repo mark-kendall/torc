@@ -22,7 +22,6 @@
 #include <QFileInfo>
 #include <QProcess>
 #include <QJsonDocument>
-#include <QCoreApplication>
 
 // Torc
 #include "torcexitcodes.h"
@@ -36,7 +35,6 @@
 #include "outputs/torcoutputs.h"
 #include "controls/torccontrols.h"
 #include "notify/torcnotify.h"
-#include "http/torchttphandler.h"
 #include "torcxmlreader.h"
 #include "torccentral.h"
 
@@ -82,9 +80,9 @@ TorcCentral::TorcCentral()
 {
     // reset state graph and clear out old files
     // content directory should already have been created by TorcHTMLDynamicContent
-    QString graphdot = GetTorcConfigDir() + DYNAMIC_DIRECTORY + "stategraph.dot";
-    QString graphsvg = GetTorcConfigDir() + DYNAMIC_DIRECTORY + "stategraph.svg";
-    QString config   = GetTorcConfigDir() + DYNAMIC_DIRECTORY + TORC_CONFIG_FILE;
+    QString graphdot = GetTorcContentDir() + "stategraph.dot";
+    QString graphsvg = GetTorcContentDir() + "stategraph.svg";
+    QString config   = GetTorcContentDir() + TORC_CONFIG_FILE;
     QString current  = GetTorcConfigDir() + "/" + TORC_CONFIG_FILE;
 
     if (QFile::exists(graphdot))
@@ -279,7 +277,7 @@ bool TorcCentral::LoadConfig(void)
     }
 
 #if defined(USING_XMLPATTERNS) || defined(USING_LIBXML2)
-    QString customxsd = GetTorcConfigDir() + DYNAMIC_DIRECTORY + "torc.xsd";
+    QString customxsd = GetTorcContentDir() + "torc.xsd";
     // we always want to delete the old xsd - if it isn't present, it wasn't used!
     // so retrieve now and then delete
     QByteArray oldxsd;
@@ -429,15 +427,6 @@ bool TorcCentral::event(QEvent *Event)
         int event = torcevent->GetEvent();
         switch (event)
         {
-            case Torc::RestartTorc:
-                LOG(VB_GENERAL, LOG_INFO, "Restarting application");
-                TorcReferenceCounter::EventLoopEnding(true);
-                QCoreApplication::exit(TORC_EXIT_RESTART);
-                break;
-            case Torc::Stop:
-                TorcReferenceCounter::EventLoopEnding(true);
-                QCoreApplication::quit();
-                break;
             case Torc::ShuttingDown:
             case Torc::Suspending:
             case Torc::Restarting:

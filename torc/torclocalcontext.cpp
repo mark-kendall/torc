@@ -31,6 +31,7 @@
 #include <QUuid>
 #include <QDir>
 #include <QMetaEnum>
+#include <QTimer>
 
 // Torc
 #include "torcevent.h"
@@ -113,8 +114,13 @@ TorcLocalContext::TorcLocalContext(TorcCommandLine* CommandLine)
     m_localSettingsLock(QReadWriteLock::Recursive),
     m_adminThread(NULL),
     m_language(NULL),
-    m_uuid()
+    m_uuid(),
+    m_shutdownDelay(0),
+    m_shutdownEvent(Torc::None)
 {
+    // listen to ourselves:)
+    AddObserver(this);
+
     // set any custom database location
     m_dbName = CommandLine->GetValue("db").toString();
 
@@ -131,7 +137,7 @@ TorcLocalContext::TorcLocalContext(TorcCommandLine* CommandLine)
     signal(SIGTERM, ExitHandler);
 
     // Initialise local directories
-    InitialiseTorcDirectories();
+    InitialiseTorcDirectories(CommandLine);
 
     // Start logging at the first opportunity
     QString logfile = CommandLine->GetValue("logfile").toString();
@@ -190,6 +196,9 @@ TorcLocalContext::~TorcLocalContext()
     // revert to the default message handler
     qInstallMessageHandler(0);
 
+    // stop listening to self..
+    RemoveObserver(this);
+
     StopLogging();
 }
 
@@ -201,7 +210,7 @@ bool TorcLocalContext::Init(void)
     QDir dir(configdir);
     if (!dir.exists())
     {
-        if (!dir.mkdir(configdir))
+        if (!dir.mkpath(configdir))
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Failed to create config directory ('%1')")
                 .arg(configdir));
@@ -264,7 +273,12 @@ bool TorcLocalContext::Init(void)
         .arg(qVersion()).arg(QT_VERSION_STR));
 
     // we don't use an admin thread as purely a server (i.e. no gui) - may need to revisit
+#ifdef TORC_TEST
+    m_adminThread = new TorcAdminThread();
+    m_adminThread->start();
+#else
     TorcAdminObject::CreateObjects();
+#endif
 
     return true;
 }
@@ -303,18 +317,41 @@ void TorcLocalContext::SetSetting(const QString &Name, const int &Value)
 
 QLocale TorcLocalContext::GetLocale(void)
 {
+    QReadLocker locker(&m_localSettingsLock);
     return m_language->GetLocale();
 }
 
 TorcLanguage* TorcLocalContext::GetLanguage(void)
 {
+    QReadLocker locker(&m_localSettingsLock);
     return m_language;
 }
 
 void TorcLocalContext::CloseDatabaseConnections(void)
 {
+    QReadLocker locker(&m_localSettingsLock);
     if (m_sqliteDB)
         m_sqliteDB->CloseThreadConnection();
+}
+
+void TorcLocalContext::SetShutdownDelay(uint Delay)
+{
+    QWriteLocker locker(&m_localSettingsLock);
+    if (Delay < 1 || Delay > 300) // set in XSD
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Not setting shutdown delay to %1: must be 1<->300 seconds").arg(Delay));
+    }
+    else if (Delay > m_shutdownDelay)
+    {
+        m_shutdownDelay = Delay;
+        LOG(VB_GENERAL, LOG_INFO, QString("Set shutdown delay to %1 seconds").arg(m_shutdownDelay));
+    }
+}
+
+uint TorcLocalContext::GetShutdownDelay(void)
+{
+    QReadLocker locker(&m_localSettingsLock);
+    return m_shutdownDelay;
 }
 
 /*! \brief Register a non-Torc QThread for logging and database access.
@@ -333,6 +370,109 @@ void TorcLocalContext::DeregisterQThread(void)
     DeregisterLoggingThread();
 }
 
+void TorcLocalContext::ShutdownTimeout(void)
+{
+    (void)HandleShutdown(m_shutdownEvent);
+}
+
+bool TorcLocalContext::QueueShutdownEvent(int Event)
+{
+    QWriteLocker locker(&m_localSettingsLock);
+
+    if (m_shutdownDelay < 1)
+        return false;
+
+    int newevent = Torc::None;
+    switch (Event)
+    {
+        case Torc::RestartTorc:
+        case Torc::Stop:
+        case Torc::Shutdown:
+        case Torc::Restart:
+        case Torc::Hibernate:
+        case Torc::Suspend:
+            newevent = Event;
+            break;
+        default: break;
+    }
+
+    if (newevent == Torc::None)
+        return false;
+
+    if (m_shutdownEvent != Torc::None)
+    {
+        LOG(VB_GENERAL, LOG_INFO, QString("Shutdown already queued - ignoring '%1' event").arg(Torc::ActionToString((Torc::Actions)newevent)));
+        return true;
+    }
+
+    m_shutdownEvent = newevent;
+    LOG(VB_GENERAL, LOG_INFO, QString("Queued '%1' event for %2 seconds").arg(Torc::ActionToString((Torc::Actions)m_shutdownEvent)).arg(m_shutdownDelay));
+    TorcEvent torcevent(Torc::TorcWillStop);
+    Notify(torcevent);
+    QTimer::singleShot(m_shutdownDelay * 1000, this, SLOT(ShutdownTimeout()));
+    return true;
+}
+
+bool TorcLocalContext::HandleShutdown(int Event)
+{
+    int event = Event == Torc::None ? m_shutdownEvent : Event;
+    switch (event)
+    {
+        case Torc::RestartTorc:
+            LOG(VB_GENERAL, LOG_INFO, "Restarting application");
+            TorcReferenceCounter::EventLoopEnding(true);
+            QCoreApplication::exit(TORC_EXIT_RESTART);
+            return true;
+        case Torc::Stop:
+            LOG(VB_GENERAL, LOG_INFO, "Stopping application");
+            TorcReferenceCounter::EventLoopEnding(true);
+            QCoreApplication::quit();
+            return true;
+        case Torc::Suspend:
+            {
+                TorcEvent event(Torc::SuspendNow);
+                Notify(event);
+            }
+            return true;
+        case Torc::Hibernate:
+            {
+                TorcEvent event(Torc::HibernateNow);
+                Notify(event);
+            }
+            return true;
+        case Torc::Shutdown:
+            {
+                TorcEvent event(Torc::ShutdownNow);
+                Notify(event);
+            }
+            return true;
+        case Torc::Restart:
+            {
+                TorcEvent event(Torc::RestartNow);
+                Notify(event);
+            }
+            return true;
+        default:
+            break;
+    }
+    return false;
+}
+
+bool TorcLocalContext::event(QEvent *Event)
+{
+    TorcEvent* torcevent = dynamic_cast<TorcEvent*>(Event);
+    if (torcevent)
+    {
+        int event = torcevent->GetEvent();
+        if (QueueShutdownEvent(event))
+            return true;
+        else if (HandleShutdown(event))
+            return true;
+    }
+
+    return QObject::event(Event);
+}
+
 QString TorcLocalContext::GetUuid(void) const
 {
     return m_uuid;
@@ -340,11 +480,13 @@ QString TorcLocalContext::GetUuid(void) const
 
 TorcSetting* TorcLocalContext::GetRootSetting(void)
 {
+    QReadLocker locker(&m_localSettingsLock);
     return gRootSetting;
 }
 
 qint64 TorcLocalContext::GetStartTime(void)
 {
+    QReadLocker locker(&m_localSettingsLock);
     return gStartTime;
 }
 

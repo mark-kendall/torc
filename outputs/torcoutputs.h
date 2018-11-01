@@ -23,7 +23,6 @@ class TorcOutputs Q_DECL_FINAL : public QObject, public TorcHTTPService
 
   public:
     TorcOutputs();
-    ~TorcOutputs();
 
     void                Graph                     (QByteArray* Data);
     QString             GetUIName                 (void) Q_DECL_OVERRIDE;

@@ -17,7 +17,6 @@ class TorcControls : public QObject, public TorcHTTPService, public TorcDeviceHa
 
   public:
     TorcControls();
-   ~TorcControls();
 
     static TorcControls* gControls;
 

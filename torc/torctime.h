@@ -4,6 +4,7 @@
 // Qt
 #include <QObject>
 #include <QTimer>
+#include <QReadWriteLock>
 
 // Torc
 #include "http/torchttpservice.h"
@@ -33,12 +34,14 @@ class TorcTime : public QObject, public TorcHTTPService
     void      Tick               (void);
     // Actual public slot
     QString   GetCurrentTime     (void);
+    QString   GetCurrentTimeUTC  (void);
 
   private:
     QString   currentTime; // dummy
     QDateTime m_lastTime;
     QTimer    m_timer;
     QString   m_dateTimeFormat;
+    QReadWriteLock m_timeLock;
 };
 
 #endif // TORCTIME_H

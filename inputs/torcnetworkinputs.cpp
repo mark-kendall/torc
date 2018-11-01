@@ -66,11 +66,6 @@ TorcNetworkInputs::TorcNetworkInputs()
 {
 }
 
-TorcNetworkInputs::~TorcNetworkInputs()
-{
-    //Destroy();
-}
-
 void TorcNetworkInputs::Create(const QVariantMap &Details)
 {
     QMutexLocker locker(m_lock);
