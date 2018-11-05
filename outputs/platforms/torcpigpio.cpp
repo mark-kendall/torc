@@ -81,7 +81,7 @@
 *
 * From the command line run:
 * \code
-* sudo apt-get install libgraphviz-dev libavahi-compat-libdnssd-dev qt5-default git-core libqt5xmlpatterns5-dev upower libxml2-dev consolekit
+* sudo apt-get install graphviz libavahi-compat-libdnssd-dev qt5-default git-core upower libxml2-dev consolekit libssl-dev libavformat-dev
 * \endcode
 *
 * \subsection piwiringpi Install wiringPi.
