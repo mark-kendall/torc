@@ -1,5 +1,5 @@
 /*jslint browser,devel,white */
-/*global window,$,bootbox,torc,TorcConnection,TorcStateGraph,TorcAPI, template */
+/*global window,$,bootbox,torc,TorcConnection,TorcStateGraph,TorcAPI,template,TorcSettings */
 
 // declare theme to keep JSLint happy and aid syntax highlighter
 var theme;

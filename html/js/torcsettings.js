@@ -21,7 +21,7 @@
 */
 
 /*jslint browser,devel,white,this */
-/*global $*/
+/*global $,md5*/
 
 // declare vars to aid syntax highlighter and keep JSLint happy
 var theme;
