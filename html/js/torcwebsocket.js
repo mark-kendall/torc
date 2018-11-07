@@ -33,7 +33,7 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
     // event handlers for notifications
     var eventHandlers = [];
     // interval timer to check for call expiry/failure
-    var expireTimer;
+    var expireTimer = null;
     // current status
     var socketStatus = torc.SocketNotConnected;
     // socket
@@ -41,7 +41,7 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
 
     // update status and notify owner
     function setSocketStatus (Status, Silent) {
-        if (Silent === undefined && typeof socketStatusChanged === 'function') {
+        if (typeof Silent === "undefined" && typeof socketStatusChanged === "function") {
             socketStatusChanged(Status);
         }
         socketStatus = Status;
@@ -57,13 +57,13 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
             if ((currentCalls[i].sent + 60000) < timenow) {
                 callback = currentCalls[i].failure;
                 currentCalls.splice(i, 1);
-                if (typeof callback === 'function') { callback(); }
+                if (typeof callback === "function") { callback(); }
             }
         }
 
         if (currentCalls.length < 1) {
             clearInterval(expireTimer);
-            expireTimer = undefined;
+            expireTimer = null;
         }
     }
 
@@ -76,17 +76,17 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
     this.call = function (methodToCall, params, successCallback, failureCallback) {
         // create the base call object
         var invocation = {
-            jsonrpc: '2.0',
+            jsonrpc: "2.0",
             method: methodToCall
         };
 
         // add params if supplied
-        if (typeof params === 'object' && params !== null) {
+        if (typeof params === "object" && params !== null) {
             invocation.params = params;
         }
 
         // no callback indicates a notification
-        if (typeof successCallback === 'function') {
+        if (typeof successCallback === "function") {
             invocation.id = currentRpcId;
             currentCalls.push({ id: currentRpcId, success: successCallback, failure: failureCallback, sent: new Date().getTime() });
             currentRpcId += 1;
@@ -97,7 +97,7 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
             }
 
             // start the expire timer if not already running
-            if (expireTimer === undefined) {
+            if (expireTimer === null) {
                 expireTimer = setInterval(expireCalls, 10000);
             }
         }
@@ -113,12 +113,12 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
         var method;
 
         // we only understand JSON-RPC 2.0
-        if (!(data.hasOwnProperty('jsonrpc') && data.jsonrpc === '2.0')) {
-            id = data.hasOwnProperty('id') ? data.id : null;
-            return {jsonrpc: '2.0', error: {code: '-32600', message: 'Invalid request'}, id: id};
+        if (!(data.hasOwnProperty("jsonrpc") && data.jsonrpc === "2.0")) {
+            id = data.hasOwnProperty("id") ? data.id : null;
+            return {jsonrpc: "2.0", error: {code: "-32600", message: "Invalid request"}, id: id};
         }
 
-        if (data.hasOwnProperty('result') && data.hasOwnProperty('id')) {
+        if (data.hasOwnProperty("result") && data.hasOwnProperty("id")) {
             // this is the result of a successful call
             id = parseInt(data.id, 10);
 
@@ -126,16 +126,16 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
                 if (currentCalls[i].id === id) {
                     callback = currentCalls[i].success;
                     currentCalls.splice(i, 1);
-                    if (typeof callback === 'function') {
+                    if (typeof callback === "function") {
                         callback(data.result);
                     }
                     return;
                 }
             }
-        } else if (data.hasOwnProperty('method')) {
+        } else if (data.hasOwnProperty("method")) {
             // there is no support for calls to the browser...
-            if (data.hasOwnProperty('id')) {
-                return {jsonrpc: '2.0', error: {code: '-32601', message: 'Method not found'}, id: data.id};
+            if (data.hasOwnProperty("id")) {
+                return {jsonrpc: "2.0", error: {code: "-32601", message: "Method not found"}, id: data.id};
             }
 
             // notification
@@ -144,17 +144,17 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
             if (eventHandlers[method]) {
                 eventHandlers[method].callback(eventHandlers[method].id, data.params);
             }
-        } else if (data.hasOwnProperty('error')) {
+        } else if (data.hasOwnProperty("error")) {
             // error...
 
-            if (data.hasOwnProperty('id')) {
+            if (data.hasOwnProperty("id")) {
                 // call failed (but valid JSON)
                 id = parseInt(data.id, 10);
                 for (i = 0; i < currentCalls.length; i += 1) {
                     if (currentCalls[i].id === id) {
                         callback = currentCalls[i].failure;
                         currentCalls.splice(i, 1);
-                        if (typeof callback === 'function') { callback(); }
+                        if (typeof callback === "function") { callback(); }
                     }
                 }
             }
@@ -162,8 +162,8 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
     }
 
     function connect(token) {
-        var url = (window.location.protocol.includes('https') ? 'wss://' : 'ws://') + window.location.host + '?accesstoken=' + token;
-        socket = (typeof MozWebSocket === 'function') ? new MozWebSocket(url, 'torc.json-rpc') : new WebSocket(url, 'torc.json-rpc');
+        var url = (window.location.protocol.includes("https") ? "wss://" : "ws://") + window.location.host + "?accesstoken=" + token;
+        socket = (typeof MozWebSocket === "function") ? new MozWebSocket(url, "torc.json-rpc") : new WebSocket(url, "torc.json-rpc");
 
         // socket closed
         socket.onclose = function () {
@@ -191,18 +191,18 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
 
                 for (i = 0; i < data.length; i += 1) {
                     result = processResult(data[i]);
-                    if (typeof result === 'object') { batchresult.push(result); }
+                    if (typeof result === "object") { batchresult.push(result); }
                 }
 
                 // a batch call of notifications requires no response
                 if (batchresult.length > 0) { socket.send(JSON.stringify(batchresult)); }
-            } else if (typeof data === 'object') {
+            } else if (typeof data === "object") {
                 // single object
                 result = processResult(data);
 
-                if (typeof result === 'object') { socket.send(JSON.stringify(result)); }
+                if (typeof result === "object") { socket.send(JSON.stringify(result)); }
             } else {
-                socket.send(JSON.stringify({jsonrpc: '2.0', error: {code: '-32700', message: 'Parse error'}, id: null}));
+                socket.send(JSON.stringify({jsonrpc: "2.0", error: {code: "-32700", message: "Parse error"}, id: null}));
             }
         };
     }
@@ -212,9 +212,9 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
 
         setSocketStatus(torc.SocketConnecting);
         // start the connection by requesting a token. If authentication is not required, it will be silently ignored.
-        $.ajax({ url: torc.ServicesPath + 'GetWebSocketToken',
+        $.ajax({ url: torc.ServicesPath + "GetWebSocketToken",
                  dataType: "json",
-                 type: 'GET',
+                 type: "GET",
                  xhrFields: { withCredentials: true },
                  success: function(result) { connect(result.accesstoken); },
                  error: function() { setSocketStatus(torc.SocketNotConnected); }
