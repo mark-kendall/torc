@@ -54,7 +54,7 @@ var TorcConnection = function ($, torc, statusChanged) {
         } else {
             console.log('Cannot unsubscribe from ' + serviceName + ' - not subscribed');
         }
-    }
+    };
 
     this.subscribe = function (serviceName, properties, propertyChanges, subscriptionChanges) {
         // is this a known service
