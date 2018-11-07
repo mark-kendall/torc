@@ -2,7 +2,7 @@
 
 // Simple JavaScript Templating
 // John Resig - http://ejohn.org/ - MIT Licensed
-(function(){
+(function () {
   var cache = {};
 
   this.template = function template(str, data){
@@ -34,4 +34,4 @@
     // Provide some basic currying to the user
     return data ? fn( data ) : fn;
   };
-})();
+}());
