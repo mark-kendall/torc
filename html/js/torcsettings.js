@@ -84,9 +84,9 @@ var TorcSettings = function ($, torc, menu) {
             $('.' + theme.SettingsModalContentID).append(template(theme.SettingsList, { "Settings": result}));
 
             // iterate over the results
-            function setup_recursive (setting) {
+            function setupRecursive (setting) {
                 if (setting.hasOwnProperty('uiname') && setting.hasOwnProperty('name') && setting.hasOwnProperty('type')) {
-                    if (setting.hasOwnProperty('children')) { Object.getOwnPropertyNames(setting.children).forEach(function (child) { setup_recursive(setting.children[child]); })}
+                    if (setting.hasOwnProperty('children')) { Object.getOwnPropertyNames(setting.children).forEach(function (child) { setupRecursive(setting.children[child]); })}
                     var name = setting.name;
                     var id   = 'torc-settings-' + name;
                     var but  = 'torc-settings-button-' + name;
@@ -174,7 +174,7 @@ var TorcSettings = function ($, torc, menu) {
                         });
                 }
             }
-            setup_recursive(result);
+            setupRecursive(result);
         }
 
         if (servicelist.hasOwnProperty(torc.RootSetting)) { torcconnection.call(torc.RootSetting, 'GetChildList', {}, function (result) { showsettings(result); }); }
