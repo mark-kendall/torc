@@ -51,6 +51,24 @@
         <userdescription>Won't work</userdescription>
       </ds18b20>
     </wire1>
+    <constant>
+      <pwm>
+        <name>constantpwminput</name>
+        <value>1.0</value>
+      </pwm>
+      <ph>
+        <name>constantphinput</name>
+        <value>7.0</value>
+      </ph>
+      <switch>
+        <name>constantswitchinput</name>
+        <value>0</value>
+      </switch>
+      <temperature>
+        <name>constanttemperatureinput</name>
+        <value>-10.0</value>
+      </temperature>
+    </constant>
   </inputs>
   <controls>
     <timer>
@@ -74,6 +92,24 @@
     </transition>
   </controls>
   <outputs>
+    <constant>
+      <pwm>
+        <name>constantpwmoutput</name>
+        <value>1.0</value>
+      </pwm>
+      <ph>
+        <name>constantphoutput</name>
+        <value>7.0</value>
+      </ph>
+      <switch>
+        <name>constantswitchoutput</name>
+        <value>0</value>
+      </switch>
+      <temperature>
+        <name>constanttemperatureoutput</name>
+        <value>-10.0</value>
+      </temperature>
+    </constant>
     <network>
       <temperature>
         <name>networkoutputtemp</name>
