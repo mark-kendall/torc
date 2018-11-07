@@ -44,7 +44,7 @@ var TorcSubscription = function (socket, serviceName, servicePath, subscribedCha
     // return the known properties for this subscription. Use for API help.
     this.getProperties = function () {
         return properties;
-    }
+    };
 
     // callback to notify successful subscription
     function subscribed(data) {
@@ -60,9 +60,9 @@ var TorcSubscription = function (socket, serviceName, servicePath, subscribedCha
                 socket.listen(element, servicePath + properties[element].notification, propertyChanged);
             });
         } else {
-            version = undefined;
-            methods = undefined;
-            properties = undefined;
+            version = [];
+            methods = [];
+            properties = [];
         }
 
         if (typeof subscribedChanged === 'function') { subscribedChanged(serviceName, version, methods, properties); }
@@ -70,10 +70,10 @@ var TorcSubscription = function (socket, serviceName, servicePath, subscribedCha
 
     // callback to notify subscription failed
     function failed() {
-        version = undefined;
-        methods = undefined;
-        properties = undefined;
-        if (typeof subscribedChanged === 'function') { subscribedChanged(serviceName, undefined); }
+        version = [];
+        methods = [];
+        properties = [];
+        if (typeof subscribedChanged === 'function') { subscribedChanged(serviceName); }
     }
 
     this.unsubscribe = function () {
