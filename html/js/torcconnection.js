@@ -56,6 +56,37 @@ var TorcConnection = function ($, torc, statusChanged) {
         }
     };
 
+    function subscriptionChanged(name, version, methods, properties) {
+        // is this a known service subscription
+        if (!subscriptions[name]) {
+            console.log('Received subscription response for unknown service' + name);
+            return;
+        }
+
+        // there was an error subscribing
+        if (version === undefined) {
+            console.log('Error subscribing to service' + name);
+            if (typeof subscriptions[name].subscriptionChanges === 'function') { subscriptions[name].subscriptionChanges(); }
+            return;
+        }
+
+        // loop through the requested properties and listen for updates
+        if (typeof properties === 'object' && $.isArray(subscriptions[name].properties)) {
+            subscriptions[name].properties.forEach(function(element) {
+                if (properties.hasOwnProperty(element)) {
+                    subscriptions[name].subscription.listen(element, subscriptions[name].propertyChanges);
+                }});
+        }
+
+        // save the methods for validating calls
+        subscriptions[name].methods = methods;
+
+        // and notifiy subscriber
+        if (typeof subscriptions[name].subscriptionChanges === 'function') {
+            subscriptions[name].subscriptionChanges(version, methods, properties, name);
+        }
+    }
+
     this.subscribe = function (serviceName, properties, propertyChanges, subscriptionChanges) {
         // is this a known service
         if (!serviceList.hasOwnProperty(serviceName)) {
@@ -107,37 +138,6 @@ var TorcConnection = function ($, torc, statusChanged) {
         }
         return undefined;
     };
-
-    function subscriptionChanged(name, version, methods, properties) {
-        // is this a known service subscription
-        if (!subscriptions[name]) {
-            console.log('Received subscription response for unknown service' + name);
-            return;
-        }
-
-        // there was an error subscribing
-        if (version === undefined) {
-            console.log('Error subscribing to service' + name);
-            if (typeof subscriptions[name].subscriptionChanges === 'function') { subscriptions[name].subscriptionChanges(); }
-            return;
-        }
-
-        // loop through the requested properties and listen for updates
-        if (typeof properties === 'object' && $.isArray(subscriptions[name].properties)) {
-            subscriptions[name].properties.forEach(function(element) {
-                if (properties.hasOwnProperty(element)) {
-                    subscriptions[name].subscription.listen(element, subscriptions[name].propertyChanges);
-                }});
-        }
-
-        // save the methods for validating calls
-        subscriptions[name].methods = methods;
-
-        // and notifiy subscriber
-        if (typeof subscriptions[name].subscriptionChanges === 'function') {
-            subscriptions[name].subscriptionChanges(version, methods, properties, name);
-        }
-    }
 
     function serviceListChanged(ignore, value) {
         // there is currently no service that starts or stops other than at startup/shutdown. So this list

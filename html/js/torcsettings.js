@@ -116,6 +116,12 @@ var TorcSettings = function ($, torc, menu) {
                         }
                         if (value === serverValue || !valid) { $('#' + col).collapse('hide'); } else { $('#' + col).collapse('show'); }
                     }
+                    function setValue (value) {
+                        serverValue = value;
+                        if (type === 'bool')    { $('#' + id).prop('checked', value); }
+                        if (type === 'string')  { $('#' + id).val(value); }
+                        if (type === 'integer') { $('#' + id).val(value); }
+                    }
                     $('#' + but).on('click', function () {
                         var value = getValue();
                         if (value === serverValue) { return; }
@@ -139,12 +145,6 @@ var TorcSettings = function ($, torc, menu) {
                     }
                     function setActive (value) {
                         $('#' + id).prop('disabled', !value);
-                    }
-                    function setValue (value) {
-                        serverValue = value;
-                        if (type === 'bool')    { $('#' + id).prop('checked', value); }
-                        if (type === 'string')  { $('#' + id).val(value); }
-                        if (type === 'integer') { $('#' + id).val(value); }
                     }
                     function update (Name, Value) {
                         if (Name === 'value')    { setValue(Value); }
