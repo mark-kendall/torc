@@ -78,7 +78,7 @@ var TorcSubscription = function (socket, serviceName, servicePath, subscribedCha
 
     this.unsubscribe = function () {
         socket.call(servicePath + 'Unsubscribe');
-    }
+    };
 
     // subscribe
     socket.call(servicePath + 'Subscribe', null, subscribed, failed);
