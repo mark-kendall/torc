@@ -89,6 +89,10 @@ var TorcSettings = function ($, torc, menu) {
                 var getValue;
                 var setValid;
                 var toggleButton;
+                var setValue;
+                var setupEvents;
+                var setActive;
+                var update;
                 if (setting.hasOwnProperty('uiname') && setting.hasOwnProperty('name') && setting.hasOwnProperty('type')) {
                     if (setting.hasOwnProperty('children')) {
                         Object.getOwnPropertyNames(setting.children).forEach(
@@ -104,10 +108,10 @@ var TorcSettings = function ($, torc, menu) {
                         if (type === 'bool')    { return $('#' + id).is(':checked'); }
                         if (type === 'string')  { return $('#' + id).val(); }
                         if (type === 'integer') { return Number($('#' + id).val()); }
-                    }
+                    };
                     setValid = function (Valid) {
                         if (Valid) { $('#' + id).removeClass('is-invalid'); } else { $('#' + id).addClass('is-invalid'); }
-                    }
+                    };
                     toggleButton = function () {
                         var value = getValue();
                         var valid = true;
@@ -118,13 +122,13 @@ var TorcSettings = function ($, torc, menu) {
                             setValid(true);
                         }
                         if (value === serverValue || !valid) { $('#' + col).collapse('hide'); } else { $('#' + col).collapse('show'); }
-                    }
-                    function setValue (value) {
+                    };
+                    setValue = function (value) {
                         serverValue = value;
                         if (type === 'bool')    { $('#' + id).prop('checked', value); }
                         if (type === 'string')  { $('#' + id).val(value); }
                         if (type === 'integer') { $('#' + id).val(value); }
-                    }
+                    };
                     $('#' + but).on('click', function () {
                         var value = getValue();
                         if (value === serverValue) { return; }
@@ -142,17 +146,17 @@ var TorcSettings = function ($, torc, menu) {
                                 } else { setValid(false); }}
                         );
                     });
-                    function setupEvents () {
+                    setupEvents = function () {
                         var event = (type === 'bool' || selections !== undefined) ? 'change' : 'input';
                         $('#' + id).on(event, function () { toggleButton(); });
-                    }
-                    function setActive (value) {
+                    };
+                    setActive = function (value) {
                         $('#' + id).prop('disabled', !value);
-                    }
-                    function update (Name, Value) {
+                    };
+                    update = function (Name, Value) {
                         if (Name === 'value')    { setValue(Value); }
                         if (Name === 'isActive') { setActive(Value); }
-                    }
+                    };
                     torcconnection.subscribe(name, ['value', 'isActive'],
                         function (Name, Value) {
                             update(Name, Value);
