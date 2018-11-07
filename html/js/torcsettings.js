@@ -90,7 +90,10 @@ var TorcSettings = function ($, torc, menu) {
                 var setValid;
                 var toggleButton;
                 if (setting.hasOwnProperty('uiname') && setting.hasOwnProperty('name') && setting.hasOwnProperty('type')) {
-                    if (setting.hasOwnProperty('children')) { Object.getOwnPropertyNames(setting.children).forEach(function (child) { setupRecursive(setting.children[child]); })}
+                    if (setting.hasOwnProperty('children')) {
+                        Object.getOwnPropertyNames(setting.children).forEach(
+                                    function (child) { setupRecursive(setting.children[child]); });
+                    }
                     var name = setting.name;
                     var id   = 'torc-settings-' + name;
                     var but  = 'torc-settings-button-' + name;
