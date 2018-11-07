@@ -151,10 +151,6 @@ var TorcConnection = function ($, torc, statusChanged) {
         serviceListChanged('serviceList', []);
     }
 
-    function connect() {
-        socket = new TorcWebsocket($, torc, socketStatusChanged);
-    }
-
     function connected() {
         that.subscribe('services', ['serviceList'], serviceListChanged, serviceSubscriptionChanged);
     }
@@ -180,6 +176,10 @@ var TorcConnection = function ($, torc, statusChanged) {
         } else if (status === torc.SocketConnected) {
             connected();
         }
+    }
+
+    function connect() {
+        socket = new TorcWebsocket($, torc, socketStatusChanged);
     }
 
     connect();
