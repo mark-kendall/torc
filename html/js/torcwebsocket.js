@@ -41,7 +41,6 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
 
     // update status and notify owner
     function setSocketStatus (Status, Silent) {
-        console.log(Status);
         if (Silent === undefined && typeof socketStatusChanged === 'function') {
             socketStatusChanged(Status);
         }
@@ -56,7 +55,6 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
 
         for (i = currentCalls.length - 1; i >= 0; i -= 1) {
             if ((currentCalls[i].sent + 60000) < timenow) {
-                console.log('Expiring call id ' + currentCalls[i].id + ' : no response received');
                 callback = currentCalls[i].failure;
                 currentCalls.splice(i, 1);
                 if (typeof callback === 'function') { callback(); }
@@ -134,8 +132,6 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
                     return;
                 }
             }
-
-            console.log('Unknown RPC result for id:' + id);
         } else if (data.hasOwnProperty('method')) {
             // there is no support for calls to the browser...
             if (data.hasOwnProperty('id')) {
@@ -147,9 +143,6 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
 
             if (eventHandlers[method]) {
                 eventHandlers[method].callback(eventHandlers[method].id, data.params);
-            } else {
-                console.log('No event handler for ' + method);
-            }
         } else if (data.hasOwnProperty('error')) {
             // error...
 
@@ -164,21 +157,12 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
                     }
                 }
             }
-
-            console.log('JSON-RPC error: ' + (data.error.hasOwnProperty('code') ? data.error.code : null) +
-                        '(' + (data.error.hasOwnProperty('code') ? data.error.message : 'unknown') + ')');
         }
     }
 
     function connect(token) {
         var url = (window.location.protocol.includes('https') ? 'wss://' : 'ws://') + window.location.host + '?accesstoken=' + token;
         socket = (typeof MozWebSocket === 'function') ? new MozWebSocket(url, 'torc.json-rpc') : new WebSocket(url, 'torc.json-rpc');
-
-        // socket error
-        socket.onerror = function (event) {
-            // this never seems to contain any pertinent information
-            console.log('Websocket error (' + event.toString() + ')');
-        };
 
         // socket closed
         socket.onclose = function () {

@@ -82,13 +82,11 @@ $(document).ready(function() {
     function languageChanged(name, value) {
         if (name === 'languageCode') {
             if (language === undefined) {
-                console.log('Using language: ' + value);
                 language = value;
             } else {
                 if (language !== value) {
                     // simple, unambiguous strings are listed in the torc var. This needs to be
                     // reloaded if the language changes.
-                    console.log("Language changed - reloading");
                     location.reload(true);
                 }
             }

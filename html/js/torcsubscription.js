@@ -63,7 +63,6 @@ var TorcSubscription = function (socket, serviceName, servicePath, subscribedCha
             version = undefined;
             methods = undefined;
             properties = undefined;
-            console.log('Invalid subscription response');
         }
 
         if (typeof subscribedChanged === 'function') { subscribedChanged(serviceName, version, methods, properties); }
@@ -74,7 +73,6 @@ var TorcSubscription = function (socket, serviceName, servicePath, subscribedCha
         version = undefined;
         methods = undefined;
         properties = undefined;
-        console.log('Failed to subscribe to ' + servicePath);
         if (typeof subscribedChanged === 'function') { subscribedChanged(serviceName, undefined); }
     }
 

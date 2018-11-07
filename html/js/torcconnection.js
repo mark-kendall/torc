@@ -44,28 +44,23 @@ var TorcConnection = function ($, torc, statusChanged) {
             socket.call(serviceList[serviceName].path + method, params, success, failure);
             return;
         }
-        console.log('Failed to call ' + serviceName + method);
     };
 
     this.unsubscribe = function (serviceName) {
         if (subscriptions[serviceName]) {
             subscriptions[serviceName].subscription.unsubscribe();
             delete subscriptions[serviceName];
-        } else {
-            console.log('Cannot unsubscribe from ' + serviceName + ' - not subscribed');
         }
     };
 
     function subscriptionChanged(name, version, methods, properties) {
         // is this a known service subscription
         if (!subscriptions[name]) {
-            console.log('Received subscription response for unknown service' + name);
             return;
         }
 
         // there was an error subscribing
         if (version === undefined) {
-            console.log('Error subscribing to service' + name);
             if (typeof subscriptions[name].subscriptionChanges === 'function') { subscriptions[name].subscriptionChanges(); }
             return;
         }
@@ -90,14 +85,12 @@ var TorcConnection = function ($, torc, statusChanged) {
     this.subscribe = function (serviceName, properties, propertyChanges, subscriptionChanges) {
         // is this a known service
         if (!serviceList.hasOwnProperty(serviceName)) {
-            console.log('Cannot subscribe to unknown service ' + serviceName);
             if (typeof subscriptionChanges === 'function') { subscriptionChanges(); }
             return;
         }
 
         // avoid double subscriptions
         if (subscriptions[serviceName]) {
-            console.log('Already subscribed to ' + serviceName);
             if (typeof subscriptionChanges === 'function') { subscriptionChanges(); }
             return;
         }
