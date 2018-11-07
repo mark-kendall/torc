@@ -59,7 +59,7 @@ var TorcSettings = function ($, torc, menu) {
                     a.removeClass("is-valid").addClass("is-invalid");
                     b.removeClass("is-valid").addClass("is-invalid");
                 }
-            }
+            };
             $('#' + theme.SettingsUsername1).on('input', function () { togglevalid($(this), $('#' + theme.SettingsUsername2)); });
             $('#' + theme.SettingsUsername2).on('input', function () { togglevalid($(this), $('#' + theme.SettingsUsername1)); });
             $('#' + theme.SettingsPassword1).on('input', function () { togglevalid($(this), $('#' + theme.SettingsPassword2)); });
