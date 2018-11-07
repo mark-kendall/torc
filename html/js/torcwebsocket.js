@@ -69,7 +69,7 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
 
     // add event callback
     this.listen = function (id, method, callback) {
-        eventHandlers[method] = { id: id, callback: callback };
+        eventHandlers[method] = { id, callback };
     };
 
     // make a remote call (public)
@@ -115,7 +115,7 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
         // we only understand JSON-RPC 2.0
         if (!(data.hasOwnProperty("jsonrpc") && data.jsonrpc === "2.0")) {
             id = data.hasOwnProperty("id") ? data.id : null;
-            return {jsonrpc: "2.0", error: {code: "-32600", message: "Invalid request"}, id: id};
+            return {jsonrpc: "2.0", error: {code: "-32600", message: "Invalid request"}, id};
         }
 
         if (data.hasOwnProperty("result") && data.hasOwnProperty("id")) {
@@ -216,8 +216,8 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
                  dataType: "json",
                  type: "GET",
                  xhrFields: { withCredentials: true },
-                 success: function(result) { connect(result.accesstoken); },
-                 error: function() { setSocketStatus(torc.SocketNotConnected); }
+                 success(result) { connect(result.accesstoken); },
+                 error() { setSocketStatus(torc.SocketNotConnected); }
                });
     }
 

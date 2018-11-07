@@ -24,21 +24,21 @@ $(document).ready(function() {
                             function () { if (typeof callback === 'function') { callback(); }});
     }
 
-    function addNavbarDropdown(dropdownClass, toggleClass, menuClass) {
-        $('.navbar-nav').append(template(theme.NavbarDropdown, { "ddclass": dropdownClass, "icon": toggleClass, "menuclass": menuClass} ));
+    function addNavbarDropdown(ddclass, icon, menuclass) {
+        $('.navbar-nav').append(template(theme.NavbarDropdown, { ddclass, icon , menuclass } ));
     }
 
     function removeNavbarDropdown(dropdownClass) {
         $('.' + dropdownClass).remove();
     }
 
-    function addDropdownMenuDivider(menu, identifier) {
-        $('.' + menu).append(template(theme.NavbarDropdownDivider, { "id": identifier }));
+    function addDropdownMenuDivider(menu, id) {
+        $('.' + menu).append(template(theme.NavbarDropdownDivider, { id }));
     }
 
-    function addDropdownMenuItem(menu, identifier, link, text, click, hide) {
-        $('.' + menu).append(template(theme.NavbarDropdownItem, {"id": identifier, "link": link, "text": text }));
-        if (typeof click === 'function') { $('.' + identifier).on("click", click); }
+    function addDropdownMenuItem(menu, id, link, text, click, hide) {
+        $('.' + menu).append(template(theme.NavbarDropdownItem, { id, link, text }));
+        if (typeof click === 'function') { $('.' + id).on("click", click); }
     }
 
     function peerListChanged(name, value) {

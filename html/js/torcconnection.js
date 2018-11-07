@@ -97,9 +97,7 @@ var TorcConnection = function ($, torc, statusChanged) {
 
         // actually subscribe
         subscriptions[serviceName] = {
-            properties: properties,
-            propertyChanges: propertyChanges,
-            subscriptionChanges: subscriptionChanges,
+            properties, propertyChanges, subscriptionChanges,
             subscription: new TorcSubscription(socket, serviceName, serviceList[serviceName].path, subscriptionChanged)
         };
     };
