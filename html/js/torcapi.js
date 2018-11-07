@@ -41,9 +41,9 @@ var TorcAPI = function ($, torc, menu) {
 
     function load (Service) {
         if (typeof torcconnection === 'object') {
-            if (servicelist === undefined) { servicelist = torcconnection.getServiceList(); };
-            if (returnformats === undefined) { returnformats = torcconnection.getReturnFormats(); };
-            if (websocketprotos === undefined) { websocketprotos = torcconnection.getWebSocketProtocols(); };
+            if (servicelist === undefined) { servicelist = torcconnection.getServiceList(); }
+            if (returnformats === undefined) { returnformats = torcconnection.getReturnFormats(); }
+            if (websocketprotos === undefined) { websocketprotos = torcconnection.getWebSocketProtocols(); }
         }
 
         // these aren't going to change

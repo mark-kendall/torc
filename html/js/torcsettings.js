@@ -86,7 +86,7 @@ var TorcSettings = function ($, torc, menu) {
             // iterate over the results
             function setup_recursive (setting) {
                 if (setting.hasOwnProperty('uiname') && setting.hasOwnProperty('name') && setting.hasOwnProperty('type')) {
-                    if (setting.hasOwnProperty('children')) { Object.getOwnPropertyNames(setting.children).forEach(function (child) { setup_recursive(setting.children[child]); })};
+                    if (setting.hasOwnProperty('children')) { Object.getOwnPropertyNames(setting.children).forEach(function (child) { setup_recursive(setting.children[child]); })}
                     var name = setting.name;
                     var id   = 'torc-settings-' + name;
                     var but  = 'torc-settings-button-' + name;
