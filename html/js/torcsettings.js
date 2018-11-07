@@ -34,6 +34,7 @@ var TorcSettings = function ($, torc, menu) {
     var subscriptions = [];
 
     function load () {
+        var togglevalid;
         // credentials need special handling
         if (typeof torcconnection !== 'object') { return; }
 
@@ -50,7 +51,7 @@ var TorcSettings = function ($, torc, menu) {
                 $('#' + theme.SettingsPassword2).val('').removeClass('is-invalid');
             });
             var regex = /^\w{4,}$/;
-            function togglevalid (a,b) {
+            togglevalid = function (a,b) {
                 if (regex.test(a.val()) && a.val() === b.val()) {
                     a.removeClass("is-invalid").addClass("is-valid");
                     b.removeClass("is-invalid").addClass("is-valid");
@@ -85,6 +86,9 @@ var TorcSettings = function ($, torc, menu) {
 
             // iterate over the results
             function setupRecursive (setting) {
+                var getValue;
+                var setValid;
+                var toggleButton;
                 if (setting.hasOwnProperty('uiname') && setting.hasOwnProperty('name') && setting.hasOwnProperty('type')) {
                     if (setting.hasOwnProperty('children')) { Object.getOwnPropertyNames(setting.children).forEach(function (child) { setupRecursive(setting.children[child]); })}
                     var name = setting.name;
@@ -93,15 +97,15 @@ var TorcSettings = function ($, torc, menu) {
                     var col  = 'torc-settings-button-col-' + name;
                     var type = setting.type;
                     var serverValue, min, max, selections;
-                    function getValue () {
+                    getValue = function () {
                         if (type === 'bool')    { return $('#' + id).is(':checked'); }
                         if (type === 'string')  { return $('#' + id).val(); }
                         if (type === 'integer') { return Number($('#' + id).val()); }
                     }
-                    function setValid (Valid) {
+                    setValid = function (Valid) {
                         if (Valid) { $('#' + id).removeClass('is-invalid'); } else { $('#' + id).addClass('is-invalid'); }
                     }
-                    function toggleButton () {
+                    toggleButton = function () {
                         var value = getValue();
                         var valid = true;
                         if (type === 'integer' && (value < min || value > max)) {
