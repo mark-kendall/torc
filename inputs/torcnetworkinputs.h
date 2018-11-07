@@ -10,6 +10,7 @@
 #include "torcinput.h"
 
 #define NETWORK_INPUTS_STRING QString("network")
+#define CONSTANT_INPUTS_STRING QString("constant")
 
 class TorcNetworkInputs Q_DECL_FINAL : public TorcDeviceHandler
 {

@@ -12,8 +12,10 @@ class TorcpHInput : public TorcInput
     TorcpHInput(double Value, const QString &ModelId, const QVariantMap &Details);
     virtual ~TorcpHInput();
 
-    TorcInput::Type  GetType    (void) Q_DECL_OVERRIDE;
-    double           ScaleValue (double Value);
+    QStringList      GetDescription (void) Q_DECL_OVERRIDE;
+    TorcInput::Type  GetType        (void) Q_DECL_OVERRIDE;
+    void             Start          (void) Q_DECL_OVERRIDE;
+    double           ScaleValue     (double Value);
 };
 
 #endif // TORCPHINPUT_H

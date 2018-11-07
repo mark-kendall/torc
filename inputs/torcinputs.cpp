@@ -43,7 +43,7 @@ TorcInputs* TorcInputs::gInputs = new TorcInputs();
 */
 TorcInputs::TorcInputs()
   : QObject(),
-    TorcHTTPService(this, SENSORS_DIRECTORY, "inputs", TorcInputs::staticMetaObject, BLACKLIST),
+    TorcHTTPService(this, INPUTS_DIRECTORY, "inputs", TorcInputs::staticMetaObject, BLACKLIST),
     inputList(),
     inputTypes(),
     m_lock(QMutex::Recursive)

@@ -42,7 +42,7 @@ void TorcSystemInputs::Create(const QVariantMap &Details)
     for ( ; i != Details.end(); ++i)
     {
         // network devices can be <sensors> or <outputs>
-        if (i.key() != SENSORS_DIRECTORY)
+        if (i.key() != INPUTS_DIRECTORY)
             continue;
 
         QVariantMap devices = i.value().toMap();

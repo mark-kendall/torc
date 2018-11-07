@@ -32,9 +32,20 @@ TorcSwitchInput::~TorcSwitchInput()
 {
 }
 
+QStringList TorcSwitchInput::GetDescription(void)
+{
+    return QStringList() << tr("Constant Switch");
+}
+
 TorcInput::Type TorcSwitchInput::GetType(void)
 {
     return TorcInput::Switch;
+}
+
+void TorcSwitchInput::Start(void)
+{
+    SetValid(true);
+    TorcInput::Start();
 }
 
 double TorcSwitchInput::ScaleValue(double Value)

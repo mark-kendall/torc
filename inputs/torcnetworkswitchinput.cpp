@@ -41,6 +41,7 @@ void TorcNetworkSwitchInput::Start(void)
 {
     SetValid(true);
     SetValue(defaultValue);
-    TorcSwitchInput::Start();
+    // NB skip TorcSwitchInput::Start
+    TorcInput::Start();
 }
 

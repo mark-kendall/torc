@@ -67,7 +67,7 @@ TorcInput::Type TorcInput::StringToType(const QString &Type)
 TorcInput::TorcInput(TorcInput::Type Type, double Value, double RangeMinimum, double RangeMaximum,
                      const QString &ModelId, const QVariantMap &Details)
   : TorcDevice(false, Value, Value, ModelId, Details),
-    TorcHTTPService(this, SENSORS_DIRECTORY + "/" + TypeToString(Type) + "/" + Details.value("name").toString(),
+    TorcHTTPService(this, INPUTS_DIRECTORY + "/" + TypeToString(Type) + "/" + Details.value("name").toString(),
                     Details.value("name").toString(), TorcInput::staticMetaObject,
                     ModelId.startsWith("Network") ? QString("") : BLACKLIST),
     operatingRangeMin(RangeMinimum),

@@ -72,7 +72,7 @@ void TorcI2CBus::Create(const QVariantMap &Details)
     for ( ; i != Details.constEnd(); ++i)
     {
         // I2C devices can be <sensors> or <outputs> (and both at the same time)
-        if (i.key() != SENSORS_DIRECTORY && i.key() != OUTPUTS_DIRECTORY)
+        if (i.key() != INPUTS_DIRECTORY && i.key() != OUTPUTS_DIRECTORY)
             continue;
 
         QVariantMap i2c = i.value().toMap();

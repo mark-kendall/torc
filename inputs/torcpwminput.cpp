@@ -32,9 +32,20 @@ TorcPWMInput::~TorcPWMInput()
 {
 }
 
+QStringList TorcPWMInput::GetDescription(void)
+{
+    return QStringList() << tr("Constant PWM");
+}
+
 TorcInput::Type TorcPWMInput::GetType(void)
 {
     return TorcInput::PWM;
+}
+
+void TorcPWMInput::Start(void)
+{
+    SetValid(true);
+    TorcInput::Start();
 }
 
 double TorcPWMInput::ScaleValue(double Value)

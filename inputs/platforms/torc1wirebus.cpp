@@ -83,7 +83,7 @@ void Torc1WireBus::Create(const QVariantMap &Details)
     for ( ; i != Details.constEnd(); ++i)
     {
         // we look for 1Wire devices in <inputs>
-        if (i.key() != SENSORS_DIRECTORY)
+        if (i.key() != INPUTS_DIRECTORY)
             continue;
 
         QVariantMap wire1 = i.value().toMap();

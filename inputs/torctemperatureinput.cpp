@@ -30,9 +30,20 @@ TorcTemperatureInput::~TorcTemperatureInput()
 {
 }
 
+QStringList TorcTemperatureInput::GetDescription(void)
+{
+    return QStringList() << tr("Constant Temp");
+}
+
 TorcInput::Type TorcTemperatureInput::GetType(void)
 {
     return TorcInput::Temperature;
+}
+
+void TorcTemperatureInput::Start(void)
+{
+    SetValid(true);
+    TorcInput::Start();
 }
 
 double TorcTemperatureInput::CelsiusToFahrenheit(double Value)

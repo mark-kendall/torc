@@ -32,6 +32,11 @@ TorcTemperatureOutput::~TorcTemperatureOutput()
 {
 }
 
+QStringList TorcTemperatureOutput::GetDescription(void)
+{
+    return QStringList() << tr("Constant Temp");
+}
+
 TorcOutput::Type TorcTemperatureOutput::GetType(void)
 {
     return TorcOutput::Temperature;

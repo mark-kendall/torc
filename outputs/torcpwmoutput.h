@@ -16,6 +16,7 @@ class TorcPWMOutput : public TorcOutput
     TorcPWMOutput(double Value, const QString &ModelId, const QVariantMap &Details, uint MaxResolution = DEFAULT_PWM_RESOLUTION);
     virtual ~TorcPWMOutput();
 
+    QStringList      GetDescription   (void) Q_DECL_OVERRIDE;
     TorcOutput::Type GetType          (void) Q_DECL_OVERRIDE;
 
   public slots:

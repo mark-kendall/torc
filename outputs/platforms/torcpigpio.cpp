@@ -181,7 +181,7 @@ void TorcPiGPIO::Create(const QVariantMap &GPIO)
     for ( ; i != GPIO.constEnd(); ++i)
     {
         // GPIO can be under <sensors> or <outputs>
-        if (i.key() != SENSORS_DIRECTORY && i.key() != OUTPUTS_DIRECTORY)
+        if (i.key() != INPUTS_DIRECTORY && i.key() != OUTPUTS_DIRECTORY)
             continue;
 
         bool output = i.key() == OUTPUTS_DIRECTORY;

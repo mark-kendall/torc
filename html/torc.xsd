@@ -217,12 +217,58 @@
   </xs:choice>
 </xs:complexType>
 
+<xs:complexType name="constantSwitchType">
+  <xs:all>
+    <xs:element name="name"     type="deviceNameType"/>
+    <xs:element name="username" type="userNameType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="value"    type="switchNumberType"/>
+  </xs:all>
+</xs:complexType>
+
+<xs:complexType name="constantPWMType">
+  <xs:all>
+    <xs:element name="name"     type="deviceNameType"/>
+    <xs:element name="username" type="userNameType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="value"    type="pwmNumberType"/>
+  </xs:all>
+</xs:complexType>
+
+<xs:complexType name="constantTempType">
+  <xs:all>
+    <xs:element name="name"     type="deviceNameType"/>
+    <xs:element name="username" type="userNameType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="value"    type="tempNumberType"/>
+  </xs:all>
+</xs:complexType>
+
+<xs:complexType name="constantpHType">
+  <xs:all>
+    <xs:element name="name"     type="deviceNameType"/>
+    <xs:element name="username" type="userNameType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="value"    type="pHNumberType"/>
+  </xs:all>
+</xs:complexType>
+
+<xs:complexType name="constantInputType">
+  <xs:choice minOccurs="1" maxOccurs="unbounded">
+    <xs:element name="switch"      type="constantSwitchType"/>
+    <xs:element name="pwm"         type="constantPWMType"/>
+    <xs:element name="temperature" type="constantTempType"/>
+    <xs:element name="ph"          type="constantpHType"/>
+  </xs:choice>
+</xs:complexType>
+
 <!--TORC_XSD_INPUTTYPES-->
 <xs:complexType name="inputsType">
   <xs:all>
     <!-- 0 or 1 instances of each of these types in any order-->
-    <xs:element minOccurs="0" maxOccurs="1" name="network" type="networkInputType"/>
-    <xs:element minOccurs="0" maxOccurs="1" name="system"  type="systemInputType"/>
+    <xs:element minOccurs="0" maxOccurs="1" name="network"  type="networkInputType"/>
+    <xs:element minOccurs="0" maxOccurs="1" name="system"   type="systemInputType"/>
+    <xs:element minOccurs="0" maxOccurs="1" name="constant" type="constantInputType"/>
 <!--TORC_XSD_INPUTS-->
   </xs:all>
 </xs:complexType>
@@ -392,11 +438,21 @@
   </xs:choice>
 </xs:complexType>
 
+<xs:complexType name="constantOutputType">
+  <xs:choice minOccurs="1" maxOccurs="unbounded">
+    <xs:element name="switch"      type="constantSwitchType"/>
+    <xs:element name="pwm"         type="constantPWMType"/>
+    <xs:element name="temperature" type="constantTempType"/>
+    <xs:element name="ph"          type="constantpHType"/>
+  </xs:choice>
+</xs:complexType>
+
 <xs:complexType name="outputsType">
   <xs:all>
     <!-- 0 or 1 instances of these types -->
     <xs:element minOccurs="0" maxOccurs="1" name="network" type="networkOutputType"/>
     <xs:element minOccurs="0" maxOccurs="1" name="cameras" type="camerasType"/>
+    <xs:element minOccurs="0" maxOccurs="1" name="constant" type="constantOutputType"/>
 <!--TORC_XSD_OUTPUTS-->
   </xs:all>
 </xs:complexType>

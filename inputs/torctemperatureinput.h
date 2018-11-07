@@ -13,7 +13,9 @@ class TorcTemperatureInput : public TorcInput
                          const QString &ModelId, const QVariantMap &Details);
     virtual ~TorcTemperatureInput();
 
-    TorcInput::Type  GetType      (void) Q_DECL_OVERRIDE;
+    QStringList      GetDescription   (void) Q_DECL_OVERRIDE;
+    TorcInput::Type  GetType          (void) Q_DECL_OVERRIDE;
+    void             Start            (void) Q_DECL_OVERRIDE;
 
     static double CelsiusToFahrenheit (double Value);
     static double FahrenheitToCelsius (double Value);

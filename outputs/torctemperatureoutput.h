@@ -10,7 +10,8 @@ class TorcTemperatureOutput : public TorcOutput
     TorcTemperatureOutput(double Value, const QString &ModelId, const QVariantMap &Details);
     virtual ~TorcTemperatureOutput();
 
-    TorcOutput::Type GetType (void) Q_DECL_OVERRIDE;
+    QStringList      GetDescription (void) Q_DECL_OVERRIDE;
+    TorcOutput::Type GetType        (void) Q_DECL_OVERRIDE;
 };
 
 #endif // TORCTEMPERATUREOUTPUT_H
