@@ -143,6 +143,7 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
 
             if (eventHandlers[method]) {
                 eventHandlers[method].callback(eventHandlers[method].id, data.params);
+            }
         } else if (data.hasOwnProperty('error')) {
             // error...
 
