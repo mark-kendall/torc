@@ -128,7 +128,7 @@ void TorcLanguage::SetLanguageCode(const QString &Language)
     // ignore unknown
     if (!m_languages.contains(locale))
     {
-        LOG(VB_GENERAL, LOG_INFO, "Requested language not available - ignoring");
+        LOG(VB_GENERAL, LOG_INFO, QString("Requested language (%1) not available - ignoring").arg(Language));
         return;
     }
 
