@@ -41,7 +41,8 @@ class TorcNetworkRequest : public TorcReferenceCounter
 
   private:
     bool            WritePriv         (QNetworkReply *Reply, char* Buffer, int Size);
-    Q_DISABLE_COPY(TorcNetworkRequest)
+    TorcNetworkRequest(const TorcNetworkRequest &) Q_DECL_EQ_DELETE;
+    TorcNetworkRequest &operator=(const TorcNetworkRequest &) Q_DECL_EQ_DELETE;
 
   protected:
     // internal state/type

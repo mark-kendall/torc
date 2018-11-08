@@ -35,7 +35,7 @@ class TorcCameraParams
 {
   public:
     TorcCameraParams(void);
-    TorcCameraParams(const QVariantMap &Details);
+    explicit TorcCameraParams(const QVariantMap &Details);
     TorcCameraParams(const TorcCameraParams &Other);
 
     bool    m_valid;
@@ -57,7 +57,7 @@ class TorcCameraDevice : public QObject
     Q_OBJECT
 
   public:
-    TorcCameraDevice(const TorcCameraParams &Params);
+    explicit TorcCameraDevice(const TorcCameraParams &Params);
     virtual ~TorcCameraDevice();
 
     virtual bool     Setup           (void) = 0;

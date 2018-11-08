@@ -32,7 +32,8 @@ class TorcSerialiser
     QByteArray *m_content;
 
   private:
-    Q_DISABLE_COPY(TorcSerialiser)
+    TorcSerialiser(const TorcSerialiser &) Q_DECL_EQ_DELETE;
+    TorcSerialiser &operator=(const TorcSerialiser &) Q_DECL_EQ_DELETE;
 };
 
 class TorcSerialiserFactory

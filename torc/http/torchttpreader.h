@@ -23,7 +23,8 @@ class TorcHTTPReader
     void                   Reset            (void);
 
   private:
-    Q_DISABLE_COPY(TorcHTTPReader)
+    TorcHTTPReader(const TorcHTTPReader &) Q_DECL_EQ_DELETE;
+    TorcHTTPReader &operator=(const TorcHTTPReader &) Q_DECL_EQ_DELETE;
 
     bool                   m_ready;
     bool                   m_requestStarted;
