@@ -71,6 +71,14 @@
     </constant>
   </inputs>
   <controls>
+    <logic>
+      <passthrough>
+        <name>passthrough</name>
+        <userdescription>dummy</userdescription>
+        <inputs><device>networkinputtemp</device></inputs>
+        <outputs><device>networkoutputtemp</device></outputs>
+      </passthrough>
+    </logic>
     <timer>
       <custom>
         <name>customtimer</name>
