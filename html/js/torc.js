@@ -280,7 +280,7 @@ $(document).ready(function() {
                             $("#" + contentid).text(current + value);
                             if ($("#" + modalid)[0].scrollHeight > $("#" + modalid).height()) { $(".torclogtoggle").removeClass("invisible"); }
                             if (following === true) { $("#" + modalid).scrollTop($("#" + modalid)[0].scrollHeight - $("#" + modalid).height()); }
-                        };
+                        }
                     },
                     function (version, ignore, properties) {
                         $.each(properties, function (key, value) {
