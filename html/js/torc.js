@@ -202,12 +202,12 @@ $(document).ready(function() {
     }
 
     function addFileModal(name, title, menu, contentSource, contentType) {
-        var id          = name    + "torcmodal";
-        var contentid   = modalid + "content";
-        var menuid      = modalid + "menu";
+        var id          = name + "torcmodal";
+        var contentid   = id + "content";
+        var menuid      = id + "menu";
         $(".torc-navbar").after(template(theme.FileModal, { id, title, contentid }));
         var item = template(theme.DropdownItemWithIcon, { "icon": "file-text-o", "text": menu });
-        addDropdownMenuItem(usermenu, menuid, "#" + modalid, item,
+        addDropdownMenuItem(usermenu, menuid, "#" + id, item,
                             contentSource !== "" ?
                                 function () { $.ajax({ url: contentSource, dataType: contentType, xhrFields: { withCredentials: true }})
                                               .done(function (ignore, ignore2, xhr) { $("#" + contentid).text(xhr.responseText); }); } : "");
@@ -217,9 +217,9 @@ $(document).ready(function() {
     function addComplexModal(name, title, menu, setup, shown, hidden) {
         addFileModal(name, title, menu);
         var modalid = name + "torcmodal";
-        if (typeof setup  === "function") { setup(); };
-        if (typeof shown  === "function") { $("#" + modalid).on("show.bs.modal", shown); };
-        if (typeof hidden === "function") { $("#" + modalid).on("hidden.bs.modal", hidden); };
+        if (typeof setup  === "function") { setup(); }
+        if (typeof shown  === "function") { $("#" + modalid).on("show.bs.modal", shown); }
+        if (typeof hidden === "function") { $("#" + modalid).on("hidden.bs.modal", hidden); }
     }
 
     function addLogModal(name, title, menu) {
@@ -228,7 +228,7 @@ $(document).ready(function() {
         function load () {
             $.ajax({ url: "/services/log/GetLog", dataType: "text", xhrFields: { withCredentials: true }})
                 .done(function (ignore, ignore2, xhr) { $("#" + contentid).text(xhr.responseText); });
-        };
+        }
         addComplexModal(name, title, menu,
             function() { // setup
                 $("#" + modalid + " h4").replaceWith("<button type=\"button\" class=\"btn btn-info invisible torclogrefresh\">" + torc.RefreshTr + "</button>");
@@ -278,8 +278,8 @@ $(document).ready(function() {
                         if (name === "tail") {
                             var current = $("#" + contentid).text();
                             $("#" + contentid).text(current + value);
-                            if ($("#" + modalid)[0].scrollHeight > $("#" + modalid).height()) { $(".torclogtoggle").removeClass("invisible"); };
-                            if (following === true) { $("#" + modalid).scrollTop($("#" + modalid)[0].scrollHeight - $("#" + modalid).height()); };
+                            if ($("#" + modalid)[0].scrollHeight > $("#" + modalid).height()) { $(".torclogtoggle").removeClass("invisible"); }
+                            if (following === true) { $("#" + modalid).scrollTop($("#" + modalid)[0].scrollHeight - $("#" + modalid).height()); }
                         };
                     },
                     function (version, ignore, properties) {
