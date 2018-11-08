@@ -33,10 +33,10 @@ var TorcSubscription = function (socket, serviceName, servicePath, subscribedCha
         listeners[serviceProperty] = propertyChangedCallback;
     };
 
-    // callback for changes in property values. Properties are sent as an object with one property - 'value'
+    // callback for changes in property values. Properties are sent as an object with one property - "value"
     function propertyChanged(name, params) {
-        if (listeners[name] && typeof listeners[name] === 'function' &&
-            typeof params === 'object' && params.hasOwnProperty('value')) {
+        if (listeners[name] && typeof listeners[name] === "function" &&
+            typeof params === "object" && params.hasOwnProperty("value")) {
             listeners[name](name, params.value, serviceName);
         }
     }
@@ -49,8 +49,8 @@ var TorcSubscription = function (socket, serviceName, servicePath, subscribedCha
     // callback to notify successful subscription
     function subscribed(data) {
         // pre-validate the subscription return for the subscriber
-        if (typeof data === 'object' && data.hasOwnProperty('methods') &&
-            data.hasOwnProperty('properties') && typeof data.properties === 'object') {
+        if (typeof data === "object" && data.hasOwnProperty("methods") &&
+            data.hasOwnProperty("properties") && typeof data.properties === "object") {
             version = data.properties.serviceVersion.value;
             methods = data.methods;
             properties = data.properties;
@@ -65,7 +65,7 @@ var TorcSubscription = function (socket, serviceName, servicePath, subscribedCha
             properties = [];
         }
 
-        if (typeof subscribedChanged === 'function') { subscribedChanged(serviceName, version, methods, properties); }
+        if (typeof subscribedChanged === "function") { subscribedChanged(serviceName, version, methods, properties); }
     }
 
     // callback to notify subscription failed
@@ -73,13 +73,13 @@ var TorcSubscription = function (socket, serviceName, servicePath, subscribedCha
         version = [];
         methods = [];
         properties = [];
-        if (typeof subscribedChanged === 'function') { subscribedChanged(serviceName); }
+        if (typeof subscribedChanged === "function") { subscribedChanged(serviceName); }
     }
 
     this.unsubscribe = function () {
-        socket.call(servicePath + 'Unsubscribe');
+        socket.call(servicePath + "Unsubscribe");
     };
 
     // subscribe
-    socket.call(servicePath + 'Subscribe', null, subscribed, failed);
+    socket.call(servicePath + "Subscribe", null, subscribed, failed);
 };

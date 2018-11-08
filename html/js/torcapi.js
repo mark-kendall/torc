@@ -30,52 +30,52 @@ var template;
 var TorcAPI = function ($, torc, menu) {
     "use strict";
 
-    var torcconnection  = undefined;
-    var servicelist     = undefined;
-    var returnformats   = undefined;
-    var websocketprotos = undefined;
+    var torcconnection;
+    var servicelist;
+    var returnformats;
+    var websocketprotos;
 
     function setServiceDetail(Service, Methods, Properties) {
-        $('#' + theme.APIServiceDetail + Service).html(template(theme.APIServiceMethods, { "methods": Methods, "properties": Properties }));
+        $("#" + theme.APIServiceDetail + Service).html(template(theme.APIServiceMethods, { "methods": Methods, "properties": Properties }));
     }
 
     function load (Service) {
-        if (typeof torcconnection === 'object') {
-            if (servicelist === undefined) { servicelist = torcconnection.getServiceList(); }
-            if (returnformats === undefined) { returnformats = torcconnection.getReturnFormats(); }
-            if (websocketprotos === undefined) { websocketprotos = torcconnection.getWebSocketProtocols(); }
+        if (typeof torcconnection === "object") {
+            if (typeof servicelist === "undefined") { servicelist = torcconnection.getServiceList(); }
+            if (typeof returnformats === "undefined") { returnformats = torcconnection.getReturnFormats(); }
+            if (typeof websocketprotos === "undefined") { websocketprotos = torcconnection.getWebSocketProtocols(); }
         }
 
-        // these aren't going to change
-        if (typeof servicelist === 'object' && typeof returnformats === 'object' && typeof websocketprotos === 'object') {
+        // these aren"t going to change
+        if (typeof servicelist === "object" && typeof returnformats === "object" && typeof websocketprotos === "object") {
             // build the API page
-            $('.' + theme.APIModalContentID).html(template(theme.APIServiceList, { "services": servicelist, "formats": returnformats, "subprotocols": websocketprotos }));
+            $("." + theme.APIModalContentID).html(template(theme.APIServiceList, { "services": servicelist, "formats": returnformats, "subprotocols": websocketprotos }));
             // iterate over services
             Object.getOwnPropertyNames(servicelist).forEach( function(service) {
                 // make service collapse buttons dynamic (up/down)
-                var button = $('button[data-target="#api-detail-' + service + '"]');
-                $('#api-detail-' + service).on('hide.bs.collapse', function() {
+                var button = $("button[data-target=\"#api-detail-" + service + "\"]");
+                $("#api-detail-" + service).on("hide.bs.collapse", function() {
                     button.html(template(theme.APICollapseShow));
-                    $('#api-detail2-' + service).removeClass('bg-secondary');
+                    $("#api-detail2-" + service).removeClass("bg-secondary");
                 });
-                $('#api-detail-' + service).on('show.bs.collapse', function() {
-                    $('#api-detail2-' + service).addClass('bg-secondary');
+                $("#api-detail-" + service).on("show.bs.collapse", function() {
+                    $("#api-detail2-" + service).addClass("bg-secondary");
                     button.html(template(theme.APICollapseHide));
                     // scroll to top of selected service
                     // TODO make this animated - the scrollTop(0) is a hack that breaks animation
-                    $('#torc-api-modal').scrollTop(0);
-                    $('#torc-api-modal').scrollTop($('#api-detail2-' + service).offset().top);
+                    $("#torc-api-modal").scrollTop(0);
+                    $("#torc-api-modal").scrollTop($("#api-detail2-" + service).offset().top);
                 });
 
                 // load method/property details
                 var methods = torcconnection.getServiceMethods(service);
                 var properties = torcconnection.getServiceProperties(service);
                 // we are subscribed and details are available
-                if (methods !== undefined && properties !== undefined) {
+                if (typeof methods !== "undefined" && typeof properties !== "undefined") {
                     setServiceDetail(service, methods, properties);
                 } else {
                 // need to ask for details
-                    torcconnection.call('services', 'GetServiceDescription', { "Service": service }, function (result) {
+                    torcconnection.call("services", "GetServiceDescription", { "Service": service }, function (result) {
                         setServiceDetail(service, result.methods, result.properties); });
                 }
             });
@@ -84,11 +84,11 @@ var TorcAPI = function ($, torc, menu) {
 
     function clearAPI () {
         // remove the modal
-        $('#' + theme.APIModalID).remove();
+        $("#" + theme.APIModalID).remove();
     }
 
     this.cleanup = function () {
-        torcconnection = undefined;
+        torcconnection = null;
         clearAPI();
     };
 
@@ -97,12 +97,12 @@ var TorcAPI = function ($, torc, menu) {
         clearAPI();
 
         // add the modal
-        $('.torc-navbar').after(template(theme.APIModal, { "title": torc.ViewAPITitleTr }));
+        $(".torc-navbar").after(template(theme.APIModal, { "title": torc.ViewAPITitleTr }));
 
         // and the menu item to display the modal
         var item = template(theme.DropdownItemWithIcon, { "icon": "github", "text": torc.ViewAPITr });
-        $('.' + menu).append(template(theme.NavbarDropdownItem, {"id": theme.APIModalID + "-menu", "link": "#" + theme.APIModalID, "text": item }));
-        $('.' + theme.APIModalID + '-menu').attr('data-toggle', 'modal');
+        $("." + menu).append(template(theme.NavbarDropdownItem, {"id": theme.APIModalID + "-menu", "link": "#" + theme.APIModalID, "text": item }));
+        $("." + theme.APIModalID + "-menu").attr("data-toggle", "modal");
 
         load();
     };
