@@ -59,8 +59,8 @@ class TorcNetworkRequest : public TorcReferenceCounter
     QByteArray      m_buffer;
     int             m_readSize;
     int             m_redirectionCount;
-    TorcTimer      *m_readTimer;
-    TorcTimer      *m_writeTimer;
+    TorcTimer       m_readTimer;
+    TorcTimer       m_writeTimer;
 
     // for POST/PUT requests
     QByteArray     *m_postData;
