@@ -202,10 +202,10 @@ $(document).ready(function() {
     }
 
     function addFileModal(name, title, menu, contentSource, contentType) {
-        var modalid     = name    + "torcmodal";
+        var id          = name    + "torcmodal";
         var contentid   = modalid + "content";
         var menuid      = modalid + "menu";
-        $(".torc-navbar").after(template(theme.FileModal, { "id": modalid, "title": title, "contentid": contentid }));
+        $(".torc-navbar").after(template(theme.FileModal, { id, title, contentid }));
         var item = template(theme.DropdownItemWithIcon, { "icon": "file-text-o", "text": menu });
         addDropdownMenuItem(usermenu, menuid, "#" + modalid, item,
                             contentSource !== "" ?
