@@ -35,14 +35,14 @@ var TorcConnection = function ($, torc, statusChanged) {
     var that = this;
 
     this.call = function(serviceName, method, params, success, failure) {
-        if (socket === null)
-            return;
-        // call to a subscribed service
-        if (subscriptions[serviceName] && subscriptions[serviceName].methods[method]) {
-            socket.call(serviceList[serviceName].path + method, params, success, failure);
-        // just a call, no subscription
-        } else if (serviceList.hasOwnProperty(serviceName)) {
-            socket.call(serviceList[serviceName].path + method, params, success, failure);
+        if (socket !== null) {
+            // call to a subscribed service
+            if (subscriptions[serviceName] && subscriptions[serviceName].methods[method]) {
+                socket.call(serviceList[serviceName].path + method, params, success, failure);
+            // just a call, no subscription
+            } else if (serviceList.hasOwnProperty(serviceName)) {
+                socket.call(serviceList[serviceName].path + method, params, success, failure);
+            }
         }
     };
 
