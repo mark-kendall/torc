@@ -126,10 +126,9 @@ class TorcCameraOutput Q_DECL_FINAL : public TorcOutput
     void             Start              (void) Q_DECL_OVERRIDE;
     void             Stop               (void) Q_DECL_OVERRIDE;
     QString          GetPresentationURL (void) Q_DECL_OVERRIDE;
-
-  public slots:
     void             ProcessHTTPRequest (const QString &PeerAddress, int PeerPort, const QString &LocalAddress,
                                          int LocalPort, TorcHTTPRequest &Request) Q_DECL_OVERRIDE;
+  public slots:
     void             WritingStarted     (void);
     void             WritingStopped     (void);
     void             CameraErrored      (bool Errored);
@@ -157,7 +156,6 @@ class TorcCameraOutputs Q_DECL_FINAL : public TorcDeviceHandler
 {
   public:
     TorcCameraOutputs();
-    ~TorcCameraOutputs();
 
     static TorcCameraOutputs *gCameraOutputs;
 

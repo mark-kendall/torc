@@ -296,7 +296,8 @@ TorcCameraParams TorcCameraThread::GetParams(void)
 }
 
 TorcCameraOutput::TorcCameraOutput(const QString &ModelId, const QVariantMap &Details)
-  : TorcOutput(TorcOutput::Camera, 0.0, ModelId, Details),
+  : TorcOutput(TorcOutput::Camera, 0.0, ModelId, Details, this, TorcCameraOutput::staticMetaObject,
+               "WritingStarted,WritingStopped,CameraErrored,SegmentRemoved,InitSegmentReady,SegmentReady"),
     m_thread(NULL),
     m_threadLock(QReadWriteLock::Recursive),
     m_params(TorcCameraParams(Details)),
@@ -648,13 +649,9 @@ TorcCameraOutputs::TorcCameraOutputs()
 {
 }
 
-TorcCameraOutputs::~TorcCameraOutputs()
-{
-}
-
 void TorcCameraOutputs::Create(const QVariantMap &Details)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(&m_lock);
 
     QVariantMap::const_iterator ii = Details.constBegin();
     for ( ; ii != Details.constEnd(); ++ii)
@@ -730,7 +727,7 @@ void TorcCameraOutputs::Create(const QVariantMap &Details)
 
 void TorcCameraOutputs::Destroy(void)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(&m_lock);
     QHash<QString, TorcCameraOutput*>::iterator it = m_cameras.begin();
     for ( ; it != m_cameras.end(); ++it)
     {

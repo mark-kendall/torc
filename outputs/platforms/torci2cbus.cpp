@@ -66,7 +66,7 @@ TorcI2CBus::TorcI2CBus()
 
 void TorcI2CBus::Create(const QVariantMap &Details)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(&m_lock);
 
     QVariantMap::const_iterator i = Details.constBegin();
     for ( ; i != Details.constEnd(); ++i)
@@ -133,7 +133,7 @@ void TorcI2CBus::Create(const QVariantMap &Details)
 
 void TorcI2CBus::Destroy(void)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(&m_lock);
 
     qDeleteAll(m_devices);
     m_devices.clear();
