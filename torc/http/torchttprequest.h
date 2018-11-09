@@ -157,7 +157,7 @@ class TorcHTTPRequest
     bool                   GetAllowCORS             (void) const;
     void                   Respond                  (QTcpSocket *Socket);
     void                   Redirected               (const QString &Redirected);
-    TorcSerialiser*        GetSerialiser            (void);
+    void                   Serialise                (const QVariant &Data, const QString &Type);
     bool                   Unmodified               (const QDateTime &LastModified);
     bool                   Unmodified               (void);
     void                   Authorise                (HTTPAuthorisation Authorisation);

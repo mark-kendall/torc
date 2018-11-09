@@ -134,10 +134,7 @@ void TorcHTTPServices::ProcessHTTPRequest(const QString &PeerAddress, int PeerPo
                 }
 
                 Request.SetStatus(HTTP_OK);
-                TorcSerialiser *serialiser = Request.GetSerialiser();
-                Request.SetResponseType(serialiser->ResponseType());
-                Request.SetResponseContent(serialiser->Serialise(result, type));
-                delete serialiser;
+                Request.Serialise(result, type);
             }
             else
             {

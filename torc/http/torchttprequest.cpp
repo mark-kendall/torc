@@ -1044,9 +1044,12 @@ QString TorcHTTPRequest::RangeToString(const QPair<quint64, quint64> &Range, qin
     return QString("%1-%2/%3").arg(Range.first).arg(Range.second).arg(Size);
 }
 
-TorcSerialiser* TorcHTTPRequest::GetSerialiser(void)
+void TorcHTTPRequest::Serialise(const QVariant &Data, const QString &Type)
 {
-    return TorcSerialiser::GetSerialiser(m_headers.value("Accept"));
+    TorcSerialiser *serialiser = TorcSerialiser::GetSerialiser(m_headers.value("Accept"));
+    SetResponseType(serialiser->ResponseType());
+    SetResponseContent(serialiser->Serialise(Data, Type));
+    delete serialiser;
 }
 
 /*! \brief Return true if the resource is unmodified.

@@ -469,11 +469,7 @@ void TorcHTTPService::ProcessHTTPRequest(const QString &PeerAddress, int PeerPor
         }
 
         Request.SetStatus(HTTP_OK);
-        TorcSerialiser *serialiser = Request.GetSerialiser();
-        Request.SetResponseType(serialiser->ResponseType());
-        Request.SetResponseContent(serialiser->Serialise(m_version, "version"));
-        delete serialiser;
-
+        Request.Serialise(m_version, "version");
         return;
     }
 
@@ -516,11 +512,8 @@ void TorcHTTPService::ProcessHTTPRequest(const QString &PeerAddress, int PeerPor
                 return;
             }
 
-            TorcSerialiser *serialiser = Request.GetSerialiser();
-            Request.SetResponseType(serialiser->ResponseType());
-            Request.SetResponseContent(serialiser->Serialise(result, type));
+            Request.Serialise(result, type);
             Request.SetAllowGZip(true);
-            delete serialiser;
         }
         else
         {
