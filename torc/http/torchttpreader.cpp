@@ -38,24 +38,22 @@ TorcHTTPReader::TorcHTTPReader()
     m_contentLength(0),
     m_contentReceived(0),
     m_method(QString()),
-    m_content(new QByteArray()),
-    m_headers(new QMap<QString,QString>())
+    m_content(),
+    m_headers()
 {
 }
 
 TorcHTTPReader::~TorcHTTPReader()
 {
-    delete m_content;
-    delete m_headers;
 }
 
 ///\brief Take ownership of the contents and headers. New owner is responsible for deleting.
-void TorcHTTPReader::TakeRequest(QByteArray*& Content, QMap<QString,QString>*& Headers)
+void TorcHTTPReader::TakeRequest(QByteArray& Content, QMap<QString,QString>& Headers)
 {
     Content   = m_content;
     Headers   = m_headers;
-    m_content = NULL;
-    m_headers = NULL;
+    m_content = QByteArray();
+    m_headers = QMap<QString,QString>();
 }
 
 bool TorcHTTPReader::IsReady(void) const
@@ -76,9 +74,6 @@ bool TorcHTTPReader::HeadersComplete(void) const
 ///\brief Reset the read state
 void TorcHTTPReader::Reset(void)
 {
-    delete m_content;
-    delete m_headers;
-
     m_ready           = false;
     m_requestStarted  = false;
     m_headersComplete = false;
@@ -86,8 +81,8 @@ void TorcHTTPReader::Reset(void)
     m_contentLength   = 0;
     m_contentReceived = 0;
     m_method          = QString();
-    m_content         = new QByteArray();
-    m_headers         = new QMap<QString,QString>();
+    m_content         = QByteArray();
+    m_headers         = QMap<QString,QString>();
 }
 
 /*! \brief Read and parse data from the given socket.
@@ -169,7 +164,7 @@ bool TorcHTTPReader::Read(QTcpSocket *Socket)
 
                     LOG(VB_NETWORK, LOG_DEBUG, QString("%1: %2").arg(key.data()).arg(value.data()));
 
-                    m_headers->insert(key, value);
+                    m_headers.insert(key, value);
                 }
             }
 
@@ -190,8 +185,8 @@ bool TorcHTTPReader::Read(QTcpSocket *Socket)
            Socket->state() == QAbstractSocket::ConnectedState)
     {
         static quint64 MAX_CHUNK = 32 * 1024;
-        m_content->append(Socket->read(qMax(m_contentLength - m_contentReceived, qMax(MAX_CHUNK, (quint64)Socket->bytesAvailable()))));
-        m_contentReceived = m_content->size();
+        m_content.append(Socket->read(qMax(m_contentLength - m_contentReceived, qMax(MAX_CHUNK, (quint64)Socket->bytesAvailable()))));
+        m_contentReceived = m_content.size();
     }
 
     // loop if we need more data

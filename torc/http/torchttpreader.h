@@ -13,7 +13,7 @@ class TorcHTTPReader
     TorcHTTPReader();
    ~TorcHTTPReader();
 
-    void                   TakeRequest      (QByteArray*& Content, QMap<QString,QString>*& Headers);
+    void                   TakeRequest      (QByteArray& Content, QMap<QString,QString>& Headers);
     QString                GetMethod        (void) const;
     bool                   Read             (QTcpSocket *Socket);
     bool                   IsReady          (void) const;
@@ -23,9 +23,6 @@ class TorcHTTPReader
     void                   Reset            (void);
 
   private:
-    TorcHTTPReader(const TorcHTTPReader &) Q_DECL_EQ_DELETE;
-    TorcHTTPReader &operator=(const TorcHTTPReader &) Q_DECL_EQ_DELETE;
-
     bool                   m_ready;
     bool                   m_requestStarted;
     bool                   m_headersComplete;
@@ -33,8 +30,8 @@ class TorcHTTPReader
     quint64                m_contentLength;
     quint64                m_contentReceived;
     QString                m_method;
-    QByteArray            *m_content;
-    QMap<QString,QString> *m_headers;
+    QByteArray             m_content;
+    QMap<QString,QString>  m_headers;
 };
 
 #endif // TORCHTTPREADER_H

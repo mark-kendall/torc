@@ -78,9 +78,9 @@ TorcHTTPRequest::TorcHTTPRequest(TorcHTTPReader *Reader)
     m_protocol(HTTPUnknownProtocol),
     m_connection(HTTPConnectionClose),
     m_ranges(),
-    m_headers(NULL),
+    m_headers(),
     m_queries(),
-    m_content(NULL),
+    m_content(),
     m_secure(false),
     m_allowGZip(false),
     m_allowCORS(false),
@@ -170,7 +170,7 @@ void TorcHTTPRequest::Initialise(const QString &Method)
     if (m_protocol > HTTPOneDotZero)
         m_connection = HTTPConnectionKeepAlive;
 
-    QString connection = m_headers->value("Connection").toLower();
+    QString connection = m_headers.value("Connection").toLower();
 
     if (connection == "keep-alive")
         m_connection = HTTPConnectionKeepAlive;
@@ -182,8 +182,6 @@ void TorcHTTPRequest::Initialise(const QString &Method)
 
 TorcHTTPRequest::~TorcHTTPRequest()
 {
-    delete m_headers;
-    delete m_content;
     delete m_responseContent;
 
     if (m_responseFile)
@@ -323,7 +321,7 @@ QString TorcHTTPRequest::GetCache(void) const
     return m_cacheTag;
 }
 
-const QMap<QString,QString>* TorcHTTPRequest::Headers(void) const
+const QMap<QString,QString>& TorcHTTPRequest::Headers(void) const
 {
     return m_headers;
 }
@@ -372,9 +370,9 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
     static QByteArray seperator("\r\n--STaRT\r\n");
     QList<QByteArray> partheaders;
 
-    if (m_headers->contains("Range") && m_responseStatus == HTTP_OK)
+    if (m_headers.contains("Range") && m_responseStatus == HTTP_OK)
     {
-        m_ranges = StringToRanges(m_headers->value("Range"), totalsize, sendsize);
+        m_ranges = StringToRanges(m_headers.value("Range"), totalsize, sendsize);
 
         if (m_ranges.isEmpty())
         {
@@ -438,7 +436,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
     //  - there is some content and it is smaller than 1Mb in size (arbitrary limit)
     //  - the response is not a range request with single or multipart response
     if (m_allowGZip && totalsize > 0 && totalsize < 0x100000 && TorcCoreUtils::HasZlib() && m_responseStatus == HTTP_OK &&
-        m_headers->contains("Accept-Encoding") && m_headers->value("Accept-Encoding").contains("gzip", Qt::CaseInsensitive))
+        m_headers.contains("Accept-Encoding") && m_headers.value("Accept-Encoding").contains("gzip", Qt::CaseInsensitive))
     {
         if (m_responseContent)
             SetResponseContent(TorcCoreUtils::GZipCompress(m_responseContent));
@@ -1055,7 +1053,7 @@ QString TorcHTTPRequest::RangeToString(const QPair<quint64, quint64> &Range, qin
 
 TorcSerialiser* TorcHTTPRequest::GetSerialiser(void)
 {
-    return TorcSerialiser::GetSerialiser(m_headers->value("Accept"));
+    return TorcSerialiser::GetSerialiser(m_headers.value("Accept"));
 }
 
 /*! \brief Return true if the resource is unmodified.
@@ -1065,9 +1063,9 @@ TorcSerialiser* TorcHTTPRequest::GetSerialiser(void)
 */
 bool TorcHTTPRequest::Unmodified(const QDateTime &LastModified)
 {
-    if ((m_cache & HTTPCacheLastModified) && m_headers->contains("If-Modified-Since"))
+    if ((m_cache & HTTPCacheLastModified) && m_headers.contains("If-Modified-Since"))
     {
-        QDateTime since = QDateTime::fromString(m_headers->value("If-Modified-Since"), DateFormat);
+        QDateTime since = QDateTime::fromString(m_headers.value("If-Modified-Since"), DateFormat);
 
         if (LastModified <= since)
         {
@@ -1090,9 +1088,9 @@ bool TorcHTTPRequest::Unmodified(const QDateTime &LastModified)
 */
 bool TorcHTTPRequest::Unmodified(void)
 {
-    if ((m_cache & HTTPCacheETag) && !m_cacheTag.isEmpty() && m_headers->contains("If-None-Match"))
+    if ((m_cache & HTTPCacheETag) && !m_cacheTag.isEmpty() && m_headers.contains("If-None-Match"))
     {
-        if (m_cacheTag == m_headers->value("If-None-Match"))
+        if (m_cacheTag == m_headers.value("If-None-Match"))
         {
             SetStatus(HTTP_NotModified);
             SetResponseType(HTTPResponseNone);

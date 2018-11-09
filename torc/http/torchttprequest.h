@@ -152,7 +152,7 @@ class TorcHTTPRequest
     QString                GetPath                  (void) const;
     QString                GetMethod                (void) const;
     QString                GetCache                 (void) const;
-    const QMap<QString,QString>* Headers            (void) const;
+    const QMap<QString,QString>& Headers            (void) const;
     const QMap<QString,QString>& Queries            (void) const;
     bool                   GetAllowCORS             (void) const;
     void                   Respond                  (QTcpSocket *Socket);
@@ -178,9 +178,9 @@ class TorcHTTPRequest
     HTTPProtocol           m_protocol;
     HTTPConnection         m_connection;
     QList<QPair<quint64,quint64> > m_ranges;
-    QMap<QString,QString> *m_headers;
+    QMap<QString,QString>  m_headers;
     QMap<QString,QString>  m_queries;
-    QByteArray            *m_content;
+    QByteArray             m_content;
     bool                   m_secure;
 
     bool                   m_allowGZip;
