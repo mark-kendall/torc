@@ -36,7 +36,7 @@ class TorcSegmentedRingBuffer : public QObject
 
   protected:
     int                     m_size;
-    uint8_t*                m_data;
+    QByteArray              m_data;
     int                     m_readPosition;
     int                     m_writePosition;
     int                     m_currentSize;
