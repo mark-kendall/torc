@@ -15,7 +15,7 @@ class TorcCoreUtils
     static void        QtMessage             (QtMsgType Type, const QMessageLogContext &Context, const QString &Message);
     static bool        HasZlib               (void);
     static QByteArray  GZipCompress          (QByteArray &Source);
-    static QByteArray  GZipCompressFile      (QFile *Source);
+    static QByteArray  GZipCompressFile      (QFile &Source);
 };
 
 #endif // TORCCOREUTILS_H

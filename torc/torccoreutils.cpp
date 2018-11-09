@@ -199,7 +199,7 @@ QByteArray TorcCoreUtils::GZipCompress(QByteArray &Source)
  * The returned data is suitable for sending as part of an HTTP response when the requestor accepts
  * gzip compression.
 */
-QByteArray TorcCoreUtils::GZipCompressFile(QFile *Source)
+QByteArray TorcCoreUtils::GZipCompressFile(QFile &Source)
 {
     QByteArray result;
 
@@ -208,7 +208,7 @@ QByteArray TorcCoreUtils::GZipCompressFile(QFile *Source)
     return result;
 #else
     // this shouldn't happen
-    if (!Source || Source->size() < 0)
+    if (Source.size() < 0)
         return result;
 
     // initialise zlib (see zlib usage examples)
@@ -228,22 +228,23 @@ QByteArray TorcCoreUtils::GZipCompressFile(QFile *Source)
     }
 
     // this should have been checked already
-    if (!Source->open(QIODevice::ReadOnly))
-        return result;
+    if (!Source.isOpen())
+        if (!Source.open(QIODevice::ReadOnly))
+            return result;
 
-    while (Source->bytesAvailable() > 0)
+    while (Source.bytesAvailable() > 0)
     {
         stream.avail_out = chunksize;
         stream.next_out  = (Bytef*)outputbuffer;
 
-        qint64 read = Source->read(inputbuffer, qMin(Source->bytesAvailable(), (qint64)chunksize));
+        qint64 read = Source.read(inputbuffer, qMin(Source.bytesAvailable(), (qint64)chunksize));
 
         if (read > 0)
         {
             stream.avail_in = read;
             stream.next_in  = (Bytef*)inputbuffer;
 
-            int error = deflate(&stream, Source->bytesAvailable() ? Z_SYNC_FLUSH : Z_FINISH);
+            int error = deflate(&stream, Source.bytesAvailable() ? Z_SYNC_FLUSH : Z_FINISH);
 
             if (error == Z_OK || error == Z_STREAM_END)
             {
