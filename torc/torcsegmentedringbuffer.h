@@ -46,9 +46,6 @@ class TorcSegmentedRingBuffer : public QObject
     QQueue<int>             m_segmentRefs;
     int                     m_segmentCounter;
     QByteArray              m_initSegment;
-
-  private:
-    Q_DISABLE_COPY(TorcSegmentedRingBuffer)
 };
 
 #endif // TORCSEGMENTEDRINGBUFFER_H
