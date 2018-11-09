@@ -380,7 +380,7 @@ void TorcNetwork::GetSafe(TorcNetworkRequest* Request)
         else if (Request->m_type == QNetworkAccessManager::HeadOperation)
             reply = head(Request->m_request);
         else if (Request->m_type == QNetworkAccessManager::PostOperation)
-            reply = post(Request->m_request, *Request->m_postData);
+            reply = post(Request->m_request, Request->m_postData);
 
         if (!reply)
         {

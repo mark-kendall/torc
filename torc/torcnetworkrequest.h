@@ -41,8 +41,6 @@ class TorcNetworkRequest : public TorcReferenceCounter
 
   private:
     bool            WritePriv         (QNetworkReply *Reply, char* Buffer, int Size);
-    TorcNetworkRequest(const TorcNetworkRequest &) Q_DECL_EQ_DELETE;
-    TorcNetworkRequest &operator=(const TorcNetworkRequest &) Q_DECL_EQ_DELETE;
 
   protected:
     // internal state/type
@@ -64,7 +62,7 @@ class TorcNetworkRequest : public TorcReferenceCounter
     TorcTimer       m_writeTimer;
 
     // for POST/PUT requests
-    QByteArray     *m_postData;
+    const QByteArray m_postData;
 
     // QNetworkReply state
     bool            m_replyFinished;
@@ -84,7 +82,7 @@ class TorcNetworkRequest : public TorcReferenceCounter
     bool            m_byteServingAvailable;
 };
 
-Q_DECLARE_METATYPE(TorcNetworkRequest*);
-Q_DECLARE_METATYPE(QNetworkReply*);
+Q_DECLARE_METATYPE(TorcNetworkRequest*)
+Q_DECLARE_METATYPE(QNetworkReply*)
 
 #endif // TORCNETWORKREQUEST_H

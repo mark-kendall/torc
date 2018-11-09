@@ -68,7 +68,7 @@ TorcNetworkRequest::TorcNetworkRequest(const QNetworkRequest Request, QNetworkAc
     m_redirectionCount(0),
     m_readTimer(),
     m_writeTimer(),
-    m_postData(NULL),
+    m_postData(),
     m_replyFinished(false),
     m_replyBytesAvailable(0),
     m_bytesReceived(0),
@@ -105,7 +105,7 @@ TorcNetworkRequest::TorcNetworkRequest(const QNetworkRequest Request, const QByt
     m_redirectionCount(0),
     m_readTimer(),
     m_writeTimer(),
-    m_postData(new QByteArray(PostData)),
+    m_postData(PostData),
     m_replyFinished(false),
     m_replyBytesAvailable(0),
     m_bytesReceived(0),
@@ -124,8 +124,6 @@ TorcNetworkRequest::TorcNetworkRequest(const QNetworkRequest Request, const QByt
 
 TorcNetworkRequest::~TorcNetworkRequest()
 {
-    delete m_postData;
-    m_postData   = NULL;
 }
 
 int TorcNetworkRequest::BytesAvailable(void)
