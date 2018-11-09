@@ -135,7 +135,7 @@ class TorcHTTPRequest
     void                   SetConnection            (HTTPConnection Connection);
     void                   SetStatus                (HTTPStatus Status);
     void                   SetResponseType          (HTTPResponseType Type);
-    void                   SetResponseContent       (QByteArray *Content);
+    void                   SetResponseContent       (const QByteArray &Content);
     void                   SetResponseFile          (QFile *File);
     void                   SetResponseHeader        (const QString &Header, const QString &Value);
     void                   SetAllowed               (int Allowed);
@@ -191,7 +191,7 @@ class TorcHTTPRequest
     int                    m_cache;
     QString                m_cacheTag;
     HTTPStatus             m_responseStatus;
-    QByteArray            *m_responseContent;
+    QByteArray             m_responseContent;
     QFile                 *m_responseFile;
     QMap<QString,QString>  m_responseHeaders;
 

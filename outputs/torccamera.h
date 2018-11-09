@@ -63,8 +63,8 @@ class TorcCameraDevice : public QObject
     virtual bool     Setup           (void) = 0;
     virtual bool     WriteFrame      (void) = 0;
     virtual bool     Stop            (void) = 0;
-    QByteArray*      GetSegment      (int Segment);
-    QByteArray*      GetInitSegment  (void);
+    QByteArray       GetSegment      (int Segment);
+    QByteArray       GetInitSegment  (void);
     TorcCameraParams GetParams       (void);
 
   signals:
@@ -93,8 +93,8 @@ class TorcCameraThread Q_DECL_FINAL : public TorcQThread
 
     void              Start          (void) Q_DECL_OVERRIDE;
     void              Finish         (void) Q_DECL_OVERRIDE;
-    QByteArray*       GetSegment     (int Segment);
-    QByteArray*       GetInitSegment (void);
+    QByteArray        GetSegment     (int Segment);
+    QByteArray        GetInitSegment (void);
     TorcCameraParams  GetParams      (void);
 
   public slots:
@@ -137,10 +137,10 @@ class TorcCameraOutput Q_DECL_FINAL : public TorcOutput
     void             SegmentReady       (int Segment);
 
   private:
-    QByteArray*      GetMasterPlaylist  (void);
-    QByteArray*      GetHLSPlaylist     (void);
-    QByteArray*      GetPlayerPage      (void);
-    QByteArray*      GetDashPlaylist    (void);
+    QByteArray       GetMasterPlaylist  (void);
+    QByteArray       GetHLSPlaylist     (void);
+    QByteArray       GetPlayerPage      (void);
+    QByteArray       GetDashPlaylist    (void);
 
   private:
     Q_DISABLE_COPY(TorcCameraOutput)

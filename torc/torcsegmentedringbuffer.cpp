@@ -226,27 +226,27 @@ void TorcSegmentedRingBuffer::SaveInitSegment(void)
     emit InitSegmentReady();
 }
 
-QByteArray* TorcSegmentedRingBuffer::GetSegment(int SegmentRef)
+QByteArray TorcSegmentedRingBuffer::GetSegment(int SegmentRef)
 {
     if (SegmentRef < 0)
-        return NULL;
+        return QByteArray();
 
     QReadLocker locker1(&m_segmentsLock);
 
     if (!m_segmentRefs.contains(SegmentRef))
-        return NULL;
+        return QByteArray();
 
     QPair<int,int> segment = m_segments[m_segmentRefs.indexOf(SegmentRef)];
-    QByteArray *result = new QByteArray(segment.second, '0');
+    QByteArray result(segment.second, '0');
     int read = qMin(segment.second, m_size - segment.first);
-    memcpy(result->data(), m_data.data() + segment.first, read);
+    memcpy(result.data(), m_data.data() + segment.first, read);
     if (read < segment.second)
-        memcpy(result->data() + read, m_data.data(), segment.second - read);
+        memcpy(result.data() + read, m_data.data(), segment.second - read);
     return result;
 }
 
-QByteArray* TorcSegmentedRingBuffer::GetInitSegment(void)
+QByteArray TorcSegmentedRingBuffer::GetInitSegment(void)
 {
     QReadLocker locker(&m_segmentsLock);
-    return new QByteArray(m_initSegment.constData(), m_initSegment.size());
+    return m_initSegment;
 }

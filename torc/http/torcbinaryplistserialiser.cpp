@@ -28,7 +28,7 @@
 
 #include <stdint.h>
 
-#define START_OBJECT { m_objectOffsets.append(m_content->size()); }
+#define START_OBJECT { m_objectOffsets.append(Dest.size()); }
 
 /*! \class TorcBinaryPListSerialiser
  *  \brief Data serialiser for the Apple binary property list format
@@ -39,7 +39,6 @@
 TorcBinaryPListSerialiser::TorcBinaryPListSerialiser()
   : TorcSerialiser(),
     m_referenceSize(8),
-    m_codec(QTextCodec::codecForName("UTF-16BE")),
     m_objectOffsets(),
     m_strings()
 {
@@ -87,18 +86,18 @@ HTTPResponseType TorcBinaryPListSerialiser::ResponseType(void)
     return HTTPResponseBinaryPList;
 }
 
-void TorcBinaryPListSerialiser::Prepare(void)
+void TorcBinaryPListSerialiser::Prepare(QByteArray &)
 {
 }
 
-void TorcBinaryPListSerialiser::Begin(void)
+void TorcBinaryPListSerialiser::Begin(QByteArray &Dest)
 {
-    m_content->reserve(1024);
+    Dest.reserve(1024);
     m_objectOffsets.clear();
-    m_content->append("bplist00");
+    Dest.append("bplist00");
 }
 
-void TorcBinaryPListSerialiser::AddProperty(const QString &Name, const QVariant &Value)
+void TorcBinaryPListSerialiser::AddProperty(QByteArray &Dest, const QString &Name, const QVariant &Value)
 {
     // this is the maximum count before string optimisation
     quint64 count = 2;
@@ -111,18 +110,18 @@ void TorcBinaryPListSerialiser::AddProperty(const QString &Name, const QVariant 
                       count < 0xffffffff ? 4 : 8;
 
     START_OBJECT
-    m_content->append(0xd1);
-    quint64 offset = m_content->size();
+    Dest.append(0xd1);
+    quint64 offset = Dest.size();
     QByteArray references(2 * m_referenceSize, 0);
-    m_content->append(references);
+    Dest.append(references);
 
-    WriteReference(BinaryFromQString(Name), m_referenceSize, (quint8*)m_content->data(), offset);
-    WriteReference(BinaryFromVariant(Name, Value), m_referenceSize, (quint8*)m_content->data(), offset);
+    WriteReference(BinaryFromQString(Dest, Name), m_referenceSize, (quint8*)Dest.data(), offset);
+    WriteReference(BinaryFromVariant(Dest, Name, Value), m_referenceSize, (quint8*)Dest.data(), offset);
 }
 
-void TorcBinaryPListSerialiser::End(void)
+void TorcBinaryPListSerialiser::End(QByteArray &Dest)
 {
-    quint64 table = m_content->size();
+    quint64 table = Dest.size();
 
     quint8 offsetsize = table < 0x000000ff ? 1 :
                         table < 0x0000ffff ? 2 :
@@ -134,7 +133,7 @@ void TorcBinaryPListSerialiser::End(void)
         case 1:
         {
             for ( ; it != m_objectOffsets.end(); ++it)
-                m_content->append((quint8)((*it) & 0xff));
+                Dest.append((quint8)((*it) & 0xff));
             break;
         }
         case 2:
@@ -142,8 +141,8 @@ void TorcBinaryPListSerialiser::End(void)
             for ( ; it != m_objectOffsets.end(); ++it)
             {
                 quint16 buffer = qToBigEndian((quint16)((*it) & 0xffff));
-                m_content->append(*((quint8*)&buffer));
-                m_content->append(*((quint8*)&buffer + 1));
+                Dest.append(*((quint8*)&buffer));
+                Dest.append(*((quint8*)&buffer + 1));
             }
             break;
         }
@@ -152,10 +151,10 @@ void TorcBinaryPListSerialiser::End(void)
             for ( ; it != m_objectOffsets.end(); ++it)
             {
                 quint32 buffer= qToBigEndian((quint32)((*it) & 0xffffffff));
-                m_content->append(*((quint8*)&buffer));
-                m_content->append(*((quint8*)&buffer + 1));
-                m_content->append(*((quint8*)&buffer + 2));
-                m_content->append(*((quint8*)&buffer + 3));
+                Dest.append(*((quint8*)&buffer));
+                Dest.append(*((quint8*)&buffer + 1));
+                Dest.append(*((quint8*)&buffer + 2));
+                Dest.append(*((quint8*)&buffer + 3));
             }
             break;
         }
@@ -164,14 +163,14 @@ void TorcBinaryPListSerialiser::End(void)
             for ( ; it != m_objectOffsets.end(); ++it)
             {
                 quint64 buffer = qToBigEndian((*it));
-                m_content->append(*((quint8*)&buffer));
-                m_content->append(*((quint8*)&buffer + 1));
-                m_content->append(*((quint8*)&buffer + 2));
-                m_content->append(*((quint8*)&buffer + 3));
-                m_content->append(*((quint8*)&buffer + 4));
-                m_content->append(*((quint8*)&buffer + 5));
-                m_content->append(*((quint8*)&buffer + 6));
-                m_content->append(*((quint8*)&buffer + 7));
+                Dest.append(*((quint8*)&buffer));
+                Dest.append(*((quint8*)&buffer + 1));
+                Dest.append(*((quint8*)&buffer + 2));
+                Dest.append(*((quint8*)&buffer + 3));
+                Dest.append(*((quint8*)&buffer + 4));
+                Dest.append(*((quint8*)&buffer + 5));
+                Dest.append(*((quint8*)&buffer + 6));
+                Dest.append(*((quint8*)&buffer + 7));
             }
             break;
         }
@@ -202,18 +201,18 @@ void TorcBinaryPListSerialiser::End(void)
     trailer[30] = *((quint8*)&table + 6);
     trailer[31] = *((quint8*)&table + 7);
 
-    m_content->append(trailer);
+    Dest.append(trailer);
 
     LOG(VB_GENERAL, LOG_INFO, QString("Actual object count %1").arg(m_objectOffsets.count()));
 
 #if 1
-    QByteArray testdata(m_content->data(), m_content->size());
+    QByteArray testdata(Dest.data(), Dest.size());
     TorcPList test(testdata);
     LOG(VB_GENERAL, LOG_INFO, "\n" + test.ToString());
 #endif
 }
 
-quint64 TorcBinaryPListSerialiser::BinaryFromVariant(const QString &Name, const QVariant &Value)
+quint64 TorcBinaryPListSerialiser::BinaryFromVariant(QByteArray &Dest, const QString &Name, const QVariant &Value)
 {
     // object formats not used; null, fill, data, ascii string, uid, set
 
@@ -221,14 +220,14 @@ quint64 TorcBinaryPListSerialiser::BinaryFromVariant(const QString &Name, const 
 
     switch ((int)Value.type())
     {
-        case QMetaType::QVariantList: return BinaryFromArray(Name, Value.toList());
-        case QMetaType::QStringList:  return BinaryFromStringList(Name, Value.toStringList());
-        case QMetaType::QVariantMap:  return BinaryFromMap(Name, Value.toMap());
+        case QMetaType::QVariantList: return BinaryFromArray(Dest, Name, Value.toList());
+        case QMetaType::QStringList:  return BinaryFromStringList(Dest, Name, Value.toStringList());
+        case QMetaType::QVariantMap:  return BinaryFromMap(Dest, Name, Value.toMap());
         case QMetaType::Bool:
         {
             START_OBJECT
             bool value = Value.toBool();
-            m_content->append((quint8)(value ? 0x09 : 0x08));
+            Dest.append((quint8)(value ? 0x09 : 0x08));
             return result;
         }
         case QMetaType::Int:
@@ -240,25 +239,25 @@ quint64 TorcBinaryPListSerialiser::BinaryFromVariant(const QString &Name, const 
         {
             START_OBJECT
             double value = Value.toDouble();
-            m_content->append((quint8)0x23);
+            Dest.append((quint8)0x23);
 #if Q_BYTE_ORDER == Q_BIG_ENDIAN && !defined (__VFP_FP__)
-            m_content->append(*((char*)&value));
-            m_content->append(*((char*)&value + 1));
-            m_content->append(*((char*)&value + 2));
-            m_content->append(*((char*)&value + 3));
-            m_content->append(*((char*)&value + 4));
-            m_content->append(*((char*)&value + 5));
-            m_content->append(*((char*)&value + 6));
-            m_content->append(*((char*)&value + 7));
+            Dest.append(*((char*)&value));
+            Dest.append(*((char*)&value + 1));
+            Dest.append(*((char*)&value + 2));
+            Dest.append(*((char*)&value + 3));
+            Dest.append(*((char*)&value + 4));
+            Dest.append(*((char*)&value + 5));
+            Dest.append(*((char*)&value + 6));
+            Dest.append(*((char*)&value + 7));
 #else
-            m_content->append(*((char*)&value + 7));
-            m_content->append(*((char*)&value + 6));
-            m_content->append(*((char*)&value + 5));
-            m_content->append(*((char*)&value + 4));
-            m_content->append(*((char*)&value + 3));
-            m_content->append(*((char*)&value + 2));
-            m_content->append(*((char*)&value + 1));
-            m_content->append(*((char*)&value));
+            Dest.append(*((char*)&value + 7));
+            Dest.append(*((char*)&value + 6));
+            Dest.append(*((char*)&value + 5));
+            Dest.append(*((char*)&value + 4));
+            Dest.append(*((char*)&value + 3));
+            Dest.append(*((char*)&value + 2));
+            Dest.append(*((char*)&value + 1));
+            Dest.append(*((char*)&value));
 #endif
             return result;
         }
@@ -268,42 +267,42 @@ quint64 TorcBinaryPListSerialiser::BinaryFromVariant(const QString &Name, const 
         case QMetaType::ULongLong:
         {
             START_OBJECT
-            BinaryFromUInt(Value.toULongLong());
+            BinaryFromUInt(Dest, Value.toULongLong());
             return result;
         }
         case QMetaType::QDateTime:
         {
             START_OBJECT
-            m_content->append(0x33);
+            Dest.append(0x33);
             double value = (double)Value.toDateTime().toTime_t();
 #if Q_BYTE_ORDER == Q_BIG_ENDIAN && !defined (__VFP_FP__)
-            m_content->append(*((char*)&value));
-            m_content->append(*((char*)&value + 1));
-            m_content->append(*((char*)&value + 2));
-            m_content->append(*((char*)&value + 3));
-            m_content->append(*((char*)&value + 4));
-            m_content->append(*((char*)&value + 5));
-            m_content->append(*((char*)&value + 6));
-            m_content->append(*((char*)&value + 7));
+            Dest.append(*((char*)&value));
+            Dest.append(*((char*)&value + 1));
+            Dest.append(*((char*)&value + 2));
+            Dest.append(*((char*)&value + 3));
+            Dest.append(*((char*)&value + 4));
+            Dest.append(*((char*)&value + 5));
+            Dest.append(*((char*)&value + 6));
+            Dest.append(*((char*)&value + 7));
 #else
-            m_content->append(*((char*)&value + 7));
-            m_content->append(*((char*)&value + 6));
-            m_content->append(*((char*)&value + 5));
-            m_content->append(*((char*)&value + 4));
-            m_content->append(*((char*)&value + 3));
-            m_content->append(*((char*)&value + 2));
-            m_content->append(*((char*)&value + 1));
-            m_content->append(*((char*)&value));
+            Dest.append(*((char*)&value + 7));
+            Dest.append(*((char*)&value + 6));
+            Dest.append(*((char*)&value + 5));
+            Dest.append(*((char*)&value + 4));
+            Dest.append(*((char*)&value + 3));
+            Dest.append(*((char*)&value + 2));
+            Dest.append(*((char*)&value + 1));
+            Dest.append(*((char*)&value));
 #endif
             return result;
         }
         case QMetaType::QString:
         default:
-            return BinaryFromQString(Value.toString());
+            return BinaryFromQString(Dest, Value.toString());
     }
 }
 
-quint64 TorcBinaryPListSerialiser::BinaryFromStringList(const QString &Name, const QStringList &Value)
+quint64 TorcBinaryPListSerialiser::BinaryFromStringList(QByteArray &Dest, const QString &Name, const QStringList &Value)
 {
     (void)Name;
 
@@ -311,22 +310,22 @@ quint64 TorcBinaryPListSerialiser::BinaryFromStringList(const QString &Name, con
     START_OBJECT
 
     int size = Value.size();
-    m_content->append((quint8)(0xa0 | (size < 0xf ? size : 0xf)));
+    Dest.append((quint8)(0xa0 | (size < 0xf ? size : 0xf)));
     if (size > 0xe)
-        BinaryFromUInt(size);
+        BinaryFromUInt(Dest, size);
 
-    quint64 offset = m_content->size();
+    quint64 offset = Dest.size();
     QByteArray references(size * m_referenceSize, 0);
-    m_content->append(references);
+    Dest.append(references);
 
     QStringList::const_iterator it = Value.begin();
     for ( ; it != Value.end(); ++it)
-        WriteReference(BinaryFromQString((*it)), m_referenceSize, (quint8*)m_content->data(), offset);
+        WriteReference(BinaryFromQString(Dest, (*it)), m_referenceSize, (quint8*)Dest.data(), offset);
 
     return result;
 }
 
-quint64 TorcBinaryPListSerialiser::BinaryFromArray(const QString &Name, const QVariantList &Value)
+quint64 TorcBinaryPListSerialiser::BinaryFromArray(QByteArray &Dest, const QString &Name, const QVariantList &Value)
 {
     if (!Value.isEmpty())
     {
@@ -335,29 +334,29 @@ quint64 TorcBinaryPListSerialiser::BinaryFromArray(const QString &Name, const QV
         QVariantList::const_iterator it = Value.begin();
         for ( ; it != Value.end(); ++it)
             if ((int)(*it).type() != type)
-                return BinaryFromQString("Error: QVariantList is not valid service return type");
+                return BinaryFromQString(Dest, "Error: QVariantList is not valid service return type");
     }
 
     quint64 result = m_objectOffsets.size();
     START_OBJECT
 
     int size = Value.size();
-    m_content->append((quint8)(0xa0 | (size < 0xf ? size : 0xf)));
+    Dest.append((quint8)(0xa0 | (size < 0xf ? size : 0xf)));
     if (size > 0xe)
-        BinaryFromUInt(size);
+        BinaryFromUInt(Dest, size);
 
-    quint64 offset = m_content->size();
+    quint64 offset = Dest.size();
     QByteArray references(size * m_referenceSize, 0);
-    m_content->append(references);
+    Dest.append(references);
 
     QVariantList::const_iterator it = Value.begin();
     for ( ; it != Value.end(); ++it)
-        WriteReference(BinaryFromVariant(Name, (*it)), m_referenceSize, (quint8*)m_content->data(), offset);
+        WriteReference(BinaryFromVariant(Dest, Name, (*it)), m_referenceSize, (quint8*)Dest.data(), offset);
 
     return result;
 }
 
-quint64 TorcBinaryPListSerialiser::BinaryFromMap(const QString &Name, const QVariantMap &Value)
+quint64 TorcBinaryPListSerialiser::BinaryFromMap(QByteArray &Dest, const QString &Name, const QVariantMap &Value)
 {
     (void)Name;
 
@@ -365,27 +364,29 @@ quint64 TorcBinaryPListSerialiser::BinaryFromMap(const QString &Name, const QVar
     START_OBJECT
 
     int size = Value.size();
-    m_content->append((quint8)(0xd0 | (size < 0xf ? size : 0xf)));
+    Dest.append((quint8)(0xd0 | (size < 0xf ? size : 0xf)));
     if (size > 0xe)
-        BinaryFromUInt(size);
+        BinaryFromUInt(Dest, size);
 
-    quint64 offset = m_content->size();
+    quint64 offset = Dest.size();
     QByteArray references(size * 2 * m_referenceSize, 0);
-    m_content->append(references);
+    Dest.append(references);
 
     QVariantMap::const_iterator it = Value.begin();
     for ( ; it != Value.end(); ++it)
-        WriteReference(BinaryFromQString(it.key()), m_referenceSize, (quint8*)m_content->data(), offset);
+        WriteReference(BinaryFromQString(Dest, it.key()), m_referenceSize, (quint8*)Dest.data(), offset);
 
     it = Value.begin();
     for ( ; it != Value.end(); ++it)
-        WriteReference(BinaryFromVariant(it.key(), it.value()), m_referenceSize, (quint8*)m_content->data(), offset);
+        WriteReference(BinaryFromVariant(Dest, it.key(), it.value()), m_referenceSize, (quint8*)Dest.data(), offset);
 
     return result;
 }
 
-quint64 TorcBinaryPListSerialiser::BinaryFromQString(const QString &Value)
+quint64 TorcBinaryPListSerialiser::BinaryFromQString(QByteArray &Dest, const QString &Value)
 {
+    static QTextCodec* textCodec = QTextCodec::codecForName("UTF-16BE");
+
     QHash<QString,quint64>::const_iterator it = m_strings.find(Value);
     if (it != m_strings.end())
         return it.value();
@@ -395,57 +396,57 @@ quint64 TorcBinaryPListSerialiser::BinaryFromQString(const QString &Value)
 
     START_OBJECT
 
-    QByteArray output = m_codec->fromUnicode(Value);
+    QByteArray output = textCodec->fromUnicode(Value);
 
     quint64 size = (output.size() >> 1) - 1;
 
-    m_content->append((quint8)(0x60 | (size < 0xf ? size : 0xf)));
+    Dest.append((quint8)(0x60 | (size < 0xf ? size : 0xf)));
     if (size > 0xe)
-        BinaryFromUInt(size);
+        BinaryFromUInt(Dest, size);
 
-    m_content->append(output.data() + 2, output.size() - 2);
+    Dest.append(output.data() + 2, output.size() - 2);
     return result;
 }
 
-void TorcBinaryPListSerialiser::BinaryFromUInt(quint64 Value)
+void TorcBinaryPListSerialiser::BinaryFromUInt(QByteArray &Dest, quint64 Value)
 {
     uint8_t size = Value <= UINT8_MAX ? 0 : Value <= UINT16_MAX ? 1 : Value <= UINT32_MAX ? 2 : 3;
-    m_content->append((quint8)(0x10 | size));
+    Dest.append((quint8)(0x10 | size));
 
     switch (size)
     {
         case 3:
         {
             quint64 buffer = qToBigEndian(Value);
-            m_content->append(*((quint8*)&buffer));
-            m_content->append(*((quint8*)&buffer + 1));
-            m_content->append(*((quint8*)&buffer + 2));
-            m_content->append(*((quint8*)&buffer + 3));
-            m_content->append(*((quint8*)&buffer + 4));
-            m_content->append(*((quint8*)&buffer + 5));
-            m_content->append(*((quint8*)&buffer + 6));
-            m_content->append(*((quint8*)&buffer + 7));
+            Dest.append(*((quint8*)&buffer));
+            Dest.append(*((quint8*)&buffer + 1));
+            Dest.append(*((quint8*)&buffer + 2));
+            Dest.append(*((quint8*)&buffer + 3));
+            Dest.append(*((quint8*)&buffer + 4));
+            Dest.append(*((quint8*)&buffer + 5));
+            Dest.append(*((quint8*)&buffer + 6));
+            Dest.append(*((quint8*)&buffer + 7));
             break;
         }
         case 2:
         {
             quint32 buffer= qToBigEndian((quint32)(Value & 0xffffffff));
-            m_content->append(*((quint8*)&buffer));
-            m_content->append(*((quint8*)&buffer + 1));
-            m_content->append(*((quint8*)&buffer + 2));
-            m_content->append(*((quint8*)&buffer + 3));
+            Dest.append(*((quint8*)&buffer));
+            Dest.append(*((quint8*)&buffer + 1));
+            Dest.append(*((quint8*)&buffer + 2));
+            Dest.append(*((quint8*)&buffer + 3));
             break;
         }
         case 1:
         {
             quint16 buffer = qToBigEndian((quint16)(Value & 0xffff));
-            m_content->append(*((quint8*)&buffer));
-            m_content->append(*((quint8*)&buffer + 1));
+            Dest.append(*((quint8*)&buffer));
+            Dest.append(*((quint8*)&buffer + 1));
             break;
         }
         case 0:
         {
-            m_content->append((quint8)(Value & 0xff));
+            Dest.append((quint8)(Value & 0xff));
         }
     }
 }

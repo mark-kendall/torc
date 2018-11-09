@@ -15,25 +15,17 @@
 class TorcSerialiser
 {
   public:
-    TorcSerialiser();
-    virtual ~TorcSerialiser();
+    virtual ~TorcSerialiser() {}
 
     static TorcSerialiser*   GetSerialiser  (const QString &MimeType);
-    QByteArray*              Serialise      (const QVariant &Data, const QString &Type = QString());
+    void                     Serialise      (QByteArray &Dest, const QVariant &Data, const QString &Type = QString());
     virtual HTTPResponseType ResponseType   (void) = 0;
 
   protected:
-    virtual void             Prepare        (void) = 0;
-    virtual void             Begin          (void) = 0;
-    virtual void             AddProperty    (const QString &Name, const QVariant &Value) = 0;
-    virtual void             End            (void) = 0;
-
-  protected:
-    QByteArray *m_content;
-
-  private:
-    TorcSerialiser(const TorcSerialiser &) Q_DECL_EQ_DELETE;
-    TorcSerialiser &operator=(const TorcSerialiser &) Q_DECL_EQ_DELETE;
+    virtual void             Prepare        (QByteArray &Dest) = 0;
+    virtual void             Begin          (QByteArray &Dest) = 0;
+    virtual void             AddProperty    (QByteArray &Dest, const QString &Name, const QVariant &Value) = 0;
+    virtual void             End            (QByteArray &Dest) = 0;
 };
 
 class TorcSerialiserFactory

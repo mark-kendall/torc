@@ -104,7 +104,8 @@ void TorcHTTPHandler::HandleOptions(TorcHTTPRequest &Request, int Allowed)
     Request.SetAllowed(Allowed);
     Request.SetStatus(HTTP_OK);
     Request.SetResponseType(HTTPResponseNone);
-    Request.SetResponseContent(NULL);
+    QByteArray empty;
+    Request.SetResponseContent(empty);
 }
 
 void TorcHTTPHandler::HandleFile(TorcHTTPRequest &Request, const QString &Filename, int Cache)

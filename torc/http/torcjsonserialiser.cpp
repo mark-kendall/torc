@@ -41,31 +41,29 @@ HTTPResponseType TorcJSONSerialiser::ResponseType(void)
     return m_javaScriptType ? HTTPResponseJSONJavascript : HTTPResponseJSON;
 }
 
-void TorcJSONSerialiser::Prepare(void)
+void TorcJSONSerialiser::Prepare(QByteArray &)
 {
 }
 
-void TorcJSONSerialiser::Begin(void)
+void TorcJSONSerialiser::Begin(QByteArray &)
 {
 }
 
-void TorcJSONSerialiser::AddProperty(const QString &Name, const QVariant &Value)
+void TorcJSONSerialiser::AddProperty(QByteArray &Dest, const QString &Name, const QVariant &Value)
 {
-    delete m_content;
-
     if (Name.isEmpty())
     {
-        m_content = new QByteArray(QJsonDocument::fromVariant(Value).toJson(QJsonDocument::Compact));
+        Dest = QByteArray(QJsonDocument::fromVariant(Value).toJson(QJsonDocument::Compact));
     }
     else
     {
         QVariantMap map;
         map.insert(Name, Value);
-        m_content = new QByteArray(QJsonDocument::fromVariant(map).toJson(QJsonDocument::Compact));
+        Dest = QByteArray(QJsonDocument::fromVariant(map).toJson(QJsonDocument::Compact));
     }
 }
 
-void TorcJSONSerialiser::End(void)
+void TorcJSONSerialiser::End(QByteArray &)
 {
 }
 

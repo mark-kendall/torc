@@ -16,10 +16,10 @@ class TorcJSONSerialiser : public TorcSerialiser
     HTTPResponseType ResponseType       (void) Q_DECL_OVERRIDE;
 
   protected:
-    void             Prepare            (void) Q_DECL_OVERRIDE;
-    void             Begin              (void) Q_DECL_OVERRIDE;
-    void             AddProperty        (const QString &Name, const QVariant &Value) Q_DECL_OVERRIDE;
-    void             End                (void) Q_DECL_OVERRIDE;
+    void             Prepare            (QByteArray &) Q_DECL_OVERRIDE;
+    void             Begin              (QByteArray &) Q_DECL_OVERRIDE;
+    void             AddProperty        (QByteArray &Dest, const QString &Name, const QVariant &Value) Q_DECL_OVERRIDE;
+    void             End                (QByteArray &) Q_DECL_OVERRIDE;
 
   private:
     bool             m_javaScriptType;

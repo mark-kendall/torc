@@ -25,16 +25,6 @@
 #include "torcxmlserialiser.h"
 #include "torcserialiser.h"
 
-TorcSerialiser::TorcSerialiser()
-  : m_content(new QByteArray())
-{
-}
-
-TorcSerialiser::~TorcSerialiser()
-{
-    delete m_content;
-}
-
 TorcSerialiser* TorcSerialiser::GetSerialiser(const QString &MimeType)
 {
     // first create a prioritised list from MimeType
@@ -85,17 +75,12 @@ TorcSerialiser* TorcSerialiser::GetSerialiser(const QString &MimeType)
     return new TorcXMLSerialiser();
 }
 
-QByteArray* TorcSerialiser::Serialise(const QVariant &Data, const QString &Type)
+void TorcSerialiser::Serialise(QByteArray &Dest, const QVariant &Data, const QString &Type)
 {
-    Prepare();
-    Begin();
-    AddProperty(Type, Data);
-    End();
-
-    // pass ownership of content to caller
-    QByteArray *result = m_content;
-    m_content = NULL;
-    return result;
+    Prepare(Dest);
+    Begin(Dest);
+    AddProperty(Dest, Type, Data);
+    End(Dest);
 }
 
 TorcSerialiserFactory* TorcSerialiserFactory::gTorcSerialiserFactory = NULL;

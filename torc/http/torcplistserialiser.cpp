@@ -34,7 +34,7 @@ HTTPResponseType TorcPListSerialiser::ResponseType(void)
     return HTTPResponsePList;
 }
 
-void TorcPListSerialiser::Begin(void)
+void TorcPListSerialiser::Begin(QByteArray &)
 {
     m_xmlStream.setAutoFormatting(true);
     m_xmlStream.setAutoFormattingIndent(4);
@@ -45,12 +45,12 @@ void TorcPListSerialiser::Begin(void)
     m_xmlStream.writeStartElement("dict");
 }
 
-void TorcPListSerialiser::AddProperty(const QString &Name, const QVariant &Value)
+void TorcPListSerialiser::AddProperty(QByteArray &, const QString &Name, const QVariant &Value)
 {
     PListFromVariant(Name, Value);
 }
 
-void TorcPListSerialiser::End(void)
+void TorcPListSerialiser::End(QByteArray &)
 {
     m_xmlStream.writeEndElement();
     m_xmlStream.writeEndElement();

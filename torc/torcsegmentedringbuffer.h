@@ -22,8 +22,8 @@ class TorcSegmentedRingBuffer : public QObject
     int                     FinishSegment    (bool Init);
     int                     ReadSegment      (uint8_t       *Data, int Max,  int SegmentRef, int Offset = 0);
     int                     ReadSegment      (QIODevice     *Dst,  int SegmentRef);
-    QByteArray*             GetSegment       (int SegmentRef);
-    QByteArray*             GetInitSegment   (void);
+    QByteArray              GetSegment       (int SegmentRef);
+    QByteArray              GetInitSegment   (void);
     void                    SaveInitSegment  (void);
 
   signals:
