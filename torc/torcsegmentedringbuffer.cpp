@@ -35,7 +35,7 @@ TorcSegmentedRingBuffer::TorcSegmentedRingBuffer(int Size)
     m_segments(),
     m_segmentRefs(),
     m_segmentCounter(0),
-    m_initSegment(NULL)
+    m_initSegment()
 {
     LOG(VB_GENERAL, LOG_INFO, QString("Allocated segmented ring buffer of size %1bytes").arg(m_size));
 }
@@ -46,8 +46,6 @@ TorcSegmentedRingBuffer::~TorcSegmentedRingBuffer()
     m_segments.clear();
     m_segmentRefs.clear();
     free(m_data);
-    if (m_initSegment)
-        delete m_initSegment;
 }
 
 inline int TorcSegmentedRingBuffer::GetBytesFree(void)
@@ -206,22 +204,19 @@ void TorcSegmentedRingBuffer::SaveInitSegment(void)
     }
 
     // sanity check
-    if (m_initSegment)
-    {
-        LOG(VB_GENERAL, LOG_WARNING, "Already have init segment - deleting");
-        delete m_initSegment;
-    }
+    if (!m_initSegment.isEmpty())
+        LOG(VB_GENERAL, LOG_WARNING, "Already have init segment - overwriting");
 
     // copy the segment
     QPair<int,int> segment = m_segments.dequeue();
-    m_initSegment = new QByteArray(segment.second, '0');
+    m_initSegment = QByteArray(segment.second, '0');
     int read = qMin(segment.second, m_size - segment.first);
-    memcpy(m_initSegment->data(), m_data + segment.first, read);
+    memcpy(m_initSegment.data(), m_data + segment.first, read);
     if (read < segment.second)
-        memcpy(m_initSegment->data() + read, m_data, segment.second - read);
+        memcpy(m_initSegment.data() + read, m_data, segment.second - read);
 
     // reset the ringbuffer
-    LOG(VB_GENERAL, LOG_INFO, QString("Init segment saved (%1 bytes) - resetting ringbuffer").arg(m_initSegment->size()));
+    LOG(VB_GENERAL, LOG_INFO, QString("Init segment saved (%1 bytes) - resetting ringbuffer").arg(m_initSegment.size()));
     m_segments.clear();
     m_segmentRefs.clear();
     m_readPosition   = 0;
@@ -254,7 +249,5 @@ QByteArray* TorcSegmentedRingBuffer::GetSegment(int SegmentRef)
 QByteArray* TorcSegmentedRingBuffer::GetInitSegment(void)
 {
     QReadLocker locker(&m_segmentsLock);
-    if (!m_initSegment)
-        return NULL;
-    return new QByteArray(m_initSegment->constData(), m_initSegment->size());
+    return new QByteArray(m_initSegment.constData(), m_initSegment.size());
 }
