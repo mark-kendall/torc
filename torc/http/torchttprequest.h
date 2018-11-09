@@ -193,7 +193,7 @@ class TorcHTTPRequest
     HTTPStatus             m_responseStatus;
     QByteArray            *m_responseContent;
     QFile                 *m_responseFile;
-    QMap<QString,QString> *m_responseHeaders;
+    QMap<QString,QString>  m_responseHeaders;
 
   private:
     Q_DISABLE_COPY(TorcHTTPRequest)

@@ -92,7 +92,7 @@ TorcHTTPRequest::TorcHTTPRequest(TorcHTTPReader *Reader)
     m_responseStatus(HTTP_NotFound),
     m_responseContent(NULL),
     m_responseFile(NULL),
-    m_responseHeaders(NULL)
+    m_responseHeaders()
 {
     if (Reader)
     {
@@ -187,7 +187,6 @@ TorcHTTPRequest::~TorcHTTPRequest()
     if (m_responseFile)
         m_responseFile->close();
     delete m_responseFile;
-    delete m_responseHeaders;
 }
 
 void TorcHTTPRequest::SetConnection(HTTPConnection Connection)
@@ -229,10 +228,7 @@ void TorcHTTPRequest::SetResponseFile(QFile *File)
 
 void TorcHTTPRequest::SetResponseHeader(const QString &Header, const QString &Value)
 {
-    if (!m_responseHeaders)
-        m_responseHeaders = new QMap<QString,QString>();
-
-    m_responseHeaders->insert(Header, Value);
+    m_responseHeaders.insert(Header, Value);
 }
 
 void TorcHTTPRequest::SetAllowed(int Allowed)
@@ -465,12 +461,9 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
         response << "Location: " << m_redirectedTo.toLatin1() << "\r\n";
 
     // process any custom headers
-    if (m_responseHeaders)
-    {
-        QMap<QString,QString>::iterator it = m_responseHeaders->begin();
-        for ( ; it != m_responseHeaders->end(); ++it)
-            response << it.key().toLatin1() << ": " << it.value().toLatin1() << "\r\n";
-    }
+    QMap<QString,QString>::iterator it = m_responseHeaders.begin();
+    for ( ; it != m_responseHeaders.end(); ++it)
+        response << it.key().toLatin1() << ": " << it.value().toLatin1() << "\r\n";
 
     response << "\r\n";
     response.flush();
