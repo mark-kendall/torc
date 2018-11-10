@@ -48,7 +48,7 @@ TorcHTMLDynamicContent::TorcHTMLDynamicContent()
 
     QDir dir(configdir);
     if (!dir.exists())
-        if (!dir.mkdir(configdir))
+        if (!dir.mkpath(configdir))
             LOG(VB_GENERAL, LOG_ERR, QString("Failed to create content directory ('%1')").arg(configdir));
     }
 
