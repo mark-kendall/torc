@@ -625,7 +625,7 @@ QByteArray TorcCameraOutput::GetDashPlaylist(void)
         "  </Period>\r\n"
         "</MPD>\r\n");
 
-    float duration = m_params.m_segmentLength / (float)m_params.m_frameRate;
+    double duration = m_params.m_segmentLength / (float)m_params.m_frameRate;
     return QByteArray(dash.arg(m_cameraStartTime.toString(Qt::ISODate))
                       .arg(QString::number(duration * 5, 'f', 2))
                       .arg(QString::number(duration * 4, 'f', 2))
