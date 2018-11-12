@@ -466,6 +466,7 @@ class TorcCentralObject : public TorcAdminObject, public TorcStringFactory
 
     ~TorcCentralObject()
     {
+        Destroy();
     }
 
     void GetStrings(QVariantMap &Strings)
