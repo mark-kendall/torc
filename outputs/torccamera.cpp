@@ -157,14 +157,14 @@ TorcCameraParams& TorcCameraParams::operator =(const TorcCameraParams &Other)
 {
     if (&Other != this)
     {
-        this->m_valid = Other.m_valid;
-        this->m_width = Other.m_width;
-        this->m_height = Other.m_height;
-        this->m_stride = Other.m_stride;
-        this->m_sliceHeight = Other.m_sliceHeight;
-        this->m_frameRate   = Other.m_frameRate;
-        this->m_bitrate     = Other.m_bitrate;
-        this->m_timebase    = Other.m_timebase;
+        this->m_valid         = Other.m_valid;
+        this->m_width         = Other.m_width;
+        this->m_height        = Other.m_height;
+        this->m_stride        = Other.m_stride;
+        this->m_sliceHeight   = Other.m_sliceHeight;
+        this->m_frameRate     = Other.m_frameRate;
+        this->m_bitrate       = Other.m_bitrate;
+        this->m_timebase      = Other.m_timebase;
         this->m_segmentLength = Other.m_segmentLength;
         this->m_gopSize       = Other.m_gopSize;
         this->m_model         = Other.m_model;
