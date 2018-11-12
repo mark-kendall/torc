@@ -252,8 +252,8 @@ QVariant TorcPList::ParseBinaryNode(quint64 Num)
     if (!data)
         return QVariant();
 
-    quint16 type = (*data) & 0xf0;
-    quint64 size = (*data) & 0x0f;
+    quint16 type = (*data) & BPLIST_HIGH;
+    quint64 size = (*data) & BPLIST_LOW;
 
     switch (type)
     {
@@ -318,7 +318,7 @@ quint8* TorcPList::GetBinaryObject(quint64 Num)
 QVariantMap TorcPList::ParseBinaryDict(quint8 *Data)
 {
     QVariantMap result;
-    if (((*Data) & 0xf0) != BPLIST_DICT)
+    if (((*Data) & BPLIST_HIGH) != BPLIST_DICT)
         return result;
 
     quint64 count = GetBinaryCount(&Data);
@@ -351,7 +351,7 @@ QVariantMap TorcPList::ParseBinaryDict(quint8 *Data)
 QList<QVariant> TorcPList::ParseBinaryArray(quint8 *Data)
 {
     QList<QVariant> result;
-    if (((*Data) & 0xf0) != BPLIST_ARRAY)
+    if (((*Data) & BPLIST_HIGH) != BPLIST_ARRAY)
         return result;
 
     quint64 count = GetBinaryCount(&Data);
@@ -373,10 +373,10 @@ QList<QVariant> TorcPList::ParseBinaryArray(quint8 *Data)
 QVariant TorcPList::ParseBinaryUInt(quint8 **Data)
 {
     quint64 result = 0;
-    if (((**Data) & 0xf0) != BPLIST_UINT)
+    if (((**Data) & BPLIST_HIGH) != BPLIST_UINT)
         return QVariant(result);
 
-    quint64 size = 1 << ((**Data) & 0x0f);
+    quint64 size = 1 << ((**Data) & BPLIST_LOW);
     (*Data)++;
     result = GetBinaryUInt(*Data, size);
     (*Data) += size;
@@ -387,10 +387,10 @@ QVariant TorcPList::ParseBinaryUInt(quint8 **Data)
 
 QVariant TorcPList::ParseBinaryUID(quint8 *Data)
 {
-    if (((*Data) & 0xf0) != BPLIST_UID)
+    if (((*Data) & BPLIST_HIGH) != BPLIST_UID)
         return QVariant();
 
-    quint64 count = ((*Data) & 0x0f) + 1; // nnnn+1 bytes
+    quint64 count = ((*Data) & BPLIST_LOW) + 1; // nnnn+1 bytes
     (*Data)++;
 
     // these are in reality limited to a bigendian 64bit uint - with 1,2,4 or 8 bytes.
@@ -410,7 +410,7 @@ QVariant TorcPList::ParseBinaryUID(quint8 *Data)
 QVariant TorcPList::ParseBinaryString(quint8 *Data)
 {
     QString result;
-    if (((*Data) & 0xf0) != BPLIST_STRING)
+    if (((*Data) & BPLIST_HIGH) != BPLIST_STRING)
         return result;
 
     quint64 count = GetBinaryCount(&Data);
@@ -425,7 +425,7 @@ QVariant TorcPList::ParseBinaryString(quint8 *Data)
 QVariant TorcPList::ParseBinaryReal(quint8 *Data)
 {
     double result = 0.0;
-    if (((*Data) & 0xf0) != BPLIST_REAL)
+    if (((*Data) & BPLIST_HIGH) != BPLIST_REAL)
         return result;
 
     quint64 count = GetBinaryCount(&Data);
@@ -451,7 +451,7 @@ QVariant TorcPList::ParseBinaryReal(quint8 *Data)
 QVariant TorcPList::ParseBinaryDate(quint8 *Data)
 {
     QDateTime result;
-    if (((*Data) & 0xf0) != BPLIST_DATE)
+    if (((*Data) & BPLIST_HIGH) != BPLIST_DATE)
         return result;
 
     quint64 count = GetBinaryCount(&Data);
@@ -467,7 +467,7 @@ QVariant TorcPList::ParseBinaryDate(quint8 *Data)
 QVariant TorcPList::ParseBinaryData(quint8 *Data)
 {
     QByteArray result;
-    if (((*Data) & 0xf0) != BPLIST_DATA)
+    if (((*Data) & BPLIST_HIGH) != BPLIST_DATA)
         return result;
 
     quint64 count = GetBinaryCount(&Data);
@@ -483,7 +483,7 @@ QVariant TorcPList::ParseBinaryData(quint8 *Data)
 QVariant TorcPList::ParseBinaryUnicode(quint8 *Data)
 {
     QString result;
-    if (((*Data) & 0xf0) != BPLIST_UNICODE)
+    if (((*Data) & BPLIST_HIGH) != BPLIST_UNICODE)
         return result;
 
     quint64 count = GetBinaryCount(&Data);
@@ -495,9 +495,9 @@ QVariant TorcPList::ParseBinaryUnicode(quint8 *Data)
 
 quint64 TorcPList::GetBinaryCount(quint8 **Data)
 {
-    quint64 count = (**Data) & 0x0f;
+    quint64 count = (**Data) & BPLIST_LOW;
     (*Data)++;
-    if (count == 0x0f)
+    if (count == BPLIST_LOW_MAX)
     {
         QVariant newcount = ParseBinaryUInt(Data);
         if (!newcount.canConvert<quint64>())

@@ -5,6 +5,10 @@
 #include <QVariant>
 #include <QXmlStreamWriter>
 
+#define BPLIST_HIGH    0xF0
+#define BPLIST_LOW     0x0F
+#define BPLIST_LOW_MAX BPLIST_LOW
+
 class TorcPList
 {
   public:

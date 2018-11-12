@@ -319,8 +319,8 @@ quint64 TorcBinaryPListSerialiser::BinaryFromStringList(QByteArray &Dest, const 
     START_OBJECT
 
     int size = Value.size();
-    Dest.append((quint8)(TorcPList::BPLIST_ARRAY | (size < 0xf ? size : 0xf)));
-    if (size > 0xe)
+    Dest.append((quint8)(TorcPList::BPLIST_ARRAY | (size < BPLIST_LOW_MAX ? size : BPLIST_LOW_MAX)));
+    if (size >= BPLIST_LOW_MAX)
         BinaryFromUInt(Dest, size);
 
     quint64 offset = Dest.size();
@@ -350,8 +350,8 @@ quint64 TorcBinaryPListSerialiser::BinaryFromArray(QByteArray &Dest, const QStri
     START_OBJECT
 
     int size = Value.size();
-    Dest.append((quint8)(TorcPList::BPLIST_ARRAY | (size < 0xf ? size : 0xf)));
-    if (size > 0xe)
+    Dest.append((quint8)(TorcPList::BPLIST_ARRAY | (size < BPLIST_LOW_MAX ? size : BPLIST_LOW_MAX)));
+    if (size >= BPLIST_LOW_MAX)
         BinaryFromUInt(Dest, size);
 
     quint64 offset = Dest.size();
@@ -373,8 +373,8 @@ quint64 TorcBinaryPListSerialiser::BinaryFromMap(QByteArray &Dest, const QString
     START_OBJECT
 
     int size = Value.size();
-    Dest.append((quint8)(TorcPList::BPLIST_DICT | (size < 0xf ? size : 0xf)));
-    if (size > 0xe)
+    Dest.append((quint8)(TorcPList::BPLIST_DICT | (size < BPLIST_LOW_MAX ? size : BPLIST_LOW_MAX)));
+    if (size >= BPLIST_LOW_MAX)
         BinaryFromUInt(Dest, size);
 
     quint64 offset = Dest.size();
@@ -409,8 +409,8 @@ quint64 TorcBinaryPListSerialiser::BinaryFromQString(QByteArray &Dest, const QSt
 
     quint64 size = (output.size() >> 1) - 1;
 
-    Dest.append((quint8)(TorcPList::BPLIST_UNICODE | (size < 0xf ? size : 0xf)));
-    if (size > 0xe)
+    Dest.append((quint8)(TorcPList::BPLIST_UNICODE | (size < BPLIST_LOW_MAX ? size : BPLIST_LOW_MAX)));
+    if (size >= BPLIST_LOW_MAX)
         BinaryFromUInt(Dest, size);
 
     Dest.append(output.data() + 2, output.size() - 2);
