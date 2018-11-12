@@ -35,27 +35,27 @@ var template;
 var TorcStateGraph = function ($, torc) {
     "use strict";
 
-    var torcconnection = undefined;
-    var inputTypes     = undefined;
-    var controlTypes   = undefined;
-    var outputTypes    = undefined;
-    var stategraph     = undefined;
+    var torcconnection;
+    var inputTypes;
+    var controlTypes;
+    var outputTypes;
+    var stategraph;
 
     function deviceChanged (name, value, service) {
-        if (name === undefined  || value === undefined || service === undefined) {
+        if (typeof name === "undefined"  || typeof value === "undefined" || typeof service === "undefined") {
             return;
         }
 
-        if (name === 'value') {
-            $('#' + service + '_value').text('Value: ' + value.toFixed(2));
-        } else if (name === 'valid') {
-            $('#' + service + '_valid').text('Valid: ' + value);
-            $('#' + service + '_background').attr('fill', value ? 'none' : 'crimson');
+        if (name === "value") {
+            $("#" + service + "_value").text("Value: " + value.toFixed(2));
+        } else if (name === "valid") {
+            $("#" + service + "_valid").text("Valid: " + value);
+            $("#" + service + "_background").attr("fill", value ? "none" : "crimson");
         }
     }
 
     function deviceSubscriptionChanged (version, ignore, properties, service) {
-        if (version !== undefined && typeof properties === 'object') {
+        if (typeof version !== "undefined" && typeof properties === "object") {
             $.each(properties, function (key, value) {
                 deviceChanged(key, value.value, service);
             });
@@ -64,18 +64,18 @@ var TorcStateGraph = function ($, torc) {
     }
 
     function setupDevice (name) {
-        // add id's to certain svg elements for each device
+        // add id"s to certain svg elements for each device
         var root = stategraph.root();
-        $('#' + name + ' > text:contains("Value")', root).attr('id', name + '_value');
-        $('#' + name + ' > text:contains("Valid")', root).attr('id', name + '_valid');
-        $('#' + name + ' > polygon',                root).attr('id', name + '_background');
-        torcconnection.subscribe(name, ['value', 'valid'], deviceChanged, deviceSubscriptionChanged);
+        $("#" + name + " > text:contains(\"Value\")", root).attr("id", name + "_value");
+        $("#" + name + " > text:contains(\"Valid\")", root).attr("id", name + "_valid");
+        $("#" + name + " > polygon",                  root).attr("id", name + "_background");
+        torcconnection.subscribe(name, ["value", "valid"], deviceChanged, deviceSubscriptionChanged);
     }
 
     function inputsChanged (name, value) {
-        if (name === 'inputTypes' && $.isArray(value)) {
+        if (name === "inputTypes" && $.isArray(value)) {
             inputTypes = value;
-        } else if (name === 'inputList' && typeof value === 'object') {
+        } else if (name === "inputList" && typeof value === "object") {
             if ($.isArray(inputTypes) && inputTypes.length > 0) {
                 $.each(inputTypes, function (ignore, type) {
                     $.each(value, function (key, inputs) {
@@ -91,9 +91,9 @@ var TorcStateGraph = function ($, torc) {
     }
 
     function inputSubscriptionChanged(version, ignore, properties) {
-        if (version !== undefined && typeof properties === 'object') {
+        if (typeof version !== "undefined" && typeof properties === "object") {
             // NB update inputTypes first so that we can iterate over inputList meaningfully
-            inputsChanged('inputTypes', properties.inputTypes.value);
+            inputsChanged("inputTypes", properties.inputTypes.value);
             $.each(properties, function (key, value) {
                 inputsChanged(key, value.value); });
             return;
@@ -101,9 +101,9 @@ var TorcStateGraph = function ($, torc) {
     }
 
     function outputsChanged (name, value) {
-        if (name === 'outputTypes' && $.isArray(value)) {
+        if (name === "outputTypes" && $.isArray(value)) {
             outputTypes = value;
-        } else if (name === 'outputList' && typeof value === 'object') {
+        } else if (name === "outputList" && typeof value === "object") {
             if ($.isArray(outputTypes) && outputTypes.length > 0) {
                 $.each(outputTypes, function (ignore, type) {
                     $.each(value, function (key, outputs) {
@@ -119,9 +119,9 @@ var TorcStateGraph = function ($, torc) {
     }
 
     function outputSubscriptionChanged(version, ignore, properties) {
-        if (version !== undefined && typeof properties === 'object') {
+        if (typeof version !== "undefined" && typeof properties === "object") {
             // NB update outputTypes first so that we can iterate over outputList meaningfully
-            outputsChanged('outputTypes', properties.outputTypes.value);
+            outputsChanged("outputTypes", properties.outputTypes.value);
             $.each(properties, function (key, value) {
                 outputsChanged(key, value.value); });
             return;
@@ -129,9 +129,9 @@ var TorcStateGraph = function ($, torc) {
     }
 
     function controlsChanged (name, value) {
-        if (name === 'controlTypes' && $.isArray(value)) {
+        if (name === "controlTypes" && $.isArray(value)) {
             controlTypes = value;
-        } else if (name === 'controlList' && typeof value === 'object') {
+        } else if (name === "controlList" && typeof value === "object") {
             if ($.isArray(controlTypes) && controlTypes.length > 0) {
                 $.each(controlTypes, function (ignore, type) {
                     $.each(value, function (key, controls) {
@@ -147,9 +147,9 @@ var TorcStateGraph = function ($, torc) {
     }
 
     function controlSubscriptionChanged(version, ignore, properties) {
-        if (version !== undefined && typeof properties === 'object') {
+        if (typeof version !== "undefined" && typeof properties === "object") {
             // NB update controlTypes first so that we can iterate over controlList meaningfully
-            controlsChanged('controlTypes', properties.controlTypes.value);
+            controlsChanged("controlTypes", properties.controlTypes.value);
             $.each(properties, function (key, value) {
                 controlsChanged(key, value.value); });
             return;
@@ -158,22 +158,20 @@ var TorcStateGraph = function ($, torc) {
 
     function initStateGraph (svg) {
         stategraph = svg;
-        stategraph.configure({width: '100%', height: '100%'}, false);
-        // NB neither inputList nor inputTypes should actually change, so don't ask for updates
-        torcconnection.subscribe('inputs',  [], inputsChanged,  inputSubscriptionChanged);
-        torcconnection.subscribe('controls', [], controlsChanged, controlSubscriptionChanged);
-        torcconnection.subscribe('outputs',  [], outputsChanged,  outputSubscriptionChanged);
+        stategraph.configure({width: "100%", height: "100%"}, false);
+        // NB neither inputList nor inputTypes should actually change, so don"t ask for updates
+        torcconnection.subscribe("inputs",  [], inputsChanged,  inputSubscriptionChanged);
+        torcconnection.subscribe("controls", [], controlsChanged, controlSubscriptionChanged);
+        torcconnection.subscribe("outputs",  [], outputsChanged,  outputSubscriptionChanged);
     }
 
     function clearStateGraph () {
         // we need to explicitly destroy the svg
         $("#torc-central").svg("destroy");
         $("#torc-central").empty();
-        stategraph = undefined;
     }
 
     this.cleanup = function () {
-        torcconnection = undefined;
         clearStateGraph();
         $("#torc-central").append(template(theme.StategraphNoConnection, { "text": torc.SocketNotConnected }));
     };
@@ -181,7 +179,7 @@ var TorcStateGraph = function ($, torc) {
     this.setup = function (connection) {
         torcconnection = connection;
         if ($("#torc-central").length < 1) {
-            $('.torc-navbar').after(template(theme.StategraphContainer, { }));
+            $(".torc-navbar").after(template(theme.StategraphContainer, { }));
         }
         clearStateGraph();
         $("#torc-central").svg({loadURL: "../content/stategraph.svg", onLoad: initStateGraph});

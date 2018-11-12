@@ -37,13 +37,13 @@ TorcNotify::TorcNotify()
 {
 }
 
-bool TorcNotify::Validate(void) const
+bool TorcNotify::Validate(void)
 {
     // there isn't always an app object when gNotify is created, so connect the dots here but ensure
     // connections are unique to account for multiple runs.
     connect(qApp, SIGNAL(applicationNameChanged()), gNotify, SLOT(ApplicationNameChanged()), Qt::UniqueConnection);
 
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(&m_lock);
 
     foreach (TorcNotification* notification, m_notifications)
         (void)notification->Setup();
@@ -51,9 +51,9 @@ bool TorcNotify::Validate(void) const
     return true;
 }
 
-TorcNotifier* TorcNotify::FindNotifierByName(const QString &Name) const
+TorcNotifier* TorcNotify::FindNotifierByName(const QString &Name)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(&m_lock);
     foreach (TorcNotifier* notifier, m_notifiers)
         if (notifier->GetUniqueId() == Name)
             return notifier;
@@ -115,7 +115,7 @@ QVariantMap TorcNotify::SetNotificationText(const QString &Title, const QString 
             initialised = true;
         }
         {
-            QMutexLocker locker(m_lock);
+            QMutexLocker locker(&m_lock);
             m_applicationNameChanged = false;
         }
     }
@@ -194,13 +194,13 @@ QVariantMap TorcNotify::SetNotificationText(const QString &Title, const QString 
 
 void TorcNotify::ApplicationNameChanged(void)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(&m_lock);
     m_applicationNameChanged = true;
 }
 
 void TorcNotify::Create(const QVariantMap &Details)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(&m_lock);
 
     QVariantMap::const_iterator ii = Details.constBegin();
     for ( ; ii != Details.constEnd(); ++ii)
@@ -282,7 +282,7 @@ void TorcNotify::Create(const QVariantMap &Details)
 
 void TorcNotify::Destroy(void)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(&m_lock);
     foreach (TorcNotifier* notifier, m_notifiers)
         notifier->DownRef();
     m_notifiers.clear();

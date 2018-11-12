@@ -104,21 +104,21 @@ void TorcHTTPHandler::HandleOptions(TorcHTTPRequest &Request, int Allowed)
     Request.SetAllowed(Allowed);
     Request.SetStatus(HTTP_OK);
     Request.SetResponseType(HTTPResponseNone);
-    Request.SetResponseContent(NULL);
+    QByteArray empty;
+    Request.SetResponseContent(empty);
 }
 
 void TorcHTTPHandler::HandleFile(TorcHTTPRequest &Request, const QString &Filename, int Cache)
 {
-    QFile *file = new QFile(Filename);
-
     // sanity checks
-    if (file->exists())
+    if (QFile::exists(Filename))
     {
-        if ((file->permissions() & QFile::ReadOther))
+        if ((QFile::permissions(Filename) & QFile::ReadOther))
         {
-            if (file->size() > 0)
+            QFileInfo fileinfo(Filename);
+            if (fileinfo.size() > 0)
             {
-                QDateTime modified = QFileInfo(*file).lastModified();
+                QDateTime modified = fileinfo.lastModified();
 
                 // set cache handling before we check for modification. This ensures the modification check is
                 // performed and the correct cache headers are re-sent with any 304 Not Modified response.
@@ -126,12 +126,9 @@ void TorcHTTPHandler::HandleFile(TorcHTTPRequest &Request, const QString &Filena
 
                 // Unmodified will handle the response
                 if (Request.Unmodified(modified))
-                {
-                    delete file;
                     return;
-                }
 
-                Request.SetResponseFile(file);
+                Request.SetResponseFile(Filename);
                 Request.SetStatus(HTTP_OK);
                 Request.SetAllowGZip(true);
                 return;
@@ -155,5 +152,4 @@ void TorcHTTPHandler::HandleFile(TorcHTTPRequest &Request, const QString &Filena
     }
 
     Request.SetResponseType(HTTPResponseNone);
-    delete file;
 }

@@ -32,7 +32,7 @@ class TorcOMXComponent Q_DECL_FINAL
     static OMX_ERRORTYPE    FillBufferDoneCallback  (OMX_HANDLETYPE Component, OMX_PTR OMXComponent, OMX_BUFFERHEADERTYPE *Buffer);
 
   public:
-    TorcOMXComponent(OMX_STRING Component);
+    explicit TorcOMXComponent(OMX_STRING Component);
    ~TorcOMXComponent();
 
     bool                    IsValid                 (void);

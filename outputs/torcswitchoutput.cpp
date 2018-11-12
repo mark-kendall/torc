@@ -32,6 +32,11 @@ TorcSwitchOutput::~TorcSwitchOutput()
 {
 }
 
+QStringList TorcSwitchOutput::GetDescription(void)
+{
+    return QStringList() << tr("Constant Switch");
+}
+
 TorcOutput::Type TorcSwitchOutput::GetType(void)
 {
     return TorcOutput::Switch;

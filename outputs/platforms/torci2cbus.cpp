@@ -66,13 +66,13 @@ TorcI2CBus::TorcI2CBus()
 
 void TorcI2CBus::Create(const QVariantMap &Details)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(&m_lock);
 
     QVariantMap::const_iterator i = Details.constBegin();
     for ( ; i != Details.constEnd(); ++i)
     {
         // I2C devices can be <sensors> or <outputs> (and both at the same time)
-        if (i.key() != SENSORS_DIRECTORY && i.key() != OUTPUTS_DIRECTORY)
+        if (i.key() != INPUTS_DIRECTORY && i.key() != OUTPUTS_DIRECTORY)
             continue;
 
         QVariantMap i2c = i.value().toMap();
@@ -133,7 +133,7 @@ void TorcI2CBus::Create(const QVariantMap &Details)
 
 void TorcI2CBus::Destroy(void)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(&m_lock);
 
     qDeleteAll(m_devices);
     m_devices.clear();

@@ -42,6 +42,7 @@ void TorcNetworkTemperatureInput::Start(void)
 {
     SetValid(true);
     SetValue(defaultValue);
-    TorcTemperatureInput::Start();
+    // NB skip TorcTemperatureInput::Start
+    TorcInput::Start();
 }
 

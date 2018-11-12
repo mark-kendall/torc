@@ -97,7 +97,7 @@ void TorcHTTPServerNonce::ProcessDigestAuth(TorcHTTPRequest &Request, bool Check
         }
 
         // remove leading 'Digest' and split out parameters
-        QStringList authentication = Request.Headers()->value("Authorization").mid(6).trimmed().split(",", QString::SkipEmptyParts);
+        QStringList authentication = Request.Headers().value("Authorization").mid(6).trimmed().split(",", QString::SkipEmptyParts);
 
         // create a filtered hash of the parameters
         QHash<QString,QString> params;

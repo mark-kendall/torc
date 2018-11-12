@@ -42,7 +42,7 @@ TorcControls::TorcControls()
 
 void TorcControls::Create(const QVariantMap &Details)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(&m_lock);
 
     QVariantMap::const_iterator it = Details.constBegin();
     for( ; it != Details.constEnd(); ++it)
@@ -90,7 +90,7 @@ void TorcControls::Create(const QVariantMap &Details)
 
 void TorcControls::Destroy(void)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(&m_lock);
 
     foreach (TorcControl *control, controlList)
         control->DownRef();
@@ -99,7 +99,7 @@ void TorcControls::Destroy(void)
 
 void TorcControls::Validate(void)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(&m_lock);
 
     // We first validate each control.
 
@@ -159,7 +159,7 @@ void TorcControls::SubscriberDeleted(QObject *Subscriber)
 QVariantMap TorcControls::GetControlList(void)
 {
     QVariantMap result;
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(&m_lock);
 
     // iterate over our list for each control type
     for (int type = TorcControl::Unknown; type < TorcControl::MaxType; type++)

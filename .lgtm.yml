@@ -1,0 +1,10 @@
+extraction:
+  cpp:
+     prepare:
+        packages: 
+          - libavahi-compat-libdnssd-dev
+          - qt5-default
+          - libxml2-dev
+     configure:
+        command:
+          - qmake torc.pro

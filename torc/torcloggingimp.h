@@ -58,7 +58,7 @@ class WebLogger : public QObject, public TorcHTTPService, public FileLogger
     Q_PROPERTY(QByteArray tail READ GetTail NOTIFY tailChanged)
 
   public:
-    WebLogger(QString Filename);
+    explicit WebLogger(QString Filename);
    ~WebLogger();
 
     bool Logmsg (LogItem *Item) Q_DECL_OVERRIDE;

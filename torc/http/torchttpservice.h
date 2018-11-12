@@ -50,5 +50,5 @@ class TorcHTTPService : public TorcHTTPHandler
     Q_DISABLE_COPY(TorcHTTPService)
 };
 
-Q_DECLARE_METATYPE(TorcHTTPService*);
+Q_DECLARE_METATYPE(TorcHTTPService*)
 #endif // TORCSERVICE_H

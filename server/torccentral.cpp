@@ -189,9 +189,9 @@ TorcCentral::TorcCentral()
         }
 
         // create a representation of the state graph
+#ifdef USING_GRAPHVIZ_LIBS
         bool created = false;
 
-#ifdef USING_GRAPHVIZ_LIBS
         FILE *handle = fopen(graphsvg.toLocal8Bit().data(), "w");
         if (handle)
         {
@@ -209,9 +209,10 @@ TorcCentral::TorcCentral()
         {
             LOG(VB_GENERAL, LOG_WARNING, QString("Failed to open '%1' for writing (err: %2)").arg(graphsvg).arg(strerror(errno)));
         }
-#endif
+
         if (!created)
         {
+#endif
             // NB QProcess appears to be fatally broken. Just use system instead
             QString command = QString("dot -Tsvg -o %1 %2").arg(graphsvg).arg(graphdot);
             int err = system(command.toLocal8Bit());
@@ -226,8 +227,9 @@ TorcCentral::TorcCentral()
                     LOG(VB_GENERAL, LOG_ERR, "dot returned an unexpected result - stategraph may be incomplete or absent");
             }
         }
+#ifdef USING_GRAPHVIZ_LIBS
     }
-
+#endif
     // no need for the graph data from here
     m_graph.clear();
 }
@@ -260,13 +262,11 @@ bool TorcCentral::LoadConfig(void)
 {
     bool skipvalidation = false;
 
-#if defined(USING_XMLPATTERNS) || defined(USING_LIBXML2)
     if (!qgetenv("TORC_NO_VALIDATION").isEmpty())
     {
         LOG(VB_GENERAL, LOG_INFO, "Skipping configuration file validation (command line).");
         skipvalidation = true;
     }
-#endif
 
     QString xml = GetTorcConfigDir() + "/" + TORC_CONFIG_FILE;
     QFileInfo config(xml);
@@ -466,6 +466,7 @@ class TorcCentralObject : public TorcAdminObject, public TorcStringFactory
 
     ~TorcCentralObject()
     {
+        Destroy();
     }
 
     void GetStrings(QVariantMap &Strings)

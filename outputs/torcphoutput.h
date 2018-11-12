@@ -12,7 +12,8 @@ class TorcpHOutput : public TorcOutput
     TorcpHOutput(double Value, const QString &ModelId, const QVariantMap &Details);
     virtual ~TorcpHOutput();
 
-    TorcOutput::Type GetType (void) Q_DECL_OVERRIDE;
+    QStringList      GetDescription (void) Q_DECL_OVERRIDE;
+    TorcOutput::Type GetType        (void) Q_DECL_OVERRIDE;
 };
 
 #endif // TORCPHOUTPUT_H

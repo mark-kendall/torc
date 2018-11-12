@@ -36,13 +36,13 @@ TorcSystemInputs::TorcSystemInputs()
 
 void TorcSystemInputs::Create(const QVariantMap &Details)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(&m_lock);
 
     QVariantMap::const_iterator i = Details.begin();
     for ( ; i != Details.end(); ++i)
     {
         // network devices can be <sensors> or <outputs>
-        if (i.key() != SENSORS_DIRECTORY)
+        if (i.key() != INPUTS_DIRECTORY)
             continue;
 
         QVariantMap devices = i.value().toMap();
@@ -72,7 +72,7 @@ void TorcSystemInputs::Create(const QVariantMap &Details)
 
 void TorcSystemInputs::Destroy(void)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(&m_lock);
 
     QMap<QString,TorcInput*>::iterator it = m_inputs.begin();
     for ( ; it != m_inputs.end(); ++it)

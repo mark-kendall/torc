@@ -54,8 +54,8 @@ void TorcUPnPContent::ProcessHTTPRequest(const QString &PeerAddress, int PeerPor
     {
         QHostAddress base(LocalAddress);
         QString url = QString("http%1://%2").arg(Request.GetSecure() ? "s" : "").arg(TorcNetwork::IPAddressToLiteral(base, LocalPort, false));
-        QByteArray *result = new QByteArray();
-        QXmlStreamWriter xml(result);
+        QByteArray result;
+        QXmlStreamWriter xml(&result);
         xml.writeStartDocument("1.0");
         xml.writeStartElement("root");
         xml.writeAttribute("xmlns", "urn:schemas-upnp-org:device-1-0");

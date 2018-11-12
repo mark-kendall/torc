@@ -41,5 +41,6 @@ void TorcNetworkpHInput::Start(void)
 {
     SetValid(true);
     SetValue(defaultValue);
-    TorcpHInput::Start();
+    // NB skip TorcpHInput::Start
+    TorcInput::Start();
 }

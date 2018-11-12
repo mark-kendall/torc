@@ -2,7 +2,7 @@
 
 // Simple JavaScript Templating
 // John Resig - http://ejohn.org/ - MIT Licensed
-(function(){
+(function () {
   var cache = {};
 
   this.template = function template(str, data){
@@ -10,7 +10,7 @@
     // load the template - and be sure to cache the result.
     var fn = !/\W/.test(str) ?
       cache[str] = cache[str] ||
-        tmpl(document.getElementById(str).innerHTML) :
+        template(document.getElementById(str).innerHTML) :
 
       // Generate a reusable function that will serve as a template
       // generator (and which will be cached).
@@ -34,4 +34,4 @@
     // Provide some basic currying to the user
     return data ? fn( data ) : fn;
   };
-})();
+}());

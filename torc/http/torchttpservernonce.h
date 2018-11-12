@@ -18,7 +18,7 @@ class TorcHTTPServerNonce
     static void ProcessDigestAuth (TorcHTTPRequest &Request, bool Check = false);
 
     TorcHTTPServerNonce();
-    TorcHTTPServerNonce(const QDateTime &Time);
+    explicit TorcHTTPServerNonce(const QDateTime &Time);
    ~TorcHTTPServerNonce();
 
     QString     GetOpaque(void) const;

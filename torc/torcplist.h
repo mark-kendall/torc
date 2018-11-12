@@ -5,6 +5,10 @@
 #include <QVariant>
 #include <QXmlStreamWriter>
 
+#define BPLIST_HIGH    0xF0
+#define BPLIST_LOW     0x0F
+#define BPLIST_LOW_MAX BPLIST_LOW
+
 class TorcPList
 {
   public:
@@ -45,6 +49,7 @@ class TorcPList
     QVariant        ParseBinaryData    (quint8 *Data);
     QVariant        ParseBinaryUnicode (quint8 *Data);
     static QVariant ParseBinaryUInt    (quint8 **Data);
+    QVariant        ParseBinaryUID     (quint8 *Data);
     quint64         GetBinaryCount     (quint8 **Data);
     static quint64  GetBinaryUInt      (quint8 *Data, quint64 Size);
     quint8*         GetBinaryObject    (quint64 Num);

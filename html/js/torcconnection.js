@@ -26,56 +26,78 @@
 var TorcConnection = function ($, torc, statusChanged) {
     "use strict";
 
-    var socket = undefined;
+    var socket = null;
     var subscriptions = {};
     var defaultServiceList = { services: { path: torc.ServicesPath } };
     var serviceList = defaultServiceList;
-    var returnFormats = undefined;
-    var websocketprotocols = undefined;
+    var returnFormats;
+    var websocketprotocols;
     var that = this;
 
     this.call = function(serviceName, method, params, success, failure) {
-        // call to a subscribed service
-        if (socket !== undefined && subscriptions[serviceName] && subscriptions[serviceName].methods[method]) {
-            socket.call(serviceList[serviceName].path + method, params, success, failure);
-            return;
-        // just a call, no subscription
-        } else if (socket !== undefined && serviceList.hasOwnProperty(serviceName)) {
-            socket.call(serviceList[serviceName].path + method, params, success, failure);
-            return;
+        if (socket !== null) {
+            // call to a subscribed service
+            if (subscriptions[serviceName] && subscriptions[serviceName].methods[method]) {
+                socket.call(serviceList[serviceName].path + method, params, success, failure);
+            // just a call, no subscription
+            } else if (serviceList.hasOwnProperty(serviceName)) {
+                socket.call(serviceList[serviceName].path + method, params, success, failure);
+            }
         }
-        console.log('Failed to call ' + serviceName + method);
     };
 
     this.unsubscribe = function (serviceName) {
         if (subscriptions[serviceName]) {
             subscriptions[serviceName].subscription.unsubscribe();
             delete subscriptions[serviceName];
-        } else {
-            console.log('Cannot unsubscribe from ' + serviceName + ' - not subscribed');
+        }
+    };
+
+    function subscriptionChanged(name, version, methods, properties) {
+        // is this a known service subscription
+        if (!subscriptions[name]) {
+            return;
+        }
+
+        // there was an error subscribing
+        if (typeof version === "undefined") {
+            if (typeof subscriptions[name].subscriptionChanges === "function") { subscriptions[name].subscriptionChanges(); }
+            return;
+        }
+
+        // loop through the requested properties and listen for updates
+        if (typeof properties === "object" && $.isArray(subscriptions[name].properties)) {
+            subscriptions[name].properties.forEach(function(element) {
+                if (properties.hasOwnProperty(element)) {
+                    subscriptions[name].subscription.listen(element, subscriptions[name].propertyChanges);
+                }});
+        }
+
+        // save the methods for validating calls
+        subscriptions[name].methods = methods;
+
+        // and notifiy subscriber
+        if (typeof subscriptions[name].subscriptionChanges === "function") {
+            subscriptions[name].subscriptionChanges(version, methods, properties, name);
         }
     }
 
     this.subscribe = function (serviceName, properties, propertyChanges, subscriptionChanges) {
         // is this a known service
         if (!serviceList.hasOwnProperty(serviceName)) {
-            console.log('Cannot subscribe to unknown service ' + serviceName);
-            if (typeof subscriptionChanges === 'function') { subscriptionChanges(); }
+            if (typeof subscriptionChanges === "function") { subscriptionChanges(); }
             return;
         }
 
         // avoid double subscriptions
         if (subscriptions[serviceName]) {
-            console.log('Already subscribed to ' + serviceName);
-            if (typeof subscriptionChanges === 'function') { subscriptionChanges(); }
+            if (typeof subscriptionChanges === "function") { subscriptionChanges(); }
             return;
         }
 
         // actually subscribe
         subscriptions[serviceName] = {
-            properties: properties,
-            propertyChanges: propertyChanges,
-            subscriptionChanges: subscriptionChanges,
+            properties, propertyChanges, subscriptionChanges,
             subscription: new TorcSubscription(socket, serviceName, serviceList[serviceName].path, subscriptionChanged)
         };
     };
@@ -93,88 +115,51 @@ var TorcConnection = function ($, torc, statusChanged) {
     };
 
     this.getServiceMethods = function (service) {
-        if (subscriptions.hasOwnProperty(service) && typeof subscriptions[service] === 'object') {
-            if (subscriptions[service].hasOwnProperty('methods') && typeof subscriptions[service].methods === 'object') {
+        if (subscriptions.hasOwnProperty(service) && typeof subscriptions[service] === "object") {
+            if (subscriptions[service].hasOwnProperty("methods") && typeof subscriptions[service].methods === "object") {
                 return subscriptions[service].methods; } }
-        return undefined;
     };
 
     // N.B. this.properties is the list of properties the subcsciber is interested in.
     // the subscription has the complete list
     this.getServiceProperties = function (service) {
-        if (subscriptions.hasOwnProperty(service) && typeof subscriptions[service] === 'object') {
+        if (subscriptions.hasOwnProperty(service) && typeof subscriptions[service] === "object") {
             return subscriptions[service].subscription.getProperties();
         }
-        return undefined;
     };
-
-    function subscriptionChanged(name, version, methods, properties) {
-        // is this a known service subscription
-        if (!subscriptions[name]) {
-            console.log('Received subscription response for unknown service' + name);
-            return;
-        }
-
-        // there was an error subscribing
-        if (version === undefined) {
-            console.log('Error subscribing to service' + name);
-            if (typeof subscriptions[name].subscriptionChanges === 'function') { subscriptions[name].subscriptionChanges(); }
-            return;
-        }
-
-        // loop through the requested properties and listen for updates
-        if (typeof properties === 'object' && $.isArray(subscriptions[name].properties)) {
-            subscriptions[name].properties.forEach(function(element) {
-                if (properties.hasOwnProperty(element)) {
-                    subscriptions[name].subscription.listen(element, subscriptions[name].propertyChanges);
-                }});
-        }
-
-        // save the methods for validating calls
-        subscriptions[name].methods = methods;
-
-        // and notifiy subscriber
-        if (typeof subscriptions[name].subscriptionChanges === 'function') {
-            subscriptions[name].subscriptionChanges(version, methods, properties, name);
-        }
-    }
 
     function serviceListChanged(ignore, value) {
         // there is currently no service that starts or stops other than at startup/shutdown. So this list
-        // shouldn't currently change and the subscriber list will be updated if a new socket is used.
+        // shouldn"t currently change and the subscriber list will be updated if a new socket is used.
         serviceList = value;
     }
 
     function serviceSubscriptionChanged(version, ignore, properties) {
-        if (version !== undefined && typeof properties === 'object' && properties.hasOwnProperty('serviceList') &&
-            properties.serviceList.hasOwnProperty('value')) {
-            serviceListChanged('serviceList', properties.serviceList.value);
+        if (typeof version !== "undefined" && typeof properties === "object" && properties.hasOwnProperty("serviceList") &&
+            properties.serviceList.hasOwnProperty("value")) {
+            serviceListChanged("serviceList", properties.serviceList.value);
             returnFormats = properties.returnFormats.value;
             websocketprotocols = properties.webSocketProtocols.value;
             statusChanged(torc.SocketReady);
             return;
         }
 
-        serviceListChanged('serviceList', []);
-    }
-
-    function connect() {
-        socket = new TorcWebsocket($, torc, socketStatusChanged);
+        serviceListChanged("serviceList", []);
     }
 
     function connected() {
-        that.subscribe('services', ['serviceList'], serviceListChanged, serviceSubscriptionChanged);
+        that.subscribe("services", ["serviceList"], serviceListChanged, serviceSubscriptionChanged);
     }
 
     function disconnected() {
         // notify subscribers that they have been disconnected and delete subscription
         Object.getOwnPropertyNames(subscriptions).forEach(function (element) {
-            if (typeof subscriptions[element].subscriptionChanges === 'function') { subscriptions[element].subscriptionChanges(); }
+            if (typeof subscriptions[element].subscriptionChanges === "function") { subscriptions[element].subscriptionChanges(); }
             delete subscriptions[element];
         });
 
         // clear state and schedule reconnect
-        socket = undefined;
+        socket = null;
         serviceList = defaultServiceList;
     }
 
@@ -189,16 +174,20 @@ var TorcConnection = function ($, torc, statusChanged) {
         }
     }
 
+    function connect() {
+        socket = new TorcWebsocket($, torc, socketStatusChanged);
+    }
+
     connect();
 
     // continually try to reconnect if the window is visible
     Visibility.every(2000, function () {
-        if (socket === undefined) {
+        if (socket === null) {
             connect();
         }});
     // and disconnect every time it is hidden
     Visibility.change(function (ignore, state) {
-        if (state === 'hidden' && socket !== undefined) {
+        if (state === "hidden" && socket !== null) {
                 socket.stop();
             }
         });

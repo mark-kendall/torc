@@ -38,21 +38,30 @@
 
 /*! \class TorcNetworkInputs
  *
- * Creates and manages known network (i.e. user set) sensors.
+ * Creates and manages known network (i.e. user set) sensors (actually inputs and outputs)
+ * as well as static/constant inputs and outputs.
  *
  * \code
  *
  * <torc>
- *     <inputs or outputs>
- *         <network>
- *             <switch or pwm or ph etc>
- *                 <name></name>
- *                 <default></default>
- *                 <username></username>
- *                 <userdescription></userdescription>
- *             </switch etc>
- *         </network>
- *     </inputs or outputs>
+ *   <inputs or outputs>
+ *     <network>
+ *       <switch/pwm/temperature/ph/button>
+ *         <name></name>
+ *         <default></default>
+ *         <username></username>
+ *         <userdescription></userdescription>
+ *       </switch etc>
+ *     </network>
+ *     <constant>
+ *       <switch/pwm/temperature/ph> -- NO BUTTON
+ *         <name></name>
+ *         <default></default>
+ *         <username></username>
+ *         <userdescription></userdescription>
+ *       </switch etc>
+ *     </constant>
+ *   </inputs or outputs>
  * </torc>
  *
  * \endcode
@@ -68,23 +77,27 @@ TorcNetworkInputs::TorcNetworkInputs()
 
 void TorcNetworkInputs::Create(const QVariantMap &Details)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(&m_lock);
 
     QVariantMap::const_iterator i = Details.begin();
     for ( ; i != Details.end(); ++i)
     {
-        // network devices can be <sensors> or <outputs>
-        if ((i.key() != SENSORS_DIRECTORY) && (i.key() != OUTPUTS_DIRECTORY))
+        // network devices can be <inputs> or <outputs>
+        if ((i.key() != INPUTS_DIRECTORY) && (i.key() != OUTPUTS_DIRECTORY))
             continue;
 
-        bool issensor = (i.key() == SENSORS_DIRECTORY);
+        bool isinput = (i.key() == INPUTS_DIRECTORY);
 
         QVariantMap devices = i.value().toMap();
         QVariantMap::const_iterator j = devices.constBegin();
         for ( ; j != devices.constEnd(); ++j)
         {
-            // look for <network>
-            if (j.key() != NETWORK_INPUTS_STRING)
+            // look for <network> or <constant>
+            QString group = j.key();
+            bool network  = group == NETWORK_INPUTS_STRING;
+            bool constant = group == CONSTANT_INPUTS_STRING;
+
+            if (!network && !constant)
                 continue;
 
             QVariantMap details = j.value().toMap();
@@ -96,65 +109,73 @@ void TorcNetworkInputs::Create(const QVariantMap &Details)
                 {
                     if (it.key() == TorcInput::TypeToString(static_cast<TorcInput::Type>(type)))
                     {
-                        QVariantMap sensor   = it.value().toMap();
-                        QString defaultvalue = sensor.value("default").toString();
-                        QString uniqueid     = sensor.value("name").toString(); // ugly... assumes it is present
+                        QVariantMap input    = it.value().toMap();
+                        QString defaultvalue = network ? input.value("default").toString() : input.value("value").toString();
+                        QString uniqueid     = input.value("name").toString(); // ugly... assumes it is present
 
                         bool ok = false;
                         double defaultdouble = defaultvalue.toDouble(&ok);
                         if (!ok)
                             defaultdouble = 0.0;
 
-                        TorcInput* newsensor = NULL;
+                        TorcInput*  newinput  = NULL;
                         TorcOutput* newoutput = NULL;
                         switch (type)
                         {
                             case TorcInput::PWM:
                                 {
-                                    if (issensor)
-                                        newsensor = new TorcNetworkPWMInput(defaultdouble, sensor);
+                                    if (isinput)
+                                        newinput = network ? new TorcNetworkPWMInput(defaultdouble, input) : new TorcPWMInput(defaultdouble, "ConstantPWM", input);
                                     else
-                                        newoutput = new TorcNetworkPWMOutput(defaultdouble, sensor);
+                                        newoutput = network ? new TorcNetworkPWMOutput(defaultdouble, input) : new TorcPWMOutput(defaultdouble, "ConstantPWM", input);
                                 }
                                 break;
                             case TorcInput::Switch:
                                 {
-                                    if (issensor)
-                                        newsensor = new TorcNetworkSwitchInput(defaultdouble, sensor);
+                                    if (isinput)
+                                        newinput = network ? new TorcNetworkSwitchInput(defaultdouble, input) : new TorcSwitchInput(defaultdouble, "ConstantSwitch", input);
                                     else
-                                        newoutput = new TorcNetworkSwitchOutput(defaultdouble, sensor);
+                                        newoutput = network ? new TorcNetworkSwitchOutput(defaultdouble, input) : new TorcSwitchOutput(defaultdouble, "ConstantSwitch", input);
                                 }
                                 break;
                             case TorcInput::Temperature:
                                 {
-                                    if (issensor)
-                                        newsensor = new TorcNetworkTemperatureInput(defaultdouble, sensor);
+                                    if (isinput)
+                                        newinput = network ? new TorcNetworkTemperatureInput(defaultdouble, input) : new TorcTemperatureInput(defaultdouble, -1000, 1000, "ConstantTemp", input);
                                     else
-                                        newoutput = new TorcNetworkTemperatureOutput(defaultdouble, sensor);
+                                        newoutput = network ? new TorcNetworkTemperatureOutput(defaultdouble, input) : new TorcTemperatureOutput(defaultdouble, "ConstantTemp", input);
                                 }
                                 break;
                             case TorcInput::pH:
                                 {
-                                    if (issensor)
-                                        newsensor = new TorcNetworkpHInput(defaultdouble, sensor);
+                                    if (isinput)
+                                        newinput = network ? new TorcNetworkpHInput(defaultdouble, input) : new TorcpHInput(defaultdouble, "ConstantpH", input);
                                     else
-                                        newoutput = new TorcNetworkpHOutput(defaultdouble, sensor);
+                                        newoutput = network ? new TorcNetworkpHOutput(defaultdouble, input) : new TorcpHOutput(defaultdouble, "ConstantpH", input);
                                 }
                                 break;
                             case TorcInput::Button:
                                 {
-                                    if (issensor)
-                                        newsensor = new TorcNetworkButtonInput(defaultdouble, sensor);
+                                    if (constant)
+                                    {
+                                        // this should be flagged by the XSD
+                                        LOG(VB_GENERAL, LOG_ERR, "Cannot create constant button input");
+                                    }
                                     else
                                     {
-                                        newoutput = new TorcNetworkButtonOutput(defaultdouble, sensor);
+                                        if (isinput)
+                                            newinput = new TorcNetworkButtonInput(defaultdouble, input);
+                                        else
+                                        {
+                                            newoutput = new TorcNetworkButtonOutput(defaultdouble, input);
+                                        }
                                     }
                                 }
                             default: break;
                         }
 
-                        if (newsensor)
-                            m_inputs.insert(uniqueid, newsensor);
+                        if (newinput)
+                            m_inputs.insert(uniqueid, newinput);
                         if (newoutput)
                             m_outputs.insert(uniqueid, newoutput);
                     }
@@ -166,7 +187,7 @@ void TorcNetworkInputs::Create(const QVariantMap &Details)
 
 void TorcNetworkInputs::Destroy(void)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(&m_lock);
 
     QMap<QString,TorcInput*>::iterator it = m_inputs.begin();
     for ( ; it != m_inputs.end(); ++it)

@@ -81,7 +81,7 @@
 *
 * From the command line run:
 * \code
-* sudo apt-get install libgraphviz-dev libavahi-compat-libdnssd-dev qt5-default git-core libqt5xmlpatterns5-dev upower libxml2-dev consolekit
+* sudo apt-get install graphviz libavahi-compat-libdnssd-dev qt5-default git-core upower libxml2-dev consolekit libssl-dev libavformat-dev
 * \endcode
 *
 * \subsection piwiringpi Install wiringPi.
@@ -153,7 +153,7 @@ TorcPiGPIO::TorcPiGPIO()
 
 void TorcPiGPIO::Create(const QVariantMap &GPIO)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(&m_lock);
 
     static bool debugged = false;
     if (!debugged)
@@ -181,7 +181,7 @@ void TorcPiGPIO::Create(const QVariantMap &GPIO)
     for ( ; i != GPIO.constEnd(); ++i)
     {
         // GPIO can be under <sensors> or <outputs>
-        if (i.key() != SENSORS_DIRECTORY && i.key() != OUTPUTS_DIRECTORY)
+        if (i.key() != INPUTS_DIRECTORY && i.key() != OUTPUTS_DIRECTORY)
             continue;
 
         bool output = i.key() == OUTPUTS_DIRECTORY;
@@ -257,7 +257,7 @@ void TorcPiGPIO::Create(const QVariantMap &GPIO)
 
 void TorcPiGPIO::Destroy(void)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(&m_lock);
 
     QMap<int,TorcPiSwitchInput*>::iterator it = m_inputs.begin();
     for ( ; it != m_inputs.end(); ++it)

@@ -143,16 +143,16 @@ bool TorcCoreUtils::HasZlib(void)
  * The returned data is suitable for sending as part of an HTTP response when the requestor accepts
  * gzip compression.
 */
-QByteArray* TorcCoreUtils::GZipCompress(QByteArray *Source)
+QByteArray TorcCoreUtils::GZipCompress(QByteArray &Source)
 {
-    QByteArray *result = NULL;
+    QByteArray result;
 
 #ifndef USING_ZLIB
     (void) Source;
     return result;
 #else
     // this shouldn't happen
-    if (!Source || Source->size() < 0)
+    if (Source.size() < 0)
         return result;
 
     // initialise zlib (see zlib usage examples)
@@ -163,16 +163,14 @@ QByteArray* TorcCoreUtils::GZipCompress(QByteArray *Source)
     stream.zalloc   = NULL;
     stream.zfree    = NULL;
     stream.opaque   = NULL;
-    stream.avail_in = Source->size();
-    stream.next_in  = (Bytef*)Source->data();
+    stream.avail_in = Source.size();
+    stream.next_in  = (Bytef*)Source.data();
 
     if (Z_OK != deflateInit2(&stream, Z_DEFAULT_COMPRESSION, Z_DEFLATED, 15 + 16, 8, Z_DEFAULT_STRATEGY))
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to setup zlip decompression");
         return result;
     }
-
-    result = new QByteArray();
 
     do
     {
@@ -188,7 +186,7 @@ QByteArray* TorcCoreUtils::GZipCompress(QByteArray *Source)
             return result;
         }
 
-        result->append(outputbuffer, chunksize - stream.avail_out);
+        result.append(outputbuffer, chunksize - stream.avail_out);
     } while (stream.avail_out == 0);
 
     deflateEnd(&stream);
@@ -201,16 +199,16 @@ QByteArray* TorcCoreUtils::GZipCompress(QByteArray *Source)
  * The returned data is suitable for sending as part of an HTTP response when the requestor accepts
  * gzip compression.
 */
-QByteArray* TorcCoreUtils::GZipCompressFile(QFile *Source)
+QByteArray TorcCoreUtils::GZipCompressFile(QFile &Source)
 {
-    QByteArray *result = NULL;
+    QByteArray result;
 
 #ifndef USING_ZLIB
     (void) Source;
     return result;
 #else
     // this shouldn't happen
-    if (!Source || Source->size() < 0)
+    if (Source.size() < 0)
         return result;
 
     // initialise zlib (see zlib usage examples)
@@ -230,28 +228,27 @@ QByteArray* TorcCoreUtils::GZipCompressFile(QFile *Source)
     }
 
     // this should have been checked already
-    if (!Source->open(QIODevice::ReadOnly))
-        return result;
+    if (!Source.isOpen())
+        if (!Source.open(QIODevice::ReadOnly))
+            return result;
 
-    result = new QByteArray();
-
-    while (Source->bytesAvailable() > 0)
+    while (Source.bytesAvailable() > 0)
     {
         stream.avail_out = chunksize;
         stream.next_out  = (Bytef*)outputbuffer;
 
-        qint64 read = Source->read(inputbuffer, qMin(Source->bytesAvailable(), (qint64)chunksize));
+        qint64 read = Source.read(inputbuffer, qMin(Source.bytesAvailable(), (qint64)chunksize));
 
         if (read > 0)
         {
             stream.avail_in = read;
             stream.next_in  = (Bytef*)inputbuffer;
 
-            int error = deflate(&stream, Source->bytesAvailable() ? Z_SYNC_FLUSH : Z_FINISH);
+            int error = deflate(&stream, Source.bytesAvailable() ? Z_SYNC_FLUSH : Z_FINISH);
 
             if (error == Z_OK || error == Z_STREAM_END)
             {
-                result->append(outputbuffer, chunksize - stream.avail_out);
+                result.append(outputbuffer, chunksize - stream.avail_out);
                 continue;
             }
         }

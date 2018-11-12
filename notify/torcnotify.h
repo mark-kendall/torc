@@ -21,8 +21,8 @@ class TorcNotify Q_DECL_FINAL : public QObject, public TorcDeviceHandler
   public:
     TorcNotify();
 
-    bool          Validate               (void) const;
-    TorcNotifier* FindNotifierByName     (const QString &Name) const;
+    bool          Validate               (void);
+    TorcNotifier* FindNotifierByName     (const QString &Name);
     QVariantMap   SetNotificationText    (const QString &Title, const QString &Body, const QMap<QString,QString> &Custom);
     void          Graph                  (QByteArray* Data);
 

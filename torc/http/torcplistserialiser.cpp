@@ -34,7 +34,7 @@ HTTPResponseType TorcPListSerialiser::ResponseType(void)
     return HTTPResponsePList;
 }
 
-void TorcPListSerialiser::Begin(void)
+void TorcPListSerialiser::Begin(QByteArray &)
 {
     m_xmlStream.setAutoFormatting(true);
     m_xmlStream.setAutoFormattingIndent(4);
@@ -45,12 +45,12 @@ void TorcPListSerialiser::Begin(void)
     m_xmlStream.writeStartElement("dict");
 }
 
-void TorcPListSerialiser::AddProperty(const QString &Name, const QVariant &Value)
+void TorcPListSerialiser::AddProperty(QByteArray &, const QString &Name, const QVariant &Value)
 {
     PListFromVariant(Name, Value);
 }
 
-void TorcPListSerialiser::End(void)
+void TorcPListSerialiser::End(QByteArray &)
 {
     m_xmlStream.writeEndElement();
     m_xmlStream.writeEndElement();
@@ -59,6 +59,14 @@ void TorcPListSerialiser::End(void)
 
 void TorcPListSerialiser::PListFromVariant(const QString &Name, const QVariant &Value, bool NeedKey)
 {
+    if (Value.isNull())
+    {
+        if (NeedKey)
+            m_xmlStream.writeTextElement("key", Name);
+        m_xmlStream.writeEmptyElement("null");
+        return;
+    }
+
     switch ((int)Value.type())
     {
         case QMetaType::QVariantList: PListFromList(Name, Value.toList());             break;
@@ -91,7 +99,14 @@ void TorcPListSerialiser::PListFromVariant(const QString &Name, const QVariant &
             m_xmlStream.writeEmptyElement(Value.toBool() ? "true" : "false");
             break;
         }
-
+        case QMetaType::Char:
+        {
+            if (NeedKey)
+                m_xmlStream.writeTextElement("key", Name);
+            m_xmlStream.writeEmptyElement("fill");
+            break;
+        }
+        break;
         case QMetaType::UInt:
         case QMetaType::UShort:
         case QMetaType::ULong:

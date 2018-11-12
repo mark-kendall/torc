@@ -33,10 +33,10 @@ var TorcSubscription = function (socket, serviceName, servicePath, subscribedCha
         listeners[serviceProperty] = propertyChangedCallback;
     };
 
-    // callback for changes in property values. Properties are sent as an object with one property - 'value'
+    // callback for changes in property values. Properties are sent as an object with one property - "value"
     function propertyChanged(name, params) {
-        if (listeners[name] && typeof listeners[name] === 'function' &&
-            typeof params === 'object' && params.hasOwnProperty('value')) {
+        if (listeners[name] && typeof listeners[name] === "function" &&
+            typeof params === "object" && params.hasOwnProperty("value")) {
             listeners[name](name, params.value, serviceName);
         }
     }
@@ -44,13 +44,13 @@ var TorcSubscription = function (socket, serviceName, servicePath, subscribedCha
     // return the known properties for this subscription. Use for API help.
     this.getProperties = function () {
         return properties;
-    }
+    };
 
     // callback to notify successful subscription
     function subscribed(data) {
         // pre-validate the subscription return for the subscriber
-        if (typeof data === 'object' && data.hasOwnProperty('methods') &&
-            data.hasOwnProperty('properties') && typeof data.properties === 'object') {
+        if (typeof data === "object" && data.hasOwnProperty("methods") &&
+            data.hasOwnProperty("properties") && typeof data.properties === "object") {
             version = data.properties.serviceVersion.value;
             methods = data.methods;
             properties = data.properties;
@@ -60,28 +60,26 @@ var TorcSubscription = function (socket, serviceName, servicePath, subscribedCha
                 socket.listen(element, servicePath + properties[element].notification, propertyChanged);
             });
         } else {
-            version = undefined;
-            methods = undefined;
-            properties = undefined;
-            console.log('Invalid subscription response');
+            version = [];
+            methods = [];
+            properties = [];
         }
 
-        if (typeof subscribedChanged === 'function') { subscribedChanged(serviceName, version, methods, properties); }
+        if (typeof subscribedChanged === "function") { subscribedChanged(serviceName, version, methods, properties); }
     }
 
     // callback to notify subscription failed
     function failed() {
-        version = undefined;
-        methods = undefined;
-        properties = undefined;
-        console.log('Failed to subscribe to ' + servicePath);
-        if (typeof subscribedChanged === 'function') { subscribedChanged(serviceName, undefined); }
+        version = [];
+        methods = [];
+        properties = [];
+        if (typeof subscribedChanged === "function") { subscribedChanged(serviceName); }
     }
 
     this.unsubscribe = function () {
-        socket.call(servicePath + 'Unsubscribe');
-    }
+        socket.call(servicePath + "Unsubscribe");
+    };
 
     // subscribe
-    socket.call(servicePath + 'Subscribe', null, subscribed, failed);
+    socket.call(servicePath + "Subscribe", null, subscribed, failed);
 };

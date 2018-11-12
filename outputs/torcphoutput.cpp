@@ -32,6 +32,11 @@ TorcpHOutput::~TorcpHOutput()
 {
 }
 
+QStringList TorcpHOutput::GetDescription(void)
+{
+    return QStringList() << tr("Constant pH");
+}
+
 TorcOutput::Type TorcpHOutput::GetType(void)
 {
     return TorcOutput::pH;

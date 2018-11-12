@@ -22,7 +22,7 @@ class TorcDeviceHandler
     TorcDeviceHandler*               GetNextHandler   (void);
 
   protected:
-    QMutex                          *m_lock;
+    QMutex                           m_lock;
 
   private:
     static QList<TorcDeviceHandler*> gTorcDeviceHandlers;

@@ -22,8 +22,8 @@ class TorcSegmentedRingBuffer : public QObject
     int                     FinishSegment    (bool Init);
     int                     ReadSegment      (uint8_t       *Data, int Max,  int SegmentRef, int Offset = 0);
     int                     ReadSegment      (QIODevice     *Dst,  int SegmentRef);
-    QByteArray*             GetSegment       (int SegmentRef);
-    QByteArray*             GetInitSegment   (void);
+    QByteArray              GetSegment       (int SegmentRef);
+    QByteArray              GetInitSegment   (void);
     void                    SaveInitSegment  (void);
 
   signals:
@@ -36,7 +36,7 @@ class TorcSegmentedRingBuffer : public QObject
 
   protected:
     int                     m_size;
-    uint8_t*                m_data;
+    QByteArray              m_data;
     int                     m_readPosition;
     int                     m_writePosition;
     int                     m_currentSize;
@@ -45,10 +45,7 @@ class TorcSegmentedRingBuffer : public QObject
     QQueue<QPair<int,int> > m_segments;
     QQueue<int>             m_segmentRefs;
     int                     m_segmentCounter;
-    QByteArray*             m_initSegment;
-
-  private:
-    Q_DISABLE_COPY(TorcSegmentedRingBuffer)
+    QByteArray              m_initSegment;
 };
 
 #endif // TORCSEGMENTEDRINGBUFFER_H

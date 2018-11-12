@@ -66,9 +66,9 @@ TorcNetworkRequest::TorcNetworkRequest(const QNetworkRequest Request, QNetworkAc
     m_buffer(QByteArray(BufferSize, 0)),
     m_readSize(DEFAULT_STREAMED_READ_SIZE),
     m_redirectionCount(0),
-    m_readTimer(new TorcTimer()),
-    m_writeTimer(new TorcTimer()),
-    m_postData(NULL),
+    m_readTimer(),
+    m_writeTimer(),
+    m_postData(),
     m_replyFinished(false),
     m_replyBytesAvailable(0),
     m_bytesReceived(0),
@@ -103,9 +103,9 @@ TorcNetworkRequest::TorcNetworkRequest(const QNetworkRequest Request, const QByt
     m_buffer(),
     m_readSize(DEFAULT_STREAMED_READ_SIZE),
     m_redirectionCount(0),
-    m_readTimer(new TorcTimer()),
-    m_writeTimer(new TorcTimer()),
-    m_postData(new QByteArray(PostData)),
+    m_readTimer(),
+    m_writeTimer(),
+    m_postData(PostData),
     m_replyFinished(false),
     m_replyBytesAvailable(0),
     m_bytesReceived(0),
@@ -124,12 +124,6 @@ TorcNetworkRequest::TorcNetworkRequest(const QNetworkRequest Request, const QByt
 
 TorcNetworkRequest::~TorcNetworkRequest()
 {
-    delete m_postData;
-    delete m_readTimer;
-    delete m_writeTimer;
-    m_postData   = NULL;
-    m_readTimer  = NULL;
-    m_writeTimer = NULL;
 }
 
 int TorcNetworkRequest::BytesAvailable(void)
@@ -155,9 +149,9 @@ qint64 TorcNetworkRequest::GetPosition(void) const
 
 bool TorcNetworkRequest::WaitForStart(int Timeout)
 {
-    m_readTimer->Restart();
+    m_readTimer.Restart();
 
-    while (!m_started && !m_replyFinished && !(*m_abort) && (m_readTimer->Elapsed() < Timeout))
+    while (!m_started && !m_replyFinished && !(*m_abort) && (m_readTimer.Elapsed() < Timeout))
         QThread::usleep(50000);
 
     return m_started || m_replyFinished;
@@ -207,11 +201,11 @@ int TorcNetworkRequest::Read(char *Buffer, qint32 BufferSize, int Timeout, bool 
     if (!Buffer || !m_bufferSize)
         return -1;
 
-    m_readTimer->Restart();
+    m_readTimer.Restart();
 
-    while ((BytesAvailable() < m_readSize) && !(*m_abort) && (m_readTimer->Elapsed() < Timeout) && !(m_replyFinished && m_replyBytesAvailable == 0))
+    while ((BytesAvailable() < m_readSize) && !(*m_abort) && (m_readTimer.Elapsed() < Timeout) && !(m_replyFinished && m_replyBytesAvailable == 0))
     {
-        if (m_replyBytesAvailable && m_writeTimer->Elapsed() > 100)
+        if (m_replyBytesAvailable && m_writeTimer.Elapsed() > 100)
             gNetwork->Poke(this);
         QThread::usleep(50000);
     }
@@ -298,7 +292,7 @@ void TorcNetworkRequest::Write(QNetworkReply *Reply)
     if (!Reply)
         return;
 
-    m_writeTimer->Restart();
+    m_writeTimer.Restart();
 
     if (!m_bufferSize)
     {
@@ -415,9 +409,9 @@ QByteArray TorcNetworkRequest::ReadAll(int Timeout)
     if (m_bufferSize)
         LOG(VB_GENERAL, LOG_WARNING, "ReadAll called for a streamed buffer");
 
-    m_readTimer->Restart();
+    m_readTimer.Restart();
 
-    while (!(*m_abort) && (m_readTimer->Elapsed() < Timeout) && !m_replyFinished)
+    while (!(*m_abort) && (m_readTimer.Elapsed() < Timeout) && !m_replyFinished)
         QThread::usleep(50000);
 
     if (*m_abort)

@@ -51,8 +51,54 @@
         <userdescription>Won't work</userdescription>
       </ds18b20>
     </wire1>
+    <constant>
+      <pwm>
+        <name>constantpwminput</name>
+        <value>1.0</value>
+      </pwm>
+      <ph>
+        <name>constantphinput</name>
+        <value>7.0</value>
+      </ph>
+      <switch>
+        <name>constantswitchinput</name>
+        <value>0</value>
+      </switch>
+      <temperature>
+        <name>constanttemperatureinput</name>
+        <value>-10.0</value>
+      </temperature>
+    </constant>
   </inputs>
   <controls>
+    <logic>
+      <passthrough>
+        <name>passthrough</name>
+        <userdescription>dummy</userdescription>
+        <inputs><device>networkinputtemp</device></inputs>
+        <outputs><device>networkoutputtemp</device></outputs>
+      </passthrough>
+      <equal>
+        <name>equal</name>
+        <username>Equals</username>
+        <inputs><device>networkswitchinput</device></inputs>
+        <references><device>constantswitchinput</device></references>
+        <outputs><device>networkswitchoutput</device></outputs>
+      </equal>
+      <lessthan>
+        <name>lessthan</name>
+        <inputs><device>networkinputtemp</device></inputs>
+        <references><device>constanttemperatureinput</device></references>
+        <outputs><device>any</device></outputs>
+      </lessthan>
+      <any>
+        <name>any</name>
+        <username>Any</username>
+        <userdescription>Allow any</userdescription>
+        <inputs><device>lessthan</device><device>transition</device></inputs>
+        <outputs><device>networkpwmoutput</device></outputs>
+      </any>
+    </logic>
     <timer>
       <custom>
         <name>customtimer</name>
@@ -69,11 +115,29 @@
         <username>lineartransition</username>
         <duration>0:0.20</duration>
         <inputs><device>customtimer</device></inputs>
-        <outputs><device>networkpwmoutput</device></outputs>
+        <outputs><device>any</device></outputs>
       </linear>
     </transition>
   </controls>
   <outputs>
+    <constant>
+      <pwm>
+        <name>constantpwmoutput</name>
+        <value>1.0</value>
+      </pwm>
+      <ph>
+        <name>constantphoutput</name>
+        <value>7.0</value>
+      </ph>
+      <switch>
+        <name>constantswitchoutput</name>
+        <value>0</value>
+      </switch>
+      <temperature>
+        <name>constanttemperatureoutput</name>
+        <value>-10.0</value>
+      </temperature>
+    </constant>
     <network>
       <temperature>
         <name>networkoutputtemp</name>

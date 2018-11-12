@@ -35,23 +35,22 @@ HTTPResponseType TorcPlainTextSerialiser::ResponseType(void)
     return HTTPResponsePlainText;
 }
 
-void TorcPlainTextSerialiser::Prepare(void)
+void TorcPlainTextSerialiser::Prepare(QByteArray &)
 {
 }
 
-void TorcPlainTextSerialiser::Begin(void)
+void TorcPlainTextSerialiser::Begin(QByteArray &)
 {
 }
 
-void TorcPlainTextSerialiser::End(void)
+void TorcPlainTextSerialiser::End(QByteArray &)
 {
 }
 
-void TorcPlainTextSerialiser::AddProperty(const QString &Name, const QVariant &Value)
+void TorcPlainTextSerialiser::AddProperty(QByteArray &Dest, const QString &Name, const QVariant &Value)
 {
     // Name is added for consistency with other serialisers...
-    delete m_content;
-    m_content = new QByteArray(Name.toLocal8Bit() + "\r\n" + Value.toByteArray());
+    Dest = QByteArray(Name.toLocal8Bit() + "\r\n" + Value.toByteArray());
 }
 
 class TorcPlainTextSerialiserFactory : public TorcSerialiserFactory

@@ -42,5 +42,6 @@ void TorcNetworkPWMInput::Start(void)
 {
     SetValid(true);
     SetValue(defaultValue);
-    TorcPWMInput::Start();
+    // NB skip TorcPWMInput as it defaults to setting valid as it is constant
+    TorcInput::Start();
 }

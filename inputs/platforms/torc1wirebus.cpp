@@ -73,7 +73,7 @@ Torc1WireBus::Torc1WireBus()
 
 void Torc1WireBus::Create(const QVariantMap &Details)
 {
-    QMutexLocker locker(m_lock);
+    QMutexLocker locker(&m_lock);
 
     // check for the correct directory
     QDir dir(ONE_WIRE_DIRECTORY);
@@ -83,7 +83,7 @@ void Torc1WireBus::Create(const QVariantMap &Details)
     for ( ; i != Details.constEnd(); ++i)
     {
         // we look for 1Wire devices in <inputs>
-        if (i.key() != SENSORS_DIRECTORY)
+        if (i.key() != INPUTS_DIRECTORY)
             continue;
 
         QVariantMap wire1 = i.value().toMap();
@@ -146,7 +146,7 @@ void Torc1WireBus::Create(const QVariantMap &Details)
 
 void Torc1WireBus::Destroy(void)
 {
-    QMutexLocker lock(m_lock);
+    QMutexLocker lock(&m_lock);
 
     // delete any extant inputs
     QHash<QString,TorcInput*>::iterator it = m_inputs.begin();

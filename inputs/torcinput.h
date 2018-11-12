@@ -9,7 +9,7 @@
 #include "http/torchttpservice.h"
 #include "torcdevice.h"
 
-#define SENSORS_DIRECTORY QString("inputs")
+#define INPUTS_DIRECTORY QString("inputs")
 
 class TorcInput : public TorcDevice, public TorcHTTPService
 {

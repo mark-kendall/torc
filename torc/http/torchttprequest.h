@@ -135,8 +135,8 @@ class TorcHTTPRequest
     void                   SetConnection            (HTTPConnection Connection);
     void                   SetStatus                (HTTPStatus Status);
     void                   SetResponseType          (HTTPResponseType Type);
-    void                   SetResponseContent       (QByteArray *Content);
-    void                   SetResponseFile          (QFile *File);
+    void                   SetResponseContent       (const QByteArray &Content);
+    void                   SetResponseFile          (const QString &File);
     void                   SetResponseHeader        (const QString &Header, const QString &Value);
     void                   SetAllowed               (int Allowed);
     void                   SetAllowGZip             (bool Allowed);
@@ -152,12 +152,12 @@ class TorcHTTPRequest
     QString                GetPath                  (void) const;
     QString                GetMethod                (void) const;
     QString                GetCache                 (void) const;
-    const QMap<QString,QString>* Headers            (void) const;
+    const QMap<QString,QString>& Headers            (void) const;
     const QMap<QString,QString>& Queries            (void) const;
     bool                   GetAllowCORS             (void) const;
     void                   Respond                  (QTcpSocket *Socket);
     void                   Redirected               (const QString &Redirected);
-    TorcSerialiser*        GetSerialiser            (void);
+    void                   Serialise                (const QVariant &Data, const QString &Type);
     bool                   Unmodified               (const QDateTime &LastModified);
     bool                   Unmodified               (void);
     void                   Authorise                (HTTPAuthorisation Authorisation);
@@ -178,9 +178,9 @@ class TorcHTTPRequest
     HTTPProtocol           m_protocol;
     HTTPConnection         m_connection;
     QList<QPair<quint64,quint64> > m_ranges;
-    QMap<QString,QString> *m_headers;
+    QMap<QString,QString>  m_headers;
     QMap<QString,QString>  m_queries;
-    QByteArray            *m_content;
+    QByteArray             m_content;
     bool                   m_secure;
 
     bool                   m_allowGZip;
@@ -191,12 +191,9 @@ class TorcHTTPRequest
     int                    m_cache;
     QString                m_cacheTag;
     HTTPStatus             m_responseStatus;
-    QByteArray            *m_responseContent;
-    QFile                 *m_responseFile;
-    QMap<QString,QString> *m_responseHeaders;
-
-  private:
-    Q_DISABLE_COPY(TorcHTTPRequest)
+    QByteArray             m_responseContent;
+    QString                m_responseFile;
+    QMap<QString,QString>  m_responseHeaders;
 };
 
 #endif // TORCHTTPREQUEST_H

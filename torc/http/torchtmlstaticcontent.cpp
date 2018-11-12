@@ -100,11 +100,11 @@ void TorcHTMLStaticContent::GetJavascriptConfiguration(TorcHTTPRequest &Request)
 
     // and generate javascript
     QJsonObject json = QJsonObject::fromVariantMap(strings);
-    QByteArray *result = new QByteArray("var torc = ");
-    result->append(QJsonDocument(json).toJson());
-    if (result->endsWith("\n"))
-        result->chop(1);
-    result->append(";\r\n\r\nif (Object.freeze) { Object.freeze(torc); }\r\n");
+    QByteArray result("var torc = ");
+    result.append(QJsonDocument(json).toJson());
+    if (result.endsWith("\n"))
+        result.chop(1);
+    result.append(";\r\n\r\nif (Object.freeze) { Object.freeze(torc); }\r\n");
 
     Request.SetStatus(HTTP_OK);
     Request.SetResponseType(HTTPResponseJSONJavascript);

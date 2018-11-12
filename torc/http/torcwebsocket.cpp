@@ -189,14 +189,14 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest &Request)
             using the default port).
     */
 
-    if (valid && !Request.Headers()->contains("Host"))
+    if (valid && !Request.Headers().contains("Host"))
     {
         error = "No Host header";
         valid = false;
     }
 
     // default ports (e.g. 80) are not listed in host, so don't check in this case
-    QUrl host("http://" + Request.Headers()->value("Host"));
+    QUrl host("http://" + Request.Headers().value("Host"));
     int localport = localPort();
 
     if (valid && localport != 80 && localport != 443 && host.port() != localport)
@@ -219,13 +219,13 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest &Request)
             MUST include the "websocket" keyword.
     */
 
-    if (valid && !Request.Headers()->contains("Upgrade"))
+    if (valid && !Request.Headers().contains("Upgrade"))
     {
         error = "No Upgrade header";
         valid = false;
     }
 
-    if (valid && !Request.Headers()->value("Upgrade").contains("websocket", Qt::CaseInsensitive))
+    if (valid && !Request.Headers().value("Upgrade").contains("websocket", Qt::CaseInsensitive))
     {
         error = "No 'websocket request";
         valid = false;
@@ -236,13 +236,13 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest &Request)
             MUST include the "Upgrade" token.
     */
 
-    if (valid && !Request.Headers()->contains("Connection"))
+    if (valid && !Request.Headers().contains("Connection"))
     {
         error = "No Connection header";
         valid = false;
     }
 
-    if (valid && !Request.Headers()->value("Connection").contains("Upgrade", Qt::CaseInsensitive))
+    if (valid && !Request.Headers().value("Connection").contains("Upgrade", Qt::CaseInsensitive))
     {
         error = "No Upgrade request";
         valid = false;
@@ -261,13 +261,13 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest &Request)
             field would be "AQIDBAUGBwgJCgsMDQ4PEC=="
     */
 
-    if (valid && !Request.Headers()->contains("Sec-WebSocket-Key"))
+    if (valid && !Request.Headers().contains("Sec-WebSocket-Key"))
     {
         error = "No Sec-WebSocket-Key header";
         valid = false;
     }
 
-    if (valid && Request.Headers()->value("Sec-WebSocket-Key").isEmpty())
+    if (valid && Request.Headers().value("Sec-WebSocket-Key").isEmpty())
     {
         error = "Invalid Sec-WebSocket-Key";
         valid = false;
@@ -293,13 +293,13 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest &Request)
             13.
     */
 
-    if (valid && !Request.Headers()->contains("Sec-WebSocket-Version"))
+    if (valid && !Request.Headers().contains("Sec-WebSocket-Version"))
     {
         error = "No Sec-WebSocket-Version header";
         valid = false;
     }
 
-    int version = Request.Headers()->value("Sec-WebSocket-Version").toInt();
+    int version = Request.Headers().value("Sec-WebSocket-Version").toInt();
 
     if (valid && version != TorcWebSocketReader::Version13 && version != TorcWebSocketReader::Version8)
     {
@@ -320,9 +320,9 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest &Request)
         constructs and rules are as given in [RFC2616].
     */
 
-    if (Request.Headers()->contains("Sec-WebSocket-Protocol"))
+    if (Request.Headers().contains("Sec-WebSocket-Protocol"))
     {
-        QList<TorcWebSocketReader::WSSubProtocol> protocols = TorcWebSocketReader::SubProtocolsFromPrioritisedString(Request.Headers()->value("Sec-WebSocket-Protocol"));
+        QList<TorcWebSocketReader::WSSubProtocol> protocols = TorcWebSocketReader::SubProtocolsFromPrioritisedString(Request.Headers().value("Sec-WebSocket-Protocol"));
         if (!protocols.isEmpty())
             protocol = protocols.first();
     }
@@ -339,7 +339,7 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest &Request)
     // valid handshake so set response headers and transfer socket
     LOG(VB_GENERAL, LOG_DEBUG, "Received valid websocket Upgrade request");
 
-    QString key = Request.Headers()->value("Sec-WebSocket-Key") + QLatin1String("258EAFA5-E914-47DA-95CA-C5AB0DC85B11");
+    QString key = Request.Headers().value("Sec-WebSocket-Key") + QLatin1String("258EAFA5-E914-47DA-95CA-C5AB0DC85B11");
     QString nonce = QCryptographicHash::hash(key.toUtf8(), QCryptographicHash::Sha1).toBase64();
 
     Request.SetResponseType(HTTPResponseNone);
@@ -362,19 +362,19 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest &Request)
         .arg(TorcNetwork::IPAddressToLiteral(peerAddress(), peerPort()))
         .arg(m_authenticated ? "Authenticated" : "Unauthenticated"));
 
-    if (Request.Headers()->contains("Torc-UUID"))
+    if (Request.Headers().contains("Torc-UUID"))
     {
         // stop the watchdog timer for peers
         m_watchdogTimer.stop();
         QVariantMap data;
-        data.insert("uuid",       Request.Headers()->value("Torc-UUID"));
-        data.insert("name",       Request.Headers()->value("Torc-Name"));
-        data.insert("port",       Request.Headers()->value("Torc-Port"));
-        data.insert("priority",   Request.Headers()->value("Torc-Priority"));
-        data.insert("starttime",  Request.Headers()->value("Torc-Starttime"));
-        data.insert("apiversion", Request.Headers()->value("Torc-APIVersion"));
+        data.insert("uuid",       Request.Headers().value("Torc-UUID"));
+        data.insert("name",       Request.Headers().value("Torc-Name"));
+        data.insert("port",       Request.Headers().value("Torc-Port"));
+        data.insert("priority",   Request.Headers().value("Torc-Priority"));
+        data.insert("starttime",  Request.Headers().value("Torc-Starttime"));
+        data.insert("apiversion", Request.Headers().value("Torc-APIVersion"));
         data.insert("address",    peerAddress().toString());
-        if (Request.Headers()->contains("Torc-Secure"))
+        if (Request.Headers().contains("Torc-Secure"))
             data.insert("secure", "yes");
         TorcNetworkedContext::PeerConnected(m_parent, data);
     }
@@ -640,7 +640,7 @@ void TorcWebSocket::ReadHTTP(void)
             return;
         }
 
-        bool upgrade = request.Headers()->contains("Upgrade");
+        bool upgrade = request.Headers().contains("Upgrade");
         TorcHTTPServer::Authorise(peerAddress().toString(), request, upgrade);
 
         if (upgrade)
@@ -889,8 +889,8 @@ void TorcWebSocket::ReadHandshake(void)
     }
 
     // does it contain the correct headers
-    if (valid && !(request.Headers()->contains("Upgrade") && request.Headers()->contains("Connection") &&
-                   request.Headers()->contains("Sec-WebSocket-Accept")))
+    if (valid && !(request.Headers().contains("Upgrade") && request.Headers().contains("Connection") &&
+                   request.Headers().contains("Sec-WebSocket-Accept")))
     {
         valid = false;
         error = QString("Response is missing required headers");
@@ -899,10 +899,10 @@ void TorcWebSocket::ReadHandshake(void)
     // correct header contents
     if (valid)
     {
-        QString upgrade    = request.Headers()->value("Upgrade").trimmed();
-        QString connection = request.Headers()->value("Connection").trimmed();
-        QString accept     = request.Headers()->value("Sec-WebSocket-Accept").trimmed();
-        QString protocols  = request.Headers()->value("Sec-WebSocket-Protocol").trimmed();
+        QString upgrade    = request.Headers().value("Upgrade").trimmed();
+        QString connection = request.Headers().value("Connection").trimmed();
+        QString accept     = request.Headers().value("Sec-WebSocket-Accept").trimmed();
+        QString protocols  = request.Headers().value("Sec-WebSocket-Protocol").trimmed();
 
         if (!upgrade.contains("websocket", Qt::CaseInsensitive) || !connection.contains("upgrade", Qt::CaseInsensitive))
         {

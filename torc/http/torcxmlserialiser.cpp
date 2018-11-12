@@ -46,25 +46,28 @@ HTTPResponseType TorcXMLSerialiser::ResponseType(void)
     return HTTPResponseXML;
 }
 
-void TorcXMLSerialiser::Prepare(void)
+void TorcXMLSerialiser::Prepare(QByteArray &Dest)
 {
-    m_buffer.setBuffer(m_content);
+    m_buffer.setBuffer(&Dest);
     m_buffer.open(QBuffer::ReadWrite);
     m_xmlStream.setDevice(&m_buffer);
 }
 
-void TorcXMLSerialiser::Begin(void)
+void TorcXMLSerialiser::Begin(QByteArray &Dest)
 {
+    (void)Dest;
     m_xmlStream.writeStartDocument("1.0");
 }
 
-void TorcXMLSerialiser::End(void)
+void TorcXMLSerialiser::End(QByteArray &Dest)
 {
+    (void)Dest;
     m_xmlStream.writeEndDocument();
 }
 
-void TorcXMLSerialiser::AddProperty(const QString &Name, const QVariant &Value)
+void TorcXMLSerialiser::AddProperty(QByteArray &Dest, const QString &Name, const QVariant &Value)
 {
+    (void)Dest;
     if (!Name.isEmpty())
         m_xmlStream.writeStartElement(Name);
     VariantToXML(Name, Value);

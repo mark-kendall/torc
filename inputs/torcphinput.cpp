@@ -32,9 +32,20 @@ TorcpHInput::~TorcpHInput()
 {
 }
 
+QStringList TorcpHInput::GetDescription(void)
+{
+    return QStringList() << tr("Constant pH");
+}
+
 TorcInput::Type TorcpHInput::GetType(void)
 {
     return TorcInput::pH;
+}
+
+void TorcpHInput::Start(void)
+{
+    SetValid(true);
+    TorcInput::Start();
 }
 
 double TorcpHInput::ScaleValue(double Value)

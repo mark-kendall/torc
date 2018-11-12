@@ -78,9 +78,9 @@ TorcHTTPRequest::TorcHTTPRequest(TorcHTTPReader *Reader)
     m_protocol(HTTPUnknownProtocol),
     m_connection(HTTPConnectionClose),
     m_ranges(),
-    m_headers(NULL),
+    m_headers(),
     m_queries(),
-    m_content(NULL),
+    m_content(),
     m_secure(false),
     m_allowGZip(false),
     m_allowCORS(false),
@@ -90,9 +90,9 @@ TorcHTTPRequest::TorcHTTPRequest(TorcHTTPReader *Reader)
     m_cache(HTTPCacheNone),
     m_cacheTag(QString("")),
     m_responseStatus(HTTP_NotFound),
-    m_responseContent(NULL),
-    m_responseFile(NULL),
-    m_responseHeaders(NULL)
+    m_responseContent(),
+    m_responseFile(),
+    m_responseHeaders()
 {
     if (Reader)
     {
@@ -170,7 +170,7 @@ void TorcHTTPRequest::Initialise(const QString &Method)
     if (m_protocol > HTTPOneDotZero)
         m_connection = HTTPConnectionKeepAlive;
 
-    QString connection = m_headers->value("Connection").toLower();
+    QString connection = m_headers.value("Connection").toLower();
 
     if (connection == "keep-alive")
         m_connection = HTTPConnectionKeepAlive;
@@ -182,14 +182,6 @@ void TorcHTTPRequest::Initialise(const QString &Method)
 
 TorcHTTPRequest::~TorcHTTPRequest()
 {
-    delete m_headers;
-    delete m_content;
-    delete m_responseContent;
-
-    if (m_responseFile)
-        m_responseFile->close();
-    delete m_responseFile;
-    delete m_responseHeaders;
 }
 
 void TorcHTTPRequest::SetConnection(HTTPConnection Connection)
@@ -207,34 +199,21 @@ void TorcHTTPRequest::SetResponseType(HTTPResponseType Type)
     m_responseType = Type;
 }
 
-void TorcHTTPRequest::SetResponseContent(QByteArray *Content)
+void TorcHTTPRequest::SetResponseContent(const QByteArray &Content)
 {
-    if (m_responseFile)
-        m_responseFile->close();
-
-    delete m_responseFile;
-    delete m_responseContent;
+    m_responseFile    = QString();
     m_responseContent = Content;
-    m_responseFile    = NULL;
 }
 
-void TorcHTTPRequest::SetResponseFile(QFile *File)
+void TorcHTTPRequest::SetResponseFile(const QString &File)
 {
-    if (m_responseFile)
-        m_responseFile->close();
-
-    delete m_responseContent;
-    delete m_responseFile;
     m_responseFile    = File;
-    m_responseContent = NULL;
+    m_responseContent = QByteArray();
 }
 
 void TorcHTTPRequest::SetResponseHeader(const QString &Header, const QString &Value)
 {
-    if (!m_responseHeaders)
-        m_responseHeaders = new QMap<QString,QString>();
-
-    m_responseHeaders->insert(Header, Value);
+    m_responseHeaders.insert(Header, Value);
 }
 
 void TorcHTTPRequest::SetAllowed(int Allowed)
@@ -323,7 +302,7 @@ QString TorcHTTPRequest::GetCache(void) const
     return m_cacheTag;
 }
 
-const QMap<QString,QString>* TorcHTTPRequest::Headers(void) const
+const QMap<QString,QString>& TorcHTTPRequest::Headers(void) const
 {
     return m_headers;
 }
@@ -338,14 +317,18 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
     if (!Socket)
         return;
 
+    QFile file;
+    if (!m_responseFile.isEmpty())
+        file.setFileName(m_responseFile);
+
     // this is not the file you are looking for...
-    if ((m_responseType == HTTPResponseUnknown && !m_responseFile)|| m_responseStatus == HTTP_NotFound)
+    if ((m_responseType == HTTPResponseUnknown && m_responseFile.isEmpty()) || m_responseStatus == HTTP_NotFound)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("'%1' not found").arg(m_fullUrl));
         m_responseStatus  = HTTP_NotFound;
 
-        QByteArray *result = new QByteArray();
-        QTextStream stream(result);
+        QByteArray result;
+        QTextStream stream(&result);
         stream << "<html><head><title>" << TORC_REALM << "</title></head>";
         stream << "<body><h1><a href='/'>" << TORC_REALM << "</a></h1>";
         stream << "<p>File not found";
@@ -357,28 +340,34 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
     QString contenttype = ResponseTypeToString(m_responseType);
 
     // set the response type based upon file
-    if (m_responseFile)
+    if (!m_responseFile.isEmpty())
     {
-        contenttype = TorcMime::MimeTypeForFileNameAndData(m_responseFile->fileName(), m_responseFile);
+        // only use the file contents if the file name returns an ambiguous result
+        QStringList types = TorcMime::MimeTypeForFileName(m_responseFile);
+        if (types.size() == 1)
+            contenttype = types.first();
+        else
+            contenttype = TorcMime::MimeTypeForFileNameAndData(m_responseFile, &file);
         m_responseType = HTTPResponseDefault;
     }
 
     QByteArray contentheader = QString("Content-Type: %1\r\n").arg(contenttype).toLatin1();
 
     // process byte range requests
-    qint64 totalsize  = m_responseContent ? m_responseContent->size() : m_responseFile ? m_responseFile->size() : 0;
+    qint64 totalsize  = !m_responseContent.isEmpty() ? m_responseContent.size() : !m_responseFile.isEmpty() ? file.size() : 0;
     qint64 sendsize   = totalsize;
     bool multipart    = false;
     static QByteArray seperator("\r\n--STaRT\r\n");
     QList<QByteArray> partheaders;
 
-    if (m_headers->contains("Range") && m_responseStatus == HTTP_OK)
+    if (m_headers.contains("Range") && m_responseStatus == HTTP_OK)
     {
-        m_ranges = StringToRanges(m_headers->value("Range"), totalsize, sendsize);
+        m_ranges = StringToRanges(m_headers.value("Range"), totalsize, sendsize);
 
         if (m_ranges.isEmpty())
         {
-            SetResponseContent(new QByteArray());
+            QByteArray empty;
+            SetResponseContent(empty);
             m_responseStatus = HTTP_RequestedRangeNotSatisfiable;
         }
         else
@@ -438,14 +427,19 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
     //  - there is some content and it is smaller than 1Mb in size (arbitrary limit)
     //  - the response is not a range request with single or multipart response
     if (m_allowGZip && totalsize > 0 && totalsize < 0x100000 && TorcCoreUtils::HasZlib() && m_responseStatus == HTTP_OK &&
-        m_headers->contains("Accept-Encoding") && m_headers->value("Accept-Encoding").contains("gzip", Qt::CaseInsensitive))
+        m_headers.contains("Accept-Encoding") && m_headers.value("Accept-Encoding").contains("gzip", Qt::CaseInsensitive))
     {
-        if (m_responseContent)
-            SetResponseContent(TorcCoreUtils::GZipCompress(m_responseContent));
-        else
-            SetResponseContent(TorcCoreUtils::GZipCompressFile(m_responseFile));
-
-        sendsize = m_responseContent->size();
+        if (!m_responseContent.isEmpty())
+        {
+            QByteArray newcontent = TorcCoreUtils::GZipCompress(m_responseContent);
+            SetResponseContent(newcontent);
+        }
+        else if (!m_responseFile.isEmpty())
+        {
+            QByteArray newcontent = TorcCoreUtils::GZipCompressFile(file);
+            SetResponseContent(newcontent);
+        }
+        sendsize = m_responseContent.size();
         response << "Content-Encoding: gzip\r\n";
     }
 
@@ -467,12 +461,9 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
         response << "Location: " << m_redirectedTo.toLatin1() << "\r\n";
 
     // process any custom headers
-    if (m_responseHeaders)
-    {
-        QMap<QString,QString>::iterator it = m_responseHeaders->begin();
-        for ( ; it != m_responseHeaders->end(); ++it)
-            response << it.key().toLatin1() << ": " << it.value().toLatin1() << "\r\n";
-    }
+    QMap<QString,QString>::iterator it = m_responseHeaders.begin();
+    for ( ; it != m_responseHeaders.end(); ++it)
+        response << it.key().toLatin1() << ": " << it.value().toLatin1() << "\r\n";
 
     response << "\r\n";
     response.flush();
@@ -488,7 +479,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
     LOG(VB_NETWORK, LOG_DEBUG, headers->data());
 
     // send content
-    if (m_responseContent && !m_responseContent->isEmpty() && m_requestType != HTTPHead)
+    if (!m_responseContent.isEmpty() && m_requestType != HTTPHead)
     {
         if (multipart)
         {
@@ -504,7 +495,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
 
                 quint64 start      = (*it).first;
                 qint64 chunksize  = (*it).second - start + 1;
-                sent  = Socket->write(m_responseContent->data() + start, chunksize);
+                sent  = Socket->write(m_responseContent.constData() + start, chunksize);
                 if (chunksize != sent)
                     LOG(VB_GENERAL, LOG_WARNING, QString("Buffer size %1 - but sent %2").arg(chunksize).arg(sent));
                 else
@@ -515,16 +506,17 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
         {
             qint64 size = sendsize;
             qint64 offset = m_ranges.isEmpty() ? 0 : m_ranges[0].first;
-            qint64 sent = Socket->write(m_responseContent->data() + offset, size);
+            qint64 sent = Socket->write(m_responseContent.constData() + offset, size);
             if (size != sent)
                 LOG(VB_GENERAL, LOG_WARNING, QString("Buffer size %1 - but sent %2").arg(size).arg(sent));
             else
                 LOG(VB_NETWORK, LOG_DEBUG, QString("Sent %1 content bytes").arg(sent));
         }
     }
-    else if (m_responseFile && m_requestType != HTTPHead)
+    else if (!m_responseFile.isEmpty() && m_requestType != HTTPHead)
     {
-        m_responseFile->open(QIODevice::ReadOnly);
+        if (!file.isOpen())
+            file.open(QIODevice::ReadOnly);
 
         if (multipart)
         {
@@ -553,7 +545,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
                     do
                     {
                         off64_t remaining = qMin(size - sent, (off64_t)READ_CHUNK_SIZE);
-                        off64_t send = sendfile64(Socket->socketDescriptor(), m_responseFile->handle(), &offset, remaining);
+                        off64_t send = sendfile64(Socket->socketDescriptor(), file.handle(), &offset, remaining);
 
                         if (send < 0)
                         {
@@ -568,7 +560,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
                         }
                         else
                         {
-                            LOG(VB_NETWORK, LOG_DEBUG, QString("Sent %1 for %2").arg(send).arg(m_responseFile->handle()));
+                            LOG(VB_NETWORK, LOG_DEBUG, QString("Sent %1 for %2").arg(send).arg(file.handle()));
                         }
 
                         sent += send;
@@ -587,7 +579,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
                     do
                     {
                         bytessent = qMin(size - sent, (qint64)READ_CHUNK_SIZE);
-                        if (sendfile(m_responseFile->handle(), Socket->socketDescriptor(), off, &bytessent, NULL, 0) < 0)
+                        if (sendfile(file.handle(), Socket->socketDescriptor(), off, &bytessent, NULL, 0) < 0)
                         {
                             if (errno != EAGAIN)
                             {
@@ -599,7 +591,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
                         }
                         else
                         {
-                            LOG(VB_GENERAL, LOG_DEBUG, QString("Sent %1 for %2").arg(bytessent).arg(m_responseFile->handle()));
+                            LOG(VB_GENERAL, LOG_DEBUG, QString("Sent %1 for %2").arg(bytessent).arg(file.handle()));
                         }
 
                         sent += bytessent;
@@ -610,15 +602,15 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
 #else
                 if (size > sent)
                 {
-                    m_responseFile->seek(offset);
+                    file.seek(offset);
 
                     do
                     {
                         qint64 remaining = qMin(size - sent, (qint64)READ_CHUNK_SIZE);
-                        qint64 read = m_responseFile->read(buffer.data()->data(), remaining);
+                        qint64 read = file.read(buffer.data()->data(), remaining);
                         if (read < 0)
                         {
-                            LOG(VB_GENERAL, LOG_ERR, QString("Error reading from '%1' (%2)").arg(m_responseFile->fileName()).arg(m_responseFile->errorString()));
+                            LOG(VB_GENERAL, LOG_ERR, QString("Error reading from '%1' (%2)").arg(file.fileName()).arg(file.errorString()));
                             break;
                         }
 
@@ -635,7 +627,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
                     while (sent < size);
 
                     if (sent < size)
-                        LOG(VB_GENERAL, LOG_ERR, QString("Failed to send all data for '%1'").arg(m_responseFile->fileName()));
+                        LOG(VB_GENERAL, LOG_ERR, QString("Failed to send all data for '%1'").arg(file.fileName()));
                 }
 #endif
             }
@@ -655,7 +647,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
                 do
                 {
                     off64_t remaining = qMin(size - sent, (off64_t)READ_CHUNK_SIZE);
-                    off64_t send = sendfile64(Socket->socketDescriptor(), m_responseFile->handle(), &offset, remaining);
+                    off64_t send = sendfile64(Socket->socketDescriptor(), file.handle(), &offset, remaining);
 
                     if (send < 0)
                     {
@@ -670,7 +662,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
                     }
                     else
                     {
-                        LOG(VB_NETWORK, LOG_DEBUG, QString("Sent %1 for %2").arg(send).arg(m_responseFile->handle()));
+                        LOG(VB_NETWORK, LOG_DEBUG, QString("Sent %1 for %2").arg(send).arg(file.handle()));
                     }
 
                     sent += send;
@@ -690,7 +682,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
                 {
                     bytessent = qMin(size - sent, (qint64)READ_CHUNK_SIZE);;
 
-                    if (sendfile(m_responseFile->handle(), Socket->socketDescriptor(), off, &bytessent, NULL, 0) < 0)
+                    if (sendfile(file.handle(), Socket->socketDescriptor(), off, &bytessent, NULL, 0) < 0)
                     {
                         if (errno != EAGAIN)
                         {
@@ -702,7 +694,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
                     }
                     else
                     {
-                        LOG(VB_GENERAL, LOG_DEBUG, QString("Sent %1 for %2").arg(bytessent).arg(m_responseFile->handle()));
+                        LOG(VB_GENERAL, LOG_DEBUG, QString("Sent %1 for %2").arg(bytessent).arg(file.handle()));
                     }
 
                     sent += bytessent;
@@ -713,16 +705,16 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
 #else
             if (size > sent)
             {
-                m_responseFile->seek(offset);
+                file.seek(offset);
                 QScopedPointer<QByteArray> buffer(new QByteArray(READ_CHUNK_SIZE, 0));
 
                 do
                 {
                     qint64 remaining = qMin(size - sent, (qint64)READ_CHUNK_SIZE);
-                    qint64 read = m_responseFile->read(buffer.data()->data(), remaining);
+                    qint64 read = file.read(buffer.data()->data(), remaining);
                     if (read < 0)
                     {
-                        LOG(VB_GENERAL, LOG_ERR, QString("Error reading from '%1' (%2)").arg(m_responseFile->fileName()).arg(m_responseFile->errorString()));
+                        LOG(VB_GENERAL, LOG_ERR, QString("Error reading from '%1' (%2)").arg(file.fileName()).arg(file.errorString()));
                         break;
                     }
 
@@ -739,12 +731,10 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
                 while (sent < size);
 
                 if (sent < size)
-                    LOG(VB_GENERAL, LOG_ERR, QString("Failed to send all data for '%1'").arg(m_responseFile->fileName()));
+                    LOG(VB_GENERAL, LOG_ERR, QString("Failed to send all data for '%1'").arg(file.fileName()));
             }
 #endif
         }
-
-        m_responseFile->close();
     }
 
     Socket->flush();
@@ -1053,9 +1043,13 @@ QString TorcHTTPRequest::RangeToString(const QPair<quint64, quint64> &Range, qin
     return QString("%1-%2/%3").arg(Range.first).arg(Range.second).arg(Size);
 }
 
-TorcSerialiser* TorcHTTPRequest::GetSerialiser(void)
+void TorcHTTPRequest::Serialise(const QVariant &Data, const QString &Type)
 {
-    return TorcSerialiser::GetSerialiser(m_headers->value("Accept"));
+    TorcSerialiser *serialiser = TorcSerialiser::GetSerialiser(m_headers.value("Accept"));
+    SetResponseType(serialiser->ResponseType());
+    serialiser->Serialise(m_responseContent, Data, Type);
+    SetResponseContent(m_responseContent);
+    delete serialiser;
 }
 
 /*! \brief Return true if the resource is unmodified.
@@ -1065,9 +1059,9 @@ TorcSerialiser* TorcHTTPRequest::GetSerialiser(void)
 */
 bool TorcHTTPRequest::Unmodified(const QDateTime &LastModified)
 {
-    if ((m_cache & HTTPCacheLastModified) && m_headers->contains("If-Modified-Since"))
+    if ((m_cache & HTTPCacheLastModified) && m_headers.contains("If-Modified-Since"))
     {
-        QDateTime since = QDateTime::fromString(m_headers->value("If-Modified-Since"), DateFormat);
+        QDateTime since = QDateTime::fromString(m_headers.value("If-Modified-Since"), DateFormat);
 
         if (LastModified <= since)
         {
@@ -1090,9 +1084,9 @@ bool TorcHTTPRequest::Unmodified(const QDateTime &LastModified)
 */
 bool TorcHTTPRequest::Unmodified(void)
 {
-    if ((m_cache & HTTPCacheETag) && !m_cacheTag.isEmpty() && m_headers->contains("If-None-Match"))
+    if ((m_cache & HTTPCacheETag) && !m_cacheTag.isEmpty() && m_headers.contains("If-None-Match"))
     {
-        if (m_cacheTag == m_headers->value("If-None-Match"))
+        if (m_cacheTag == m_headers.value("If-None-Match"))
         {
             SetStatus(HTTP_NotModified);
             SetResponseType(HTTPResponseNone);

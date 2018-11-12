@@ -81,6 +81,11 @@ void TorcXmlValidator::HandleMessage(void *ctx, const char *format, ...)
 
 void TorcXmlValidator::Validate(void)
 {
+    xmlSetStructuredErrorFunc(NULL, NULL);
+    xmlSetGenericErrorFunc(this, HandleMessage);
+    xmlThrDefSetStructuredErrorFunc(NULL, NULL);
+    xmlThrDefSetGenericErrorFunc(this, HandleMessage);
+
     xmlSchemaParserCtxtPtr parsercontext = NULL;
 
     if (!m_xsdFile.isEmpty())
@@ -121,11 +126,6 @@ void TorcXmlValidator::Validate(void)
         LOG(VB_GENERAL, LOG_INFO, "XSD loaded and validated");
 
     m_xsdDone = true;
-
-    xmlSetStructuredErrorFunc(NULL, NULL);
-    xmlSetGenericErrorFunc(this, HandleMessage);
-    xmlThrDefSetStructuredErrorFunc(NULL, NULL);
-    xmlThrDefSetGenericErrorFunc(this, HandleMessage);
 
     xmlDocPtr xmldocumentptr = xmlParseFile(m_xmlFile.toLocal8Bit().constData());
     int result = xmlSchemaValidateDoc(validcontext, xmldocumentptr);
