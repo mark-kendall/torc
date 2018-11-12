@@ -451,11 +451,12 @@ FileLogger::~FileLogger()
                                         __LINE__, LOG_INFO, kMessage);
 
         strcpy(item->message, m_file.isOpen() ? "Closing file logger." : "Closing console logger.");
-        Logmsg(item);
+        FileLogger::Logmsg(item);
         LogItem::Delete(item);
         //m_file.flush();
         m_file.close();
     }
+    m_opened = false;
 }
 
 bool FileLogger::Logmsg(LogItem *Item)
