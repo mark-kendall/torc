@@ -59,6 +59,14 @@ void TorcPListSerialiser::End(QByteArray &)
 
 void TorcPListSerialiser::PListFromVariant(const QString &Name, const QVariant &Value, bool NeedKey)
 {
+    if (Value.isNull())
+    {
+        if (NeedKey)
+            m_xmlStream.writeTextElement("key", Name);
+        m_xmlStream.writeEmptyElement("null");
+        return;
+    }
+
     switch ((int)Value.type())
     {
         case QMetaType::QVariantList: PListFromList(Name, Value.toList());             break;
@@ -91,7 +99,14 @@ void TorcPListSerialiser::PListFromVariant(const QString &Name, const QVariant &
             m_xmlStream.writeEmptyElement(Value.toBool() ? "true" : "false");
             break;
         }
-
+        case QMetaType::Char:
+        {
+            if (NeedKey)
+                m_xmlStream.writeTextElement("key", Name);
+            m_xmlStream.writeEmptyElement("fill");
+            break;
+        }
+        break;
         case QMetaType::UInt:
         case QMetaType::UShort:
         case QMetaType::ULong:
