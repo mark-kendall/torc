@@ -267,17 +267,16 @@ QVariant TorcPList::ParseBinaryNode(quint64 Num)
         case BPLIST_DATA:    return ParseBinaryData(data);
         case BPLIST_UNICODE: return ParseBinaryUnicode(data);
         case BPLIST_UID:     return ParseBinaryUID(data);
+        case BPLIST_FILL:    return QVariant(QChar());
         case BPLIST_NULL:
         {
             switch (size)
             {
                 case BPLIST_TRUE:  return QVariant(true);
                 case BPLIST_FALSE: return QVariant(false);
-                case BPLIST_NULL:
-                default:           return QVariant();
+                case BPLIST_NULL:  return QVariant();
             }
         }
-        default: break;
     }
 
     return QVariant();

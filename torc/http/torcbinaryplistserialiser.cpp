@@ -239,6 +239,12 @@ quint64 TorcBinaryPListSerialiser::BinaryFromVariant(QByteArray &Dest, const QSt
             Dest.append(TorcPList::BPLIST_NULL | (value ? TorcPList::BPLIST_TRUE : TorcPList::BPLIST_FALSE));
             return result;
         }
+        case QMetaType::Char:
+        {
+            START_OBJECT
+            Dest.append(TorcPList::BPLIST_NULL | TorcPList::BPLIST_FILL);
+            return result;
+        }
         case QMetaType::Int:
         case QMetaType::Short:
         case QMetaType::Long:
