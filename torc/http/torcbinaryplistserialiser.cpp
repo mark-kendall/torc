@@ -111,7 +111,7 @@ void TorcBinaryPListSerialiser::AddProperty(QByteArray &Dest, const QString &Nam
                       count < 0xffffffff ? 4 : 8;
 
     START_OBJECT
-    Dest.append(TorcPList::BPLIST_DICT | 1);
+    Dest.append((quint8)(TorcPList::BPLIST_DICT | 1));
     quint64 offset = Dest.size();
     QByteArray references(2 * m_referenceSize, 0);
     Dest.append(references);
@@ -222,7 +222,7 @@ quint64 TorcBinaryPListSerialiser::BinaryFromVariant(QByteArray &Dest, const QSt
 
     if (Value.isNull())
     {
-        Dest.append(TorcPList::BPLIST_NULL | TorcPList::BPLIST_NULL);
+        Dest.append((char)TorcPList::BPLIST_NULL);
         return result;
     }
 
@@ -237,13 +237,13 @@ quint64 TorcBinaryPListSerialiser::BinaryFromVariant(QByteArray &Dest, const QSt
         {
             START_OBJECT
             bool value = Value.toBool();
-            Dest.append(TorcPList::BPLIST_NULL | (value ? TorcPList::BPLIST_TRUE : TorcPList::BPLIST_FALSE));
+            Dest.append((quint8)(TorcPList::BPLIST_NULL | (value ? TorcPList::BPLIST_TRUE : TorcPList::BPLIST_FALSE)));
             return result;
         }
         case QMetaType::Char:
         {
             START_OBJECT
-            Dest.append(TorcPList::BPLIST_NULL | TorcPList::BPLIST_FILL);
+            Dest.append((quint8)(TorcPList::BPLIST_NULL | TorcPList::BPLIST_FILL));
             return result;
         }
         case QMetaType::Int:
@@ -289,7 +289,7 @@ quint64 TorcBinaryPListSerialiser::BinaryFromVariant(QByteArray &Dest, const QSt
         case QMetaType::QDateTime:
         {
             START_OBJECT
-            Dest.append(TorcPList::BPLIST_DATE | 3);
+            Dest.append((quint8)(TorcPList::BPLIST_DATE | 3));
             double value = (double)Value.toDateTime().toTime_t();
 #if Q_BYTE_ORDER == Q_BIG_ENDIAN && !defined (__VFP_FP__)
             Dest.append(*((char*)&value));
@@ -464,7 +464,7 @@ void TorcBinaryPListSerialiser::BinaryFromData(QByteArray &Dest, const QVariant 
     if (data.isNull())
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to retrieve binary data");
-        Dest.append(TorcPList::BPLIST_NULL | TorcPList::BPLIST_FALSE);
+        Dest.append((quint8)(TorcPList::BPLIST_NULL | TorcPList::BPLIST_FALSE));
         return;
     }
 
@@ -484,13 +484,13 @@ void TorcBinaryPListSerialiser::BinaryFromUuid(QByteArray &Dest, const QVariant 
 
         quint64 buffer = (quint64)(qToBigEndian(*((quint64*)value.constData() + 8)));
         uint8_t size = buffer <= UINT8_MAX ? 1 : buffer <= UINT16_MAX ? 2 : buffer <= UINT32_MAX ? 4 : 8;
-        Dest.append(TorcPList::BPLIST_UID | (size -1));
+        Dest.append((quint8)(TorcPList::BPLIST_UID | (size -1)));
         binaryFromUint(Dest, buffer, size);
     }
     else
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Unknown UUID binary with size %1 bytes").arg(value.size()));
-        Dest.append(TorcPList::BPLIST_NULL | TorcPList::BPLIST_FALSE);
+        Dest.append((quint8)(TorcPList::BPLIST_NULL | TorcPList::BPLIST_FALSE));
     }
 }
 
