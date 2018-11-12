@@ -232,6 +232,7 @@ quint64 TorcBinaryPListSerialiser::BinaryFromVariant(QByteArray &Dest, const QSt
         case QMetaType::QStringList:  return BinaryFromStringList(Dest, Name, Value.toStringList());
         case QMetaType::QVariantMap:  return BinaryFromMap(Dest, Name, Value.toMap());
         case QMetaType::QUuid:        BinaryFromUuid(Dest, Value); return result;
+        case QMetaType::QByteArray:   BinaryFromData(Dest, Value); return result;
         case QMetaType::Bool:
         {
             START_OBJECT
@@ -454,6 +455,24 @@ inline void binaryFromUint(QByteArray &Dest, quint64 Value, uint8_t size)
     {
         Dest.append((quint8)(Value & 0xff));
     }
+}
+
+void TorcBinaryPListSerialiser::BinaryFromData(QByteArray &Dest, const QVariant &Value)
+{
+    START_OBJECT
+    QByteArray data = Value.toByteArray();
+    if (data.isNull())
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Failed to retrieve binary data");
+        Dest.append(TorcPList::BPLIST_NULL | TorcPList::BPLIST_FALSE);
+        return;
+    }
+
+    int size = data.size();
+    Dest.append((quint8)(TorcPList::BPLIST_DATA | (size < BPLIST_LOW_MAX ? size : BPLIST_LOW_MAX)));
+    if (size >= BPLIST_LOW_MAX)
+        BinaryFromUInt(Dest, size);
+    Dest.append(data);
 }
 
 void TorcBinaryPListSerialiser::BinaryFromUuid(QByteArray &Dest, const QVariant &Value)
