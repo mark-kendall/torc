@@ -36,7 +36,9 @@ class TorcPiCamera Q_DECL_FINAL : public TorcCameraDevice
     bool LoadDrivers        (void);
     bool LoadCameraSettings (void);
     bool ConfigureCamera    (void);
-    bool ConfigureEncoder   (void);
+    bool ConfigureVideoEncoder(void);
+    bool ConfigureImageEncoder(void);
+    void ClearSnapshotBuffers(void);
 
   private:
     Q_DISABLE_COPY(TorcPiCamera)
@@ -44,20 +46,27 @@ class TorcPiCamera Q_DECL_FINAL : public TorcCameraDevice
     CameraType               m_cameraType;
     TorcOMXCore              m_core;
     TorcOMXComponent         m_camera;
-    TorcOMXComponent         m_encoder;
+    TorcOMXComponent         m_videoEncoder;
     TorcOMXComponent         m_nullSink;
+    TorcOMXComponent         m_splitter;
+    TorcOMXComponent         m_imageEncoder;
     OMX_U32                  m_cameraPreviewPort;
     OMX_U32                  m_cameraVideoPort;
-    OMX_U32                  m_encoderInputPort;
-    OMX_U32                  m_encoderOutputPort;
+    OMX_U32                  m_videoEncoderInputPort;
+    OMX_U32                  m_videoEncoderOutputPort;
+    OMX_U32                  m_imageEncoderOutputPort;
+    TorcOMXTunnel            m_splitterTunnel;
     TorcOMXTunnel            m_videoTunnel;
     TorcOMXTunnel            m_previewTunnel;
+    TorcOMXTunnel            m_imageTunnel;
 
     TorcMuxer               *m_muxer;
     int                      m_videoStream;
     quint64                  m_frameCount;
     AVPacket                *m_bufferedPacket;
     bool                     m_haveInitSegment;
+    bool                     m_takeSnapshot;
+    QList<QPair<quint32, uint8_t*> > m_snapshotBuffers;
 };
 
 #endif // TORCPICAMERA_H
