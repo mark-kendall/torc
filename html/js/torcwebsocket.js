@@ -126,7 +126,7 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
     }
 
     function processError (data) {
-        if (!data.hasOwnProperty("id")) return;
+        if (!data.hasOwnProperty("id")) { return; }
         processResponse(data, true);
     }
 
