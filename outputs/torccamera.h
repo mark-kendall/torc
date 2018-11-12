@@ -37,6 +37,7 @@ class TorcCameraParams
     TorcCameraParams(void);
     explicit TorcCameraParams(const QVariantMap &Details);
     TorcCameraParams(const TorcCameraParams &Other);
+    TorcCameraParams& operator =(const TorcCameraParams &Other);
 
     bool    m_valid;
     int     m_width;

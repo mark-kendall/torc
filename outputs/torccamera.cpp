@@ -138,19 +138,39 @@ TorcCameraParams::TorcCameraParams(const QVariantMap &Details)
 }
 
 TorcCameraParams::TorcCameraParams(const TorcCameraParams &Other)
-    : m_valid(Other.m_valid),
-      m_width(Other.m_width),
-      m_height(Other.m_height),
-      m_stride(Other.m_stride),
-      m_sliceHeight(Other.m_sliceHeight),
-      m_frameRate(Other.m_frameRate),
-      m_bitrate(Other.m_bitrate),
-      m_timebase(Other.m_timebase),
-      m_segmentLength(Other.m_segmentLength),
-      m_gopSize(Other.m_gopSize),
-      m_model(Other.m_model),
-      m_videoCodec(Other.m_videoCodec)
+  : m_valid(Other.m_valid),
+    m_width(Other.m_width),
+    m_height(Other.m_height),
+    m_stride(Other.m_stride),
+    m_sliceHeight(Other.m_sliceHeight),
+    m_frameRate(Other.m_frameRate),
+    m_bitrate(Other.m_bitrate),
+    m_timebase(Other.m_timebase),
+    m_segmentLength(Other.m_segmentLength),
+    m_gopSize(Other.m_gopSize),
+    m_model(Other.m_model),
+    m_videoCodec(Other.m_videoCodec)
 {
+}
+
+TorcCameraParams& TorcCameraParams::operator =(const TorcCameraParams &Other)
+{
+    if (&Other != this)
+    {
+        this->m_valid = Other.m_valid;
+        this->m_width = Other.m_width;
+        this->m_height = Other.m_height;
+        this->m_stride = Other.m_stride;
+        this->m_sliceHeight = Other.m_sliceHeight;
+        this->m_frameRate   = Other.m_frameRate;
+        this->m_bitrate     = Other.m_bitrate;
+        this->m_timebase    = Other.m_timebase;
+        this->m_segmentLength = Other.m_segmentLength;
+        this->m_gopSize       = Other.m_gopSize;
+        this->m_model         = Other.m_model;
+        this->m_videoCodec    = Other.m_videoCodec;
+    }
+    return *this;
 }
 
 TorcCameraDevice::TorcCameraDevice(const TorcCameraParams &Params)
