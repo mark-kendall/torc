@@ -417,6 +417,39 @@ quint64 TorcBinaryPListSerialiser::BinaryFromQString(QByteArray &Dest, const QSt
     return result;
 }
 
+inline void binaryFromUint(QByteArray &Dest, quint64 Value, uint8_t size)
+{
+    if (8 == size)
+    {
+        Dest.append(*((quint8*)&Value));
+        Dest.append(*((quint8*)&Value + 1));
+        Dest.append(*((quint8*)&Value + 2));
+        Dest.append(*((quint8*)&Value + 3));
+        Dest.append(*((quint8*)&Value + 4));
+        Dest.append(*((quint8*)&Value + 5));
+        Dest.append(*((quint8*)&Value + 6));
+        Dest.append(*((quint8*)&Value + 7));
+    }
+    else if (4 == size)
+    {
+        quint32 value32= qToBigEndian((quint32)(Value & 0xffffffff));
+        Dest.append(*((quint8*)&value32));
+        Dest.append(*((quint8*)&value32 + 1));
+        Dest.append(*((quint8*)&value32 + 2));
+        Dest.append(*((quint8*)&value32 + 3));
+    }
+    else if (2 == size)
+    {
+        quint16 value16 = qToBigEndian((quint16)(Value & 0xffff));
+        Dest.append(*((quint8*)&value16));
+        Dest.append(*((quint8*)&value16 + 1));
+    }
+    else
+    {
+        Dest.append((quint8)(Value & 0xff));
+    }
+}
+
 void TorcBinaryPListSerialiser::BinaryFromUuid(QByteArray &Dest, const QVariant &Value)
 {
     QByteArray value = Value.toUuid().toRfc4122();
@@ -426,35 +459,7 @@ void TorcBinaryPListSerialiser::BinaryFromUuid(QByteArray &Dest, const QVariant 
         quint64 buffer = (quint64)(qToBigEndian(*((quint64*)value.constData() + 8)));
         uint8_t size = buffer <= UINT8_MAX ? 1 : buffer <= UINT16_MAX ? 2 : buffer <= UINT32_MAX ? 4 : 8;
         Dest.append(TorcPList::BPLIST_UID | (size -1));
-        if (8 == size)
-        {
-            Dest.append(*((quint8*)&buffer));
-            Dest.append(*((quint8*)&buffer + 1));
-            Dest.append(*((quint8*)&buffer + 2));
-            Dest.append(*((quint8*)&buffer + 3));
-            Dest.append(*((quint8*)&buffer + 4));
-            Dest.append(*((quint8*)&buffer + 5));
-            Dest.append(*((quint8*)&buffer + 6));
-            Dest.append(*((quint8*)&buffer + 7));
-        }
-        else if (4 == size)
-        {
-            quint32 buffer32= qToBigEndian((quint32)(buffer & 0xffffffff));
-            Dest.append(*((quint8*)&buffer32));
-            Dest.append(*((quint8*)&buffer32 + 1));
-            Dest.append(*((quint8*)&buffer32 + 2));
-            Dest.append(*((quint8*)&buffer32 + 3));
-        }
-        else if (2 == size)
-        {
-            quint16 buffer16 = qToBigEndian((quint16)(buffer & 0xffff));
-            Dest.append(*((quint8*)&buffer16));
-            Dest.append(*((quint8*)&buffer16 + 1));
-        }
-        else
-        {
-            Dest.append((quint8)(buffer & 0xff));
-        }
+        binaryFromUint(Dest, buffer, size);
     }
     else
     {
@@ -467,43 +472,7 @@ void TorcBinaryPListSerialiser::BinaryFromUInt(QByteArray &Dest, quint64 Value)
 {
     uint8_t size = Value <= UINT8_MAX ? 0 : Value <= UINT16_MAX ? 1 : Value <= UINT32_MAX ? 2 : 3;
     Dest.append((quint8)(TorcPList::BPLIST_UINT | size));
-
-    switch (size)
-    {
-        case 3:
-        {
-            quint64 buffer = qToBigEndian(Value);
-            Dest.append(*((quint8*)&buffer));
-            Dest.append(*((quint8*)&buffer + 1));
-            Dest.append(*((quint8*)&buffer + 2));
-            Dest.append(*((quint8*)&buffer + 3));
-            Dest.append(*((quint8*)&buffer + 4));
-            Dest.append(*((quint8*)&buffer + 5));
-            Dest.append(*((quint8*)&buffer + 6));
-            Dest.append(*((quint8*)&buffer + 7));
-            break;
-        }
-        case 2:
-        {
-            quint32 buffer= qToBigEndian((quint32)(Value & 0xffffffff));
-            Dest.append(*((quint8*)&buffer));
-            Dest.append(*((quint8*)&buffer + 1));
-            Dest.append(*((quint8*)&buffer + 2));
-            Dest.append(*((quint8*)&buffer + 3));
-            break;
-        }
-        case 1:
-        {
-            quint16 buffer = qToBigEndian((quint16)(Value & 0xffff));
-            Dest.append(*((quint8*)&buffer));
-            Dest.append(*((quint8*)&buffer + 1));
-            break;
-        }
-        case 0:
-        {
-            Dest.append((quint8)(Value & 0xff));
-        }
-    }
+    binaryFromUint(Dest, Value, 2 ^ size);
 }
 
 void TorcBinaryPListSerialiser::CountObjects(quint64 &Count, const QVariant &Value)
