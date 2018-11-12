@@ -31,7 +31,7 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
     // current calls
     var currentCalls = [];
     // event handlers for notifications
-    var eventHandlers = [];
+    var eventHandlers = {};
     // interval timer to check for call expiry/failure
     var expireTimer = null;
     // current status
@@ -122,7 +122,9 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
         // there is no support for calls to the browser...
         if (data.hasOwnProperty("id")) { return {jsonrpc: "2.0", error: {code: "-32601", message: "Method not found"}, id: data.id}; }
         var method = data.method;
-        if (eventHandlers[method]) { eventHandlers[method].callback(eventHandlers[method].id, data.params); }
+        $.each(eventHandlers, function (key, value) {
+            if (key === method) { value.callback(value.id, data.params); }
+        });
     }
 
     function processError (data) {
