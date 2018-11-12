@@ -105,63 +105,49 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
         socket.send(JSON.stringify(invocation));
     };
 
-    // handle individual responses
-    function processResult(data) {
-        var i;
-        var id;
-        var callback;
-        var method;
-
-        // we only understand JSON-RPC 2.0
-        if (!(data.hasOwnProperty("jsonrpc") && data.jsonrpc === "2.0")) {
-            id = data.hasOwnProperty("id") ? data.id : null;
-            return {jsonrpc: "2.0", error: {code: "-32600", message: "Invalid request"}, id};
-        }
-
-        if (data.hasOwnProperty("result") && data.hasOwnProperty("id")) {
-            // this is the result of a successful call
-            id = parseInt(data.id, 10);
-
-            for (i = 0; i < currentCalls.length; i += 1) {
-                if (currentCalls[i].id === id) {
-                    callback = currentCalls[i].success;
-                    currentCalls.splice(i, 1);
-                    if (typeof callback === "function") {
-                        callback(data.result);
-                    }
-                    return;
-                }
-            }
-        } else if (data.hasOwnProperty("method")) {
-            // there is no support for calls to the browser...
-            if (data.hasOwnProperty("id")) {
-                return {jsonrpc: "2.0", error: {code: "-32601", message: "Method not found"}, id: data.id};
-            }
-
-            // notification
-            method = data.method;
-
-            if (eventHandlers[method]) {
-                eventHandlers[method].callback(eventHandlers[method].id, data.params);
-            }
-        } else if (data.hasOwnProperty("error")) {
-            // error...
-
-            if (data.hasOwnProperty("id")) {
-                // call failed (but valid JSON)
-                id = parseInt(data.id, 10);
-                for (i = 0; i < currentCalls.length; i += 1) {
-                    if (currentCalls[i].id === id) {
-                        callback = currentCalls[i].failure;
-                        currentCalls.splice(i, 1);
-                        if (typeof callback === "function") { callback(); }
-                    }
-                }
+    function processResponse (data, error) {
+        // this is the result of a successful call
+        var id = parseInt(data.id, 10);
+        for (var i = 0; i < currentCalls.length; i += 1) {
+            if (currentCalls[i].id === id) {
+                var callback = error === false ? currentCalls[i].success : currentCalls[i].failure;
+                currentCalls.splice(i, 1);
+                if (typeof callback === "function") { callback(error === false ? data.result : data); }
+                return;
             }
         }
     }
 
-    function connect(token) {
+    function processCallback (data) {
+        // there is no support for calls to the browser...
+        if (data.hasOwnProperty("id")) { return {jsonrpc: "2.0", error: {code: "-32601", message: "Method not found"}, id: data.id}; }
+        var method = data.method;
+        if (eventHandlers[method]) { eventHandlers[method].callback(eventHandlers[method].id, data.params); }
+    }
+
+    function processError (data) {
+        if (!data.hasOwnProperty("id")) return;
+        processResponse(data, true);
+    }
+
+    function processGoodResult (data) {
+        if (data.hasOwnProperty("result") && data.hasOwnProperty("id")) { processResponse(data, false); }
+        else if (data.hasOwnProperty("method")) { processCallback(data); }
+        else if (data.hasOwnProperty("error")) { processError(data); }
+    }
+
+    // handle individual responses
+    function processResult (data) {
+        // we only understand JSON-RPC 2.0
+        if (!(data.hasOwnProperty("jsonrpc") && data.jsonrpc === "2.0")) {
+            var id = data.hasOwnProperty("id") ? data.id : null;
+            return {jsonrpc: "2.0", error: {code: "-32600", message: "Invalid request"}, id};
+        }
+
+        processGoodResult(data);
+    }
+
+    function connect (token) {
         var url = (window.location.protocol.includes("https") ? "wss://" : "ws://") + window.location.host + "?accesstoken=" + token;
         socket = (typeof MozWebSocket === "function") ? new MozWebSocket(url, "torc.json-rpc") : new WebSocket(url, "torc.json-rpc");
 
