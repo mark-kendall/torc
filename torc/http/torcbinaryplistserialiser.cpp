@@ -458,10 +458,11 @@ inline void binaryFromUint(QByteArray &Dest, quint64 Value, uint8_t size)
 
 void TorcBinaryPListSerialiser::BinaryFromUuid(QByteArray &Dest, const QVariant &Value)
 {
+    START_OBJECT
     QByteArray value = Value.toUuid().toRfc4122();
     if (value.size() == 16)
     {
-        START_OBJECT
+
         quint64 buffer = (quint64)(qToBigEndian(*((quint64*)value.constData() + 8)));
         uint8_t size = buffer <= UINT8_MAX ? 1 : buffer <= UINT16_MAX ? 2 : buffer <= UINT32_MAX ? 4 : 8;
         Dest.append(TorcPList::BPLIST_UID | (size -1));
