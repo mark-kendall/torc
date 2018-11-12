@@ -23,6 +23,7 @@
 #include <QTextStream>
 #include <QTextCodec>
 #include <QBuffer>
+#include <QUuid>
 
 // Torc
 #include "torclogging.h"
@@ -265,6 +266,7 @@ QVariant TorcPList::ParseBinaryNode(quint64 Num)
         case BPLIST_DATE:    return ParseBinaryDate(data);
         case BPLIST_DATA:    return ParseBinaryData(data);
         case BPLIST_UNICODE: return ParseBinaryUnicode(data);
+        case BPLIST_UID:     return ParseBinaryUID(data);
         case BPLIST_NULL:
         {
             switch (size)
@@ -275,7 +277,6 @@ QVariant TorcPList::ParseBinaryNode(quint64 Num)
                 default:           return QVariant();
             }
         }
-        case BPLIST_UID: break; // FIXME
         default: break;
     }
 
@@ -382,6 +383,28 @@ QVariant TorcPList::ParseBinaryUInt(quint8 **Data)
 
     LOG(VB_GENERAL, LOG_DEBUG, QString("UInt: %1").arg(result));
     return QVariant(result);
+}
+
+QVariant TorcPList::ParseBinaryUID(quint8 *Data)
+{
+    if (((*Data) & 0xf0) != BPLIST_UID)
+        return QVariant();
+
+    quint64 count = ((*Data) & 0x0f) + 1; // nnnn+1 bytes
+    (*Data)++;
+
+    // these are in reality limited to a bigendian 64bit uint - with 1,2,4 or 8 bytes.
+    quint64 uid = GetBinaryUInt(Data, count);
+    // which we pack into a QUuid to identify it
+    ushort b1 = (uid & 0xff00000000000000) >> 56;
+    ushort b2 = (uid & 0x00ff000000000000) >> 48;
+    ushort b3 = (uid & 0x0000ff0000000000) >> 40;
+    ushort b4 = (uid & 0x000000ff00000000) >> 32;
+    ushort b5 = (uid & 0x00000000ff000000) >> 24;
+    ushort b6 = (uid & 0x0000000000ff0000) >> 16;
+    ushort b7 = (uid & 0x000000000000ff00) >> 8;
+    ushort b8 = (uid & 0x00000000000000ff) >> 0;
+    return QVariant(QUuid(0, 0, 0, b1, b2, b3, b4, b5, b6, b7, b8));
 }
 
 QVariant TorcPList::ParseBinaryString(quint8 *Data)

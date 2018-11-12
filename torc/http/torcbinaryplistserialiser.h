@@ -28,6 +28,7 @@ class TorcBinaryPListSerialiser : public TorcSerialiser
     quint64          BinaryFromMap        (QByteArray &Dest, const QString &Name, const QVariantMap &Value);
     quint64          BinaryFromQString    (QByteArray &Dest, const QString &Value);
     void             BinaryFromUInt       (QByteArray &Dest, quint64 Value);
+    void             BinaryFromUuid       (QByteArray &Dest, const QVariant & Value);
     void             CountObjects         (quint64 &Count, const QVariant &Value);
 
   private:
