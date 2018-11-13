@@ -92,6 +92,7 @@ class TorcPower : public QObject, public TorcHTTPService
     virtual bool          DoHibernate     (void) = 0;
     virtual bool          DoRestart       (void) = 0;
 
+    QMutex                m_lock;
     TorcSetting          *m_canShutdown;
     TorcSetting          *m_canSuspend;
     TorcSetting          *m_canHibernate;

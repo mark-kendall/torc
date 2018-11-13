@@ -127,15 +127,14 @@ TorcPower* TorcPowerFactory::CreatePower()
  * - though TorcPower may be accessed from multiple threads and hence implementations must
  * guard against concurrent access if necessary.
  *
- * \sa PowerFactory
+ * \sa TorcPowerFactory
  * \sa TorcPowerObject
- *
- * \todo Make HTTP acccess thread safe.
 */
 
 TorcPower::TorcPower()
   : QObject(),
     TorcHTTPService(this, "power", "power", TorcPower::staticMetaObject, "ShuttingDown,Suspending,Hibernating,Restarting,WokeUp,LowBattery,Refresh"),
+    m_lock(QMutex::Recursive),
     m_canShutdown(new TorcSetting(NULL,  QString("CanShutdown"),  QString(), TorcSetting::Bool, TorcSetting::None, QVariant((bool)false))),
     m_canSuspend(new TorcSetting(NULL,   QString("CanSuspend"),   QString(), TorcSetting::Bool, TorcSetting::None, QVariant((bool)false))),
     m_canHibernate(new TorcSetting(NULL, QString("CanHibernate"), QString(), TorcSetting::Bool, TorcSetting::None, QVariant((bool)false))),
@@ -164,6 +163,8 @@ TorcPower::TorcPower()
     canRestart(false),
     batteryLevel(UnknownPower)
 {
+    QMutexLocker locker(&m_lock);
+
     m_powerEnabled->SetActive(true);
     // 'allow' depends on both underlying platform capabilities and top level setting
     m_allowShutdown->SetActiveThreshold(2);
@@ -302,6 +303,8 @@ QString TorcPower::GetUIName(void)
 
 void TorcPower::BatteryUpdated(int Level)
 {
+    QMutexLocker locker(&m_lock);
+
     if (m_lastBatteryLevel == Level)
         return;
 
@@ -346,6 +349,7 @@ bool TorcPower::event(QEvent *Event)
 
 bool TorcPower::Shutdown(void)
 {
+    QMutexLocker locker(&m_lock);
     if (m_allowShutdown->GetValue().toBool() && m_allowShutdown->GetIsActive())
     {
         if (gLocalContext->QueueShutdownEvent(Torc::Shutdown))
@@ -357,6 +361,7 @@ bool TorcPower::Shutdown(void)
 
 bool TorcPower::Suspend(void)
 {
+    QMutexLocker locker(&m_lock);
     if (m_allowSuspend->GetValue().toBool() && m_allowSuspend->GetIsActive())
     {
         if (gLocalContext->QueueShutdownEvent(Torc::Suspend))
@@ -368,6 +373,7 @@ bool TorcPower::Suspend(void)
 
 bool TorcPower::Hibernate(void)
 {
+    QMutexLocker locker(&m_lock);
     if (m_allowHibernate->GetValue().toBool() && m_allowHibernate->GetIsActive())
     {
         if (gLocalContext->QueueShutdownEvent(Torc::Hibernate))
@@ -379,6 +385,7 @@ bool TorcPower::Hibernate(void)
 
 bool TorcPower::Restart(void)
 {
+    QMutexLocker locker(&m_lock);
     if (m_allowRestart->GetValue().toBool() && m_allowRestart->GetIsActive())
     {
         if (gLocalContext->QueueShutdownEvent(Torc::Restart))
@@ -415,6 +422,7 @@ bool TorcPower::GetCanRestart(void)
 
 int TorcPower::GetBatteryLevel(void)
 {
+    QMutexLocker locker(&m_lock);
     return m_batteryLevel;
 }
 

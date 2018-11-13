@@ -65,10 +65,11 @@ TorcPowerUnixDBus::TorcPowerUnixDBus()
   : TorcPower(),
     m_onBattery(false),
     m_devices(QMap<QString,int>()),
-    m_deviceLock(QMutex::Recursive),
     m_upowerInterface("org.freedesktop.UPower", "/org/freedesktop/UPower", "org.freedesktop.UPower", QDBusConnection::systemBus()),
     m_consoleInterface("org.freedesktop.ConsoleKit", "/org/freedesktop/ConsoleKit/Manager", "org.freedesktop.ConsoleKit.Manager", QDBusConnection::systemBus())
 {
+    QMutexLocker locker(&m_lock);
+
     if (m_consoleInterface.isValid())
     {
         QDBusReply<bool> shutdown = m_consoleInterface.call(QLatin1String("CanStop"));
@@ -90,12 +91,8 @@ TorcPowerUnixDBus::TorcPowerUnixDBus()
         QDBusReply<QList<QDBusObjectPath> > devicecheck = m_upowerInterface.call(QLatin1String("EnumerateDevices"));
 
         if (devicecheck.isValid())
-        {
-            QMutexLocker locker(&m_deviceLock);
-
             foreach (QDBusObjectPath device, devicecheck.value())
                 m_devices.insert(device.path(), GetBatteryLevel(device.path()));
-        }
     }
     else
     {
@@ -163,6 +160,7 @@ TorcPowerUnixDBus::~TorcPowerUnixDBus()
 
 bool TorcPowerUnixDBus::DoShutdown(void)
 {
+    QMutexLocker locker(&m_lock);
     if (m_consoleInterface.isValid() && m_canShutdown->GetValue().toBool())
     {
         QList<QVariant> dummy;
@@ -180,6 +178,7 @@ bool TorcPowerUnixDBus::DoShutdown(void)
 
 bool TorcPowerUnixDBus::DoSuspend(void)
 {
+    QMutexLocker locker(&m_lock);
     if (m_upowerInterface.isValid() && m_canSuspend->GetValue().toBool())
     {
         QList<QVariant> dummy;
@@ -200,6 +199,7 @@ bool TorcPowerUnixDBus::DoSuspend(void)
 
 bool TorcPowerUnixDBus::DoHibernate(void)
 {
+    QMutexLocker locker(&m_lock);
     if (m_upowerInterface.isValid() && m_canHibernate->GetValue().toBool())
     {
         QList<QVariant> dummy;
@@ -220,6 +220,7 @@ bool TorcPowerUnixDBus::DoHibernate(void)
 
 bool TorcPowerUnixDBus::DoRestart(void)
 {
+    QMutexLocker locker(&m_lock);
     if (m_consoleInterface.isValid() && m_canRestart->GetValue().toBool())
     {
         QList<QVariant> dummy;
@@ -238,7 +239,7 @@ bool TorcPowerUnixDBus::DoRestart(void)
 void TorcPowerUnixDBus::DeviceAdded(QDBusObjectPath Device)
 {
     {
-        QMutexLocker locker(&m_deviceLock);
+        QMutexLocker locker(&m_lock);
 
         if (m_devices.contains(Device.path()))
             return;
@@ -255,7 +256,7 @@ void TorcPowerUnixDBus::DeviceAdded(QDBusObjectPath Device)
 void TorcPowerUnixDBus::DeviceRemoved(QDBusObjectPath Device)
 {
     {
-        QMutexLocker locker(&m_deviceLock);
+        QMutexLocker locker(&m_lock);
 
         if (!m_devices.contains(Device.path()))
             return;
@@ -272,7 +273,7 @@ void TorcPowerUnixDBus::DeviceRemoved(QDBusObjectPath Device)
 void TorcPowerUnixDBus::DeviceChanged(QDBusObjectPath Device)
 {
     {
-        QMutexLocker locker(&m_deviceLock);
+        QMutexLocker locker(&m_lock);
 
         if (!m_devices.contains(Device.path()))
             return;
@@ -301,10 +302,9 @@ void TorcPowerUnixDBus::Changed(void)
 
 void TorcPowerUnixDBus::UpdateBattery(void)
 {
+    QMutexLocker locker(&m_lock);
     if (m_onBattery)
     {
-        QMutexLocker locker(&m_deviceLock);
-
         qreal total = 0;
         int   count = 0;
 
@@ -337,6 +337,7 @@ void TorcPowerUnixDBus::UpdateBattery(void)
 
 int TorcPowerUnixDBus::GetBatteryLevel(const QString &Path)
 {
+    QMutexLocker locker(&m_lock);
     QDBusInterface interface("org.freedesktop.UPower", Path, "org.freedesktop.UPower.Device",
                              QDBusConnection::systemBus());
 
@@ -364,6 +365,7 @@ int TorcPowerUnixDBus::GetBatteryLevel(const QString &Path)
 
 void TorcPowerUnixDBus::UpdateProperties(void)
 {
+    QMutexLocker locker(&m_lock);
     m_canSuspend->SetValue(QVariant((bool)false));
     m_canHibernate->SetValue(QVariant((bool)false));
     m_onBattery = false;
