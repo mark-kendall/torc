@@ -53,6 +53,29 @@ matrix:
             echo Ignoring branch
           fi
 
+    - os: osx
+      env: TORC=osx-codecov
+      compiler: clang
+      before_install:
+        - |
+          if [[ $TRAVIS_BRANCH != "coverity_scan" ]]; then
+            travis_retry brew install qt5
+            travis_retry brew link qt5 --force
+          else
+            echo Ignoring branch
+          fi
+
+      script:
+        - |
+          if [[ $TRAVIS_BRANCH != "coverity_scan" ]]; then
+            qmake CONFIG+=test torc.pro
+            make
+            ./torc-tests -c test/config -s . -t i18n
+            bash <(curl -s https://codecov.io/bash)
+          else
+            echo Ignoring branch
+          fi
+
     - os: linux
       env: TORC=linux
       dist: xenial
@@ -98,6 +121,3 @@ matrix:
           else
             echo Ignoring branch
           fi
-      addons:
-        hosts:
-        - torc.test
