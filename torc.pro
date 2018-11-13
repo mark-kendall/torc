@@ -450,8 +450,8 @@ test {
     message("Building tests")
     DEFINES += TORC_TEST
     QMAKE_CXXFLAGS -= -O2
-    QMAKE_CXXFLAGS += -fprofile-arcs -ftest-coverage
-    !macx:LIBS += -lgcov
+    QMAKE_CXXFLAGS += --coverage
+    LIBS += --coverage
     QT += testlib
     TARGET = torc-tests
     target.path = ./
