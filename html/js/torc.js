@@ -90,7 +90,7 @@ $(document).ready(function() {
     }
 
     function languageSubscriptionChanged(version, ignore, properties) {
-        if (typeof version !== "undefined" || typeof properties !== "object") { return; }
+        if (typeof version === "undefined" || typeof properties !== "object") { return; }
         // this should happen when the socket status transitions to Connected but we don"t have the
         // translation service at that point
         torcconnection.call("services", "IsSecure", {},
