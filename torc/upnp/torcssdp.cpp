@@ -552,7 +552,7 @@ void TorcSSDP::SendAnnounce(bool IPv6, bool Alive)
     sent       += socket->writeDatagram(packet2, address, TORC_SSDP_UDP_MULTICAST_PORT);
     sent       += socket->writeDatagram(packet3, address, TORC_SSDP_UDP_MULTICAST_PORT);
     if (sent != (packet1.size() + packet2.size() + packet3.size()))
-        LOG(VB_GENERAL, LOG_ERR, QString("Error sending 3 %1 SSDP NOTIFYs (%1)").arg(IPv6 ? "IPv6" : "IPv4").arg(m_ipv4MulticastSocket->errorString()));
+        LOG(VB_GENERAL, LOG_ERR, QString("Error sending 3 %1 SSDP NOTIFYs (%2)").arg(IPv6 ? "IPv6" : "IPv4").arg(m_ipv4MulticastSocket->errorString()));
     else
         LOG(VB_NETWORK, LOG_INFO, QString("Sent 3 %1 SSDP NOTIFYs ").arg(IPv6 ? "IPv6" : "IPv4"));
 }
