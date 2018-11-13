@@ -58,12 +58,6 @@ TorcSSDPSearchResponse::TorcSSDPSearchResponse()
  *  \brief The public class for handling Simple Service Discovery Protocol searches and announcements
  *
  * All SSDP interaction is via the static methods Search, CancelSearch, Announce and CancelAnnounce
- *
- * \todo Revisit behaviour for search and announce wrt network availability and network allowed inbound/outbound
- * \todo Actually announce (with random 0-100ms delay) plus retry
- * \todo Schedule announce refreshes (half of cache-control)
- * \todo Respond to search requests
- * \todo Correct handling of multiple responses (i.e. via both IPv4 and IPv6)
 */
 
 TorcSSDP::TorcSSDP()
