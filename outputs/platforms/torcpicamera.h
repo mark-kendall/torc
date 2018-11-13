@@ -12,7 +12,7 @@
 // FFmpeg
 #include <libavcodec/avcodec.h>
 
-class TorcPiCamera Q_DECL_FINAL : public TorcCameraDevice 
+class TorcPiCamera final : public TorcCameraDevice 
 {
     Q_OBJECT
 
@@ -28,9 +28,9 @@ class TorcPiCamera Q_DECL_FINAL : public TorcCameraDevice
     TorcPiCamera(const TorcCameraParams &Params);
     virtual ~TorcPiCamera();
 
-    bool Setup              (void) Q_DECL_OVERRIDE;
-    bool WriteFrame         (void) Q_DECL_OVERRIDE;
-    bool Stop               (void) Q_DECL_OVERRIDE;
+    bool Setup              (void) override;
+    bool WriteFrame         (void) override;
+    bool Stop               (void) override;
 
   private:
     bool LoadDrivers        (void);

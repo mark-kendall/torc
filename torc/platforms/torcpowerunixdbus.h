@@ -7,7 +7,7 @@
 // Torc
 #include "torcpower.h"
 
-class TorcPowerUnixDBus Q_DECL_FINAL : public TorcPower
+class TorcPowerUnixDBus final : public TorcPower
 {
     Q_OBJECT
 
@@ -18,10 +18,10 @@ class TorcPowerUnixDBus Q_DECL_FINAL : public TorcPower
     TorcPowerUnixDBus();
     virtual ~TorcPowerUnixDBus();
 
-    bool DoShutdown         (void) Q_DECL_OVERRIDE;
-    bool DoSuspend          (void) Q_DECL_OVERRIDE;
-    bool DoHibernate        (void) Q_DECL_OVERRIDE;
-    bool DoRestart          (void) Q_DECL_OVERRIDE;
+    bool DoShutdown         (void) override;
+    bool DoSuspend          (void) override;
+    bool DoHibernate        (void) override;
+    bool DoRestart          (void) override;
 
   public slots:
     void DeviceAdded        (QDBusObjectPath Device);

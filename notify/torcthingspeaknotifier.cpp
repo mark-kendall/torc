@@ -82,9 +82,9 @@ TorcNetworkRequest* TorcThingSpeakNotifier::CreateRequest(void)
     return new TorcNetworkRequest(qrequest, QNetworkAccessManager::GetOperation, 0, &m_networkAbort);
 }
 
-class TorcThingSpeakNotifierFactory Q_DECL_FINAL : public TorcNotifierFactory
+class TorcThingSpeakNotifierFactory final : public TorcNotifierFactory
 {
-    TorcNotifier* Create(const QString &Type, const QVariantMap &Details) Q_DECL_OVERRIDE
+    TorcNotifier* Create(const QString &Type, const QVariantMap &Details) override
     {
         if (Type == "thingspeak" && Details.contains("apikey") && Details.contains("fields"))
             return new TorcThingSpeakNotifier(Details);

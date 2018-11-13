@@ -12,7 +12,7 @@ class TorcNetworkSwitchOutput : public TorcSwitchOutput
     TorcNetworkSwitchOutput(double Default, const QVariantMap &Details);
     virtual ~TorcNetworkSwitchOutput();
 
-    virtual QStringList GetDescription(void) Q_DECL_OVERRIDE;
+    virtual QStringList GetDescription(void) override;
 };
 
 #endif // TORCNETWORKSWITCHOUTPUT_H

@@ -72,7 +72,7 @@ class TorcWebSocket : public QSslSocket
     void            BytesWritten          (qint64);
 
   protected:
-    bool            event                 (QEvent *Event) Q_DECL_OVERRIDE;
+    bool            event                 (QEvent *Event) override;
 
   private:
     Q_DISABLE_COPY(TorcWebSocket)

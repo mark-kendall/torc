@@ -14,13 +14,13 @@ class TorcXMLSerialiser : public TorcSerialiser
     TorcXMLSerialiser();
     virtual ~TorcXMLSerialiser();
 
-    virtual HTTPResponseType ResponseType    (void) Q_DECL_OVERRIDE;
+    virtual HTTPResponseType ResponseType    (void) override;
 
   protected:
-    virtual void             Prepare         (QByteArray &Dest) Q_DECL_OVERRIDE;
-    virtual void             Begin           (QByteArray &Dest) Q_DECL_OVERRIDE;
-    virtual void             AddProperty     (QByteArray &Dest, const QString &Name, const QVariant &Value) Q_DECL_OVERRIDE;
-    virtual void             End             (QByteArray &Dest) Q_DECL_OVERRIDE;
+    virtual void             Prepare         (QByteArray &Dest) override;
+    virtual void             Begin           (QByteArray &Dest) override;
+    virtual void             AddProperty     (QByteArray &Dest, const QString &Name, const QVariant &Value) override;
+    virtual void             End             (QByteArray &Dest) override;
 
     void                     VariantToXML    (const QString &Name, const QVariant &Value);
     void                     ListToXML       (const QString &Name, const QVariantList &Value);

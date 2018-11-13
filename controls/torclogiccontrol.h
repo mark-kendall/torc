@@ -33,13 +33,13 @@ class TorcLogicControl : public TorcControl
     TorcLogicControl(const QString &Type, const QVariantMap &Details);
    ~TorcLogicControl();
 
-    bool                        Validate         (void) Q_DECL_OVERRIDE;
-    TorcControl::Type           GetType          (void) const Q_DECL_OVERRIDE;
-    QStringList                 GetDescription   (void) Q_DECL_OVERRIDE;
-    bool                        IsPassthrough    (void) Q_DECL_OVERRIDE;
+    bool                        Validate         (void) override;
+    TorcControl::Type           GetType          (void) const override;
+    QStringList                 GetDescription   (void) override;
+    bool                        IsPassthrough    (void) override;
 
   private:
-    void                        CalculateOutput  (void) Q_DECL_OVERRIDE;
+    void                        CalculateOutput  (void) override;
 
   private:
     Q_DISABLE_COPY(TorcLogicControl)

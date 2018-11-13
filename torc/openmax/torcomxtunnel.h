@@ -13,7 +13,7 @@
 #include "OMX_Core.h"
 #include "OMX_Component.h"
 
-class TorcOMXTunnel Q_DECL_FINAL
+class TorcOMXTunnel final
 {
   public:
     TorcOMXTunnel(TorcOMXComponent *Source, OMX_U32 SourceIndex, OMX_INDEXTYPE SourceDomain,

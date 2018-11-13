@@ -44,7 +44,7 @@ class TorcOutput : public TorcDevice, public TorcHTTPService
 
     bool             HasOwner               (void);
     bool             SetOwner               (QObject *Owner);
-    QString          GetUIName              (void) Q_DECL_OVERRIDE;
+    QString          GetUIName              (void) override;
 
   public slots:
     // TorcHTTPService

@@ -4,7 +4,7 @@
 // Torc
 #include "torcinput.h"
 
-class TorcSystemInput Q_DECL_FINAL : public TorcInput
+class TorcSystemInput final : public TorcInput
 {
     Q_OBJECT
 
@@ -12,11 +12,11 @@ class TorcSystemInput Q_DECL_FINAL : public TorcInput
     TorcSystemInput(double Value, const QVariantMap &Details);
    ~TorcSystemInput();
 
-    TorcInput::Type GetType        (void) Q_DECL_OVERRIDE;
-    QStringList     GetDescription (void) Q_DECL_OVERRIDE;
+    TorcInput::Type GetType        (void) override;
+    QStringList     GetDescription (void) override;
 
   public slots:
-    bool            event          (QEvent *Event) Q_DECL_OVERRIDE;
+    bool            event          (QEvent *Event) override;
 
   private:
     uint            m_shutdownDelay;

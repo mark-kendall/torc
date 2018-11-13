@@ -4,7 +4,7 @@
 // Qt
 #include <QTcpServer>
 
-class TorcHTTPServerListener Q_DECL_FINAL : public QTcpServer
+class TorcHTTPServerListener final : public QTcpServer
 {
     Q_OBJECT
 
@@ -18,7 +18,7 @@ class TorcHTTPServerListener Q_DECL_FINAL : public QTcpServer
     void NewConnection(qintptr SocketDescriptor);
 
   protected:
-    void incomingConnection (qintptr SocketDescriptor) Q_DECL_OVERRIDE Q_DECL_FINAL;
+    void incomingConnection (qintptr SocketDescriptor) override final;
 };
 
 #endif // TORCHTTPSERVERADDRESS_H

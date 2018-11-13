@@ -4,7 +4,7 @@
 // Torc
 #include "torciotlogger.h"
 
-class TorcThingSpeakNotifier Q_DECL_FINAL : public TorcIOTLogger
+class TorcThingSpeakNotifier final : public TorcIOTLogger
 {
     Q_OBJECT
 
@@ -12,8 +12,8 @@ class TorcThingSpeakNotifier Q_DECL_FINAL : public TorcIOTLogger
     explicit TorcThingSpeakNotifier(const QVariantMap &Details);
     virtual ~TorcThingSpeakNotifier();
 
-    void ProcessRequest(TorcNetworkRequest* Request) Q_DECL_OVERRIDE;
-    TorcNetworkRequest* CreateRequest(void) Q_DECL_OVERRIDE;
+    void ProcessRequest(TorcNetworkRequest* Request) override;
+    TorcNetworkRequest* CreateRequest(void) override;
 };
 
 #endif // TORCTHINGSPEAKNOTIFIER_H

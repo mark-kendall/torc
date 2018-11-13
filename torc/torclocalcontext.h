@@ -103,7 +103,7 @@ class TorcLocalContext : public QObject, public TorcObservable
   public slots:
     void                     RegisterQThread     (void);
     void                     DeregisterQThread   (void);
-    bool                     event               (QEvent *Event) Q_DECL_OVERRIDE;
+    bool                     event               (QEvent *Event) override;
     void                     ShutdownTimeout     (void);
 
   private:

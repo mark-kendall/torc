@@ -906,7 +906,7 @@ class TorcPiCameraXSDFactory : public TorcXSDFactory
     void GetXSD(QMultiMap<QString,QString> &XSD) { XSD.insert(XSD_CAMERATYPES, piCameraType); }
 } TorcPiCameraXSDFactory;
 
-class TorcPiCameraFactory Q_DECL_FINAL : public TorcCameraFactory
+class TorcPiCameraFactory final : public TorcCameraFactory
 {
   public:
     TorcPiCameraFactory() : TorcCameraFactory()
@@ -919,7 +919,7 @@ class TorcPiCameraFactory Q_DECL_FINAL : public TorcCameraFactory
         bcm_host_deinit();
     }
 
-    bool CanHandle(const QString &Type, const TorcCameraParams &Params) Q_DECL_OVERRIDE
+    bool CanHandle(const QString &Type, const TorcCameraParams &Params) override
     {
         (void)Params;
 
@@ -970,7 +970,7 @@ class TorcPiCameraFactory Q_DECL_FINAL : public TorcCameraFactory
         return TorcPiCamera::gPiCameraDetected ? "pi" == Type : false;
     }
 
-    TorcCameraDevice* Create(const QString &Type, const TorcCameraParams &Params) Q_DECL_OVERRIDE
+    TorcCameraDevice* Create(const QString &Type, const TorcCameraParams &Params) override
     {
         if (("pi" == Type) && TorcPiCamera::gPiCameraDetected)
             return new TorcPiCamera(Params);

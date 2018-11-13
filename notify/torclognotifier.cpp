@@ -50,9 +50,9 @@ void TorcLogNotifier::Notify(const QVariantMap &Notification)
     LOG(VB_GENERAL, LOG_INFO, QString("Notify: %1").arg(message));
 }
 
-class TorcLogNotifierFactory Q_DECL_FINAL : public TorcNotifierFactory
+class TorcLogNotifierFactory final : public TorcNotifierFactory
 {
-    TorcNotifier* Create(const QString &Type, const QVariantMap &Details) Q_DECL_OVERRIDE
+    TorcNotifier* Create(const QString &Type, const QVariantMap &Details) override
     {
         if (Type == "log")
             return new TorcLogNotifier(Details);

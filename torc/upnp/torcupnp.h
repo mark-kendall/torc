@@ -6,7 +6,7 @@
 
 #define TORC_ROOT_UPNP_DEVICE QString("urn:schemas-torcapp-org:device:TorcClient:1")
 
-class TorcUPNPDescription Q_DECL_FINAL
+class TorcUPNPDescription final
 {
   public:
     TorcUPNPDescription ();
@@ -22,7 +22,7 @@ class TorcUPNPDescription Q_DECL_FINAL
     qint64  m_expiry;
 };
 
-class TorcUPNP Q_DECL_FINAL
+class TorcUPNP final
 {
   public:
     static  QString     UUIDFromUSN (const QString &USN);

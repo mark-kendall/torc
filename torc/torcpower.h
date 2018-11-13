@@ -42,8 +42,8 @@ class TorcPower : public QObject, public TorcHTTPService
   public:
     virtual ~TorcPower();
     void BatteryUpdated  (int Level);
-    QString GetUIName    (void) Q_DECL_OVERRIDE;
-    bool event           (QEvent *Event) Q_DECL_OVERRIDE;
+    QString GetUIName    (void) override;
+    bool event           (QEvent *Event) override;
 
   signals:
     void CanShutdownChanged  (bool CanShutdown);

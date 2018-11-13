@@ -4,7 +4,7 @@
 // Torc
 #include "torcomxcore.h"
 
-class TorcOMXTest Q_DECL_FINAL
+class TorcOMXTest final
 {
   public:
     TorcOMXTest();

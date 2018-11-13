@@ -4,14 +4,14 @@
 // Torc
 #include "torcnotifier.h"
 
-class TorcLogNotifier Q_DECL_FINAL : public TorcNotifier
+class TorcLogNotifier final : public TorcNotifier
 {
   public:
     explicit TorcLogNotifier(const QVariantMap &Details);
     ~TorcLogNotifier();
 
-    void Notify (const QVariantMap &Notification) Q_DECL_OVERRIDE;
-    QStringList GetDescription (void) Q_DECL_OVERRIDE;
+    void Notify (const QVariantMap &Notification) override;
+    QStringList GetDescription (void) override;
 };
 
 #endif // TORCLOGNOTIFIER_H

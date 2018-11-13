@@ -84,7 +84,7 @@ class TorcCameraDevice : public QObject
 
 class TorcCameraOutput;
 
-class TorcCameraThread Q_DECL_FINAL : public TorcQThread
+class TorcCameraThread final : public TorcQThread
 {
     Q_OBJECT
 
@@ -92,8 +92,8 @@ class TorcCameraThread Q_DECL_FINAL : public TorcQThread
     TorcCameraThread(TorcCameraOutput *Parent, const QString &Type, const TorcCameraParams &Params);
     ~TorcCameraThread();
 
-    void              Start          (void) Q_DECL_OVERRIDE;
-    void              Finish         (void) Q_DECL_OVERRIDE;
+    void              Start          (void) override;
+    void              Finish         (void) override;
     QByteArray        GetSegment     (int Segment);
     QByteArray        GetInitSegment (void);
     TorcCameraParams  GetParams      (void);
@@ -115,7 +115,7 @@ class TorcCameraThread Q_DECL_FINAL : public TorcQThread
     bool              m_stop;
 };
 
-class TorcCameraOutput Q_DECL_FINAL : public TorcOutput
+class TorcCameraOutput final : public TorcOutput
 {
     Q_OBJECT
 
@@ -123,12 +123,12 @@ class TorcCameraOutput Q_DECL_FINAL : public TorcOutput
     TorcCameraOutput(const QString &ModelId, const QVariantMap &Details);
     virtual ~TorcCameraOutput();
 
-    TorcOutput::Type GetType            (void) Q_DECL_OVERRIDE;
-    void             Start              (void) Q_DECL_OVERRIDE;
-    void             Stop               (void) Q_DECL_OVERRIDE;
-    QString          GetPresentationURL (void) Q_DECL_OVERRIDE;
+    TorcOutput::Type GetType            (void) override;
+    void             Start              (void) override;
+    void             Stop               (void) override;
+    QString          GetPresentationURL (void) override;
     void             ProcessHTTPRequest (const QString &PeerAddress, int PeerPort, const QString &LocalAddress,
-                                         int LocalPort, TorcHTTPRequest &Request) Q_DECL_OVERRIDE;
+                                         int LocalPort, TorcHTTPRequest &Request) override;
   public slots:
     void             WritingStarted     (void);
     void             WritingStopped     (void);
@@ -153,15 +153,15 @@ class TorcCameraOutput Q_DECL_FINAL : public TorcOutput
     QDateTime         m_cameraStartTime;
 };
 
-class TorcCameraOutputs Q_DECL_FINAL : public TorcDeviceHandler
+class TorcCameraOutputs final : public TorcDeviceHandler
 {
   public:
     TorcCameraOutputs();
 
     static TorcCameraOutputs *gCameraOutputs;
 
-    void Create  (const QVariantMap &Details) Q_DECL_OVERRIDE;
-    void Destroy (void) Q_DECL_OVERRIDE;
+    void Create  (const QVariantMap &Details) override;
+    void Destroy (void) override;
 
   private:
     QHash<QString, TorcCameraOutput*> m_cameras;
