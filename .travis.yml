@@ -98,3 +98,6 @@ matrix:
           else
             echo Ignoring branch
           fi
+      addons:
+        hosts:
+        - torc.test
