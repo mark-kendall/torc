@@ -495,8 +495,6 @@ TorcWebSocketThread* TorcHTTPServer::TakeSocket(TorcWebSocketThread *Socket)
  *
  * Authentication credentials supplied via the url are used for WebSocket upgrade requests - and it is assumed the if the
  * initial request is authenticated, the entire socket is then authenticated for that user.
- *
- * \todo Use proper username and password.
 */
 void TorcHTTPServer::Authorise(const QString &Host, TorcHTTPRequest &Request, bool ForceCheck)
 {
