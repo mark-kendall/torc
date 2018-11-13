@@ -29,6 +29,10 @@ TorcPWMOutput::TorcPWMOutput(double Value, const QString &ModelId, const QVarian
     m_resolution(MaxResolution),
     m_maxResolution(MaxResolution)
 {
+    // disallow inputs
+    if (ModelId.startsWith(DEVICE_CONSTANT))
+        SetOwner(this);
+
     // check for user defined resolution
     // the XSD limits this to 7 to 24bit resolution
     QVariantMap::const_iterator it = Details.begin();

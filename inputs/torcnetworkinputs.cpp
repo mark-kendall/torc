@@ -125,33 +125,33 @@ void TorcNetworkInputs::Create(const QVariantMap &Details)
                             case TorcInput::PWM:
                                 {
                                     if (isinput)
-                                        newinput = network ? new TorcNetworkPWMInput(defaultdouble, input) : new TorcPWMInput(defaultdouble, "ConstantPWM", input);
+                                        newinput = network ? new TorcNetworkPWMInput(defaultdouble, input) : new TorcPWMInput(defaultdouble, DEVICE_CONSTANT + TorcInput::TypeToString(TorcInput::PWM), input);
                                     else
-                                        newoutput = network ? new TorcNetworkPWMOutput(defaultdouble, input) : new TorcPWMOutput(defaultdouble, "ConstantPWM", input);
+                                        newoutput = network ? new TorcNetworkPWMOutput(defaultdouble, input) : new TorcPWMOutput(defaultdouble, DEVICE_CONSTANT + TorcOutput::TypeToString(TorcOutput::PWM), input);
                                 }
                                 break;
                             case TorcInput::Switch:
                                 {
                                     if (isinput)
-                                        newinput = network ? new TorcNetworkSwitchInput(defaultdouble, input) : new TorcSwitchInput(defaultdouble, "ConstantSwitch", input);
+                                        newinput = network ? new TorcNetworkSwitchInput(defaultdouble, input) : new TorcSwitchInput(defaultdouble, DEVICE_CONSTANT + TorcInput::TypeToString(TorcInput::Switch), input);
                                     else
-                                        newoutput = network ? new TorcNetworkSwitchOutput(defaultdouble, input) : new TorcSwitchOutput(defaultdouble, "ConstantSwitch", input);
+                                        newoutput = network ? new TorcNetworkSwitchOutput(defaultdouble, input) : new TorcSwitchOutput(defaultdouble, DEVICE_CONSTANT + TorcOutput::TypeToString(TorcOutput::Switch), input);
                                 }
                                 break;
                             case TorcInput::Temperature:
                                 {
                                     if (isinput)
-                                        newinput = network ? new TorcNetworkTemperatureInput(defaultdouble, input) : new TorcTemperatureInput(defaultdouble, -1000, 1000, "ConstantTemp", input);
+                                        newinput = network ? new TorcNetworkTemperatureInput(defaultdouble, input) : new TorcTemperatureInput(defaultdouble, -1000, 1000, DEVICE_CONSTANT + TorcInput::TypeToString(TorcInput::Temperature), input);
                                     else
-                                        newoutput = network ? new TorcNetworkTemperatureOutput(defaultdouble, input) : new TorcTemperatureOutput(defaultdouble, "ConstantTemp", input);
+                                        newoutput = network ? new TorcNetworkTemperatureOutput(defaultdouble, input) : new TorcTemperatureOutput(defaultdouble, DEVICE_CONSTANT + TorcOutput::TypeToString(TorcOutput::Temperature), input);
                                 }
                                 break;
                             case TorcInput::pH:
                                 {
                                     if (isinput)
-                                        newinput = network ? new TorcNetworkpHInput(defaultdouble, input) : new TorcpHInput(defaultdouble, "ConstantpH", input);
+                                        newinput = network ? new TorcNetworkpHInput(defaultdouble, input) : new TorcpHInput(defaultdouble, DEVICE_CONSTANT + TorcInput::TypeToString(TorcInput::pH), input);
                                     else
-                                        newoutput = network ? new TorcNetworkpHOutput(defaultdouble, input) : new TorcpHOutput(defaultdouble, "ConstantpH", input);
+                                        newoutput = network ? new TorcNetworkpHOutput(defaultdouble, input) : new TorcpHOutput(defaultdouble, DEVICE_CONSTANT + TorcOutput::TypeToString(TorcOutput::pH), input);
                                 }
                                 break;
                             case TorcInput::Button:

@@ -12,6 +12,7 @@
 #include "torcdevicehandler.h"
 
 #define DEVICE_LINE_ITEM "|<FONT POINT-SIZE=\"10\">%1</FONT>"
+#define DEVICE_CONSTANT "Constant"
 
 class TorcDevice : public QObject, public TorcReferenceCounter
 {

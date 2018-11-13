@@ -26,6 +26,9 @@
 TorcTemperatureOutput::TorcTemperatureOutput(double Value, const QString &ModelId, const QVariantMap &Details)
   : TorcOutput(TorcOutput::Temperature, Value, ModelId, Details)
 {
+    // disallow inputs
+    if (ModelId.startsWith(DEVICE_CONSTANT))
+        SetOwner(this);
 }
 
 TorcTemperatureOutput::~TorcTemperatureOutput()
