@@ -121,9 +121,6 @@ void TorcLocalContext::NotifyEvent(int Event)
 
 /*! \class TorcLocalContext
  *  \brief TorcLocalContext is the core Torc object.
- *
- * \todo Add priority generation based on role and maybe user setting.
- * \todo Convert Q_INVOKABLEs to public slots.
 */
 TorcLocalContext::TorcLocalContext(TorcCommandLine* CommandLine)
   : QObject(),
