@@ -57,6 +57,7 @@ static void ExitHandler(int Sig)
     TorcLocalContext::NotifyEvent(Torc::Stop);
 }
 
+/// Return the string describing the given action.
 QString Torc::ActionToString(Actions Action)
 {
     const QMetaObject &mo = Torc::staticMetaObject;
@@ -65,12 +66,30 @@ QString Torc::ActionToString(Actions Action)
     return metaEnum.valueToKey(Action);
 }
 
-int Torc::StringToAction(const QString &Action)
+/*! \brief Return the Torc action that matches the given string.
+ *
+ * \note QMetaEnum::keyToValue is case sensitive but this routine is used
+ *       to validate system events from the config file - and we cannot be too
+ *       picky about case. So default to a case insensitive search.
+*/
+int Torc::StringToAction(const QString &Action, bool CaseSensitive /*=false*/)
 {
     const QMetaObject &mo = Torc::staticMetaObject;
     int enum_index        = mo.indexOfEnumerator("Actions");
     QMetaEnum metaEnum    = mo.enumerator(enum_index);
-    return metaEnum.keyToValue(Action.toLatin1());
+    if (CaseSensitive)
+        return metaEnum.keyToValue(Action.toLatin1());
+
+    QByteArray action = Action.toLower().toLatin1();
+    int count = metaEnum.keyCount();
+    for (int i = 0; i < count; i++)
+    {
+        QByteArray key = QByteArray(metaEnum.key(count)).toLower();
+        if (qstrcmp(action, key) == 0)
+            return metaEnum.value(count);
+    }
+
+    return -1; // for consistency with QMetaEnum::keyToValue
 }
 
 qint16 TorcLocalContext::Create(TorcCommandLine* CommandLine, bool Init /*=true*/)

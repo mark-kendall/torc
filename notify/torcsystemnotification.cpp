@@ -19,7 +19,6 @@
 
 // Torc
 #include "torclogging.h"
-#include "torclocalcontext.h"
 #include "torcnotify.h"
 #include "torcsystemnotification.h"
 
@@ -55,8 +54,6 @@
  *   </notifications>
  * </notify>
  * \endcode
- *
- * \todo Validate the list of events against those specified in Torc::Actions.
 */
 TorcSystemNotification::TorcSystemNotification(const QVariantMap &Details)
   : TorcNotification(Details),
@@ -65,14 +62,20 @@ TorcSystemNotification::TorcSystemNotification(const QVariantMap &Details)
     if (uniqueId.isEmpty() || m_notifierNames.isEmpty() || m_body.isEmpty())
         return;
 
-    // NB individual event strings are validated by the xsd.
+    // NB event names are also validated in the xsd
     if (Details.contains("inputs"))
     {
         QVariantMap inputs = Details.value("inputs").toMap();
         QVariantMap::const_iterator it = inputs.constBegin();
         for ( ; it != inputs.constEnd(); ++it)
+        {
             if (it.key() == "event")
-                m_events.append(it.value().toString().trimmed().toLower());
+            {
+                int event = Torc::StringToAction(it.value().toString().trimmed());
+                if (event != -1)
+                    m_events.append((Torc::Actions)event);
+            }
+        }
     }
 
     if (m_events.isEmpty())
@@ -95,7 +98,8 @@ QStringList TorcSystemNotification::GetDescription(void)
 {
     QStringList result;
     result.append(tr("System event"));
-    result.append(m_events);
+    foreach (Torc::Actions event, m_events)
+        result.append(Torc::ActionToString(event));
     return result;
 }
 
@@ -117,11 +121,11 @@ bool TorcSystemNotification::event(QEvent *Event)
         if (torcevent)
         {
             QMutexLocker locker(&lock);
-            QString eventname = Torc::ActionToString((Torc::Actions)torcevent->GetEvent()).toLower();
-            if (m_events.contains(eventname))
+            Torc::Actions event = (Torc::Actions)torcevent->GetEvent();
+            if (m_events.contains(event))
             {
                 QMap<QString,QString> custom;
-                custom.insert("event", Torc::ActionToString((Torc::Actions)torcevent->GetEvent()));
+                custom.insert("event", Torc::ActionToString(event));
                 QVariantMap message = TorcNotify::gNotify->SetNotificationText(m_title, m_body, custom);
                 emit Notify(message);
             }

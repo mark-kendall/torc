@@ -2,6 +2,7 @@
 #define TORCSYSTEMNOTIFICATION_H
 
 // Torc
+#include "torclocalcontext.h"
 #include "torcnotification.h"
 
 class TorcSystemNotification final : public TorcNotification
@@ -17,10 +18,10 @@ class TorcSystemNotification final : public TorcNotification
 
   public slots:
     // QObject
-    bool         event (QEvent *Event) override;
+    bool        event (QEvent *Event) override;
 
   private:
-    QStringList  m_events;
+    QList<Torc::Actions>  m_events;
 };
 
 #endif // TORCSYSTEMNOTIFICATION_H
