@@ -42,28 +42,27 @@ $(document).ready(function() {
     }
 
     function peerListChanged(name, value) {
-        if (name === "peers") {
-            // remove old peers
-            $(".torc-peer").remove();
-            $(".torc-peer-status").remove();
+        if (name !== "peers") { return; }
+        // remove old peers
+        $(".torc-peer").remove();
+        $(".torc-peer-status").remove();
 
-            // and add new
-            if ($.isArray(value) && value.length) {
-                addDropdownMenuItem("torc-peer-menu", "torc-peer-status", "#", "");
-                qsTranslate("TorcNetworkedContext", "%n other Torc device(s) discovered", "", value.length,
-                            function(result) { $(".torc-peer-status").html(result); });
-                addDropdownMenuDivider("torc-peer-menu", "torc-peer");
-                value.forEach( function (element, index) {
-                    var prot = "http://";
-                    if (element.hasOwnProperty("secure")) { prot = "https://"; }
-                    addDropdownMenuItem("torc-peer-menu", "torc-peer torc-peer" + index, prot + element.address + ":" + element.port + "/index.html", "");
-                    qsTranslate("TorcNetworkedContext", "Connect to %1", "", 0,
-                                function(result) { $(".torc-peer" + index).html(template(theme.DropdownItemWithIcon, { "icon": "external-link-square", "text": result.replace("%1", element.name) })); });
-                });
-            } else {
-                addDropdownMenuItem("torc-peer-menu", "torc-peer-status", "#", torc.NoPeers);
-            }
+        // and add new
+        if ($.isArray(value) && value.length) {
+            addDropdownMenuItem("torc-peer-menu", "torc-peer-status", "#", "");
+            qsTranslate("TorcNetworkedContext", "%n other Torc device(s) discovered", "", value.length,
+                        function(result) { $(".torc-peer-status").html(result); });
+            addDropdownMenuDivider("torc-peer-menu", "torc-peer");
+            value.forEach( function (element, index) {
+                var prot = element.hasOwnProperty("secure") ? "https://" : "http://";
+                addDropdownMenuItem("torc-peer-menu", "torc-peer torc-peer" + index, prot + element.address + ":" + element.port + "/index.html", "");
+                qsTranslate("TorcNetworkedContext", "Connect to %1", "", 0,
+                            function(result) { $(".torc-peer" + index).html(template(theme.DropdownItemWithIcon, { "icon": "external-link-square", "text": result.replace("%1", element.name) })); });
+            });
+            return;
         }
+        // no peers found
+        addDropdownMenuItem("torc-peer-menu", "torc-peer-status", "#", torc.NoPeers);
     }
 
     function peerSubscriptionChanged(version, ignore, properties) {
@@ -80,35 +79,31 @@ $(document).ready(function() {
     }
 
     function languageChanged(name, value) {
-        if (name === "languageCode") {
-            if (typeof language === "undefined") {
-                language = value;
-            } else {
-                if (language !== value) {
-                    // simple, unambiguous strings are listed in the torc var. This needs to be
-                    // reloaded if the language changes.
-                    location.reload(true);
-                }
-            }
+        if (name !== "languageCode") { return; }
+        if (typeof language === "undefined") {
+            language = value;
+        } else if (language !== value) {
+            // simple, unambiguous strings are listed in the torc var. This needs to be
+            // reloaded if the language changes.
+            location.reload(true);
         }
     }
 
     function languageSubscriptionChanged(version, ignore, properties) {
-        if (typeof version !== "undefined" && typeof properties === "object") {
-            // this should happen when the socket status transitions to Connected but we don"t have the
-            // translation service at that point
-            torcconnection.call("services", "IsSecure", {},
-                                function (result) {
-                                    if (result.secure === true) {
-                                        secure = true;
-                                        $(".torc-socket-status-icon").removeClass("fa-check fa-exclamation-circle fa-question-circle-o fa-check-circle-o").addClass("fa-lock");
-                                    }
-                                    qsTranslate("TorcNetworkedContext", secure ? "Connected securely to %1" : "Connected to %1", "", 0,
-                                                function (result) { $(".torc-socket-status-text").html(result.replace("%1", window.location.hostname)); });
-                                });
-            $.each(properties, function (key, value) {
-                languageChanged(key, value.value); });
-        }
+        if (typeof version !== "undefined" || typeof properties !== "object") { return; }
+        // this should happen when the socket status transitions to Connected but we don"t have the
+        // translation service at that point
+        torcconnection.call("services", "IsSecure", {},
+                            function (result) {
+                                if (result.secure === true) {
+                                    secure = true;
+                                    $(".torc-socket-status-icon").removeClass("fa-check fa-exclamation-circle fa-question-circle-o fa-check-circle-o").addClass("fa-lock");
+                                }
+                                qsTranslate("TorcNetworkedContext", secure ? "Connected securely to %1" : "Connected to %1", "", 0,
+                                            function (result) { $(".torc-socket-status-text").html(result.replace("%1", window.location.hostname)); });
+                            });
+        $.each(properties, function (key, value) {
+            languageChanged(key, value.value); });
     }
 
     function powerChanged(name, value) {
