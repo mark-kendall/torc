@@ -1,0 +1,5 @@
+<map id="TorcTriggerNotification" name="TorcTriggerNotification">
+<area shape="rect" id="node2" href="$dc/d10/class_torc_notification.html" title="TorcNotification" alt="" coords="53,155,172,181"/>
+<area shape="rect" id="node3" href="$d5/d76/class_torc_device.html" title="TorcDevice" alt="" coords="67,80,158,107"/>
+<area shape="rect" id="node5" href="$d6/dad/class_torc_reference_counter.html" title="A reference counting implementation. " alt="" coords="103,5,264,32"/>
+</map>

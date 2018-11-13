@@ -1,0 +1,10 @@
+<map id="TorcDeviceHandler" name="TorcDeviceHandler">
+<area shape="rect" id="node2" href="$d6/d7b/class_torc1_wire_bus.html" title="A class to handle the one wire files system (OWFS) for 1Wire devices. " alt="" coords="215,5,321,32"/>
+<area shape="rect" id="node3" href="$df/d70/class_torc_camera_outputs.html" title="TorcCameraOutputs" alt="" coords="193,56,343,83"/>
+<area shape="rect" id="node4" href="$d9/dac/class_torc_controls.html" title="TorcControls" alt="" coords="218,107,318,133"/>
+<area shape="rect" id="node5" href="$d3/da6/class_torc_i2_c_bus.html" title="TorcI2CBus" alt="" coords="223,157,313,184"/>
+<area shape="rect" id="node6" href="$d1/d27/class_torc_network_inputs.html" title="TorcNetworkInputs" alt="" coords="199,208,337,235"/>
+<area shape="rect" id="node7" href="$df/d23/class_torc_notify.html" title="TorcNotify" alt="" coords="226,259,310,285"/>
+<area shape="rect" id="node8" href="$da/da0/class_torc_pi_g_p_i_o.html" title="TorcPiGPIO" alt="" coords="223,309,313,336"/>
+<area shape="rect" id="node9" href="$d4/d19/class_torc_system_inputs.html" title="TorcSystemInputs" alt="" coords="201,360,335,387"/>
+</map>

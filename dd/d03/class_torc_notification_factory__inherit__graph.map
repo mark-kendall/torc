@@ -1,0 +1,4 @@
+<map id="TorcNotificationFactory" name="TorcNotificationFactory">
+<area shape="rect" id="node2" href="$dc/d25/class_torc_system_notification_factory.html" title="Create instances of TorcSystemNotification. " alt="" coords="5,80,220,107"/>
+<area shape="rect" id="node3" href="$dc/d0f/class_torc_trigger_notification_factory.html" title="TorcTriggerNotificationFactory" alt="" coords="244,80,451,107"/>
+</map>

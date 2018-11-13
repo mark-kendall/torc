@@ -1,0 +1,6 @@
+<map id="TorcIoTPlotterNotifier" name="TorcIoTPlotterNotifier">
+<area shape="rect" id="node2" href="$d0/db9/class_torc_i_o_t_logger.html" title="TorcIOTLogger" alt="" coords="57,229,168,256"/>
+<area shape="rect" id="node3" href="$d4/d20/class_torc_notifier.html" title="TorcNotifier" alt="" coords="66,155,159,181"/>
+<area shape="rect" id="node4" href="$d5/d76/class_torc_device.html" title="TorcDevice" alt="" coords="67,80,158,107"/>
+<area shape="rect" id="node6" href="$d6/dad/class_torc_reference_counter.html" title="A reference counting implementation. " alt="" coords="103,5,264,32"/>
+</map>

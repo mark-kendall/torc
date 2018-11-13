@@ -1,0 +1,11 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node2" href="$d2/d41/class_torc_q_thread.html" title="A Torc specific wrapper around QThread. " alt="" coords="129,183,231,209"/>
+<area shape="rect" id="node3" href="$da/d38/class_logging_thread.html" title="LoggingThread" alt="" coords="308,5,424,32"/>
+<area shape="rect" id="node4" href="$d8/d54/class_torc1_wire_read_thread.html" title="Torc1WireReadThread" alt="" coords="287,56,445,83"/>
+<area shape="rect" id="node5" href="$dd/d56/class_torc_admin_thread.html" title="A simple thread to launch helper objects outside of the main loop. " alt="" coords="300,107,432,133"/>
+<area shape="rect" id="node6" href="$de/dc9/class_torc_camera_thread.html" title="TorcCameraThread" alt="" coords="295,157,437,184"/>
+<area shape="rect" id="node7" href="$de/dbc/class_torc_o_s_x_callback_thread.html" title="TorcQThread subclass to run a CFRunLoop. " alt="" coords="281,208,451,235"/>
+<area shape="rect" id="node8" href="$d6/d3b/class_torc_pi_switch_input_thread.html" title="TorcPiSwitchInputThread" alt="" coords="279,259,453,285"/>
+<area shape="rect" id="node9" href="$df/d33/class_torc_s_s_d_p_thread.html" title="TorcSSDPThread" alt="" coords="303,309,429,336"/>
+<area shape="rect" id="node10" href="$d3/d5b/class_torc_web_socket_thread.html" title="Wraps a TorcQThread around a TorcWebsocket. " alt="" coords="285,360,447,387"/>
+</map>

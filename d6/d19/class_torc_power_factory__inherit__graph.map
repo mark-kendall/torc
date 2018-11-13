@@ -1,0 +1,5 @@
+<map id="TorcPowerFactory" name="TorcPowerFactory">
+<area shape="rect" id="node2" href="$da/d9a/class_torc_power_factory_null.html" title="TorcPowerFactoryNull" alt="" coords="5,80,160,107"/>
+<area shape="rect" id="node3" href="$db/da2/class_torc_power_factory_o_s_x.html" title="Create a TorcPowerOSX singleton to handle power status. " alt="" coords="185,80,343,107"/>
+<area shape="rect" id="node4" href="$d7/d66/class_torc_power_factory_unix_d_bus.html" title="TorcPowerFactoryUnixDBus" alt="" coords="367,80,561,107"/>
+</map>

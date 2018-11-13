@@ -1,0 +1,9 @@
+<map id="TorcControl" name="TorcControl">
+<area shape="rect" id="node7" href="$d5/d8f/class_torc_logic_control.html" title="TorcLogicControl" alt="" coords="43,229,169,256"/>
+<area shape="rect" id="node8" href="$d6/d72/class_torc_timer_control.html" title="TorcTimerControl" alt="" coords="193,229,323,256"/>
+<area shape="rect" id="node9" href="$df/d11/class_torc_transition_control.html" title="TorcTransitionControl" alt="" coords="347,229,500,256"/>
+<area shape="rect" id="node2" href="$d5/d76/class_torc_device.html" title="TorcDevice" alt="" coords="138,80,229,107"/>
+<area shape="rect" id="node4" href="$d6/dad/class_torc_reference_counter.html" title="A reference counting implementation. " alt="" coords="103,5,264,32"/>
+<area shape="rect" id="node5" href="$d6/d70/class_torc_h_t_t_p_service.html" title="TorcHTTPService" alt="" coords="271,80,397,107"/>
+<area shape="rect" id="node6" href="$d5/d15/class_torc_h_t_t_p_handler.html" title="Base HTTP response handler class. " alt="" coords="288,5,417,32"/>
+</map>

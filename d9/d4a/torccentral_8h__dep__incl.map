@@ -1,0 +1,34 @@
+<map id="torccentral.h" name="torccentral.h">
+<area shape="rect" id="node2" href="$d5/d16/torccontrol_8cpp.html" title="torccontrol.cpp" alt="" coords="5,80,124,107"/>
+<area shape="rect" id="node3" href="$db/d27/torccontrols_8h.html" title="torccontrols.h" alt="" coords="748,80,859,107"/>
+<area shape="rect" id="node5" href="$d1/d81/torccentral_8cpp.html" title="torccentral.cpp" alt="" coords="488,155,607,181"/>
+<area shape="rect" id="node7" href="$d2/df5/torc1wirebus_8h.html" title="torc1wirebus.h" alt="" coords="149,80,263,107"/>
+<area shape="rect" id="node10" href="$df/d8e/torc1wireds18b20_8cpp.html" title="torc1wireds18b20.cpp" alt="" coords="194,229,357,256"/>
+<area shape="rect" id="node11" href="$d4/d68/torcinputs_8h.html" title="torcinputs.h" alt="" coords="1034,80,1133,107"/>
+<area shape="rect" id="node13" href="$d1/d0c/torcinputs_8cpp.html" title="torcinputs.cpp" alt="" coords="631,155,744,181"/>
+<area shape="rect" id="node16" href="$da/d84/torcpigpio_8cpp.html" title="torcpigpio.cpp" alt="" coords="1521,155,1633,181"/>
+<area shape="rect" id="node17" href="$d7/dcc/torcnetworkinputs_8h.html" title="torcnetworkinputs.h" alt="" coords="1327,80,1475,107"/>
+<area shape="rect" id="node18" href="$d7/ddf/torcsysteminputs_8h.html" title="torcsysteminputs.h" alt="" coords="1157,80,1303,107"/>
+<area shape="rect" id="node19" href="$d6/d33/torci2cbus_8cpp.html" title="torci2cbus.cpp" alt="" coords="2249,155,2363,181"/>
+<area shape="rect" id="node20" href="$de/d67/torci2cbus_8h.html" title="torci2cbus.h" alt="" coords="1735,80,1835,107"/>
+<area shape="rect" id="node23" href="$da/d80/torcoutputs_8h.html" title="torcoutputs.h" alt="" coords="1551,80,1659,107"/>
+<area shape="rect" id="node26" href="$d5/da7/torcoutputs_8cpp.html" title="torcoutputs.cpp" alt="" coords="1945,155,2067,181"/>
+<area shape="rect" id="node27" href="$d7/de1/torcpicamera_8cpp.html" title="torcpicamera.cpp" alt="" coords="1911,80,2045,107"/>
+<area shape="rect" id="node28" href="$d4/de1/torcpigpio_8h.html" title="torcpigpio.h" alt="" coords="2069,80,2167,107"/>
+<area shape="rect" id="node32" href="$dd/d82/torcdevice_8cpp.html" title="torcdevice.cpp" alt="" coords="2191,80,2306,107"/>
+<area shape="rect" id="node33" href="$d6/ddf/torcxsdtest_8cpp.html" title="torcxsdtest.cpp" alt="" coords="2331,80,2452,107"/>
+<area shape="rect" id="node4" href="$d4/d91/torccontrols_8cpp.html" title="torccontrols.cpp" alt="" coords="338,155,463,181"/>
+<area shape="rect" id="node6" href="$dd/dbf/testtorclocalcontext_8cpp.html" title="testtorclocalcontext.cpp" alt="" coords="769,155,945,181"/>
+<area shape="rect" id="node8" href="$d8/d63/torc1wirebus_8cpp.html" title="torc1wirebus.cpp" alt="" coords="39,229,170,256"/>
+<area shape="rect" id="node9" href="$d0/d86/torc1wireds18b20_8h.html" title="torc1wireds18b20.h" alt="" coords="66,155,213,181"/>
+<area shape="rect" id="node12" href="$da/d5d/torcinput_8cpp.html" title="torcinput.cpp" alt="" coords="1203,155,1310,181"/>
+<area shape="rect" id="node14" href="$df/dc7/torcnetworkinputs_8cpp.html" title="torcnetworkinputs.cpp" alt="" coords="1334,155,1497,181"/>
+<area shape="rect" id="node15" href="$dd/d56/torcsysteminputs_8cpp.html" title="torcsysteminputs.cpp" alt="" coords="1019,155,1179,181"/>
+<area shape="rect" id="node21" href="$db/dd5/torci2cpca9685_8h.html" title="torci2cpca9685.h" alt="" coords="2092,155,2224,181"/>
+<area shape="rect" id="node22" href="$d9/d02/torci2cpca9685_8cpp.html" title="torci2cpca9685.cpp" alt="" coords="2085,229,2231,256"/>
+<area shape="rect" id="node24" href="$d0/d11/torccamera_8cpp.html" title="torccamera.cpp" alt="" coords="1798,155,1921,181"/>
+<area shape="rect" id="node25" href="$d5/d6d/torcoutput_8cpp.html" title="torcoutput.cpp" alt="" coords="1657,155,1773,181"/>
+<area shape="rect" id="node29" href="$dd/df5/torcpiswitchinput_8cpp.html" title="torcpiswitchinput.cpp" alt="" coords="2388,155,2544,181"/>
+<area shape="rect" id="node30" href="$d1/d80/torcpipwmoutput_8cpp.html" title="torcpipwmoutput.cpp" alt="" coords="2569,155,2726,181"/>
+<area shape="rect" id="node31" href="$d2/de8/torcpiswitchoutput_8cpp.html" title="torcpiswitchoutput.cpp" alt="" coords="2751,155,2917,181"/>
+</map>

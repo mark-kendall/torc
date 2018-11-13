@@ -1,0 +1,8 @@
+<map id="TorcNetworkTemperatureOutput" name="TorcNetworkTemperatureOutput">
+<area shape="rect" id="node2" href="$d5/dda/class_torc_temperature_output.html" title="TorcTemperatureOutput" alt="" coords="172,229,344,256"/>
+<area shape="rect" id="node3" href="$d1/dc7/class_torc_output.html" title="TorcOutput" alt="" coords="213,155,303,181"/>
+<area shape="rect" id="node4" href="$d5/d76/class_torc_device.html" title="TorcDevice" alt="" coords="138,80,229,107"/>
+<area shape="rect" id="node6" href="$d6/dad/class_torc_reference_counter.html" title="A reference counting implementation. " alt="" coords="103,5,264,32"/>
+<area shape="rect" id="node7" href="$d6/d70/class_torc_h_t_t_p_service.html" title="TorcHTTPService" alt="" coords="271,80,397,107"/>
+<area shape="rect" id="node8" href="$d5/d15/class_torc_h_t_t_p_handler.html" title="Base HTTP response handler class. " alt="" coords="288,5,417,32"/>
+</map>

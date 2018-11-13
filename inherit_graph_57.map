@@ -1,0 +1,7 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$d5/d5d/class_torc_x_s_d_factory.html" title="TorcXSDFactory" alt="" coords="5,81,125,108"/>
+<area shape="rect" id="node2" href="$d5/d83/class_torc1_wire_x_s_d_factory.html" title="Torc1WireXSDFactory" alt="" coords="187,5,342,32"/>
+<area shape="rect" id="node3" href="$d2/d66/class_torc_i2_c_x_s_d_factory.html" title="TorcI2CXSDFactory" alt="" coords="195,56,335,83"/>
+<area shape="rect" id="node4" href="$d1/d6b/class_torc_pi_camera_x_s_d_factory.html" title="TorcPiCameraXSDFactory" alt="" coords="173,107,356,133"/>
+<area shape="rect" id="node5" href="$d9/df2/class_torc_pi_g_p_i_o_x_s_d_factory.html" title="TorcPiGPIOXSDFactory" alt="" coords="184,157,345,184"/>
+</map>

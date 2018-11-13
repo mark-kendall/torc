@@ -1,0 +1,7 @@
+<map id="TorcPower" name="TorcPower">
+<area shape="rect" id="node5" href="$d4/d2f/class_torc_power_null.html" title="A dummy/default power implementation. " alt="" coords="5,229,115,256"/>
+<area shape="rect" id="node6" href="$d7/d52/class_torc_power_o_s_x.html" title="A power monitoring class for OS X. " alt="" coords="139,229,251,256"/>
+<area shape="rect" id="node7" href="$d6/df0/class_torc_power_unix_d_bus.html" title="A power monitoring class for Unix based systems. " alt="" coords="275,229,421,256"/>
+<area shape="rect" id="node3" href="$d6/d70/class_torc_h_t_t_p_service.html" title="TorcHTTPService" alt="" coords="194,80,321,107"/>
+<area shape="rect" id="node4" href="$d5/d15/class_torc_h_t_t_p_handler.html" title="Base HTTP response handler class. " alt="" coords="193,5,322,32"/>
+</map>

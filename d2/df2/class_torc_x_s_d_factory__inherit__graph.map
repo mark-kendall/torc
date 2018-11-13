@@ -1,0 +1,6 @@
+<map id="TorcXSDFactory" name="TorcXSDFactory">
+<area shape="rect" id="node2" href="$d5/d83/class_torc1_wire_x_s_d_factory.html" title="Torc1WireXSDFactory" alt="" coords="5,80,160,107"/>
+<area shape="rect" id="node3" href="$d2/d66/class_torc_i2_c_x_s_d_factory.html" title="TorcI2CXSDFactory" alt="" coords="185,80,325,107"/>
+<area shape="rect" id="node4" href="$d1/d6b/class_torc_pi_camera_x_s_d_factory.html" title="TorcPiCameraXSDFactory" alt="" coords="349,80,531,107"/>
+<area shape="rect" id="node5" href="$d9/df2/class_torc_pi_g_p_i_o_x_s_d_factory.html" title="TorcPiGPIOXSDFactory" alt="" coords="555,80,717,107"/>
+</map>

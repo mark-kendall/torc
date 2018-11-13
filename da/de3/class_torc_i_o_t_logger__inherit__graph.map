@@ -1,0 +1,7 @@
+<map id="TorcIOTLogger" name="TorcIOTLogger">
+<area shape="rect" id="node6" href="$df/d10/class_torc_io_t_plotter_notifier.html" title="TorcIoTPlotterNotifier" alt="" coords="5,304,159,331"/>
+<area shape="rect" id="node7" href="$d0/d1f/class_torc_thing_speak_notifier.html" title="TorcThingSpeakNotifier" alt="" coords="183,304,349,331"/>
+<area shape="rect" id="node2" href="$d4/d20/class_torc_notifier.html" title="TorcNotifier" alt="" coords="127,155,221,181"/>
+<area shape="rect" id="node3" href="$d5/d76/class_torc_device.html" title="TorcDevice" alt="" coords="129,80,219,107"/>
+<area shape="rect" id="node5" href="$d6/dad/class_torc_reference_counter.html" title="A reference counting implementation. " alt="" coords="164,5,325,32"/>
+</map>

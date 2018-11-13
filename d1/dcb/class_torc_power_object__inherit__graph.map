@@ -1,0 +1,4 @@
+<map id="TorcPowerObject" name="TorcPowerObject">
+<area shape="rect" id="node2" href="$d4/d75/class_torc_admin_object.html" title="A factory class for automatically running objects outside of the main loop. " alt="" coords="5,5,135,32"/>
+<area shape="rect" id="node3" href="$d5/d29/class_torc_string_factory.html" title="A factory class to register translatable strings for use with external interfaces/applications. " alt="" coords="158,5,289,32"/>
+</map>

@@ -1,0 +1,10 @@
+<map id="TorcSwitchInput" name="TorcSwitchInput">
+<area shape="rect" id="node8" href="$df/d5c/class_torc_network_switch_input.html" title="TorcNetworkSwitchInput" alt="" coords="84,304,256,331"/>
+<area shape="rect" id="node10" href="$de/d6d/class_torc_pi_switch_input.html" title="TorcPiSwitchInput" alt="" coords="281,304,411,331"/>
+<area shape="rect" id="node2" href="$d8/d61/class_torc_input.html" title="TorcInput" alt="" coords="219,155,297,181"/>
+<area shape="rect" id="node3" href="$d5/d76/class_torc_device.html" title="TorcDevice" alt="" coords="138,80,229,107"/>
+<area shape="rect" id="node5" href="$d6/dad/class_torc_reference_counter.html" title="A reference counting implementation. " alt="" coords="103,5,264,32"/>
+<area shape="rect" id="node6" href="$d6/d70/class_torc_h_t_t_p_service.html" title="TorcHTTPService" alt="" coords="271,80,397,107"/>
+<area shape="rect" id="node7" href="$d5/d15/class_torc_h_t_t_p_handler.html" title="Base HTTP response handler class. " alt="" coords="288,5,417,32"/>
+<area shape="rect" id="node9" href="$d7/d4b/class_torc_network_button_input.html" title="A network input that mimics the behaviour of a mechanical push button. " alt="" coords="83,379,257,405"/>
+</map>

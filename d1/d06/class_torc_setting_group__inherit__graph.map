@@ -1,0 +1,6 @@
+<map id="TorcSettingGroup" name="TorcSettingGroup">
+<area shape="rect" id="node2" href="$dd/d69/class_torc_setting.html" title="A wrapper around a database setting. " alt="" coords="119,155,213,181"/>
+<area shape="rect" id="node4" href="$d6/d70/class_torc_h_t_t_p_service.html" title="TorcHTTPService" alt="" coords="103,80,229,107"/>
+<area shape="rect" id="node5" href="$d5/d15/class_torc_h_t_t_p_handler.html" title="Base HTTP response handler class. " alt="" coords="101,5,231,32"/>
+<area shape="rect" id="node6" href="$d6/dad/class_torc_reference_counter.html" title="A reference counting implementation. " alt="" coords="253,80,415,107"/>
+</map>

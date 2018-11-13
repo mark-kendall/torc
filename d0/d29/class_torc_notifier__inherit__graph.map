@@ -1,0 +1,9 @@
+<map id="TorcNotifier" name="TorcNotifier">
+<area shape="rect" id="node5" href="$d0/db9/class_torc_i_o_t_logger.html" title="TorcIOTLogger" alt="" coords="119,229,229,256"/>
+<area shape="rect" id="node8" href="$df/dd1/class_torc_log_notifier.html" title="Log notifications to the log file. " alt="" coords="253,229,369,256"/>
+<area shape="rect" id="node9" href="$d7/d0b/class_torc_pushbullet_notifier.html" title="Send push notifications using the Pushbullet API. " alt="" coords="393,229,552,256"/>
+<area shape="rect" id="node2" href="$d5/d76/class_torc_device.html" title="TorcDevice" alt="" coords="266,80,357,107"/>
+<area shape="rect" id="node4" href="$d6/dad/class_torc_reference_counter.html" title="A reference counting implementation. " alt="" coords="301,5,463,32"/>
+<area shape="rect" id="node6" href="$df/d10/class_torc_io_t_plotter_notifier.html" title="TorcIoTPlotterNotifier" alt="" coords="5,304,159,331"/>
+<area shape="rect" id="node7" href="$d0/d1f/class_torc_thing_speak_notifier.html" title="TorcThingSpeakNotifier" alt="" coords="183,304,349,331"/>
+</map>

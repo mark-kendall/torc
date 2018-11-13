@@ -1,0 +1,12 @@
+<map id="TorcAdminObject" name="TorcAdminObject">
+<area shape="rect" id="node2" href="$df/d62/class_torc_central_object.html" title="Create the central controller object. " alt="" coords="219,5,353,32"/>
+<area shape="rect" id="node3" href="$dd/d10/class_torc_h_t_t_p_server_object.html" title="TorcHTTPServerObject" alt="" coords="205,56,367,83"/>
+<area shape="rect" id="node4" href="$d8/d0c/class_torc_networked_context_object.html" title="TorcNetworkedContextObject" alt="" coords="183,107,389,133"/>
+<area shape="rect" id="node5" href="$da/dc5/class_torc_network_object.html" title="A static class used to create the TorcNetwork singleton in the admin thread. " alt="" coords="216,157,356,184"/>
+<area shape="rect" id="node6" href="$d2/d8e/class_torc_o_m_x_test_object.html" title="TorcOMXTestObject" alt="" coords="215,208,357,235"/>
+<area shape="rect" id="node7" href="$d2/d28/class_torc_power_object.html" title="A static class used to create the TorcPower singleton in the admin thread. " alt="" coords="223,259,349,285"/>
+<area shape="rect" id="node8" href="$d2/d3e/class_torc_run_loop_o_s_x.html" title="A TorcAdminObject to instanciate the TorcOSXCallbackThread singleton. " alt="" coords="222,309,350,336"/>
+<area shape="rect" id="node9" href="$de/d5a/class_torc_service_test_object.html" title="Creates a TorcHTTPServiceTest singleton. " alt="" coords="206,360,366,387"/>
+<area shape="rect" id="node10" href="$d8/dfc/class_torc_time_object.html" title="A static class used to create the TorcTime singleton in the admin thread. " alt="" coords="227,411,345,437"/>
+<area shape="rect" id="node11" href="$d9/d4e/class_torc_user_object.html" title="TorcUserObject" alt="" coords="227,461,345,488"/>
+</map>
