@@ -10,7 +10,7 @@ var searchData=
   ['takesocketpriv',['TakeSocketPriv',['../db/dc7/class_torc_h_t_t_p_server.html#a1c7c7c2243e2d64a000d9227d0c303aa',1,'TorcHTTPServer']]],
   ['teardown',['TearDown',['../d0/d9f/class_torc_bonjour.html#a03d9612d584534def92e2658c84c850d',1,'TorcBonjour::TearDown()'],['../d7/d17/class_torc_local_context.html#aa32a79d18b005ec505118ea24a7053b9',1,'TorcLocalContext::TearDown()'],['../d7/da5/class_torc_power.html#a115a907966c7bbeec85a0239a1b05cfc',1,'TorcPower::TearDown()']]],
   ['temperature',['Temperature',['../d8/d61/class_torc_input.html#afb288ada1ecb4b2593398a9ae8df145aacc28a9a05702859b3ffff0670b23b57c',1,'TorcInput::Temperature()'],['../d1/dc7/class_torc_output.html#a68bfe71abbe6a4a7634c22458da29391a085b87c01fa46e403caa9f0a4d7f33cc',1,'TorcOutput::Temperature()']]],
-  ['temperatureunits',['TemperatureUnits',['../d9/d56/class_torc_central.html#af007e56605ccea8cc30e355e9085fae2',1,'TorcCentral::TemperatureUnits()'],['../d9/d56/class_torc_central.html#a2f11dde886dfd9e8c601395944be6b8e',1,'TorcCentral::temperatureUnits()']]],
+  ['temperatureunits',['temperatureUnits',['../d9/d56/class_torc_central.html#a2f11dde886dfd9e8c601395944be6b8e',1,'TorcCentral::temperatureUnits()'],['../d9/d56/class_torc_central.html#af007e56605ccea8cc30e355e9085fae2',1,'TorcCentral::TemperatureUnits()']]],
   ['temperatureunitstostring',['TemperatureUnitsToString',['../d9/d56/class_torc_central.html#a96d5c3ff2653943f4cd25c25633874da',1,'TorcCentral']]],
   ['testserialisers',['TestSerialisers',['../df/dc8/class_test_serialisers.html',1,'']]],
   ['testserialisers_2ecpp',['testserialisers.cpp',['../dc/d6d/testserialisers_8cpp.html',1,'']]],

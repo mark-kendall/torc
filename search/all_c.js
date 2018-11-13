@@ -73,7 +73,7 @@ var searchData=
   ['m_5fipaddresses',['m_ipAddresses',['../db/dff/class_torc_bonjour_service.html#ad58880bf5cc74955928d7f5cd08bb8ff',1,'TorcBonjourService']]],
   ['m_5flastinputvalues',['m_lastInputValues',['../d1/d34/class_torc_control.html#a1f24353a31c98a713447da2beba17bc0',1,'TorcControl']]],
   ['m_5flastupdate',['m_lastUpdate',['../d0/db9/class_torc_i_o_t_logger.html#a2b549bdd13ed80c891b19bce9b21a1bc',1,'TorcIOTLogger']]],
-  ['m_5flock',['m_lock',['../dc/dfc/class_torc_device_handler.html#a4cf1f8ca0998ca44bba7bfb42846e6b4',1,'TorcDeviceHandler::m_lock()'],['../de/d1d/class_torc_o_m_x_component.html#ae359c5e79fff854adbe62eddf5b8022a',1,'TorcOMXComponent::m_lock()'],['../d1/d2e/class_torc_d_b.html#a931966307ce54e14983d553c8e1861ed',1,'TorcDB::m_lock()']]],
+  ['m_5flock',['m_lock',['../dc/dfc/class_torc_device_handler.html#a4cf1f8ca0998ca44bba7bfb42846e6b4',1,'TorcDeviceHandler::m_lock()'],['../de/d1d/class_torc_o_m_x_component.html#ae359c5e79fff854adbe62eddf5b8022a',1,'TorcOMXComponent::m_lock()'],['../d1/d2e/class_torc_d_b.html#a931966307ce54e14983d553c8e1861ed',1,'TorcDB::m_lock()'],['../d7/da5/class_torc_power.html#aa259d9c262de563cccdcd97d23b69e80',1,'TorcPower::m_lock()']]],
   ['m_5flookupid',['m_lookupID',['../db/dff/class_torc_bonjour_service.html#ad01f89622d9cf838cdbaf4f1b218490c',1,'TorcBonjourService']]],
   ['m_5fmaxbadrequests',['m_maxBadRequests',['../d0/db9/class_torc_i_o_t_logger.html#a13d99b23663bd6d02e54431b2b42575c',1,'TorcIOTLogger']]],
   ['m_5fmaxfields',['m_maxFields',['../d0/db9/class_torc_i_o_t_logger.html#a8ff358c36f1d7f80e884cf219bc7bbdd',1,'TorcIOTLogger']]],

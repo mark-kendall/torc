@@ -163,7 +163,7 @@ Additional Inherited Members</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SQLite implementation of <a class="el" href="../../d1/d2e/class_torc_d_b.html" title="Base Sql database access class. ">TorcDB</a>. </p>
 <p>All Sql specific code resides in <a class="el" href="../../d1/d2e/class_torc_d_b.html" title="Base Sql database access class. ">TorcDB</a>. <a class="el" href="../../da/de8/class_torc_s_q_lite_d_b.html" title="SQLite implementation of TorcDB. ">TorcSQLiteDB</a> applies SQLite specifics when creating the database and upon first use after startup.</p>
-<dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000034">Todo:</a></b></dt><dd>Check the exclusive lock handling. It's unclear whether this will lock out other threads.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>The SQLite database is not locked as this prevents access from all threads. This is not best practice and can lead to strange behaviour if two instances of <a class="el" href="../../d6/db6/class_torc.html">Torc</a> open the same database.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="../../d1/d2e/class_torc_d_b.html" title="Base Sql database access class. ">TorcDB</a> </dd></dl>
 
 <p>Definition at line <a class="el" href="../../d7/d70/torcsqlitedb_8h_source.html#l00006">6</a> of file <a class="el" href="../../d7/d70/torcsqlitedb_8h_source.html">torcsqlitedb.h</a>.</p>
@@ -190,7 +190,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../de/d43/torcsqlitedb_8cpp_source.html#l00040">40</a> of file <a class="el" href="../../de/d43/torcsqlitedb_8cpp_source.html">torcsqlitedb.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../de/d43/torcsqlitedb_8cpp_source.html#l00042">42</a> of file <a class="el" href="../../de/d43/torcsqlitedb_8cpp_source.html">torcsqlitedb.cpp</a>.</p>
 
 </div>
 </div>
@@ -221,7 +221,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="../../d1/d2e/class_torc_d_b.html#aeab563e80b1615e7ba09dee0adfa99de">TorcDB</a>.</p>
 
-<p>Definition at line <a class="el" href="../../de/d43/torcsqlitedb_8cpp_source.html#l00049">49</a> of file <a class="el" href="../../de/d43/torcsqlitedb_8cpp_source.html">torcsqlitedb.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../de/d43/torcsqlitedb_8cpp_source.html#l00051">51</a> of file <a class="el" href="../../de/d43/torcsqlitedb_8cpp_source.html">torcsqlitedb.cpp</a>.</p>
 
 </div>
 </div>
@@ -232,7 +232,7 @@ Additional Inherited Members</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Nov 13 2018 18:09:53 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Nov 13 2018 21:28:14 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

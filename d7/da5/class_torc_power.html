@@ -267,6 +267,8 @@ Protected Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
+<tr class="memitem:aa259d9c262de563cccdcd97d23b69e80"><td class="memItemLeft" align="right" valign="top">QMutex&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/da5/class_torc_power.html#aa259d9c262de563cccdcd97d23b69e80">m_lock</a></td></tr>
+<tr class="separator:aa259d9c262de563cccdcd97d23b69e80"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a80ad43b48253a296cf11986ea0525853"><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../dd/d69/class_torc_setting.html">TorcSetting</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/da5/class_torc_power.html#a80ad43b48253a296cf11986ea0525853">m_canShutdown</a></td></tr>
 <tr class="separator:a80ad43b48253a296cf11986ea0525853"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9d7b747c41ac5a7c4f428aaa9574ad00"><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../dd/d69/class_torc_setting.html">TorcSetting</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/da5/class_torc_power.html#a9d7b747c41ac5a7c4f428aaa9574ad00">m_canSuspend</a></td></tr>
@@ -316,10 +318,9 @@ Additional Inherited Members</h2></td></tr>
 <p>A singleton power object is created by <a class="el" href="../../d2/d28/class_torc_power_object.html" title="A static class used to create the TorcPower singleton in the admin thread. ">TorcPowerObject</a> from within the administration thread</p><ul>
 <li>though <a class="el" href="../../d7/da5/class_torc_power.html" title="A generic power status class. ">TorcPower</a> may be accessed from multiple threads and hence implementations must guard against concurrent access if necessary.</li>
 </ul>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="../../d8/d0a/class_power_factory.html">PowerFactory</a> </dd>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="../../d5/d8c/class_torc_power_factory.html">TorcPowerFactory</a> </dd>
 <dd>
-<a class="el" href="../../d2/d28/class_torc_power_object.html" title="A static class used to create the TorcPower singleton in the admin thread. ">TorcPowerObject</a></dd></dl>
-<dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000029">Todo:</a></b></dt><dd>Make HTTP acccess thread safe. </dd></dl>
+<a class="el" href="../../d2/d28/class_torc_power_object.html" title="A static class used to create the TorcPower singleton in the admin thread. ">TorcPowerObject</a> </dd></dl>
 
 <p>Definition at line <a class="el" href="../../d1/da5/torcpower_8h_source.html#l00012">12</a> of file <a class="el" href="../../d1/da5/torcpower_8h_source.html">torcpower.h</a>.</p>
 </div><h2 class="groupheader">Member Enumeration Documentation</h2>
@@ -371,7 +372,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00215">215</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00216">216</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
 
 </div>
 </div>
@@ -396,7 +397,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00136">136</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00134">134</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
 
 </div>
 </div>
@@ -439,7 +440,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00303">303</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00304">304</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
 
 </div>
 </div>
@@ -465,7 +466,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00441">441</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00449">449</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
 
 </div>
 </div>
@@ -515,7 +516,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00446">446</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00454">454</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
 
 </div>
 </div>
@@ -541,7 +542,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00451">451</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00459">459</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
 
 </div>
 </div>
@@ -591,7 +592,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00456">456</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00464">464</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
 
 </div>
 </div>
@@ -617,7 +618,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00421">421</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00429">429</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
 
 </div>
 </div>
@@ -667,7 +668,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00426">426</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00434">434</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
 
 </div>
 </div>
@@ -693,7 +694,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00431">431</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00439">439</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
 
 </div>
 </div>
@@ -743,7 +744,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00436">436</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00444">444</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
 
 </div>
 </div>
@@ -793,7 +794,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00279">279</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00280">280</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
 
 </div>
 </div>
@@ -923,7 +924,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00324">324</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00327">327</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
 
 </div>
 </div>
@@ -949,7 +950,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00416">416</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00423">423</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
 
 </div>
 </div>
@@ -975,7 +976,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00406">406</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00413">413</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
 
 </div>
 </div>
@@ -1001,7 +1002,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00411">411</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00418">418</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
 
 </div>
 </div>
@@ -1027,7 +1028,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00396">396</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00403">403</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
 
 </div>
 </div>
@@ -1053,7 +1054,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00401">401</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00408">408</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
 
 </div>
 </div>
@@ -1079,7 +1080,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00461">461</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00469">469</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
 
 </div>
 </div>
@@ -1107,7 +1108,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="../../d6/d70/class_torc_h_t_t_p_service.html#ac1ad2d6a8450afa4314dc9a35b67426d">TorcHTTPService</a>.</p>
 
-<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00298">298</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00299">299</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
 
 </div>
 </div>
@@ -1133,7 +1134,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00369">369</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00374">374</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
 
 </div>
 </div>
@@ -1159,7 +1160,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00484">484</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00492">492</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
 
 </div>
 </div>
@@ -1185,7 +1186,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00502">502</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00510">510</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
 
 </div>
 </div>
@@ -1211,7 +1212,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00380">380</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00386">386</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
 
 </div>
 </div>
@@ -1237,7 +1238,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00490">490</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00498">498</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
 
 </div>
 </div>
@@ -1263,7 +1264,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00347">347</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00350">350</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
 
 </div>
 </div>
@@ -1289,7 +1290,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00472">472</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00480">480</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
 
 </div>
 </div>
@@ -1315,7 +1316,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00391">391</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00398">398</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
 
 </div>
 </div>
@@ -1341,7 +1342,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00358">358</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00362">362</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
 
 </div>
 </div>
@@ -1367,7 +1368,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00478">478</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00486">486</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
 
 </div>
 </div>
@@ -1417,7 +1418,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00496">496</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/da7/torcpower_8cpp_source.html#l00504">504</a> of file <a class="el" href="../../d2/da7/torcpower_8cpp_source.html">torcpower.cpp</a>.</p>
 
 </div>
 </div>
@@ -1440,7 +1441,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d1/da5/torcpower_8h_source.html#l00099">99</a> of file <a class="el" href="../../d1/da5/torcpower_8h_source.html">torcpower.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/da5/torcpower_8h_source.html#l00100">100</a> of file <a class="el" href="../../d1/da5/torcpower_8h_source.html">torcpower.h</a>.</p>
 
 </div>
 </div>
@@ -1462,7 +1463,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d1/da5/torcpower_8h_source.html#l00097">97</a> of file <a class="el" href="../../d1/da5/torcpower_8h_source.html">torcpower.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/da5/torcpower_8h_source.html#l00098">98</a> of file <a class="el" href="../../d1/da5/torcpower_8h_source.html">torcpower.h</a>.</p>
 
 </div>
 </div>
@@ -1484,7 +1485,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d1/da5/torcpower_8h_source.html#l00098">98</a> of file <a class="el" href="../../d1/da5/torcpower_8h_source.html">torcpower.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/da5/torcpower_8h_source.html#l00099">99</a> of file <a class="el" href="../../d1/da5/torcpower_8h_source.html">torcpower.h</a>.</p>
 
 </div>
 </div>
@@ -1506,7 +1507,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d1/da5/torcpower_8h_source.html#l00095">95</a> of file <a class="el" href="../../d1/da5/torcpower_8h_source.html">torcpower.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/da5/torcpower_8h_source.html#l00096">96</a> of file <a class="el" href="../../d1/da5/torcpower_8h_source.html">torcpower.h</a>.</p>
 
 </div>
 </div>
@@ -1528,7 +1529,29 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d1/da5/torcpower_8h_source.html#l00096">96</a> of file <a class="el" href="../../d1/da5/torcpower_8h_source.html">torcpower.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/da5/torcpower_8h_source.html#l00097">97</a> of file <a class="el" href="../../d1/da5/torcpower_8h_source.html">torcpower.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aa259d9c262de563cccdcd97d23b69e80"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QMutex TorcPower::m_lock</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="../../d1/da5/torcpower_8h_source.html#l00095">95</a> of file <a class="el" href="../../d1/da5/torcpower_8h_source.html">torcpower.h</a>.</p>
 
 </div>
 </div>
@@ -1650,7 +1673,7 @@ Additional Inherited Members</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Nov 13 2018 18:09:53 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Nov 13 2018 21:28:14 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

@@ -278,6 +278,8 @@ Additional Inherited Members</h2></td></tr>
 <tr class="memitem:acd54087b95fabdfb71fb7e7e7ffa90c9 inherit pro_methods_class_torc_h_t_t_p_service"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d70/class_torc_h_t_t_p_service.html#acd54087b95fabdfb71fb7e7e7ffa90c9">HandleSubscriberDeleted</a> (QObject *Subscriber)</td></tr>
 <tr class="separator:acd54087b95fabdfb71fb7e7e7ffa90c9 inherit pro_methods_class_torc_h_t_t_p_service"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_attribs_class_torc_power"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_class_torc_power')"><img src="../../closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="../../d7/da5/class_torc_power.html">TorcPower</a></td></tr>
+<tr class="memitem:aa259d9c262de563cccdcd97d23b69e80 inherit pro_attribs_class_torc_power"><td class="memItemLeft" align="right" valign="top">QMutex&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/da5/class_torc_power.html#aa259d9c262de563cccdcd97d23b69e80">m_lock</a></td></tr>
+<tr class="separator:aa259d9c262de563cccdcd97d23b69e80 inherit pro_attribs_class_torc_power"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a80ad43b48253a296cf11986ea0525853 inherit pro_attribs_class_torc_power"><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../dd/d69/class_torc_setting.html">TorcSetting</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/da5/class_torc_power.html#a80ad43b48253a296cf11986ea0525853">m_canShutdown</a></td></tr>
 <tr class="separator:a80ad43b48253a296cf11986ea0525853 inherit pro_attribs_class_torc_power"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9d7b747c41ac5a7c4f428aaa9574ad00 inherit pro_attribs_class_torc_power"><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../dd/d69/class_torc_setting.html">TorcSetting</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/da5/class_torc_power.html#a9d7b747c41ac5a7c4f428aaa9574ad00">m_canSuspend</a></td></tr>
@@ -310,8 +312,7 @@ Additional Inherited Members</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A power monitoring class for OS X. </p>
 <p><a class="el" href="../../d7/d52/class_torc_power_o_s_x.html" title="A power monitoring class for OS X. ">TorcPowerOSX</a> uses the IOKit framework to monitor the system's power status.</p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="../../d2/d3e/class_torc_run_loop_o_s_x.html" title="A TorcAdminObject to instanciate the TorcOSXCallbackThread singleton. ">TorcRunLoopOSX</a></dd></dl>
-<dl class="bug"><dt><b><a class="el" href="../../de/da5/bug.html#_bug000001">Bug:</a></b></dt><dd>Power callbacks are no longer being received by torc-server. Could be a Qt update but more likely an OS X update affecting only console applications (torc-tv is fine). </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="../../d2/d3e/class_torc_run_loop_o_s_x.html" title="A TorcAdminObject to instanciate the TorcOSXCallbackThread singleton. ">TorcRunLoopOSX</a> </dd></dl>
 
 <p>Definition at line <a class="el" href="../../d2/d2f/torcpowerosx_8h_source.html#l00012">12</a> of file <a class="el" href="../../d2/d2f/torcpowerosx_8h_source.html">torcpowerosx.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
@@ -328,7 +329,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html#l00047">47</a> of file <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html">torcpowerosx.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html#l00044">44</a> of file <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html">torcpowerosx.cpp</a>.</p>
 
 </div>
 </div>
@@ -353,7 +354,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html#l00102">102</a> of file <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html">torcpowerosx.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html#l00099">99</a> of file <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html">torcpowerosx.cpp</a>.</p>
 
 </div>
 </div>
@@ -384,7 +385,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="../../d7/da5/class_torc_power.html#a95ec97ff15ac5dd305720c11224c2cce">TorcPower</a>.</p>
 
-<p>Definition at line <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html#l00157">157</a> of file <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html">torcpowerosx.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html#l00154">154</a> of file <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html">torcpowerosx.cpp</a>.</p>
 
 </div>
 </div>
@@ -414,7 +415,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="../../d7/da5/class_torc_power.html#ae318c9fe756c15ef8d9da4df43d48c49">TorcPower</a>.</p>
 
-<p>Definition at line <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html#l00163">163</a> of file <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html">torcpowerosx.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html#l00160">160</a> of file <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html">torcpowerosx.cpp</a>.</p>
 
 </div>
 </div>
@@ -444,7 +445,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="../../d7/da5/class_torc_power.html#a019d3c90490d5984f98db2381fbe9973">TorcPower</a>.</p>
 
-<p>Definition at line <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html#l00126">126</a> of file <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html">torcpowerosx.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html#l00123">123</a> of file <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html">torcpowerosx.cpp</a>.</p>
 
 </div>
 </div>
@@ -474,7 +475,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="../../d7/da5/class_torc_power.html#a85b3d089484caf3e83e797398f343de4">TorcPower</a>.</p>
 
-<p>Definition at line <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html#l00142">142</a> of file <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html">torcpowerosx.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html#l00139">139</a> of file <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html">torcpowerosx.cpp</a>.</p>
 
 </div>
 </div>
@@ -526,7 +527,7 @@ Additional Inherited Members</h2></td></tr>
 <p>The OS will call this function when the power state is about to change. We can then make the appropriate internal calls to handle any necessary state changes.</p>
 <p>In the case of system requests to ask whether power changes can proceed, we always allow. </p>
 
-<p>Definition at line <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html#l00236">236</a> of file <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html">torcpowerosx.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html#l00233">233</a> of file <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html">torcpowerosx.cpp</a>.</p>
 
 </div>
 </div>
@@ -556,7 +557,7 @@ Additional Inherited Members</h2></td></tr>
 <p>Changes may be a change in the battery level or switches between mains power and battery.</p>
 <dl class="section note"><dt>Note</dt><dd>This is currently not being called using torc-server from the command line. </dd></dl>
 
-<p>Definition at line <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html#l00281">281</a> of file <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html">torcpowerosx.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html#l00278">278</a> of file <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html">torcpowerosx.cpp</a>.</p>
 
 </div>
 </div>
@@ -577,7 +578,7 @@ Additional Inherited Members</h2></td></tr>
 <p>Update the current power supply status. </p>
 <p>A change to the current status is notified from PowerSourceCallback, which calls this method to check for the actual change. </p>
 
-<p>Definition at line <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html#l00182">182</a> of file <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html">torcpowerosx.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html#l00179">179</a> of file <a class="el" href="../../df/d2a/torcpowerosx_8cpp_source.html">torcpowerosx.cpp</a>.</p>
 
 </div>
 </div>
@@ -588,7 +589,7 @@ Additional Inherited Members</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Nov 13 2018 18:09:53 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Nov 13 2018 21:28:14 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['bug_20list',['Bug List',['../bug.html',1,'']]]
+  ['configuring_20torc',['Configuring Torc',['../config.html',1,'']]],
+  ['configuration_20file_20format',['Configuration file format',['../xsd.html',1,'']]]
 ];

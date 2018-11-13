@@ -220,9 +220,8 @@ Additional Inherited Members</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="../../d7/df8/class_torc_system_notification.html">TorcSystemNotification</a> listens for <a class="el" href="../../d6/db6/class_torc.html">Torc</a> system events, such as Start, Stop, Suspending etc and messages when the specified events are seen.</p>
 <p>The configuration file must specifiy a comma separated list of events (per the <a class="el" href="../../d6/db6/class_torc.html">Torc</a> definitions) and a comma separated list of notifiers who will send the appropriate messages.</p>
-<p>Example configuration:- </p><div class="fragment"><div class="line">&lt;notify&gt;</div><div class="line">  &lt;notifications&gt;</div><div class="line">    &lt;system&gt;</div><div class="line">      &lt;name&gt;systemtest&lt;/name&gt;</div><div class="line">      &lt;inputs&gt;</div><div class="line">        &lt;<span class="keyword">event</span>&gt;start&lt;/<span class="keyword">event</span>&gt;</div><div class="line">        &lt;<span class="keyword">event</span>&gt;stop&lt;/<span class="keyword">event</span>&gt;</div><div class="line">      &lt;/inputs&gt;</div><div class="line">      &lt;outputs&gt;</div><div class="line">        &lt;notifier&gt;testnotifier&lt;/notifier&gt;</div><div class="line">        &lt;notifier&gt;testnotifier2&lt;/notifier&gt;</div><div class="line">      &lt;/outputs&gt;</div><div class="line">      &lt;message&gt;</div><div class="line">        &lt;!-- title is optional --&gt;</div><div class="line">        &lt;title&gt;%applicationname% message:&lt;/title&gt;</div><div class="line">        &lt;!-- body is mandatory --&gt;</div><div class="line">        &lt;body&gt;System <span class="keyword">event</span>: <span class="stringliteral">&#39;%event%&#39;</span> (%shortdatetime%)&lt;/body&gt;</div><div class="line">      &lt;/message&gt;</div><div class="line">    &lt;/system&gt;</div><div class="line">  &lt;/notifications&gt;</div><div class="line">&lt;/notify&gt;</div></div><!-- fragment --><dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000003">Todo:</a></b></dt><dd>Validate the list of events against those specified in <a class="el" href="../../d6/db6/class_torc.html#ae24951db8926b98a75762aef8448e473">Torc::Actions</a>. </dd></dl>
-
-<p>Definition at line <a class="el" href="../../d1/d5d/torcsystemnotification_8h_source.html#l00007">7</a> of file <a class="el" href="../../d1/d5d/torcsystemnotification_8h_source.html">torcsystemnotification.h</a>.</p>
+<p>Example configuration:- </p><div class="fragment"><div class="line">&lt;notify&gt;</div><div class="line">  &lt;notifications&gt;</div><div class="line">    &lt;system&gt;</div><div class="line">      &lt;name&gt;systemtest&lt;/name&gt;</div><div class="line">      &lt;inputs&gt;</div><div class="line">        &lt;<span class="keyword">event</span>&gt;start&lt;/<span class="keyword">event</span>&gt;</div><div class="line">        &lt;<span class="keyword">event</span>&gt;stop&lt;/<span class="keyword">event</span>&gt;</div><div class="line">      &lt;/inputs&gt;</div><div class="line">      &lt;outputs&gt;</div><div class="line">        &lt;notifier&gt;testnotifier&lt;/notifier&gt;</div><div class="line">        &lt;notifier&gt;testnotifier2&lt;/notifier&gt;</div><div class="line">      &lt;/outputs&gt;</div><div class="line">      &lt;message&gt;</div><div class="line">        &lt;!-- title is optional --&gt;</div><div class="line">        &lt;title&gt;%applicationname% message:&lt;/title&gt;</div><div class="line">        &lt;!-- body is mandatory --&gt;</div><div class="line">        &lt;body&gt;System <span class="keyword">event</span>: <span class="stringliteral">&#39;%event%&#39;</span> (%shortdatetime%)&lt;/body&gt;</div><div class="line">      &lt;/message&gt;</div><div class="line">    &lt;/system&gt;</div><div class="line">  &lt;/notifications&gt;</div><div class="line">&lt;/notify&gt;</div></div><!-- fragment --> 
+<p>Definition at line <a class="el" href="../../d1/d5d/torcsystemnotification_8h_source.html#l00008">8</a> of file <a class="el" href="../../d1/d5d/torcsystemnotification_8h_source.html">torcsystemnotification.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="aad370a2f35630075c7bb101546590bdf"></a>
 <div class="memitem">
@@ -246,7 +245,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d8/de9/torcsystemnotification_8cpp_source.html#l00061">61</a> of file <a class="el" href="../../d8/de9/torcsystemnotification_8cpp_source.html">torcsystemnotification.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/de9/torcsystemnotification_8cpp_source.html#l00058">58</a> of file <a class="el" href="../../d8/de9/torcsystemnotification_8cpp_source.html">torcsystemnotification.cpp</a>.</p>
 
 </div>
 </div>
@@ -263,7 +262,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d8/de9/torcsystemnotification_8cpp_source.html#l00089">89</a> of file <a class="el" href="../../d8/de9/torcsystemnotification_8cpp_source.html">torcsystemnotification.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/de9/torcsystemnotification_8cpp_source.html#l00092">92</a> of file <a class="el" href="../../d8/de9/torcsystemnotification_8cpp_source.html">torcsystemnotification.cpp</a>.</p>
 
 </div>
 </div>
@@ -292,7 +291,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Listen for system events (<a class="el" href="../../d6/d78/class_torc_event.html" title="A general purpose event object. ">TorcEvent</a>). </p>
 
-<p>Definition at line <a class="el" href="../../d8/de9/torcsystemnotification_8cpp_source.html#l00112">112</a> of file <a class="el" href="../../d8/de9/torcsystemnotification_8cpp_source.html">torcsystemnotification.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/de9/torcsystemnotification_8cpp_source.html#l00116">116</a> of file <a class="el" href="../../d8/de9/torcsystemnotification_8cpp_source.html">torcsystemnotification.cpp</a>.</p>
 
 </div>
 </div>
@@ -320,7 +319,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="../../dc/d10/class_torc_notification.html#a888cf5b6b5e8c301dc1af1ce462cee64">TorcNotification</a>.</p>
 
-<p>Definition at line <a class="el" href="../../d8/de9/torcsystemnotification_8cpp_source.html#l00094">94</a> of file <a class="el" href="../../d8/de9/torcsystemnotification_8cpp_source.html">torcsystemnotification.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/de9/torcsystemnotification_8cpp_source.html#l00097">97</a> of file <a class="el" href="../../d8/de9/torcsystemnotification_8cpp_source.html">torcsystemnotification.cpp</a>.</p>
 
 </div>
 </div>
@@ -348,7 +347,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="../../dc/d10/class_torc_notification.html#a16262ee234bca4e1556851aa70e10902">TorcNotification</a>.</p>
 
-<p>Definition at line <a class="el" href="../../d8/de9/torcsystemnotification_8cpp_source.html#l00102">102</a> of file <a class="el" href="../../d8/de9/torcsystemnotification_8cpp_source.html">torcsystemnotification.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/de9/torcsystemnotification_8cpp_source.html#l00106">106</a> of file <a class="el" href="../../d8/de9/torcsystemnotification_8cpp_source.html">torcsystemnotification.cpp</a>.</p>
 
 </div>
 </div>
@@ -359,7 +358,7 @@ Additional Inherited Members</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Nov 13 2018 18:09:53 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Nov 13 2018 21:28:14 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

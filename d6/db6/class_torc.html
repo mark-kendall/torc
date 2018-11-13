@@ -141,9 +141,11 @@ Public Types</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a072fdb5bbcbbbe8af1f6b1d093c37aa5"><td class="memItemLeft" align="right" valign="top">static QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/db6/class_torc.html#a072fdb5bbcbbbe8af1f6b1d093c37aa5">ActionToString</a> (enum <a class="el" href="../../d6/db6/class_torc.html#ae24951db8926b98a75762aef8448e473">Actions</a> Action)</td></tr>
+<tr class="memdesc:a072fdb5bbcbbbe8af1f6b1d093c37aa5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the string describing the given action.  <a href="#a072fdb5bbcbbbe8af1f6b1d093c37aa5">More...</a><br /></td></tr>
 <tr class="separator:a072fdb5bbcbbbe8af1f6b1d093c37aa5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ace8c887c3c408403e587a063f5c1347f"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/db6/class_torc.html#ace8c887c3c408403e587a063f5c1347f">StringToAction</a> (const QString &amp;Action)</td></tr>
-<tr class="separator:ace8c887c3c408403e587a063f5c1347f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a902cfc75d86c7d6aefccd17d956eeb3f"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/db6/class_torc.html#a902cfc75d86c7d6aefccd17d956eeb3f">StringToAction</a> (const QString &amp;Action, bool CaseSensitive=<a class="el" href="../../d1/d37/torcloggingdefs_8h.html#a93519f65dd0ef21fc5be0c286a833ae4">false</a>)</td></tr>
+<tr class="memdesc:a902cfc75d86c7d6aefccd17d956eeb3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the <a class="el" href="../../d6/db6/class_torc.html">Torc</a> action that matches the given string.  <a href="#a902cfc75d86c7d6aefccd17d956eeb3f">More...</a><br /></td></tr>
+<tr class="separator:a902cfc75d86c7d6aefccd17d956eeb3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock">
@@ -246,11 +248,13 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../da/d67/torclocalcontext_8cpp_source.html#l00060">60</a> of file <a class="el" href="../../da/d67/torclocalcontext_8cpp_source.html">torclocalcontext.cpp</a>.</p>
+<p>Return the string describing the given action. </p>
+
+<p>Definition at line <a class="el" href="../../da/d67/torclocalcontext_8cpp_source.html#l00061">61</a> of file <a class="el" href="../../da/d67/torclocalcontext_8cpp_source.html">torclocalcontext.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ace8c887c3c408403e587a063f5c1347f"></a>
+<a class="anchor" id="a902cfc75d86c7d6aefccd17d956eeb3f"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -261,8 +265,18 @@ Static Public Member Functions</h2></td></tr>
           <td class="memname">int Torc::StringToAction </td>
           <td>(</td>
           <td class="paramtype">const QString &amp;&#160;</td>
-          <td class="paramname"><em>Action</em></td><td>)</td>
+          <td class="paramname"><em>Action</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>CaseSensitive</em> = <code><a class="el" href="../../d1/d37/torcloggingdefs_8h.html#a93519f65dd0ef21fc5be0c286a833ae4">false</a></code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -272,7 +286,10 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../da/d67/torclocalcontext_8cpp_source.html#l00068">68</a> of file <a class="el" href="../../da/d67/torclocalcontext_8cpp_source.html">torclocalcontext.cpp</a>.</p>
+<p>Return the <a class="el" href="../../d6/db6/class_torc.html">Torc</a> action that matches the given string. </p>
+<dl class="section note"><dt>Note</dt><dd>QMetaEnum::keyToValue is case sensitive but this routine is used to validate system events from the config file - and we cannot be too picky about case. So default to a case insensitive search. </dd></dl>
+
+<p>Definition at line <a class="el" href="../../da/d67/torclocalcontext_8cpp_source.html#l00075">75</a> of file <a class="el" href="../../da/d67/torclocalcontext_8cpp_source.html">torclocalcontext.cpp</a>.</p>
 
 </div>
 </div>
@@ -283,7 +300,7 @@ Static Public Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Nov 13 2018 18:09:53 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Nov 13 2018 21:28:14 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

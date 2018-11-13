@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['configuring_20torc',['Configuring Torc',['../config.html',1,'']]],
-  ['configuration_20file_20format',['Configuration file format',['../xsd.html',1,'']]]
+  ['known_20bugs_2c_20issues_20and_20outstanding_20enhancements_2e',['Known bugs, issues and outstanding enhancements.',['../bugs.html',1,'']]]
 ];

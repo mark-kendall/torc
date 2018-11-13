@@ -81,115 +81,87 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><dl class="reflist">
-<dt><a class="anchor" id="_todo000018"></a>Class <a class="el" href="dd/d56/class_torc_admin_thread.html">TorcAdminThread</a>  </dt>
+<dt><a class="anchor" id="_todo000015"></a>Class <a class="el" href="dd/d56/class_torc_admin_thread.html">TorcAdminThread</a>  </dt>
 <dd>Add a mechanism to add and remove <a class="el" href="d4/d75/class_torc_admin_object.html" title="A factory class for automatically running objects outside of the main loop. ">TorcAdminObject</a>'s dynamically  </dd>
-<dt><a class="anchor" id="_todo000006"></a>Class <a class="el" href="d7/dfd/class_torc_binary_p_list_serialiser.html">TorcBinaryPListSerialiser</a>  </dt>
+<dt><a class="anchor" id="_todo000005"></a>Class <a class="el" href="d7/dfd/class_torc_binary_p_list_serialiser.html">TorcBinaryPListSerialiser</a>  </dt>
 <dd>Top level dictionary  </dd>
-<dt><a class="anchor" id="_todo000019"></a>Class <a class="el" href="d0/d9f/class_torc_bonjour.html">TorcBonjour</a>  </dt>
+<dt><a class="anchor" id="_todo000016"></a>Class <a class="el" href="d0/d9f/class_torc_bonjour.html">TorcBonjour</a>  </dt>
 <dd><p class="startdd">Send events to clients only (as for <a class="el" href="d7/d61/class_torc_s_s_d_p.html" title="The public class for handling Simple Service Discovery Protocol searches and announcements. ">TorcSSDP</a>) </p>
 <p>Guard against or properly handle duplicate requests (registration or browse) </p>
 <p class="enddd">Make non-static public methods thread safe (Register, Browse, Deregister)  </p>
 </dd>
 <dt><a class="anchor" id="_todo000001"></a>Member <a class="el" href="d1/d34/class_torc_control.html#a6e70a8ee3b449f7a5fd61213a5645537">TorcControl::Finish</a>  (void)</dt>
 <dd>Make Outputs 'valid' aware and handle their own defaults if any input/control is invalid.  </dd>
-<dt><a class="anchor" id="_todo000020"></a>Member <a class="el" href="d5/dfc/class_torc_core_utils.html#ac055a13369c25c30947199d109a28d62">TorcCoreUtils::QtMessage</a>  (QtMsgType Type, const QMessageLogContext &amp;Context, const QString &amp;Message)</dt>
+<dt><a class="anchor" id="_todo000017"></a>Member <a class="el" href="d5/dfc/class_torc_core_utils.html#ac055a13369c25c30947199d109a28d62">TorcCoreUtils::QtMessage</a>  (QtMsgType Type, const QMessageLogContext &amp;Context, const QString &amp;Message)</dt>
 <dd>Refactor logging to allow using Context directly in the log, hence removing line/function duplication.  </dd>
-<dt><a class="anchor" id="_todo000007"></a>Member <a class="el" href="d2/d5b/class_torc_h_t_m_l_static_content.html#a85ecc82e35afa549467566f7e9a95e26">TorcHTMLStaticContent::GetJavascriptConfiguration</a>  (<a class="el" href="da/dfc/class_torc_h_t_t_p_request.html" title="A class to encapsulate an incoming HTTP request. ">TorcHTTPRequest</a> &amp;Request)</dt>
+<dt><a class="anchor" id="_todo000006"></a>Member <a class="el" href="d2/d5b/class_torc_h_t_m_l_static_content.html#a85ecc82e35afa549467566f7e9a95e26">TorcHTMLStaticContent::GetJavascriptConfiguration</a>  (<a class="el" href="da/dfc/class_torc_h_t_t_p_request.html" title="A class to encapsulate an incoming HTTP request. ">TorcHTTPRequest</a> &amp;Request)</dt>
 <dd>Translations are static and will need to be regenerated if the language is changed.  </dd>
-<dt><a class="anchor" id="_todo000008"></a>Class <a class="el" href="da/dfc/class_torc_h_t_t_p_request.html">TorcHTTPRequest</a>  </dt>
+<dt><a class="anchor" id="_todo000007"></a>Class <a class="el" href="da/dfc/class_torc_h_t_t_p_request.html">TorcHTTPRequest</a>  </dt>
 <dd><p class="startdd">Add support for multiple headers of the same type (e.g. Sec-WebSocket-Protocol). </p>
 <p class="enddd">Support gzip compression for range requests (if it is possible?)  </p>
 </dd>
-<dt><a class="anchor" id="_todo000009"></a>Class <a class="el" href="db/dc7/class_torc_h_t_t_p_server.html">TorcHTTPServer</a>  </dt>
-<dd><p class="startdd">Fix potential socket and request leak in UpgradeSocket. </p>
-<p>Add setting for authentication (and hence full username/password requirement). </p>
-<p class="enddd">Add setting for SSL.  </p>
-</dd>
-<dt><a class="anchor" id="_todo000010"></a>Member <a class="el" href="db/dc7/class_torc_h_t_t_p_server.html#a137ad2328a7bece60939bd7616e334d9">TorcHTTPServer::Authorise</a>  (const QString &amp;Host, <a class="el" href="da/dfc/class_torc_h_t_t_p_request.html" title="A class to encapsulate an incoming HTTP request. ">TorcHTTPRequest</a> &amp;Request, bool ForceCheck)</dt>
-<dd>Use proper username and password.  </dd>
-<dt><a class="anchor" id="_todo000011"></a>Member <a class="el" href="d5/d46/class_torc_h_t_t_p_server_nonce.html#a0e315be3e0bc74a3e444ea6f707b814e">TorcHTTPServerNonce::ProcessDigestAuth</a>  (<a class="el" href="da/dfc/class_torc_h_t_t_p_request.html" title="A class to encapsulate an incoming HTTP request. ">TorcHTTPRequest</a> &amp;Request, bool Check=false)</dt>
+<dt><a class="anchor" id="_todo000008"></a>Member <a class="el" href="d5/d46/class_torc_h_t_t_p_server_nonce.html#a0e315be3e0bc74a3e444ea6f707b814e">TorcHTTPServerNonce::ProcessDigestAuth</a>  (<a class="el" href="da/dfc/class_torc_h_t_t_p_request.html" title="A class to encapsulate an incoming HTTP request. ">TorcHTTPRequest</a> &amp;Request, bool Check=false)</dt>
 <dd>Investigate browsers that request a new nonce for every request  </dd>
-<dt><a class="anchor" id="_todo000012"></a>Class <a class="el" href="d6/d70/class_torc_h_t_t_p_service.html">TorcHTTPService</a>  </dt>
+<dt><a class="anchor" id="_todo000009"></a>Class <a class="el" href="d6/d70/class_torc_h_t_t_p_service.html">TorcHTTPService</a>  </dt>
 <dd><p class="startdd">Support for complex parameter types via RPC (e.g. array etc). </p>
 <p class="enddd">ProcessRequest implicitly assumes JSON-RPC (though applies to much of the RPC code).  </p>
 </dd>
-<dt><a class="anchor" id="_todo000013"></a>Class <a class="el" href="de/d9b/class_torc_h_t_t_p_service_test.html">TorcHTTPServiceTest</a>  </dt>
+<dt><a class="anchor" id="_todo000010"></a>Class <a class="el" href="de/d9b/class_torc_h_t_t_p_service_test.html">TorcHTTPServiceTest</a>  </dt>
 <dd>Only build in debug mode.  </dd>
-<dt><a class="anchor" id="_todo000005"></a>Member <a class="el" href="df/d66/class_torc_i2_c_p_c_a9685.html#ac0dff65be555f63deb0b91b48449e313">TorcI2CPCA9685::SetPWM</a>  (int Channel, int Value)</dt>
+<dt><a class="anchor" id="_todo000004"></a>Member <a class="el" href="df/d66/class_torc_i2_c_p_c_a9685.html#ac0dff65be555f63deb0b91b48449e313">TorcI2CPCA9685::SetPWM</a>  (int Channel, int Value)</dt>
 <dd>check return values  </dd>
 <dt><a class="anchor" id="_todo000002"></a>Member <a class="el" href="d7/ddb/class_torc_inputs.html#a9c98eb33ee13880d451e23604ccd1d9f">TorcInputs::TorcInputs</a>  ()</dt>
 <dd>Translations and constants for web client.  </dd>
-<dt><a class="anchor" id="_todo000021"></a>Class <a class="el" href="d5/d34/class_torc_language.html">TorcLanguage</a>  </dt>
+<dt><a class="anchor" id="_todo000018"></a>Class <a class="el" href="d5/d34/class_torc_language.html">TorcLanguage</a>  </dt>
 <dd><p class="startdd">Check whether QTranslator::load is thread safe. </p>
 <p class="enddd">Add support for multiple translation files (e.g. plugins as well ).  </p>
 </dd>
-<dt><a class="anchor" id="_todo000022"></a>Class <a class="el" href="d7/d17/class_torc_local_context.html">TorcLocalContext</a>  </dt>
-<dd><p class="startdd">Add priority generation based on role and maybe user setting. </p>
-<p class="enddd">Convert Q_INVOKABLEs to public slots.  </p>
-</dd>
-<dt><a class="anchor" id="_todo000023"></a>Class <a class="el" href="d8/d73/class_torc_network.html">TorcNetwork</a>  </dt>
+<dt><a class="anchor" id="_todo000019"></a>Class <a class="el" href="d8/d73/class_torc_network.html">TorcNetwork</a>  </dt>
 <dd>Check whether authenticationRequired signal is being emitted.  </dd>
-<dt><a class="anchor" id="_todo000026"></a>Class <a class="el" href="d3/ded/class_torc_network_request.html">TorcNetworkRequest</a>  </dt>
-<dd><p class="startdd">Complete streamed support for seeking and peeking </p>
-<p class="enddd">Add user messaging for network errors  </p>
-</dd>
-<dt><a class="anchor" id="_todo000027"></a>Member <a class="el" href="d3/ded/class_torc_network_request.html#a0d7f126a31063ca67d8bc5adca569ce3">TorcNetworkRequest::GetHeader</a>  (const QByteArray &amp;Header) const </dt>
+<dt><a class="anchor" id="_todo000022"></a>Member <a class="el" href="d3/ded/class_torc_network_request.html#a0d7f126a31063ca67d8bc5adca569ce3">TorcNetworkRequest::GetHeader</a>  (const QByteArray &amp;Header) const </dt>
 <dd><p class="startdd">This is not very efficient. May be better for <a class="el" href="d3/ded/class_torc_network_request.html" title="A wrapper around QNetworkRequest. ">TorcNetworkRequest</a> to retrieve pre-specified headers that are of interest to the caller. </p>
 <p class="enddd">An empty return value could signify an empty header or no header...  </p>
 </dd>
-<dt><a class="anchor" id="_todo000024"></a>Class <a class="el" href="dd/d3a/class_torc_network_service.html">TorcNetworkService</a>  </dt>
+<dt><a class="anchor" id="_todo000020"></a>Class <a class="el" href="dd/d3a/class_torc_network_service.html">TorcNetworkService</a>  </dt>
 <dd>Should retries be limited? If support is added for manually specified peers (e.g. remote) and that peer is offline, need a better approach.  </dd>
-<dt><a class="anchor" id="_todo000025"></a>Member <a class="el" href="dd/d3a/class_torc_network_service.html#a180a9b49c7996e5d5ecc7db1570ec170">TorcNetworkService::~TorcNetworkService</a>  ()</dt>
+<dt><a class="anchor" id="_todo000021"></a>Member <a class="el" href="dd/d3a/class_torc_network_service.html#a180a9b49c7996e5d5ecc7db1570ec170">TorcNetworkService::~TorcNetworkService</a>  ()</dt>
 <dd>Make the call to <a class="el" href="d8/d73/class_torc_network.html#ae0a866ec6804a8c72cb5194449af0cfc">TorcNetwork::Cancel</a> blocking, as for <a class="el" href="d9/d0a/class_torc_web_socket.html#af4a3a0beba0fd40c47a0b558ff9c3ef9" title="Cancel a Remote Procedure Call. ">TorcWebSocket::CancelRequest</a>.  </dd>
-<dt><a class="anchor" id="_todo000028"></a>Class <a class="el" href="d4/d39/class_torc_p_list.html">TorcPList</a>  </dt>
+<dt><a class="anchor" id="_todo000023"></a>Class <a class="el" href="d4/d39/class_torc_p_list.html">TorcPList</a>  </dt>
 <dd>Support for importing Xml formatted property lists.  </dd>
-<dt><a class="anchor" id="_todo000029"></a>Class <a class="el" href="d7/da5/class_torc_power.html">TorcPower</a>  </dt>
-<dd>Make HTTP acccess thread safe.  </dd>
-<dt><a class="anchor" id="_todo000017"></a>Class <a class="el" href="d6/df0/class_torc_power_unix_d_bus.html">TorcPowerUnixDBus</a>  </dt>
+<dt><a class="anchor" id="_todo000014"></a>Class <a class="el" href="d6/df0/class_torc_power_unix_d_bus.html">TorcPowerUnixDBus</a>  </dt>
 <dd>Battery status monitoring is untested.  </dd>
-<dt><a class="anchor" id="_todo000030"></a>Class <a class="el" href="d2/d41/class_torc_q_thread.html">TorcQThread</a>  </dt>
+<dt><a class="anchor" id="_todo000024"></a>Class <a class="el" href="d2/d41/class_torc_q_thread.html">TorcQThread</a>  </dt>
 <dd>Make run private again and enfore event driven loops for all classes.  </dd>
-<dt><a class="anchor" id="_todo000031"></a>Class <a class="el" href="d6/dad/class_torc_reference_counter.html">TorcReferenceCounter</a>  </dt>
+<dt><a class="anchor" id="_todo000025"></a>Class <a class="el" href="d6/dad/class_torc_reference_counter.html">TorcReferenceCounter</a>  </dt>
 <dd>Review use of EventLoopEnding which may not be a good idea outside of the main thread.  </dd>
-<dt><a class="anchor" id="_todo000032"></a>Class <a class="el" href="db/dc6/class_torc_r_p_c_request.html">TorcRPCRequest</a>  </dt>
+<dt><a class="anchor" id="_todo000026"></a>Class <a class="el" href="db/dc6/class_torc_r_p_c_request.html">TorcRPCRequest</a>  </dt>
 <dd><p class="startdd">Add serialisation of protocols other than JSON-RPC. </p>
 <p>Add parsing of protocols other than JSON-RPC. </p>
 <p class="enddd">Review memory consumption/performance.  </p>
 </dd>
-<dt><a class="anchor" id="_todo000033"></a>Member <a class="el" href="db/dc6/class_torc_r_p_c_request.html#aa6d7eb36c3c225a55510ef7b52c468ab">TorcRPCRequest::AddParameter</a>  (const QString &amp;Name, const QVariant &amp;Value)</dt>
+<dt><a class="anchor" id="_todo000027"></a>Member <a class="el" href="db/dc6/class_torc_r_p_c_request.html#aa6d7eb36c3c225a55510ef7b52c468ab">TorcRPCRequest::AddParameter</a>  (const QString &amp;Name, const QVariant &amp;Value)</dt>
 <dd>Check for duplicate parameters.  </dd>
-<dt><a class="anchor" id="_todo000034"></a>Class <a class="el" href="da/de8/class_torc_s_q_lite_d_b.html">TorcSQLiteDB</a>  </dt>
-<dd>Check the exclusive lock handling. It's unclear whether this will lock out other threads. </dd>
-<dt><a class="anchor" id="_todo000036"></a>Class <a class="el" href="d7/d61/class_torc_s_s_d_p.html">TorcSSDP</a>  </dt>
-<dd><p class="startdd">Revisit behaviour for search and announce wrt network availability and network allowed inbound/outbound </p>
-<p>Actually announce (with random 0-100ms delay) plus retry </p>
-<p>Schedule announce refreshes (half of cache-control) </p>
-<p>Respond to search requests </p>
-<p class="enddd">Correct handling of multiple responses (i.e. via both IPv4 and IPv6)  </p>
-</dd>
-<dt><a class="anchor" id="_todo000003"></a>Class <a class="el" href="d7/df8/class_torc_system_notification.html">TorcSystemNotification</a>  </dt>
-<dd>Validate the list of events against those specified in <a class="el" href="d6/db6/class_torc.html#ae24951db8926b98a75762aef8448e473">Torc::Actions</a>.  </dd>
-<dt><a class="anchor" id="_todo000035"></a>Class <a class="el" href="d6/d7b/class_torc_time.html">TorcTime</a>  </dt>
+<dt><a class="anchor" id="_todo000028"></a>Class <a class="el" href="d6/d7b/class_torc_time.html">TorcTime</a>  </dt>
 <dd>Allow customisation of the time format.  </dd>
-<dt><a class="anchor" id="_todo000004"></a>Class <a class="el" href="dd/d6d/class_torc_trigger_notification.html">TorcTriggerNotification</a>  </dt>
+<dt><a class="anchor" id="_todo000003"></a>Class <a class="el" href="dd/d6d/class_torc_trigger_notification.html">TorcTriggerNotification</a>  </dt>
 <dd><p class="startdd">how to handle continuous 'high' state. Repeat notification every XX mins, XX hours? </p>
 <p class="enddd">how to handle reversion to 'low'state. Send alternate notification or ignore and leave to 'twin' notification that handles the reverse state.  </p>
 </dd>
-<dt><a class="anchor" id="_todo000014"></a>Class <a class="el" href="d9/d0a/class_torc_web_socket.html">TorcWebSocket</a>  </dt>
+<dt><a class="anchor" id="_todo000011"></a>Class <a class="el" href="d9/d0a/class_torc_web_socket.html">TorcWebSocket</a>  </dt>
 <dd><p class="startdd">Limit frame size for reading </p>
 <p>Fix testsuite partial failures (fail fast on invalid UTF-8) </p>
 <p>Add timeout for response to upgrade request </p>
 <p class="enddd">Add support for batched RPC calls  </p>
 </dd>
-<dt><a class="anchor" id="_todo000015"></a>Class <a class="el" href="d3/d5b/class_torc_web_socket_thread.html">TorcWebSocketThread</a>  </dt>
+<dt><a class="anchor" id="_todo000012"></a>Class <a class="el" href="d3/d5b/class_torc_web_socket_thread.html">TorcWebSocketThread</a>  </dt>
 <dd>Investigate edge case leak when RemoteRequest or CancelRequest possibly might not be delivered during socket or application shutdown. Is this a real issue? (N.B. Only applies when signals are asynchronous i.e. running inside <a class="el" href="d3/d5b/class_torc_web_socket_thread.html" title="Wraps a TorcQThread around a TorcWebsocket. ">TorcWebSocketThread</a>).  </dd>
-<dt><a class="anchor" id="_todo000016"></a>Class <a class="el" href="de/d44/class_torc_x_m_l_serialiser.html">TorcXMLSerialiser</a>  </dt>
+<dt><a class="anchor" id="_todo000013"></a>Class <a class="el" href="de/d44/class_torc_x_m_l_serialiser.html">TorcXMLSerialiser</a>  </dt>
 <dd>Ensure complete consistency and interopability with all other serialisers. </dd>
 </dl>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Nov 13 2018 18:09:53 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Nov 13 2018 21:28:14 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

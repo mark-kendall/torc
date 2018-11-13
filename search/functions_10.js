@@ -89,7 +89,7 @@ var searchData=
   ['stoptorc',['StopTorc',['../d5/d47/class_torc_user.html#aef40b066c635e5c4b79b9c62db738043',1,'TorcUser']]],
   ['stopwriting',['StopWriting',['../de/dc9/class_torc_camera_thread.html#a36f13fc9663557d0f03c1cd15343e6d6',1,'TorcCameraThread']]],
   ['stringlisttoxml',['StringListToXML',['../de/d44/class_torc_x_m_l_serialiser.html#a9fed74be8e2ebd2575976c075e70a7da',1,'TorcXMLSerialiser']]],
-  ['stringtoaction',['StringToAction',['../d6/db6/class_torc.html#ace8c887c3c408403e587a063f5c1347f',1,'Torc']]],
+  ['stringtoaction',['StringToAction',['../d6/db6/class_torc.html#a902cfc75d86c7d6aefccd17d956eeb3f',1,'Torc']]],
   ['stringtoallowed',['StringToAllowed',['../da/dfc/class_torc_h_t_t_p_request.html#a21d32c9d1185514906bd91dc6e034280',1,'TorcHTTPRequest']]],
   ['stringtooperation',['StringToOperation',['../d5/d8f/class_torc_logic_control.html#a8a1c6223e6548ef8b7143715e4cbd6d1',1,'TorcLogicControl']]],
   ['stringtoranges',['StringToRanges',['../da/dfc/class_torc_h_t_t_p_request.html#a6013ebedc71f5be0381c3b5763ea83cd',1,'TorcHTTPRequest']]],

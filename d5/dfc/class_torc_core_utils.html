@@ -102,9 +102,6 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a8bcd5980c6298893bba430be942f981d"><td class="memItemLeft" align="right" valign="top">static quint64&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/dfc/class_torc_core_utils.html#a8bcd5980c6298893bba430be942f981d">GetMicrosecondCount</a> (void)</td></tr>
 <tr class="memdesc:a8bcd5980c6298893bba430be942f981d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current system clock time in microseconds.  <a href="#a8bcd5980c6298893bba430be942f981d">More...</a><br /></td></tr>
 <tr class="separator:a8bcd5980c6298893bba430be942f981d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9a82cda336f904d9cdaa543af486160d"><td class="memItemLeft" align="right" valign="top">static QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/dfc/class_torc_core_utils.html#a9a82cda336f904d9cdaa543af486160d">EnumsToScript</a> (const QMetaObject &amp;MetaObject)</td></tr>
-<tr class="memdesc:a9a82cda336f904d9cdaa543af486160d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a QMetaEnum into a QString that can be passed to QScript.  <a href="#a9a82cda336f904d9cdaa543af486160d">More...</a><br /></td></tr>
-<tr class="separator:a9a82cda336f904d9cdaa543af486160d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac055a13369c25c30947199d109a28d62"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/dfc/class_torc_core_utils.html#ac055a13369c25c30947199d109a28d62">QtMessage</a> (QtMsgType Type, const QMessageLogContext &amp;Context, const QString &amp;Message)</td></tr>
 <tr class="memdesc:ac055a13369c25c30947199d109a28d62"><td class="mdescLeft">&#160;</td><td class="mdescRight">A handler routine for Qt messages.  <a href="#ac055a13369c25c30947199d109a28d62">More...</a><br /></td></tr>
 <tr class="separator:ac055a13369c25c30947199d109a28d62"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -147,35 +144,6 @@ Static Public Member Functions</h2></td></tr>
 <p>Parse a QDataTime from the given QString. </p>
 
 <p>Definition at line <a class="el" href="../../d1/d98/torccoreutils_8cpp_source.html#l00044">44</a> of file <a class="el" href="../../d1/d98/torccoreutils_8cpp_source.html">torccoreutils.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a9a82cda336f904d9cdaa543af486160d"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">QString TorcCoreUtils::EnumsToScript </td>
-          <td>(</td>
-          <td class="paramtype">const QMetaObject &amp;&#160;</td>
-          <td class="paramname"><em>MetaObject</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Convert a QMetaEnum into a QString that can be passed to QScript. </p>
-<p>This function is used to pass the string representation of enumerations to a QScript context. The enumerations can then be used directly within scripts. </p>
-
-<p>Definition at line <a class="el" href="../../d1/d98/torccoreutils_8cpp_source.html#l00090">90</a> of file <a class="el" href="../../d1/d98/torccoreutils_8cpp_source.html">torccoreutils.cpp</a>.</p>
 
 </div>
 </div>
@@ -233,7 +201,7 @@ Static Public Member Functions</h2></td></tr>
 <p>Compress the supplied data using GZip. </p>
 <p>The returned data is suitable for sending as part of an HTTP response when the requestor accepts gzip compression. </p>
 
-<p>Definition at line <a class="el" href="../../d1/d98/torccoreutils_8cpp_source.html#l00146">146</a> of file <a class="el" href="../../d1/d98/torccoreutils_8cpp_source.html">torccoreutils.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d98/torccoreutils_8cpp_source.html#l00125">125</a> of file <a class="el" href="../../d1/d98/torccoreutils_8cpp_source.html">torccoreutils.cpp</a>.</p>
 
 </div>
 </div>
@@ -262,7 +230,7 @@ Static Public Member Functions</h2></td></tr>
 <p>Compress the given file using GZip. </p>
 <p>The returned data is suitable for sending as part of an HTTP response when the requestor accepts gzip compression. </p>
 
-<p>Definition at line <a class="el" href="../../d1/d98/torccoreutils_8cpp_source.html#l00202">202</a> of file <a class="el" href="../../d1/d98/torccoreutils_8cpp_source.html">torccoreutils.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d98/torccoreutils_8cpp_source.html#l00181">181</a> of file <a class="el" href="../../d1/d98/torccoreutils_8cpp_source.html">torccoreutils.cpp</a>.</p>
 
 </div>
 </div>
@@ -290,7 +258,7 @@ Static Public Member Functions</h2></td></tr>
 
 <p>Return true if zlib support is available. </p>
 
-<p>Definition at line <a class="el" href="../../d1/d98/torccoreutils_8cpp_source.html#l00132">132</a> of file <a class="el" href="../../d1/d98/torccoreutils_8cpp_source.html">torccoreutils.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d98/torccoreutils_8cpp_source.html#l00111">111</a> of file <a class="el" href="../../d1/d98/torccoreutils_8cpp_source.html">torccoreutils.cpp</a>.</p>
 
 </div>
 </div>
@@ -334,9 +302,9 @@ Static Public Member Functions</h2></td></tr>
 
 <p>A handler routine for Qt messages. </p>
 <p>This ensures Qt warnings are included in non-console logs.</p>
-<dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000020">Todo:</a></b></dt><dd>Refactor logging to allow using Context directly in the log, hence removing line/function duplication. </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000017">Todo:</a></b></dt><dd>Refactor logging to allow using Context directly in the log, hence removing line/function duplication. </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d1/d98/torccoreutils_8cpp_source.html#l00112">112</a> of file <a class="el" href="../../d1/d98/torccoreutils_8cpp_source.html">torccoreutils.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d98/torccoreutils_8cpp_source.html#l00091">91</a> of file <a class="el" href="../../d1/d98/torccoreutils_8cpp_source.html">torccoreutils.cpp</a>.</p>
 
 </div>
 </div>
@@ -347,7 +315,7 @@ Static Public Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Nov 13 2018 18:09:53 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Nov 13 2018 21:28:14 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

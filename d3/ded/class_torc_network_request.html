@@ -249,10 +249,7 @@ Additional Inherited Members</h2></td></tr>
 <p><a class="el" href="../../d3/ded/class_torc_network_request.html" title="A wrapper around QNetworkRequest. ">TorcNetworkRequest</a> acts as the intermediary between <a class="el" href="../../d8/d73/class_torc_network.html" title="Subclass of QNetworkAccessManager for sending network requests and monitoring the network state...">TorcNetwork</a> and any other class accessing the network.</p>
 <p>The requestor must create a valid QNetworkRequest, an abort signal and, if a streamed download is required, provide a buffer size.</p>
 <p>In the case of streamed downloads, a circular buffer of the given size is created which must be emptied (via Read) on a frequent basis. The readBufferSize for the associated QNetworkReply is set to the same size. Hence there is matched buffering between Qt and <a class="el" href="../../d6/db6/class_torc.html">Torc</a>. Streamed downloads are optimised for a single producer and a single consumer thread - any other usage is likely to lead to tears before bedtime.</p>
-<p>For non-streamed requests, the complete download is copied to the internal buffer and can be retrieved via ReadAll. Take care when downloading files of an unknown size.</p>
-<dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000026">Todo:</a></b></dt><dd><p class="startdd">Complete streamed support for seeking and peeking </p>
-<p class="enddd">Add user messaging for network errors </p>
-</dd></dl>
+<p>For non-streamed requests, the complete download is copied to the internal buffer and can be retrieved via ReadAll. Take care when downloading files of an unknown size. </p>
 
 <p>Definition at line <a class="el" href="../../db/d18/torcnetworkrequest_8h_source.html#l00010">10</a> of file <a class="el" href="../../db/d18/torcnetworkrequest_8h_source.html">torcnetworkrequest.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
@@ -292,7 +289,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00054">54</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00051">51</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
 
 </div>
 </div>
@@ -326,7 +323,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00091">91</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00088">88</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
 
 </div>
 </div>
@@ -351,7 +348,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00125">125</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00122">122</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
 
 </div>
 </div>
@@ -370,7 +367,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00129">129</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00126">126</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
 
 </div>
 </div>
@@ -388,7 +385,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00358">358</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00355">355</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
 
 </div>
 </div>
@@ -416,7 +413,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00352">352</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00349">349</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
 
 </div>
 </div>
@@ -434,7 +431,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00402">402</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00399">399</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
 
 </div>
 </div>
@@ -452,7 +449,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00368">368</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00365">365</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
 
 </div>
 </div>
@@ -470,7 +467,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00363">363</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00360">360</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
 
 </div>
 </div>
@@ -489,11 +486,11 @@ Additional Inherited Members</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Return the value of the given header, if present. </p>
-<dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000027">Todo:</a></b></dt><dd><p class="startdd">This is not very efficient. May be better for <a class="el" href="../../d3/ded/class_torc_network_request.html" title="A wrapper around QNetworkRequest. ">TorcNetworkRequest</a> to retrieve pre-specified headers that are of interest to the caller. </p>
+<dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000022">Todo:</a></b></dt><dd><p class="startdd">This is not very efficient. May be better for <a class="el" href="../../d3/ded/class_torc_network_request.html" title="A wrapper around QNetworkRequest. ">TorcNetworkRequest</a> to retrieve pre-specified headers that are of interest to the caller. </p>
 <p class="enddd">An empty return value could signify an empty header or no header... </p>
 </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00384">384</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00381">381</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
 
 </div>
 </div>
@@ -511,7 +508,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00142">142</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00139">139</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
 
 </div>
 </div>
@@ -529,7 +526,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00392">392</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00389">389</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
 
 </div>
 </div>
@@ -547,7 +544,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00137">137</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00134">134</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
 
 </div>
 </div>
@@ -565,7 +562,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00373">373</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00370">370</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
 
 </div>
 </div>
@@ -599,7 +596,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00160">160</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00157">157</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
 
 </div>
 </div>
@@ -639,7 +636,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00199">199</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00196">196</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
 
 </div>
 </div>
@@ -657,7 +654,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00407">407</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00404">404</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
 
 </div>
 </div>
@@ -676,7 +673,7 @@ Additional Inherited Members</h2></td></tr>
 </div><div class="memdoc">
 <p>If this is a streamed download, attempt to seek within the range of what is currently buffered. </p>
 
-<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00169">169</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00166">166</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
 
 </div>
 </div>
@@ -704,7 +701,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00325">325</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00322">322</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
 
 </div>
 </div>
@@ -722,7 +719,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00320">320</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00317">317</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
 
 </div>
 </div>
@@ -740,7 +737,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00397">397</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00394">394</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
 
 </div>
 </div>
@@ -758,7 +755,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00150">150</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00147">147</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
 
 </div>
 </div>
@@ -784,7 +781,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00290">290</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html#l00287">287</a> of file <a class="el" href="../../d8/dcb/torcnetworkrequest_8cpp_source.html">torcnetworkrequest.cpp</a>.</p>
 
 </div>
 </div>
@@ -1479,7 +1476,7 @@ Additional Inherited Members</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Nov 13 2018 18:09:53 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Nov 13 2018 21:28:14 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>
