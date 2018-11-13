@@ -451,7 +451,7 @@ test {
     DEFINES += TORC_TEST
     QMAKE_CXXFLAGS -= -O2
     QMAKE_CXXFLAGS += -fprofile-arcs -ftest-coverage
-    LIBS += -lgcov
+    !macx:LIBS += -lgcov
     QT += testlib
     TARGET = torc-tests
     target.path = ./
