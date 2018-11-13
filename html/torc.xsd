@@ -548,6 +548,8 @@
                 <xs:enumeration value="start"/>
                 <xs:enumeration value="stop"/>
                 <xs:enumeration value="restarttorc"/>
+                <xs:enumeration value="userchanged"/>
+                <xs:enumeration value="torcwillstop"/>
                 <xs:enumeration value="shutdown"/>
                 <xs:enumeration value="suspend"/>
                 <xs:enumeration value="hibernate"/>
@@ -564,6 +566,7 @@
                 <xs:enumeration value="networkhostnameschanged"/>
                 <xs:enumeration value="servicediscovered"/>
                 <xs:enumeration value="servicewentaway"/>
+                <xs:enumeration value="systemtimechanged"/>
               </xs:restriction>
             </xs:simpleType>
           </xs:element>
