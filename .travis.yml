@@ -130,6 +130,9 @@ matrix:
           if [[ $TRAVIS_BRANCH != "coverity_scan" ]]; then
             travis_retry sudo apt-get update
             travis_retry sudo apt-get install graphviz doxygen
+          else
+            echo Ignoring branch
+          fi
 
       script:
         - |
@@ -137,6 +140,9 @@ matrix:
             cd docs
             doxygen doxygen.cfg
             cd ..
+          else
+            echo Ignoring branch
+          fi
 
       deploy:
         provider: pages
