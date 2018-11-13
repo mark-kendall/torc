@@ -82,27 +82,6 @@ quint64 TorcCoreUtils::GetMicrosecondCount(void)
 #endif
 }
 
-/*! \brief Convert a QMetaEnum into a QString that can be passed to QScript.
- *
- * This function is used to pass the string representation of enumerations to a QScript
- * context. The enumerations can then be used directly within scripts.
- */
-QString TorcCoreUtils::EnumsToScript(const QMetaObject &MetaObject)
-{
-    QString name   = MetaObject.className();
-    QString result = QString("%1 = new Object();\n").arg(name);
-
-    for (int i = 0; i < MetaObject.enumeratorCount(); ++i)
-    {
-        QMetaEnum metaenum = MetaObject.enumerator(i);
-
-        for (int j = 0; j < metaenum.keyCount(); ++j)
-            result += QString("%1.%2 = %3;\n").arg(name).arg(metaenum.key(j)).arg(metaenum.value(j));
-    }
-
-    return result;
-}
-
 /*! \brief A handler routine for Qt messages.
  *
  * This ensures Qt warnings are included in non-console logs.
