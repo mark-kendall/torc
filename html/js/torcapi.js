@@ -46,40 +46,39 @@ var TorcAPI = function ($, torc, menu) {
             if (typeof websocketprotos === "undefined") { websocketprotos = torcconnection.getWebSocketProtocols(); }
         }
 
-        // these aren"t going to change
-        if (typeof servicelist === "object" && typeof returnformats === "object" && typeof websocketprotos === "object") {
-            // build the API page
-            $("." + theme.APIModalContentID).html(template(theme.APIServiceList, { "services": servicelist, "formats": returnformats, "subprotocols": websocketprotos }));
-            // iterate over services
-            Object.getOwnPropertyNames(servicelist).forEach( function(service) {
-                // make service collapse buttons dynamic (up/down)
-                var button = $("button[data-target=\"#api-detail-" + service + "\"]");
-                $("#api-detail-" + service).on("hide.bs.collapse", function() {
-                    button.html(template(theme.APICollapseShow));
-                    $("#api-detail2-" + service).removeClass("bg-secondary");
-                });
-                $("#api-detail-" + service).on("show.bs.collapse", function() {
-                    $("#api-detail2-" + service).addClass("bg-secondary");
-                    button.html(template(theme.APICollapseHide));
-                    // scroll to top of selected service
-                    // TODO make this animated - the scrollTop(0) is a hack that breaks animation
-                    $("#torc-api-modal").scrollTop(0);
-                    $("#torc-api-modal").scrollTop($("#api-detail2-" + service).offset().top);
-                });
-
-                // load method/property details
-                var methods = torcconnection.getServiceMethods(service);
-                var properties = torcconnection.getServiceProperties(service);
-                // we are subscribed and details are available
-                if (typeof methods !== "undefined" && typeof properties !== "undefined") {
-                    setServiceDetail(service, methods, properties);
-                } else {
-                // need to ask for details
-                    torcconnection.call("services", "GetServiceDescription", { "Service": service }, function (result) {
-                        setServiceDetail(service, result.methods, result.properties); });
-                }
+        // these aren't going to change
+        if (typeof servicelist !== "object" || typeof returnformats !== "object" || typeof websocketprotos !== "object") { return; }
+        // build the API page
+        $("." + theme.APIModalContentID).html(template(theme.APIServiceList, { "services": servicelist, "formats": returnformats, "subprotocols": websocketprotos }));
+        // iterate over services
+        Object.getOwnPropertyNames(servicelist).forEach( function(service) {
+            // make service collapse buttons dynamic (up/down)
+            var button = $("button[data-target=\"#api-detail-" + service + "\"]");
+            $("#api-detail-" + service).on("hide.bs.collapse", function() {
+                button.html(template(theme.APICollapseShow));
+                $("#api-detail2-" + service).removeClass("bg-secondary");
             });
-        }
+            $("#api-detail-" + service).on("show.bs.collapse", function() {
+                $("#api-detail2-" + service).addClass("bg-secondary");
+                button.html(template(theme.APICollapseHide));
+                // scroll to top of selected service
+                // TODO make this animated - the scrollTop(0) is a hack that breaks animation
+                $("#torc-api-modal").scrollTop(0);
+                $("#torc-api-modal").scrollTop($("#api-detail2-" + service).offset().top);
+            });
+
+            // load method/property details
+            var methods = torcconnection.getServiceMethods(service);
+            var properties = torcconnection.getServiceProperties(service);
+            // we are subscribed and details are available
+            if (typeof methods !== "undefined" && typeof properties !== "undefined") {
+                setServiceDetail(service, methods, properties);
+            } else {
+            // need to ask for details
+                torcconnection.call("services", "GetServiceDescription", { "Service": service }, function (result) {
+                    setServiceDetail(service, result.methods, result.properties); });
+            }
+        });
     }
 
     function clearAPI () {
