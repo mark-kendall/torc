@@ -164,30 +164,26 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
             setSocketStatus(torc.SocketConnected);
         };
 
+        function processBatch (data) {
+            var batchresult = [];
+            for (var i = 0; i < data.length; i += 1) {
+                var result = processResult(data[i]);
+                if (typeof result === "object") { batchresult.push(result); }
+            }
+            // a batch call of notifications requires no response
+            if (batchresult.length > 0) { socket.send(JSON.stringify(batchresult)); }
+        }
+
         // socket message
         socket.onmessage = function (event) {
-            var i;
-            var result;
-            var batchresult;
-
             // parse the JSON result
             var data = JSON.parse(event.data);
 
             if ($.isArray(data)) {
-                // array of objects (batch)
-                batchresult = [];
-
-                for (i = 0; i < data.length; i += 1) {
-                    result = processResult(data[i]);
-                    if (typeof result === "object") { batchresult.push(result); }
-                }
-
-                // a batch call of notifications requires no response
-                if (batchresult.length > 0) { socket.send(JSON.stringify(batchresult)); }
+                processBatch(data);
             } else if (typeof data === "object") {
                 // single object
-                result = processResult(data);
-
+                var result = processResult(data);
                 if (typeof result === "object") { socket.send(JSON.stringify(result)); }
             } else {
                 socket.send(JSON.stringify({jsonrpc: "2.0", error: {code: "-32700", message: "Parse error"}, id: null}));
