@@ -15,13 +15,26 @@ $(document).ready(function() {
     var torcapi        = new TorcAPI($, torc, usermenu);
     var torcsettings   = new TorcSettings($, torc, usermenu);
 
+    function qsTranslateBatch(translations) {
+        var batch = [];
+        $.each(translations, function (index, value) {
+            batch.push({servicename: "languages",
+                        method:  "GetTranslation",
+                        params:  { Context: value.context, String: value.string, Disambiguation: value.disambiguation, Number: value.plural },
+                        success: function (translated) { if (typeof value.callback === "function") { value.callback(translated); }},
+                        failure: function () { if (typeof value.callback === "function") { value.callback("?"); }}});
+        });
+        torcconnection.call(batch);
+    }
+
     function qsTranslate(context, string, disambiguation, plural, callback) {
+        if ($.isArray(context)) { qsTranslateBatch(context); return }
         if (typeof disambiguation === "undefined") { disambiguation = ""; }
         if (typeof plural === "undefined") { plural = 0; }
         torcconnection.call("languages", "GetTranslation",
                             { Context: context, String: string, Disambiguation: disambiguation, Number: plural},
                             function (translated) { if (typeof callback === "function") { callback(translated); }},
-                            function () { if (typeof callback === "function") { callback(); }});
+                            function () { if (typeof callback === "function") { callback("?"); }});
     }
 
     function addNavbarDropdown(ddclass, icon, menuclass) {
@@ -53,12 +66,14 @@ $(document).ready(function() {
             qsTranslate("TorcNetworkedContext", "%n other Torc device(s) discovered", "", value.length,
                         function(result) { $(".torc-peer-status").html(result); });
             addDropdownMenuDivider("torc-peer-menu", "torc-peer");
+            var batch = [];
             value.forEach( function (element, index) {
                 var prot = element.hasOwnProperty("secure") ? "https://" : "http://";
                 addDropdownMenuItem("torc-peer-menu", "torc-peer torc-peer" + index, prot + element.address + ":" + element.port + "/index.html", "");
-                qsTranslate("TorcNetworkedContext", "Connect to %1", "", 0,
-                            function(result) { $(".torc-peer" + index).html(template(theme.DropdownItemWithIcon, { "icon": "external-link-square", "text": result.replace("%1", element.name) })); });
+                batch.push({context: "TorcNetworkedContext", string: "Connect to %1", disambiguation: "", plural: 0,
+                            callback: function(result) { $(".torc-peer" + index).html(template(theme.DropdownItemWithIcon, { "icon": "external-link-square", "text": result.replace("%1", element.name) })) }});
             });
+            qsTranslate(batch);
             return;
         }
         // no peers found
