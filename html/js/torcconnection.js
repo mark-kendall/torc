@@ -56,7 +56,7 @@ var TorcConnection = function ($, torc, statusChanged) {
                 }
             });
             socket.call(batchcall);
-            return
+            return;
         }
         if (recognisedcall(serviceName, method)) {
             socket.call(serviceList[serviceName].path + method, params, success, failure);
