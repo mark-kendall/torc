@@ -56,7 +56,6 @@
  * \todo Limit frame size for reading
  * \todo Fix testsuite partial failures (fail fast on invalid UTF-8)
  * \todo Add timeout for response to upgrade request
- * \todo Add support for batched RPC calls
 */
 
 TorcWebSocket::TorcWebSocket(TorcWebSocketThread* Parent, qintptr SocketDescriptor, bool Secure)
