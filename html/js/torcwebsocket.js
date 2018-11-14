@@ -72,8 +72,7 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
         eventHandlers[method] = { id, callback };
     };
 
-    // make a remote call (public)
-    this.call = function (methodToCall, params, successCallback, failureCallback) {
+    function singlecall (methodToCall, params, successCallback, failureCallback) {
         // create the base call object
         var invocation = {
             jsonrpc: "2.0",
@@ -102,7 +101,22 @@ var TorcWebsocket = function ($, torc, socketStatusChanged) {
             }
         }
 
-        socket.send(JSON.stringify(invocation));
+        return invocation;
+    }
+
+    // make a remote call (public)
+    this.call = function (methodToCall, params, successCallback, failureCallback) {
+        var result;
+        if ($.isArray(methodToCall)) {
+            result = [];
+            $.each(methodToCall, function (index, value) {
+                result.push(singlecall(value.method, value.params, value.success, value.failure));
+            });
+        } else {
+            result = singlecall(methodToCall, params, successCallback, failureCallback);
+        }
+
+        socket.send(JSON.stringify(result));
     };
 
     function processResponse (data, error) {
