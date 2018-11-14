@@ -21,8 +21,8 @@ $(document).ready(function() {
             batch.push({servicename: "languages",
                         method:  "GetTranslation",
                         params:  { Context: value.context, String: value.string, Disambiguation: value.disambiguation, Number: value.plural },
-                        success: function (translated) { if (typeof value.callback === "function") { value.callback(translated); }},
-                        failure: function () { if (typeof value.callback === "function") { value.callback("?"); }}});
+                        success(translated) { if (typeof value.callback === "function") { value.callback(translated); }},
+                        failure() { if (typeof value.callback === "function") { value.callback("?"); }}});
         });
         torcconnection.call(batch);
     }
@@ -71,7 +71,7 @@ $(document).ready(function() {
                 var prot = element.hasOwnProperty("secure") ? "https://" : "http://";
                 addDropdownMenuItem("torc-peer-menu", "torc-peer torc-peer" + index, prot + element.address + ":" + element.port + "/index.html", "");
                 batch.push({context: "TorcNetworkedContext", string: "Connect to %1", disambiguation: "", plural: 0,
-                            callback: function(result) { $(".torc-peer" + index).html(template(theme.DropdownItemWithIcon, { "icon": "external-link-square", "text": result.replace("%1", element.name) })); }});
+                            callback(result) { $(".torc-peer" + index).html(template(theme.DropdownItemWithIcon, { "icon": "external-link-square", "text": result.replace("%1", element.name) })); }});
             });
             qsTranslate(batch);
             return;
