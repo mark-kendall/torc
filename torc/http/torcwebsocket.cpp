@@ -61,6 +61,7 @@
 TorcWebSocket::TorcWebSocket(TorcWebSocketThread* Parent, qintptr SocketDescriptor, bool Secure)
   : QSslSocket(),
     m_parent(Parent),
+    m_debug(),
     m_secure(Secure),
     m_socketState(SocketState::DisconnectedSt),
     m_socketDescriptor(SocketDescriptor),
@@ -86,6 +87,7 @@ TorcWebSocket::TorcWebSocket(TorcWebSocketThread* Parent, qintptr SocketDescript
 TorcWebSocket::TorcWebSocket(TorcWebSocketThread* Parent, const QHostAddress &Address, quint16 Port, bool Secure, TorcWebSocketReader::WSSubProtocol Protocol)
   : QSslSocket(),
     m_parent(Parent),
+    m_debug(),
     m_secure(Secure),
     m_socketState(SocketState::DisconnectedSt),
     m_socketDescriptor(0),
@@ -124,8 +126,6 @@ TorcWebSocket::~TorcWebSocket()
         m_wsReader.InitiateClose(TorcWebSocketReader::CloseGoingAway, QString("WebSocket exiting normally"));
 
     CloseSocket();
-
-    LOG(VB_GENERAL, LOG_INFO, "WebSocket dtor");
 }
 
 void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest &Request)
@@ -357,9 +357,7 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest &Request)
     SetState(SocketState::Upgraded);
     m_authenticated = Request.IsAuthorised();
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Upgraded socket from %1 (%2)")
-        .arg(TorcNetwork::IPAddressToLiteral(peerAddress(), peerPort()))
-        .arg(m_authenticated ? "Authenticated" : "Unauthenticated"));
+    LOG(VB_GENERAL, LOG_INFO, QString("%1 socket upgraded  (%2)").arg(m_debug).arg(m_authenticated ? "Authenticated" : "Unauthenticated"));
 
     if (Request.Headers().contains("Torc-UUID"))
     {
@@ -403,9 +401,11 @@ QVariantList TorcWebSocket::GetSupportedSubProtocols(void)
 
 void TorcWebSocket::Encrypted(void)
 {
+    if (m_debug.isEmpty())
+        m_debug = QString(">> %1 %2 -").arg(TorcNetwork::IPAddressToLiteral(peerAddress(), peerPort())).arg(m_secure ? "secure" : "insecure");
     connect(this, SIGNAL(readyRead()), this, SLOT(ReadyRead()));
     emit ConnectionEstablished();
-    LOG(VB_GENERAL, LOG_INFO, "Encrypted");
+    LOG(VB_GENERAL, LOG_INFO, QString("%1 encrypted").arg(m_debug));
 
     if (!m_serverSide)
         Connected();
@@ -448,10 +448,8 @@ void TorcWebSocket::Start(void)
     {
         if (setSocketDescriptor(m_socketDescriptor))
         {
-            LOG(VB_GENERAL, LOG_INFO, QString("%1 socket connected from %2")
-                .arg(m_authenticated ? "Authenticated" : "Unauthenticated")
-                .arg(TorcNetwork::IPAddressToLiteral(peerAddress(), peerPort())));
-
+            m_debug = QString("<< %1 %2 -").arg(TorcNetwork::IPAddressToLiteral(peerAddress(), peerPort())).arg(m_secure ? "secure" : "insecure");
+            LOG(VB_GENERAL, LOG_INFO, QString("%1 socket connected (%2)").arg(m_debug).arg(m_authenticated ? "Authenticated" : "Unauthenticated"));
             SetState(SocketState::ConnectedTo);
 
             if (m_secure)
@@ -760,6 +758,9 @@ void TorcWebSocket::SubscriberDeleted(QObject *Object)
 
 void TorcWebSocket::CloseSocket(void)
 {
+    if(state() == QAbstractSocket::ConnectedState)
+        LOG(VB_GENERAL, LOG_INFO, QString("%1 disconnecting").arg(m_debug));
+
     disconnectFromHost();
     // we only check for connected state - we don't care if it is any in any prior or subsequent state (hostlookup, connecting) and
     // the wait is only a 'courtesy' anyway.
@@ -770,6 +771,8 @@ void TorcWebSocket::CloseSocket(void)
 
 void TorcWebSocket::Connected(void)
 {
+    m_debug = QString(">> %1 %2 -").arg(TorcNetwork::IPAddressToLiteral(peerAddress(), peerPort())).arg(m_secure ? "secure" : "insecure");
+    LOG(VB_GENERAL, LOG_INFO, QString("%1 connection to remote host").arg(m_debug));
     SetState(SocketState::Upgrading);
     SendHandshake();
 }
@@ -832,8 +835,8 @@ void TorcWebSocket::SendHandshake(void)
         return;
     }
 
-    LOG(VB_GENERAL, LOG_DEBUG, QString("Client WebSocket connected to '%1' (SubProtocol: %2)")
-        .arg(TorcNetwork::IPAddressToLiteral(m_address, (m_port))).arg(TorcWebSocketReader::SubProtocolsToString(m_subProtocol)));
+    LOG(VB_GENERAL, LOG_DEBUG, QString("%1 client WebSocket connected (SubProtocol: %2)")
+        .arg(m_debug).arg(TorcWebSocketReader::SubProtocolsToString(m_subProtocol)));
 
     LOG(VB_NETWORK, LOG_DEBUG, QString("Data...\r\n%1").arg(upgrade->data()));
 }
@@ -953,17 +956,19 @@ void TorcWebSocket::ReadHandshake(void)
 
 void TorcWebSocket::Error(QAbstractSocket::SocketError SocketError)
 {
-    (void)SocketError;
-    LOG(VB_GENERAL, LOG_ERR, QString("Socket error: %1 ('%2')").arg(error()).arg(errorString()));
+    if (QAbstractSocket::RemoteHostClosedError == SocketError)
+        LOG(VB_GENERAL, LOG_INFO, QString("%1 remote host disconnected socket").arg(m_debug));
+    else
+        LOG(VB_GENERAL, LOG_ERR, QString("%1 socket error %2 '%3'").arg(m_debug).arg(SocketError).arg(errorString()));
     SetState(SocketState::ErroredSt);
 }
 
 void TorcWebSocket::TimedOut(void)
 {
     if(m_socketState == SocketState::Upgraded)
-        LOG(VB_GENERAL, LOG_WARNING, QString("No activity on upgraded websocket for %1seconds - closing").arg(m_watchdogTimer.interval() / 1000));
+        LOG(VB_GENERAL, LOG_WARNING, QString("%1 no websocket traffic for %2seconds").arg(m_debug).arg(m_watchdogTimer.interval() / 1000));
     else
-        LOG(VB_GENERAL, LOG_DEBUG, QString("No activity on HTTP socket for %1seconds - closing").arg(m_watchdogTimer.interval() / 1000));
+        LOG(VB_GENERAL, LOG_INFO, QString("%1 no HTTP traffic for %2seconds").arg(m_debug).arg(m_watchdogTimer.interval() / 1000));
     SetState(SocketState::DisconnectedSt);
 }
 

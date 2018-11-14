@@ -85,6 +85,7 @@ class TorcWebSocket : public QSslSocket
 
   private:
     TorcWebSocketThread *m_parent;
+    QString          m_debug;
     bool             m_secure;
     SocketState      m_socketState;
     qintptr          m_socketDescriptor;

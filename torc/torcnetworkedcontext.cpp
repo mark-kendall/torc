@@ -614,6 +614,8 @@ TorcNetworkedContext::~TorcNetworkedContext()
 
     {
         QWriteLocker locker(&m_discoveredServicesLock);
+        if (!m_discoveredServices.isEmpty())
+            LOG(VB_GENERAL, LOG_INFO, QString("Removing %1 discovered peers").arg(m_discoveredServices.size()));
         while (!m_discoveredServices.isEmpty())
             delete m_discoveredServices.takeLast();
     }
