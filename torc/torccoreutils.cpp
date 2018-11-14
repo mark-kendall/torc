@@ -85,25 +85,32 @@ quint64 TorcCoreUtils::GetMicrosecondCount(void)
 /*! \brief A handler routine for Qt messages.
  *
  * This ensures Qt warnings are included in non-console logs.
- *
- * \todo Refactor logging to allow using Context directly in the log, hence removing line/function duplication.
 */
 void TorcCoreUtils::QtMessage(QtMsgType Type, const QMessageLogContext &Context, const QString &Message)
 {
-    QString message = QString("%1 (%2:%3) %4").arg(Context.function).arg(Context.file).arg(Context.line).arg(Message);
+    const char *function = Context.function ? Context.function : __FUNCTION__;
+    const char *file     = Context.file ? Context.file : __FILE__;
+    int         line     = Context.line ? Context.line : __LINE__;
 
+    int level = LOG_UNKNOWN;
     switch (Type)
     {
-        case QtFatalMsg:
-            LOG(VB_GENERAL, LOG_CRIT, message);
-            QThread::msleep(100);
-            abort();
-        case QtDebugMsg:
-            LOG(VB_GENERAL, LOG_INFO, message);
-            break;
-        default:
-            LOG(VB_GENERAL, LOG_ERR, message);
-            break;
+        case QtFatalMsg: level = LOG_CRIT; break;
+        case QtDebugMsg: level = LOG_INFO; break;
+        default: level = LOG_ERR;
+    }
+
+    if (VERBOSE_LEVEL_CHECK(VB_GENERAL, level))
+    {
+        PrintLogLine(VB_GENERAL, (LogLevel)level,
+                     file, line, function, 1,
+                     Message.toLocal8Bit().constData());
+    }
+
+    if (LOG_CRIT == level)
+    {
+        QThread::msleep(100);
+        abort();
     }
 }
 
