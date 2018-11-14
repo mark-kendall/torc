@@ -10,7 +10,7 @@ var searchData=
   ['logerrortostring',['LogErrorToString',['../d7/d24/torcloggingimp_8cpp.html#a78f45dcc6606633b7a984d62bdd5f810',1,'torcloggingimp.cpp']]],
   ['loggerbase',['LoggerBase',['../da/de4/class_logger_base.html#af9c8a698bb83ee4be79dfc2015e9d0a7',1,'LoggerBase']]],
   ['loggingthread',['LoggingThread',['../da/d38/class_logging_thread.html#ac89e583f05c24a9bff3b6dca48aebc7b',1,'LoggingThread']]],
-  ['logitem',['LogItem',['../df/dd2/class_log_item.html#a3c28fb86170f790e9d072098954ba238',1,'LogItem']]],
+  ['logitem',['LogItem',['../df/dd2/class_log_item.html#a61c17dbf04a789d015e92e64a8ab06d2',1,'LogItem']]],
   ['logmsg',['Logmsg',['../da/de4/class_logger_base.html#af7b1678540c35fcdba61c7be980b6955',1,'LoggerBase::Logmsg()'],['../de/db9/class_file_logger.html#a3392abbe167739e8cf0fec60021f0fd0',1,'FileLogger::Logmsg()'],['../d3/d3c/class_web_logger.html#a090e10e5c4001135894fa3556b6c92d7',1,'WebLogger::Logmsg()']]],
   ['lowbattery',['LowBattery',['../d7/da5/class_torc_power.html#a19e8e922cb6cdbe546fe0e55c31c5baa',1,'TorcPower']]]
 ];

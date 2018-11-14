@@ -161,7 +161,7 @@ var searchData=
   ['m_5fwriteposition',['m_writePosition',['../d3/ded/class_torc_network_request.html#a3e43cd824fb34d9979665ea291b88c65',1,'TorcNetworkRequest::m_writePosition()'],['../df/d16/class_torc_segmented_ring_buffer.html#aab95e8c023e6255c8f5aa90a4a6ced49',1,'TorcSegmentedRingBuffer::m_writePosition()']]],
   ['m_5fwritetimer',['m_writeTimer',['../d3/ded/class_torc_network_request.html#a420479c0d361963611cd4ad2c3982b73',1,'TorcNetworkRequest']]],
   ['m_5fxmlstream',['m_xmlStream',['../de/d44/class_torc_x_m_l_serialiser.html#afe8181307a4bf552ebb811749cef815e',1,'TorcXMLSerialiser']]],
-  ['mask',['mask',['../d0/d53/struct_verbose_def.html#a0e5b0e59c847bf5959a4b610505a6433',1,'VerboseDef']]],
+  ['mask',['mask',['../df/dd2/class_log_item.html#ab4b2073beef780ad31cd1f2450e069a9',1,'LogItem::mask()'],['../d0/d53/struct_verbose_def.html#a0e5b0e59c847bf5959a4b610505a6433',1,'VerboseDef::mask()']]],
   ['message',['message',['../df/dd2/class_log_item.html#a07fa36379ff1c7be6990531be56ece3c',1,'LogItem']]],
   ['modelid',['modelId',['../d5/d76/class_torc_device.html#a7cb231fcb683b579d5dc5040926a1952',1,'TorcDevice']]]
 ];

@@ -25,7 +25,7 @@ var searchData=
   ['loggingthread',['LoggingThread',['../da/d38/class_logging_thread.html',1,'LoggingThread'],['../da/d38/class_logging_thread.html#ac89e583f05c24a9bff3b6dca48aebc7b',1,'LoggingThread::LoggingThread()']]],
   ['loggingtype',['LoggingType',['../d7/d24/torcloggingimp_8cpp.html#a91d409898e51bded499875cd40c3c4d3',1,'torcloggingimp.cpp']]],
   ['logic',['Logic',['../d1/d34/class_torc_control.html#a9674689dc841799e823c26856123a8b0ae719f03f63389b8577d03b47de860d1d',1,'TorcControl']]],
-  ['logitem',['LogItem',['../df/dd2/class_log_item.html',1,'LogItem'],['../df/dd2/class_log_item.html#a3c28fb86170f790e9d072098954ba238',1,'LogItem::LogItem()']]],
+  ['logitem',['LogItem',['../df/dd2/class_log_item.html',1,'LogItem'],['../df/dd2/class_log_item.html#a61c17dbf04a789d015e92e64a8ab06d2',1,'LogItem::LogItem()']]],
   ['loglevel',['LogLevel',['../dc/dee/class_torc_command_line.html#a1ce038f9cd42849bc4cdb065819afa63aa9603f7d078d70892784d17320af6260',1,'TorcCommandLine']]],
   ['loglevel_5fmap',['LOGLEVEL_MAP',['../d1/d37/torcloggingdefs_8h.html#a1a3d3ab4eaa11700a3ca912c15d125c6',1,'LOGLEVEL_MAP():&#160;torcloggingdefs.h'],['../d7/d24/torcloggingimp_8cpp.html#a1a3d3ab4eaa11700a3ca912c15d125c6',1,'LOGLEVEL_MAP():&#160;torcloggingimp.cpp']]],
   ['loglevel_5fpostamble',['LOGLEVEL_POSTAMBLE',['../d1/d37/torcloggingdefs_8h.html#ac01750e19b8995d3d9e6e716313c734b',1,'LOGLEVEL_POSTAMBLE():&#160;torcloggingdefs.h'],['../d7/d24/torcloggingimp_8cpp.html#ac01750e19b8995d3d9e6e716313c734b',1,'LOGLEVEL_POSTAMBLE():&#160;torcloggingimp.cpp']]],

@@ -168,7 +168,7 @@ var searchData=
   ['makeavailable',['MakeAvailable',['../d7/d61/class_torc_o_m_x_port.html#a0044cf3a788591c1e1facbed1164668a',1,'TorcOMXPort']]],
   ['maptotxtrecord',['MapToTxtRecord',['../d0/d9f/class_torc_bonjour.html#a6f1fcaefbe7d07dfa58b105070d9361b',1,'TorcBonjour']]],
   ['maptoxml',['MapToXML',['../de/d44/class_torc_x_m_l_serialiser.html#a27fc20142e2f81c8d27e0f96f685d29f',1,'TorcXMLSerialiser']]],
-  ['mask',['mask',['../d0/d53/struct_verbose_def.html#a0e5b0e59c847bf5959a4b610505a6433',1,'VerboseDef']]],
+  ['mask',['mask',['../df/dd2/class_log_item.html#ab4b2073beef780ad31cd1f2450e069a9',1,'LogItem::mask()'],['../d0/d53/struct_verbose_def.html#a0e5b0e59c847bf5959a4b610505a6433',1,'VerboseDef::mask()']]],
   ['max_5fbad_5frequests',['MAX_BAD_REQUESTS',['../df/dc4/torcpushbulletnotifier_8cpp.html#a19ae74790bfc2077cd445ab9bba96c20',1,'torcpushbulletnotifier.cpp']]],
   ['max_5fsocket_5fthreads',['MAX_SOCKET_THREADS',['../dc/d5c/torcwebsocketpool_8h.html#a877b3d35724989df7106126be8d9d31e',1,'torcwebsocketpool.h']]],
   ['max_5fstring_5flength',['MAX_STRING_LENGTH',['../d7/d24/torcloggingimp_8cpp.html#a6789ebc0df71a8ef76bfbb4fb5f74aad',1,'torcloggingimp.cpp']]],
