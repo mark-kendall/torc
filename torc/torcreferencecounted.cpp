@@ -28,8 +28,6 @@
 
 /*! \class TorcReferenceCounter
  *  \brief A reference counting implementation.
- *
- * \todo Review use of EventLoopEnding which may not be a good idea outside of the main thread.
 */
 
 bool TorcReferenceCounter::m_eventLoopEnding = false;
