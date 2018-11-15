@@ -28,11 +28,59 @@
 
 /*! \class TorcTriggerNotification
  *
- * A notification class for sending messages when the input value is high (or greater than 0).
+ * A notification class for sending messages when the input value switches from low to
+ * high or high to low.
  *
- * \todo how to handle continuous 'high' state. Repeat notification every XX mins, XX hours?
- * \todo how to handle reversion to 'low'state. Send alternate notification or ignore and leave
- * to 'twin' notification that handles the reverse state.
+ * A single notification is sent when the trigger occurs. If the input remains unchanged, no further notifications
+ * are sent. A notification is not sent when the input changes back - this should be handled by a matching, configured
+ * trigger notification. Consider some form of hysteresis for non-binary or frequently changing inputs to avoid frequent
+ * notifications.
+ *
+ * \code
+ * <torc>
+ *   <notify>
+ *     <notifications>
+ *       <trigger>
+ *         <name>test</name>
+ *         <inputs><device>mytrigger</device></inputs> <-- an input or control
+ *         <outputs><device>mynotifier></device></outputs> <- a  notifier
+ *         <references><device>myinterestingdevice</device></references> <-- devices whose values we want to notify
+ *         <message>
+ *           <title>%applicationname% ALERT</title>
+ *           <body>Interesting value %myinterestingdevice% at %datatime%</body>
+ *         </message>
+ *       </trigger>
+ *     </notifications>
+ *   </notify>
+ * </torc>
+ * \endcode
+ *
+ * To trigger the output when the input transitions from high to low (the default is low to high) add a <triggerlow> member.
+ *
+ * \code
+ * <torc>
+ *   <notify>
+ *     <notifications>
+ *       <trigger>
+ *         <name>test</name>
+ *         <triggerlow>yes</triggerlow> <-- !!!!
+ *         <inputs><device>mytrigger</device></inputs> <-- an input or control
+ *         <outputs><device>mynotifier></device></outputs> <- a  notifier
+ *         <references><device>myinterestingdevice</device></references> <-- devices whose values we want to notify
+ *         <message>
+ *           <title>%applicationname% ALERT</title>
+ *           <body>Interesting value %myinterestingdevice% at %datatime%</body>
+ *         </message>
+ *       </trigger>
+ *     </notifications>
+ *   </notify>
+ * </torc>
+ * \endcode
+ *
+ * \sa TorcNotify
+ * \sa TorcNotification
+ * \sa TorcNotifier
+ * \sa TorcSystemNotification
 */
 TorcTriggerNotification::TorcTriggerNotification(const QVariantMap &Details)
   : TorcNotification(Details),
