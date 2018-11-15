@@ -215,9 +215,7 @@ void TorcBinaryPListSerialiser::End(QByteArray &Dest)
 
 quint64 TorcBinaryPListSerialiser::BinaryFromVariant(QByteArray &Dest, const QString &Name, const QVariant &Value)
 {
-    // object formats not used; fill, data, ascii string, set
-
-    // TODO data = QByteArray
+    // object formats not used: ascii string, set
     quint64 result = m_objectOffsets.size();
 
     if (Value.isNull())
