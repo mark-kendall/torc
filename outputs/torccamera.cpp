@@ -174,7 +174,8 @@ TorcCameraParams& TorcCameraParams::operator =(const TorcCameraParams &Other)
 }
 
 TorcCameraDevice::TorcCameraDevice(const TorcCameraParams &Params)
-  : m_params(Params),
+  : QObject(),
+    m_params(Params),
     m_ringBuffer(NULL)
 {
 }
