@@ -192,11 +192,10 @@ Additional Inherited Members</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A class encapsulating a Remote Procedure Call. </p>
 <p>Remote Procedure Calls are currently only handled through <a class="el" href="../../d9/d0a/class_torc_web_socket.html" title="Overlays the Websocket protocol over a QTcpSocket. ">TorcWebSocket</a>.</p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="../../d9/d0a/class_torc_web_socket.html" title="Overlays the Websocket protocol over a QTcpSocket. ">TorcWebSocket</a></dd></dl>
-<dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000024">Todo:</a></b></dt><dd><p class="startdd">Add serialisation of protocols other than JSON-RPC. </p>
-<p>Add parsing of protocols other than JSON-RPC. </p>
-<p class="enddd">Review memory consumption/performance. </p>
-</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>The underlying protocol is restricted to JSON-RPC.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="../../d9/d0a/class_torc_web_socket.html" title="Overlays the Websocket protocol over a QTcpSocket. ">TorcWebSocket</a> </dd>
+<dd>
+<a class="el" href="../../d6/d70/class_torc_h_t_t_p_service.html">TorcHTTPService</a> </dd></dl>
 
 <p>Definition at line <a class="el" href="../../dd/d52/torcrpcrequest_8h_source.html#l00014">14</a> of file <a class="el" href="../../dd/d52/torcrpcrequest_8h_source.html">torcrpcrequest.h</a>.</p>
 </div><h2 class="groupheader">Member Enumeration Documentation</h2>
@@ -258,7 +257,7 @@ Additional Inherited Members</h2></td></tr>
 <p>Creates an RPC request owned by the given Parent. </p>
 <p>Parent will be notified when the request has been completed (or on error) and is responsible for cancelling the request if it is no longer required. Upon completion, error or cancellation, the parent must then DownRef the request to ensure it is deleted. </p>
 
-<p>Definition at line <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html#l00048">48</a> of file <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html">torcrpcrequest.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html#l00047">47</a> of file <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html">torcrpcrequest.cpp</a>.</p>
 
 </div>
 </div>
@@ -287,7 +286,7 @@ Additional Inherited Members</h2></td></tr>
 <p>Creates a notification request for which no response is expected. </p>
 <p>Notification requests are deleted after they have been sent. </p>
 
-<p>Definition at line <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html#l00069">69</a> of file <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html">torcrpcrequest.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html#l00068">68</a> of file <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html">torcrpcrequest.cpp</a>.</p>
 
 </div>
 </div>
@@ -329,7 +328,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Creates a request or response from the given raw data using the given protocol. </p>
 
-<p>Definition at line <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html#l00107">107</a> of file <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html">torcrpcrequest.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html#l00106">106</a> of file <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html">torcrpcrequest.cpp</a>.</p>
 
 </div>
 </div>
@@ -359,7 +358,7 @@ Additional Inherited Members</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Add Parameter and value to list of call parameters. </p>
-<dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000025">Todo:</a></b></dt><dd>Check for duplicate parameters. </dd></dl>
+<p>Ideally this should check for duplicate parameter names but it is not a commonly used method, would be inneficient and the caller should control the duplication. </p>
 
 <p>Definition at line <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html#l00402">402</a> of file <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html">torcrpcrequest.cpp</a>.</p>
 
@@ -403,7 +402,7 @@ Additional Inherited Members</h2></td></tr>
 <p>Progress the state for this request. </p>
 <dl class="section note"><dt>Note</dt><dd>Request state is incremental. </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html#l00387">387</a> of file <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html">torcrpcrequest.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html#l00386">386</a> of file <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html">torcrpcrequest.cpp</a>.</p>
 
 </div>
 </div>
@@ -565,7 +564,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html#l00307">307</a> of file <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html">torcrpcrequest.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html#l00306">306</a> of file <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html">torcrpcrequest.cpp</a>.</p>
 
 </div>
 </div>
@@ -585,7 +584,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Signal to the parent that the request is ready (but may be errored). </p>
 
-<p>Definition at line <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html#l00313">313</a> of file <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html">torcrpcrequest.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html#l00312">312</a> of file <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html">torcrpcrequest.cpp</a>.</p>
 
 </div>
 </div>
@@ -606,7 +605,7 @@ Additional Inherited Members</h2></td></tr>
 <p>Serialise the request for the given protocol. </p>
 <dl class="section note"><dt>Note</dt><dd>QJsonValue may not be flexbible enough for all types. </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html#l00346">346</a> of file <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html">torcrpcrequest.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html#l00345">345</a> of file <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html">torcrpcrequest.cpp</a>.</p>
 
 </div>
 </div>
@@ -626,7 +625,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Set the unique ID for this request. </p>
 
-<p>Definition at line <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html#l00393">393</a> of file <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html">torcrpcrequest.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html#l00392">392</a> of file <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html">torcrpcrequest.cpp</a>.</p>
 
 </div>
 </div>
@@ -647,7 +646,7 @@ Additional Inherited Members</h2></td></tr>
 <p>Set the parent for the request. </p>
 <p>Usually only used when a request is being cancelled by the parent and the parent is being deleted. </p>
 
-<p>Definition at line <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html#l00328">328</a> of file <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html">torcrpcrequest.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html#l00327">327</a> of file <a class="el" href="../../d0/d89/torcrpcrequest_8cpp_source.html">torcrpcrequest.cpp</a>.</p>
 
 </div>
 </div>
@@ -676,7 +675,7 @@ Additional Inherited Members</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Nov 14 2018 17:50:44 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Nov 15 2018 10:54:59 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

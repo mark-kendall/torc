@@ -222,10 +222,16 @@ Additional Inherited Members</h2></td></tr>
 <tr class="separator:aded7a79950cdd452f4626713e1aa17d0 inherit properties_class_torc_device"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>A notification class for sending messages when the input value is high (or greater than 0).</p>
-<dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000003">Todo:</a></b></dt><dd><p class="startdd">how to handle continuous 'high' state. Repeat notification every XX mins, XX hours? </p>
-<p class="enddd">how to handle reversion to 'low'state. Send alternate notification or ignore and leave to 'twin' notification that handles the reverse state. </p>
-</dd></dl>
+<div class="textblock"><p>A notification class for sending messages when the input value switches from low to high or high to low.</p>
+<p>A single notification is sent when the trigger occurs. If the input remains unchanged, no further notifications are sent. A notification is not sent when the input changes back - this should be handled by a matching, configured trigger notification. Consider some form of hysteresis for non-binary or frequently changing inputs to avoid frequent notifications.</p>
+<div class="fragment"><div class="line">&lt;torc&gt;</div><div class="line">  &lt;notify&gt;</div><div class="line">    &lt;notifications&gt;</div><div class="line">      &lt;trigger&gt;</div><div class="line">        &lt;name&gt;test&lt;/name&gt;</div><div class="line">        &lt;inputs&gt;&lt;device&gt;mytrigger&lt;/device&gt;&lt;/inputs&gt; &lt;-- an input or control</div><div class="line">        &lt;outputs&gt;&lt;device&gt;mynotifier&gt;&lt;/device&gt;&lt;/outputs&gt; &lt;- a  notifier</div><div class="line">        &lt;references&gt;&lt;device&gt;myinterestingdevice&lt;/device&gt;&lt;/references&gt; &lt;-- devices whose values we want to notify</div><div class="line">        &lt;message&gt;</div><div class="line">          &lt;title&gt;%applicationname% ALERT&lt;/title&gt;</div><div class="line">          &lt;body&gt;Interesting <a class="code" href="../../d5/d76/class_torc_device.html#ae077bff2755060265238ed6a3a47c5eb">value</a> %myinterestingdevice% at %datatime%&lt;/body&gt;</div><div class="line">        &lt;/message&gt;</div><div class="line">      &lt;/trigger&gt;</div><div class="line">    &lt;/notifications&gt;</div><div class="line">  &lt;/notify&gt;</div><div class="line">&lt;/torc&gt;</div></div><!-- fragment --><p>To trigger the output when the input transitions from high to low (the default is low to high) add a &lt;triggerlow&gt; member.</p>
+<div class="fragment"><div class="line">&lt;torc&gt;</div><div class="line">  &lt;notify&gt;</div><div class="line">    &lt;notifications&gt;</div><div class="line">      &lt;trigger&gt;</div><div class="line">        &lt;name&gt;test&lt;/name&gt;</div><div class="line">        &lt;triggerlow&gt;yes&lt;/triggerlow&gt; &lt;-- !!!!</div><div class="line">        &lt;inputs&gt;&lt;device&gt;mytrigger&lt;/device&gt;&lt;/inputs&gt; &lt;-- an input or control</div><div class="line">        &lt;outputs&gt;&lt;device&gt;mynotifier&gt;&lt;/device&gt;&lt;/outputs&gt; &lt;- a  notifier</div><div class="line">        &lt;references&gt;&lt;device&gt;myinterestingdevice&lt;/device&gt;&lt;/references&gt; &lt;-- devices whose values we want to notify</div><div class="line">        &lt;message&gt;</div><div class="line">          &lt;title&gt;%applicationname% ALERT&lt;/title&gt;</div><div class="line">          &lt;body&gt;Interesting <a class="code" href="../../d5/d76/class_torc_device.html#ae077bff2755060265238ed6a3a47c5eb">value</a> %myinterestingdevice% at %datatime%&lt;/body&gt;</div><div class="line">        &lt;/message&gt;</div><div class="line">      &lt;/trigger&gt;</div><div class="line">    &lt;/notifications&gt;</div><div class="line">  &lt;/notify&gt;</div><div class="line">&lt;/torc&gt;</div></div><!-- fragment --><dl class="section see"><dt>See also</dt><dd><a class="el" href="../../df/d23/class_torc_notify.html">TorcNotify</a> </dd>
+<dd>
+<a class="el" href="../../dc/d10/class_torc_notification.html">TorcNotification</a> </dd>
+<dd>
+<a class="el" href="../../d4/d20/class_torc_notifier.html">TorcNotifier</a> </dd>
+<dd>
+<a class="el" href="../../d7/df8/class_torc_system_notification.html">TorcSystemNotification</a> </dd></dl>
 
 <p>Definition at line <a class="el" href="../../db/d71/torctriggernotification_8h_source.html#l00009">9</a> of file <a class="el" href="../../db/d71/torctriggernotification_8h_source.html">torctriggernotification.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
@@ -251,7 +257,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d9/d78/torctriggernotification_8cpp_source.html#l00037">37</a> of file <a class="el" href="../../d9/d78/torctriggernotification_8cpp_source.html">torctriggernotification.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d9/d78/torctriggernotification_8cpp_source.html#l00085">85</a> of file <a class="el" href="../../d9/d78/torctriggernotification_8cpp_source.html">torctriggernotification.cpp</a>.</p>
 
 </div>
 </div>
@@ -268,7 +274,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d9/d78/torctriggernotification_8cpp_source.html#l00084">84</a> of file <a class="el" href="../../d9/d78/torctriggernotification_8cpp_source.html">torctriggernotification.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d9/d78/torctriggernotification_8cpp_source.html#l00132">132</a> of file <a class="el" href="../../d9/d78/torctriggernotification_8cpp_source.html">torctriggernotification.cpp</a>.</p>
 
 </div>
 </div>
@@ -297,7 +303,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="../../dc/d10/class_torc_notification.html#a888cf5b6b5e8c301dc1af1ce462cee64">TorcNotification</a>.</p>
 
-<p>Definition at line <a class="el" href="../../d9/d78/torctriggernotification_8cpp_source.html#l00094">94</a> of file <a class="el" href="../../d9/d78/torctriggernotification_8cpp_source.html">torctriggernotification.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d9/d78/torctriggernotification_8cpp_source.html#l00142">142</a> of file <a class="el" href="../../d9/d78/torctriggernotification_8cpp_source.html">torctriggernotification.cpp</a>.</p>
 
 </div>
 </div>
@@ -325,7 +331,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="../../dc/d10/class_torc_notification.html#a16262ee234bca4e1556851aa70e10902">TorcNotification</a>.</p>
 
-<p>Definition at line <a class="el" href="../../d9/d78/torctriggernotification_8cpp_source.html#l00101">101</a> of file <a class="el" href="../../d9/d78/torctriggernotification_8cpp_source.html">torctriggernotification.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d9/d78/torctriggernotification_8cpp_source.html#l00149">149</a> of file <a class="el" href="../../d9/d78/torctriggernotification_8cpp_source.html">torctriggernotification.cpp</a>.</p>
 
 </div>
 </div>
@@ -351,7 +357,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d9/d78/torctriggernotification_8cpp_source.html#l00113">113</a> of file <a class="el" href="../../d9/d78/torctriggernotification_8cpp_source.html">torctriggernotification.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d9/d78/torctriggernotification_8cpp_source.html#l00161">161</a> of file <a class="el" href="../../d9/d78/torctriggernotification_8cpp_source.html">torctriggernotification.cpp</a>.</p>
 
 </div>
 </div>
@@ -379,7 +385,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="../../dc/d10/class_torc_notification.html#a57ab69ed6f348e0e642a62b6866d1cf3">TorcNotification</a>.</p>
 
-<p>Definition at line <a class="el" href="../../d9/d78/torctriggernotification_8cpp_source.html#l00088">88</a> of file <a class="el" href="../../d9/d78/torctriggernotification_8cpp_source.html">torctriggernotification.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d9/d78/torctriggernotification_8cpp_source.html#l00136">136</a> of file <a class="el" href="../../d9/d78/torctriggernotification_8cpp_source.html">torctriggernotification.cpp</a>.</p>
 
 </div>
 </div>
@@ -410,7 +416,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="../../dc/d10/class_torc_notification.html#a95b1cc0062f3cbe6bf489af75c2bd8d1">TorcNotification</a>.</p>
 
-<p>Definition at line <a class="el" href="../../d9/d78/torctriggernotification_8cpp_source.html#l00142">142</a> of file <a class="el" href="../../d9/d78/torctriggernotification_8cpp_source.html">torctriggernotification.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d9/d78/torctriggernotification_8cpp_source.html#l00190">190</a> of file <a class="el" href="../../d9/d78/torctriggernotification_8cpp_source.html">torctriggernotification.cpp</a>.</p>
 
 </div>
 </div>
@@ -421,7 +427,7 @@ Additional Inherited Members</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Nov 14 2018 17:50:44 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Nov 15 2018 10:54:59 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

@@ -155,15 +155,12 @@ Protected Member Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Advertises and searches for services via Bonjour (aka Zero Configuration Networking/Avahi) </p>
 <p><a class="el" href="../../d0/d9f/class_torc_bonjour.html" title="Advertises and searches for services via Bonjour (aka Zero Configuration Networking/Avahi) ...">TorcBonjour</a> returns opaque references for use by client objects. These are guaranteed to remain unchanged across network outages and other suspension events. Hence clients do not need to explicitly monitor network status and cancel advertisements and/or browse requests.</p>
+<p>A ServiceDiscovered event is sent (via <a class="el" href="../../d7/d17/class_torc_local_context.html" title="TorcLocalContext is the core Torc object. ">TorcLocalContext</a>) when a device is discovered and a ServiceWentAway event when it is no longer available. Clients must listen for such events via TorcLocalContext::AddObserver(this).</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="../../dc/d96/torcbonjour_8cpp.html#a0c420ab308f66171ea353d8d47025bf5" title="Global TorcBonjour singleton. ">gBonjour</a> </dd>
 <dd>
 <a class="el" href="../../dc/d96/torcbonjour_8cpp.html#a3cdaf31774a6481d34b37997307866b0" title="Lock around access to gBonjour. ">gBonjourLock</a> </dd>
 <dd>
-<a class="el" href="../../db/dff/class_torc_bonjour_service.html" title="Wrapper around a DNS service reference, either advertised or discovered. ">TorcBonjourService</a></dd></dl>
-<dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000015">Todo:</a></b></dt><dd><p class="startdd">Send events to clients only (as for <a class="el" href="../../d7/d61/class_torc_s_s_d_p.html" title="The public class for handling Simple Service Discovery Protocol searches and announcements. ">TorcSSDP</a>) </p>
-<p>Guard against or properly handle duplicate requests (registration or browse) </p>
-<p class="enddd">Make non-static public methods thread safe (Register, Browse, Deregister) </p>
-</dd></dl>
+<a class="el" href="../../db/dff/class_torc_bonjour_service.html" title="Wrapper around a DNS service reference, either advertised or discovered. ">TorcBonjourService</a> </dd></dl>
 
 <p>Definition at line <a class="el" href="../../de/d53/torcbonjour_8h_source.html#l00050">50</a> of file <a class="el" href="../../de/d53/torcbonjour_8h_source.html">torcbonjour.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
@@ -245,7 +242,7 @@ Protected Member Functions</h2></td></tr>
 <p>Handle newly discovered service. </p>
 <p>Services that have not been seen before are added to the list of known services and a name resolution is kicked off. </p>
 
-<p>Definition at line <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html#l00760">760</a> of file <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html">torcbonjour.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html#l00758">758</a> of file <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html">torcbonjour.cpp</a>.</p>
 
 </div>
 </div>
@@ -417,7 +414,7 @@ Protected Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html#l00469">469</a> of file <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html">torcbonjour.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html#l00467">467</a> of file <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html">torcbonjour.cpp</a>.</p>
 
 </div>
 </div>
@@ -463,7 +460,7 @@ Protected Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html#l00476">476</a> of file <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html">torcbonjour.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html#l00474">474</a> of file <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html">torcbonjour.cpp</a>.</p>
 
 </div>
 </div>
@@ -493,7 +490,7 @@ Protected Member Functions</h2></td></tr>
 
 <p>Handle removed services. </p>
 
-<p>Definition at line <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html#l00831">831</a> of file <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html">torcbonjour.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html#l00829">829</a> of file <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html">torcbonjour.cpp</a>.</p>
 
 </div>
 </div>
@@ -555,7 +552,7 @@ Protected Member Functions</h2></td></tr>
 <p>This function is called from the Bonjour library when a discovered service is resolved to a target and port. Before we can use this target, we attempt to discover its IP addresses via QHostInfo.</p>
 <dl class="section see"><dt>See also</dt><dd>HostLookup </dd></dl>
 
-<p>Definition at line <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html#l00894">894</a> of file <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html">torcbonjour.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html#l00892">892</a> of file <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html">torcbonjour.cpp</a>.</p>
 
 </div>
 </div>
@@ -651,7 +648,7 @@ Protected Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Nov 14 2018 17:50:44 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Nov 15 2018 10:54:59 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

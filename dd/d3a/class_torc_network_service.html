@@ -222,7 +222,7 @@ Properties</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Encapsulates information on a discovered <a class="el" href="../../d6/db6/class_torc.html">Torc</a> peer. </p>
-<dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000018">Todo:</a></b></dt><dd>Should retries be limited? If support is added for manually specified peers (e.g. remote) and that peer is offline, need a better approach. </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000014">Todo:</a></b></dt><dd>Should retries be limited? If support is added for manually specified peers (e.g. remote) and that peer is offline, need a better approach. </dd></dl>
 
 <p>Definition at line <a class="el" href="../../d5/d9a/torcnetworkedcontext_8h_source.html#l00020">20</a> of file <a class="el" href="../../d5/d9a/torcnetworkedcontext_8h_source.html">torcnetworkedcontext.h</a>.</p>
 </div><h2 class="groupheader">Member Enumeration Documentation</h2>
@@ -310,7 +310,7 @@ Properties</h2></td></tr>
 
 <p>Destroy this service. </p>
 <dl class="section note"><dt>Note</dt><dd>When cancelling m_getPeerDetailsRPC, the call to <a class="el" href="../../d9/d0a/class_torc_web_socket.html#af4a3a0beba0fd40c47a0b558ff9c3ef9" title="Cancel a Remote Procedure Call. ">TorcWebSocket::CancelRequest</a> is blocking (to avoid leaking the request). Hence the request should always have been cancelled and downref'd when the call is complete. If the request happens to be processed while it is being cancelled, the request will no longer be valid for cancellation in the <a class="el" href="../../d9/d0a/class_torc_web_socket.html" title="Overlays the Websocket protocol over a QTcpSocket. ">TorcWebSocket</a> thread and if RequestReady is triggered in the <a class="el" href="../../d8/d93/class_torc_networked_context.html" title="A class to discover and connect to other Torc applications. ">TorcNetworkedContext</a> thread (main thread), m_getPeerDetailsRPC will already have been released. This is because <a class="el" href="../../d9/d0a/class_torc_web_socket.html" title="Overlays the Websocket protocol over a QTcpSocket. ">TorcWebSocket</a> and <a class="el" href="../../d8/d93/class_torc_networked_context.html" title="A class to discover and connect to other Torc applications. ">TorcNetworkedContext</a> process all of their updates in their own threads.</dd></dl>
-<dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000019">Todo:</a></b></dt><dd>Make the call to <a class="el" href="../../d8/d73/class_torc_network.html#ae0a866ec6804a8c72cb5194449af0cfc">TorcNetwork::Cancel</a> blocking, as for <a class="el" href="../../d9/d0a/class_torc_web_socket.html#af4a3a0beba0fd40c47a0b558ff9c3ef9" title="Cancel a Remote Procedure Call. ">TorcWebSocket::CancelRequest</a>. </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000015">Todo:</a></b></dt><dd>Make the call to <a class="el" href="../../d8/d73/class_torc_network.html#ae0a866ec6804a8c72cb5194449af0cfc">TorcNetwork::Cancel</a> blocking, as for <a class="el" href="../../d9/d0a/class_torc_web_socket.html#af4a3a0beba0fd40c47a0b558ff9c3ef9" title="Cancel a Remote Procedure Call. ">TorcWebSocket::CancelRequest</a>. </dd></dl>
 
 <p>Definition at line <a class="el" href="../../de/d48/torcnetworkedcontext_8cpp_source.html#l00096">96</a> of file <a class="el" href="../../de/d48/torcnetworkedcontext_8cpp_source.html">torcnetworkedcontext.cpp</a>.</p>
 
@@ -1284,7 +1284,7 @@ Properties</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Nov 14 2018 17:50:44 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Nov 15 2018 10:54:59 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>
