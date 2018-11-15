@@ -43,13 +43,13 @@
 * \note While Torc will run on the compute module, GPIO will not currently work as the pin numbering scheme is different.
 *
 * \note The following instructions are not exhaustive and additional steps may be required for distributions other
-* than Raspbian Jessie.
+* than Raspbian Stretch.
 *
 * \section piinstall Installing on the Raspberry Pi.
 *
 * \subsection pidownload Download and install linux.
 *  Download the latest version of your favourite Raspberry Pi linux image (the following instructions
-* assume Raspbian Jesie Lite - but any recent distribution should work). Torc does not require a desktop
+* assume Raspbian Stretch Lite - but any recent distribution should work). Torc does not require a desktop
 * interface so a minimal (headless) version is fine. Install that image on a suitable SD card and insert the card
 * into your device.
 *
