@@ -286,7 +286,6 @@ void BonjourBrowseCallback(DNSServiceRef Ref, DNSServiceFlags Flags,
 
     if (!(Flags & kDNSServiceFlagsMoreComing))
     {
-        // TODO
     }
 }
 
@@ -319,13 +318,12 @@ void BonjourResolveCallback(DNSServiceRef Ref, DNSServiceFlags Flags,
  * unchanged across network outages and other suspension events. Hence clients do not need to explicitly
  * monitor network status and cancel advertisements and/or browse requests.
  *
+ * A ServiceDiscovered event is sent (via TorcLocalContext) when a device is discovered and a ServiceWentAway
+ * event when it is no longer available. Clients must listen for such events via TorcLocalContext::AddObserver(this).
+ *
  * \sa gBonjour
  * \sa gBonjourLock
  * \sa TorcBonjourService
- *
- * \todo Send events to clients only (as for TorcSSDP)
- * \todo Guard against or properly handle duplicate requests (registration or browse)
- * \todo Make non-static public methods thread safe (Register, Browse, Deregister)
 */
 
 /*! \fn    TorcBonjour::Instance
