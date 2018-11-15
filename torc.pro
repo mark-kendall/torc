@@ -65,7 +65,6 @@ else
     LIBS    += -lz
 }
 
-!mac:!win32:LIBS += -ldns_sd
 !mac:!win32:LIBS += -lrt
 
 QMAKE_CXXFLAGS += -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE
@@ -232,6 +231,10 @@ win32 {
     SOURCES += torc/platforms/torcbonjourwindows.cpp
     message("Bonjour NOT available for peer detection")
 } else {
+    linux {
+        CONFIG    += link_pkgconfig
+        PKGCONFIG += avahi-compat-libdns_sd
+    }
     SOURCES += torc/torcbonjour.cpp
     message("Bonjour available for peer detection")
 }
