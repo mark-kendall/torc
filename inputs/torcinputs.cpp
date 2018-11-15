@@ -38,7 +38,6 @@ TorcInputs* TorcInputs::gInputs = new TorcInputs();
  * Any subclass of TorcInput will automatically register itself on creation. Any class
  * creating inputs must DownRef AND call RemoveInput when deleting them.
  *
- * \todo Translations and constants for web client.
  * \note This class is thread safe.
 */
 TorcInputs::TorcInputs()
