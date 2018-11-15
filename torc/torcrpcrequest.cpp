@@ -396,7 +396,8 @@ void TorcRPCRequest::SetID(int ID)
 
 /*! \brief Add Parameter and value to list of call parameters.
  *
- * \todo Check for duplicate parameters.
+ * Ideally this should check for duplicate parameter names but it is not a commonly
+ * used method, would be inneficient and the caller should control the duplication.
 */
 void TorcRPCRequest::AddParameter(const QString &Name, const QVariant &Value)
 {
