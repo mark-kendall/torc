@@ -114,11 +114,14 @@ TorcI2CPCA9685::TorcI2CPCA9685(int Address, const QVariantMap &Details)
     }
 
     // set frequency to 1000Hz
-    // stop error checking here:)
-    (int)wiringPiI2CWriteReg8(m_fd, MODE1, 0x01);
-    (int)wiringPiI2CWriteReg8(m_fd, PRESCALE, (uint8_t)((CLOCKFREQ / PCA9685_RANGE / 1000) - 1));
-    (int)wiringPiI2CWriteReg8(m_fd, MODE1, 0x80);
-    (int)wiringPiI2CWriteReg8(m_fd, MODE2, 0x04);
+    bool success = true;
+    success &= wiringPiI2CWriteReg8(m_fd, MODE1, 0x01) > -1;
+    success &= wiringPiI2CWriteReg8(m_fd, PRESCALE, (uint8_t)((CLOCKFREQ / PCA9685_RANGE / 1000) - 1)) > -1;
+    success &= wiringPiI2CWriteReg8(m_fd, MODE1, 0x80) > -1;
+    success &= wiringPiI2CWriteReg8(m_fd, MODE2, 0x04) > -1;
+
+    if (!success)
+        LOG(VB_GENERAL, LOG_ERR, "Failed to set up PCA9685 device");
 
     // create individual channel services
     // this will also reset each channel to the default value (0)
@@ -174,8 +177,6 @@ TorcI2CPCA9685::~TorcI2CPCA9685()
 }
 
 /*! \brief Set the hardware PWM for given channel.
- *
- * \todo check return values
  */
 bool TorcI2CPCA9685::SetPWM(int Channel, int Value)
 {
@@ -198,12 +199,15 @@ bool TorcI2CPCA9685::SetPWM(int Channel, int Value)
         ontime |= 0x1000;
     }
 
-    (int)wiringPiI2CWriteReg8(m_fd, LED0_ON_LOW   + (4 * Channel), ontime & 0xFF);
-    (int)wiringPiI2CWriteReg8(m_fd, LED0_ON_HIGH  + (4 * Channel), ontime >> 8);
-    (int)wiringPiI2CWriteReg8(m_fd, LED0_OFF_LOW  + (4 * Channel), offtime & 0xFF);
-    (int)wiringPiI2CWriteReg8(m_fd, LED0_OFF_HIGH + (4 * Channel), offtime >> 8);
+    bool success = true;
+    success &= wiringPiI2CWriteReg8(m_fd, LED0_ON_LOW   + (4 * Channel), ontime & 0xFF) > -1;
+    success &= wiringPiI2CWriteReg8(m_fd, LED0_ON_HIGH  + (4 * Channel), ontime >> 8) > -1;
+    success &= wiringPiI2CWriteReg8(m_fd, LED0_OFF_LOW  + (4 * Channel), offtime & 0xFF) > -1;
+    success &= wiringPiI2CWriteReg8(m_fd, LED0_OFF_HIGH + (4 * Channel), offtime >> 8) > -1;
     
-    return true;
+    if (!success)
+        LOG(VB_GENERAL, LOG_ERR, QString("Error writing to channel %1").arg(Channel));
+    return success;
 }
 
 class TorcI2CPCA9685Factory : public TorcI2CDeviceFactory
