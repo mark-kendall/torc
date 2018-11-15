@@ -31,11 +31,10 @@
  *
  * Remote Procedure Calls are currently only handled through TorcWebSocket.
  *
- * \sa TorcWebSocket
+ * \note The underlying protocol is restricted to JSON-RPC.
  *
- * \todo Add serialisation of protocols other than JSON-RPC.
- * \todo Add parsing of protocols other than JSON-RPC.
- * \todo Review memory consumption/performance.
+ * \sa TorcWebSocket
+ * \sa TorcHTTPService
 */
 
 /*! \brief Creates an RPC request owned by the given Parent.
