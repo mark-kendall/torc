@@ -23,6 +23,7 @@
 // Qt
 #include <QFile>
 #include <QTime>
+#include <QThread>
 
 // Torc
 #include "torclogging.h"
@@ -105,7 +106,8 @@ TorcPiCamera::TorcPiCamera(const TorcCameraParams &Params)
     m_frameCount(0),
     m_bufferedPacket(NULL),
     m_haveInitSegment(false),
-    m_takeSnapshot(false),
+    m_stillsToTake(0),
+    m_firstStill(false),
     m_snapshotBuffers()
 {
     if (m_params.m_frameRate > 30 && (m_params.m_width > 1280 || m_params.m_height > 720))
@@ -146,6 +148,15 @@ TorcPiCamera::~TorcPiCamera()
         delete m_muxer;
         m_muxer = NULL;
     }
+}
+
+/*! \brief Tell the camera to take Count number of still images
+ *
+ * \note For multiple snapshots, the existing remaining count is ignored.
+*/
+void TorcPiCamera::TakeStills(uint Count)
+{
+    m_stillsToTake = Count;
 }
 
 bool TorcPiCamera::Setup(void)
@@ -190,11 +201,12 @@ bool TorcPiCamera::Setup(void)
     m_nullSink.SetState(OMX_StateIdle);
 
     // set splitter to image encoder to single shot
-    m_takeSnapshot = true;
+    m_stillsToTake = 0;
+    m_firstStill   = true;
     OMX_PARAM_U32TYPE single;
     OMX_INITSTRUCTURE(single);
     single.nPortIndex = m_splitter.GetPort(OMX_DirOutput, 1, OMX_IndexParamVideoInit);
-    single.nU32       = 1;
+    single.nU32       = 1; // NB 0 will stream - so set to 1 regardless and ignore the result.
     if (m_splitter.SetParameter(OMX_IndexConfigSingleStep, &single))
         return  false;
 
@@ -274,7 +286,8 @@ bool TorcPiCamera::WriteFrame(void)
     if (!m_muxer)
         return false;
 
-    if (m_takeSnapshot && m_imageEncoder.GetAvailableBuffers(OMX_DirOutput, 0, OMX_IndexParamImageInit) > 0)
+    // empty the image buffers whether we need them or not (we will always get one frame at startup)
+    if ((m_stillsToTake || m_firstStill) && m_imageEncoder.GetAvailableBuffers(OMX_DirOutput, 0, OMX_IndexParamImageInit) > 0)
     {
         OMX_BUFFERHEADERTYPE* buffer = m_imageEncoder.GetBuffer(OMX_DirOutput, 0, 1000, OMX_IndexParamImageInit);
         m_imageEncoder.FillThisBuffer(buffer);
@@ -290,21 +303,25 @@ bool TorcPiCamera::WriteFrame(void)
 
         if (buffer->nFlags & OMX_BUFFERFLAG_ENDOFFRAME)
         {
-            QFile file(GetTorcContentDir() + QDateTime::currentDateTime().toString("dd_MM_yyyy_hh_mm_ss_zzz") + "_snapshot.jpg");
-            if (file.open(QIODevice::ReadWrite | QIODevice::Truncate))
+            if (m_stillsToTake)
             {
-                QPair<quint32, uint8_t*> pair;
-                foreach(pair, m_snapshotBuffers)
-                    file.write((const char*)pair.second, pair.first);
-                file.close();
-                LOG(VB_GENERAL, LOG_INFO, QString("Saved snapshot as '%1'").arg(file.fileName()));
-            }
-            else
-            {
-                LOG(VB_GENERAL, LOG_ERR, QString("Failed to open %1 for writing").arg(file.fileName()));
+                QFile file(GetTorcContentDir() + QDateTime::currentDateTime().toString("dd_MM_yyyy_hh_mm_ss_zzz") + "_snapshot.jpg");
+                if (file.open(QIODevice::ReadWrite | QIODevice::Truncate))
+                {
+                    QPair<quint32, uint8_t*> pair;
+                    foreach(pair, m_snapshotBuffers)
+                        file.write((const char*)pair.second, pair.first);
+                    file.close();
+                    LOG(VB_GENERAL, LOG_INFO, QString("Saved snapshot as '%1'").arg(file.fileName()));
+                }
+                else
+                {
+                    LOG(VB_GENERAL, LOG_ERR, QString("Failed to open %1 for writing").arg(file.fileName()));
+                }
+                m_stillsToTake--;
             }
             ClearSnapshotBuffers();
-            m_takeSnapshot = false;
+            m_firstStill = false;
         }
     }
 

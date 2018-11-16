@@ -32,6 +32,9 @@ class TorcPiCamera final : public TorcCameraDevice
     bool WriteFrame         (void) override;
     bool Stop               (void) override;
 
+  public slots:
+    void TakeStills         (uint Count) override;
+
   private:
     bool LoadDrivers        (void);
     bool LoadCameraSettings (void);
@@ -65,7 +68,8 @@ class TorcPiCamera final : public TorcCameraDevice
     quint64                  m_frameCount;
     AVPacket                *m_bufferedPacket;
     bool                     m_haveInitSegment;
-    bool                     m_takeSnapshot;
+    uint                     m_stillsToTake;
+    bool                     m_firstStill;
     QList<QPair<quint32, uint8_t*> > m_snapshotBuffers;
 };
 

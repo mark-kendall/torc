@@ -65,6 +65,9 @@ class TorcCameraDevice : public QObject
     QByteArray       GetInitSegment  (void);
     TorcCameraParams GetParams       (void);
 
+  public slots:
+    virtual void     TakeStills      (uint Count) = 0;
+
   signals:
     void             SegmentRemoved  (int Segment);
     void             InitSegmentReady(void);
