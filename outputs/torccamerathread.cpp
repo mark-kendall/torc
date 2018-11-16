@@ -100,6 +100,9 @@ void TorcCameraThread::SetParent(TorcCameraOutput *Parent)
         return;
 
     QWriteLocker locker(&m_cameraLock);
+    if (m_parent)
+        LOG(VB_GENERAL, LOG_WARNING, "Setting thread parent but already have one...");
+
     m_parent = Parent;
     connect(this, SIGNAL(WritingStarted()),    m_parent, SLOT(WritingStarted()));
     connect(this, SIGNAL(WritingStopped()),    m_parent, SLOT(WritingStopped()));
