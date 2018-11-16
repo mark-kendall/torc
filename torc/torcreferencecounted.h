@@ -13,10 +13,10 @@ class TorcReferenceCounter
     virtual ~TorcReferenceCounter(void);
 
     void UpRef(void);
-    bool DownRef(void);
+    virtual bool DownRef(void);
     bool IsShared(void);
 
-  private:
+  protected:
     QAtomicInt   m_refCount;
     static bool  m_eventLoopEnding;
 };
