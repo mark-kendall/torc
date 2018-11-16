@@ -23,6 +23,7 @@
 // Torc
 #include "torclogging.h"
 #include "torcoutputs.h"
+#include "torccamerathread.h"
 #include "torccameraoutput.h"
 
 TorcCameraOutput::TorcCameraOutput(const QString &ModelId, const QVariantMap &Details)

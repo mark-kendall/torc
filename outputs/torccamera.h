@@ -5,9 +5,7 @@
 #include <QObject>
 
 // Torc
-#include "torcqthread.h"
 #include "torcsegmentedringbuffer.h"
-#include "torcoutput.h"
 
 // NB these are also enforced in the XSD
 #define VIDEO_WIDTH_MIN      640
@@ -30,8 +28,6 @@
 
 #define VIDEO_CODEC_ISO      QString("avc1.4d0028") // AVC Main Level 4
 #define AUDIO_CODEC_ISO      QString("mp4a.40.2")   // AAC LC
-
-class TorcCameraOutput;
 
 class TorcCameraParams
 {
@@ -82,37 +78,6 @@ class TorcCameraDevice : public QObject
 
   private:
     Q_DISABLE_COPY(TorcCameraDevice)
-};
-
-class TorcCameraThread final : public TorcQThread
-{
-    Q_OBJECT
-
-  public:
-    TorcCameraThread(TorcCameraOutput *Parent, const QString &Type, const TorcCameraParams &Params);
-    ~TorcCameraThread();
-
-    void              Start          (void) override;
-    void              Finish         (void) override;
-    QByteArray        GetSegment     (int Segment);
-    QByteArray        GetInitSegment (void);
-    TorcCameraParams  GetParams      (void);
-
-  public slots:
-    void              StopWriting    (void);
-
-  signals:
-    void              WritingStarted (void);
-    void              WritingStopped (void);
-
-  private:
-    Q_DISABLE_COPY(TorcCameraThread)
-    TorcCameraOutput *m_parent;
-    QString           m_type;
-    TorcCameraParams  m_params;
-    TorcCameraDevice *m_camera;
-    QReadWriteLock    m_cameraLock;
-    bool              m_stop;
 };
 
 class TorcCameraFactory
