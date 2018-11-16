@@ -75,7 +75,6 @@ void TorcCameraThread::CreateOrDestroy(TorcCameraThread *&Thread, const QString 
 
 TorcCameraThread::TorcCameraThread( const QString &Type, const TorcCameraParams &Params)
   : TorcQThread("Camera"),
-    m_parent(NULL),
     m_type(Type),
     m_params(Params),
     m_camera(NULL),
@@ -94,22 +93,18 @@ TorcCameraThread::~TorcCameraThread()
     }
 }
 
-void TorcCameraThread::SetParent(TorcCameraOutput *Parent)
+void TorcCameraThread::SetVideoParent(TorcCameraOutput *Parent)
 {
     if (!Parent)
         return;
 
     QWriteLocker locker(&m_cameraLock);
-    if (m_parent)
-        LOG(VB_GENERAL, LOG_WARNING, "Setting thread parent but already have one...");
-
-    m_parent = Parent;
-    connect(this, SIGNAL(WritingStarted()),    m_parent, SLOT(WritingStarted()));
-    connect(this, SIGNAL(WritingStopped()),    m_parent, SLOT(WritingStopped()));
-    connect(this, SIGNAL(InitSegmentReady()),  m_parent, SLOT(InitSegmentReady()));
-    connect(this, SIGNAL(SegmentReady(int)),   m_parent, SLOT(SegmentReady(int)));
-    connect(this, SIGNAL(SegmentRemoved(int)), m_parent, SLOT(SegmentRemoved(int)));
-    connect(this, SIGNAL(CameraErrored(bool)), m_parent, SLOT(CameraErrored(bool)));
+    connect(this, SIGNAL(WritingStarted()),    Parent, SLOT(WritingStarted()));
+    connect(this, SIGNAL(WritingStopped()),    Parent, SLOT(WritingStopped()));
+    connect(this, SIGNAL(InitSegmentReady()),  Parent, SLOT(InitSegmentReady()));
+    connect(this, SIGNAL(SegmentReady(int)),   Parent, SLOT(SegmentReady(int)));
+    connect(this, SIGNAL(SegmentRemoved(int)), Parent, SLOT(SegmentRemoved(int)));
+    connect(this, SIGNAL(CameraErrored(bool)), Parent, SLOT(CameraErrored(bool)));
 }
 
 /*! \brief Decrement the reference count for this thread.

@@ -21,7 +21,7 @@ class TorcCameraThread final : public TorcQThread, public TorcReferenceCounter
     QByteArray        GetSegment     (int Segment);
     QByteArray        GetInitSegment (void);
     TorcCameraParams  GetParams      (void);
-    void              SetParent      (TorcCameraOutput *Parent);
+    void              SetVideoParent  (TorcCameraOutput *Parent);
 
   public slots:
     void              StopWriting    (void);
@@ -41,7 +41,6 @@ class TorcCameraThread final : public TorcQThread, public TorcReferenceCounter
     Q_DISABLE_COPY(TorcCameraThread)
     bool              DownRef        (void) override;
 
-    TorcCameraOutput *m_parent;
     QString           m_type;
     TorcCameraParams  m_params;
     TorcCameraDevice *m_camera;

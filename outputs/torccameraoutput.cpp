@@ -61,7 +61,7 @@ void TorcCameraOutput::Start(void)
     TorcCameraThread::CreateOrDestroy(m_thread, modelId, m_params);
     if (m_thread)
     {
-        m_thread->SetParent(this);
+        m_thread->SetVideoParent(this);
         m_thread->start();
     }
     m_threadLock.unlock();
