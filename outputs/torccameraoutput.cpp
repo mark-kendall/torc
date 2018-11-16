@@ -71,9 +71,7 @@ TorcCameraStillsOutput::TorcCameraStillsOutput(const QString &ModelId, const QVa
         { namefilters << QString("*." + image); }
     QFileInfoList stills = stillsdir.entryInfoList(namefilters, QDir::NoDotAndDotDot | QDir::Files | QDir::Readable, QDir::Name);
     foreach (QFileInfo file, stills)
-        m_stillsList.append(file.path());
-
-    LOG(VB_GENERAL, LOG_INFO, m_stillsList.join("\r\n"));
+        m_stillsList.append(file.fileName());
 }
 
 TorcCameraStillsOutput::~TorcCameraStillsOutput()
