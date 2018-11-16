@@ -152,11 +152,13 @@ TorcPiCamera::~TorcPiCamera()
 
 /*! \brief Tell the camera to take Count number of still images
  *
- * \note For multiple snapshots, the existing remaining count is ignored.
+ * \note We ignore values below the current setting, as the stills will be triggered when the input
+ *       value moves from zero to X - but it should then drop back to zero.
 */
 void TorcPiCamera::TakeStills(uint Count)
 {
-    m_stillsToTake = Count;
+    if (Count > m_stillsToTake)
+        m_stillsToTake = Count;
 }
 
 bool TorcPiCamera::Setup(void)
