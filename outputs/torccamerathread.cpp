@@ -158,10 +158,15 @@ void TorcCameraThread::Start(void)
 
     if (m_camera)
     {
+        // outbound video signals
         connect(m_camera, SIGNAL(InitSegmentReady()),  this, SIGNAL(InitSegmentReady()));
         connect(m_camera, SIGNAL(SegmentReady(int)),   this, SIGNAL(SegmentReady(int)));
         connect(m_camera, SIGNAL(SegmentRemoved(int)), this, SIGNAL(SegmentRemoved(int)));
         connect(m_camera, SIGNAL(SetErrored(bool)),    this, SIGNAL(CameraErrored(bool)));
+        // outbound stills signals
+        connect(m_camera, SIGNAL(StillReady(QString)), this, SIGNAL(StillReady(QString)));
+        // inbound stills signals
+        connect(this, SIGNAL(TakeStills(uint)), m_camera, SLOT(TakeStills(uint)));
 
         if (m_camera->Setup())
         {

@@ -313,6 +313,7 @@ bool TorcPiCamera::WriteFrame(void)
                         file.write((const char*)pair.second, pair.first);
                     file.close();
                     LOG(VB_GENERAL, LOG_INFO, QString("Saved snapshot as '%1'").arg(file.fileName()));
+                    emit StillReady(file.fileName());
                 }
                 else
                 {
