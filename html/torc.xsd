@@ -423,7 +423,6 @@
     <xs:element name="name"            type="deviceNameType"/>
     <xs:element name="username"        type="userNameType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
-    <xs:element name="model"           type="validStringType"/>
     <xs:element name="width"           type="videoWidthType"/>
     <xs:element name="height"          type="videoHeightType"/>
     <xs:element name="framerate"       type="videoFrameRateType"/>

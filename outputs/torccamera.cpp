@@ -38,7 +38,6 @@ TorcCameraParams::TorcCameraParams(void)
     m_timebase(VIDEO_TIMEBASE),
     m_segmentLength(0),
     m_gopSize(0),
-    m_model(),
     m_videoCodec()
 {
 }
@@ -54,12 +53,10 @@ TorcCameraParams::TorcCameraParams(const QVariantMap &Details)
     m_timebase(VIDEO_TIMEBASE),
     m_segmentLength(0),
     m_gopSize(0),
-    m_model(),
     m_videoCodec()
 {
     if (!Details.contains("width")     || !Details.contains("height")  ||
-        !Details.contains("framerate") || !Details.contains("bitrate") ||
-        !Details.contains("model"))
+        !Details.contains("framerate") || !Details.contains("bitrate"))
     {
         return;
     }
@@ -68,7 +65,6 @@ TorcCameraParams::TorcCameraParams(const QVariantMap &Details)
     m_height    = Details.value("height").toInt();
     m_frameRate = Details.value("framerate").toInt();
     m_bitrate   = Details.value("bitrate").toInt();
-    m_model     = Details.value("model").toString();
 
     // N.B. pitch and slice height may be further constrained in certain encoders and may be further adjusted
     // most h264 streams will expect 16 pixel aligned video so round up
@@ -148,7 +144,6 @@ TorcCameraParams::TorcCameraParams(const TorcCameraParams &Other)
     m_timebase(Other.m_timebase),
     m_segmentLength(Other.m_segmentLength),
     m_gopSize(Other.m_gopSize),
-    m_model(Other.m_model),
     m_videoCodec(Other.m_videoCodec)
 {
 }
@@ -167,7 +162,6 @@ TorcCameraParams& TorcCameraParams::operator =(const TorcCameraParams &Other)
         this->m_timebase      = Other.m_timebase;
         this->m_segmentLength = Other.m_segmentLength;
         this->m_gopSize       = Other.m_gopSize;
-        this->m_model         = Other.m_model;
         this->m_videoCodec    = Other.m_videoCodec;
     }
     return *this;

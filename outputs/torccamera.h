@@ -47,7 +47,6 @@ class TorcCameraParams
     int     m_timebase;
     int     m_segmentLength;
     int     m_gopSize;
-    QString m_model;
     QString m_videoCodec;
 };
 

@@ -405,11 +405,6 @@ void TorcCameraOutputs::Create(const QVariantMap &Details)
                             LOG(VB_GENERAL, LOG_ERR, QString("Camera '%1' has no name").arg(it.key()));
                             continue;
                         }
-                        if (!camera.contains("model"))
-                        {
-                            LOG(VB_GENERAL, LOG_ERR, QString("Camera '%1' does not specify model").arg(camera.value("name").toString()));
-                            continue;
-                        }
                         if (!camera.contains("width"))
                         {
                             LOG(VB_GENERAL, LOG_ERR, QString("Camera '%1' does not specify width").arg(camera.value("name").toString()));
@@ -433,7 +428,6 @@ void TorcCameraOutputs::Create(const QVariantMap &Details)
 
                         // NB TorcCameraFactory checks that the underlying class can handle the specified camera
                         // which ensures the TorcCameraOutput instance will be able to create the camera.
-                        QString model = camera.value("model").toString();
                         TorcCameraOutput *newcamera = NULL;
                         TorcCameraFactory* factory = TorcCameraFactory::GetTorcCameraFactory();
                         TorcCameraParams params(Details);
@@ -441,14 +435,14 @@ void TorcCameraOutputs::Create(const QVariantMap &Details)
                         {
                             if (factory->CanHandle(it.key(), params))
                             {
-                                newcamera = new TorcCameraOutput(model, camera);
-                                m_cameras.insertMulti(model, newcamera);
-                                LOG(VB_GENERAL, LOG_INFO, QString("New '%1' camera '%2'").arg(model).arg(newcamera->GetUniqueId()));
+                                newcamera = new TorcCameraOutput(it.key(), camera);
+                                m_cameras.insertMulti(it.key(), newcamera);
+                                LOG(VB_GENERAL, LOG_INFO, QString("New '%1' camera '%2'").arg(it.key()).arg(newcamera->GetUniqueId()));
                                 break;
                             }
                         }
                         if (NULL == newcamera)
-                            LOG(VB_GENERAL, LOG_WARNING, QString("Failed to find handler for camera '%1'").arg(model));
+                            LOG(VB_GENERAL, LOG_WARNING, QString("Failed to find handler for camera '%1'").arg(it.key()));
                     }
                 }
             }
