@@ -6,7 +6,7 @@
 #include "torcqthread.h"
 #include "torccamera.h"
 
-class TorcCameraOutput;
+class TorcCameraVideoOutput;
 
 class TorcCameraThread final : public TorcQThread, public TorcReferenceCounter
 {
@@ -21,7 +21,7 @@ class TorcCameraThread final : public TorcQThread, public TorcReferenceCounter
     QByteArray        GetSegment     (int Segment);
     QByteArray        GetInitSegment (void);
     TorcCameraParams  GetParams      (void);
-    void              SetVideoParent  (TorcCameraOutput *Parent);
+    void              SetVideoParent (TorcCameraVideoOutput *Parent);
 
   public slots:
     void              StopWriting    (void);

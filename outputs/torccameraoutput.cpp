@@ -26,8 +26,8 @@
 #include "torccamerathread.h"
 #include "torccameraoutput.h"
 
-TorcCameraOutput::TorcCameraOutput(const QString &ModelId, const QVariantMap &Details)
-  : TorcOutput(TorcOutput::Camera, 0.0, ModelId, Details, this, TorcCameraOutput::staticMetaObject,
+TorcCameraVideoOutput::TorcCameraVideoOutput(const QString &ModelId, const QVariantMap &Details)
+  : TorcOutput(TorcOutput::Camera, 0.0, ModelId, Details, this, TorcCameraVideoOutput::staticMetaObject,
                "WritingStarted,WritingStopped,CameraErrored,SegmentRemoved,InitSegmentReady,SegmentReady"),
     m_thread(NULL),
     m_threadLock(QReadWriteLock::Recursive),
@@ -38,22 +38,22 @@ TorcCameraOutput::TorcCameraOutput(const QString &ModelId, const QVariantMap &De
 {
 }
 
-TorcCameraOutput::~TorcCameraOutput()
+TorcCameraVideoOutput::~TorcCameraVideoOutput()
 {
     Stop();
 }
 
-TorcOutput::Type TorcCameraOutput::GetType(void)
+TorcOutput::Type TorcCameraVideoOutput::GetType(void)
 {
     return TorcOutput::Camera;
 }
 
-QString TorcCameraOutput::GetPresentationURL(void)
+QString TorcCameraVideoOutput::GetPresentationURL(void)
 {
     return QString("%1%2").arg(m_signature).arg(VIDEO_PAGE);
 }
 
-void TorcCameraOutput::Start(void)
+void TorcCameraVideoOutput::Start(void)
 {
     Stop();
 
@@ -67,7 +67,7 @@ void TorcCameraOutput::Start(void)
     m_threadLock.unlock();
 }
 
-void TorcCameraOutput::InitSegmentReady(void)
+void TorcCameraVideoOutput::InitSegmentReady(void)
 {
     QReadLocker locker(&m_threadLock);
     if (m_thread)
@@ -80,13 +80,13 @@ void TorcCameraOutput::InitSegmentReady(void)
     }
 }
 
-void TorcCameraOutput::WritingStarted(void)
+void TorcCameraVideoOutput::WritingStarted(void)
 {
     SetValue(1);
     LOG(VB_GENERAL, LOG_INFO, "Camera started");
 }
 
-void TorcCameraOutput::Stop(void)
+void TorcCameraVideoOutput::Stop(void)
 {
     m_segmentLock.lockForWrite();
     m_segments.clear();
@@ -101,14 +101,14 @@ void TorcCameraOutput::Stop(void)
     m_threadLock.unlock();
 }
 
-void TorcCameraOutput::WritingStopped(void)
+void TorcCameraVideoOutput::WritingStopped(void)
 {
     SetValue(0);
     LOG(VB_GENERAL, LOG_INFO, "Camera stopped");
     m_cameraStartTime = QDateTime();
 }
 
-void TorcCameraOutput::CameraErrored(bool Errored)
+void TorcCameraVideoOutput::CameraErrored(bool Errored)
 {
     SetValid(!Errored);
     if (Errored)
@@ -118,7 +118,7 @@ void TorcCameraOutput::CameraErrored(bool Errored)
     }
 }
 
-void TorcCameraOutput::SegmentReady(int Segment)
+void TorcCameraVideoOutput::SegmentReady(int Segment)
 {
     LOG(VB_GENERAL, LOG_DEBUG, QString("Segment %1 ready").arg(Segment));
 
@@ -136,7 +136,7 @@ void TorcCameraOutput::SegmentReady(int Segment)
     }
 }
 
-void TorcCameraOutput::SegmentRemoved(int Segment)
+void TorcCameraVideoOutput::SegmentRemoved(int Segment)
 {
     LOG(VB_GENERAL, LOG_DEBUG, QString("Segment %1 removed").arg(Segment));
 
@@ -155,7 +155,7 @@ void TorcCameraOutput::SegmentRemoved(int Segment)
     }
 }
 
-void TorcCameraOutput::ProcessHTTPRequest(const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest &Request)
+void TorcCameraVideoOutput::ProcessHTTPRequest(const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest &Request)
 {
     (void)PeerAddress;
     (void)PeerPort;
@@ -296,7 +296,7 @@ void TorcCameraOutput::ProcessHTTPRequest(const QString &PeerAddress, int PeerPo
     }
 }
 
-QByteArray TorcCameraOutput::GetPlayerPage(void)
+QByteArray TorcCameraVideoOutput::GetPlayerPage(void)
 {
     static const QString player("<html>\r\n"
                                 "  <script src=\"/js/vendor/dash-2.9.0.all.min.js\"></script>\r\n"
@@ -310,7 +310,7 @@ QByteArray TorcCameraOutput::GetPlayerPage(void)
     return QByteArray(player.arg(DASH_PLAYLIST).toLocal8Bit());
 }
 
-QByteArray TorcCameraOutput::GetMasterPlaylist(void)
+QByteArray TorcCameraVideoOutput::GetMasterPlaylist(void)
 {
     static const QString playlist("#EXTM3U\r\n"
                                   "#EXT-X-VERSION:4\r\n"
@@ -321,7 +321,7 @@ QByteArray TorcCameraOutput::GetMasterPlaylist(void)
                                   .arg(HLS_PLAYLIST).arg(m_params.m_videoCodec)/*.arg(AUDIO_CODEC_ISO)*/.toLocal8Bit());
 }
 
-QByteArray TorcCameraOutput::GetHLSPlaylist(void)
+QByteArray TorcCameraVideoOutput::GetHLSPlaylist(void)
 {
     static const QString playlist("#EXTM3U\r\n"
                                   "#EXT-X-VERSION:4\r\n"
@@ -341,7 +341,7 @@ QByteArray TorcCameraOutput::GetHLSPlaylist(void)
     return QByteArray(result.toLocal8Bit());
 }
 
-QByteArray TorcCameraOutput::GetDashPlaylist(void)
+QByteArray TorcCameraVideoOutput::GetDashPlaylist(void)
 {
     static const QString dash(
         "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\r\n"
@@ -429,14 +429,14 @@ void TorcCameraOutputs::Create(const QVariantMap &Details)
 
                         // NB TorcCameraFactory checks that the underlying class can handle the specified camera
                         // which ensures the TorcCameraOutput instance will be able to create the camera.
-                        TorcCameraOutput *newcamera = NULL;
+                        TorcCameraVideoOutput *newcamera = NULL;
                         TorcCameraFactory* factory = TorcCameraFactory::GetTorcCameraFactory();
                         TorcCameraParams params(Details);
                         for ( ; factory; factory = factory->NextFactory())
                         {
                             if (factory->CanHandle(it.key(), params))
                             {
-                                newcamera = new TorcCameraOutput(it.key(), camera);
+                                newcamera = new TorcCameraVideoOutput(it.key(), camera);
                                 m_cameras.insertMulti(it.key(), newcamera);
                                 LOG(VB_GENERAL, LOG_INFO, QString("New '%1' camera '%2'").arg(it.key()).arg(newcamera->GetUniqueId()));
                                 break;
@@ -454,7 +454,7 @@ void TorcCameraOutputs::Create(const QVariantMap &Details)
 void TorcCameraOutputs::Destroy(void)
 {
     QMutexLocker locker(&m_lock);
-    QHash<QString, TorcCameraOutput*>::iterator it = m_cameras.begin();
+    QHash<QString, TorcCameraVideoOutput*>::iterator it = m_cameras.begin();
     for ( ; it != m_cameras.end(); ++it)
     {
         TorcOutputs::gOutputs->RemoveOutput(it.value());

@@ -93,7 +93,7 @@ TorcCameraThread::~TorcCameraThread()
     }
 }
 
-void TorcCameraThread::SetVideoParent(TorcCameraOutput *Parent)
+void TorcCameraThread::SetVideoParent(TorcCameraVideoOutput *Parent)
 {
     if (!Parent)
         return;

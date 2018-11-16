@@ -8,13 +8,13 @@
 class TorcCameraThread;
 class TorcCameraParams;
 
-class TorcCameraOutput final : public TorcOutput
+class TorcCameraVideoOutput final : public TorcOutput
 {
     Q_OBJECT
 
   public:
-    TorcCameraOutput(const QString &ModelId, const QVariantMap &Details);
-    virtual ~TorcCameraOutput();
+    TorcCameraVideoOutput(const QString &ModelId, const QVariantMap &Details);
+    virtual ~TorcCameraVideoOutput();
 
     TorcOutput::Type GetType            (void) override;
     void             Start              (void) override;
@@ -37,7 +37,7 @@ class TorcCameraOutput final : public TorcOutput
     QByteArray       GetDashPlaylist    (void);
 
   private:
-    Q_DISABLE_COPY(TorcCameraOutput)
+    Q_DISABLE_COPY(TorcCameraVideoOutput)
     TorcCameraThread *m_thread;
     QReadWriteLock    m_threadLock;
     TorcCameraParams  m_params;
@@ -57,7 +57,7 @@ class TorcCameraOutputs final : public TorcDeviceHandler
     void Destroy (void) override;
 
   private:
-    QHash<QString, TorcCameraOutput*> m_cameras;
+    QHash<QString, TorcCameraVideoOutput*> m_cameras;
 };
 
 
