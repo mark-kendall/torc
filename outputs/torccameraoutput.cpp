@@ -58,8 +58,12 @@ void TorcCameraOutput::Start(void)
     Stop();
 
     m_threadLock.lockForWrite();
-    m_thread = new TorcCameraThread(this, modelId, m_params);
-    m_thread->start();
+    TorcCameraThread::CreateOrDestroy(m_thread, modelId, m_params);
+    if (m_thread)
+    {
+        m_thread->SetParent(this);
+        m_thread->start();
+    }
     m_threadLock.unlock();
 }
 
@@ -91,10 +95,7 @@ void TorcCameraOutput::Stop(void)
     m_threadLock.lockForWrite();
     if (m_thread)
     {
-        m_thread->StopWriting();
-        m_thread->quit();
-        m_thread->wait();
-        delete m_thread;
+        TorcCameraThread::CreateOrDestroy(m_thread, modelId);
         m_thread = NULL;
     }
     m_threadLock.unlock();

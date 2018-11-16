@@ -25,20 +25,63 @@
 #include "torccameraoutput.h"
 #include "torccamerathread.h"
 
-TorcCameraThread::TorcCameraThread(TorcCameraOutput *Parent, const QString &Type, const TorcCameraParams &Params)
+void TorcCameraThread::CreateOrDestroy(TorcCameraThread *&Thread, const QString &Type, const TorcCameraParams &Params)
+{
+    QMutex lock(QMutex::NonRecursive);
+    QMutexLocker locker(&lock);
+    QMap<QString,TorcCameraThread*> threads;
+
+    if (Thread)
+    {
+        if (threads.contains(Type))
+        {
+            TorcCameraThread* thread = threads.value(Type);
+            if (thread != Thread)
+                LOG(VB_GENERAL, LOG_ERR, QString("Mismatch between thread and type for '%1'").arg(Type));
+
+            thread->DownRef();
+            // release our own ref
+            if (!thread->IsShared())
+            {
+                LOG(VB_GENERAL, LOG_INFO, QString("Removing camera thread - no longer in use '%1'").arg(Type));
+                thread->DownRef();
+                threads.remove(Type);
+            }
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Unknown camera thread type '%1'").arg(Type));
+        }
+    }
+    else
+    {
+        TorcCameraThread* thread = NULL;
+        if (threads.contains(Type))
+        {
+            LOG(VB_GENERAL, LOG_INFO, QString("Sharing existing camera thread '%1'").arg(Type));
+            thread = threads.value(Type);
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_INFO, QString("Creating shared camera thread '%1'").arg(Type));
+            thread = new TorcCameraThread(Type, Params);
+            threads.insert(Type, thread);
+        }
+        // as creator, we hold one reference. Add another for the requestor.
+        thread->UpRef();
+        Thread = thread;
+    }
+}
+
+TorcCameraThread::TorcCameraThread( const QString &Type, const TorcCameraParams &Params)
   : TorcQThread("Camera"),
-    m_parent(Parent),
+    m_parent(NULL),
     m_type(Type),
     m_params(Params),
     m_camera(NULL),
     m_cameraLock(QReadWriteLock::Recursive),
     m_stop(false)
 {
-    if (m_parent)
-    {
-        connect(this, SIGNAL(WritingStarted()), m_parent, SLOT(WritingStarted()));
-        connect(this, SIGNAL(WritingStopped()), m_parent, SLOT(WritingStopped()));
-    }
 }
 
 TorcCameraThread::~TorcCameraThread()
@@ -49,6 +92,50 @@ TorcCameraThread::~TorcCameraThread()
         delete m_camera;
         m_camera = NULL;
     }
+}
+
+void TorcCameraThread::SetParent(TorcCameraOutput *Parent)
+{
+    if (!Parent)
+        return;
+
+    QWriteLocker locker(&m_cameraLock);
+    m_parent = Parent;
+    connect(this, SIGNAL(WritingStarted()),    m_parent, SLOT(WritingStarted()));
+    connect(this, SIGNAL(WritingStopped()),    m_parent, SLOT(WritingStopped()));
+    connect(this, SIGNAL(InitSegmentReady()),  m_parent, SLOT(InitSegmentReady()));
+    connect(this, SIGNAL(SegmentReady(int)),   m_parent, SLOT(InitSegmentReady()));
+    connect(this, SIGNAL(SegmentRemoved(int)), m_parent, SLOT(SegmentRemoved(int)));
+    connect(this, SIGNAL(CameraErrored(bool)), m_parent, SLOT(CameraErrored(bool)));
+}
+
+/*! \brief Decrement the reference count for this thread.
+ *
+ * We cannot use the default DownRef implementatin as we need to stop the thread
+ * before deleting it.
+*/
+bool TorcCameraThread::DownRef(void)
+{
+    if (!m_refCount.deref())
+    {
+        StopWriting();
+        quit();
+        wait();
+        if (!m_eventLoopEnding)
+        {
+            QObject* object = dynamic_cast<QObject*>(this);
+            if (object)
+            {
+                object->deleteLater();
+                return true;
+            }
+        }
+
+        delete this;
+        return true;
+    }
+
+    return false;
 }
 
 void TorcCameraThread::StopWriting(void)
@@ -68,13 +155,10 @@ void TorcCameraThread::Start(void)
 
     if (m_camera)
     {
-        if (m_parent)
-        {
-            connect(m_camera, SIGNAL(InitSegmentReady()),  m_parent, SLOT(InitSegmentReady()));
-            connect(m_camera, SIGNAL(SegmentReady(int)),   m_parent, SLOT(SegmentReady(int)));
-            connect(m_camera, SIGNAL(SegmentRemoved(int)), m_parent, SLOT(SegmentRemoved(int)));
-            connect(m_camera, SIGNAL(SetErrored(bool)),    m_parent, SLOT(CameraErrored(bool)));
-        }
+        connect(m_camera, SIGNAL(InitSegmentReady()),  this, SIGNAL(InitSegmentReady()));
+        connect(m_camera, SIGNAL(SegmentReady(int)),   this, SIGNAL(SegmentReady(int)));
+        connect(m_camera, SIGNAL(SegmentRemoved(int)), this, SIGNAL(SegmentRemoved(int)));
+        connect(m_camera, SIGNAL(SetErrored(bool)),    this, SIGNAL(CameraErrored(bool)));
 
         if (m_camera->Setup())
         {
