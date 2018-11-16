@@ -25,8 +25,6 @@
 #include "torccameraoutput.h"
 #include "torccamera.h"
 
-#define BLACKLIST QString("StartCamera,StopCamera,WritingStarted,WritingStopped")
-
 TorcCameraParams::TorcCameraParams(void)
   : m_valid(false),
     m_width(0),
