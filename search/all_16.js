@@ -17,8 +17,8 @@ var searchData=
   ['writeavpacket',['WriteAVPacket',['../d2/d10/class_torc_muxer.html#ae997004c110ecc7e806e3e3f3a5147a3',1,'TorcMuxer']]],
   ['writeframe',['WriteFrame',['../da/da1/class_torc_pi_camera.html#ad939366a1407694b4807dc0081bc9b75',1,'TorcPiCamera::WriteFrame()'],['../d3/dfd/class_torc_camera_device.html#a4aa314dff85b19a7ed9111fe2b7963f8',1,'TorcCameraDevice::WriteFrame()']]],
   ['writereference',['WriteReference',['../d5/d41/torcbinaryplistserialiser_8cpp.html#a78a9d5e1b3b0f6805e38becd6b238388',1,'torcbinaryplistserialiser.cpp']]],
-  ['writingstarted',['WritingStarted',['../de/dc9/class_torc_camera_thread.html#a9dc74c907d95fba2d3b5dccd2ff51734',1,'TorcCameraThread::WritingStarted()'],['../db/dc8/class_torc_camera_output.html#a2cb61cb146b15eb52bf9d66e7ec928c1',1,'TorcCameraOutput::WritingStarted()']]],
-  ['writingstopped',['WritingStopped',['../de/dc9/class_torc_camera_thread.html#ae9a880a13e2cad09314e1cf0510c3f00',1,'TorcCameraThread::WritingStopped()'],['../db/dc8/class_torc_camera_output.html#a5062d4af3e4c5e45d99432beb39d7cb8',1,'TorcCameraOutput::WritingStopped()']]],
+  ['writingstarted',['WritingStarted',['../db/dc8/class_torc_camera_output.html#a2cb61cb146b15eb52bf9d66e7ec928c1',1,'TorcCameraOutput::WritingStarted()'],['../de/dc9/class_torc_camera_thread.html#a9dc74c907d95fba2d3b5dccd2ff51734',1,'TorcCameraThread::WritingStarted()']]],
+  ['writingstopped',['WritingStopped',['../db/dc8/class_torc_camera_output.html#a5062d4af3e4c5e45d99432beb39d7cb8',1,'TorcCameraOutput::WritingStopped()'],['../de/dc9/class_torc_camera_thread.html#ae9a880a13e2cad09314e1cf0510c3f00',1,'TorcCameraThread::WritingStopped()']]],
   ['wssubprotocol',['WSSubProtocol',['../d3/d9a/class_torc_web_socket_reader.html#a6c998b57e09ce050435169ced7f2dcd8',1,'TorcWebSocketReader']]],
   ['wsversion',['WSVersion',['../d3/d9a/class_torc_web_socket_reader.html#a440af48a5b5c5152fa6ec32a801b8a5f',1,'TorcWebSocketReader']]]
 ];

@@ -1,3 +1,4 @@
 <map id="TorcCameraThread" name="TorcCameraThread">
-<area shape="rect" id="node2" href="$d2/d41/class_torc_q_thread.html" title="A Torc specific wrapper around QThread. " alt="" coords="26,80,127,107"/>
+<area shape="rect" id="node2" href="$d2/d41/class_torc_q_thread.html" title="A Torc specific wrapper around QThread. " alt="" coords="5,80,107,107"/>
+<area shape="rect" id="node4" href="$d6/dad/class_torc_reference_counter.html" title="A reference counting implementation. " alt="" coords="131,80,293,107"/>
 </map>

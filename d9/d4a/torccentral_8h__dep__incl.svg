@@ -46,7 +46,7 @@ if (edges && edges.length) {
         </defs>
 
 <script type="text/javascript">
-var viewWidth = 2192;
+var viewWidth = 2224;
 var viewHeight = 196;
 var sectionId = 'dynsection-1';
 </script>
@@ -54,7 +54,7 @@ var sectionId = 'dynsection-1';
 <svg id="graph" class="graph">
 <g id="viewport">
 <title>torccentral.h</title>
-<polygon fill="white" stroke="none" points="-4,4 -4,-192 2188,-192 2188,4 -4,4"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-192 2220,-192 2220,4 -4,4"/>
 <!-- Node1 -->
 <g id="node1" class="node"><title>Node1</title>
 <polygon fill="#bfbfbf" stroke="black" points="1050,-168.5 1050,-187.5 1127,-187.5 1127,-168.5 1050,-168.5"/>
@@ -193,14 +193,14 @@ var sectionId = 'dynsection-1';
 <!-- Node19 -->
 <g id="node19" class="node"><title>Node19</title>
 <g id="a_node19"><a xlink:href="../../d6/d33/torci2cbus_8cpp.html" target="_top" xlink:title="torci2cbus.cpp">
-<polygon fill="white" stroke="black" points="1682.5,-56.5 1682.5,-75.5 1768.5,-75.5 1768.5,-56.5 1682.5,-56.5"/>
-<text text-anchor="middle" x="1725.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">torci2cbus.cpp</text>
+<polygon fill="white" stroke="black" points="1714.5,-56.5 1714.5,-75.5 1800.5,-75.5 1800.5,-56.5 1714.5,-56.5"/>
+<text text-anchor="middle" x="1757.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">torci2cbus.cpp</text>
 </a>
 </g>
 </g>
 <!-- Node1&#45;&gt;Node19 -->
 <g id="edge28" class="edge"><title>Node1&#45;&gt;Node19</title>
-<path fill="none" stroke="midnightblue" d="M1137.51,-174.286C1196.6,-169.925 1298.36,-158.919 1381.5,-132 1400.03,-126 1401.93,-117.898 1420.5,-112 1528.75,-77.6123 1561.31,-93.6868 1673.5,-76 1676.4,-75.5434 1679.38,-75.0604 1682.39,-74.5646"/>
+<path fill="none" stroke="midnightblue" d="M1137.51,-174.286C1196.6,-169.925 1298.36,-158.919 1381.5,-132 1400.03,-126 1401.89,-117.752 1420.5,-112 1542.48,-74.3004 1579.23,-94.8917 1705.5,-76 1708.4,-75.5662 1711.39,-75.1002 1714.39,-74.6168"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1137.07,-170.808 1127.34,-175.001 1137.56,-177.791 1137.07,-170.808"/>
 </g>
 <!-- Node20 -->
@@ -232,14 +232,14 @@ var sectionId = 'dynsection-1';
 <!-- Node26 -->
 <g id="node26" class="node"><title>Node26</title>
 <g id="a_node26"><a xlink:href="../../d5/da7/torcoutputs_8cpp.html" target="_top" xlink:title="torcoutputs.cpp">
-<polygon fill="white" stroke="black" points="1454.5,-56.5 1454.5,-75.5 1546.5,-75.5 1546.5,-56.5 1454.5,-56.5"/>
-<text text-anchor="middle" x="1500.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">torcoutputs.cpp</text>
+<polygon fill="white" stroke="black" points="1486.5,-56.5 1486.5,-75.5 1578.5,-75.5 1578.5,-56.5 1486.5,-56.5"/>
+<text text-anchor="middle" x="1532.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">torcoutputs.cpp</text>
 </a>
 </g>
 </g>
 <!-- Node1&#45;&gt;Node26 -->
 <g id="edge49" class="edge"><title>Node1&#45;&gt;Node26</title>
-<path fill="none" stroke="midnightblue" d="M1137.38,-166.058C1169.73,-158.157 1212.8,-146.37 1249.5,-132 1267.64,-124.898 1270.15,-118.524 1288.5,-112 1318.46,-101.352 1401.25,-85.1515 1454.07,-75.3699"/>
+<path fill="none" stroke="midnightblue" d="M1137.38,-166.058C1169.73,-158.157 1212.8,-146.37 1249.5,-132 1267.64,-124.898 1270.06,-118.277 1288.5,-112 1306.93,-105.727 1420.97,-85.8793 1486.42,-74.7527"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1136.18,-162.747 1127.27,-168.485 1137.81,-169.553 1136.18,-162.747"/>
 </g>
 <!-- Node27 -->
@@ -447,34 +447,34 @@ var sectionId = 'dynsection-1';
 </g>
 <!-- Node20&#45;&gt;Node19 -->
 <g id="edge30" class="edge"><title>Node20&#45;&gt;Node19</title>
-<path fill="none" stroke="midnightblue" d="M1382.55,-112.6C1383.88,-112.394 1385.2,-112.194 1386.5,-112 1513.65,-93.0329 1546.35,-94.9671 1673.5,-76 1676.4,-75.5674 1679.39,-75.1024 1682.39,-74.6197"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="1381.56,-109.215 1372.24,-114.255 1382.67,-116.126 1381.56,-109.215"/>
+<path fill="none" stroke="midnightblue" d="M1382.55,-112.578C1383.88,-112.379 1385.2,-112.186 1386.5,-112 1527.74,-91.825 1564.26,-96.175 1705.5,-76 1708.4,-75.5854 1711.39,-75.1339 1714.4,-74.6611"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="1381.57,-109.19 1372.23,-114.2 1382.65,-116.105 1381.57,-109.19"/>
 </g>
 <!-- Node21 -->
 <g id="node21" class="node"><title>Node21</title>
 <g id="a_node21"><a xlink:href="../../db/dd5/torci2cpca9685_8h.html" target="_top" xlink:title="torci2cpca9685.h">
-<polygon fill="white" stroke="black" points="1565,-56.5 1565,-75.5 1664,-75.5 1664,-56.5 1565,-56.5"/>
-<text text-anchor="middle" x="1614.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">torci2cpca9685.h</text>
+<polygon fill="white" stroke="black" points="1597,-56.5 1597,-75.5 1696,-75.5 1696,-56.5 1597,-56.5"/>
+<text text-anchor="middle" x="1646.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">torci2cpca9685.h</text>
 </a>
 </g>
 </g>
 <!-- Node20&#45;&gt;Node21 -->
 <g id="edge31" class="edge"><title>Node20&#45;&gt;Node21</title>
-<path fill="none" stroke="midnightblue" d="M1382.34,-111.773C1434.93,-101.631 1518.73,-85.4707 1569.96,-75.59"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="1381.42,-108.387 1372.26,-113.717 1382.74,-115.26 1381.42,-108.387"/>
+<path fill="none" stroke="midnightblue" d="M1382.17,-112.75C1440.35,-102.679 1538.25,-85.7357 1597.18,-75.537"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="1381.39,-109.332 1372.13,-114.486 1382.58,-116.23 1381.39,-109.332"/>
 </g>
 <!-- Node22 -->
 <g id="node22" class="node"><title>Node22</title>
 <g id="a_node22"><a xlink:href="../../d9/d02/torci2cpca9685_8cpp.html" target="_top" xlink:title="torci2cpca9685.cpp">
-<polygon fill="white" stroke="black" points="1559.5,-0.5 1559.5,-19.5 1669.5,-19.5 1669.5,-0.5 1559.5,-0.5"/>
-<text text-anchor="middle" x="1614.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">torci2cpca9685.cpp</text>
+<polygon fill="white" stroke="black" points="1591.5,-0.5 1591.5,-19.5 1701.5,-19.5 1701.5,-0.5 1591.5,-0.5"/>
+<text text-anchor="middle" x="1646.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">torci2cpca9685.cpp</text>
 </a>
 </g>
 </g>
 <!-- Node21&#45;&gt;Node22 -->
 <g id="edge32" class="edge"><title>Node21&#45;&gt;Node22</title>
-<path fill="none" stroke="midnightblue" d="M1614.5,-45.8045C1614.5,-36.9102 1614.5,-26.7798 1614.5,-19.7511"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="1611,-46.083 1614.5,-56.083 1618,-46.083 1611,-46.083"/>
+<path fill="none" stroke="midnightblue" d="M1646.5,-45.8045C1646.5,-36.9102 1646.5,-26.7798 1646.5,-19.7511"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="1643,-46.083 1646.5,-56.083 1650,-46.083 1643,-46.083"/>
 </g>
 <!-- Node23&#45;&gt;Node5 -->
 <g id="edge40" class="edge"><title>Node23&#45;&gt;Node5</title>
@@ -498,21 +498,21 @@ var sectionId = 'dynsection-1';
 </g>
 <!-- Node23&#45;&gt;Node21 -->
 <g id="edge35" class="edge"><title>Node23&#45;&gt;Node21</title>
-<path fill="none" stroke="midnightblue" d="M1250.29,-114.995C1319.41,-106.728 1446.93,-91.1404 1555.5,-76 1558.58,-75.5707 1561.75,-75.1184 1564.94,-74.6544"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="1249.64,-111.548 1240.12,-116.209 1250.47,-118.499 1249.64,-111.548"/>
+<path fill="none" stroke="midnightblue" d="M1250.05,-115.723C1324.18,-107.852 1466.66,-92.2186 1587.5,-76 1590.58,-75.5865 1593.75,-75.1463 1596.94,-74.6914"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="1249.63,-112.248 1240.06,-116.781 1250.37,-119.209 1249.63,-112.248"/>
 </g>
 <!-- Node24 -->
 <g id="node24" class="node"><title>Node24</title>
-<g id="a_node24"><a xlink:href="../../d0/d11/torccamera_8cpp.html" target="_top" xlink:title="torccamera.cpp">
-<polygon fill="white" stroke="black" points="1344.5,-56.5 1344.5,-75.5 1436.5,-75.5 1436.5,-56.5 1344.5,-56.5"/>
-<text text-anchor="middle" x="1390.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">torccamera.cpp</text>
+<g id="a_node24"><a xlink:href="../../d1/d3b/torccameraoutput_8cpp.html" target="_top" xlink:title="torccameraoutput.cpp">
+<polygon fill="white" stroke="black" points="1344.5,-56.5 1344.5,-75.5 1468.5,-75.5 1468.5,-56.5 1344.5,-56.5"/>
+<text text-anchor="middle" x="1406.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">torccameraoutput.cpp</text>
 </a>
 </g>
 </g>
 <!-- Node23&#45;&gt;Node24 -->
 <g id="edge37" class="edge"><title>Node23&#45;&gt;Node24</title>
-<path fill="none" stroke="midnightblue" d="M1239.47,-109.699C1275.52,-99.507 1327.74,-84.7429 1360.38,-75.5164"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="1238.44,-106.355 1229.76,-112.444 1240.34,-113.091 1238.44,-106.355"/>
+<path fill="none" stroke="midnightblue" d="M1242.32,-109.829C1281.41,-99.6333 1338.33,-84.7823 1373.85,-75.5164"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="1241.09,-106.533 1232.3,-112.444 1242.86,-113.306 1241.09,-106.533"/>
 </g>
 <!-- Node25 -->
 <g id="node25" class="node"><title>Node25</title>
@@ -529,8 +529,8 @@ var sectionId = 'dynsection-1';
 </g>
 <!-- Node23&#45;&gt;Node26 -->
 <g id="edge39" class="edge"><title>Node23&#45;&gt;Node26</title>
-<path fill="none" stroke="midnightblue" d="M1249.98,-111.944C1307.05,-101.704 1399.2,-85.1741 1454.4,-75.2706"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="1249.32,-108.506 1240.09,-113.717 1250.56,-115.396 1249.32,-108.506"/>
+<path fill="none" stroke="midnightblue" d="M1250.06,-112.723C1251.55,-112.479 1253.04,-112.238 1254.5,-112 1353.59,-95.8937 1378.41,-92.1063 1477.5,-76 1480.37,-75.5343 1483.31,-75.0542 1486.29,-74.5694"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="1249.35,-109.291 1240.05,-114.355 1250.48,-116.2 1249.35,-109.291"/>
 </g>
 <!-- Node28&#45;&gt;Node16 -->
 <g id="edge46" class="edge"><title>Node28&#45;&gt;Node16</title>
@@ -540,41 +540,41 @@ var sectionId = 'dynsection-1';
 <!-- Node29 -->
 <g id="node29" class="node"><title>Node29</title>
 <g id="a_node29"><a xlink:href="../../dd/df5/torcpiswitchinput_8cpp.html" target="_top" xlink:title="torcpiswitchinput.cpp">
-<polygon fill="white" stroke="black" points="1787,-56.5 1787,-75.5 1904,-75.5 1904,-56.5 1787,-56.5"/>
-<text text-anchor="middle" x="1845.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">torcpiswitchinput.cpp</text>
+<polygon fill="white" stroke="black" points="1819,-56.5 1819,-75.5 1936,-75.5 1936,-56.5 1819,-56.5"/>
+<text text-anchor="middle" x="1877.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">torcpiswitchinput.cpp</text>
 </a>
 </g>
 </g>
 <!-- Node28&#45;&gt;Node29 -->
 <g id="edge45" class="edge"><title>Node28&#45;&gt;Node29</title>
-<path fill="none" stroke="midnightblue" d="M1631.11,-111.356C1680.24,-101.191 1756.91,-85.3292 1804.01,-75.5834"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="1630.15,-107.981 1621.07,-113.435 1631.57,-114.836 1630.15,-107.981"/>
+<path fill="none" stroke="midnightblue" d="M1631.28,-111.873C1706.51,-97.698 1782.01,-84.0604 1829.65,-75.5269"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="1630.33,-108.49 1621.15,-113.785 1631.63,-115.369 1630.33,-108.49"/>
 </g>
 <!-- Node30 -->
 <g id="node30" class="node"><title>Node30</title>
 <g id="a_node30"><a xlink:href="../../d1/d80/torcpipwmoutput_8cpp.html" target="_top" xlink:title="torcpipwmoutput.cpp">
-<polygon fill="white" stroke="black" points="1922.5,-56.5 1922.5,-75.5 2040.5,-75.5 2040.5,-56.5 1922.5,-56.5"/>
-<text text-anchor="middle" x="1981.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">torcpipwmoutput.cpp</text>
+<polygon fill="white" stroke="black" points="1954.5,-56.5 1954.5,-75.5 2072.5,-75.5 2072.5,-56.5 1954.5,-56.5"/>
+<text text-anchor="middle" x="2013.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">torcpipwmoutput.cpp</text>
 </a>
 </g>
 </g>
 <!-- Node28&#45;&gt;Node30 -->
 <g id="edge47" class="edge"><title>Node28&#45;&gt;Node30</title>
-<path fill="none" stroke="midnightblue" d="M1631.17,-111.99C1757.36,-91.8307 1790.96,-91.9038 1913.5,-76 1916.33,-75.6322 1919.23,-75.2542 1922.16,-74.8712"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="1630.44,-108.563 1621.12,-113.607 1631.55,-115.474 1630.44,-108.563"/>
+<path fill="none" stroke="midnightblue" d="M1631.38,-111.982C1771.49,-90.5745 1808.93,-92.8409 1945.5,-76 1948.34,-75.6502 1951.24,-75.2869 1954.17,-74.9157"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="1630.46,-108.582 1621.11,-113.565 1631.53,-115.5 1630.46,-108.582"/>
 </g>
 <!-- Node31 -->
 <g id="node31" class="node"><title>Node31</title>
 <g id="a_node31"><a xlink:href="../../d2/de8/torcpiswitchoutput_8cpp.html" target="_top" xlink:title="torcpiswitchoutput.cpp">
-<polygon fill="white" stroke="black" points="2059,-56.5 2059,-75.5 2184,-75.5 2184,-56.5 2059,-56.5"/>
-<text text-anchor="middle" x="2121.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">torcpiswitchoutput.cpp</text>
+<polygon fill="white" stroke="black" points="2091,-56.5 2091,-75.5 2216,-75.5 2216,-56.5 2091,-56.5"/>
+<text text-anchor="middle" x="2153.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">torcpiswitchoutput.cpp</text>
 </a>
 </g>
 </g>
 <!-- Node28&#45;&gt;Node31 -->
 <g id="edge48" class="edge"><title>Node28&#45;&gt;Node31</title>
-<path fill="none" stroke="midnightblue" d="M1631.22,-112.057C1817.32,-86.3459 1866.89,-95.2508 2049.5,-76 2052.51,-75.683 2055.58,-75.3464 2058.69,-74.9966"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="1630.52,-108.621 1621.1,-113.471 1631.49,-115.554 1630.52,-108.621"/>
+<path fill="none" stroke="midnightblue" d="M1631.06,-112.09C1831.42,-85.0236 1884.69,-96.1458 2081.5,-76 2084.51,-75.6921 2087.58,-75.3629 2090.69,-75.019"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="1630.53,-108.63 1621.1,-113.451 1631.48,-115.565 1630.53,-108.63"/>
 </g>
 </g>
 </svg>

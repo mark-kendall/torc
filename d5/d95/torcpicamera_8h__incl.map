@@ -1,18 +1,9 @@
 <map id="torcpicamera.h" name="torcpicamera.h">
 <area shape="rect" id="node2" href="$d7/df9/torcomxcore_8h.html" title="torcomxcore.h" alt="" coords="57,304,171,331"/>
-<area shape="rect" id="node6" href="$d1/de8/torcomxport_8h.html" title="torcomxport.h" alt="" coords="448,155,561,181"/>
-<area shape="rect" id="node10" href="$d3/de4/torcomxcomponent_8h.html" title="torcomxcomponent.h" alt="" coords="330,229,490,256"/>
-<area shape="rect" id="node12" href="$d5/ddd/torcomxtunnel_8h.html" title="torcomxtunnel.h" alt="" coords="245,80,372,107"/>
-<area shape="rect" id="node13" href="$d4/d0f/torcmuxer_8h.html" title="ffmpeg/torcmuxer.h" alt="" coords="675,80,823,107"/>
-<area shape="rect" id="node20" href="$d3/d38/torccamera_8h.html" title="torccamera.h" alt="" coords="1059,80,1167,107"/>
-<area shape="rect" id="node15" href="$de/df7/torcsegmentedringbuffer_8h.html" title="torcsegmentedringbuffer.h" alt="" coords="930,155,1122,181"/>
-<area shape="rect" id="node22" href="$dd/db0/torcqthread_8h.html" title="torcqthread.h" alt="" coords="1146,155,1255,181"/>
-<area shape="rect" id="node24" href="$dc/d01/torcoutput_8h.html" title="torcoutput.h" alt="" coords="1386,155,1487,181"/>
-<area shape="rect" id="node25" href="$d8/dfe/torcreferencecounted_8h.html" title="torcreferencecounted.h" alt="" coords="1624,304,1796,331"/>
-<area shape="rect" id="node27" href="$d3/dee/torchttpservice_8h.html" title="torchttpservice.h" alt="" coords="1819,229,1950,256"/>
-<area shape="rect" id="node39" href="$d1/df7/torcdevice_8h.html" title="torcdevice.h" alt="" coords="1431,229,1531,256"/>
-<area shape="rect" id="node31" href="$d4/d11/torchttphandler_8h.html" title="torchttphandler.h" alt="" coords="1923,304,2055,331"/>
-<area shape="rect" id="node34" href="$df/dd7/torchttprequest_8h.html" title="torchttprequest.h" alt="" coords="1852,379,1987,405"/>
-<area shape="rect" id="node36" href="$de/de6/torchttpreader_8h.html" title="torchttpreader.h" alt="" coords="1856,453,1983,480"/>
-<area shape="rect" id="node41" href="$d2/d5b/torcdevicehandler_8h.html" title="torcdevicehandler.h" alt="" coords="1351,304,1498,331"/>
+<area shape="rect" id="node6" href="$d1/de8/torcomxport_8h.html" title="torcomxport.h" alt="" coords="343,155,456,181"/>
+<area shape="rect" id="node10" href="$d3/de4/torcomxcomponent_8h.html" title="torcomxcomponent.h" alt="" coords="297,229,457,256"/>
+<area shape="rect" id="node12" href="$d5/ddd/torcomxtunnel_8h.html" title="torcomxtunnel.h" alt="" coords="469,80,596,107"/>
+<area shape="rect" id="node13" href="$d4/d0f/torcmuxer_8h.html" title="ffmpeg/torcmuxer.h" alt="" coords="748,80,896,107"/>
+<area shape="rect" id="node20" href="$d3/d38/torccamera_8h.html" title="torccamera.h" alt="" coords="1019,80,1127,107"/>
+<area shape="rect" id="node15" href="$de/df7/torcsegmentedringbuffer_8h.html" title="torcsegmentedringbuffer.h" alt="" coords="1027,155,1219,181"/>
 </map>
