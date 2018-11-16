@@ -1,9 +1,9 @@
 <map id="TorcReferenceCounter" name="TorcReferenceCounter">
 <area shape="rect" id="node2" href="$de/dc9/class_torc_camera_thread.html" title="TorcCameraThread" alt="" coords="219,448,361,475"/>
 <area shape="rect" id="node3" href="$d5/d76/class_torc_device.html" title="TorcDevice" alt="" coords="245,499,335,525"/>
-<area shape="rect" id="node44" href="$d3/ded/class_torc_network_request.html" title="A wrapper around QNetworkRequest. " alt="" coords="215,549,365,576"/>
-<area shape="rect" id="node45" href="$db/dc6/class_torc_r_p_c_request.html" title="A class encapsulating a Remote Procedure Call. " alt="" coords="229,600,351,627"/>
-<area shape="rect" id="node46" href="$dd/d69/class_torc_setting.html" title="A wrapper around a database setting. " alt="" coords="243,727,337,753"/>
+<area shape="rect" id="node46" href="$d3/ded/class_torc_network_request.html" title="A wrapper around QNetworkRequest. " alt="" coords="215,549,365,576"/>
+<area shape="rect" id="node47" href="$db/dc6/class_torc_r_p_c_request.html" title="A class encapsulating a Remote Procedure Call. " alt="" coords="229,600,351,627"/>
+<area shape="rect" id="node48" href="$dd/d69/class_torc_setting.html" title="A wrapper around a database setting. " alt="" coords="243,727,337,753"/>
 <area shape="rect" id="node4" href="$d1/d34/class_torc_control.html" title="TorcControl" alt="" coords="433,81,526,108"/>
 <area shape="rect" id="node8" href="$d8/d61/class_torc_input.html" title="TorcInput" alt="" coords="440,284,519,311"/>
 <area shape="rect" id="node21" href="$dc/d10/class_torc_notification.html" title="TorcNotification" alt="" coords="420,461,539,488"/>
@@ -29,20 +29,22 @@
 <area shape="rect" id="node25" href="$d0/db9/class_torc_i_o_t_logger.html" title="TorcIOTLogger" alt="" coords="624,512,735,539"/>
 <area shape="rect" id="node28" href="$df/dd1/class_torc_log_notifier.html" title="Log notifications to the log file. " alt="" coords="621,563,737,589"/>
 <area shape="rect" id="node29" href="$d7/d0b/class_torc_pushbullet_notifier.html" title="Send push notifications using the Pushbullet API. " alt="" coords="600,613,759,640"/>
-<area shape="rect" id="node26" href="$df/d10/class_torc_io_t_plotter_notifier.html" title="TorcIoTPlotterNotifier" alt="" coords="849,499,1002,525"/>
-<area shape="rect" id="node27" href="$d0/d1f/class_torc_thing_speak_notifier.html" title="TorcThingSpeakNotifier" alt="" coords="842,549,1009,576"/>
+<area shape="rect" id="node26" href="$df/d10/class_torc_io_t_plotter_notifier.html" title="TorcIoTPlotterNotifier" alt="" coords="849,473,1002,500"/>
+<area shape="rect" id="node27" href="$d0/d1f/class_torc_thing_speak_notifier.html" title="TorcThingSpeakNotifier" alt="" coords="842,524,1009,551"/>
 <area shape="rect" id="node31" href="$db/dc8/class_torc_camera_output.html" title="TorcCameraOutput" alt="" coords="608,664,751,691"/>
-<area shape="rect" id="node32" href="$d2/d21/class_torcp_h_output.html" title="TorcpHOutput" alt="" coords="625,715,734,741"/>
-<area shape="rect" id="node34" href="$d9/db0/class_torc_p_w_m_output.html" title="TorcPWMOutput" alt="" coords="619,765,740,792"/>
-<area shape="rect" id="node38" href="$d9/d5b/class_torc_switch_output.html" title="TorcSwitchOutput" alt="" coords="613,828,745,855"/>
-<area shape="rect" id="node42" href="$d5/dda/class_torc_temperature_output.html" title="TorcTemperatureOutput" alt="" coords="593,904,765,931"/>
-<area shape="rect" id="node33" href="$d0/d23/class_torc_networkp_h_output.html" title="TorcNetworkpHOutput" alt="" coords="845,625,1006,652"/>
-<area shape="rect" id="node35" href="$d6/d33/class_torc_i2_c_p_c_a9685_channel.html" title="TorcI2CPCA9685Channel" alt="" coords="837,676,1014,703"/>
-<area shape="rect" id="node36" href="$d0/db8/class_torc_network_p_w_m_output.html" title="TorcNetworkPWMOutput" alt="" coords="839,727,1012,753"/>
-<area shape="rect" id="node37" href="$d3/d08/class_torc_pi_p_w_m_output.html" title="A device to output PWM signals on the Raspberry Pi. " alt="" coords="859,777,991,804"/>
-<area shape="rect" id="node39" href="$d1/d71/class_torc_network_switch_output.html" title="TorcNetworkSwitchOutput" alt="" coords="833,828,1017,855"/>
-<area shape="rect" id="node41" href="$dc/d7e/class_torc_pi_switch_output.html" title="TorcPiSwitchOutput" alt="" coords="854,879,997,905"/>
-<area shape="rect" id="node40" href="$d0/da9/class_torc_network_button_output.html" title="A network output that mimics the behaviour of a mechanical push button. " alt="" coords="1085,828,1272,855"/>
-<area shape="rect" id="node43" href="$d2/dd7/class_torc_network_temperature_output.html" title="TorcNetworkTemperatureOutput" alt="" coords="813,929,1037,956"/>
-<area shape="rect" id="node47" href="$d0/d84/class_torc_setting_group.html" title="High level group of related settings. " alt="" coords="413,765,545,792"/>
+<area shape="rect" id="node34" href="$d2/d21/class_torcp_h_output.html" title="TorcpHOutput" alt="" coords="625,715,734,741"/>
+<area shape="rect" id="node36" href="$d9/db0/class_torc_p_w_m_output.html" title="TorcPWMOutput" alt="" coords="619,803,740,829"/>
+<area shape="rect" id="node40" href="$d9/d5b/class_torc_switch_output.html" title="TorcSwitchOutput" alt="" coords="613,904,745,931"/>
+<area shape="rect" id="node44" href="$d5/dda/class_torc_temperature_output.html" title="TorcTemperatureOutput" alt="" coords="593,980,765,1007"/>
+<area shape="rect" id="node32" href="$d4/dbb/class_torc_camera_stills_output.html" title="TorcCameraStillsOutput" alt="" coords="839,600,1011,627"/>
+<area shape="rect" id="node33" href="$df/d01/class_torc_camera_video_output.html" title="TorcCameraVideoOutput" alt="" coords="836,651,1015,677"/>
+<area shape="rect" id="node35" href="$d0/d23/class_torc_networkp_h_output.html" title="TorcNetworkpHOutput" alt="" coords="845,701,1006,728"/>
+<area shape="rect" id="node37" href="$d6/d33/class_torc_i2_c_p_c_a9685_channel.html" title="TorcI2CPCA9685Channel" alt="" coords="837,752,1014,779"/>
+<area shape="rect" id="node38" href="$d0/db8/class_torc_network_p_w_m_output.html" title="TorcNetworkPWMOutput" alt="" coords="839,803,1012,829"/>
+<area shape="rect" id="node39" href="$d3/d08/class_torc_pi_p_w_m_output.html" title="A device to output PWM signals on the Raspberry Pi. " alt="" coords="859,853,991,880"/>
+<area shape="rect" id="node41" href="$d1/d71/class_torc_network_switch_output.html" title="TorcNetworkSwitchOutput" alt="" coords="833,904,1017,931"/>
+<area shape="rect" id="node43" href="$dc/d7e/class_torc_pi_switch_output.html" title="TorcPiSwitchOutput" alt="" coords="854,955,997,981"/>
+<area shape="rect" id="node42" href="$d0/da9/class_torc_network_button_output.html" title="A network output that mimics the behaviour of a mechanical push button. " alt="" coords="1085,904,1272,931"/>
+<area shape="rect" id="node45" href="$d2/dd7/class_torc_network_temperature_output.html" title="TorcNetworkTemperatureOutput" alt="" coords="813,1005,1037,1032"/>
+<area shape="rect" id="node49" href="$d0/d84/class_torc_setting_group.html" title="High level group of related settings. " alt="" coords="413,765,545,792"/>
 </map>

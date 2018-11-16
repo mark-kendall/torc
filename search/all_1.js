@@ -35,7 +35,6 @@ var searchData=
   ['apiversion',['apiVersion',['../dd/d3a/class_torc_network_service.html#a662346f88425e7097d6892a408bd3815',1,'TorcNetworkService']]],
   ['apiversionchanged',['ApiVersionChanged',['../dd/d3a/class_torc_network_service.html#a936eb2a055b180e50d591a3f78088d48',1,'TorcNetworkService']]],
   ['applicationnamechanged',['ApplicationNameChanged',['../df/d23/class_torc_notify.html#a5922349121a3e527b853e3577f77162c',1,'TorcNotify']]],
-  ['audio_5fcodec_5fiso',['AUDIO_CODEC_ISO',['../d3/d38/torccamera_8h.html#ab89ccc5af26f6a905fa349e8b9ec25cc',1,'torccamera.h']]],
   ['authenticate',['Authenticate',['../d8/d73/class_torc_network.html#ab32e43110c5bcc1e37bdb30720f8335e',1,'TorcNetwork']]],
   ['authenticateuser',['AuthenticateUser',['../db/dc7/class_torc_h_t_t_p_server.html#a1b71f705548905052b884199f838821e',1,'TorcHTTPServer']]],
   ['authorise',['Authorise',['../da/dfc/class_torc_h_t_t_p_request.html#a09148d0f451c474e5bc6fa95322cf27b',1,'TorcHTTPRequest::Authorise()'],['../db/dc7/class_torc_h_t_t_p_server.html#a137ad2328a7bece60939bd7616e334d9',1,'TorcHTTPServer::Authorise()']]],

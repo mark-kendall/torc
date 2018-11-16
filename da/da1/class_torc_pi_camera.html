@@ -160,6 +160,8 @@ Additional Inherited Members</h2></td></tr>
 <tr class="separator:aab56fdf4b87ab38422bd3f869ba76a52 inherit signals_class_torc_camera_device"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afd00e5ad5c3fc76ace3ea318152de285 inherit signals_class_torc_camera_device"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dfd/class_torc_camera_device.html#afd00e5ad5c3fc76ace3ea318152de285">SetErrored</a> (bool Errored)</td></tr>
 <tr class="separator:afd00e5ad5c3fc76ace3ea318152de285 inherit signals_class_torc_camera_device"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5c21bd483cdd9f288101371b1d3212a7 inherit signals_class_torc_camera_device"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dfd/class_torc_camera_device.html#a5c21bd483cdd9f288101371b1d3212a7">StillReady</a> (const QString File)</td></tr>
+<tr class="separator:a5c21bd483cdd9f288101371b1d3212a7 inherit signals_class_torc_camera_device"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_attribs_class_torc_camera_device"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_class_torc_camera_device')"><img src="../../closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="../../d3/dfd/class_torc_camera_device.html">TorcCameraDevice</a></td></tr>
 <tr class="memitem:a11f160f904e70acfa116452ccc69da69 inherit pro_attribs_class_torc_camera_device"><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../da/dfa/class_torc_camera_params.html">TorcCameraParams</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dfd/class_torc_camera_device.html#a11f160f904e70acfa116452ccc69da69">m_params</a></td></tr>
 <tr class="separator:a11f160f904e70acfa116452ccc69da69 inherit pro_attribs_class_torc_camera_device"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -261,7 +263,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="../../d3/dfd/class_torc_camera_device.html#a83a5d1fd14e999a688603d24fab413e2">TorcCameraDevice</a>.</p>
 
-<p>Definition at line <a class="el" href="../../d7/de1/torcpicamera_8cpp_source.html#l00162">162</a> of file <a class="el" href="../../d7/de1/torcpicamera_8cpp_source.html">torcpicamera.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/de1/torcpicamera_8cpp_source.html#l00164">164</a> of file <a class="el" href="../../d7/de1/torcpicamera_8cpp_source.html">torcpicamera.cpp</a>.</p>
 
 </div>
 </div>
@@ -289,7 +291,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="../../d3/dfd/class_torc_camera_device.html#abbb7c0b7071a2559846f473d310570e0">TorcCameraDevice</a>.</p>
 
-<p>Definition at line <a class="el" href="../../d7/de1/torcpicamera_8cpp_source.html#l00424">424</a> of file <a class="el" href="../../d7/de1/torcpicamera_8cpp_source.html">torcpicamera.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/de1/torcpicamera_8cpp_source.html#l00427">427</a> of file <a class="el" href="../../d7/de1/torcpicamera_8cpp_source.html">torcpicamera.cpp</a>.</p>
 
 </div>
 </div>
@@ -316,9 +318,9 @@ Additional Inherited Members</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Tell the camera to take Count number of still images. </p>
-<dl class="section note"><dt>Note</dt><dd>For multiple snapshots, the existing remaining count is ignored. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>We ignore values below the current setting, as the stills will be triggered when the input value moves from zero to X - but it should then drop back to zero. </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d7/de1/torcpicamera_8cpp_source.html#l00157">157</a> of file <a class="el" href="../../d7/de1/torcpicamera_8cpp_source.html">torcpicamera.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/de1/torcpicamera_8cpp_source.html#l00158">158</a> of file <a class="el" href="../../d7/de1/torcpicamera_8cpp_source.html">torcpicamera.cpp</a>.</p>
 
 </div>
 </div>
@@ -346,7 +348,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="../../d3/dfd/class_torc_camera_device.html#a4aa314dff85b19a7ed9111fe2b7963f8">TorcCameraDevice</a>.</p>
 
-<p>Definition at line <a class="el" href="../../d7/de1/torcpicamera_8cpp_source.html#l00284">284</a> of file <a class="el" href="../../d7/de1/torcpicamera_8cpp_source.html">torcpicamera.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/de1/torcpicamera_8cpp_source.html#l00286">286</a> of file <a class="el" href="../../d7/de1/torcpicamera_8cpp_source.html">torcpicamera.cpp</a>.</p>
 
 </div>
 </div>
@@ -380,7 +382,7 @@ Additional Inherited Members</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Nov 16 2018 13:08:01 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Nov 16 2018 23:18:05 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

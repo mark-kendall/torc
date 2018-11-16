@@ -6,7 +6,7 @@ var searchData=
   ['initialisetorcdirectories',['InitialiseTorcDirectories',['../d7/def/torcdirectories_8cpp.html#aa748934c0df5b9b92dfb7aadded6f4a4',1,'InitialiseTorcDirectories(TorcCommandLine *CommandLine):&#160;torcdirectories.cpp'],['../d1/d6c/torcdirectories_8h.html#aa748934c0df5b9b92dfb7aadded6f4a4',1,'InitialiseTorcDirectories(TorcCommandLine *CommandLine):&#160;torcdirectories.cpp']]],
   ['initiateclose',['InitiateClose',['../d3/d9a/class_torc_web_socket_reader.html#a771d8450a6fc08a5697c6eba32c20962',1,'TorcWebSocketReader']]],
   ['initrand',['InitRand',['../d2/d41/class_torc_q_thread.html#ad198f515b8a971c2222a522dcb25e06d',1,'TorcQThread']]],
-  ['initsegmentready',['InitSegmentReady',['../d3/dfd/class_torc_camera_device.html#a0ecab4cb1a05f6eacb350b6c4450afd8',1,'TorcCameraDevice::InitSegmentReady()'],['../db/dc8/class_torc_camera_output.html#aadc210e9ab03090163eeda135ff223ce',1,'TorcCameraOutput::InitSegmentReady()'],['../de/dc9/class_torc_camera_thread.html#abc71dccd4ee6932928e6a02426b3a75d',1,'TorcCameraThread::InitSegmentReady()'],['../df/d16/class_torc_segmented_ring_buffer.html#ae64e130f4a72e70ff1b203c0c9679bb2',1,'TorcSegmentedRingBuffer::InitSegmentReady()']]],
+  ['initsegmentready',['InitSegmentReady',['../d3/dfd/class_torc_camera_device.html#a0ecab4cb1a05f6eacb350b6c4450afd8',1,'TorcCameraDevice::InitSegmentReady()'],['../df/d01/class_torc_camera_video_output.html#a379e4672e9075eb593c19357f735dda6',1,'TorcCameraVideoOutput::InitSegmentReady()'],['../de/dc9/class_torc_camera_thread.html#abc71dccd4ee6932928e6a02426b3a75d',1,'TorcCameraThread::InitSegmentReady()'],['../df/d16/class_torc_segmented_ring_buffer.html#ae64e130f4a72e70ff1b203c0c9679bb2',1,'TorcSegmentedRingBuffer::InitSegmentReady()']]],
   ['initverbose',['InitVerbose',['../d7/d24/torcloggingimp_8cpp.html#af7907d0a3eaed3942bc99696b1e12ecf',1,'torcloggingimp.cpp']]],
   ['inputschanged',['InputsChanged',['../d7/ddb/class_torc_inputs.html#a5fea4185574b9cd1a1dcbd5f31ccf1f2',1,'TorcInputs']]],
   ['inputvalidchanged',['InputValidChanged',['../d1/d34/class_torc_control.html#a4e816c75c5393312a0febaeb434afcf2',1,'TorcControl']]],
@@ -18,6 +18,7 @@ var searchData=
   ['ipv6changed',['IPv6Changed',['../db/dc7/class_torc_h_t_t_p_server.html#a68c8d8d45d98da9f83a8dcf6eaedabc7',1,'TorcHTTPServer']]],
   ['isauthorised',['IsAuthorised',['../da/dfc/class_torc_h_t_t_p_request.html#a7bfe2f62f752f6747c781f98a415a159',1,'TorcHTTPRequest']]],
   ['isavailable',['IsAvailable',['../d8/d73/class_torc_network.html#a63a043981858567c24cd286fe8f77e11',1,'TorcNetwork']]],
+  ['iscompatible',['IsCompatible',['../da/dfa/class_torc_camera_params.html#a5981d3d1821c430d85cf324622d399d0',1,'TorcCameraParams']]],
   ['isconnected',['IsConnected',['../d3/db6/class_torc_o_m_x_tunnel.html#a38d59d2564f215dfb18b807787355f66',1,'TorcOMXTunnel']]],
   ['isexternal',['IsExternal',['../d8/d73/class_torc_network.html#abfa4272255a3ef40373868c06c7479af',1,'TorcNetwork']]],
   ['isglobal',['IsGlobal',['../d8/d73/class_torc_network.html#a4ce7f625cf153e5e7b07434ed688dbea',1,'TorcNetwork']]],
@@ -37,5 +38,7 @@ var searchData=
   ['isrunning',['IsRunning',['../da/da4/class_torc_timer.html#a35a2c7de2d7e2dfddcd56bf490e533eb',1,'TorcTimer']]],
   ['issecure',['IsSecure',['../d1/d54/class_torc_h_t_t_p_services.html#a698bf1b10fbd3ed3cb74d285e3ade148',1,'TorcHTTPServices::IsSecure()'],['../d9/d0a/class_torc_web_socket.html#ae80345e9ff3afd418759e958b0e0b2b9',1,'TorcWebSocket::IsSecure()'],['../d3/d5b/class_torc_web_socket_thread.html#a9fe0d702c2f39eee6a704b55aa056fb2',1,'TorcWebSocketThread::IsSecure()']]],
   ['isshared',['IsShared',['../d6/dad/class_torc_reference_counter.html#a6f81bd851c3accb637ff9d11f4a861d9',1,'TorcReferenceCounter']]],
-  ['isvalid',['IsValid',['../d2/d10/class_torc_muxer.html#ad65e6a2093484ae56551795e47c8ecd6',1,'TorcMuxer::IsValid()'],['../de/d1d/class_torc_o_m_x_component.html#aa93dd7b7f0ad6dd542fb56c61b3b6f42',1,'TorcOMXComponent::IsValid()'],['../d1/d2e/class_torc_d_b.html#a1e7084504f6e6c5de02f8be9c2c4e03f',1,'TorcDB::IsValid()'],['../d2/d8c/class_torc_x_m_l_reader.html#a3e008a03250b805ff677b9a539ee79d5',1,'TorcXMLReader::IsValid()']]]
+  ['isstill',['IsStill',['../da/dfa/class_torc_camera_params.html#a8b2df67926422ba0152459448cd4ca98',1,'TorcCameraParams']]],
+  ['isvalid',['IsValid',['../d2/d10/class_torc_muxer.html#ad65e6a2093484ae56551795e47c8ecd6',1,'TorcMuxer::IsValid()'],['../de/d1d/class_torc_o_m_x_component.html#aa93dd7b7f0ad6dd542fb56c61b3b6f42',1,'TorcOMXComponent::IsValid()'],['../d1/d2e/class_torc_d_b.html#a1e7084504f6e6c5de02f8be9c2c4e03f',1,'TorcDB::IsValid()'],['../d2/d8c/class_torc_x_m_l_reader.html#a3e008a03250b805ff677b9a539ee79d5',1,'TorcXMLReader::IsValid()']]],
+  ['isvideo',['IsVideo',['../da/dfa/class_torc_camera_params.html#a8466e85b74e3771b9efe27fdc783779c',1,'TorcCameraParams']]]
 ];

@@ -1,4 +1,6 @@
 <map id="TorcCameraOutput" name="TorcCameraOutput">
+<area shape="rect" id="node8" href="$d4/dbb/class_torc_camera_stills_output.html" title="TorcCameraStillsOutput" alt="" coords="72,304,244,331"/>
+<area shape="rect" id="node9" href="$df/d01/class_torc_camera_video_output.html" title="TorcCameraVideoOutput" alt="" coords="269,304,447,331"/>
 <area shape="rect" id="node2" href="$d1/dc7/class_torc_output.html" title="TorcOutput" alt="" coords="213,155,303,181"/>
 <area shape="rect" id="node3" href="$d5/d76/class_torc_device.html" title="TorcDevice" alt="" coords="138,80,229,107"/>
 <area shape="rect" id="node5" href="$d6/dad/class_torc_reference_counter.html" title="A reference counting implementation. " alt="" coords="103,5,264,32"/>
