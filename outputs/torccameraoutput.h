@@ -42,7 +42,7 @@ class TorcCameraStillsOutput final : public TorcCameraOutput
 {
     Q_OBJECT
     Q_CLASSINFO("Version",        "1.0.0")
-    Q_PROPERTY(QStringList stillsList MEMBER m_stillsList READ GetStillsList NOTIFY StillsListChanged(QStringList))
+    Q_PROPERTY(QStringList stillsList READ GetStillsList NOTIFY StillsListChanged(QStringList))
 
   public:
     TorcCameraStillsOutput(const QString &ModelId, const QVariantMap &Details);
@@ -63,8 +63,10 @@ class TorcCameraStillsOutput final : public TorcCameraOutput
 
  private:
     Q_DISABLE_COPY(TorcCameraStillsOutput)
+    QStringList       stillsList; // adding MEMBER to property deems it writeable ??
     QStringList       m_stillsList;
     QString           m_stillsDirectory;
+
 };
 
 class TorcCameraVideoOutput final : public TorcCameraOutput

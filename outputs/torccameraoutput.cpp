@@ -57,6 +57,7 @@ void TorcCameraOutput::SetParams(TorcCameraParams &Params)
 TorcCameraStillsOutput::TorcCameraStillsOutput(const QString &ModelId, const QVariantMap &Details)
   : TorcCameraOutput(TorcOutput::Camera, 0.0, ModelId, Details, this, TorcCameraStillsOutput::staticMetaObject,
                "StillReady"),
+    stillsList(),
     m_stillsList(),
     m_stillsDirectory()
 {
