@@ -21,21 +21,19 @@
 #define VIDEO_SEGMENT_NUMBER 10 // 10 segments for a total of 20 buffered seconds
 #define VIDEO_TIMEBASE       90000
 
-#define DASH_PLAYLIST        QString("dash.mpd")
-#define HLS_PLAYLIST_MAST    QString("master.m3u8")
-#define HLS_PLAYLIST         QString("playlist.m3u8")
-#define VIDEO_PAGE           QString("video.html")
-
-#define VIDEO_CODEC_ISO      QString("avc1.4d0028") // AVC Main Level 4
-#define AUDIO_CODEC_ISO      QString("mp4a.40.2")   // AAC LC
-
 class TorcCameraParams
 {
   public:
     TorcCameraParams(void);
     explicit TorcCameraParams(const QVariantMap &Details);
     TorcCameraParams(const TorcCameraParams &Other);
-    TorcCameraParams& operator =(const TorcCameraParams &Other);
+    TorcCameraParams  Combine     (const TorcCameraParams &Add);
+    TorcCameraParams& operator =  (const TorcCameraParams &Other);
+    bool              operator == (const TorcCameraParams &Other) const;
+
+    bool    IsVideo      (void) const;
+    bool    IsStill      (void) const;
+    bool    IsCompatible (const TorcCameraParams &Other) const;
 
     bool    m_valid;
     int     m_width;

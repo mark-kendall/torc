@@ -107,6 +107,17 @@ void TorcCameraThread::SetVideoParent(TorcCameraVideoOutput *Parent)
     connect(this, SIGNAL(CameraErrored(bool)), Parent, SLOT(CameraErrored(bool)));
 }
 
+void TorcCameraThread::SetStillsParent(TorcCameraStillsOutput *Parent)
+{
+    if (!Parent)
+        return;
+
+    QWriteLocker locker(&m_cameraLock);
+    connect(this, SIGNAL(CameraErrored(bool)), Parent, SLOT(CameraErrored(bool)));
+    connect(this, SIGNAL(StillReady(QString)), Parent, SLOT(StillReady(QString)));
+    connect(Parent, SIGNAL(TakeStills(uint)), this, SIGNAL(TakeStills(uint)));
+}
+
 /*! \brief Decrement the reference count for this thread.
  *
  * We cannot use the default DownRef implementatin as we need to stop the thread
@@ -219,3 +230,4 @@ TorcCameraParams TorcCameraThread::GetParams(void)
         return m_camera->GetParams();
     return TorcCameraParams();
 }
+

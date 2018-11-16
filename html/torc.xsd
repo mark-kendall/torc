@@ -418,7 +418,7 @@
 
 <!-- outputs definitions -->
 <!--TORC_XSD_OUTPUTTYPES-->
-<xs:complexType name="cameraType">
+<xs:complexType name="cameraVideoType">
   <xs:all>
     <xs:element name="name"            type="deviceNameType"/>
     <xs:element name="username"        type="userNameType" minOccurs="0" maxOccurs="1"/>
@@ -427,6 +427,23 @@
     <xs:element name="height"          type="videoHeightType"/>
     <xs:element name="framerate"       type="videoFrameRateType"/>
     <xs:element name="bitrate"         type="videoBitRateType"/>
+  </xs:all>
+</xs:complexType>
+
+<xs:complexType name="cameraStillsType">
+  <xs:all>
+    <xs:element name="name"            type="deviceNameType"/>
+    <xs:element name="username"        type="userNameType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="width"           type="videoWidthType"/>
+    <xs:element name="height"          type="videoHeightType"/>
+  </xs:all>
+</xs:complexType>
+
+<xs:complexType name="cameraType">
+  <xs:all>
+    <xs:element name="video"  type="cameraVideoType"  minOccurs="0" maxOccurs="1"/>
+    <xs:element name="stills" type="cameraStillsType" minOccurs="0" maxOccurs="1"/>
   </xs:all>
 </xs:complexType>
 

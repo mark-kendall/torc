@@ -53,16 +53,19 @@ TorcCameraParams::TorcCameraParams(const QVariantMap &Details)
     m_gopSize(0),
     m_videoCodec()
 {
-    if (!Details.contains("width")     || !Details.contains("height")  ||
-        !Details.contains("framerate") || !Details.contains("bitrate"))
-    {
+    if (!Details.contains("width") || !Details.contains("height"))
         return;
-    }
+
+    bool bitrate   = Details.contains("bitrate");
+    bool framerate = Details.contains("framerate");
+    bool video     = bitrate && framerate;
+    bool stills    = !bitrate && !framerate;
+
+    if (!video && !stills)
+        return;
 
     m_width     = Details.value("width").toInt();
     m_height    = Details.value("height").toInt();
-    m_frameRate = Details.value("framerate").toInt();
-    m_bitrate   = Details.value("bitrate").toInt();
 
     // N.B. pitch and slice height may be further constrained in certain encoders and may be further adjusted
     // most h264 streams will expect 16 pixel aligned video so round up
@@ -99,34 +102,44 @@ TorcCameraParams::TorcCameraParams(const QVariantMap &Details)
         LOG(VB_GENERAL, LOG_WARNING, QString("Video too large - forcing output to %1x%2").arg(m_width).arg(m_height));
     }
 
-    if (m_frameRate < VIDEO_FRAMERATE_MIN)
+    if (video)
     {
-        m_frameRate = VIDEO_FRAMERATE_MIN;
-        LOG(VB_GENERAL, LOG_WARNING, QString("Video framerate too low - forcing to %1").arg(m_frameRate));
-    }
-    else if (m_frameRate > VIDEO_FRAMERATE_MAX)
-    {
-        m_frameRate = VIDEO_FRAMERATE_MAX;
-        LOG(VB_GENERAL, LOG_WARNING, QString("Video framerate too high - forcing to %1").arg(m_frameRate));
-    }
+        m_frameRate = Details.value("framerate").toInt();
+        m_bitrate   = Details.value("bitrate").toInt();
 
-    if (m_bitrate < VIDEO_BITRATE_MIN)
-    {
-        m_bitrate = VIDEO_BITRATE_MIN;
-        LOG(VB_GENERAL, LOG_WARNING, QString("Video bitrate too low - forcing to %1").arg(m_bitrate));
-    }
-    else if (m_bitrate > VIDEO_BITRATE_MAX)
-    {
-        m_bitrate = VIDEO_BITRATE_MAX;
-        LOG(VB_GENERAL, LOG_WARNING, QString("Video bitrate too high - forcing to %1").arg(m_bitrate));
-    }
+        if (m_frameRate < VIDEO_FRAMERATE_MIN)
+        {
+            m_frameRate = VIDEO_FRAMERATE_MIN;
+            LOG(VB_GENERAL, LOG_WARNING, QString("Video framerate too low - forcing to %1").arg(m_frameRate));
+        }
+        else if (m_frameRate > VIDEO_FRAMERATE_MAX)
+        {
+            m_frameRate = VIDEO_FRAMERATE_MAX;
+            LOG(VB_GENERAL, LOG_WARNING, QString("Video framerate too high - forcing to %1").arg(m_frameRate));
+        }
 
-    m_segmentLength = m_frameRate * VIDEO_SEGMENT_TARGET;
-    m_gopSize       = m_frameRate * VIDEO_GOPDURA_TARGET;
+        if (m_bitrate < VIDEO_BITRATE_MIN)
+        {
+            m_bitrate = VIDEO_BITRATE_MIN;
+            LOG(VB_GENERAL, LOG_WARNING, QString("Video bitrate too low - forcing to %1").arg(m_bitrate));
+        }
+        else if (m_bitrate > VIDEO_BITRATE_MAX)
+        {
+            m_bitrate = VIDEO_BITRATE_MAX;
+            LOG(VB_GENERAL, LOG_WARNING, QString("Video bitrate too high - forcing to %1").arg(m_bitrate));
+        }
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Segment length: %1frames %2seconds").arg(m_segmentLength).arg(m_segmentLength / m_frameRate));
-    LOG(VB_GENERAL, LOG_INFO, QString("GOP     length: %1frames %2seconds").arg(m_gopSize).arg(m_gopSize / m_frameRate));
-    LOG(VB_GENERAL, LOG_INFO, QString("Camera video  : %1x%2@%3fps bitrate %4").arg(m_width).arg(m_height).arg(m_frameRate).arg(m_bitrate));
+        m_segmentLength = m_frameRate * VIDEO_SEGMENT_TARGET;
+        m_gopSize       = m_frameRate * VIDEO_GOPDURA_TARGET;
+
+        LOG(VB_GENERAL, LOG_INFO, QString("Segment length: %1frames %2seconds").arg(m_segmentLength).arg(m_segmentLength / m_frameRate));
+        LOG(VB_GENERAL, LOG_INFO, QString("GOP     length: %1frames %2seconds").arg(m_gopSize).arg(m_gopSize / m_frameRate));
+        LOG(VB_GENERAL, LOG_INFO, QString("Camera video  : %1x%2@%3fps bitrate %4").arg(m_width).arg(m_height).arg(m_frameRate).arg(m_bitrate));
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_INFO, QString("Camera stills: %1x%2").arg(m_width).arg(m_height));
+    }
 
     m_valid = true;
 }
@@ -163,6 +176,76 @@ TorcCameraParams& TorcCameraParams::operator =(const TorcCameraParams &Other)
         this->m_videoCodec    = Other.m_videoCodec;
     }
     return *this;
+}
+
+bool TorcCameraParams::operator == (const TorcCameraParams &Other) const
+{
+    return this->m_valid         == Other.m_valid &&
+           this->m_width         == Other.m_width &&
+           this->m_height        == Other.m_height &&
+           this->m_stride        == Other.m_stride &&
+           this->m_sliceHeight   == Other.m_sliceHeight &&
+           this->m_frameRate     == Other.m_frameRate &&
+           this->m_bitrate       == Other.m_bitrate &&
+           this->m_timebase      == Other.m_timebase &&
+           this->m_segmentLength == Other.m_segmentLength &&
+           this->m_gopSize       == Other.m_gopSize;
+           // ignore codec - it is set by the camera device
+           //this->m_videoCodec    == Other.m_videoCodec;
+}
+
+TorcCameraParams TorcCameraParams::Combine(const TorcCameraParams &Add)
+{
+    if (!Add.m_valid)
+        return *this;
+    if (!m_valid)
+        return Add;
+    if (Add == *this)
+        return *this;
+
+    if (!IsCompatible(Add))
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Error combining camera parameters - %1x%2 != %3x%4")
+                                    .arg(m_width).arg(m_height).arg(Add.m_width).arg(Add.m_height));
+        // this should cover most cases
+        if ((m_width > Add.m_width) || (m_height > Add.m_height))
+        {
+            m_width  = Add.m_width;
+            m_height = Add.m_height;
+        }
+        LOG(VB_GENERAL, LOG_WARNING, QString("Using smaller image size %1x%2").arg(m_width).arg(m_height));
+    }
+
+    // add video data - nothing to add in reverse
+    if (IsStill() && Add.IsVideo())
+    {
+        m_bitrate       = Add.m_bitrate;
+        m_frameRate     = Add.m_frameRate;
+        m_gopSize       = Add.m_gopSize;
+        m_stride        = Add.m_stride;
+        m_sliceHeight   = Add.m_sliceHeight;
+        m_segmentLength = Add.m_segmentLength;
+        m_videoCodec    = Add.m_videoCodec;
+        m_timebase      = Add.m_timebase;
+        LOG(VB_GENERAL, LOG_INFO, "Added video to camera parameters");
+    }
+
+    return *this;
+}
+
+bool TorcCameraParams::IsVideo(void) const
+{
+    return m_valid && (m_frameRate > 1) && (m_bitrate > 0);
+}
+
+bool TorcCameraParams::IsStill(void) const
+{
+    return m_valid && (m_frameRate < 2) && (m_bitrate < 1);
+}
+
+bool TorcCameraParams::IsCompatible(const TorcCameraParams &Other) const
+{
+    return m_valid && Other.m_valid && (Other.m_width == m_width) && (Other.m_height == m_height);
 }
 
 TorcCameraDevice::TorcCameraDevice(const TorcCameraParams &Params)

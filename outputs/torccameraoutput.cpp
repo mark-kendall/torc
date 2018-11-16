@@ -20,18 +20,130 @@
 * USA.
 */
 
+// Qt
+#include <QDir>
+
 // Torc
 #include "torclogging.h"
+#include "torcmime.h"
+#include "torcdirectories.h"
 #include "torcoutputs.h"
 #include "torccamerathread.h"
 #include "torccameraoutput.h"
 
-TorcCameraVideoOutput::TorcCameraVideoOutput(const QString &ModelId, const QVariantMap &Details)
-  : TorcOutput(TorcOutput::Camera, 0.0, ModelId, Details, this, TorcCameraVideoOutput::staticMetaObject,
-               "WritingStarted,WritingStopped,CameraErrored,SegmentRemoved,InitSegmentReady,SegmentReady"),
+TorcCameraOutput::TorcCameraOutput(TorcOutput::Type Type, double Value, const QString &ModelId, const QVariantMap &Details,
+                                   QObject *Output, const QMetaObject &MetaObject, const QString &Blacklist)
+  : TorcOutput(Type, Value, ModelId, Details, Output, MetaObject, Blacklist + "," + "CameraErrored"),
     m_thread(NULL),
     m_threadLock(QReadWriteLock::Recursive),
-    m_params(TorcCameraParams(Details)),
+    m_params(Details)
+{
+}
+
+TorcCameraOutput::~TorcCameraOutput()
+{
+}
+
+TorcCameraParams& TorcCameraOutput::GetParams(void)
+{
+    return m_params;
+}
+
+void TorcCameraOutput::SetParams(TorcCameraParams &Params)
+{
+    m_params = Params;
+}
+
+TorcCameraStillsOutput::TorcCameraStillsOutput(const QString &ModelId, const QVariantMap &Details)
+  : TorcCameraOutput(TorcOutput::Camera, 0.0, ModelId, Details, this, TorcCameraStillsOutput::staticMetaObject,
+               "StillReady"),
+    m_stillsList(),
+    m_stillsDirectory()
+{
+    // TODO use a sub directory based on modelid as well. Pass this directory to TorcCameraDevice to use
+    m_stillsDirectory = GetTorcContentDir();
+
+    // populate m_stillsList - camera has not started yet, so should be static
+    QDir stillsdir(m_stillsDirectory);
+    QStringList namefilters;
+    QStringList imagefilters = TorcMime::ExtensionsForType("image");
+    foreach (QString image, imagefilters)
+        { namefilters << QString("*." + image); }
+    QFileInfoList stills = stillsdir.entryInfoList(namefilters, QDir::NoDotAndDotDot | QDir::Files | QDir::Readable, QDir::Name);
+    foreach (QFileInfo file, stills)
+        m_stillsList.append(file.path());
+
+    LOG(VB_GENERAL, LOG_INFO, m_stillsList.join("\r\n"));
+}
+
+TorcCameraStillsOutput::~TorcCameraStillsOutput()
+{
+    Stop();
+}
+
+void TorcCameraStillsOutput::Stop(void)
+{
+    m_threadLock.lockForWrite();
+    if (m_thread)
+    {
+        TorcCameraThread::CreateOrDestroy(m_thread, modelId);
+        m_thread = NULL;
+    }
+    m_threadLock.unlock();
+}
+
+void TorcCameraStillsOutput::Start(void)
+{
+    Stop();
+
+    m_threadLock.lockForWrite();
+    TorcCameraThread::CreateOrDestroy(m_thread, modelId, m_params);
+    if (m_thread)
+    {
+        m_thread->SetStillsParent(this);
+        m_thread->start();
+    }
+    m_threadLock.unlock();
+}
+
+QStringList TorcCameraStillsOutput::GetStillsList(void)
+{
+    QReadLocker locker(&m_threadLock);
+    return m_stillsList;
+}
+
+TorcOutput::Type TorcCameraStillsOutput::GetType(void)
+{
+    return TorcOutput::Camera;
+}
+
+void TorcCameraStillsOutput::CameraErrored(bool Errored)
+{
+    SetValid(!Errored);
+    if (Errored)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Camera reported error");
+        Stop();
+    }
+}
+
+void TorcCameraStillsOutput::StillReady(const QString File)
+{
+    QWriteLocker locker(&m_threadLock);
+    if (m_stillsList.contains(File))
+    {
+        LOG(VB_GENERAL, LOG_WARNING, QString("Still '%1' is duplicate - ignoring").arg(File));
+    }
+    else
+    {
+        m_stillsList.append(File);
+        emit StillsListChanged(m_stillsList);
+    }
+}
+
+TorcCameraVideoOutput::TorcCameraVideoOutput(const QString &ModelId, const QVariantMap &Details)
+  : TorcCameraOutput(TorcOutput::Camera, 0.0, ModelId, Details, this, TorcCameraVideoOutput::staticMetaObject,
+               "WritingStarted,WritingStopped,SegmentRemoved,InitSegmentReady,SegmentReady"),
     m_segments(),
     m_segmentLock(QReadWriteLock::Recursive),
     m_cameraStartTime()
@@ -388,73 +500,120 @@ void TorcCameraOutputs::Create(const QVariantMap &Details)
     QVariantMap::const_iterator ii = Details.constBegin();
     for ( ; ii != Details.constEnd(); ++ii)
     {
-        if (ii.key() == "outputs")
-        {
-            QVariantMap outputs = ii.value().toMap();
-            QVariantMap::const_iterator i = outputs.constBegin();
-            for ( ; i != outputs.constEnd(); ++i)
-            {
-                if (i.key() == "cameras")
-                {
-                    QVariantMap cameras = i.value().toMap();
-                    QVariantMap::iterator it = cameras.begin();
-                    for ( ; it != cameras.end(); ++it)
-                    {
-                        QVariantMap camera = it.value().toMap();
-                        if (!camera.contains("name"))
-                        {
-                            LOG(VB_GENERAL, LOG_ERR, QString("Camera '%1' has no name").arg(it.key()));
-                            continue;
-                        }
-                        if (!camera.contains("width"))
-                        {
-                            LOG(VB_GENERAL, LOG_ERR, QString("Camera '%1' does not specify width").arg(camera.value("name").toString()));
-                            continue;
-                        }
-                        if (!camera.contains("height"))
-                        {
-                            LOG(VB_GENERAL, LOG_ERR, QString("Camera '%1' does not specify height").arg(camera.value("name").toString()));
-                            continue;
-                        }
-                        if (!camera.contains("bitrate"))
-                        {
-                            LOG(VB_GENERAL, LOG_ERR, QString("Camera '%1' does not specify bitrate").arg(camera.value("name").toString()));
-                            continue;
-                        }
-                        if (!camera.contains("framerate"))
-                        {
-                            LOG(VB_GENERAL, LOG_ERR, QString("Camera '%1' does not specify framerate").arg(camera.value("name").toString()));
-                            continue;
-                        }
+        if (ii.key() != "outputs")
+            continue;
 
-                        // NB TorcCameraFactory checks that the underlying class can handle the specified camera
-                        // which ensures the TorcCameraOutput instance will be able to create the camera.
-                        TorcCameraVideoOutput *newcamera = NULL;
-                        TorcCameraFactory* factory = TorcCameraFactory::GetTorcCameraFactory();
-                        TorcCameraParams params(Details);
-                        for ( ; factory; factory = factory->NextFactory())
+        QVariantMap outputs = ii.value().toMap();
+        QVariantMap::const_iterator i = outputs.constBegin();
+        for ( ; i != outputs.constEnd(); ++i)
+        {
+            if (i.key() != "cameras")
+                continue;
+
+            QVariantMap cameras = i.value().toMap();
+            QVariantMap::iterator it = cameras.begin();
+            for ( ; it != cameras.end(); ++it)
+            {
+                QVariantMap types = it.value().toMap();
+                QVariantMap::iterator it2 = types.begin();
+                for ( ; it2 != types.end(); ++it2)
+                {
+                    bool video  = false;
+                    bool stills = false;
+                    QVariantMap camera;
+                    if (it2.key() == "video")
+                    {
+                        video = true;
+                        camera = it2.value().toMap();
+                    }
+                    else if (it2.key() == "stills")
+                    {
+                        stills = true;
+                        camera = it2.value().toMap();
+                    }
+                    else
+                    {
+                        LOG(VB_GENERAL, LOG_ERR, QString("Unknown camera interface '%1'").arg(it2.key()));
+                        continue;
+                    }
+
+                    if (!camera.contains("name"))
+                    {
+                        LOG(VB_GENERAL, LOG_ERR, QString("Camera '%1' has no name").arg(it.key()));
+                        continue;
+                    }
+                    if (!camera.contains("width"))
+                    {
+                        LOG(VB_GENERAL, LOG_ERR, QString("Camera '%1' does not specify width").arg(camera.value("name").toString()));
+                        continue;
+                    }
+                    if (!camera.contains("height"))
+                    {
+                        LOG(VB_GENERAL, LOG_ERR, QString("Camera '%1' does not specify height").arg(camera.value("name").toString()));
+                        continue;
+                    }
+                    bool bitrate   = camera.contains("bitrate");
+                    bool framerate = camera.contains("framerate");
+
+                    if (video && !bitrate)
+                    {
+                        LOG(VB_GENERAL, LOG_ERR, QString("Camera video interface '%1' does not specify bitrate").arg(camera.value("name").toString()));
+                        continue;
+                    }
+
+                    if (video && !framerate)
+                    {
+                        LOG(VB_GENERAL, LOG_ERR, QString("Camera video interface '%1' does not specify framerate").arg(camera.value("name").toString()));
+                        continue;
+                    }
+
+                    // NB TorcCameraFactory checks that the underlying class can handle the specified camera
+                    // which ensures the TorcCameraOutput instance will be able to create the camera.
+                    TorcCameraOutput *newcamera = NULL;
+                    TorcCameraFactory* factory = TorcCameraFactory::GetTorcCameraFactory();
+                    TorcCameraParams params(Details);
+                    for ( ; factory; factory = factory->NextFactory())
+                    {
+                        if (factory->CanHandle(it.key(), params))
                         {
-                            if (factory->CanHandle(it.key(), params))
-                            {
+                            if (video)
                                 newcamera = new TorcCameraVideoOutput(it.key(), camera);
+                            if (stills)
+                                newcamera = new TorcCameraStillsOutput(it.key(), camera);
+
+                            if (newcamera)
+                            {
                                 m_cameras.insertMulti(it.key(), newcamera);
                                 LOG(VB_GENERAL, LOG_INFO, QString("New '%1' camera '%2'").arg(it.key()).arg(newcamera->GetUniqueId()));
                                 break;
                             }
                         }
-                        if (NULL == newcamera)
-                            LOG(VB_GENERAL, LOG_WARNING, QString("Failed to find handler for camera '%1'").arg(it.key()));
                     }
+                    if (NULL == newcamera)
+                        LOG(VB_GENERAL, LOG_WARNING, QString("Failed to find handler for camera '%1'").arg(it.key()));
                 }
             }
         }
+    }
+
+    // we now need to analyse our list of cameras and combine the parameters for output devices that
+    // reference the same camera device
+    QList<QString> keys = m_cameras.uniqueKeys();
+    foreach (QString key, keys)
+    {
+        QList<TorcCameraOutput*> outputs = m_cameras.values(key);
+        TorcCameraParams params;
+        foreach (TorcCameraOutput* output, outputs)
+            params = params.Combine(output->GetParams());
+        foreach (TorcCameraOutput* output, outputs)
+            output->SetParams(params);
     }
 }
 
 void TorcCameraOutputs::Destroy(void)
 {
     QMutexLocker locker(&m_lock);
-    QHash<QString, TorcCameraVideoOutput*>::iterator it = m_cameras.begin();
+    QHash<QString, TorcCameraOutput*>::iterator it = m_cameras.begin();
     for ( ; it != m_cameras.end(); ++it)
     {
         TorcOutputs::gOutputs->RemoveOutput(it.value());

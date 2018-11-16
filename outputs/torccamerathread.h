@@ -7,6 +7,7 @@
 #include "torccamera.h"
 
 class TorcCameraVideoOutput;
+class TorcCameraStillsOutput;
 
 class TorcCameraThread final : public TorcQThread, public TorcReferenceCounter
 {
@@ -22,6 +23,7 @@ class TorcCameraThread final : public TorcQThread, public TorcReferenceCounter
     QByteArray        GetInitSegment (void);
     TorcCameraParams  GetParams      (void);
     void              SetVideoParent (TorcCameraVideoOutput *Parent);
+    void              SetStillsParent(TorcCameraStillsOutput *Parent);
 
   public slots:
     void              StopWriting    (void);
