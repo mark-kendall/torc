@@ -27,9 +27,9 @@
 
 void TorcCameraThread::CreateOrDestroy(TorcCameraThread *&Thread, const QString &Type, const TorcCameraParams &Params)
 {
-    QMutex lock(QMutex::NonRecursive);
-    QMutexLocker locker(&lock);
-    QMap<QString,TorcCameraThread*> threads;
+    static QMutex lock(QMutex::NonRecursive);
+    static QMutexLocker locker(&lock);
+    static QMap<QString,TorcCameraThread*> threads;
 
     if (Thread)
     {
@@ -107,7 +107,7 @@ void TorcCameraThread::SetParent(TorcCameraOutput *Parent)
     connect(this, SIGNAL(WritingStarted()),    m_parent, SLOT(WritingStarted()));
     connect(this, SIGNAL(WritingStopped()),    m_parent, SLOT(WritingStopped()));
     connect(this, SIGNAL(InitSegmentReady()),  m_parent, SLOT(InitSegmentReady()));
-    connect(this, SIGNAL(SegmentReady(int)),   m_parent, SLOT(InitSegmentReady()));
+    connect(this, SIGNAL(SegmentReady(int)),   m_parent, SLOT(SegmentReady()));
     connect(this, SIGNAL(SegmentRemoved(int)), m_parent, SLOT(SegmentRemoved(int)));
     connect(this, SIGNAL(CameraErrored(bool)), m_parent, SLOT(CameraErrored(bool)));
 }
