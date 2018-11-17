@@ -85,6 +85,7 @@ void TorcCameraStillsOutput::Stop(void)
     m_threadLock.lockForWrite();
     if (m_thread)
     {
+        disconnect(this, SIGNAL(ValueChanged(double)), this, SLOT(TakeStills(double)));
         TorcCameraThread::CreateOrDestroy(m_thread, modelId);
         m_thread = NULL;
     }
@@ -101,8 +102,15 @@ void TorcCameraStillsOutput::Start(void)
     {
         m_thread->SetStillsParent(this);
         m_thread->start();
+        // listen for requests
+        connect(this, SIGNAL(ValueChanged(double)), this, SLOT(TakeStills(double)));
     }
     m_threadLock.unlock();
+}
+
+void TorcCameraStillsOutput::TakeStills(double Count)
+{
+    emit TakeStills((uint)((quint64)Count & 0xffffffff));
 }
 
 QStringList TorcCameraStillsOutput::GetStillsList(void)
