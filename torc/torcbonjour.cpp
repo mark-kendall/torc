@@ -286,6 +286,7 @@ void BonjourBrowseCallback(DNSServiceRef Ref, DNSServiceFlags Flags,
 
     if (!(Flags & kDNSServiceFlagsMoreComing))
     {
+        // no idea
     }
 }
 
