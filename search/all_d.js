@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['name',['Name',['../d5/d15/class_torc_h_t_t_p_handler.html#ab800fd3cb042a325d9ddd2e5c80899ee',1,'TorcHTTPHandler::Name()'],['../d0/d53/struct_verbose_def.html#ab7572d0bc712771d5248dfa62d72ba78',1,'VerboseDef::name()'],['../dc/df7/struct_loglevel_def.html#a1635334cb4d4e058c246906a62f655f1',1,'LoglevelDef::name()'],['../dd/d3a/class_torc_network_service.html#a8425aa64fbe5fedfc525b5275d7ed6b2',1,'TorcNetworkService::name()']]],
+  ['name',['name',['../d0/d53/struct_verbose_def.html#ab7572d0bc712771d5248dfa62d72ba78',1,'VerboseDef::name()'],['../dc/df7/struct_loglevel_def.html#a1635334cb4d4e058c246906a62f655f1',1,'LoglevelDef::name()'],['../dd/d3a/class_torc_network_service.html#a8425aa64fbe5fedfc525b5275d7ed6b2',1,'TorcNetworkService::name()'],['../d5/d15/class_torc_h_t_t_p_handler.html#ab800fd3cb042a325d9ddd2e5c80899ee',1,'TorcHTTPHandler::Name()']]],
   ['network_5finputs_5fstring',['NETWORK_INPUTS_STRING',['../d7/dcc/torcnetworkinputs_8h.html#a44909b10f9754e068efc1d79578c2462',1,'torcnetworkinputs.h']]],
   ['networkavailable',['NetworkAvailable',['../d6/db6/class_torc.html#ae24951db8926b98a75762aef8448e473a5154ecec904db653a391442a7ee99df3',1,'Torc']]],
   ['networkchanged',['NetworkChanged',['../d6/db6/class_torc.html#ae24951db8926b98a75762aef8448e473ab06b1b5272ccc71a4f82453c5f6c984e',1,'Torc']]],
