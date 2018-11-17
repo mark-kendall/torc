@@ -66,6 +66,8 @@ TorcCameraStillsOutput::TorcCameraStillsOutput(const QString &ModelId, const QVa
 
     // populate m_stillsList - camera has not started yet, so should be static
     QDir stillsdir(m_stillsDirectory);
+    if (!stillsdir.exists())
+        stillsdir.mkpath(m_stillsDirectory);
     QStringList namefilters;
     QStringList imagefilters = TorcMime::ExtensionsForType("image");
     foreach (QString image, imagefilters)
