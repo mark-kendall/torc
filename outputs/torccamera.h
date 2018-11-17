@@ -46,6 +46,7 @@ class TorcCameraParams
     int     m_segmentLength;
     int     m_gopSize;
     QString m_videoCodec;
+    QString m_contentDir;
 };
 
 class TorcCameraDevice : public QObject

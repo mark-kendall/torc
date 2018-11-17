@@ -36,7 +36,8 @@ TorcCameraParams::TorcCameraParams(void)
     m_timebase(VIDEO_TIMEBASE),
     m_segmentLength(0),
     m_gopSize(0),
-    m_videoCodec()
+    m_videoCodec(),
+    m_contentDir()
 {
 }
 
@@ -51,7 +52,8 @@ TorcCameraParams::TorcCameraParams(const QVariantMap &Details)
     m_timebase(VIDEO_TIMEBASE),
     m_segmentLength(0),
     m_gopSize(0),
-    m_videoCodec()
+    m_videoCodec(),
+    m_contentDir()
 {
     if (!Details.contains("width") || !Details.contains("height"))
         return;
@@ -155,7 +157,8 @@ TorcCameraParams::TorcCameraParams(const TorcCameraParams &Other)
     m_timebase(Other.m_timebase),
     m_segmentLength(Other.m_segmentLength),
     m_gopSize(Other.m_gopSize),
-    m_videoCodec(Other.m_videoCodec)
+    m_videoCodec(Other.m_videoCodec),
+    m_contentDir(Other.m_contentDir)
 {
 }
 
@@ -174,6 +177,7 @@ TorcCameraParams& TorcCameraParams::operator =(const TorcCameraParams &Other)
         this->m_segmentLength = Other.m_segmentLength;
         this->m_gopSize       = Other.m_gopSize;
         this->m_videoCodec    = Other.m_videoCodec;
+        this->m_contentDir    = Other.m_contentDir;
     }
     return *this;
 }
@@ -192,6 +196,7 @@ bool TorcCameraParams::operator == (const TorcCameraParams &Other) const
            this->m_gopSize       == Other.m_gopSize;
            // ignore codec - it is set by the camera device
            //this->m_videoCodec    == Other.m_videoCodec;
+           //this->m_contentDir    == Other.m_contentDir;
 }
 
 TorcCameraParams TorcCameraParams::Combine(const TorcCameraParams &Add)
@@ -216,7 +221,7 @@ TorcCameraParams TorcCameraParams::Combine(const TorcCameraParams &Add)
         LOG(VB_GENERAL, LOG_WARNING, QString("Using smaller image size %1x%2").arg(m_width).arg(m_height));
     }
 
-    // add video data - nothing to add in reverse
+    // add video data
     if (IsStill() && Add.IsVideo())
     {
         m_bitrate       = Add.m_bitrate;
@@ -229,6 +234,11 @@ TorcCameraParams TorcCameraParams::Combine(const TorcCameraParams &Add)
         m_timebase      = Add.m_timebase;
         LOG(VB_GENERAL, LOG_INFO, "Added video to camera parameters");
     }
+    // add stills
+    else if (IsVideo() && Add.IsStill())
+    {
+        m_contentDir    = Add.m_contentDir;
+    }
 
     return *this;
 }
@@ -240,7 +250,7 @@ bool TorcCameraParams::IsVideo(void) const
 
 bool TorcCameraParams::IsStill(void) const
 {
-    return m_valid && (m_frameRate < 2) && (m_bitrate < 1);
+    return m_valid && (m_frameRate < 2) && (m_bitrate < 1) && !m_contentDir.isEmpty();
 }
 
 bool TorcCameraParams::IsCompatible(const TorcCameraParams &Other) const

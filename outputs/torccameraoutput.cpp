@@ -61,8 +61,8 @@ TorcCameraStillsOutput::TorcCameraStillsOutput(const QString &ModelId, const QVa
     m_stillsList(),
     m_stillsDirectory()
 {
-    // TODO use a sub directory based on modelid as well. Pass this directory to TorcCameraDevice to use
-    m_stillsDirectory = GetTorcContentDir();
+    m_stillsDirectory = GetTorcContentDir() + ModelId + "/";
+    m_params.m_contentDir = m_stillsDirectory;
 
     // populate m_stillsList - camera has not started yet, so should be static
     QDir stillsdir(m_stillsDirectory);

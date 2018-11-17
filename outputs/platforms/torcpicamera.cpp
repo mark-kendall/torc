@@ -307,19 +307,22 @@ bool TorcPiCamera::WriteFrame(void)
         {
             if (m_stillsToTake)
             {
-                QFile file(GetTorcContentDir() + QDateTime::currentDateTime().toString("dd_MM_yyyy_hh_mm_ss_zzz") + "_snapshot.jpg");
-                if (file.open(QIODevice::ReadWrite | QIODevice::Truncate))
+                if (!m_params.m_contentDir.isEmpty())
                 {
-                    QPair<quint32, uint8_t*> pair;
-                    foreach(pair, m_snapshotBuffers)
-                        file.write((const char*)pair.second, pair.first);
-                    file.close();
-                    LOG(VB_GENERAL, LOG_INFO, QString("Saved snapshot as '%1'").arg(file.fileName()));
-                    emit StillReady(file.fileName());
-                }
-                else
-                {
-                    LOG(VB_GENERAL, LOG_ERR, QString("Failed to open %1 for writing").arg(file.fileName()));
+                    QFile file(m_params.m_contentDir + QDateTime::currentDateTime().toString("yyyy_MM_dd_hh_mm_ss_zzz") + ".jpg");
+                    if (file.open(QIODevice::ReadWrite | QIODevice::Truncate))
+                    {
+                        QPair<quint32, uint8_t*> pair;
+                        foreach(pair, m_snapshotBuffers)
+                            file.write((const char*)pair.second, pair.first);
+                        file.close();
+                        LOG(VB_GENERAL, LOG_INFO, QString("Saved snapshot as '%1'").arg(file.fileName()));
+                        emit StillReady(file.fileName());
+                    }
+                    else
+                    {
+                        LOG(VB_GENERAL, LOG_ERR, QString("Failed to open %1 for writing").arg(file.fileName()));
+                    }
                 }
                 m_stillsToTake--;
             }
