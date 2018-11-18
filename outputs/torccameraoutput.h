@@ -61,9 +61,6 @@ class TorcCameraStillsOutput final : public TorcCameraOutput
     void             TakeStills        (uint Count);
     void             StillsListChanged (QStringList);
 
-  protected slots:
-    void             TakeStills        (double Count);
-
  private:
     Q_DISABLE_COPY(TorcCameraStillsOutput)
     QStringList       stillsList; // adding MEMBER to property deems it writeable ??
