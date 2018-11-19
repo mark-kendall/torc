@@ -106,6 +106,7 @@ void TorcCameraThread::SetVideoParent(TorcCameraVideoOutput *Parent)
         return;
 
     QWriteLocker locker(&m_cameraLock);
+    connect(Parent, SIGNAL(StreamVideo(bool)), this, SIGNAL(StreamVideo(bool)));
     connect(this, SIGNAL(WritingStarted()),    Parent, SLOT(WritingStarted()));
     connect(this, SIGNAL(WritingStopped()),    Parent, SLOT(WritingStopped()));
     connect(this, SIGNAL(InitSegmentReady()),  Parent, SLOT(InitSegmentReady()));
@@ -167,13 +168,15 @@ void TorcCameraThread::Start(void)
         return;
     }
 
-    // outbound video signals
+    // outbound streaming signals
     connect(m_camera, SIGNAL(WritingStarted()),    this, SIGNAL(WritingStarted()));
     connect(m_camera, SIGNAL(WritingStopped()),    this, SIGNAL(WritingStopped()));
     connect(m_camera, SIGNAL(InitSegmentReady()),  this, SIGNAL(InitSegmentReady()));
     connect(m_camera, SIGNAL(SegmentReady(int)),   this, SIGNAL(SegmentReady(int)));
     connect(m_camera, SIGNAL(SegmentRemoved(int)), this, SIGNAL(SegmentRemoved(int)));
     connect(m_camera, SIGNAL(SetErrored(bool)),    this, SIGNAL(CameraErrored(bool)));
+    // inbound streaming signals
+    connect(this, SIGNAL(StreamVideo(bool)), m_camera, SLOT(StreamVideo(bool)));
     // outbound stills signals
     connect(m_camera, SIGNAL(StillReady(QString)), this, SIGNAL(StillReady(QString)));
     // inbound stills signals

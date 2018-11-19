@@ -179,10 +179,12 @@ void TorcCameraVideoOutput::Start(void)
     {
         m_thread->SetVideoParent(this);
         m_thread->start();
+        connect(this, SIGNAL(ValueChanged(double)), this, SIGNAL(StreamVideo(bool)));
     }
     m_threadLock.unlock();
 }
 
+/// The 'init' segment is ready and available.
 void TorcCameraVideoOutput::InitSegmentReady(void)
 {
     QReadLocker locker(&m_threadLock);
@@ -196,9 +198,11 @@ void TorcCameraVideoOutput::InitSegmentReady(void)
     }
 }
 
+/// The camera has started to record video.
 void TorcCameraVideoOutput::WritingStarted(void)
 {
-    SetValue(1);
+    // we actually deem video output to be valid once the init segment has been received
+    // (which is signalled separately)
     LOG(VB_GENERAL, LOG_INFO, "Camera started");
 }
 
@@ -211,15 +215,16 @@ void TorcCameraVideoOutput::Stop(void)
     m_threadLock.lockForWrite();
     if (m_thread)
     {
+        disconnect(this, SIGNAL(ValueChanged(double)), this, SIGNAL(StreamVideo(bool)));
         TorcCameraThread::CreateOrDestroy(m_thread, modelId);
         m_thread = NULL;
     }
     m_threadLock.unlock();
 }
 
+/// The camera is no longer recording any video.
 void TorcCameraVideoOutput::WritingStopped(void)
 {
-    SetValue(0);
     LOG(VB_GENERAL, LOG_INFO, "Camera stopped");
     m_cameraStartTime = QDateTime();
 }

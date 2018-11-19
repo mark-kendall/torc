@@ -26,6 +26,7 @@ class TorcCameraThread final : public TorcQThread, public TorcReferenceCounter
     void              SetStillsParent(TorcCameraStillsOutput *Parent);
 
   signals:
+    void              StreamVideo    (bool Video);
     void              WritingStarted (void);
     void              WritingStopped (void);
     void              InitSegmentReady(void);

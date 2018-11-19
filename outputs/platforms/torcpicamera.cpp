@@ -171,6 +171,11 @@ void TorcPiCamera::TakeStills(uint Count)
     }
 }
 
+void TorcPiCamera::StreamVideo(bool Video)
+{
+    (void)Video;
+}
+
 bool TorcPiCamera::Setup(void)
 {
     // NB Pi hardware is initialised in TorcPiGPIO as it is static
@@ -393,6 +398,11 @@ void TorcPiCamera::ProcessStillsBuffer(OMX_BUFFERHEADERTYPE *Buffer)
 
     if (m_stillsExpected)
         StartStill();
+}
+
+bool TorcPiCamera::EnableVideo(bool Video)
+{
+    (void)Video;
 }
 
 /*! \brief Start capturing a video buffer.

@@ -34,6 +34,7 @@ class TorcPiCamera final : public TorcCameraDevice
 
   public slots:
     void TakeStills         (uint Count) override;
+    void StreamVideo        (bool Video) override;
     void BufferReady        (OMX_BUFFERHEADERTYPE *Buffer, quint64 Type);
 
   private:
@@ -45,6 +46,7 @@ class TorcPiCamera final : public TorcCameraDevice
 
     void StartVideo         (void);
     void ProcessVideoBuffer (OMX_BUFFERHEADERTYPE *Buffer);
+    bool EnableVideo        (bool Video);
 
     void StartStill         (void);
     void ProcessStillsBuffer(OMX_BUFFERHEADERTYPE *Buffer);

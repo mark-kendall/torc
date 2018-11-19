@@ -66,6 +66,7 @@ class TorcCameraDevice : public QObject
 
   public slots:
     virtual void     TakeStills      (uint Count) = 0;
+    virtual void     StreamVideo     (bool Video) = 0;
 
   signals:
     void             WritingStarted  (void);

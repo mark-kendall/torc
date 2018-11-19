@@ -92,6 +92,9 @@ class TorcCameraVideoOutput final : public TorcCameraOutput
     void             InitSegmentReady   (void);
     void             SegmentReady       (int Segment);
 
+  signals:
+    void             StreamVideo        (bool Video);
+
   private:
     QByteArray       GetMasterPlaylist  (void);
     QByteArray       GetHLSPlaylist     (void);
