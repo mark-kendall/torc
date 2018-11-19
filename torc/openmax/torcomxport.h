@@ -14,8 +14,10 @@
 #include "OMX_Core.h"
 #include "OMX_Component.h"
 
-class TorcOMXPort final
+class TorcOMXPort final : public QObject
 {
+    Q_OBJECT
+
   public:
     TorcOMXPort(TorcOMXComponent *Parent, OMX_HANDLETYPE Handle, OMX_U32 Port, OMX_INDEXTYPE Domain);
    ~TorcOMXPort();
@@ -24,13 +26,17 @@ class TorcOMXPort final
     OMX_INDEXTYPE                 GetDomain      (void);
     OMX_ERRORTYPE                 EnablePort     (bool Enable, bool Wait = true);
     OMX_U32                       GetAvailableBuffers (void);
-    OMX_ERRORTYPE                 CreateBuffers  (void);
+    OMX_ERRORTYPE                 CreateBuffers  (QObject* Owner = NULL);
     OMX_ERRORTYPE                 DestroyBuffers (void);
     OMX_ERRORTYPE                 Flush          (void);
     OMX_ERRORTYPE                 MakeAvailable  (OMX_BUFFERHEADERTYPE* Buffer);
     OMX_BUFFERHEADERTYPE*         GetBuffer      (OMX_S32 Timeout);
 
+  signals:
+    void                          BufferReady    (OMX_BUFFERHEADERTYPE* Buffer, quint64 Type);
+
   private:
+    QObject                      *m_owner;
     TorcOMXComponent             *m_parent;
     OMX_HANDLETYPE                m_handle;
     OMX_U32                       m_port;

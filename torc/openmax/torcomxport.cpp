@@ -28,7 +28,8 @@
 #include "torcomxport.h"
 
 TorcOMXPort::TorcOMXPort(TorcOMXComponent *Parent, OMX_HANDLETYPE Handle, OMX_U32 Port, OMX_INDEXTYPE Domain)
-  : m_parent(Parent),
+  : m_owner(NULL),
+    m_parent(Parent),
     m_handle(Handle),
     m_port(Port),
     m_domain(Domain),
@@ -99,12 +100,16 @@ OMX_U32 TorcOMXPort::GetAvailableBuffers(void)
     return result;
 }
 
-OMX_ERRORTYPE TorcOMXPort::CreateBuffers(void)
+OMX_ERRORTYPE TorcOMXPort::CreateBuffers(QObject *Owner /*=NULL*/)
 {
     if (!m_handle)
         return OMX_ErrorUndefined;
 
     QMutexLocker locker(&m_lock);
+
+    m_owner = Owner;
+    if (m_owner)
+        connect(this, SIGNAL(BufferReady(OMX_BUFFERHEADERTYPE*, quint64)), m_owner, SLOT(BufferReady(OMX_BUFFERHEADERTYPE*, quint64)), Qt::QueuedConnection);
 
     OMX_PARAM_PORTDEFINITIONTYPE portdefinition;
     OMX_INITSTRUCTURE(portdefinition);
@@ -144,6 +149,12 @@ OMX_ERRORTYPE TorcOMXPort::DestroyBuffers(void)
 {
     if (!m_handle || !m_parent)
         return OMX_ErrorUndefined;
+
+    if (m_owner)
+    {
+        disconnect(this, SIGNAL(BufferReady(OMX_BUFFERHEADERTYPE*, quint64)), m_owner, SLOT(BufferReady(OMX_BUFFERHEADERTYPE*, quint64)));
+        m_owner = NULL;
+    }
 
     (void)EnablePort(false);
 
@@ -185,6 +196,7 @@ OMX_ERRORTYPE TorcOMXPort::MakeAvailable(OMX_BUFFERHEADERTYPE *Buffer)
     m_lock.unlock();
 
     m_wait.wakeAll();
+    emit BufferReady(Buffer, (quint64)m_domain);
     return OMX_ErrorNone;
 }
 

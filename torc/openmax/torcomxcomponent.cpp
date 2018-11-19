@@ -356,13 +356,13 @@ OMX_ERRORTYPE TorcOMXComponent::FillThisBuffer(OMX_BUFFERHEADERTYPE *Buffer)
     return OMX_ErrorNone;
 }
 
-OMX_ERRORTYPE TorcOMXComponent::CreateBuffers(OMX_DIRTYPE Direction, OMX_U32 Index, OMX_INDEXTYPE Domain)
+OMX_ERRORTYPE TorcOMXComponent::CreateBuffers(OMX_DIRTYPE Direction, OMX_U32 Index, OMX_INDEXTYPE Domain, QObject* Owner /*=NULL*/)
 {
     QMutexLocker locker(&m_lock);
 
     TorcOMXPort *port = FindPort(Direction, Index, Domain);
     if (port)
-        return port->CreateBuffers();
+        return port->CreateBuffers(Owner);
 
     return OMX_ErrorUndefined;
 }
