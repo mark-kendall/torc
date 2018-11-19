@@ -132,6 +132,7 @@ var searchData=
   ['m_5freversefields',['m_reverseFields',['../d0/db9/class_torc_i_o_t_logger.html#acb3f8e53108a8845aad1d2516cd4a6a9',1,'TorcIOTLogger']]],
   ['m_5frewindpositioninfile',['m_rewindPositionInFile',['../d3/ded/class_torc_network_request.html#ae049d3e5c174e8ed09f49fa1a820aaae',1,'TorcNetworkRequest']]],
   ['m_5fringbuffer',['m_ringBuffer',['../d3/dfd/class_torc_camera_device.html#ac9db1b4759e27dd4a5df91d49f9e2837',1,'TorcCameraDevice']]],
+  ['m_5fringbufferlock',['m_ringBufferLock',['../d3/dfd/class_torc_camera_device.html#a669b5852085719e297cff4945800f005',1,'TorcCameraDevice']]],
   ['m_5fsecure',['m_secure',['../da/dfc/class_torc_h_t_t_p_request.html#a93eecb632f16680f4d3e7d6a5adac79a',1,'TorcHTTPRequest']]],
   ['m_5fsegmentcounter',['m_segmentCounter',['../df/d16/class_torc_segmented_ring_buffer.html#a0f36ae292332d395828e7fa1a6df72b3',1,'TorcSegmentedRingBuffer']]],
   ['m_5fsegmentlength',['m_segmentLength',['../da/dfa/class_torc_camera_params.html#af550b7894e351ecc6e245dcff9aef5d6',1,'TorcCameraParams']]],
