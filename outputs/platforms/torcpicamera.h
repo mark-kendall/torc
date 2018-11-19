@@ -29,11 +29,12 @@ class TorcPiCamera final : public TorcCameraDevice
     virtual ~TorcPiCamera();
 
     bool Setup              (void) override;
-    bool WriteFrame         (void) override;
+    bool Start              (void) override;
     bool Stop               (void) override;
 
   public slots:
     void TakeStills         (uint Count) override;
+    void BufferReady        (OMX_BUFFERHEADERTYPE *Buffer, quint64 Type);
 
   private:
     bool LoadDrivers        (void);
@@ -41,12 +42,21 @@ class TorcPiCamera final : public TorcCameraDevice
     bool ConfigureCamera    (void);
     bool ConfigureVideoEncoder(void);
     bool ConfigureImageEncoder(void);
-    void ClearSnapshotBuffers(void);
+
+    void StartVideo         (void);
+    void ProcessVideoBuffer (OMX_BUFFERHEADERTYPE *Buffer);
+
+    void StartStill         (void);
+    void ProcessStillsBuffer(OMX_BUFFERHEADERTYPE *Buffer);
+    void ClearStillsBuffers (void);
+    bool EnableStills       (uint Count);
 
   private:
     Q_DISABLE_COPY(TorcPiCamera)
 
     CameraType               m_cameraType;
+
+    // OpenMax
     TorcOMXCore              m_core;
     TorcOMXComponent         m_camera;
     TorcOMXComponent         m_videoEncoder;
@@ -63,14 +73,17 @@ class TorcPiCamera final : public TorcCameraDevice
     TorcOMXTunnel            m_previewTunnel;
     TorcOMXTunnel            m_imageTunnel;
 
+    // stream
     TorcMuxer               *m_muxer;
     int                      m_videoStream;
     quint64                  m_frameCount;
     AVPacket                *m_bufferedPacket;
     bool                     m_haveInitSegment;
-    uint                     m_stillsToTake;
-    bool                     m_firstStill;
-    QList<QPair<quint32, uint8_t*> > m_snapshotBuffers;
+
+    // stills
+    uint                     m_stillsRequired;
+    uint                     m_stillsExpected;
+    QList<QPair<quint32, uint8_t*> > m_stillsBuffers;
 };
 
 #endif // TORCPICAMERA_H

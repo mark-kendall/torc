@@ -261,12 +261,14 @@ bool TorcCameraParams::IsCompatible(const TorcCameraParams &Other) const
 TorcCameraDevice::TorcCameraDevice(const TorcCameraParams &Params)
   : QObject(),
     m_params(Params),
-    m_ringBuffer(NULL)
+    m_ringBuffer(NULL),
+    m_ringBufferLock(QReadWriteLock::Recursive)
 {
 }
 
 TorcCameraDevice::~TorcCameraDevice()
 {
+    QWriteLocker locker(&m_ringBufferLock);
     if (m_ringBuffer)
     {
         delete m_ringBuffer;
@@ -276,6 +278,7 @@ TorcCameraDevice::~TorcCameraDevice()
 
 QByteArray TorcCameraDevice::GetSegment(int Segment)
 {
+    QWriteLocker locker(&m_ringBufferLock);
     if (m_ringBuffer)
         return m_ringBuffer->GetSegment(Segment);
     return QByteArray();
@@ -283,6 +286,7 @@ QByteArray TorcCameraDevice::GetSegment(int Segment)
 
 QByteArray TorcCameraDevice::GetInitSegment(void)
 {
+    QWriteLocker locker(&m_ringBufferLock);
     if (m_ringBuffer)
         return m_ringBuffer->GetInitSegment();
     return QByteArray();

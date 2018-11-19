@@ -25,6 +25,15 @@
 #include "torccameraoutput.h"
 #include "torccamerathread.h"
 
+/*! \brief Create and release shared camera threads/devices.
+ *
+ * A TorcCamera device can be configured to stream video and/or capture still images. Each role requires different for control
+ * and to avoid breaking the 'single input to an output' rule, we create different output devices for stills and video. These can then
+ * present their own methods externally and have custom controls/logic to handle their state. These output devices then share
+ * the camera thread by way of custom referencing counting.
+ *
+ * This static method encapsulates all camera thread creation, sharing and destruction without needing any external state.
+*/
 void TorcCameraThread::CreateOrDestroy(TorcCameraThread *&Thread, const QString &Type, const TorcCameraParams &Params)
 {
     static QMutex lock(QMutex::NonRecursive);
@@ -73,26 +82,24 @@ void TorcCameraThread::CreateOrDestroy(TorcCameraThread *&Thread, const QString 
     }
 }
 
+/*! \brief A custom thread to run TorcCameraDevice's
+ */
 TorcCameraThread::TorcCameraThread( const QString &Type, const TorcCameraParams &Params)
   : TorcQThread("Camera"),
     m_type(Type),
     m_params(Params),
     m_camera(NULL),
-    m_cameraLock(QReadWriteLock::Recursive),
-    m_stop(false)
+    m_cameraLock(QReadWriteLock::Recursive)
 {
 }
 
 TorcCameraThread::~TorcCameraThread()
 {
-    QWriteLocker locker(&m_cameraLock);
-    if (m_camera)
-    {
-        delete m_camera;
-        m_camera = NULL;
-    }
+    delete m_camera;
 }
 
+/*! \brief Connect camera signals for video streaming to the stream output device.
+ */
 void TorcCameraThread::SetVideoParent(TorcCameraVideoOutput *Parent)
 {
     if (!Parent)
@@ -107,6 +114,8 @@ void TorcCameraThread::SetVideoParent(TorcCameraVideoOutput *Parent)
     connect(this, SIGNAL(CameraErrored(bool)), Parent, SLOT(CameraErrored(bool)));
 }
 
+/*! \brief Connect camera signals for stills capture.
+ */
 void TorcCameraThread::SetStillsParent(TorcCameraStillsOutput *Parent)
 {
     if (!Parent)
@@ -120,14 +129,13 @@ void TorcCameraThread::SetStillsParent(TorcCameraStillsOutput *Parent)
 
 /*! \brief Decrement the reference count for this thread.
  *
- * We cannot use the default DownRef implementatin as we need to stop the thread
+ * We cannot use the default DownRef implementation as we need to stop the thread
  * before deleting it.
 */
 bool TorcCameraThread::DownRef(void)
 {
     if (!m_refCount.deref())
     {
-        StopWriting();
         quit();
         wait();
         if (!m_eventLoopEnding)
@@ -147,64 +155,44 @@ bool TorcCameraThread::DownRef(void)
     return false;
 }
 
-void TorcCameraThread::StopWriting(void)
-{
-    m_stop = true;
-}
-
 void TorcCameraThread::Start(void)
 {
-    if (m_stop)
-        return;
-
     LOG(VB_GENERAL, LOG_INFO, "Camera thread starting");
 
-    m_cameraLock.lockForWrite();
+    QWriteLocker locker(&m_cameraLock);
     m_camera = TorcCameraFactory::GetCamera(m_type, m_params);
-
-    if (m_camera)
+    if (!m_camera)
     {
-        // outbound video signals
-        connect(m_camera, SIGNAL(InitSegmentReady()),  this, SIGNAL(InitSegmentReady()));
-        connect(m_camera, SIGNAL(SegmentReady(int)),   this, SIGNAL(SegmentReady(int)));
-        connect(m_camera, SIGNAL(SegmentRemoved(int)), this, SIGNAL(SegmentRemoved(int)));
-        connect(m_camera, SIGNAL(SetErrored(bool)),    this, SIGNAL(CameraErrored(bool)));
-        // outbound stills signals
-        connect(m_camera, SIGNAL(StillReady(QString)), this, SIGNAL(StillReady(QString)));
-        // inbound stills signals
-        connect(this, SIGNAL(TakeStills(uint)), m_camera, SLOT(TakeStills(uint)));
-
-        if (m_camera->Setup())
-        {
-            m_cameraLock.unlock();
-            emit WritingStarted();
-            m_cameraLock.lockForRead();
-            while (!m_stop)
-            {
-                if (!m_camera->WriteFrame())
-                {
-                    LOG(VB_GENERAL, LOG_WARNING, "Camera returned error from WriteFrame()");
-                    break;
-                }
-            }
-            m_cameraLock.unlock();
-            m_cameraLock.lockForWrite();
-            m_camera->Stop();
-        }
-
-        m_camera->disconnect();
-        delete m_camera;
-        m_camera = NULL;
+        quit();
+        return;
     }
 
-    m_cameraLock.unlock();
+    // outbound video signals
+    connect(m_camera, SIGNAL(WritingStarted()),    this, SIGNAL(WritingStarted()));
+    connect(m_camera, SIGNAL(WritingStopped()),    this, SIGNAL(WritingStopped()));
+    connect(m_camera, SIGNAL(InitSegmentReady()),  this, SIGNAL(InitSegmentReady()));
+    connect(m_camera, SIGNAL(SegmentReady(int)),   this, SIGNAL(SegmentReady(int)));
+    connect(m_camera, SIGNAL(SegmentRemoved(int)), this, SIGNAL(SegmentRemoved(int)));
+    connect(m_camera, SIGNAL(SetErrored(bool)),    this, SIGNAL(CameraErrored(bool)));
+    // outbound stills signals
+    connect(m_camera, SIGNAL(StillReady(QString)), this, SIGNAL(StillReady(QString)));
+    // inbound stills signals
+    connect(this, SIGNAL(TakeStills(uint)), m_camera, SLOT(TakeStills(uint)));
 
-    LOG(VB_GENERAL, LOG_INFO, "Camera thread stopping");
-    emit WritingStopped();
+    if (!m_camera->Setup() || !m_camera->Start())
+        quit();
 }
 
 void TorcCameraThread::Finish(void)
 {
+    if (m_camera)
+    {
+        m_camera->Stop();
+        delete m_camera;
+        m_camera = NULL;
+    }
+
+    LOG(VB_GENERAL, LOG_INFO, "Camera thread stopping");
 }
 
 QByteArray TorcCameraThread::GetSegment(int Segment)

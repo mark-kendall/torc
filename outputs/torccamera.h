@@ -58,7 +58,7 @@ class TorcCameraDevice : public QObject
     virtual ~TorcCameraDevice();
 
     virtual bool     Setup           (void) = 0;
-    virtual bool     WriteFrame      (void) = 0;
+    virtual bool     Start           (void) = 0;
     virtual bool     Stop            (void) = 0;
     QByteArray       GetSegment      (int Segment);
     QByteArray       GetInitSegment  (void);
@@ -68,6 +68,8 @@ class TorcCameraDevice : public QObject
     virtual void     TakeStills      (uint Count) = 0;
 
   signals:
+    void             WritingStarted  (void);
+    void             WritingStopped  (void);
     void             SegmentRemoved  (int Segment);
     void             InitSegmentReady(void);
     void             SegmentReady    (int Segment);
@@ -77,6 +79,7 @@ class TorcCameraDevice : public QObject
   protected:
     TorcCameraParams m_params;
     TorcSegmentedRingBuffer *m_ringBuffer;
+    QReadWriteLock   m_ringBufferLock;
 
   private:
     Q_DISABLE_COPY(TorcCameraDevice)

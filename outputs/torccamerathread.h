@@ -25,9 +25,6 @@ class TorcCameraThread final : public TorcQThread, public TorcReferenceCounter
     void              SetVideoParent (TorcCameraVideoOutput *Parent);
     void              SetStillsParent(TorcCameraStillsOutput *Parent);
 
-  public slots:
-    void              StopWriting    (void);
-
   signals:
     void              WritingStarted (void);
     void              WritingStopped (void);
@@ -47,7 +44,6 @@ class TorcCameraThread final : public TorcQThread, public TorcReferenceCounter
     TorcCameraParams  m_params;
     TorcCameraDevice *m_camera;
     QReadWriteLock    m_cameraLock;
-    bool              m_stop;
 };
 
 
