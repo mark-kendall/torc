@@ -379,7 +379,16 @@ void TorcCameraVideoOutput::ProcessHTTPRequest(const QString &PeerAddress, int P
             }
             else
             {
-                LOG(VB_GENERAL, LOG_WARNING, "Segment not found");
+                QReadLocker locker(&m_segmentLock);
+                if (m_segments.isEmpty())
+                {
+                    LOG(VB_GENERAL, LOG_WARNING, QString("No segments - %1 requested").arg(num));
+                }
+                {
+                    LOG(VB_GENERAL, LOG_WARNING, QString("Segment %1 not found - we have %2-%3")
+                        .arg(num).arg(m_segments.constLast()).arg(m_segments.constFirst()));
+                }
+
             }
         }
         else
