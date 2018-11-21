@@ -27,7 +27,8 @@ QMutex*      TorcDevice::gDeviceListLock         = new QMutex(QMutex::Recursive)
 
 TorcDevice::TorcDevice(bool Valid, double Value, double Default,
                        const QString &ModelId,   const QVariantMap &Details)
-  : TorcReferenceCounter(),
+  : QObject(),
+    TorcReferenceCounter(),
     valid(Valid),
     value(Value),
     defaultValue(Default),
