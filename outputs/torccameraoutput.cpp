@@ -386,7 +386,7 @@ void TorcCameraVideoOutput::ProcessHTTPRequest(const QString &PeerAddress, int P
                 }
                 {
                     LOG(VB_GENERAL, LOG_WARNING, QString("Segment %1 not found - we have %2-%3")
-                        .arg(num).arg(m_segments.constLast()).arg(m_segments.constFirst()));
+                        .arg(num).arg(m_segments.last()).arg(m_segments.first()));
                 }
 
             }
