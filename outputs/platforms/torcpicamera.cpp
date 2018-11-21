@@ -403,6 +403,7 @@ void TorcPiCamera::ProcessStillsBuffer(OMX_BUFFERHEADERTYPE *Buffer)
 bool TorcPiCamera::EnableVideo(bool Video)
 {
     (void)Video;
+    return true;
 }
 
 /*! \brief Start capturing a video buffer.
