@@ -66,6 +66,7 @@ TorcSSDP::TorcSSDP()
     m_announceOptions(),
     m_serverString(),
     m_searching(false),
+    m_searchDebugged(false),
     m_firstSearchTimer(0),
     m_secondSearchTimer(0),
     m_firstAnnounceTimer(0),
@@ -396,9 +397,14 @@ void TorcSSDP::SendSearch(void)
         QByteArray ipv4search = QString(search).arg(TORC_IPV4_UDP_MULTICAST_URL).arg(searchdevice).toLocal8Bit();
         qint64 sent = m_ipv4MulticastSocket->writeDatagram(ipv4search, m_ipv4GroupAddress, TORC_SSDP_UDP_MULTICAST_PORT);
         if (sent != ipv4search.size())
+        {
             LOG(VB_GENERAL, LOG_ERR, QString("Error sending IPv4 search request (%1)").arg(m_ipv4MulticastSocket->errorString()));
-        else
+        }
+        else if (!m_searchDebugged)
+        {
             LOG(VB_GENERAL, LOG_INFO, "Sent IPv4 SSDP global search request");
+            LOG(VB_GENERAL, LOG_INFO, "Will send further IPv4 requests every 5 minutes");
+        }
     }
 
     if (m_searchOptions.ipv6 && !m_ipv6Address.isEmpty() && m_ipv6LinkMulticastSocket && m_ipv6LinkMulticastSocket->isValid() && m_ipv6LinkMulticastSocket->state() == QAbstractSocket::BoundState)
@@ -407,10 +413,16 @@ void TorcSSDP::SendSearch(void)
         QByteArray ipv6search = QString(search).arg(TORC_IPV6_UDP_MULTICAST_URL).arg(searchdevice).toLocal8Bit();
         qint64 sent = m_ipv6LinkMulticastSocket->writeDatagram(ipv6search, m_ipv6LinkGroupBaseAddress, TORC_SSDP_UDP_MULTICAST_PORT);
         if (sent != ipv6search.size())
+        {
             LOG(VB_GENERAL, LOG_ERR, QString("Error sending IPv6 search request (%1)").arg(m_ipv6LinkMulticastSocket->errorString()));
-        else
+        }
+        else if (!m_searchDebugged)
+        {
             LOG(VB_GENERAL, LOG_INFO, "Sent IPv6 SSDP global search request");
+            LOG(VB_GENERAL, LOG_INFO, "Will send further IPv6 requests every 5 minutes");
+        }
     }
+    m_searchDebugged = true;
 }
 
 void TorcSSDP::SearchPriv(void)
@@ -959,6 +971,7 @@ void TorcSSDP::StartSearch(void)
     // and schedule another search for after the MX time in our first request (3)
     m_secondSearchTimer = startTimer(5000, Qt::CoarseTimer);
 
+    m_searchDebugged = false;
     m_searching = true;
 }
 

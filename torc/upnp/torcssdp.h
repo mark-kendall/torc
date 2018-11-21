@@ -101,6 +101,7 @@ class TorcSSDP final : public QObject
     TorcHTTPServer::Status              m_announceOptions;
     QString                             m_serverString;
     bool                                m_searching;
+    bool                                m_searchDebugged;
     int                                 m_firstSearchTimer;
     int                                 m_secondSearchTimer;
     int                                 m_firstAnnounceTimer;
