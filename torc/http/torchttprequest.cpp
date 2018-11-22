@@ -555,7 +555,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
                                 continue;
                             }
 
-                            LOG(VB_GENERAL, LOG_ERR, QString("Error sending data (%1)").arg(errno));
+                            LOG(VB_GENERAL, LOG_ERR, QString("Error sending data (%1) %2").arg(errno).arg(strerror(errno)));
                             break;
                         }
                         else
@@ -657,7 +657,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
                             continue;
                         }
 
-                        LOG(VB_GENERAL, LOG_ERR, QString("Error sending data (%1)").arg(errno));
+                        LOG(VB_GENERAL, LOG_ERR, QString("Error sending data (%1 - '%2')").arg(errno).arg(strerror(errno)));
                         break;
                     }
                     else
