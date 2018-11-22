@@ -371,7 +371,7 @@ void TorcControl::Graph(QByteArray* Data)
         desc.append(QString(DEVICE_LINE_ITEM).arg(tr("Value %1").arg(GetValue())));
 
         Data->append(QString("    \"%1\" [shape=record id=\"%1\" label=<<B>%2</B>%3>];\r\n")
-                             .arg(uniqueId).arg(userName).arg(desc));
+                             .arg(uniqueId).arg(userName.isEmpty() ? uniqueId : userName).arg(desc));
     }
 
     QMap<QObject*,QString>::const_iterator it = m_outputs.constBegin();
