@@ -295,6 +295,18 @@
   </xs:all>
 </xs:complexType>
 
+<xs:complexType name="complexerLogicType">
+  <xs:all>
+    <xs:element name="name"       type="deviceNameType"/>
+    <xs:element name="username"   type="userNameType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="inputs"     type="deviceInputOutputType"/>
+    <xs:element name="outputs"    type="deviceInputsOutputsType"/>
+    <xs:element name="references" type="deviceInputOutputType"/>
+    <xs:element name="triggers"   type="deviceInputOutputType"/>
+  </xs:all>
+</xs:complexType>
+
 <xs:complexType name="logicType">
   <xs:choice minOccurs="1" maxOccurs="unbounded">
     <xs:element name="passthrough"        type="simpleLogicType"/>
@@ -311,6 +323,9 @@
     <xs:element name="greaterthan"        type="complexLogicType"/>
     <xs:element name="lessthanorequal"    type="complexLogicType"/>
     <xs:element name="greaterthanorequal" type="complexLogicType"/>
+    <xs:element name="runningaverage"     type="complexerLogicType"/>
+    <xs:element name="runningmax"         type="complexLogicType"/>
+    <xs:element name="runningmin"         type="complexLogicType"/>
   </xs:choice>
 </xs:complexType>
 

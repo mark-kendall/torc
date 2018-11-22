@@ -95,27 +95,79 @@
         <name>any</name>
         <username>Any</username>
         <userdescription>Allow any</userdescription>
-        <inputs><device>lessthan</device><device>transition</device></inputs>
+        <inputs><device>lessthan</device><device>lineartransition1</device></inputs>
         <outputs><device>networkpwmoutput</device></outputs>
       </any>
+      <runningaverage>
+        <name>runningavg</name>
+        <username>Running average</username>
+        <inputs><device>lineartransition2</device></inputs>
+        <references><device>2minutetimer</device></references>
+        <triggers><device>2secondtimer</device></triggers>
+        <outputs><device>runningavgout</device></outputs>
+      </runningaverage>
+      <runningmin>
+        <name>runningmin</name>
+        <username>Running minimum</username>
+        <inputs><device>lineartransition2</device></inputs>
+        <references><device>2minutetimer</device></references>
+        <outputs><device>runningminout</device></outputs>
+      </runningmin>
+      <runningmax>
+        <name>runningmax</name>
+        <username>Running maximum</username>
+        <inputs><device>lineartransition2</device></inputs>
+        <references><device>2minutetimer</device></references>
+        <outputs><device>runningmaxout</device></outputs>
+      </runningmax>
     </logic>
     <timer>
+      <minutely>
+        <name>minutetimer</name>
+        <username>minutetimer</username>
+        <start>0.30</start>
+        <duration>0:0.30</duration>
+        <outputs><device>lineartransition2</device></outputs>
+      </minutely>
+      <custom>
+        <name>2minutetimer</name>
+        <username>2 minute reset</username>
+        <period>0:2</period>
+        <start>0:1.59</start>
+        <duration>0:0.1</duration>
+        <outputs><device>runningavg</device><device>runningmin</device><device>runningmax</device></outputs>
+      </custom>
+      <custom>
+        <name>2secondtimer</name>
+        <username>2 second average</username>
+        <period>0:0.2</period>
+        <start>0:0.1</start>
+        <duration>0:0.1</duration>
+        <outputs><device>runningavg</device></outputs>
+      </custom>
       <custom>
         <name>customtimer</name>
         <username>Custom timer</username>
         <period>0:0.40</period>
         <start>0:0.10</start>
         <duration>0:0.20</duration>
-        <outputs><device>transition</device></outputs>
+        <outputs><device>lineartransition1</device></outputs>
       </custom>
     </timer>
     <transition>
       <linear>
-        <name>transition</name>
-        <username>lineartransition</username>
+        <name>lineartransition1</name>
+        <username>Linear Transition</username>
         <duration>0:0.20</duration>
         <inputs><device>customtimer</device></inputs>
         <outputs><device>any</device></outputs>
+      </linear>
+      <linear>
+        <name>lineartransition2</name>
+        <username>Variable value</username>
+        <duration>0:0.30</duration>
+        <inputs><device>minutetimer</device></inputs>
+        <outputs><device>runningavg</device><device>runningmin</device><device>runningmax</device></outputs>
       </linear>
     </transition>
   </controls>
@@ -139,6 +191,18 @@
       </temperature>
     </constant>
     <network>
+      <pwm>
+        <name>runningavgout</name>
+        <default>0</default>
+      </pwm>
+      <pwm>
+        <name>runningminout</name>
+        <default>0</default>
+      </pwm>
+      <pwm>
+        <name>runningmaxout</name>
+        <default>0</default>
+      </pwm>
       <temperature>
         <name>networkoutputtemp</name>
         <username>Network temperature output</username>

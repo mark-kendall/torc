@@ -24,7 +24,10 @@ class TorcLogicControl : public TorcControl
         Invert,
         Maximum,
         Minimum,
-        Multiply
+        Multiply,
+        RunningAverage,
+        RunningMax,
+        RunningMin
     };
 
     static TorcLogicControl::Operation StringToOperation (const QString &Operation);
@@ -45,10 +48,17 @@ class TorcLogicControl : public TorcControl
     Q_DISABLE_COPY(TorcLogicControl)
     TorcLogicControl::Operation m_operation;
 
-    // Reference device for controls that require a 'comparison' value.
+    // Reference device for controls that require a 'comparison' value (or reset for running avg/max/min)
     QString                     m_referenceDeviceId;
     QObject                    *m_referenceDevice;
-
+    QObject                    *m_inputDevice; // for simplicity
+    // trigger device for updating running average. Reference device resets.
+    QString                     m_triggerDeviceId;
+    QObject                    *m_triggerDevice;
+    quint64                     m_runningAvgCount;
+    // 'running' devices
+    bool                        m_firstRunningValue;
+    double                      m_runningValue;
 };
 
 #endif // TORCLOGICCONTROL_H
