@@ -49,5 +49,8 @@ var searchData=
   ['role',['Role',['../dd/d69/class_torc_setting.html#ab91211f9675b4a8fdec1819d32e2c7f8',1,'TorcSetting']]],
   ['root',['Root',['../d9/d91/class_torc_s_s_d_p_search_response.html#a6d4e6702aa1e073a7cf325081651769ca22b89dc38bf5bac1ace9913bf4d8bd83',1,'TorcSSDPSearchResponse']]],
   ['run',['run',['../d6/d3b/class_torc_pi_switch_input_thread.html#ab4f0fac5485d86d47859b5c16b8496b9',1,'TorcPiSwitchInputThread::run()'],['../da/d38/class_logging_thread.html#a072cd7284123fa0cdfe5e47602015a10',1,'LoggingThread::run()'],['../d2/d41/class_torc_q_thread.html#aa2140555d0c221f6eebe2da48eb17dd1',1,'TorcQThread::run()'],['../db/dd7/class_callback_object.html#a1e8feacf44050db36d8feda726630fa1',1,'CallbackObject::Run()']]],
+  ['runningaverage',['RunningAverage',['../d5/d8f/class_torc_logic_control.html#a9a534064891b32f43f8210c3ff211b38a89f82cd00e9277e599d376c53217898a',1,'TorcLogicControl']]],
+  ['runningmax',['RunningMax',['../d5/d8f/class_torc_logic_control.html#a9a534064891b32f43f8210c3ff211b38ad957dc5968b2c9f7f92cd3228bfb0b9c',1,'TorcLogicControl']]],
+  ['runningmin',['RunningMin',['../d5/d8f/class_torc_logic_control.html#a9a534064891b32f43f8210c3ff211b38a900e84a5d7beec50fd08924f7ea8bb6d',1,'TorcLogicControl']]],
   ['runxsdtestsuite',['RunXSDTestSuite',['../d1/d15/class_torc_x_s_d_test.html#ace5cb42623a5cfdbfe55e561a55183b8',1,'TorcXSDTest']]]
 ];

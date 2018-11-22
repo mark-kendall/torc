@@ -33,6 +33,7 @@ var searchData=
   ['isauthorised',['IsAuthorised',['../da/dfc/class_torc_h_t_t_p_request.html#a7bfe2f62f752f6747c781f98a415a159',1,'TorcHTTPRequest']]],
   ['isavailable',['IsAvailable',['../d8/d73/class_torc_network.html#a63a043981858567c24cd286fe8f77e11',1,'TorcNetwork']]],
   ['iscompatible',['IsCompatible',['../da/dfa/class_torc_camera_params.html#a5981d3d1821c430d85cf324622d399d0',1,'TorcCameraParams']]],
+  ['iscomplextype',['IsComplexType',['../dc/d55/torclogiccontrol_8cpp.html#a2e3a629349c506dff5029d87f4e5809c',1,'torclogiccontrol.cpp']]],
   ['isconnected',['IsConnected',['../d3/db6/class_torc_o_m_x_tunnel.html#a38d59d2564f215dfb18b807787355f66',1,'TorcOMXTunnel']]],
   ['isexternal',['IsExternal',['../d8/d73/class_torc_network.html#abfa4272255a3ef40373868c06c7479af',1,'TorcNetwork']]],
   ['isglobal',['IsGlobal',['../d8/d73/class_torc_network.html#a4ce7f625cf153e5e7b07434ed688dbea',1,'TorcNetwork']]],
