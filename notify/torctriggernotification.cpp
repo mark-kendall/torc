@@ -154,6 +154,9 @@ void TorcTriggerNotification::Graph(QByteArray *Data)
     if (m_input)
         Data->append(QString("    \"%2\"->\"%1\"\r\n").arg(uniqueId).arg(m_input->GetUniqueId()));
 
+    foreach (TorcDevice *device, m_referenceDevices)
+        Data->append(QString("    \"%1\"->\"%2\" [style=dashed]\r\n").arg(device->GetUniqueId()).arg(uniqueId));
+
     foreach (TorcNotifier* notifier, m_notifiers)
         Data->append(QString("    \"%1\"->\"%2\"\r\n").arg(uniqueId).arg(notifier->GetUniqueId()));
 }
