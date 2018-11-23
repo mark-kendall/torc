@@ -12,6 +12,7 @@
 
 class TorcCameraThread;
 class TorcCameraParams;
+class TorcNetworkRequest;
 
 class TorcCameraOutput : public TorcOutput
 {
@@ -91,9 +92,12 @@ class TorcCameraVideoOutput final : public TorcCameraOutput
     void             SegmentRemoved     (int Segment);
     void             InitSegmentReady   (void);
     void             SegmentReady       (int Segment);
+    void             TimeCheck          (void);
+    void             RequestReady       (TorcNetworkRequest *Request);
 
   signals:
     void             StreamVideo        (bool Video);
+    void             CheckTime          (void);
 
   private:
     QByteArray       GetMasterPlaylist  (void);
@@ -103,9 +107,11 @@ class TorcCameraVideoOutput final : public TorcCameraOutput
 
   private:
     Q_DISABLE_COPY(TorcCameraVideoOutput)
-    QQueue<int>       m_segments;
-    QReadWriteLock    m_segmentLock;
-    QDateTime         m_cameraStartTime;
+    QQueue<int>         m_segments;
+    QReadWriteLock      m_segmentLock;
+    QDateTime           m_cameraStartTime;
+    int                 m_networkTimeAbort;
+    TorcNetworkRequest *m_networkTimeRequest;
 };
 
 class TorcCameraOutputs final : public TorcDeviceHandler

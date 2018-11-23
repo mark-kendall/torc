@@ -20,6 +20,8 @@
 * USA.
 */
 
+#define AKAMAI_TIME_ISO QString("http://time.akamai.com/?iso")
+
 // Qt
 #include <QDir>
 
@@ -27,6 +29,7 @@
 #include "torclogging.h"
 #include "torcmime.h"
 #include "torcdirectories.h"
+#include "torcnetworkrequest.h"
 #include "torcoutputs.h"
 #include "torccamerathread.h"
 #include "torccameraoutput.h"
@@ -150,13 +153,51 @@ TorcCameraVideoOutput::TorcCameraVideoOutput(const QString &ModelId, const QVari
                "WritingStarted,WritingStopped,SegmentRemoved,InitSegmentReady,SegmentReady"),
     m_segments(),
     m_segmentLock(QReadWriteLock::Recursive),
-    m_cameraStartTime()
+    m_cameraStartTime(),
+    m_networkTimeAbort(0),
+    m_networkTimeRequest(NULL)
 {
+    // keep time checks in this thread
+    connect(this, SIGNAL(CheckTime()), this, SLOT(TimeCheck()));
+    // and check initially
+    emit CheckTime();
 }
 
 TorcCameraVideoOutput::~TorcCameraVideoOutput()
 {
     Stop();
+
+    m_networkTimeAbort = 1;
+
+    if (m_networkTimeRequest)
+    {
+        TorcNetwork::Cancel(m_networkTimeRequest);
+        m_networkTimeRequest->DownRef();
+    }
+}
+
+void TorcCameraVideoOutput::TimeCheck(void)
+{
+    if (m_networkTimeRequest)
+    {
+        LOG(VB_GENERAL, LOG_INFO, "Time check in progress - not resending");
+        return;
+    }
+
+    QUrl url(AKAMAI_TIME_ISO);
+    QNetworkRequest request(url);
+    m_networkTimeRequest = new TorcNetworkRequest(request, QNetworkAccessManager::GetOperation, 0, &m_networkTimeAbort);
+    TorcNetwork::GetAsynchronous(m_networkTimeRequest, this);
+}
+
+void TorcCameraVideoOutput::RequestReady(TorcNetworkRequest *Request)
+{
+    if (Request && m_networkTimeRequest && (Request == m_networkTimeRequest))
+    {
+        LOG(VB_GENERAL, LOG_INFO, QString("Network time  : %1").arg(Request->GetBuffer().constData()));
+        m_networkTimeRequest->DownRef();
+        m_networkTimeRequest = NULL;
+    }
 }
 
 TorcOutput::Type TorcCameraVideoOutput::GetType(void)
@@ -389,9 +430,18 @@ void TorcCameraVideoOutput::ProcessHTTPRequest(const QString &PeerAddress, int P
                 {
                     LOG(VB_GENERAL, LOG_WARNING, QString("No segments - %1 requested").arg(num));
                 }
+                else
                 {
+                    m_threadLock.lockForRead();
+                    QDateTime start = m_cameraStartTime;
+                    m_threadLock.unlock();
                     LOG(VB_GENERAL, LOG_WARNING, QString("Segment %1 not found - we have %2-%3")
-                        .arg(num).arg(m_segments.last()).arg(m_segments.first()));
+                        .arg(num).arg(m_segments.first()).arg(m_segments.last()));
+                    LOG(VB_GENERAL, LOG_WARNING, QString("Our start time: %1").arg(start.toString(Qt::ISODate)));
+                    LOG(VB_GENERAL, LOG_WARNING, QString("System time   : %1").arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate)));
+                    LOG(VB_GENERAL, LOG_WARNING, QString("Start+request : %1").arg(start.addSecs(num *2).toString(Qt::ISODate)));
+                    LOG(VB_GENERAL, LOG_WARNING, QString("Start+first   : %1").arg(start.addSecs(m_segments.first()).toString(Qt::ISODate)));
+                    emit CheckTime();
                 }
 
             }
