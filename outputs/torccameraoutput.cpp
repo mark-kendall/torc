@@ -226,7 +226,9 @@ void TorcCameraVideoOutput::Stop(void)
 void TorcCameraVideoOutput::WritingStopped(void)
 {
     LOG(VB_GENERAL, LOG_INFO, "Camera stopped");
+    m_threadLock.lockForWrite();
     m_cameraStartTime = QDateTime();
+    m_threadLock.unlock();
 }
 
 void TorcCameraVideoOutput::CameraErrored(bool Errored)
@@ -289,7 +291,10 @@ void TorcCameraVideoOutput::ProcessHTTPRequest(const QString &PeerAddress, int P
     //    return;
 
     // cameraStartTime is set when the camera thread has started (and set to invalid when stopped)
-    if (!m_cameraStartTime.isValid())
+    m_threadLock.lockForRead();
+    bool valid = m_cameraStartTime.isValid();
+    m_threadLock.unlock();
+    if (!valid)
         return;
 
     Request.SetAllowCORS(true); // needed for a number of browser players.
@@ -488,7 +493,10 @@ QByteArray TorcCameraVideoOutput::GetDashPlaylist(void)
         "</MPD>\r\n");
 
     double duration = m_params.m_segmentLength / (float)m_params.m_frameRate;
-    return QByteArray(dash.arg(m_cameraStartTime.toString(Qt::ISODate))
+    m_threadLock.lockForRead();
+    QString start = m_cameraStartTime.toString(Qt::ISODate);
+    m_threadLock.unlock();
+    return QByteArray(dash.arg(start)
                       .arg(QString::number(duration * 5, 'f', 2))
                       .arg(QString::number(duration * 4, 'f', 2))
                       .arg(QString::number(duration * 2, 'f', 2))
