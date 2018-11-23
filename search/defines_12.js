@@ -1,23 +1,6 @@
 var searchData=
 [
-  ['verbose_5flevel_5fcheck',['VERBOSE_LEVEL_CHECK',['../d4/df9/torclogging_8h.html#aa2c2cf7786c2730b3b739536b797f132',1,'torclogging.h']]],
-  ['verbose_5flevel_5fnone',['VERBOSE_LEVEL_NONE',['../d4/df9/torclogging_8h.html#aeeb5ccc7d7c2bdc0591f5cdb1cc360be',1,'torclogging.h']]],
-  ['verbose_5fmap',['VERBOSE_MAP',['../d1/d37/torcloggingdefs_8h.html#aa5135d1fc4a5019f94e80672b5d34ba6',1,'VERBOSE_MAP():&#160;torcloggingdefs.h'],['../d7/d24/torcloggingimp_8cpp.html#aa5135d1fc4a5019f94e80672b5d34ba6',1,'VERBOSE_MAP():&#160;torcloggingimp.cpp']]],
-  ['verbose_5fpostamble',['VERBOSE_POSTAMBLE',['../d1/d37/torcloggingdefs_8h.html#aea86693ed95c60eefad2dea4beefb05f',1,'VERBOSE_POSTAMBLE():&#160;torcloggingdefs.h'],['../d7/d24/torcloggingimp_8cpp.html#aea86693ed95c60eefad2dea4beefb05f',1,'VERBOSE_POSTAMBLE():&#160;torcloggingimp.cpp']]],
-  ['verbose_5fpreamble',['VERBOSE_PREAMBLE',['../d1/d37/torcloggingdefs_8h.html#add0e269312f113aa3d7f040ec68752b9',1,'VERBOSE_PREAMBLE():&#160;torcloggingdefs.h'],['../d7/d24/torcloggingimp_8cpp.html#add0e269312f113aa3d7f040ec68752b9',1,'VERBOSE_PREAMBLE():&#160;torcloggingimp.cpp']]],
-  ['version',['VERSION',['../db/d68/torcplist_8cpp.html#a1c6d5de492ac61ad29aec7aa9a436bbf',1,'torcplist.cpp']]],
-  ['version_5fsize',['VERSION_SIZE',['../db/d68/torcplist_8cpp.html#afe01d4e5f1d715620b9593287967f3a8',1,'torcplist.cpp']]],
-  ['video_5fbitrate_5fmax',['VIDEO_BITRATE_MAX',['../d3/d38/torccamera_8h.html#abe682f7723d66bc72fd31c600b18ea00',1,'torccamera.h']]],
-  ['video_5fbitrate_5fmin',['VIDEO_BITRATE_MIN',['../d3/d38/torccamera_8h.html#af9c310f2c8265b1cc6e64ba778051a4a',1,'torccamera.h']]],
-  ['video_5fframerate_5fmax',['VIDEO_FRAMERATE_MAX',['../d3/d38/torccamera_8h.html#a131aaa77ea71feba2ed391c86d9e548d',1,'torccamera.h']]],
-  ['video_5fframerate_5fmin',['VIDEO_FRAMERATE_MIN',['../d3/d38/torccamera_8h.html#a1358db3327f24c2a7e599318a49e2c2f',1,'torccamera.h']]],
-  ['video_5fgopdura_5ftarget',['VIDEO_GOPDURA_TARGET',['../d3/d38/torccamera_8h.html#a3f542686e057eba94fa3f3f35f2ce2f3',1,'torccamera.h']]],
-  ['video_5fheight_5fmax',['VIDEO_HEIGHT_MAX',['../d3/d38/torccamera_8h.html#a33b416033fefb1d7ba9a92ef4e6dd4e6',1,'torccamera.h']]],
-  ['video_5fheight_5fmin',['VIDEO_HEIGHT_MIN',['../d3/d38/torccamera_8h.html#ae4f5a7fb6c15d18df51ea17815a50816',1,'torccamera.h']]],
-  ['video_5fpage',['VIDEO_PAGE',['../d2/d57/torccameraoutput_8h.html#afeed51ad1840e7e378de7b3ef9d0acda',1,'torccameraoutput.h']]],
-  ['video_5fsegment_5fnumber',['VIDEO_SEGMENT_NUMBER',['../d3/d38/torccamera_8h.html#a160e377735a90004ed7d0da3548b3e45',1,'torccamera.h']]],
-  ['video_5fsegment_5ftarget',['VIDEO_SEGMENT_TARGET',['../d3/d38/torccamera_8h.html#a763b1027721a78f930377580f17ca758',1,'torccamera.h']]],
-  ['video_5ftimebase',['VIDEO_TIMEBASE',['../d3/d38/torccamera_8h.html#a433a6e9c545d111d4b88e35ecc1e9d6c',1,'torccamera.h']]],
-  ['video_5fwidth_5fmax',['VIDEO_WIDTH_MAX',['../d3/d38/torccamera_8h.html#aab10ef2c3271b81122f06843ad41baa4',1,'torccamera.h']]],
-  ['video_5fwidth_5fmin',['VIDEO_WIDTH_MIN',['../d3/d38/torccamera_8h.html#af701e923b03e7a90d028475954eecece',1,'torccamera.h']]]
+  ['unknown_5fbody',['UNKNOWN_BODY',['../db/df1/torcnotifier_8h.html#ac228acdbca80d0fdcc385799839f0016',1,'torcnotifier.h']]],
+  ['unknown_5ftitle',['UNKNOWN_TITLE',['../db/df1/torcnotifier_8h.html#a39fa7d0a666685d3f4dc550cc03d7873',1,'torcnotifier.h']]],
+  ['upnp_5fdirectory',['UPNP_DIRECTORY',['../d4/d11/torchttphandler_8h.html#ad10ca3d8cb82470efaada45b2e413213',1,'torchttphandler.h']]]
 ];

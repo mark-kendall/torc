@@ -1,12 +1,12 @@
 var searchData=
 [
-  ['magic',['MAGIC',['../db/d68/torcplist_8cpp.html#a94630370ae389fb1189282fa0742f310',1,'torcplist.cpp']]],
-  ['magic_5fsize',['MAGIC_SIZE',['../db/d68/torcplist_8cpp.html#aa176c73e17840560e7c59df986f7b9f1',1,'torcplist.cpp']]],
-  ['max_5fbad_5frequests',['MAX_BAD_REQUESTS',['../df/dc4/torcpushbulletnotifier_8cpp.html#a19ae74790bfc2077cd445ab9bba96c20',1,'torcpushbulletnotifier.cpp']]],
-  ['max_5fsocket_5fthreads',['MAX_SOCKET_THREADS',['../dc/d5c/torcwebsocketpool_8h.html#a877b3d35724989df7106126be8d9d31e',1,'torcwebsocketpool.h']]],
-  ['max_5fstring_5flength',['MAX_STRING_LENGTH',['../d7/d24/torcloggingimp_8cpp.html#a6789ebc0df71a8ef76bfbb4fb5f74aad',1,'torcloggingimp.cpp']]],
-  ['min_5fread_5finterval',['MIN_READ_INTERVAL',['../df/d8e/torc1wireds18b20_8cpp.html#acfbafeb561cf9359084c9f7094c0959b',1,'torc1wireds18b20.cpp']]],
-  ['min_5fsize',['MIN_SIZE',['../db/d68/torcplist_8cpp.html#a278694c2333c9826f21ddd2c2d220f66',1,'torcplist.cpp']]],
-  ['mode1',['MODE1',['../d9/d02/torci2cpca9685_8cpp.html#a443b1268c43b309560d57e34d50b5b3b',1,'torci2cpca9685.cpp']]],
-  ['mode2',['MODE2',['../d9/d02/torci2cpca9685_8cpp.html#ab2d8aca64e351712eae6f03e3f9d64ad',1,'torci2cpca9685.cpp']]]
+  ['led0_5foff_5fhigh',['LED0_OFF_HIGH',['../d9/d02/torci2cpca9685_8cpp.html#a3bbbfd115af36517264e9d9768330f12',1,'torci2cpca9685.cpp']]],
+  ['led0_5foff_5flow',['LED0_OFF_LOW',['../d9/d02/torci2cpca9685_8cpp.html#a4ba395d0a4c36c58a259dfb525599369',1,'torci2cpca9685.cpp']]],
+  ['led0_5fon_5fhigh',['LED0_ON_HIGH',['../d9/d02/torci2cpca9685_8cpp.html#ac979feec276ef1b68fece8539f0f1799',1,'torci2cpca9685.cpp']]],
+  ['led0_5fon_5flow',['LED0_ON_LOW',['../d9/d02/torci2cpca9685_8cpp.html#a4b05d48db754d03009d1e0595bbf7ded',1,'torci2cpca9685.cpp']]],
+  ['log',['LOG',['../d4/df9/torclogging_8h.html#a73a147108bf0df6442820b82b022ef94',1,'torclogging.h']]],
+  ['loglevel_5fmap',['LOGLEVEL_MAP',['../d1/d37/torcloggingdefs_8h.html#a1a3d3ab4eaa11700a3ca912c15d125c6',1,'LOGLEVEL_MAP():&#160;torcloggingdefs.h'],['../d7/d24/torcloggingimp_8cpp.html#a1a3d3ab4eaa11700a3ca912c15d125c6',1,'LOGLEVEL_MAP():&#160;torcloggingimp.cpp']]],
+  ['loglevel_5fpostamble',['LOGLEVEL_POSTAMBLE',['../d1/d37/torcloggingdefs_8h.html#ac01750e19b8995d3d9e6e716313c734b',1,'LOGLEVEL_POSTAMBLE():&#160;torcloggingdefs.h'],['../d7/d24/torcloggingimp_8cpp.html#ac01750e19b8995d3d9e6e716313c734b',1,'LOGLEVEL_POSTAMBLE():&#160;torcloggingimp.cpp']]],
+  ['loglevel_5fpreamble',['LOGLEVEL_PREAMBLE',['../d1/d37/torcloggingdefs_8h.html#a309ff0717a568559a7b1cfe939b4958c',1,'LOGLEVEL_PREAMBLE():&#160;torcloggingdefs.h'],['../d7/d24/torcloggingimp_8cpp.html#a309ff0717a568559a7b1cfe939b4958c',1,'LOGLEVEL_PREAMBLE():&#160;torcloggingimp.cpp']]],
+  ['logline_5fmax',['LOGLINE_MAX',['../d3/d0a/torcloggingimp_8h.html#ad7e1de35f4dcab3167e90689860289d5',1,'torcloggingimp.h']]]
 ];
