@@ -233,9 +233,6 @@ void TorcCameraVideoOutput::InitSegmentReady(void)
     {
         m_params = m_thread->GetParams();
         LOG(VB_GENERAL, LOG_INFO, QString("Initial segment ready - codec '%1'").arg(m_params.m_videoCodec));
-        // allow remote clients to start reading once the init segment is saved and hence codec information
-        // is available
-        m_cameraStartTime = QDateTime::currentDateTimeUtc();
     }
 }
 
@@ -286,6 +283,17 @@ void TorcCameraVideoOutput::SegmentReady(int Segment)
 {
     LOG(VB_GENERAL, LOG_DEBUG, QString("Segment %1 ready").arg(Segment));
 
+    // allow remote clients to start reading once the first segment is saved
+    m_threadLock.lockForRead();
+    if (!m_cameraStartTime.isValid())
+    {
+        m_threadLock.unlock();
+        m_threadLock.lockForWrite();
+        m_cameraStartTime = QDateTime::currentDateTimeUtc();
+        LOG(VB_GENERAL, LOG_INFO, "First segment ready - start time set");
+    }
+    m_threadLock.unlock();
+
     QWriteLocker locker(&m_segmentLock);
     if (!m_segments.contains(Segment))
     {
@@ -331,7 +339,7 @@ void TorcCameraVideoOutput::ProcessHTTPRequest(const QString &PeerAddress, int P
     //if (!MethodIsAuthorised(Request, HTTPAuth))
     //    return;
 
-    // cameraStartTime is set when the camera thread has started (and set to invalid when stopped)
+    // cameraStartTime is set when the first segment has been received
     m_threadLock.lockForRead();
     bool valid = m_cameraStartTime.isValid();
     m_threadLock.unlock();
@@ -438,9 +446,10 @@ void TorcCameraVideoOutput::ProcessHTTPRequest(const QString &PeerAddress, int P
                     LOG(VB_GENERAL, LOG_WARNING, QString("Segment %1 not found - we have %2-%3")
                         .arg(num).arg(m_segments.first()).arg(m_segments.last()));
                     LOG(VB_GENERAL, LOG_WARNING, QString("Our start time: %1").arg(start.toString(Qt::ISODate)));
-                    LOG(VB_GENERAL, LOG_WARNING, QString("System time   : %1").arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate)));
                     LOG(VB_GENERAL, LOG_WARNING, QString("Start+request : %1").arg(start.addSecs(num *2).toString(Qt::ISODate)));
-                    LOG(VB_GENERAL, LOG_WARNING, QString("Start+first   : %1").arg(start.addSecs(m_segments.first()).toString(Qt::ISODate)));
+                    LOG(VB_GENERAL, LOG_WARNING, QString("Start+first   : %1").arg(start.addSecs(m_segments.first() * 2).toString(Qt::ISODate)));
+                    LOG(VB_GENERAL, LOG_WARNING, QString("Start+last    : %1").arg(start.addSecs(m_segments.last() * 2).toString(Qt::ISODate)));
+                    LOG(VB_GENERAL, LOG_WARNING, QString("System time   : %1").arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate)));
                     emit CheckTime();
                 }
 
