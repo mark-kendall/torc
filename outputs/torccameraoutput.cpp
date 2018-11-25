@@ -290,9 +290,17 @@ void TorcCameraVideoOutput::SegmentReady(int Segment)
     if (!m_segments.contains(Segment))
     {
         if (!m_segments.isEmpty() && m_segments.head() >= Segment)
+        {
             LOG(VB_GENERAL, LOG_ERR, QString("Segment %1 is not greater than head (%2)").arg(Segment).arg(m_segments.head()));
+        }
         else
+        {
             m_segments.enqueue(Segment);
+            // track drift - m_cameraStartTime points to the beginning of the first segment
+            qint64 drift = m_cameraStartTime.addMSecs((m_segments.last() + 1) * (VIDEO_SEGMENT_TARGET * 1000)).msecsTo(QDateTime::currentDateTime());
+            LOG(VB_GENERAL, LOG_INFO, QString("Drift %1ms (%2) first %3 last %4")
+                .arg(drift).arg(drift > 0 ? "behind" : "ahead").arg(m_segments.first()).arg(m_segments.last()));
+        }
     }
     else
     {
