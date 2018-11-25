@@ -233,6 +233,9 @@ void TorcCameraVideoOutput::InitSegmentReady(void)
     {
         m_params = m_thread->GetParams();
         LOG(VB_GENERAL, LOG_INFO, QString("Initial segment ready - codec '%1'").arg(m_params.m_videoCodec));
+        // allow remote clients to start reading once the init segment is saved and hence codec information
+        // is available
+        m_cameraStartTime = QDateTime::currentDateTimeUtc();
     }
 }
 
@@ -283,17 +286,6 @@ void TorcCameraVideoOutput::SegmentReady(int Segment)
 {
     LOG(VB_GENERAL, LOG_DEBUG, QString("Segment %1 ready").arg(Segment));
 
-    // allow remote clients to start reading once the first segment is saved
-    m_threadLock.lockForRead();
-    if (!m_cameraStartTime.isValid())
-    {
-        m_threadLock.unlock();
-        m_threadLock.lockForWrite();
-        m_cameraStartTime = QDateTime::currentDateTimeUtc();
-        LOG(VB_GENERAL, LOG_INFO, "First segment ready - start time set");
-    }
-    m_threadLock.unlock();
-
     QWriteLocker locker(&m_segmentLock);
     if (!m_segments.contains(Segment))
     {
@@ -339,7 +331,7 @@ void TorcCameraVideoOutput::ProcessHTTPRequest(const QString &PeerAddress, int P
     //if (!MethodIsAuthorised(Request, HTTPAuth))
     //    return;
 
-    // cameraStartTime is set when the first segment has been received
+    // cameraStartTime is set when the camera thread has started (and set to invalid when stopped)
     m_threadLock.lockForRead();
     bool valid = m_cameraStartTime.isValid();
     m_threadLock.unlock();
