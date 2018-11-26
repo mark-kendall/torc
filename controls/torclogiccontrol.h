@@ -2,6 +2,7 @@
 #define TORCLOGICCONTROL_H
 
 // Torc
+#include "torcmaths.h"
 #include "torccontrol.h"
 
 class TorcLogicControl : public TorcControl
@@ -55,8 +56,8 @@ class TorcLogicControl : public TorcControl
     // trigger device for updating running average. Reference device resets.
     QString                     m_triggerDeviceId;
     QObject                    *m_triggerDevice;
-    quint64                     m_runningAvgCount;
     // 'running' devices
+    TorcAverage<double>         m_average;
     bool                        m_firstRunningValue;
     double                      m_runningValue;
 };

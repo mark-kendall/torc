@@ -78,7 +78,7 @@ TorcLogicControl::TorcLogicControl(const QString &Type, const QVariantMap &Detai
     m_inputDevice(NULL),
     m_triggerDeviceId(),
     m_triggerDevice(NULL),
-    m_runningAvgCount(0),
+    m_average(),
     m_firstRunningValue(true),
     m_runningValue(0)
 {
@@ -395,14 +395,13 @@ void TorcLogicControl::CalculateOutput(void)
             // NB trigger and reset can both be high at the same time - which should probably be avoided
             if (referencevalue) // reset
             {
-                m_runningValue = newvalue = 0.0;
-                m_runningAvgCount = 0;
+                m_average.Reset();
+                newvalue = m_average.GetAverage();
             }
             // trigger
             if (triggervalue)
             {
-                m_runningValue = newvalue = ((m_runningValue * m_runningAvgCount) + inputvalue) / (m_runningAvgCount + 1);
-                m_runningAvgCount++;
+                newvalue = m_average.AddValue(inputvalue);
             }
             break;
         case TorcLogicControl::RunningMax:
