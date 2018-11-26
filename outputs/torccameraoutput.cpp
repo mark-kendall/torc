@@ -289,7 +289,9 @@ void TorcCameraVideoOutput::SegmentReady(int Segment)
     {
         m_threadLock.unlock();
         m_threadLock.lockForWrite();
-        m_cameraStartTime = QDateTime::currentDateTimeUtc();
+	// set start time now and 'backdate' as the init segment is usually sent once processing has started, so the rest
+	// of the segment arrives quicker than 'expected'
+        m_cameraStartTime = QDateTime::currentDateTimeUtc().addMSecs(VIDEO_SEGMENT_TARGET * -1000);
         LOG(VB_GENERAL, LOG_INFO, "First segment ready - start time set");
     }
     m_threadLock.unlock();
