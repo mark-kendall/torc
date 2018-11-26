@@ -216,6 +216,8 @@ $(document).ready(function() {
         var contentid   = id + "content";
         var menuid      = id + "menu";
         $(".torc-navbar").after(template(theme.FileModal, { id, title, contentid }));
+        $("#" + contentid).text("");
+        $("#" + id).on("hidden.bs.modal", function () { $("#" + contentid).text(""); });
         var item = template(theme.DropdownItemWithIcon, { "icon": "file-text-o", "text": menu });
         addDropdownMenuItem(usermenu, menuid, "#" + id, item,
                             contentSource !== "" ?
