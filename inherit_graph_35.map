@@ -1,3 +1,7 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$df/d7a/class_torc_o_m_x_core.html" title="TorcOMXCore" alt="" coords="5,5,111,32"/>
+<area shape="rect" id="node1" href="$d0/d97/class_torc_notifier_factory.html" title="TorcNotifierFactory" alt="" coords="5,81,144,108"/>
+<area shape="rect" id="node2" href="$d1/d0a/class_torc_io_t_plotter_notifier_factory.html" title="TorcIoTPlotterNotifierFactory" alt="" coords="199,5,398,32"/>
+<area shape="rect" id="node3" href="$d9/d2d/class_torc_log_notifier_factory.html" title="TorcLogNotifierFactory" alt="" coords="217,56,380,83"/>
+<area shape="rect" id="node4" href="$d5/d33/class_torc_pushbullet_notifier_factory.html" title="TorcPushbulletNotifierFactory" alt="" coords="196,107,401,133"/>
+<area shape="rect" id="node5" href="$d5/d25/class_torc_thing_speak_notifier_factory.html" title="TorcThingSpeakNotifierFactory" alt="" coords="192,157,405,184"/>
 </map>

@@ -80,6 +80,7 @@ var searchData=
   ['m_5fmaxbadrequests',['m_maxBadRequests',['../d0/db9/class_torc_i_o_t_logger.html#a13d99b23663bd6d02e54431b2b42575c',1,'TorcIOTLogger']]],
   ['m_5fmaxfields',['m_maxFields',['../d0/db9/class_torc_i_o_t_logger.html#a8ff358c36f1d7f80e884cf219bc7bbdd',1,'TorcIOTLogger']]],
   ['m_5fmaxresolution',['m_maxResolution',['../d9/db0/class_torc_p_w_m_output.html#a9a2dbfe50ad373b7ff907798ed0d80a4',1,'TorcPWMOutput']]],
+  ['m_5fmaxsegments',['m_maxSegments',['../df/d16/class_torc_segmented_ring_buffer.html#a31279f3f61f673a175c0aaa2e549ee87',1,'TorcSegmentedRingBuffer']]],
   ['m_5fmaxupdateinterval',['m_maxUpdateInterval',['../d0/db9/class_torc_i_o_t_logger.html#a776e74986f8207f17a3277c64a0a08f5',1,'TorcIOTLogger']]],
   ['m_5fmethod',['m_method',['../da/dfc/class_torc_h_t_t_p_request.html#adb8bcdf5e681bb99d811eba7fe8ce826',1,'TorcHTTPRequest::m_method()'],['../de/db3/class_method_parameters.html#ab9d556343c0bed3667a686a691a816fd',1,'MethodParameters::m_method()']]],
   ['m_5fname',['m_name',['../d5/d15/class_torc_h_t_t_p_handler.html#aef14b1e7af0dfadf9ddb05a1f7ad70da',1,'TorcHTTPHandler::m_name()'],['../db/dff/class_torc_bonjour_service.html#add36c6037167067fb60fd4e99d68e4fc',1,'TorcBonjourService::m_name()']]],

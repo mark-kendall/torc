@@ -101,6 +101,7 @@ var searchData=
   ['torclogiccontrol_2eh',['torclogiccontrol.h',['../dd/df8/torclogiccontrol_8h.html',1,'']]],
   ['torclognotifier_2ecpp',['torclognotifier.cpp',['../d0/d0b/torclognotifier_8cpp.html',1,'']]],
   ['torclognotifier_2eh',['torclognotifier.h',['../d0/d71/torclognotifier_8h.html',1,'']]],
+  ['torcmaths_2eh',['torcmaths.h',['../d2/d60/torcmaths_8h.html',1,'']]],
   ['torcmime_2ecpp',['torcmime.cpp',['../d6/ddd/torcmime_8cpp.html',1,'']]],
   ['torcmime_2eh',['torcmime.h',['../d3/d20/torcmime_8h.html',1,'']]],
   ['torcmuxer_2ecpp',['torcmuxer.cpp',['../d3/d5e/torcmuxer_8cpp.html',1,'']]],

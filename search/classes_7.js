@@ -14,6 +14,8 @@ var searchData=
   ['torcapplebinaryplistserialiserfactory',['TorcAppleBinaryPListSerialiserFactory',['../dc/dcf/class_torc_apple_binary_p_list_serialiser_factory.html',1,'']]],
   ['torcappleplistserialiserfactory',['TorcApplePListSerialiserFactory',['../d0/dd2/class_torc_apple_p_list_serialiser_factory.html',1,'']]],
   ['torcargument',['TorcArgument',['../d1/d70/class_torc_argument.html',1,'']]],
+  ['torcaverage',['TorcAverage',['../db/d25/class_torc_average.html',1,'']]],
+  ['torcaverage_3c_20double_20_3e',['TorcAverage&lt; double &gt;',['../db/d25/class_torc_average.html',1,'']]],
   ['torcbinaryplistserialiser',['TorcBinaryPListSerialiser',['../d7/dfd/class_torc_binary_p_list_serialiser.html',1,'']]],
   ['torcbinaryplistserialiserfactory',['TorcBinaryPListSerialiserFactory',['../df/d35/class_torc_binary_p_list_serialiser_factory.html',1,'']]],
   ['torcbonjour',['TorcBonjour',['../d0/d9f/class_torc_bonjour.html',1,'']]],

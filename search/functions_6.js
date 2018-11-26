@@ -10,6 +10,7 @@ var searchData=
   ['getasynchronous',['GetAsynchronous',['../d8/d73/class_torc_network.html#a85aa66ee263f16d0ce6b74b88d539afa',1,'TorcNetwork']]],
   ['getavailablebuffers',['GetAvailableBuffers',['../de/d1d/class_torc_o_m_x_component.html#a9a051570f47077ed79947acc55048056',1,'TorcOMXComponent::GetAvailableBuffers()'],['../d7/d61/class_torc_o_m_x_port.html#aecdfe2f336409fbad14cfe6e7ae632a4',1,'TorcOMXPort::GetAvailableBuffers()']]],
   ['getavccodec',['GetAVCCodec',['../d2/d10/class_torc_muxer.html#aecf0fd0c533cc4e6690982c4354c1839',1,'TorcMuxer']]],
+  ['getaverage',['GetAverage',['../db/d25/class_torc_average.html#afad0992ec81c6e49f4b533b7945527fe',1,'TorcAverage']]],
   ['getbatterylevel',['GetBatteryLevel',['../d7/da5/class_torc_power.html#aa4cdff6d31246fe9fa17d53fdd19000c',1,'TorcPower']]],
   ['getbegin',['GetBegin',['../dd/d69/class_torc_setting.html#a45ccb3c5d68bb63ef1a856e01a82ab26',1,'TorcSetting']]],
   ['getbuffer',['GetBuffer',['../de/d1d/class_torc_o_m_x_component.html#ad5eaa5ada5057556e2bf6ead530f8695',1,'TorcOMXComponent::GetBuffer()'],['../d7/d61/class_torc_o_m_x_port.html#aadecf461e74779c1a0f314a97f72f666',1,'TorcOMXPort::GetBuffer()'],['../d3/ded/class_torc_network_request.html#ab962586f6d5f42a2037dbc310128fa4b',1,'TorcNetworkRequest::GetBuffer()']]],
