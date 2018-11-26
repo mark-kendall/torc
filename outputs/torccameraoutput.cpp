@@ -150,7 +150,7 @@ void TorcCameraStillsOutput::StillReady(const QString File)
 
 TorcCameraVideoOutput::TorcCameraVideoOutput(const QString &ModelId, const QVariantMap &Details)
   : TorcCameraOutput(TorcOutput::Camera, 0.0, ModelId, Details, this, TorcCameraVideoOutput::staticMetaObject,
-               "WritingStarted,WritingStopped,SegmentRemoved,InitSegmentReady,SegmentReady"),
+               "WritingStarted,WritingStopped,SegmentRemoved,InitSegmentReady,SegmentReady,TimeCheck,RequestReady"),
     m_segments(),
     m_segmentLock(QReadWriteLock::Recursive),
     m_cameraStartTime(),
@@ -220,7 +220,7 @@ void TorcCameraVideoOutput::Start(void)
     {
         m_thread->SetVideoParent(this);
         m_thread->start();
-        connect(this, SIGNAL(ValueChanged(double)), this, SIGNAL(StreamVideo(bool)));
+        connect(this, &TorcCameraVideoOutput::ValueChanged, this, &TorcCameraVideoOutput::StreamVideo);
     }
     m_threadLock.unlock();
 }
@@ -289,8 +289,8 @@ void TorcCameraVideoOutput::SegmentReady(int Segment)
     {
         m_threadLock.unlock();
         m_threadLock.lockForWrite();
-	// set start time now and 'backdate' as the init segment is usually sent once processing has started, so the rest
-	// of the segment arrives quicker than 'expected'
+        // set start time now and 'backdate' as the init segment is usually sent once processing has started, so the rest
+        // of the segment arrives quicker than 'expected'
         m_cameraStartTime = QDateTime::currentDateTimeUtc().addMSecs(VIDEO_SEGMENT_TARGET * -1000);
         LOG(VB_GENERAL, LOG_INFO, "First segment ready - start time set");
     }
