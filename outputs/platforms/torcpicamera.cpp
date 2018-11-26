@@ -448,10 +448,6 @@ void TorcPiCamera::ProcessVideoBuffer(OMX_BUFFERHEADERTYPE *Buffer)
 
     if (complete)
     {
-        static qint64 lastFrameTime = QDateTime::currentMSecsSinceEpoch();
-        qint64 timenow = QDateTime::currentMSecsSinceEpoch();
-        LOG(VB_GENERAL, LOG_INFO, QString("%1ms since last frame (target 33.33)").arg(timenow - lastFrameTime));
-        lastFrameTime = timenow;
         AVPacket *packet = m_bufferedPacket;
         if (!packet)
         {

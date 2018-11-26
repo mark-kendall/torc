@@ -76,15 +76,8 @@ int TorcSegmentedRingBuffer::GetSegmentsAvail(int &TailRef)
     return result;
 }
 
-#include <QDateTime>
-
 int TorcSegmentedRingBuffer::FinishSegment(bool Init)
 {
-    static qint64 lastSegmentTime = QDateTime::currentMSecsSinceEpoch();
-    qint64 timenow = QDateTime::currentMSecsSinceEpoch();
-    LOG(VB_GENERAL, LOG_INFO, QString("%1ms since last segment - target 2000").arg(timenow - lastSegmentTime));
-    lastSegmentTime = timenow;
-
     QWriteLocker locker(&m_segmentsLock);
     int result = -1;
     if (m_writePosition == m_currentStartPosition || m_currentSize < 1)
