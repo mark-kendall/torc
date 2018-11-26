@@ -101,7 +101,12 @@ bool TorcPWMOutput::ValueIsDifferent(double &NewValue)
     double newvalue = qBound(0.0, NewValue, 1.0);
 
     // resolution check
-    if (qAbs(value - newvalue) < (1.0 / (double)m_resolution))
+    double threshhold = 1.0 / (double)m_resolution;
+    // ensure we get maximum resolution at the extremes
+    if (newvalue <= threshhold || newvalue >= (1 - threshhold))
+        threshhold = 0;
+
+    if (qAbs(value - newvalue) < threshhold)
         return false;
 
     // set new value in case range check caught out of bounds
