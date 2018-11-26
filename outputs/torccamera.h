@@ -19,6 +19,7 @@
 #define VIDEO_SEGMENT_TARGET 2  // 2 second segments
 #define VIDEO_GOPDURA_TARGET 1  // with IDR every second
 #define VIDEO_SEGMENT_NUMBER 10 // 10 segments for a total of 20 buffered seconds
+#define VIDEO_SEGMENT_MAX    20
 #define VIDEO_TIMEBASE       90000
 
 class TorcCameraParams

@@ -274,7 +274,7 @@ bool TorcPiCamera::Setup(void)
     {
         QWriteLocker locker(&m_ringBufferLock);
         int buffersize = (m_params.m_bitrate * (m_params.m_segmentLength / m_params.m_frameRate) * VIDEO_SEGMENT_NUMBER) / 8;
-        m_ringBuffer   = new TorcSegmentedRingBuffer(buffersize);
+        m_ringBuffer   = new TorcSegmentedRingBuffer(buffersize, VIDEO_SEGMENT_MAX);
         m_muxer        = new TorcMuxer(m_ringBuffer);
         if (!m_muxer)
             return false;

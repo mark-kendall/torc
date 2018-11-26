@@ -24,7 +24,7 @@
 #include "torclogging.h"
 #include "torcsegmentedringbuffer.h"
 
-TorcSegmentedRingBuffer::TorcSegmentedRingBuffer(int Size)
+TorcSegmentedRingBuffer::TorcSegmentedRingBuffer(int Size, int MaxSegments)
   : m_size(Size),
     m_data(Size, '0'),
     m_readPosition(0),
@@ -35,6 +35,7 @@ TorcSegmentedRingBuffer::TorcSegmentedRingBuffer(int Size)
     m_segments(),
     m_segmentRefs(),
     m_segmentCounter(0),
+    m_maxSegments(MaxSegments),
     m_initSegment()
 {
     LOG(VB_GENERAL, LOG_INFO, QString("Allocated segmented ring buffer of size %1bytes").arg(m_size));
@@ -113,10 +114,10 @@ int TorcSegmentedRingBuffer::Write(const uint8_t *Data, int Size)
     if (!Data || Size <= 0 || Size >= m_size)
         return -1;
 
+    int dummyref = 0;
     // free up space if needed
-    while (GetBytesFree() < Size)
+    while ((GetBytesFree() < Size) || (GetSegmentsAvail(dummyref) > m_maxSegments))
     {
-        int dummyref = 0;
         if (GetSegmentsAvail(dummyref) < 1)
         {
             LOG(VB_GENERAL, LOG_WARNING, "Segmented buffer underrun - no space for write");
