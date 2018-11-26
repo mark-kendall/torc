@@ -441,9 +441,15 @@ FileLogger::FileLogger(QString Filename, bool ErrorsOnly, int Quiet)
         m_errorsOnly = false;
         m_quiet    = false;
         m_file.setFileName(m_fileName);
-        m_opened = m_file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Truncate |
-                               QIODevice::Text | QIODevice::Unbuffered);
-        LOG(VB_GENERAL, LOG_INFO, QString("Logging to '%1'").arg(m_fileName));
+        if (!m_file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Truncate |
+                               QIODevice::Text | QIODevice::Unbuffered))
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to open %1 for logging").arg(m_fileName));
+        }
+        {
+            LOG(VB_GENERAL, LOG_INFO, QString("Logging to '%1'").arg(m_fileName));
+            m_opened = true;
+        }
     }
 }
 
