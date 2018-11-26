@@ -4,7 +4,7 @@
 // Qt
 #include <QQueue>
 
-/*! /brief Compute a running average.
+/*! \brief Compute a running average.
  *
  * If MaxCount is set, the average will be limited to MaxCount number of most recent samples.
 */

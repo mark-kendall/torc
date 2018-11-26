@@ -40,7 +40,7 @@
 #include "zlib.h"
 #endif
 
-/// \brief Parse a QDataTime from the given QString
+/// \brief Parse a QDateTime from the given QString
 QDateTime TorcCoreUtils::DateTimeFromString(const QString &String)
 {
     if (String.isEmpty())
