@@ -251,6 +251,7 @@ HEADERS += torc/torclocalcontext.h
 HEADERS += torc/torcnetworkedcontext.h
 HEADERS += torc/torcsqlitedb.h
 HEADERS += torc/torcdb.h
+HEADERS += torc/torcmaths.h
 HEADERS += torc/torcreferencecounted.h
 HEADERS += torc/torccoreutils.h
 HEADERS += torc/torccommandline.h
