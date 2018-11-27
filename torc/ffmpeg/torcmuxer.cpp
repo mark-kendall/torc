@@ -179,8 +179,9 @@ TorcMuxer::~TorcMuxer()
 
 void TorcMuxer::SetupContext(void)
 {
-    // TODO can this be called once
+#if (LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58,9,100))
     av_register_all();
+#endif
 
     AVOutputFormat *format = av_guess_format("mp4", NULL, NULL);
     if (!format)
