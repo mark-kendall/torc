@@ -362,32 +362,38 @@ void TorcPiCamera::ProcessVideoBuffer(OMX_BUFFERHEADERTYPE *Buffer)
         packet->dts          = pts;
         packet->duration     = 1;
         packet->flags       |= idr ? AV_PKT_FLAG_KEY : 0;
-        m_muxer->AddPacket(packet, sps);
 
-        if (sps && !m_haveInitSegment)
         {
-            QByteArray config = QByteArray::fromRawData((char*)packet->data, packet->size);
-            m_params.m_videoCodec = m_muxer->GetAVCCodec(config);
-            m_haveInitSegment = true;
-            m_muxer->FinishSegment(true);
-            // video is notionally available once the init segment is available
-            emit WritingStarted();
-        }
-        else if (!sps && !(m_frameCount % (m_params.m_frameRate * VIDEO_SEGMENT_TARGET)))
-        {
-            m_muxer->FinishSegment(false);
-            TrackDrift();
-        }
+            QWriteLocker locker(&m_ringBufferLock); // muxer accesses ringbuffer
+            m_muxer->AddPacket(packet, sps);
 
-        if (m_bufferedPacket)
-        {
-            av_packet_free(&m_bufferedPacket);
-            m_bufferedPacket = NULL;
-        }
-        else
-        {
-            packet->data = NULL;
-            av_packet_free(&packet);
+            if (sps && !m_haveInitSegment)
+            {
+                QByteArray config = QByteArray::fromRawData((char*)packet->data, packet->size);
+                m_params.m_videoCodec = m_muxer->GetAVCCodec(config);
+                m_haveInitSegment = true;
+                m_muxer->FinishSegment(true);
+                // video is notionally available once the init segment is available
+                emit WritingStarted();
+            }
+            else if (!sps && !(m_frameCount % (m_params.m_frameRate * VIDEO_SEGMENT_TARGET)))
+            {
+                m_muxer->FinishSegment(false);
+                locker.unlock();
+                TrackDrift();
+                locker.relock();
+            }
+
+            if (m_bufferedPacket)
+            {
+                av_packet_free(&m_bufferedPacket);
+                m_bufferedPacket = NULL;
+            }
+            else
+            {
+                packet->data = NULL;
+                av_packet_free(&packet);
+            }
         }
     }
     else

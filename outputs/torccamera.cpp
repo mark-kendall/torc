@@ -323,7 +323,7 @@ bool TorcCameraDevice::Setup(void)
 
 QByteArray TorcCameraDevice::GetSegment(int Segment)
 {
-    QWriteLocker locker(&m_ringBufferLock);
+    QReadLocker locker(&m_ringBufferLock);
     if (m_ringBuffer)
         return m_ringBuffer->GetSegment(Segment);
     return QByteArray();
@@ -331,7 +331,7 @@ QByteArray TorcCameraDevice::GetSegment(int Segment)
 
 QByteArray TorcCameraDevice::GetInitSegment(void)
 {
-    QWriteLocker locker(&m_ringBufferLock);
+    QReadLocker locker(&m_ringBufferLock);
     if (m_ringBuffer)
         return m_ringBuffer->GetInitSegment();
     return QByteArray();
