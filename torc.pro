@@ -94,7 +94,7 @@ install.files  = html/index.html
 install.files += html/torc.xsd
 install.files += html/manifest.json
 install.files += html/browserconfig.xml
-install.files += html/css html/fonts html/img html/js
+install.files += html/css html/webfonts html/img html/js
 INSTALLS      += install
 
 # libxml2 for xml validation
