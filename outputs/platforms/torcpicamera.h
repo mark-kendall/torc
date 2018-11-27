@@ -17,7 +17,7 @@ class TorcPiCamera final : public TorcCameraDevice
     Q_OBJECT
 
   public:
-    enum CameraType
+    enum PiCameraType
     {
         Unknown = 0,
         V1      = 1,
@@ -56,7 +56,7 @@ class TorcPiCamera final : public TorcCameraDevice
   private:
     Q_DISABLE_COPY(TorcPiCamera)
 
-    CameraType               m_cameraType;
+    PiCameraType             m_cameraType;
 
     // OpenMax
     TorcOMXCore              m_core;
