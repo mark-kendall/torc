@@ -105,7 +105,6 @@ void TorcCameraStillsOutput::Stop(void)
     m_threadLock.lockForWrite();
     if (m_thread)
     {
-        disconnect(this, &TorcCameraStillsOutput::ValueChanged, this, &TorcCameraStillsOutput::TakeStills);
         TorcCameraThread::CreateOrDestroy(m_thread, modelId);
         m_thread = NULL;
     }
@@ -267,7 +266,6 @@ void TorcCameraVideoOutput::Stop(void)
     m_threadLock.lockForWrite();
     if (m_thread)
     {
-        disconnect(this, SIGNAL(ValueChanged(double)), this, SIGNAL(StreamVideo(bool)));
         TorcCameraThread::CreateOrDestroy(m_thread, modelId);
         m_thread = NULL;
     }
