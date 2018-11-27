@@ -61,7 +61,6 @@ class TorcLanguage : public QObject, public TorcHTTPService
     QLocale                  m_locale;
     QList<QLocale>           m_languages;
     QTranslator              m_translator;
-    QReadWriteLock           m_lock;
 };
 
 class TorcStringFactory

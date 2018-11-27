@@ -77,7 +77,6 @@ class WebLogger : public QObject, public TorcHTTPService, public FileLogger
     QByteArray log;
     QByteArray tail;
     bool       changed;
-    QMutex     lock;
 };
 
 #endif // TORCLOGGINGIMP_H

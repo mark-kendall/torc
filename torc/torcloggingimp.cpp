@@ -494,14 +494,22 @@ bool FileLogger::PrintLine(QByteArray &Line)
     return true;
 }
 
+/*! \class WebLogger
+ *  \brief Serves log content to registered subscribers and HTTP clients.
+ *
+ * The latest, complete log can be downloaded via GetLog.
+ * Notifications of updates to the log are sent every 10 seconds.
+ *
+ * \note Subscribers to the 'tail' may not receive all log items if they do not retrieve the latest tail
+ *       before the next item is logged.
+*/
 WebLogger::WebLogger(QString Filename)
   : QObject(),
     TorcHTTPService(this, "log", "log", WebLogger::staticMetaObject, "event"),
     FileLogger(Filename, false, false),
     log(),
     tail(),
-    changed(false),
-    lock(QMutex::Recursive)
+    changed(false)
 {
     // we rate limit the LogChanged signal to once every 10 seconds
     startTimer(10000);
@@ -515,11 +523,17 @@ bool WebLogger::event(QEvent *event)
 {
     if (event && event->type() == QEvent::Timer)
     {
-        lock.lock();
-        if (changed)
+        m_httpServiceLock.lockForRead();
+        bool haschanged = changed;
+        m_httpServiceLock.unlock();
+
+        if (haschanged)
+        {
+            m_httpServiceLock.lockForWrite();
+            changed = false;
+            m_httpServiceLock.unlock();
             emit logChanged();
-        changed = false;
-        lock.unlock();
+        }
     }
     return QObject::event(event);
 }
@@ -541,7 +555,7 @@ QByteArray WebLogger::GetLog(void)
 
 QByteArray WebLogger::GetTail(void)
 {
-    QMutexLocker locker(&lock);
+    QReadLocker locker(&m_httpServiceLock);
     return tail;
 }
 
@@ -559,10 +573,10 @@ bool WebLogger::Logmsg(LogItem *Item)
     if (filter)
         return true;
 
-    lock.lock();
+    m_httpServiceLock.lockForWrite();
     changed = true;
     tail = line;
-    lock.unlock();
+    m_httpServiceLock.unlock();
 
     emit tailChanged();
     return PrintLine(line);

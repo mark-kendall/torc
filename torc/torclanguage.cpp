@@ -62,11 +62,8 @@ TorcLanguage::TorcLanguage(TorcSetting *SettingParent)
     languageString(),
     m_locale(),
     m_languages(),
-    m_translator(),
-    m_lock(QReadWriteLock::Recursive)
+    m_translator()
 {
-    QWriteLocker locker(&m_lock);
-
     QCoreApplication::installTranslator(&m_translator);
 
     LOG(VB_GENERAL, LOG_INFO, QString("System language: %1 (%2) (%3)(env - %4)")
@@ -93,7 +90,6 @@ TorcLanguage::TorcLanguage(TorcSetting *SettingParent)
 
 TorcLanguage::~TorcLanguage()
 {
-    QWriteLocker locker(&m_lock);
     QCoreApplication::removeTranslator(&m_translator);
     m_languageSetting->Remove();
     m_languageSetting->DownRef();
@@ -115,7 +111,7 @@ QString TorcLanguage::GetUIName(void)
 */
 void TorcLanguage::SetLanguageCode(const QString &Language)
 {
-    QWriteLocker locker(&m_lock);
+    QWriteLocker locker(&m_httpServiceLock);
 
     // ignore unnecessary changes
     QLocale locale(Language);
@@ -159,19 +155,19 @@ void TorcLanguage::SetLanguageCode(const QString &Language)
 /// \brief Return the current language.
 QString TorcLanguage::GetLanguageCode(void)
 {
-    QReadLocker locker(&m_lock);
+    QReadLocker locker(&m_httpServiceLock);
     return languageCode;
 }
 
 QLocale TorcLanguage::GetLocale(void)
 {
-    QReadLocker locker(&m_lock);
+    QReadLocker locker(&m_httpServiceLock);
     return m_locale;
 }
 
 QString TorcLanguage::GetLanguageString(void)
 {
-    QReadLocker locker(&m_lock);
+    QReadLocker locker(&m_httpServiceLock);
     return languageString;
 }
 
@@ -238,8 +234,6 @@ QLocale::Language TorcLanguage::From3CharCode(const QString &Code)
 
 void TorcLanguage::InitialiseTranslations(void)
 {
-    QWriteLocker locker(&m_lock);
-
     // clear out old (just in case)
     m_languages.clear();
 
