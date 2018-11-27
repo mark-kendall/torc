@@ -24,6 +24,14 @@
 #include "torclogging.h"
 #include "torcsegmentedringbuffer.h"
 
+/*! \class TorcSegmentedRingBuffer
+ *
+ * A circular buffer customised for storing segmented media data - principally fragmented
+ * MP4 files but should work with other formats such as transport streams (TS).
+ *
+ * The owner is responsible for ensuring the total buffer size is appropriate for the use case
+ * (i.e. media type/bitrate and buffering required).
+*/
 TorcSegmentedRingBuffer::TorcSegmentedRingBuffer(int Size, int MaxSegments)
   : m_size(Size),
     m_data(Size, '0'),
@@ -48,6 +56,7 @@ TorcSegmentedRingBuffer::~TorcSegmentedRingBuffer()
     m_segmentRefs.clear();
 }
 
+/// Return the number of free bytes available for writing.
 inline int TorcSegmentedRingBuffer::GetBytesFree(void)
 {
     int result = 0;
@@ -59,11 +68,27 @@ inline int TorcSegmentedRingBuffer::GetBytesFree(void)
     return result;
 }
 
+/// Return the size of the buffer (NOT the number of segments).
 int TorcSegmentedRingBuffer::GetSize(void)
 {
     return m_size;
 }
 
+/// Return the number of the segment at the head of the queue (the newest).
+int TorcSegmentedRingBuffer::GetHead(void)
+{
+    int result = -1;
+    m_segmentsLock.lockForRead();
+    if (!m_segments.isEmpty())
+        result = m_segmentRefs.last();
+    m_segmentsLock.unlock();
+    return result;
+}
+
+/*! \brief Return the number of available segments
+ *
+ * If the buffer is not empty, TailRef will be set to the value of the oldest segment.
+*/
 int TorcSegmentedRingBuffer::GetSegmentsAvail(int &TailRef)
 {
     // only the 'writer' can change the number of segments
@@ -76,6 +101,12 @@ int TorcSegmentedRingBuffer::GetSegmentsAvail(int &TailRef)
     return result;
 }
 
+/*! \brief Finish the current segment and start a new one
+ *
+ * The buffer's owner is responsible for indicating that the segment is finished.
+ *
+ * \param Init Indicates that this is an MP4 'init' segment that should be saved separately.
+*/
 int TorcSegmentedRingBuffer::FinishSegment(bool Init)
 {
     QWriteLocker locker(&m_segmentsLock);
@@ -102,6 +133,7 @@ int TorcSegmentedRingBuffer::FinishSegment(bool Init)
     return result;
 }
 
+/// Write data to the current segment.
 int TorcSegmentedRingBuffer::Write(const uint8_t *Data, int Size)
 {
     if (!Data || Size <= 0 || Size >= m_size)
@@ -134,6 +166,9 @@ int TorcSegmentedRingBuffer::Write(const uint8_t *Data, int Size)
     return Size;
 }
 
+/*! \brief Write data to the current segment
+ * \overload int TorcSegmentedRingBuffer::Write(const uint8_t *Data, int Size)
+*/
 int TorcSegmentedRingBuffer::Write(QByteArray *Data, int Size)
 {
     if (Data)
@@ -194,6 +229,7 @@ int TorcSegmentedRingBuffer::ReadSegment(QIODevice *Dst, int SegmentRef)
     return segment.second;
 }
 
+/// Save the MP4 'init' segment.
 void TorcSegmentedRingBuffer::SaveInitSegment(void)
 {
     QWriteLocker locker(&m_segmentsLock);
@@ -227,6 +263,7 @@ void TorcSegmentedRingBuffer::SaveInitSegment(void)
     emit InitSegmentReady();
 }
 
+/// Return a copy of the segment identified by SegmentRef.
 QByteArray TorcSegmentedRingBuffer::GetSegment(int SegmentRef)
 {
     if (SegmentRef < 0)
@@ -246,6 +283,7 @@ QByteArray TorcSegmentedRingBuffer::GetSegment(int SegmentRef)
     return result;
 }
 
+/// Return a copy of the MP4 'init' segment.
 QByteArray TorcSegmentedRingBuffer::GetInitSegment(void)
 {
     QReadLocker locker(&m_segmentsLock);

@@ -16,6 +16,7 @@ class TorcSegmentedRingBuffer : public QObject
     ~TorcSegmentedRingBuffer();
 
     int                     GetSize          (void);
+    int                     GetHead          (void);
     int                     GetSegmentsAvail (int &TailRef);
     int                     Write            (QByteArray    *Data, int Size);
     int                     Write            (const uint8_t *Data, int Size);
