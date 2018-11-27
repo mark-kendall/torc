@@ -13,6 +13,7 @@ var searchData=
   ['enableecho',['EnableEcho',['../d3/d9a/class_torc_web_socket_reader.html#a48d38e5741bccd86270051f5ea7f4027',1,'TorcWebSocketReader']]],
   ['enablemethod',['EnableMethod',['../d6/d70/class_torc_h_t_t_p_service.html#a63735bbaa0886adc834d275b6d4e416b',1,'TorcHTTPService']]],
   ['enableport',['EnablePort',['../de/d1d/class_torc_o_m_x_component.html#a232d37c7db138ef6362d83bc071bf041',1,'TorcOMXComponent::EnablePort()'],['../d7/d61/class_torc_o_m_x_port.html#ad53fcc785f5e2c11746cf639b7b2f964',1,'TorcOMXPort::EnablePort()']]],
+  ['enablestills',['EnableStills',['../da/da1/class_torc_pi_camera.html#a5beab970495724e8fa8f7b78d7ba3720',1,'TorcPiCamera::EnableStills()'],['../d3/dfd/class_torc_camera_device.html#a83b20eb10509cd0deab162be970fb567',1,'TorcCameraDevice::EnableStills()']]],
   ['encoder_5feede',['ENCODER_EEDE',['../d7/de1/torcpicamera_8cpp.html#a66a6f9f928bdfe2a5c1abf6d268e9ce8',1,'torcpicamera.cpp']]],
   ['encoder_5feede_5floss_5frate',['ENCODER_EEDE_LOSS_RATE',['../d7/de1/torcpicamera_8cpp.html#ac3439ee3abb76c10961f60f007d10647',1,'torcpicamera.cpp']]],
   ['encoder_5finline_5fheaders',['ENCODER_INLINE_HEADERS',['../d7/de1/torcpicamera_8cpp.html#a037c02f4478d15850c451dda15bac9e8',1,'torcpicamera.cpp']]],

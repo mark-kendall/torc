@@ -1,6 +1,8 @@
 var searchData=
 [
   ['saveinitsegment',['SaveInitSegment',['../df/d16/class_torc_segmented_ring_buffer.html#acb5ef0f35bfca1af613aaf8329815a87',1,'TorcSegmentedRingBuffer']]],
+  ['savestill',['SaveStill',['../d3/dfd/class_torc_camera_device.html#ae83bcf0a54d9a5badb22fd0c3045270b',1,'TorcCameraDevice']]],
+  ['savestillbuffer',['SaveStillBuffer',['../d3/dfd/class_torc_camera_device.html#aef16c41057880802b59a2f3b45da850e',1,'TorcCameraDevice']]],
   ['scalevalue',['ScaleValue',['../db/d20/class_torcp_h_input.html#a7a886b94e6cdbea37c4b9d2dc62ee274',1,'TorcpHInput::ScaleValue()'],['../d1/d8b/class_torc_p_w_m_input.html#a9902db84956f342951939332921b6e54',1,'TorcPWMInput::ScaleValue()'],['../db/dd0/class_torc_switch_input.html#a40ae27bba2fcfaa0abdc9502ba53e1a8',1,'TorcSwitchInput::ScaleValue()']]],
   ['score',['Score',['../d5/d8c/class_torc_power_factory.html#affc6fd521360f61b80fd132886efc280',1,'TorcPowerFactory']]],
   ['search',['Search',['../d7/d61/class_torc_s_s_d_p.html#a50c026037a427016a65e24a6991f74bd',1,'TorcSSDP']]],
@@ -79,6 +81,7 @@ var searchData=
   ['started',['Started',['../d2/d41/class_torc_q_thread.html#a410da9d866deeabfee7817832be12bd5',1,'TorcQThread']]],
   ['startlogging',['StartLogging',['../d7/d24/torcloggingimp_8cpp.html#af9855554af12dbe3732b6a870e96ae08',1,'torcloggingimp.cpp']]],
   ['startresettimer',['StartResetTimer',['../d7/d0b/class_torc_pushbullet_notifier.html#a7bc55144a063837c0c07f341cb9c5716',1,'TorcPushbulletNotifier']]],
+  ['startstill',['StartStill',['../da/da1/class_torc_pi_camera.html#a42e54a5b8d6bdf092bdabfe86e039956',1,'TorcPiCamera::StartStill()'],['../d3/dfd/class_torc_camera_device.html#afcb6bc2f30724dcda8956c24b93b04fd',1,'TorcCameraDevice::StartStill()']]],
   ['starttimechanged',['StartTimeChanged',['../dd/d3a/class_torc_network_service.html#abd08fba2755b000758dbef83d18aac39',1,'TorcNetworkService']]],
   ['starttimer',['StartTimer',['../d0/db9/class_torc_i_o_t_logger.html#a28ab8819c9b2cee74d6b1a5fc2c83f3d',1,'TorcIOTLogger']]],
   ['statetostring',['StateToString',['../d8/d3f/torcomxcore_8cpp.html#a5e54981f24af575eeeeac6c8911ebf82',1,'StateToString(OMX_STATETYPE State):&#160;torcomxcore.cpp'],['../d7/df9/torcomxcore_8h.html#a5e54981f24af575eeeeac6c8911ebf82',1,'StateToString(OMX_STATETYPE State):&#160;torcomxcore.cpp']]],

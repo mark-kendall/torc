@@ -106,8 +106,9 @@ Inheritance diagram for TorcCameraDevice:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-slots"></a>
 Public Slots</h2></td></tr>
-<tr class="memitem:aec8c645db2171c717f19c59f35252972"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dfd/class_torc_camera_device.html#aec8c645db2171c717f19c59f35252972">TakeStills</a> (uint Count)=0</td></tr>
-<tr class="separator:aec8c645db2171c717f19c59f35252972"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab8573ec3aebd6e118bf4f244017e354"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dfd/class_torc_camera_device.html#aab8573ec3aebd6e118bf4f244017e354">TakeStills</a> (uint Count)</td></tr>
+<tr class="memdesc:aab8573ec3aebd6e118bf4f244017e354"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tell the camera to take Count number of still images.  <a href="#aab8573ec3aebd6e118bf4f244017e354">More...</a><br /></td></tr>
+<tr class="separator:aab8573ec3aebd6e118bf4f244017e354"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad90b8a69adadccb718173487cfe0c151"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dfd/class_torc_camera_device.html#ad90b8a69adadccb718173487cfe0c151">StreamVideo</a> (bool Video)=0</td></tr>
 <tr class="separator:ad90b8a69adadccb718173487cfe0c151"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -151,6 +152,16 @@ Public Member Functions</h2></td></tr>
 Protected Member Functions</h2></td></tr>
 <tr class="memitem:a992e4b35f2699695d4bc59cc96ff1083"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dfd/class_torc_camera_device.html#a992e4b35f2699695d4bc59cc96ff1083">TrackDrift</a> (void)</td></tr>
 <tr class="separator:a992e4b35f2699695d4bc59cc96ff1083"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afcb6bc2f30724dcda8956c24b93b04fd"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dfd/class_torc_camera_device.html#afcb6bc2f30724dcda8956c24b93b04fd">StartStill</a> (void)=0</td></tr>
+<tr class="separator:afcb6bc2f30724dcda8956c24b93b04fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a83b20eb10509cd0deab162be970fb567"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dfd/class_torc_camera_device.html#a83b20eb10509cd0deab162be970fb567">EnableStills</a> (uint Count)</td></tr>
+<tr class="separator:a83b20eb10509cd0deab162be970fb567"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae83bcf0a54d9a5badb22fd0c3045270b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dfd/class_torc_camera_device.html#ae83bcf0a54d9a5badb22fd0c3045270b">SaveStill</a> (void)</td></tr>
+<tr class="separator:ae83bcf0a54d9a5badb22fd0c3045270b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef16c41057880802b59a2f3b45da850e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dfd/class_torc_camera_device.html#aef16c41057880802b59a2f3b45da850e">SaveStillBuffer</a> (quint32 Length, uint8_t *Data)</td></tr>
+<tr class="separator:aef16c41057880802b59a2f3b45da850e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9e675abdc7ce6e630a111d0a024a4e28"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dfd/class_torc_camera_device.html#a9e675abdc7ce6e630a111d0a024a4e28">ClearStillsBuffers</a> (void)</td></tr>
+<tr class="separator:a9e675abdc7ce6e630a111d0a024a4e28"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -168,6 +179,12 @@ Protected Attributes</h2></td></tr>
 <tr class="separator:a2f612f3d73705de87881a89b23bf1937"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6f614c17b7784c1e24e01f286c29f441"><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../db/d25/class_torc_average.html">TorcAverage</a>&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dfd/class_torc_camera_device.html#a6f614c17b7784c1e24e01f286c29f441">m_longAverage</a></td></tr>
 <tr class="separator:a6f614c17b7784c1e24e01f286c29f441"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7032657a6f07cb58524050ff4e287c71"><td class="memItemLeft" align="right" valign="top">uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dfd/class_torc_camera_device.html#a7032657a6f07cb58524050ff4e287c71">m_stillsRequired</a></td></tr>
+<tr class="separator:a7032657a6f07cb58524050ff4e287c71"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a75ab4292e3b5c80bff2fce9b1d6ee703"><td class="memItemLeft" align="right" valign="top">uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dfd/class_torc_camera_device.html#a75ab4292e3b5c80bff2fce9b1d6ee703">m_stillsExpected</a></td></tr>
+<tr class="separator:a75ab4292e3b5c80bff2fce9b1d6ee703"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa7779d807b8aefd01694eb7624e40061"><td class="memItemLeft" align="right" valign="top">QList&lt; QPair&lt; quint32, uint8_t * &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dfd/class_torc_camera_device.html#aa7779d807b8aefd01694eb7624e40061">m_stillsBuffers</a></td></tr>
+<tr class="separator:aa7779d807b8aefd01694eb7624e40061"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock">
@@ -195,7 +212,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d0/d11/torccamera_8cpp_source.html#l00261">261</a> of file <a class="el" href="../../d0/d11/torccamera_8cpp_source.html">torccamera.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d0/d11/torccamera_8cpp_source.html#l00264">264</a> of file <a class="el" href="../../d0/d11/torccamera_8cpp_source.html">torccamera.cpp</a>.</p>
 
 </div>
 </div>
@@ -220,11 +237,65 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d0/d11/torccamera_8cpp_source.html#l00273">273</a> of file <a class="el" href="../../d0/d11/torccamera_8cpp_source.html">torccamera.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d0/d11/torccamera_8cpp_source.html#l00279">279</a> of file <a class="el" href="../../d0/d11/torccamera_8cpp_source.html">torccamera.cpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="a9e675abdc7ce6e630a111d0a024a4e28"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void TorcCameraDevice::ClearStillsBuffers </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="../../d0/d11/torccamera_8cpp_source.html#l00368">368</a> of file <a class="el" href="../../d0/d11/torccamera_8cpp_source.html">torccamera.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a83b20eb10509cd0deab162be970fb567"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool TorcCameraDevice::EnableStills </td>
+          <td>(</td>
+          <td class="paramtype">uint&#160;</td>
+          <td class="paramname"><em>Count</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Reimplemented in <a class="el" href="../../da/da1/class_torc_pi_camera.html#a5beab970495724e8fa8f7b78d7ba3720">TorcPiCamera</a>.</p>
+
+<p>Definition at line <a class="el" href="../../d0/d11/torccamera_8cpp_source.html#l00323">323</a> of file <a class="el" href="../../d0/d11/torccamera_8cpp_source.html">torccamera.cpp</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a0675c4eb8cbb7a80acb31488ef7c211c"></a>
 <div class="memitem">
 <div class="memproto">
@@ -239,7 +310,7 @@ Protected Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d0/d11/torccamera_8cpp_source.html#l00291">291</a> of file <a class="el" href="../../d0/d11/torccamera_8cpp_source.html">torccamera.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d0/d11/torccamera_8cpp_source.html#l00299">299</a> of file <a class="el" href="../../d0/d11/torccamera_8cpp_source.html">torccamera.cpp</a>.</p>
 
 </div>
 </div>
@@ -257,7 +328,7 @@ Protected Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d0/d11/torccamera_8cpp_source.html#l00334">334</a> of file <a class="el" href="../../d0/d11/torccamera_8cpp_source.html">torccamera.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d0/d11/torccamera_8cpp_source.html#l00410">410</a> of file <a class="el" href="../../d0/d11/torccamera_8cpp_source.html">torccamera.cpp</a>.</p>
 
 </div>
 </div>
@@ -275,7 +346,7 @@ Protected Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d0/d11/torccamera_8cpp_source.html#l00283">283</a> of file <a class="el" href="../../d0/d11/torccamera_8cpp_source.html">torccamera.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d0/d11/torccamera_8cpp_source.html#l00291">291</a> of file <a class="el" href="../../d0/d11/torccamera_8cpp_source.html">torccamera.cpp</a>.</p>
 
 </div>
 </div>
@@ -300,6 +371,68 @@ Protected Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ae83bcf0a54d9a5badb22fd0c3045270b"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void TorcCameraDevice::SaveStill </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="../../d0/d11/torccamera_8cpp_source.html#l00330">330</a> of file <a class="el" href="../../d0/d11/torccamera_8cpp_source.html">torccamera.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aef16c41057880802b59a2f3b45da850e"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void TorcCameraDevice::SaveStillBuffer </td>
+          <td>(</td>
+          <td class="paramtype">quint32&#160;</td>
+          <td class="paramname"><em>Length</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t *&#160;</td>
+          <td class="paramname"><em>Data</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="../../d0/d11/torccamera_8cpp_source.html#l00360">360</a> of file <a class="el" href="../../d0/d11/torccamera_8cpp_source.html">torccamera.cpp</a>.</p>
 
 </div>
 </div>
@@ -427,6 +560,32 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="afcb6bc2f30724dcda8956c24b93b04fd"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void TorcCameraDevice::StartStill </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implemented in <a class="el" href="../../da/da1/class_torc_pi_camera.html#a42e54a5b8d6bdf092bdabfe86e039956">TorcPiCamera</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a5c21bd483cdd9f288101371b1d3212a7"></a>
 <div class="memitem">
 <div class="memproto">
@@ -501,7 +660,7 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="aec8c645db2171c717f19c59f35252972"></a>
+<a class="anchor" id="aab8573ec3aebd6e118bf4f244017e354"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -509,7 +668,7 @@ Protected Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual void TorcCameraDevice::TakeStills </td>
+          <td class="memname">void TorcCameraDevice::TakeStills </td>
           <td>(</td>
           <td class="paramtype">uint&#160;</td>
           <td class="paramname"><em>Count</em></td><td>)</td>
@@ -518,10 +677,15 @@ Protected Attributes</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span><span class="mlabel">slot</span></span>  </td>
+<span class="mlabels"><span class="mlabel">virtual</span><span class="mlabel">slot</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Tell the camera to take Count number of still images. </p>
+<dl class="section note"><dt>Note</dt><dd>We ignore values below the current setting, as the stills will be triggered when the input value moves from zero to X - but it should then drop back to zero. </dd></dl>
+
+<p>Definition at line <a class="el" href="../../d0/d11/torccamera_8cpp_source.html#l00312">312</a> of file <a class="el" href="../../d0/d11/torccamera_8cpp_source.html">torccamera.cpp</a>.</p>
 
 </div>
 </div>
@@ -547,7 +711,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d0/d11/torccamera_8cpp_source.html#l00300">300</a> of file <a class="el" href="../../d0/d11/torccamera_8cpp_source.html">torccamera.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d0/d11/torccamera_8cpp_source.html#l00376">376</a> of file <a class="el" href="../../d0/d11/torccamera_8cpp_source.html">torccamera.cpp</a>.</p>
 
 </div>
 </div>
@@ -618,7 +782,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00091">91</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00099">99</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
 
 </div>
 </div>
@@ -640,7 +804,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00093">93</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00101">101</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
 
 </div>
 </div>
@@ -662,7 +826,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00087">87</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00094">94</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
 
 </div>
 </div>
@@ -684,7 +848,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00090">90</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00098">98</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
 
 </div>
 </div>
@@ -706,7 +870,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00088">88</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00096">96</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
 
 </div>
 </div>
@@ -728,7 +892,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00089">89</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00097">97</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
 
 </div>
 </div>
@@ -750,7 +914,73 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00092">92</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00100">100</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aa7779d807b8aefd01694eb7624e40061"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QList&lt;QPair&lt;quint32, uint8_t*&gt; &gt; TorcCameraDevice::m_stillsBuffers</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00106">106</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a75ab4292e3b5c80bff2fce9b1d6ee703"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint TorcCameraDevice::m_stillsExpected</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00105">105</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a7032657a6f07cb58524050ff4e287c71"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint TorcCameraDevice::m_stillsRequired</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00104">104</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
 
 </div>
 </div>
@@ -761,7 +991,7 @@ Protected Attributes</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Nov 27 2018 09:31:35 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Nov 27 2018 13:12:49 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

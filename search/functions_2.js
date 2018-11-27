@@ -32,6 +32,7 @@ var searchData=
   ['checkheaders',['CheckHeaders',['../d8/d73/class_torc_network.html#a00b8a9893069d128e2d6109b569d5d42',1,'TorcNetwork']]],
   ['checkinputvalues',['CheckInputValues',['../d1/d34/class_torc_control.html#a723bf0ffb99ccb44f7bbf5262f51d092',1,'TorcControl']]],
   ['checktime',['CheckTime',['../df/d01/class_torc_camera_video_output.html#a8d21cb664eb19ad641cb449dcd07bb3a',1,'TorcCameraVideoOutput']]],
+  ['clearstillsbuffers',['ClearStillsBuffers',['../d3/dfd/class_torc_camera_device.html#a9e675abdc7ce6e630a111d0a024a4e28',1,'TorcCameraDevice']]],
   ['close',['Close',['../db/dc7/class_torc_h_t_t_p_server.html#a564f5678b7293fd6cb51a7c3f0df466a',1,'TorcHTTPServer']]],
   ['closecodetostring',['CloseCodeToString',['../d3/d9a/class_torc_web_socket_reader.html#a30680e436b9576ddb90df3695c4246ee',1,'TorcWebSocketReader']]],
   ['closeconnections',['CloseConnections',['../d1/d2e/class_torc_d_b.html#aa9a306027e5d52bd311dfb2aa4d7a9ab',1,'TorcDB::CloseConnections()'],['../d8/d73/class_torc_network.html#ac2137ddd75d19be6a7277e6b1cb374bb',1,'TorcNetwork::CloseConnections()']]],
