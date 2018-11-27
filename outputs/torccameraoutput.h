@@ -38,6 +38,7 @@ class TorcCameraOutput : public TorcOutput
     TorcCameraThread *m_thread;
     QReadWriteLock    m_threadLock;
     TorcCameraParams  m_params;
+    QReadWriteLock    m_paramsLock;
 
   private:
    Q_DISABLE_COPY(TorcCameraOutput)

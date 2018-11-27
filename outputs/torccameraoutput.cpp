@@ -39,7 +39,8 @@ TorcCameraOutput::TorcCameraOutput(TorcOutput::Type Type, double Value, const QS
   : TorcOutput(Type, Value, ModelId, Details, Output, MetaObject, Blacklist + "," + "CameraErrored"),
     m_thread(NULL),
     m_threadLock(QReadWriteLock::Recursive),
-    m_params(Details)
+    m_params(Details),
+    m_paramsLock(QReadWriteLock::Recursive)
 {
 }
 
@@ -65,8 +66,10 @@ void TorcCameraOutput::SetParams(TorcCameraParams &Params)
 */
 void TorcCameraOutput::ParamsChanged(TorcCameraParams Params)
 {
+    m_paramsLock.lockForWrite();
     m_params = Params;
     LOG(VB_GENERAL, LOG_INFO, QString("Camera parameters changed - video codec '%1'").arg(m_params.m_videoCodec));
+    m_paramsLock.unlock();
 }
 
 TorcCameraStillsOutput::TorcCameraStillsOutput(const QString &ModelId, const QVariantMap &Details)
@@ -114,7 +117,9 @@ void TorcCameraStillsOutput::Start(void)
     Stop();
 
     m_threadLock.lockForWrite();
+    m_paramsLock.lockForRead();
     TorcCameraThread::CreateOrDestroy(m_thread, modelId, m_params);
+    m_paramsLock.unlock();
     if (m_thread)
     {
         m_thread->SetStillsParent(this);
@@ -227,7 +232,9 @@ void TorcCameraVideoOutput::Start(void)
     Stop();
 
     m_threadLock.lockForWrite();
+    m_paramsLock.lockForRead();
     TorcCameraThread::CreateOrDestroy(m_thread, modelId, m_params);
+    m_paramsLock.unlock();
     if (m_thread)
     {
         m_thread->SetVideoParent(this);
@@ -524,8 +531,11 @@ QByteArray TorcCameraVideoOutput::GetMasterPlaylist(void)
                                   "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=%1,RESOLUTION=%2x%3,CODECS=\"%5\"\r\n"
                                   "%4\r\n");
 
-    return QByteArray(playlist.arg(m_params.m_bitrate).arg(m_params.m_width).arg(m_params.m_height)
+    m_paramsLock.lockForRead();
+    QByteArray result(playlist.arg(m_params.m_bitrate).arg(m_params.m_width).arg(m_params.m_height)
                                   .arg(HLS_PLAYLIST).arg(m_params.m_videoCodec)/*.arg(AUDIO_CODEC_ISO)*/.toLocal8Bit());
+    m_paramsLock.unlock();
+    return result;
 }
 
 QByteArray TorcCameraVideoOutput::GetHLSPlaylist(void)
@@ -536,7 +546,9 @@ QByteArray TorcCameraVideoOutput::GetHLSPlaylist(void)
                                   "#EXT-X-MEDIA-SEQUENCE:%2\r\n"
                                   "#EXT-X-MAP:URI=\"initSegment.mp4\"\r\n");
 
+    m_paramsLock.lockForRead();
     QString duration = QString::number(m_params.m_segmentLength / (float) m_params.m_frameRate, 'f', 2);
+    m_paramsLock.unlock();
     m_segmentLock.lockForRead();
     QString result = playlist.arg(duration).arg(m_segments.first());
     foreach (int segment, m_segments)
@@ -564,23 +576,27 @@ QByteArray TorcCameraVideoOutput::GetDashPlaylist(void)
         "  </Period>\r\n"
         "</MPD>\r\n");
 
-    double duration = m_params.m_segmentLength / (float)m_params.m_frameRate;
     m_threadLock.lockForRead();
     QString start = m_cameraStartTime.toString(Qt::ISODate);
     m_threadLock.unlock();
-    return QByteArray(dash.arg(start)
-                      .arg(QString::number(duration * 5, 'f', 2))
-                      .arg(QString::number(duration * 4, 'f', 2))
-                      .arg(QString::number(duration * 2, 'f', 2))
-                      .arg(TorcHTTPRequest::ResponseTypeToString(HTTPResponseMP4/*HTTPResponseMPEGTS*/))
-                      .arg(m_params.m_width)
-                      .arg(m_params.m_height)
-                      .arg(m_params.m_bitrate)
-                      .arg(QString("%1").arg(m_params.m_videoCodec))
-                      //.arg(QString("%1,%2").arg(VIDEO_CODEC_ISO).arg(AUDIO_CODEC_ISO))
-                      .arg(QString("%1").arg(m_params.m_frameRate))
-                      .arg(duration * m_params.m_timebase)
-                      .arg(m_params.m_timebase).toLocal8Bit());
+
+    m_paramsLock.lockForRead();
+    double duration = m_params.m_segmentLength / (float)m_params.m_frameRate;
+    QByteArray result(dash.arg(start)
+                          .arg(QString::number(duration * 5, 'f', 2))
+                          .arg(QString::number(duration * 4, 'f', 2))
+                          .arg(QString::number(duration * 2, 'f', 2))
+                          .arg(TorcHTTPRequest::ResponseTypeToString(HTTPResponseMP4/*HTTPResponseMPEGTS*/))
+                          .arg(m_params.m_width)
+                          .arg(m_params.m_height)
+                          .arg(m_params.m_bitrate)
+                          .arg(QString("%1").arg(m_params.m_videoCodec))
+                          //.arg(QString("%1,%2").arg(VIDEO_CODEC_ISO).arg(AUDIO_CODEC_ISO))
+                          .arg(QString("%1").arg(m_params.m_frameRate))
+                          .arg(duration * m_params.m_timebase)
+                          .arg(m_params.m_timebase).toLocal8Bit());
+    m_paramsLock.unlock();
+    return result;
 }
 
 TorcCameraOutputs* TorcCameraOutputs::gCameraOutputs = new TorcCameraOutputs();
