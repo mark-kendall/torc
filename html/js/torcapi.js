@@ -99,7 +99,7 @@ var TorcAPI = function ($, torc, menu) {
         $(".torc-navbar").after(template(theme.APIModal, { "title": torc.ViewAPITitleTr }));
 
         // and the menu item to display the modal
-        var item = template(theme.DropdownItemWithIcon, { "icon": "github", "text": torc.ViewAPITr });
+        var item = template(theme.DropdownItemWithIcon, { "icon": "fas fa-fw fa-sliders-h", "text": torc.ViewAPITr });
         $("." + menu).append(template(theme.NavbarDropdownItem, {"id": theme.APIModalID + "-menu", "link": "#" + theme.APIModalID, "text": item }));
         $("." + theme.APIModalID + "-menu").attr("data-toggle", "modal");
 

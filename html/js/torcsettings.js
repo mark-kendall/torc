@@ -214,7 +214,7 @@ var TorcSettings = function ($, torc, menu) {
         $(".torc-navbar").after(template(theme.SettingsModal, { "title": torc.SettingsTr }));
 
         // and the menu item to display the modal
-        var item = template(theme.DropdownItemWithIcon, { "icon": "cog", "text": torc.SettingsTr });
+        var item = template(theme.DropdownItemWithIcon, { "icon": "fas fa-fw fa-cog", "text": torc.SettingsTr });
         $("." + menu).append(template(theme.NavbarDropdownItem, {"id": theme.SettingsModalID + "-menu", "link": "#" + theme.SettingsModalID, "text": item }));
         $("." + theme.SettingsModalID + "-menu").attr("data-toggle", "modal");
         $("#" + theme.SettingsModalID).on("show.bs.modal", function () { load(); });
