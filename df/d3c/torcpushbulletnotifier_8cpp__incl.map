@@ -1,17 +1,17 @@
 <map id="torcpushbulletnotifier.cpp" name="torcpushbulletnotifier.cpp">
-<area shape="rect" id="node2" href="$d4/df9/torclogging_8h.html" title="torclogging.h" alt="" coords="181,80,287,107"/>
-<area shape="rect" id="node6" href="$df/dd7/torchttprequest_8h.html" title="torchttprequest.h" alt="" coords="295,453,429,480"/>
-<area shape="rect" id="node14" href="$db/d18/torcnetworkrequest_8h.html" title="torcnetworkrequest.h" alt="" coords="535,80,693,107"/>
-<area shape="rect" id="node34" href="$d9/dbc/torcpushbulletnotifier_8h.html" title="torcpushbulletnotifier.h" alt="" coords="1337,80,1505,107"/>
-<area shape="rect" id="node5" href="$d1/d37/torcloggingdefs_8h.html" title="torcloggingdefs.h" alt="" coords="5,155,137,181"/>
-<area shape="rect" id="node11" href="$de/de6/torchttpreader_8h.html" title="torchttpreader.h" alt="" coords="208,528,335,555"/>
-<area shape="rect" id="node16" href="$da/da5/torcnetwork_8h.html" title="torcnetwork.h" alt="" coords="559,155,669,181"/>
-<area shape="rect" id="node20" href="$db/df5/torcsetting_8h.html" title="torcsetting.h" alt="" coords="841,229,944,256"/>
-<area shape="rect" id="node32" href="$d3/dd0/torctimer_8h.html" title="torctimer.h" alt="" coords="525,229,617,256"/>
-<area shape="rect" id="node25" href="$d3/dee/torchttpservice_8h.html" title="torchttpservice.h" alt="" coords="487,304,618,331"/>
-<area shape="rect" id="node31" href="$d8/dfe/torcreferencecounted_8h.html" title="torcreferencecounted.h" alt="" coords="1036,304,1208,331"/>
-<area shape="rect" id="node29" href="$d4/d11/torchttphandler_8h.html" title="torchttphandler.h" alt="" coords="791,379,923,405"/>
-<area shape="rect" id="node36" href="$db/df1/torcnotifier_8h.html" title="torcnotifier.h" alt="" coords="1369,155,1472,181"/>
-<area shape="rect" id="node37" href="$d1/df7/torcdevice_8h.html" title="torcdevice.h" alt="" coords="1371,229,1471,256"/>
-<area shape="rect" id="node39" href="$d2/d5b/torcdevicehandler_8h.html" title="torcdevicehandler.h" alt="" coords="1483,304,1630,331"/>
+<area shape="rect" id="node2" href="$d4/df9/torclogging_8h.html" title="torclogging.h" alt="" coords="165,80,271,107"/>
+<area shape="rect" id="node6" href="$df/dd7/torchttprequest_8h.html" title="torchttprequest.h" alt="" coords="607,453,741,480"/>
+<area shape="rect" id="node14" href="$db/d18/torcnetworkrequest_8h.html" title="torcnetworkrequest.h" alt="" coords="515,80,673,107"/>
+<area shape="rect" id="node34" href="$d9/dbc/torcpushbulletnotifier_8h.html" title="torcpushbulletnotifier.h" alt="" coords="895,80,1063,107"/>
+<area shape="rect" id="node5" href="$d1/d37/torcloggingdefs_8h.html" title="torcloggingdefs.h" alt="" coords="97,155,229,181"/>
+<area shape="rect" id="node11" href="$de/de6/torchttpreader_8h.html" title="torchttpreader.h" alt="" coords="611,528,737,555"/>
+<area shape="rect" id="node16" href="$da/da5/torcnetwork_8h.html" title="torcnetwork.h" alt="" coords="602,155,711,181"/>
+<area shape="rect" id="node20" href="$db/df5/torcsetting_8h.html" title="torcsetting.h" alt="" coords="819,229,921,256"/>
+<area shape="rect" id="node32" href="$d3/dd0/torctimer_8h.html" title="torctimer.h" alt="" coords="441,229,533,256"/>
+<area shape="rect" id="node25" href="$d3/dee/torchttpservice_8h.html" title="torchttpservice.h" alt="" coords="530,304,661,331"/>
+<area shape="rect" id="node31" href="$d8/dfe/torcreferencecounted_8h.html" title="torcreferencecounted.h" alt="" coords="1131,304,1303,331"/>
+<area shape="rect" id="node29" href="$d4/d11/torchttphandler_8h.html" title="torchttphandler.h" alt="" coords="737,379,869,405"/>
+<area shape="rect" id="node36" href="$db/df1/torcnotifier_8h.html" title="torcnotifier.h" alt="" coords="1289,155,1392,181"/>
+<area shape="rect" id="node37" href="$d1/df7/torcdevice_8h.html" title="torcdevice.h" alt="" coords="1401,229,1501,256"/>
+<area shape="rect" id="node39" href="$d2/d5b/torcdevicehandler_8h.html" title="torcdevicehandler.h" alt="" coords="1378,304,1525,331"/>
 </map>

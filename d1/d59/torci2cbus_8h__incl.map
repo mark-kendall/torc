@@ -1,10 +1,10 @@
 <map id="torci2cbus.h" name="torci2cbus.h">
-<area shape="rect" id="node5" href="$d5/d41/torccentral_8h.html" title="torccentral.h" alt="" coords="871,80,974,107"/>
-<area shape="rect" id="node7" href="$d1/df7/torcdevice_8h.html" title="torcdevice.h" alt="" coords="1055,155,1155,181"/>
-<area shape="rect" id="node13" href="$d3/dee/torchttpservice_8h.html" title="http/torchttpservice.h" alt="" coords="381,155,541,181"/>
-<area shape="rect" id="node10" href="$d8/dfe/torcreferencecounted_8h.html" title="torcreferencecounted.h" alt="" coords="1194,229,1366,256"/>
-<area shape="rect" id="node12" href="$d2/d5b/torcdevicehandler_8h.html" title="torcdevicehandler.h" alt="" coords="921,229,1068,256"/>
-<area shape="rect" id="node16" href="$d4/d11/torchttphandler_8h.html" title="torchttphandler.h" alt="" coords="174,229,306,256"/>
-<area shape="rect" id="node18" href="$df/dd7/torchttprequest_8h.html" title="torchttprequest.h" alt="" coords="135,304,270,331"/>
-<area shape="rect" id="node21" href="$de/de6/torchttpreader_8h.html" title="torchttpreader.h" alt="" coords="286,379,413,405"/>
+<area shape="rect" id="node5" href="$d5/d41/torccentral_8h.html" title="torccentral.h" alt="" coords="311,80,414,107"/>
+<area shape="rect" id="node7" href="$d1/df7/torcdevice_8h.html" title="torcdevice.h" alt="" coords="430,155,530,181"/>
+<area shape="rect" id="node14" href="$d3/dee/torchttpservice_8h.html" title="http/torchttpservice.h" alt="" coords="944,155,1104,181"/>
+<area shape="rect" id="node10" href="$d8/dfe/torcreferencecounted_8h.html" title="torcreferencecounted.h" alt="" coords="518,229,690,256"/>
+<area shape="rect" id="node12" href="$d2/d5b/torcdevicehandler_8h.html" title="torcdevicehandler.h" alt="" coords="296,229,443,256"/>
+<area shape="rect" id="node17" href="$d4/d11/torchttphandler_8h.html" title="torchttphandler.h" alt="" coords="1302,229,1434,256"/>
+<area shape="rect" id="node19" href="$df/dd7/torchttprequest_8h.html" title="torchttprequest.h" alt="" coords="1353,304,1487,331"/>
+<area shape="rect" id="node22" href="$de/de6/torchttpreader_8h.html" title="torchttpreader.h" alt="" coords="1243,379,1370,405"/>
 </map>

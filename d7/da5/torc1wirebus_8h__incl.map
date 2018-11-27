@@ -1,11 +1,11 @@
 <map id="torc1wirebus.h" name="torc1wirebus.h">
-<area shape="rect" id="node4" href="$dd/d69/torcinput_8h.html" title="torcinput.h" alt="" coords="597,80,688,107"/>
-<area shape="rect" id="node24" href="$d5/d41/torccentral_8h.html" title="torccentral.h" alt="" coords="787,80,890,107"/>
-<area shape="rect" id="node6" href="$d3/dee/torchttpservice_8h.html" title="http/torchttpservice.h" alt="" coords="357,155,517,181"/>
-<area shape="rect" id="node18" href="$d1/df7/torcdevice_8h.html" title="torcdevice.h" alt="" coords="814,155,914,181"/>
-<area shape="rect" id="node9" href="$d4/d11/torchttphandler_8h.html" title="torchttphandler.h" alt="" coords="301,229,433,256"/>
-<area shape="rect" id="node12" href="$df/dd7/torchttprequest_8h.html" title="torchttprequest.h" alt="" coords="149,304,283,331"/>
-<area shape="rect" id="node15" href="$de/de6/torchttpreader_8h.html" title="torchttpreader.h" alt="" coords="287,379,414,405"/>
-<area shape="rect" id="node20" href="$d8/dfe/torcreferencecounted_8h.html" title="torcreferencecounted.h" alt="" coords="1161,229,1333,256"/>
-<area shape="rect" id="node22" href="$d2/d5b/torcdevicehandler_8h.html" title="torcdevicehandler.h" alt="" coords="989,229,1136,256"/>
+<area shape="rect" id="node4" href="$dd/d69/torcinput_8h.html" title="torcinput.h" alt="" coords="1153,80,1244,107"/>
+<area shape="rect" id="node25" href="$d5/d41/torccentral_8h.html" title="torccentral.h" alt="" coords="1269,80,1371,107"/>
+<area shape="rect" id="node6" href="$d3/dee/torchttpservice_8h.html" title="http/torchttpservice.h" alt="" coords="416,155,576,181"/>
+<area shape="rect" id="node19" href="$d1/df7/torcdevice_8h.html" title="torcdevice.h" alt="" coords="1021,155,1121,181"/>
+<area shape="rect" id="node10" href="$d4/d11/torchttphandler_8h.html" title="torchttphandler.h" alt="" coords="430,229,562,256"/>
+<area shape="rect" id="node13" href="$df/dd7/torchttprequest_8h.html" title="torchttprequest.h" alt="" coords="197,304,331,331"/>
+<area shape="rect" id="node16" href="$de/de6/torchttpreader_8h.html" title="torchttpreader.h" alt="" coords="335,379,462,405"/>
+<area shape="rect" id="node21" href="$d8/dfe/torcreferencecounted_8h.html" title="torcreferencecounted.h" alt="" coords="638,229,810,256"/>
+<area shape="rect" id="node23" href="$d2/d5b/torcdevicehandler_8h.html" title="torcdevicehandler.h" alt="" coords="936,229,1083,256"/>
 </map>

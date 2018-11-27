@@ -38,7 +38,6 @@ var searchData=
   ['devicechanged',['DeviceChanged',['../d6/df0/class_torc_power_unix_d_bus.html#ae874ca1769be40b2c661dc04ded458a3',1,'TorcPowerUnixDBus']]],
   ['deviceremoved',['DeviceRemoved',['../d6/df0/class_torc_power_unix_d_bus.html#acdd2f8cd299339b5c5b94fc4134a8af9',1,'TorcPowerUnixDBus']]],
   ['disable',['Disable',['../de/db3/class_method_parameters.html#aeac021817bc96ec1b5c1d2024fea4c3b',1,'MethodParameters']]],
-  ['disablemethod',['DisableMethod',['../d6/d70/class_torc_h_t_t_p_service.html#aacf2b99a7317bdc9d961efc64057931a',1,'TorcHTTPService']]],
   ['disableports',['DisablePorts',['../de/d1d/class_torc_o_m_x_component.html#ad55d3d1a2ec01c2696478c7ad3df03e9',1,'TorcOMXComponent']]],
   ['disconnect',['Disconnect',['../d9/d0a/class_torc_web_socket.html#a6ead4fc6218b912c0ede245c1557ac8c',1,'TorcWebSocket']]],
   ['disconnected',['Disconnected',['../d9/d0a/class_torc_web_socket.html#a3dec9534407db137400e3f4b394d5c3f',1,'TorcWebSocket::Disconnected()'],['../dd/d3a/class_torc_network_service.html#afd25142c31f11cadfdf1e452787132b7',1,'TorcNetworkService::Disconnected()'],['../d8/d93/class_torc_networked_context.html#a1ab8ad3e43dd9cee60363387b93b7040',1,'TorcNetworkedContext::Disconnected()']]],
