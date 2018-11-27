@@ -440,16 +440,12 @@ void TorcCameraDevice::TrackDrift(void)
         .arg((double)drift/1000, 0, 'f', 3).arg(shortaverage/1000, 0, 'f', 3).arg(longaverage/1000, 0, 'f', 3).arg(timetozero/1000, 0, 'f', 3));
 }
 
-TorcCameraParams TorcCameraDevice::GetParams(void)
-{
-    return m_params;
-}
-
 TorcCameraFactory* TorcCameraFactory::gTorcCameraFactory = NULL;
 
 TorcCameraFactory::TorcCameraFactory()
   : nextTorcCameraFactory(gTorcCameraFactory)
 {
+    qRegisterMetaType<TorcCameraParams>();
     gTorcCameraFactory = this;
 }
 

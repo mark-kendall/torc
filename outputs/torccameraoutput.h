@@ -11,24 +11,28 @@
 #define VIDEO_PAGE           QString("video.html")
 
 class TorcCameraThread;
-class TorcCameraParams;
 class TorcNetworkRequest;
+class TorcCameraOutputs;
 
 class TorcCameraOutput : public TorcOutput
 {
     Q_OBJECT
     Q_CLASSINFO("Version",        "1.0.0")
 
+    friend class TorcCameraOutputs;
+
   public:
     TorcCameraOutput(TorcOutput::Type Type, double Value, const QString &ModelId, const QVariantMap &Details,
                      QObject *Output, const QMetaObject &MetaObject, const QString &Blacklist = QString(""));
     virtual ~TorcCameraOutput();
 
-    TorcCameraParams& GetParams (void);
-    void              SetParams (TorcCameraParams &Params);
-
   public slots:
     virtual void CameraErrored (bool Errored) = 0;
+    void         ParamsChanged (TorcCameraParams Params);
+
+  protected:
+    TorcCameraParams& GetParams (void);
+    void              SetParams (TorcCameraParams &Params);
 
   public:
     TorcCameraThread *m_thread;

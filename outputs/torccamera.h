@@ -58,6 +58,8 @@ class TorcCameraParams
     QString m_contentDir;
 };
 
+Q_DECLARE_METATYPE(TorcCameraParams)
+
 class TorcCameraDevice : public QObject
 {
     Q_OBJECT
@@ -71,7 +73,6 @@ class TorcCameraDevice : public QObject
     virtual bool     Stop            (void) = 0;
     QByteArray       GetSegment      (int Segment);
     QByteArray       GetInitSegment  (void);
-    TorcCameraParams GetParams       (void);
 
   public slots:
     virtual void     TakeStills      (uint Count);
@@ -85,6 +86,7 @@ class TorcCameraDevice : public QObject
     void             SegmentReady    (int Segment);
     void             SetErrored      (bool Errored);
     void             StillReady      (const QString File);
+    void             ParametersChanged (TorcCameraParams Params);
 
   protected:
     // streaming

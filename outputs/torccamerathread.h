@@ -21,7 +21,6 @@ class TorcCameraThread final : public TorcQThread, public TorcReferenceCounter
     void              Finish         (void) override;
     QByteArray        GetSegment     (int Segment);
     QByteArray        GetInitSegment (void);
-    TorcCameraParams  GetParams      (void);
     void              SetVideoParent (TorcCameraVideoOutput *Parent);
     void              SetStillsParent(TorcCameraStillsOutput *Parent);
 
@@ -33,6 +32,7 @@ class TorcCameraThread final : public TorcQThread, public TorcReferenceCounter
     void              SegmentReady   (int);
     void              SegmentRemoved (int);
     void              CameraErrored  (bool);
+    void              ParamsChanged  (TorcCameraParams Params);
     void              StillReady     (const QString File);
     void              TakeStills     (uint Count);
 

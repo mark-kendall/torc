@@ -57,6 +57,18 @@ void TorcCameraOutput::SetParams(TorcCameraParams &Params)
     m_params = Params;
 }
 
+/*! \brief Notify the output that the camera parameters have changed.
+ *
+ * \note This is used by the camera device when the init segment has been saved and the video
+ *       code determined - which is needed before streaming has started. It should however have roughly 2
+ *       seconds to arrive before the first video segment is available.
+*/
+void TorcCameraOutput::ParamsChanged(TorcCameraParams Params)
+{
+    m_params = Params;
+    LOG(VB_GENERAL, LOG_INFO, QString("Camera parameters changed - video codec '%1'").arg(m_params.m_videoCodec));
+}
+
 TorcCameraStillsOutput::TorcCameraStillsOutput(const QString &ModelId, const QVariantMap &Details)
   : TorcCameraOutput(TorcOutput::Camera, 0.0, ModelId, Details, this, TorcCameraStillsOutput::staticMetaObject,
                "StillReady"),
@@ -228,12 +240,7 @@ void TorcCameraVideoOutput::Start(void)
 /// The 'init' segment is ready and available.
 void TorcCameraVideoOutput::InitSegmentReady(void)
 {
-    QReadLocker locker(&m_threadLock);
-    if (m_thread)
-    {
-        m_params = m_thread->GetParams();
-        LOG(VB_GENERAL, LOG_INFO, QString("Initial segment ready - codec '%1'").arg(m_params.m_videoCodec));
-    }
+    LOG(VB_GENERAL, LOG_INFO, "Initial segment ready");
 }
 
 /// The camera has started to record video.
