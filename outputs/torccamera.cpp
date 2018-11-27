@@ -264,6 +264,11 @@ bool TorcCameraParams::IsCompatible(const TorcCameraParams &Other) const
 TorcCameraDevice::TorcCameraDevice(const TorcCameraParams &Params)
   : QObject(),
     m_params(Params),
+    m_muxer(NULL),
+    m_videoStream(0),
+    m_frameCount(0),
+    m_haveInitSegment(false),
+    m_bufferedPacket(NULL),
     m_ringBuffer(NULL),
     m_ringBufferLock(QReadWriteLock::Recursive),
     m_referenceTime(0),
@@ -278,14 +283,42 @@ TorcCameraDevice::TorcCameraDevice(const TorcCameraParams &Params)
 
 TorcCameraDevice::~TorcCameraDevice()
 {
-    QWriteLocker locker(&m_ringBufferLock);
-    if (m_ringBuffer)
+    if (m_muxer)
     {
-        delete m_ringBuffer;
-        m_ringBuffer = NULL;
+        m_muxer->Finish();
+        delete m_muxer;
     }
 
+    if (m_ringBuffer)
+        delete m_ringBuffer;
+
+    if (m_bufferedPacket)
+        av_packet_free(&m_bufferedPacket);
+
     ClearStillsBuffers();
+}
+
+bool TorcCameraDevice::Setup(void)
+{
+    QWriteLocker locker(&m_ringBufferLock);
+    int buffersize = (m_params.m_bitrate * (m_params.m_segmentLength / m_params.m_frameRate) * VIDEO_SEGMENT_NUMBER) / 8;
+    m_ringBuffer   = new TorcSegmentedRingBuffer(buffersize, VIDEO_SEGMENT_MAX);
+    m_muxer        = new TorcMuxer(m_ringBuffer);
+    if (!m_muxer)
+        return false;
+
+    m_videoStream = m_muxer->AddH264Stream(m_params.m_width, m_params.m_height, VIDEO_H264_PROFILE, m_params.m_bitrate);
+    if (!m_muxer->IsValid())
+        return false;
+
+    connect(m_ringBuffer, SIGNAL(SegmentReady(int)),    this, SIGNAL(SegmentReady(int)));
+    connect(m_ringBuffer, SIGNAL(SegmentRemoved(int)),  this, SIGNAL(SegmentRemoved(int)));
+    connect(m_ringBuffer, SIGNAL(InitSegmentReady()),   this, SIGNAL(InitSegmentReady()));
+
+    m_frameCount      = 0;
+    m_bufferedPacket  = NULL;
+    m_haveInitSegment = false;
+    return true;
 }
 
 QByteArray TorcCameraDevice::GetSegment(int Segment)

@@ -7,6 +7,10 @@
 // Torc
 #include "torcmaths.h"
 #include "torcsegmentedringbuffer.h"
+#include "ffmpeg/torcmuxer.h"
+
+// FFmpeg
+#include <libavcodec/avcodec.h>
 
 // NB these are also enforced in the XSD
 #define VIDEO_WIDTH_MIN      640
@@ -24,6 +28,7 @@
 #define VIDEO_TIMEBASE       90000
 #define VIDEO_DRIFT_SHORT    60 // short term drift average
 #define VIDEO_DRIFT_LONG     (60*5) // long term drift average
+#define VIDEO_H264_PROFILE   FF_PROFILE_H264_MAIN
 
 class TorcCameraParams
 {
@@ -61,7 +66,7 @@ class TorcCameraDevice : public QObject
     explicit TorcCameraDevice(const TorcCameraParams &Params);
     virtual ~TorcCameraDevice();
 
-    virtual bool     Setup           (void) = 0;
+    virtual bool     Setup           (void);
     virtual bool     Start           (void) = 0;
     virtual bool     Stop            (void) = 0;
     QByteArray       GetSegment      (int Segment);
@@ -92,7 +97,13 @@ class TorcCameraDevice : public QObject
     void             ClearStillsBuffers (void);
 
     TorcCameraParams         m_params;
+
     // video/streaming
+    TorcMuxer               *m_muxer;
+    int                      m_videoStream;
+    quint64                  m_frameCount;
+    bool                     m_haveInitSegment;
+    AVPacket                *m_bufferedPacket;
     TorcSegmentedRingBuffer *m_ringBuffer;
     QReadWriteLock           m_ringBufferLock;
     quint64                  m_referenceTime;

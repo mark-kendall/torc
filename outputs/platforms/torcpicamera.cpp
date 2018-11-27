@@ -76,7 +76,6 @@
 #define ENCODER_SEI                    OMX_FALSE
 #define ENCODER_EEDE                   OMX_FALSE
 #define ENCODER_EEDE_LOSS_RATE         0
-#define ENCODER_PROFILE                OMX_VIDEO_AVCProfileMain
 #define ENCODER_INLINE_HEADERS         OMX_TRUE
 #define ENCODER_SPS_TIMING             OMX_TRUE
 
@@ -99,12 +98,7 @@ TorcPiCamera::TorcPiCamera(const TorcCameraParams &Params)
     m_splitterTunnel(&m_camera, 1, OMX_IndexParamVideoInit, &m_splitter, 0, OMX_IndexParamVideoInit),
     m_videoTunnel(&m_splitter, 0, OMX_IndexParamVideoInit, &m_videoEncoder,  0, OMX_IndexParamVideoInit),
     m_previewTunnel(&m_camera, 0, OMX_IndexParamVideoInit, &m_nullSink, 0, OMX_IndexParamVideoInit),
-    m_imageTunnel(&m_splitter, 1, OMX_IndexParamVideoInit, &m_imageEncoder,  0, OMX_IndexParamImageInit),
-    m_muxer(NULL),
-    m_videoStream(0),
-    m_frameCount(0),
-    m_bufferedPacket(NULL),
-    m_haveInitSegment(false)
+    m_imageTunnel(&m_splitter, 1, OMX_IndexParamVideoInit, &m_imageEncoder,  0, OMX_IndexParamImageInit)
 {
     if (m_params.m_frameRate > 30 && (m_params.m_width > 1280 || m_params.m_height > 720))
     {
@@ -130,23 +124,6 @@ TorcPiCamera::TorcPiCamera(const TorcCameraParams &Params)
 
 TorcPiCamera::~TorcPiCamera()
 {
-    if (m_bufferedPacket)
-    {
-        av_packet_free(&m_bufferedPacket);
-        m_bufferedPacket = NULL;
-    }
-
-    if (m_muxer)
-    {
-        m_muxer->Finish();
-        delete m_muxer;
-    }
-
-    {
-        QWriteLocker locker(&m_ringBufferLock);
-        if (m_ringBuffer)
-            delete m_ringBuffer;
-    }
 }
 
 void TorcPiCamera::StreamVideo(bool Video)
@@ -235,42 +212,14 @@ bool TorcPiCamera::Setup(void)
     if (m_camera.SetConfig(OMX_IndexConfigPortCapturing, &capture))
         return false;
 
-    int profile = FF_PROFILE_H264_BASELINE;
-    switch (ENCODER_PROFILE)
+    if (TorcCameraDevice::Setup())
     {
-        case OMX_VIDEO_AVCProfileBaseline: profile = FF_PROFILE_H264_BASELINE; break;
-        case OMX_VIDEO_AVCProfileMain:     profile = FF_PROFILE_H264_MAIN;     break;
-        case OMX_VIDEO_AVCProfileExtended: profile = FF_PROFILE_H264_EXTENDED; break;
-        case OMX_VIDEO_AVCProfileHigh:     profile = FF_PROFILE_H264_HIGH;     break;
-        case OMX_VIDEO_AVCProfileHigh10:   profile = FF_PROFILE_H264_HIGH_10;  break;
-        case OMX_VIDEO_AVCProfileHigh422:  profile = FF_PROFILE_H264_HIGH_422; break;
-        case OMX_VIDEO_AVCProfileHigh444:  profile = FF_PROFILE_H264_HIGH_444; break;
-        default:
-            LOG(VB_GENERAL, LOG_WARNING, "Unknown H264 profile. Defaulting to baseline");
+        LOG(VB_GENERAL, LOG_INFO, "Pi camera setup");
+        return true;
     }
 
-    {
-        QWriteLocker locker(&m_ringBufferLock);
-        int buffersize = (m_params.m_bitrate * (m_params.m_segmentLength / m_params.m_frameRate) * VIDEO_SEGMENT_NUMBER) / 8;
-        m_ringBuffer   = new TorcSegmentedRingBuffer(buffersize, VIDEO_SEGMENT_MAX);
-        m_muxer        = new TorcMuxer(m_ringBuffer);
-        if (!m_muxer)
-            return false;
-
-        m_videoStream = m_muxer->AddH264Stream(m_params.m_width, m_params.m_height, profile, m_params.m_bitrate);
-        if (!m_muxer->IsValid())
-            return false;
-
-        connect(m_ringBuffer, SIGNAL(SegmentReady(int)),    this, SIGNAL(SegmentReady(int)));
-        connect(m_ringBuffer, SIGNAL(SegmentRemoved(int)),  this, SIGNAL(SegmentRemoved(int)));
-        connect(m_ringBuffer, SIGNAL(InitSegmentReady()),   this, SIGNAL(InitSegmentReady()));
-
-        m_frameCount      = 0;
-        m_bufferedPacket  = NULL;
-        m_haveInitSegment = false;
-    }
-    LOG(VB_GENERAL, LOG_INFO, "Pi camera setup");
-    return true;
+    LOG(VB_GENERAL, LOG_ERR, "Failed to setup Pi camera");
+    return false;
 }
 
 /*! \brief Start the camera
@@ -889,12 +838,26 @@ bool TorcPiCamera::ConfigureVideoEncoder(void)
     LOG(VB_GENERAL, LOG_INFO, "Set video encoder output EEDE loss rate");
 
     // profile
+    OMX_VIDEO_AVCPROFILETYPE profile = OMX_VIDEO_AVCProfileMain;
+    switch (VIDEO_H264_PROFILE)
+    {
+        case FF_PROFILE_H264_BASELINE: profile = OMX_VIDEO_AVCProfileBaseline; break;
+        case FF_PROFILE_H264_MAIN:     profile = OMX_VIDEO_AVCProfileMain;     break;
+        case FF_PROFILE_H264_EXTENDED: profile = OMX_VIDEO_AVCProfileExtended; break;
+        case FF_PROFILE_H264_HIGH:     profile = OMX_VIDEO_AVCProfileHigh;     break;
+        case FF_PROFILE_H264_HIGH_10:  profile = OMX_VIDEO_AVCProfileHigh10;   break;
+        case FF_PROFILE_H264_HIGH_422: profile = OMX_VIDEO_AVCProfileHigh422;  break;
+        case FF_PROFILE_H264_HIGH_444: profile = OMX_VIDEO_AVCProfileHigh444;  break;
+        default:
+            LOG(VB_GENERAL, LOG_WARNING, "Unknown H264 profile. Defaulting to main");
+    }
+
     OMX_VIDEO_PARAM_AVCTYPE avc;
     OMX_INITSTRUCTURE(avc);
     avc.nPortIndex = m_videoEncoderOutputPort;
     if (m_videoEncoder.GetParameter(OMX_IndexParamVideoAvc, &avc))
         return false;
-    avc.eProfile = ENCODER_PROFILE;
+    avc.eProfile = profile;
     if (m_videoEncoder.SetParameter(OMX_IndexParamVideoAvc, &avc))
         return false;
 

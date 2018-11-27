@@ -6,11 +6,7 @@
 #include "torcomxport.h"
 #include "torcomxcomponent.h"
 #include "torcomxtunnel.h"
-#include "ffmpeg/torcmuxer.h"
 #include "torccamera.h"
-
-// FFmpeg
-#include <libavcodec/avcodec.h>
 
 class TorcPiCamera final : public TorcCameraDevice 
 {
@@ -74,13 +70,6 @@ class TorcPiCamera final : public TorcCameraDevice
     TorcOMXTunnel            m_videoTunnel;
     TorcOMXTunnel            m_previewTunnel;
     TorcOMXTunnel            m_imageTunnel;
-
-    // stream
-    TorcMuxer               *m_muxer;
-    int                      m_videoStream;
-    quint64                  m_frameCount;
-    AVPacket                *m_bufferedPacket;
-    bool                     m_haveInitSegment;
 };
 
 #endif // TORCPICAMERA_H
