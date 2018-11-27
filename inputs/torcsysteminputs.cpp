@@ -36,7 +36,7 @@ TorcSystemInputs::TorcSystemInputs()
 
 void TorcSystemInputs::Create(const QVariantMap &Details)
 {
-    QMutexLocker locker(&m_lock);
+    QWriteLocker locker(&m_handlerLock);
 
     QVariantMap::const_iterator i = Details.begin();
     for ( ; i != Details.end(); ++i)
@@ -72,7 +72,7 @@ void TorcSystemInputs::Create(const QVariantMap &Details)
 
 void TorcSystemInputs::Destroy(void)
 {
-    QMutexLocker locker(&m_lock);
+    QWriteLocker locker(&m_handlerLock);
 
     QMap<QString,TorcInput*>::iterator it = m_inputs.begin();
     for ( ; it != m_inputs.end(); ++it)

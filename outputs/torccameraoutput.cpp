@@ -607,7 +607,7 @@ TorcCameraOutputs::TorcCameraOutputs()
 
 void TorcCameraOutputs::Create(const QVariantMap &Details)
 {
-    QMutexLocker locker(&m_lock);
+    QWriteLocker locker(&m_handlerLock);
 
     QVariantMap::const_iterator ii = Details.constBegin();
     for ( ; ii != Details.constEnd(); ++ii)
@@ -724,7 +724,7 @@ void TorcCameraOutputs::Create(const QVariantMap &Details)
 
 void TorcCameraOutputs::Destroy(void)
 {
-    QMutexLocker locker(&m_lock);
+    QWriteLocker locker(&m_handlerLock);
     QHash<QString, TorcCameraOutput*>::iterator it = m_cameras.begin();
     for ( ; it != m_cameras.end(); ++it)
     {

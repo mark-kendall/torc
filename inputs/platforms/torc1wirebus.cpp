@@ -73,7 +73,7 @@ Torc1WireBus::Torc1WireBus()
 
 void Torc1WireBus::Create(const QVariantMap &Details)
 {
-    QMutexLocker locker(&m_lock);
+    QWriteLocker locker(&m_handlerLock);
 
     // check for the correct directory
     QDir dir(ONE_WIRE_DIRECTORY);
@@ -146,7 +146,7 @@ void Torc1WireBus::Create(const QVariantMap &Details)
 
 void Torc1WireBus::Destroy(void)
 {
-    QMutexLocker lock(&m_lock);
+    QWriteLocker locker(&m_handlerLock);
 
     // delete any extant inputs
     QHash<QString,TorcInput*>::iterator it = m_inputs.begin();

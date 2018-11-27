@@ -43,7 +43,7 @@ bool TorcNotify::Validate(void)
     // connections are unique to account for multiple runs.
     connect(qApp, SIGNAL(applicationNameChanged()), gNotify, SLOT(ApplicationNameChanged()), Qt::UniqueConnection);
 
-    QMutexLocker locker(&m_lock);
+    QWriteLocker locker(&m_handlerLock);
 
     foreach (TorcNotification* notification, m_notifications)
         (void)notification->Setup();
@@ -53,7 +53,7 @@ bool TorcNotify::Validate(void)
 
 TorcNotifier* TorcNotify::FindNotifierByName(const QString &Name)
 {
-    QMutexLocker locker(&m_lock);
+    QWriteLocker locker(&m_handlerLock);
     foreach (TorcNotifier* notifier, m_notifiers)
         if (notifier->GetUniqueId() == Name)
             return notifier;
@@ -115,7 +115,7 @@ QVariantMap TorcNotify::SetNotificationText(const QString &Title, const QString 
             initialised = true;
         }
         {
-            QMutexLocker locker(&m_lock);
+            QWriteLocker locker(&m_handlerLock);
             m_applicationNameChanged = false;
         }
     }
@@ -194,13 +194,13 @@ QVariantMap TorcNotify::SetNotificationText(const QString &Title, const QString 
 
 void TorcNotify::ApplicationNameChanged(void)
 {
-    QMutexLocker locker(&m_lock);
+    QWriteLocker locker(&m_handlerLock);
     m_applicationNameChanged = true;
 }
 
 void TorcNotify::Create(const QVariantMap &Details)
 {
-    QMutexLocker locker(&m_lock);
+    QWriteLocker locker(&m_handlerLock);
 
     QVariantMap::const_iterator ii = Details.constBegin();
     for ( ; ii != Details.constEnd(); ++ii)
@@ -282,7 +282,7 @@ void TorcNotify::Create(const QVariantMap &Details)
 
 void TorcNotify::Destroy(void)
 {
-    QMutexLocker locker(&m_lock);
+    QWriteLocker locker(&m_handlerLock);
     foreach (TorcNotifier* notifier, m_notifiers)
         notifier->DownRef();
     m_notifiers.clear();

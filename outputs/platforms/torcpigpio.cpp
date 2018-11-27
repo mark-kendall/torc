@@ -153,7 +153,7 @@ TorcPiGPIO::TorcPiGPIO()
 
 void TorcPiGPIO::Create(const QVariantMap &GPIO)
 {
-    QMutexLocker locker(&m_lock);
+    QWriteLocker locker(&m_handlerLock);
 
     static bool debugged = false;
     if (!debugged)
@@ -257,7 +257,7 @@ void TorcPiGPIO::Create(const QVariantMap &GPIO)
 
 void TorcPiGPIO::Destroy(void)
 {
-    QMutexLocker locker(&m_lock);
+    QWriteLocker locker(&m_handlerLock);
 
     QMap<int,TorcPiSwitchInput*>::iterator it = m_inputs.begin();
     for ( ; it != m_inputs.end(); ++it)
