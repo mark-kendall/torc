@@ -20,6 +20,9 @@
 * USA.
 */
 
+// Qt
+#include <QFile>
+
 // Torc
 #include "torclogging.h"
 #include "torccameraoutput.h"
@@ -266,7 +269,10 @@ TorcCameraDevice::TorcCameraDevice(const TorcCameraParams &Params)
     m_referenceTime(0),
     m_discardDrift(2),
     m_shortAverage(VIDEO_DRIFT_SHORT / VIDEO_SEGMENT_TARGET),
-    m_longAverage(VIDEO_DRIFT_LONG / VIDEO_SEGMENT_TARGET)
+    m_longAverage(VIDEO_DRIFT_LONG / VIDEO_SEGMENT_TARGET),
+    m_stillsRequired(0),
+    m_stillsExpected(0),
+    m_stillsBuffers()
 {
 }
 
@@ -278,6 +284,8 @@ TorcCameraDevice::~TorcCameraDevice()
         delete m_ringBuffer;
         m_ringBuffer = NULL;
     }
+
+    ClearStillsBuffers();
 }
 
 QByteArray TorcCameraDevice::GetSegment(int Segment)
@@ -296,6 +304,74 @@ QByteArray TorcCameraDevice::GetInitSegment(void)
     return QByteArray();
 }
 
+/*! \brief Tell the camera to take Count number of still images
+ *
+ * \note We ignore values below the current setting, as the stills will be triggered when the input
+ *       value moves from zero to X - but it should then drop back to zero.
+*/
+void TorcCameraDevice::TakeStills(uint Count)
+{
+    if (Count > m_stillsRequired)
+    {
+        bool started = m_stillsExpected > 0;
+        (void)EnableStills(Count);
+        if (!started)
+            StartStill();
+    }
+}
+
+bool TorcCameraDevice::EnableStills(uint Count)
+{
+    m_stillsRequired  = Count;
+    m_stillsExpected  = Count;
+    return true;
+}
+
+void TorcCameraDevice::SaveStill(void)
+{
+    if (m_stillsExpected)
+    {
+        if (m_stillsRequired)
+        {
+            if (!m_params.m_contentDir.isEmpty())
+            {
+                QFile file(m_params.m_contentDir + QDateTime::currentDateTime().toString("yyyy_MM_dd_hh_mm_ss_zzz") + ".jpg");
+                if (file.open(QIODevice::ReadWrite | QIODevice::Truncate))
+                {
+                    QPair<quint32, uint8_t*> pair;
+                    foreach(pair, m_stillsBuffers)
+                        file.write((const char*)pair.second, pair.first);
+                    file.close();
+                    LOG(VB_GENERAL, LOG_INFO, QString("Saved snapshot as '%1'").arg(file.fileName()));
+                    emit StillReady(file.fileName());
+                }
+                else
+                {
+                    LOG(VB_GENERAL, LOG_ERR, QString("Failed to open %1 for writing").arg(file.fileName()));
+                }
+            }
+            m_stillsRequired--;
+        }
+        m_stillsExpected--;
+    }
+    ClearStillsBuffers();
+}
+
+void TorcCameraDevice::SaveStillBuffer(quint32 Length, uint8_t *Data)
+{
+    if (Length < 1 || !Data)
+        return;
+
+    m_stillsBuffers.append(QPair<quint32,uint8_t*>(Length, Data));
+}
+
+void TorcCameraDevice::ClearStillsBuffers(void)
+{
+    QPair<quint32, uint8_t*> buffer;
+    foreach(buffer, m_stillsBuffers)
+        free(buffer.second);
+    m_stillsBuffers.clear();
+}
 
 void TorcCameraDevice::TrackDrift(void)
 {

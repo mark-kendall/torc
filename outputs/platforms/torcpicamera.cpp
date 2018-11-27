@@ -21,7 +21,6 @@
 */
 
 // Qt
-#include <QFile>
 #include <QTime>
 #include <QThread>
 
@@ -105,10 +104,7 @@ TorcPiCamera::TorcPiCamera(const TorcCameraParams &Params)
     m_videoStream(0),
     m_frameCount(0),
     m_bufferedPacket(NULL),
-    m_haveInitSegment(false),
-    m_stillsRequired(0),
-    m_stillsExpected(0),
-    m_stillsBuffers()
+    m_haveInitSegment(false)
 {
     if (m_params.m_frameRate > 30 && (m_params.m_width > 1280 || m_params.m_height > 720))
     {
@@ -134,8 +130,6 @@ TorcPiCamera::TorcPiCamera(const TorcCameraParams &Params)
 
 TorcPiCamera::~TorcPiCamera()
 {
-    ClearStillsBuffers();
-
     if (m_bufferedPacket)
     {
         av_packet_free(&m_bufferedPacket);
@@ -152,22 +146,6 @@ TorcPiCamera::~TorcPiCamera()
         QWriteLocker locker(&m_ringBufferLock);
         if (m_ringBuffer)
             delete m_ringBuffer;
-    }
-}
-
-/*! \brief Tell the camera to take Count number of still images
- *
- * \note We ignore values below the current setting, as the stills will be triggered when the input
- *       value moves from zero to X - but it should then drop back to zero.
-*/
-void TorcPiCamera::TakeStills(uint Count)
-{
-    if (Count > m_stillsRequired)
-    {
-        bool started = m_stillsExpected > 0;
-        (void)EnableStills(Count);
-        if (!started)
-            StartStill();
     }
 }
 
@@ -363,38 +341,11 @@ void TorcPiCamera::ProcessStillsBuffer(OMX_BUFFERHEADERTYPE *Buffer)
     {
         uint8_t* data = (uint8_t*)malloc(Buffer->nFilledLen);
         memcpy(data, Buffer->pBuffer + Buffer->nOffset, Buffer->nFilledLen);
-        m_stillsBuffers.append(QPair<quint32,uint8_t*>(Buffer->nFilledLen, data));
+        SaveStillBuffer(Buffer->nFilledLen, data);
     }
 
     if (Buffer->nFlags & OMX_BUFFERFLAG_ENDOFFRAME)
-    {
-        if (m_stillsExpected)
-        {
-            if (m_stillsRequired)
-            {
-                if (!m_params.m_contentDir.isEmpty())
-                {
-                    QFile file(m_params.m_contentDir + QDateTime::currentDateTime().toString("yyyy_MM_dd_hh_mm_ss_zzz") + ".jpg");
-                    if (file.open(QIODevice::ReadWrite | QIODevice::Truncate))
-                    {
-                        QPair<quint32, uint8_t*> pair;
-                        foreach(pair, m_stillsBuffers)
-                            file.write((const char*)pair.second, pair.first);
-                        file.close();
-                        LOG(VB_GENERAL, LOG_INFO, QString("Saved snapshot as '%1'").arg(file.fileName()));
-                        emit StillReady(file.fileName());
-                    }
-                    else
-                    {
-                        LOG(VB_GENERAL, LOG_ERR, QString("Failed to open %1 for writing").arg(file.fileName()));
-                    }
-                }
-                m_stillsRequired--;
-            }
-            m_stillsExpected--;
-        }
-        ClearStillsBuffers();
-    }
+        SaveStill();
 
     if (m_stillsExpected)
         StartStill();
@@ -971,14 +922,6 @@ bool TorcPiCamera::ConfigureVideoEncoder(void)
     return true;
 }
 
-void TorcPiCamera::ClearStillsBuffers(void)
-{
-    QPair<quint32, uint8_t*> buffer;
-    foreach(buffer, m_stillsBuffers)
-        free(buffer.second);
-    m_stillsBuffers.clear();
-}
-
 bool TorcPiCamera::EnableStills(uint Count)
 {
     OMX_PARAM_U32TYPE single;
@@ -987,9 +930,8 @@ bool TorcPiCamera::EnableStills(uint Count)
     single.nU32       = Count;
     if (m_splitter.SetParameter(OMX_IndexConfigSingleStep, &single))
         return false;
-    m_stillsRequired  = Count;
-    m_stillsExpected  = Count;
-    return true;
+
+    return TorcCameraDevice::EnableStills(Count);
 }
 
 static const QString piCameraType =

@@ -69,7 +69,7 @@ class TorcCameraDevice : public QObject
     TorcCameraParams GetParams       (void);
 
   public slots:
-    virtual void     TakeStills      (uint Count) = 0;
+    virtual void     TakeStills      (uint Count);
     virtual void     StreamVideo     (bool Video) = 0;
 
   signals:
@@ -82,15 +82,28 @@ class TorcCameraDevice : public QObject
     void             StillReady      (const QString File);
 
   protected:
+    // streaming
     void             TrackDrift      (void);
+    // stills
+    virtual void     StartStill      (void) = 0;
+    virtual bool     EnableStills    (uint Count);
+    void             SaveStill       (void);
+    void             SaveStillBuffer (quint32 Length, uint8_t* Data);
+    void             ClearStillsBuffers (void);
 
     TorcCameraParams         m_params;
+    // video/streaming
     TorcSegmentedRingBuffer *m_ringBuffer;
     QReadWriteLock           m_ringBufferLock;
     quint64                  m_referenceTime;
     int                      m_discardDrift;
     TorcAverage<double>      m_shortAverage;
     TorcAverage<double>      m_longAverage;
+
+    // stills
+    uint                     m_stillsRequired;
+    uint                     m_stillsExpected;
+    QList<QPair<quint32, uint8_t*> > m_stillsBuffers;
 
   private:
     Q_DISABLE_COPY(TorcCameraDevice)

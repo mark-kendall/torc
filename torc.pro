@@ -12,6 +12,8 @@ libxml2 = $$(TORC_LIBXML2)
 pi = $$(TORC_PI)
 # OpenMax - disabled by default
 openmax =
+# ffmpeg
+ffmpeg = $$(TORC_FFMPEG)
 
 TEMPLATE    = app
 CONFIG     += thread console
@@ -191,15 +193,7 @@ linux-rasp-pi-g++ | !isEmpty(pi) {
     INCLUDEPATH += /opt/vc/include/interface/vmcs_host/linux
     message("Linking to OpenMaxIL library (Raspberry Pi)")
 
-    DEFINES     += USING_FFMPEG
-    CONFIG      += link_pkgconfig
-    PKGCONFIG   += libavformat
-    PKGCONFIG   += libavcodec
-    PKGCONFIG   += libavutil
-    HEADERS     += torc/ffmpeg/torcmuxer.h
-    SOURCES     += torc/ffmpeg/torcmuxer.cpp
-    INCLUDEPATH += ./torc/ffmpeg
-    message("Linking to ffmpeg")
+    ffmpeg = true
 
     # install with suid permissions on Pi
     # this allows access to I2C and GPIO
@@ -211,6 +205,24 @@ linux-rasp-pi-g++ | !isEmpty(pi) {
     INSTALLS            += setpriv
 
     message("Building for Raspberry Pi")
+}
+
+!isEmpty(ffmpeg) {
+    DEFINES   += USING_FFMPEG
+    CONFIG    += link_pkgconfig
+    PKGCONFIG += libavformat
+    PKGCONFIG += libavcodec
+    PKGCONFIG += libavutil
+    HEADERS   += torc/ffmpeg/torcmuxer.h
+    HEADERS   += outputs/torccamera.h
+    HEADERS   += outputs/torccamerathread.h
+    HEADERS   += outputs/torccameraoutput.h
+    SOURCES   += torc/ffmpeg/torcmuxer.cpp
+    SOURCES   += outputs/torccamera.cpp
+    SOURCES   += outputs/torccamerathread.cpp
+    SOURCES   += outputs/torccameraoutput.cpp
+    INCLUDEPATH += ./torc/ffmpeg
+    message("Linking to ffmpeg for camera support")
 }
 
 !isEmpty(openmax) {
@@ -326,9 +338,6 @@ HEADERS += outputs/torcnetworkswitchoutput.h
 HEADERS += outputs/torcnetworktemperatureoutput.h
 HEADERS += outputs/torcnetworkphoutput.h
 HEADERS += outputs/torcnetworkbuttonoutput.h
-HEADERS += outputs/torccamera.h
-HEADERS += outputs/torccamerathread.h
-HEADERS += outputs/torccameraoutput.h
 HEADERS += controls/torccontrol.h
 HEADERS += controls/torccontrols.h
 HEADERS += controls/torclogiccontrol.h
@@ -425,9 +434,6 @@ SOURCES += outputs/torcnetworkswitchoutput.cpp
 SOURCES += outputs/torcnetworktemperatureoutput.cpp
 SOURCES += outputs/torcnetworkphoutput.cpp
 SOURCES += outputs/torcnetworkbuttonoutput.cpp
-SOURCES += outputs/torccamera.cpp
-SOURCES += outputs/torccamerathread.cpp
-SOURCES += outputs/torccameraoutput.cpp
 SOURCES += controls/torccontrol.cpp
 SOURCES += controls/torccontrols.cpp
 SOURCES += controls/torclogiccontrol.cpp
