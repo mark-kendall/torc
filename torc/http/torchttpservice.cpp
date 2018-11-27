@@ -269,7 +269,8 @@ TorcHTTPService::TorcHTTPService(QObject *Parent, const QString &Signature, cons
     m_subscribers(),
     m_subscriberLock(QMutex::Recursive)
 {
-    QStringList blacklist = Blacklist.split(",");
+    static const QString defaultblacklisted("deleteLater,SubscriberDeleted,");
+    QStringList blacklist = (defaultblacklisted + Blacklist).split(",");
 
     m_parent->setObjectName(Name);
 
@@ -320,7 +321,7 @@ TorcHTTPService::TorcHTTPService(QObject *Parent, const QString &Signature, cons
                 name = name.section('(', 0, 0);
 
                 // discard unwanted slots
-                if (name == "deleteLater" || name == "SubscriberDeleted" || blacklist.contains(name))
+                if (blacklist.contains(name))
                     continue;
 
                 // any Q_CLASSINFO for this method?
