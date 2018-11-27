@@ -4,6 +4,7 @@
 // Qt
 #include <QMap>
 #include <QMutex>
+#include <QReadWriteLock>
 #include <QMetaObject>
 #include <QCoreApplication>
 
@@ -34,6 +35,9 @@ class TorcHTTPService : public TorcHTTPHandler
 
   protected:
     void         HandleSubscriberDeleted  (QObject* Subscriber);
+    // this is a generic lock around data that may be accessed fro multiple sockets/threads
+    // use with care to ensure maximum concurrency.
+    QReadWriteLock                         m_httpServiceLock;
 
   private:
     QObject                               *m_parent;

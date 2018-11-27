@@ -261,6 +261,7 @@ class MethodParameters
 TorcHTTPService::TorcHTTPService(QObject *Parent, const QString &Signature, const QString &Name,
                                  const QMetaObject &MetaObject, const QString &Blacklist)
   : TorcHTTPHandler(TORC_SERVICES_DIR + Signature, Name),
+    m_httpServiceLock(QReadWriteLock::Recursive),
     m_parent(Parent),
     m_version("Unknown"),
     m_methods(),

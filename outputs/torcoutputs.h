@@ -44,7 +44,6 @@ class TorcOutputs final : public QObject, public TorcHTTPService
   private:
     QList<TorcOutput*>  outputList;
     QStringList         outputTypes;
-    QMutex              m_lock;
 
   private:
     Q_DISABLE_COPY(TorcOutputs)

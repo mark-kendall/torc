@@ -55,8 +55,6 @@ class TorcUser : public QObject, public TorcHTTPService
     TorcSetting   *m_userCredentials;
     bool           m_canRestartTorc;
     bool           m_canStopTorc;
-    QMutex         m_lock;
-
 };
 
 #endif // TORCUSER_H

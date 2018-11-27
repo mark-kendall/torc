@@ -73,7 +73,6 @@ TorcCentral::TemperatureUnits TorcCentral::GetGlobalTemperatureUnits(void)
 TorcCentral::TorcCentral()
   : QObject(),
     TorcHTTPService(this, "central", "central", TorcCentral::staticMetaObject, ""),
-    m_lock(QMutex::Recursive),
     m_config(QVariantMap()),
     m_graph(),
     temperatureUnits("celsius")
