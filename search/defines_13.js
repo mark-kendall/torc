@@ -14,6 +14,7 @@ var searchData=
   ['video_5fframerate_5fmax',['VIDEO_FRAMERATE_MAX',['../d3/d38/torccamera_8h.html#a131aaa77ea71feba2ed391c86d9e548d',1,'torccamera.h']]],
   ['video_5fframerate_5fmin',['VIDEO_FRAMERATE_MIN',['../d3/d38/torccamera_8h.html#a1358db3327f24c2a7e599318a49e2c2f',1,'torccamera.h']]],
   ['video_5fgopdura_5ftarget',['VIDEO_GOPDURA_TARGET',['../d3/d38/torccamera_8h.html#a3f542686e057eba94fa3f3f35f2ce2f3',1,'torccamera.h']]],
+  ['video_5fh264_5fprofile',['VIDEO_H264_PROFILE',['../d3/d38/torccamera_8h.html#a32ecc65c5c61e99b8ed8e0c8d131c42a',1,'torccamera.h']]],
   ['video_5fheight_5fmax',['VIDEO_HEIGHT_MAX',['../d3/d38/torccamera_8h.html#a33b416033fefb1d7ba9a92ef4e6dd4e6',1,'torccamera.h']]],
   ['video_5fheight_5fmin',['VIDEO_HEIGHT_MIN',['../d3/d38/torccamera_8h.html#ae4f5a7fb6c15d18df51ea17815a50816',1,'torccamera.h']]],
   ['video_5fpage',['VIDEO_PAGE',['../d2/d57/torccameraoutput_8h.html#afeed51ad1840e7e378de7b3ef9d0acda',1,'torccameraoutput.h']]],

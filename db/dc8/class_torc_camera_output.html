@@ -88,6 +88,8 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <a href="#pub-slots">Public Slots</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="#pro-methods">Protected Member Functions</a> &#124;
+<a href="#friends">Friends</a> &#124;
 <a href="../../df/d48/class_torc_camera_output-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">TorcCameraOutput Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div>  </div>
@@ -106,6 +108,9 @@ Inheritance diagram for TorcCameraOutput:</div>
 Public Slots</h2></td></tr>
 <tr class="memitem:a0b922498c56df3bad72a46bdc54d8225"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/dc8/class_torc_camera_output.html#a0b922498c56df3bad72a46bdc54d8225">CameraErrored</a> (bool Errored)=0</td></tr>
 <tr class="separator:a0b922498c56df3bad72a46bdc54d8225"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aca918c8beb3ee59fe621734f56364fda"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/dc8/class_torc_camera_output.html#aca918c8beb3ee59fe621734f56364fda">ParamsChanged</a> (<a class="el" href="../../da/dfa/class_torc_camera_params.html">TorcCameraParams</a> Params)</td></tr>
+<tr class="memdesc:aca918c8beb3ee59fe621734f56364fda"><td class="mdescLeft">&#160;</td><td class="mdescRight">Notify the output that the camera parameters have changed.  <a href="#aca918c8beb3ee59fe621734f56364fda">More...</a><br /></td></tr>
+<tr class="separator:aca918c8beb3ee59fe621734f56364fda"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_slots_class_torc_output"><td colspan="2" onclick="javascript:toggleInherit('pub_slots_class_torc_output')"><img src="../../closed.png" alt="-"/>&#160;Public Slots inherited from <a class="el" href="../../d1/dc7/class_torc_output.html">TorcOutput</a></td></tr>
 <tr class="memitem:ae4b824ff0fd39d2d028046df5d52ae4b inherit pub_slots_class_torc_output"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/dc7/class_torc_output.html#ae4b824ff0fd39d2d028046df5d52ae4b">SubscriberDeleted</a> (QObject *Subscriber)</td></tr>
 <tr class="separator:ae4b824ff0fd39d2d028046df5d52ae4b inherit pub_slots_class_torc_output"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -135,10 +140,6 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a33648a182aeaad9bb8c19e48b93ac5db"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab9e94cc42737798972f9f12e7dfae24b"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/dc8/class_torc_camera_output.html#ab9e94cc42737798972f9f12e7dfae24b">~TorcCameraOutput</a> ()</td></tr>
 <tr class="separator:ab9e94cc42737798972f9f12e7dfae24b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2320aa33dcf355612d17587766650ac3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../da/dfa/class_torc_camera_params.html">TorcCameraParams</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/dc8/class_torc_camera_output.html#a2320aa33dcf355612d17587766650ac3">GetParams</a> (void)</td></tr>
-<tr class="separator:a2320aa33dcf355612d17587766650ac3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8bb7cdd862c66cb950ec42308432a799"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/dc8/class_torc_camera_output.html#a8bb7cdd862c66cb950ec42308432a799">SetParams</a> (<a class="el" href="../../da/dfa/class_torc_camera_params.html">TorcCameraParams</a> &amp;Params)</td></tr>
-<tr class="separator:a8bb7cdd862c66cb950ec42308432a799"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_class_torc_output"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_torc_output')"><img src="../../closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="../../d1/dc7/class_torc_output.html">TorcOutput</a></td></tr>
 <tr class="memitem:ac61d340d6e42ff8894d445fc1cc1bd1e inherit pub_methods_class_torc_output"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/dc7/class_torc_output.html#ac61d340d6e42ff8894d445fc1cc1bd1e">TorcOutput</a> (<a class="el" href="../../d1/dc7/class_torc_output.html#a68bfe71abbe6a4a7634c22458da29391">TorcOutput::Type</a> <a class="el" href="../../d1/dc7/class_torc_output.html#a68bfe71abbe6a4a7634c22458da29391">Type</a>, double Value, const QString &amp;ModelId, const QVariantMap &amp;Details)</td></tr>
 <tr class="separator:ac61d340d6e42ff8894d445fc1cc1bd1e inherit pub_methods_class_torc_output"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -204,6 +205,32 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a1b93b9fe45aea567530865d7710af952"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afac8285c9b3645b4a8ade3ec29077d28"><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../da/dfa/class_torc_camera_params.html">TorcCameraParams</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/dc8/class_torc_camera_output.html#afac8285c9b3645b4a8ade3ec29077d28">m_params</a></td></tr>
 <tr class="separator:afac8285c9b3645b4a8ade3ec29077d28"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a81c2d5176dadedbcbd06562c33b4f51a"><td class="memItemLeft" align="right" valign="top">QReadWriteLock&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/dc8/class_torc_camera_output.html#a81c2d5176dadedbcbd06562c33b4f51a">m_paramsLock</a></td></tr>
+<tr class="separator:a81c2d5176dadedbcbd06562c33b4f51a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
+<tr class="memitem:a2320aa33dcf355612d17587766650ac3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../da/dfa/class_torc_camera_params.html">TorcCameraParams</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/dc8/class_torc_camera_output.html#a2320aa33dcf355612d17587766650ac3">GetParams</a> (void)</td></tr>
+<tr class="separator:a2320aa33dcf355612d17587766650ac3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8bb7cdd862c66cb950ec42308432a799"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/dc8/class_torc_camera_output.html#a8bb7cdd862c66cb950ec42308432a799">SetParams</a> (<a class="el" href="../../da/dfa/class_torc_camera_params.html">TorcCameraParams</a> &amp;Params)</td></tr>
+<tr class="separator:a8bb7cdd862c66cb950ec42308432a799"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_methods_class_torc_device"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_class_torc_device')"><img src="../../closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="../../d5/d76/class_torc_device.html">TorcDevice</a></td></tr>
+<tr class="memitem:a1bb956ffa3c089a9447821dcf7b817da inherit pro_methods_class_torc_device"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d76/class_torc_device.html#a1bb956ffa3c089a9447821dcf7b817da">~TorcDevice</a> ()</td></tr>
+<tr class="separator:a1bb956ffa3c089a9447821dcf7b817da inherit pro_methods_class_torc_device"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_methods_class_torc_h_t_t_p_service"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_class_torc_h_t_t_p_service')"><img src="../../closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="../../d6/d70/class_torc_h_t_t_p_service.html">TorcHTTPService</a></td></tr>
+<tr class="memitem:a63735bbaa0886adc834d275b6d4e416b inherit pro_methods_class_torc_h_t_t_p_service"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d70/class_torc_h_t_t_p_service.html#a63735bbaa0886adc834d275b6d4e416b">EnableMethod</a> (const QString &amp;Method)</td></tr>
+<tr class="memdesc:a63735bbaa0886adc834d275b6d4e416b inherit pro_methods_class_torc_h_t_t_p_service"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable the given method.  <a href="#a63735bbaa0886adc834d275b6d4e416b">More...</a><br /></td></tr>
+<tr class="separator:a63735bbaa0886adc834d275b6d4e416b inherit pro_methods_class_torc_h_t_t_p_service"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aacf2b99a7317bdc9d961efc64057931a inherit pro_methods_class_torc_h_t_t_p_service"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d70/class_torc_h_t_t_p_service.html#aacf2b99a7317bdc9d961efc64057931a">DisableMethod</a> (const QString &amp;Method)</td></tr>
+<tr class="memdesc:aacf2b99a7317bdc9d961efc64057931a inherit pro_methods_class_torc_h_t_t_p_service"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable the given method.  <a href="#aacf2b99a7317bdc9d961efc64057931a">More...</a><br /></td></tr>
+<tr class="separator:aacf2b99a7317bdc9d961efc64057931a inherit pro_methods_class_torc_h_t_t_p_service"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acd54087b95fabdfb71fb7e7e7ffa90c9 inherit pro_methods_class_torc_h_t_t_p_service"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d70/class_torc_h_t_t_p_service.html#acd54087b95fabdfb71fb7e7e7ffa90c9">HandleSubscriberDeleted</a> (QObject *Subscriber)</td></tr>
+<tr class="separator:acd54087b95fabdfb71fb7e7e7ffa90c9 inherit pro_methods_class_torc_h_t_t_p_service"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
+Friends</h2></td></tr>
+<tr class="memitem:a0018feb3d2e429588dde0bcb2853e02e"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/dc8/class_torc_camera_output.html#a0018feb3d2e429588dde0bcb2853e02e">TorcCameraOutputs</a></td></tr>
+<tr class="separator:a0018feb3d2e429588dde0bcb2853e02e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
@@ -233,18 +260,6 @@ Additional Inherited Members</h2></td></tr>
 <tr class="inherit_header pub_static_methods_class_torc_reference_counter"><td colspan="2" onclick="javascript:toggleInherit('pub_static_methods_class_torc_reference_counter')"><img src="../../closed.png" alt="-"/>&#160;Static Public Member Functions inherited from <a class="el" href="../../d6/dad/class_torc_reference_counter.html">TorcReferenceCounter</a></td></tr>
 <tr class="memitem:a351fef355ab2fc1df639f4d40c06786d inherit pub_static_methods_class_torc_reference_counter"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dad/class_torc_reference_counter.html#a351fef355ab2fc1df639f4d40c06786d">EventLoopEnding</a> (bool Ending)</td></tr>
 <tr class="separator:a351fef355ab2fc1df639f4d40c06786d inherit pub_static_methods_class_torc_reference_counter"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pro_methods_class_torc_device"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_class_torc_device')"><img src="../../closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="../../d5/d76/class_torc_device.html">TorcDevice</a></td></tr>
-<tr class="memitem:a1bb956ffa3c089a9447821dcf7b817da inherit pro_methods_class_torc_device"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d76/class_torc_device.html#a1bb956ffa3c089a9447821dcf7b817da">~TorcDevice</a> ()</td></tr>
-<tr class="separator:a1bb956ffa3c089a9447821dcf7b817da inherit pro_methods_class_torc_device"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pro_methods_class_torc_h_t_t_p_service"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_class_torc_h_t_t_p_service')"><img src="../../closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="../../d6/d70/class_torc_h_t_t_p_service.html">TorcHTTPService</a></td></tr>
-<tr class="memitem:a63735bbaa0886adc834d275b6d4e416b inherit pro_methods_class_torc_h_t_t_p_service"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d70/class_torc_h_t_t_p_service.html#a63735bbaa0886adc834d275b6d4e416b">EnableMethod</a> (const QString &amp;Method)</td></tr>
-<tr class="memdesc:a63735bbaa0886adc834d275b6d4e416b inherit pro_methods_class_torc_h_t_t_p_service"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable the given method.  <a href="#a63735bbaa0886adc834d275b6d4e416b">More...</a><br /></td></tr>
-<tr class="separator:a63735bbaa0886adc834d275b6d4e416b inherit pro_methods_class_torc_h_t_t_p_service"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aacf2b99a7317bdc9d961efc64057931a inherit pro_methods_class_torc_h_t_t_p_service"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d70/class_torc_h_t_t_p_service.html#aacf2b99a7317bdc9d961efc64057931a">DisableMethod</a> (const QString &amp;Method)</td></tr>
-<tr class="memdesc:aacf2b99a7317bdc9d961efc64057931a inherit pro_methods_class_torc_h_t_t_p_service"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable the given method.  <a href="#aacf2b99a7317bdc9d961efc64057931a">More...</a><br /></td></tr>
-<tr class="separator:aacf2b99a7317bdc9d961efc64057931a inherit pro_methods_class_torc_h_t_t_p_service"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acd54087b95fabdfb71fb7e7e7ffa90c9 inherit pro_methods_class_torc_h_t_t_p_service"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d70/class_torc_h_t_t_p_service.html#acd54087b95fabdfb71fb7e7e7ffa90c9">HandleSubscriberDeleted</a> (QObject *Subscriber)</td></tr>
-<tr class="separator:acd54087b95fabdfb71fb7e7e7ffa90c9 inherit pro_methods_class_torc_h_t_t_p_service"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_static_methods_class_torc_h_t_t_p_handler"><td colspan="2" onclick="javascript:toggleInherit('pro_static_methods_class_torc_h_t_t_p_handler')"><img src="../../closed.png" alt="-"/>&#160;Static Protected Member Functions inherited from <a class="el" href="../../d5/d15/class_torc_h_t_t_p_handler.html">TorcHTTPHandler</a></td></tr>
 <tr class="memitem:a1c097265c2fecdab79725e73bbfedeab inherit pro_static_methods_class_torc_h_t_t_p_handler"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d15/class_torc_h_t_t_p_handler.html#a1c097265c2fecdab79725e73bbfedeab">MethodIsAuthorised</a> (<a class="el" href="../../da/dfc/class_torc_h_t_t_p_request.html">TorcHTTPRequest</a> &amp;Request, int Allowed)</td></tr>
 <tr class="memdesc:a1c097265c2fecdab79725e73bbfedeab inherit pro_static_methods_class_torc_h_t_t_p_handler"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check the current request is authorised and set the authentication header if not.  <a href="#a1c097265c2fecdab79725e73bbfedeab">More...</a><br /></td></tr>
@@ -375,7 +390,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d1/d3b/torccameraoutput_8cpp_source.html#l00046">46</a> of file <a class="el" href="../../d1/d3b/torccameraoutput_8cpp_source.html">torccameraoutput.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d3b/torccameraoutput_8cpp_source.html#l00047">47</a> of file <a class="el" href="../../d1/d3b/torccameraoutput_8cpp_source.html">torccameraoutput.cpp</a>.</p>
 
 </div>
 </div>
@@ -407,6 +422,9 @@ Additional Inherited Members</h2></td></tr>
 <a class="anchor" id="a2320aa33dcf355612d17587766650ac3"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="../../da/dfa/class_torc_camera_params.html">TorcCameraParams</a> &amp; TorcCameraOutput::GetParams </td>
@@ -416,15 +434,52 @@ Additional Inherited Members</h2></td></tr>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d1/d3b/torccameraoutput_8cpp_source.html#l00050">50</a> of file <a class="el" href="../../d1/d3b/torccameraoutput_8cpp_source.html">torccameraoutput.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d3b/torccameraoutput_8cpp_source.html#l00051">51</a> of file <a class="el" href="../../d1/d3b/torccameraoutput_8cpp_source.html">torccameraoutput.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aca918c8beb3ee59fe621734f56364fda"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void TorcCameraOutput::ParamsChanged </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="../../da/dfa/class_torc_camera_params.html">TorcCameraParams</a>&#160;</td>
+          <td class="paramname"><em>Params</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">slot</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Notify the output that the camera parameters have changed. </p>
+<dl class="section note"><dt>Note</dt><dd>This is used by the camera device when the init segment has been saved and the video code determined - which is needed before streaming has started. It should however have roughly 2 seconds to arrive before the first video segment is available. </dd></dl>
+
+<p>Definition at line <a class="el" href="../../d1/d3b/torccameraoutput_8cpp_source.html#l00067">67</a> of file <a class="el" href="../../d1/d3b/torccameraoutput_8cpp_source.html">torccameraoutput.cpp</a>.</p>
 
 </div>
 </div>
 <a class="anchor" id="a8bb7cdd862c66cb950ec42308432a799"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void TorcCameraOutput::SetParams </td>
@@ -434,9 +489,37 @@ Additional Inherited Members</h2></td></tr>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d1/d3b/torccameraoutput_8cpp_source.html#l00055">55</a> of file <a class="el" href="../../d1/d3b/torccameraoutput_8cpp_source.html">torccameraoutput.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d3b/torccameraoutput_8cpp_source.html#l00056">56</a> of file <a class="el" href="../../d1/d3b/torccameraoutput_8cpp_source.html">torccameraoutput.cpp</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Friends And Related Function Documentation</h2>
+<a class="anchor" id="a0018feb3d2e429588dde0bcb2853e02e"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">friend class <a class="el" href="../../df/d70/class_torc_camera_outputs.html">TorcCameraOutputs</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="../../d2/d57/torccameraoutput_8h_source.html#l00022">22</a> of file <a class="el" href="../../d2/d57/torccameraoutput_8h_source.html">torccameraoutput.h</a>.</p>
 
 </div>
 </div>
@@ -451,7 +534,21 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/d57/torccameraoutput_8h_source.html#l00036">36</a> of file <a class="el" href="../../d2/d57/torccameraoutput_8h_source.html">torccameraoutput.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/d57/torccameraoutput_8h_source.html#l00040">40</a> of file <a class="el" href="../../d2/d57/torccameraoutput_8h_source.html">torccameraoutput.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a81c2d5176dadedbcbd06562c33b4f51a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QReadWriteLock TorcCameraOutput::m_paramsLock</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="../../d2/d57/torccameraoutput_8h_source.html#l00041">41</a> of file <a class="el" href="../../d2/d57/torccameraoutput_8h_source.html">torccameraoutput.h</a>.</p>
 
 </div>
 </div>
@@ -465,7 +562,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/d57/torccameraoutput_8h_source.html#l00034">34</a> of file <a class="el" href="../../d2/d57/torccameraoutput_8h_source.html">torccameraoutput.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/d57/torccameraoutput_8h_source.html#l00038">38</a> of file <a class="el" href="../../d2/d57/torccameraoutput_8h_source.html">torccameraoutput.h</a>.</p>
 
 </div>
 </div>
@@ -479,7 +576,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/d57/torccameraoutput_8h_source.html#l00035">35</a> of file <a class="el" href="../../d2/d57/torccameraoutput_8h_source.html">torccameraoutput.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/d57/torccameraoutput_8h_source.html#l00039">39</a> of file <a class="el" href="../../d2/d57/torccameraoutput_8h_source.html">torccameraoutput.h</a>.</p>
 
 </div>
 </div>
@@ -490,7 +587,7 @@ Additional Inherited Members</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Nov 27 2018 13:12:49 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Nov 27 2018 15:19:39 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

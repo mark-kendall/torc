@@ -99,7 +99,7 @@ var searchData=
   ['getoutputtypes',['GetOutputTypes',['../df/da4/class_torc_outputs.html#a019b4264db20372a218b7ab8ca772315',1,'TorcOutputs']]],
   ['getparameter',['GetParameter',['../de/d1d/class_torc_o_m_x_component.html#a52492cdf821968684ac1949fe3b5d2a8',1,'TorcOMXComponent']]],
   ['getparameters',['GetParameters',['../db/dc6/class_torc_r_p_c_request.html#a6a613dc8aba9beed46320ab9111f2c4c',1,'TorcRPCRequest']]],
-  ['getparams',['GetParams',['../d3/dfd/class_torc_camera_device.html#ac8c25593c0827a883fcdcab88fb5f86a',1,'TorcCameraDevice::GetParams()'],['../db/dc8/class_torc_camera_output.html#a2320aa33dcf355612d17587766650ac3',1,'TorcCameraOutput::GetParams()'],['../de/dc9/class_torc_camera_thread.html#a06882696afffe1fa1630b204ca2d9bb7',1,'TorcCameraThread::GetParams()']]],
+  ['getparams',['GetParams',['../db/dc8/class_torc_camera_output.html#a2320aa33dcf355612d17587766650ac3',1,'TorcCameraOutput']]],
   ['getparent',['GetParent',['../db/dc6/class_torc_r_p_c_request.html#a1c19367a0f47c85d3f3445cc885c0609',1,'TorcRPCRequest']]],
   ['getpath',['GetPath',['../da/dfc/class_torc_h_t_t_p_request.html#af96b3ff07d66b9de039e5c14d7a9e8fc',1,'TorcHTTPRequest']]],
   ['getpayload',['GetPayload',['../d3/d9a/class_torc_web_socket_reader.html#ac674f9a21142ee3a2c0f02546585df57',1,'TorcWebSocketReader']]],

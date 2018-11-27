@@ -1,5 +1,11 @@
 <map id="torcmuxer.h" name="torcmuxer.h">
-<area shape="rect" id="node2" href="$d0/dd4/torcpicamera_8h.html" title="torcpicamera.h" alt="" coords="13,80,132,107"/>
-<area shape="rect" id="node4" href="$d3/d5e/torcmuxer_8cpp.html" title="torcmuxer.cpp" alt="" coords="157,80,271,107"/>
-<area shape="rect" id="node3" href="$d7/de1/torcpicamera_8cpp.html" title="torcpicamera.cpp" alt="" coords="5,155,140,181"/>
+<area shape="rect" id="node2" href="$d3/d38/torccamera_8h.html" title="torccamera.h" alt="" coords="228,80,336,107"/>
+<area shape="rect" id="node10" href="$d3/d5e/torcmuxer_8cpp.html" title="torcmuxer.cpp" alt="" coords="361,80,475,107"/>
+<area shape="rect" id="node3" href="$d0/dd4/torcpicamera_8h.html" title="torcpicamera.h" alt="" coords="41,155,160,181"/>
+<area shape="rect" id="node5" href="$d2/d57/torccameraoutput_8h.html" title="torccameraoutput.h" alt="" coords="264,155,415,181"/>
+<area shape="rect" id="node6" href="$d0/d11/torccamera_8cpp.html" title="torccamera.cpp" alt="" coords="165,229,287,256"/>
+<area shape="rect" id="node9" href="$d9/dd8/torccamerathread_8h.html" title="torccamerathread.h" alt="" coords="439,155,589,181"/>
+<area shape="rect" id="node4" href="$d7/de1/torcpicamera_8cpp.html" title="torcpicamera.cpp" alt="" coords="5,229,140,256"/>
+<area shape="rect" id="node7" href="$d1/d3b/torccameraoutput_8cpp.html" title="torccameraoutput.cpp" alt="" coords="311,229,477,256"/>
+<area shape="rect" id="node8" href="$d0/d44/torccamerathread_8cpp.html" title="torccamerathread.cpp" alt="" coords="501,229,666,256"/>
 </map>

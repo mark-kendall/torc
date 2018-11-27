@@ -1,4 +1,5 @@
 <map id="torccamera.h" name="torccamera.h">
-<area shape="rect" id="node3" href="$d2/d60/torcmaths_8h.html" title="torcmaths.h" alt="" coords="103,80,203,107"/>
-<area shape="rect" id="node5" href="$de/df7/torcsegmentedringbuffer_8h.html" title="torcsegmentedringbuffer.h" alt="" coords="227,80,419,107"/>
+<area shape="rect" id="node3" href="$d2/d60/torcmaths_8h.html" title="torcmaths.h" alt="" coords="5,155,105,181"/>
+<area shape="rect" id="node5" href="$de/df7/torcsegmentedringbuffer_8h.html" title="torcsegmentedringbuffer.h" alt="" coords="130,155,322,181"/>
+<area shape="rect" id="node9" href="$d4/d0f/torcmuxer_8h.html" title="ffmpeg/torcmuxer.h" alt="" coords="264,80,412,107"/>
 </map>
