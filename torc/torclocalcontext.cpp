@@ -50,10 +50,16 @@ qint64             gStartTime   = QDateTime::currentMSecsSinceEpoch();
 
 static void ExitHandler(int Sig)
 {
-    signal(SIGINT, SIG_DFL);
+    if (SIGPIPE == Sig)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Received SIGPIPE interrupt - ignoring");
+        return;
+    }
+
     LOG(VB_GENERAL, LOG_INFO, QString("Received %1")
         .arg(Sig == SIGINT ? "SIGINT" : "SIGTERM"));
 
+    signal(SIGINT, SIG_DFL);
     TorcLocalContext::NotifyEvent(Torc::Stop);
 }
 
@@ -151,6 +157,7 @@ TorcLocalContext::TorcLocalContext(TorcCommandLine* CommandLine)
     // Handle signals gracefully
     signal(SIGINT,  ExitHandler);
     signal(SIGTERM, ExitHandler);
+    signal(SIGPIPE, ExitHandler);
 
     // Initialise local directories
     InitialiseTorcDirectories(CommandLine);
