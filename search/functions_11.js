@@ -176,6 +176,7 @@ var searchData=
   ['torcxsdfactory',['TorcXSDFactory',['../d5/d5d/class_torc_x_s_d_factory.html#a4abf07a38c83ddcdcbc1c1186e9776fa',1,'TorcXSDFactory']]],
   ['tostring',['ToString',['../d5/d34/class_torc_language.html#a40a8d5d8548ee931ee9e7a7a2c50df42',1,'TorcLanguage::ToString()'],['../d4/d39/class_torc_p_list.html#a30702a14b73f242c4364f23bdfa7410b',1,'TorcPList::ToString()']]],
   ['toxml',['ToXML',['../d4/d39/class_torc_p_list.html#a33c9480467eeca5ce7618816cb545e70',1,'TorcPList']]],
+  ['trackdrift',['TrackDrift',['../d3/dfd/class_torc_camera_device.html#a992e4b35f2699695d4bc59cc96ff1083',1,'TorcCameraDevice']]],
   ['tryconnect',['TryConnect',['../dd/d3a/class_torc_network_service.html#a25801b8d95abe55ae17fc1fe38c71b97',1,'TorcNetworkService']]],
   ['trynotify',['TryNotify',['../d0/db9/class_torc_i_o_t_logger.html#a47917ff5decf4a7f9710f0128bbbc210',1,'TorcIOTLogger']]],
   ['txtrecordtomap',['TxtRecordToMap',['../d0/d9f/class_torc_bonjour.html#a6d602ba5fb9021f2cb7be12ecc90e70a',1,'TorcBonjour']]],

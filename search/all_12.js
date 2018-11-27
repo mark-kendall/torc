@@ -100,7 +100,7 @@ var searchData=
   ['starttimer',['StartTimer',['../d0/db9/class_torc_i_o_t_logger.html#a28ab8819c9b2cee74d6b1a5fc2c83f3d',1,'TorcIOTLogger']]],
   ['state',['State',['../db/dc6/class_torc_r_p_c_request.html#ad9dfd7a6372a7be05888a5472ab03202',1,'TorcRPCRequest']]],
   ['statetostring',['StateToString',['../d8/d3f/torcomxcore_8cpp.html#a5e54981f24af575eeeeac6c8911ebf82',1,'StateToString(OMX_STATETYPE State):&#160;torcomxcore.cpp'],['../d7/df9/torcomxcore_8h.html#a5e54981f24af575eeeeac6c8911ebf82',1,'StateToString(OMX_STATETYPE State):&#160;torcomxcore.cpp']]],
-  ['static_5fdirectory',['STATIC_DIRECTORY',['../d4/d11/torchttphandler_8h.html#a28db14a375e71698878ba770c554b3b2',1,'torchttphandler.h']]],
+  ['static_5fdirectory',['STATIC_DIRECTORY',['../d6/d66/torchtmlstaticcontent_8h.html#a28db14a375e71698878ba770c554b3b2',1,'torchtmlstaticcontent.h']]],
   ['status',['Status',['../d4/dee/class_torc_h_t_t_p_server_1_1_status.html#a8570afbe3f89280e89215b0f1825db8f',1,'TorcHTTPServer::Status']]],
   ['status',['Status',['../d4/dee/class_torc_h_t_t_p_server_1_1_status.html',1,'TorcHTTPServer']]],
   ['statusfromstring',['StatusFromString',['../da/dfc/class_torc_h_t_t_p_request.html#ad6bf852a4c293900b3875256f12c5b9f',1,'TorcHTTPRequest']]],

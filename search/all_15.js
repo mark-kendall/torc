@@ -31,6 +31,8 @@ var searchData=
   ['versionunknown',['VersionUnknown',['../d3/d9a/class_torc_web_socket_reader.html#a440af48a5b5c5152fa6ec32a801b8a5fa3b355b1a2f2477240a4d8f93fa137630',1,'TorcWebSocketReader']]],
   ['video_5fbitrate_5fmax',['VIDEO_BITRATE_MAX',['../d3/d38/torccamera_8h.html#abe682f7723d66bc72fd31c600b18ea00',1,'torccamera.h']]],
   ['video_5fbitrate_5fmin',['VIDEO_BITRATE_MIN',['../d3/d38/torccamera_8h.html#af9c310f2c8265b1cc6e64ba778051a4a',1,'torccamera.h']]],
+  ['video_5fdrift_5flong',['VIDEO_DRIFT_LONG',['../d3/d38/torccamera_8h.html#ac74d402052e4e97fe38bd880893c48a2',1,'torccamera.h']]],
+  ['video_5fdrift_5fshort',['VIDEO_DRIFT_SHORT',['../d3/d38/torccamera_8h.html#a6acd12e650fdbf272cc89ed09dd82bb1',1,'torccamera.h']]],
   ['video_5fframerate_5fmax',['VIDEO_FRAMERATE_MAX',['../d3/d38/torccamera_8h.html#a131aaa77ea71feba2ed391c86d9e548d',1,'torccamera.h']]],
   ['video_5fframerate_5fmin',['VIDEO_FRAMERATE_MIN',['../d3/d38/torccamera_8h.html#a1358db3327f24c2a7e599318a49e2c2f',1,'torccamera.h']]],
   ['video_5fgopdura_5ftarget',['VIDEO_GOPDURA_TARGET',['../d3/d38/torccamera_8h.html#a3f542686e057eba94fa3f3f35f2ce2f3',1,'torccamera.h']]],

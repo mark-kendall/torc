@@ -59,6 +59,7 @@ var searchData=
   ['getfinalurl',['GetFinalURL',['../d3/ded/class_torc_network_request.html#a798a8b481913c0b6231df056b71ed9ef',1,'TorcNetworkRequest']]],
   ['getglobaltemperatureunits',['GetGlobalTemperatureUnits',['../d9/d56/class_torc_central.html#a07fc23858ef24da324ce92e6a0a9dd9d',1,'TorcCentral']]],
   ['gethandle',['GetHandle',['../de/d1d/class_torc_o_m_x_component.html#adc6065f886eba18334697c04ea3532c0',1,'TorcOMXComponent']]],
+  ['gethead',['GetHead',['../df/d16/class_torc_segmented_ring_buffer.html#a40f4a976847ce22ef199f60f2b781cff',1,'TorcSegmentedRingBuffer']]],
   ['getheader',['GetHeader',['../d3/ded/class_torc_network_request.html#a0d7f126a31063ca67d8bc5adca569ce3',1,'TorcNetworkRequest']]],
   ['gethelptext',['GetHelpText',['../dd/d69/class_torc_setting.html#af0c2e8a16dbfc8b785294887d0f26cc4',1,'TorcSetting']]],
   ['gethost',['GetHost',['../dd/d3a/class_torc_network_service.html#a804130bf9d844d49b38cecaf99ca533b',1,'TorcNetworkService']]],

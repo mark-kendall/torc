@@ -94,11 +94,12 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &lt;QObject&gt;</code><br />
+<code>#include &quot;<a class="el" href="../../d2/d60/torcmaths_8h_source.html">torcmaths.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="../../de/df7/torcsegmentedringbuffer_8h_source.html">torcsegmentedringbuffer.h</a>&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for torccamera.h:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="../../da/d78/torccamera_8h__incl.svg" width="448" height="187"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../da/d78/torccamera_8h__incl.svg" width="535" height="187"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div><div class="textblock"><div class="dynheader">
@@ -147,6 +148,10 @@ Macros</h2></td></tr>
 <tr class="separator:a4ea6d3404191584733b65c3adb04b4a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a433a6e9c545d111d4b88e35ecc1e9d6c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d38/torccamera_8h.html#a433a6e9c545d111d4b88e35ecc1e9d6c">VIDEO_TIMEBASE</a>&#160;&#160;&#160;90000</td></tr>
 <tr class="separator:a433a6e9c545d111d4b88e35ecc1e9d6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6acd12e650fdbf272cc89ed09dd82bb1"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d38/torccamera_8h.html#a6acd12e650fdbf272cc89ed09dd82bb1">VIDEO_DRIFT_SHORT</a>&#160;&#160;&#160;60</td></tr>
+<tr class="separator:a6acd12e650fdbf272cc89ed09dd82bb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac74d402052e4e97fe38bd880893c48a2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d38/torccamera_8h.html#ac74d402052e4e97fe38bd880893c48a2">VIDEO_DRIFT_LONG</a>&#160;&#160;&#160;(60*5)</td></tr>
+<tr class="separator:ac74d402052e4e97fe38bd880893c48a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a class="anchor" id="abe682f7723d66bc72fd31c600b18ea00"></a>
@@ -159,7 +164,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00018">18</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00019">19</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
 
 </div>
 </div>
@@ -173,7 +178,35 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00017">17</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00018">18</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ac74d402052e4e97fe38bd880893c48a2"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define VIDEO_DRIFT_LONG&#160;&#160;&#160;(60*5)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00026">26</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a6acd12e650fdbf272cc89ed09dd82bb1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define VIDEO_DRIFT_SHORT&#160;&#160;&#160;60</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00025">25</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
 
 </div>
 </div>
@@ -187,7 +220,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00016">16</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00017">17</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
 
 </div>
 </div>
@@ -201,7 +234,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00015">15</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00016">16</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
 
 </div>
 </div>
@@ -215,7 +248,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00020">20</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00021">21</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
 
 </div>
 </div>
@@ -229,7 +262,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00014">14</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00015">15</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
 
 </div>
 </div>
@@ -243,7 +276,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00013">13</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00014">14</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
 
 </div>
 </div>
@@ -257,7 +290,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00022">22</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00023">23</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
 
 </div>
 </div>
@@ -271,7 +304,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00021">21</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00022">22</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
 
 </div>
 </div>
@@ -285,7 +318,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00019">19</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00020">20</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
 
 </div>
 </div>
@@ -299,7 +332,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00023">23</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00024">24</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
 
 </div>
 </div>
@@ -313,7 +346,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00012">12</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00013">13</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
 
 </div>
 </div>
@@ -327,14 +360,14 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00011">11</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d38/torccamera_8h_source.html#l00012">12</a> of file <a class="el" href="../../d3/d38/torccamera_8h_source.html">torccamera.h</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Nov 26 2018 21:03:59 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Nov 27 2018 09:31:34 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>
