@@ -5,6 +5,7 @@
 #include <QObject>
 
 // Torc
+#include "torcmaths.h"
 #include "torcsegmentedringbuffer.h"
 
 // NB these are also enforced in the XSD
@@ -21,6 +22,8 @@
 #define VIDEO_SEGMENT_NUMBER 10 // 10 segments for a total of 20 buffered seconds
 #define VIDEO_SEGMENT_MAX    20
 #define VIDEO_TIMEBASE       90000
+#define VIDEO_DRIFT_SHORT    60 // short term drift average
+#define VIDEO_DRIFT_LONG     (60*5) // long term drift average
 
 class TorcCameraParams
 {
@@ -79,9 +82,15 @@ class TorcCameraDevice : public QObject
     void             StillReady      (const QString File);
 
   protected:
-    TorcCameraParams m_params;
+    void             TrackDrift      (void);
+
+    TorcCameraParams         m_params;
     TorcSegmentedRingBuffer *m_ringBuffer;
-    QReadWriteLock   m_ringBufferLock;
+    QReadWriteLock           m_ringBufferLock;
+    quint64                  m_referenceTime;
+    int                      m_discardDrift;
+    TorcAverage<double>      m_shortAverage;
+    TorcAverage<double>      m_longAverage;
 
   private:
     Q_DISABLE_COPY(TorcCameraDevice)

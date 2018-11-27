@@ -476,6 +476,7 @@ void TorcPiCamera::ProcessVideoBuffer(OMX_BUFFERHEADERTYPE *Buffer)
         else if (!sps && !(m_frameCount % (m_params.m_frameRate * VIDEO_SEGMENT_TARGET)))
         {
             m_muxer->FinishSegment(false);
+            TrackDrift();
         }
 
         if (m_bufferedPacket)

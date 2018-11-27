@@ -262,7 +262,11 @@ TorcCameraDevice::TorcCameraDevice(const TorcCameraParams &Params)
   : QObject(),
     m_params(Params),
     m_ringBuffer(NULL),
-    m_ringBufferLock(QReadWriteLock::Recursive)
+    m_ringBufferLock(QReadWriteLock::Recursive),
+    m_referenceTime(0),
+    m_discardDrift(2),
+    m_shortAverage(VIDEO_DRIFT_SHORT / VIDEO_SEGMENT_TARGET),
+    m_longAverage(VIDEO_DRIFT_LONG / VIDEO_SEGMENT_TARGET)
 {
 }
 
@@ -290,6 +294,41 @@ QByteArray TorcCameraDevice::GetInitSegment(void)
     if (m_ringBuffer)
         return m_ringBuffer->GetInitSegment();
     return QByteArray();
+}
+
+
+void TorcCameraDevice::TrackDrift(void)
+{
+    quint64 now = QDateTime::currentMSecsSinceEpoch();
+    if (!m_referenceTime)
+        m_referenceTime = now;
+
+    // discard first few samples while camera settles down
+    if (m_discardDrift)
+    {
+        m_discardDrift--;
+        return;
+    }
+
+    // reference time points to the end of the first video segment
+    m_ringBufferLock.lockForRead();
+    int last = m_ringBuffer->GetHead();
+    m_ringBufferLock.unlock();
+    if (last < 0)
+        return;
+
+    // all milliseconds
+    qint64 drift = QDateTime::currentMSecsSinceEpoch() - (m_referenceTime + (last * VIDEO_SEGMENT_TARGET * 1000));
+    double shortaverage = m_shortAverage.AddValue(drift);
+    double longaverage  = m_longAverage.AddValue(drift);
+
+    static const double timedelta = ((VIDEO_DRIFT_LONG - VIDEO_DRIFT_SHORT) / 2) * 1000;
+    double driftdelta = longaverage - shortaverage;
+    double gradient   = driftdelta / timedelta;
+    double timetozero = qAbs(driftdelta) < 1 ? qInf() : drift / gradient;
+
+    LOG(VB_GENERAL, LOG_INFO, QString("Drift: %1secs 1min %2 5min %3 timetozero %4")
+        .arg((double)drift/1000, 0, 'f', 3).arg(shortaverage/1000, 0, 'f', 3).arg(longaverage/1000, 0, 'f', 3).arg(timetozero/1000, 0, 'f', 3));
 }
 
 TorcCameraParams TorcCameraDevice::GetParams(void)
