@@ -33,14 +33,11 @@ class TorcHTTPService : public TorcHTTPHandler
     virtual QString GetPresentationURL    (void);
 
   protected:
-    void         EnableMethod             (const QString &Method);
-    void         DisableMethod            (const QString &Method);
     void         HandleSubscriberDeleted  (QObject* Subscriber);
 
   private:
     QObject                               *m_parent;
     QString                                m_version;
-    QMetaObject                            m_metaObject;
     QMap<QString,MethodParameters*>        m_methods;
     QMap<int,int>                          m_properties;
     QList<QObject*>                        m_subscribers;

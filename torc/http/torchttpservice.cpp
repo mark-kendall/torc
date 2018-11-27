@@ -263,7 +263,6 @@ TorcHTTPService::TorcHTTPService(QObject *Parent, const QString &Signature, cons
   : TorcHTTPHandler(TORC_SERVICES_DIR + Signature, Name),
     m_parent(Parent),
     m_version("Unknown"),
-    m_metaObject(MetaObject),
     m_methods(),
     m_properties(),
     m_subscribers(),
@@ -275,7 +274,7 @@ TorcHTTPService::TorcHTTPService(QObject *Parent, const QString &Signature, cons
     m_parent->setObjectName(Name);
 
     // the parent MUST implement SubscriberDeleted.
-    if (m_metaObject.indexOfSlot(QMetaObject::normalizedSignature("SubscriberDeleted(QObject*)")) < 0)
+    if (MetaObject.indexOfSlot(QMetaObject::normalizedSignature("SubscriberDeleted(QObject*)")) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Service '%1' has no SubscriberDeleted slot. This is a programmer error - exiting").arg(Name));
         QCoreApplication::exit(TORC_EXIT_UNKOWN_ERROR);
@@ -283,19 +282,19 @@ TorcHTTPService::TorcHTTPService(QObject *Parent, const QString &Signature, cons
     }
 
     // determine version
-    int index = m_metaObject.indexOfClassInfo("Version");
+    int index = MetaObject.indexOfClassInfo("Version");
     if (index > -1)
-        m_version = m_metaObject.classInfo(index).value();
+        m_version = MetaObject.classInfo(index).value();
     else
         LOG(VB_GENERAL, LOG_WARNING, QString("Service '%1' is missing version information").arg(Name));
 
     // is this a secure service (all methods require authentication)
-    bool secure = m_metaObject.indexOfClassInfo("Secure") > -1;
+    bool secure = MetaObject.indexOfClassInfo("Secure") > -1;
 
     // build a list of metaobjects from all superclasses as well.
     QList<const QMetaObject*> metas;
-    metas.append(&m_metaObject);
-    const QMetaObject* super = m_metaObject.superClass();
+    metas.append(&MetaObject);
+    const QMetaObject* super = MetaObject.superClass();
     while (super)
     {
         metas.append(super);
@@ -332,10 +331,10 @@ TorcHTTPService::TorcHTTPService(QObject *Parent, const QString &Signature, cons
                 int customallowed = HTTPUnknownType;
 
                 // use the actual class metaObject - not the superclass
-                int index = m_metaObject.indexOfClassInfo(name.toLatin1());
+                int index = MetaObject.indexOfClassInfo(name.toLatin1());
                 if (index > -1)
                 {
-                    QStringList infos = QString(m_metaObject.classInfo(index).value()).split(",", QString::SkipEmptyParts);
+                    QStringList infos = QString(MetaObject.classInfo(index).value()).split(",", QString::SkipEmptyParts);
                     foreach (QString info, infos)
                     {
                         if (info.startsWith("methods="))
@@ -642,8 +641,8 @@ QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVarian
                     m_subscribers.append(Connection);
 
                     // notify success and provide appropriate details about properties, notifications, get'ers etc
-                    QMap<int,int>::const_iterator it = m_properties.begin();
-                    for ( ; it != m_properties.end(); ++it)
+                    QMap<int,int>::const_iterator it = m_properties.constBegin();
+                    for ( ; it != m_properties.constEnd(); ++it)
                     {
                         // and connect property change notifications to the one slot
                         // NB we use the parent's metaObject here - not the staticMetaObject (or m_metaObject)
@@ -733,8 +732,8 @@ QVariantMap TorcHTTPService::GetServiceDetails(void)
     QVariantMap properties;
     QVariantMap methods;
 
-    QMap<int,int>::const_iterator it = m_properties.begin();
-    for ( ; it != m_properties.end(); ++it)
+    QMap<int,int>::const_iterator it = m_properties.constBegin();
+    for ( ; it != m_properties.constEnd(); ++it)
     {
         // NB for some reason, QMetaProperty doesn't provide the QMetaMethod for the read and write
         // slots, so try to infer them (and check the result)
