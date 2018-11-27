@@ -474,8 +474,8 @@ void TorcHTTPService::ProcessHTTPRequest(const QString &PeerAddress, int PeerPor
         return;
     }
 
-    QMap<QString,MethodParameters*>::iterator it = m_methods.find(method);
-    if (it != m_methods.end())
+    QMap<QString,MethodParameters*>::const_iterator it = m_methods.constFind(method);
+    if (it != m_methods.constEnd())
     {
         // filter out invalid request types
         if ((!(type & (*it)->m_allowedRequestTypes)) ||
@@ -535,8 +535,8 @@ QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVarian
     if (Connection && !method.isEmpty())
     {
         // find the correct method to invoke
-        QMap<QString,MethodParameters*>::iterator it = m_methods.find(method);
-        if (it != m_methods.end())
+        QMap<QString,MethodParameters*>::const_iterator it = m_methods.constFind(method);
+        if (it != m_methods.constEnd())
         {
             // disallow methods based on state and authentication
             int types         = it.value()->m_allowedRequestTypes;
@@ -769,8 +769,8 @@ QVariantMap TorcHTTPService::GetServiceDetails(void)
         properties.insert(name, description);
     }
 
-    QMap<QString,MethodParameters*>::const_iterator it2 = m_methods.begin();
-    for ( ; it2 != m_methods.end(); ++it2)
+    QMap<QString,MethodParameters*>::const_iterator it2 = m_methods.constBegin();
+    for ( ; it2 != m_methods.constEnd(); ++it2)
     {
         QVariantMap map;
         QVariantList params;
@@ -838,46 +838,6 @@ QVariant TorcHTTPService::GetProperty(int Index)
         LOG(VB_GENERAL, LOG_ERR, "Failed to retrieve property");
 
     return result;
-}
-
-/*! \brief Enable the given method.
- *
- *  Used to enable a method previously disabled with DisableMethod.
- */
-void TorcHTTPService::EnableMethod(const QString &Method)
-{
-    QMap<QString,MethodParameters*>::const_iterator it = m_methods.constFind(Method);
-    if (it != m_methods.constEnd())
-    {
-        it.value()->Enable();
-        LOG(VB_GENERAL, LOG_DEBUG, QString("Enabled method '%1' for service '%2'").arg(Method).arg(m_name));
-    }
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("Unable to enable unknown method '%1' for service '%2'").arg(Method).arg(m_name));
-    }
-
-}
-
-/*! \brief Disable the given method.
- *
- * This is used to dynamically disable a 'setter' when an internal object has taken control
- * of the service.
- *
- * Methods can be re-enabled with EnableMethod.
-*/
-void TorcHTTPService::DisableMethod(const QString &Method)
-{
-    QMap<QString,MethodParameters*>::const_iterator it = m_methods.constFind(Method);
-    if (it != m_methods.constEnd())
-    {
-        it.value()->Disable();
-        LOG(VB_GENERAL, LOG_DEBUG, QString("Disabled method '%1' for service '%2'").arg(Method).arg(m_name));
-    }
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("Unable to disable unknown method '%1' for service '%2'").arg(Method).arg(m_name));
-    }
 }
 
 void TorcHTTPService::HandleSubscriberDeleted(QObject *Subscriber)
