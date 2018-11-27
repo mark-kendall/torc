@@ -71,7 +71,10 @@ void TorcTime::Tick(void)
     QDateTime timenow = QDateTime::currentDateTime();
     qint64 difference = timenow.secsTo(m_lastTime);
     m_lastTime = timenow;
-    if (qAbs(difference) > 10)
+    // half an hour change triggers an event
+    // anything in th order of seconds can be triggered under heavy load,
+    // so compromise between seconds and a full hour.
+    if (qAbs(difference) > (30 * 60))
     {
         LOG(VB_GENERAL, LOG_WARNING, "Detected change in system time");
         gLocalContext->NotifyEvent(Torc::SystemTimeChanged);
