@@ -187,7 +187,7 @@ void TorcPowerOSX::Refresh(void)
     if (m_powerRef)
         return;
 
-    m_httpServiceLock.LockedForWrite;
+    m_httpServiceLock.lockForWrite();
 
     CFTypeRef  info = IOPSCopyPowerSourcesInfo();
     CFArrayRef list = IOPSCopyPowerSourcesList(info);
