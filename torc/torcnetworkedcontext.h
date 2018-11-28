@@ -167,7 +167,6 @@ class TorcNetworkedContext: public QObject, public TorcHTTPService
 
   private:
     QList<TorcNetworkService*> m_discoveredServices;
-    QReadWriteLock             m_discoveredServicesLock;
     QList<QString>             m_serviceList;
     QVariantList               peers; // dummy
 };

@@ -589,7 +589,6 @@ TorcNetworkedContext::TorcNetworkedContext()
   : QObject(),
     TorcHTTPService(this, "peers", "peers", TorcNetworkedContext::staticMetaObject, BLACKLIST),
     m_discoveredServices(),
-    m_discoveredServicesLock(QReadWriteLock::Recursive),
     m_serviceList(),
     peers()
 {
@@ -612,13 +611,10 @@ TorcNetworkedContext::~TorcNetworkedContext()
     // stoplistening
     gLocalContext->RemoveObserver(this);
 
-    {
-        QWriteLocker locker(&m_discoveredServicesLock);
-        if (!m_discoveredServices.isEmpty())
-            LOG(VB_GENERAL, LOG_INFO, QString("Removing %1 discovered peers").arg(m_discoveredServices.size()));
-        while (!m_discoveredServices.isEmpty())
-            delete m_discoveredServices.takeLast();
-    }
+    if (!m_discoveredServices.isEmpty())
+        LOG(VB_GENERAL, LOG_INFO, QString("Removing %1 discovered peers").arg(m_discoveredServices.size()));
+    while (!m_discoveredServices.isEmpty())
+        delete m_discoveredServices.takeLast();
 }
 
 QString TorcNetworkedContext::GetUIName(void)
@@ -630,7 +626,7 @@ QVariantList TorcNetworkedContext::GetPeers(void)
 {
     QVariantList result;
 
-    QReadLocker locker(&m_discoveredServicesLock);
+    QReadLocker locker(&m_httpServiceLock);
     foreach (TorcNetworkService* service, m_discoveredServices)
         result.append(service->ToMap());
 
@@ -683,7 +679,7 @@ bool TorcNetworkedContext::event(QEvent *Event)
                         else if (m_serviceList.contains(uuid))
                         {
                             // register this as an additional source
-                            QWriteLocker locker(&m_discoveredServicesLock);
+                            QWriteLocker locker(&m_httpServiceLock);
                             for (int i = 0; i < m_discoveredServices.size(); ++i)
                                 if (m_discoveredServices.at(i)->GetUuid() == uuid)
                                     m_discoveredServices.at(i)->SetSource(TorcNetworkService::Bonjour);
@@ -769,7 +765,7 @@ bool TorcNetworkedContext::event(QEvent *Event)
                     else if (m_serviceList.contains(uuid))
                     {
                         // register this as an additional source
-                        QWriteLocker locker(&m_discoveredServicesLock);
+                        QWriteLocker locker(&m_httpServiceLock);
                         for (int i = 0; i < m_discoveredServices.size(); ++i)
                             if (m_discoveredServices.at(i)->GetUuid() == uuid)
                                 m_discoveredServices.at(i)->SetSource(TorcNetworkService::UPnP);
@@ -872,7 +868,7 @@ void TorcNetworkedContext::HandleNewRequest(const QString &UUID, TorcRPCRequest 
 {
     if (!UUID.isEmpty() && m_serviceList.contains(UUID))
     {
-        // no locking required - discovered services are changed in this thread.
+        QReadLocker locker(&m_httpServiceLock);
         for (int i = 0; i < m_discoveredServices.size(); ++i)
         {
             if (m_discoveredServices[i]->GetUuid() == UUID)
@@ -890,7 +886,7 @@ void TorcNetworkedContext::HandleCancelRequest(const QString &UUID, TorcRPCReque
 {
     if (!UUID.isEmpty() && m_serviceList.contains(UUID))
     {
-        // no locking required - discovered services are changed in this thread.
+        QReadLocker locker(&m_httpServiceLock);
         for (int i = 0; i < m_discoveredServices.size(); ++i)
         {
             if (m_discoveredServices[i]->GetUuid() == UUID)
@@ -931,7 +927,7 @@ void TorcNetworkedContext::HandleNewPeer(TorcWebSocketThread *Thread, const QVar
 
     if (m_serviceList.contains(UUID))
     {
-        // no locking required - discovered services are changed in this thread.
+        QReadLocker locker(&m_httpServiceLock);
         for (int i = 0; i < m_discoveredServices.size(); ++i)
         {
             if (m_discoveredServices[i]->GetUuid() == UUID && !TorcNetworkService::WeActAsServer(priority, starttime, UUID))
@@ -967,7 +963,7 @@ void TorcNetworkedContext::Add(TorcNetworkService *Peer)
     if (Peer && !m_serviceList.contains(Peer->GetUuid()))
     {
         {
-            QWriteLocker locker(&m_discoveredServicesLock);
+            QWriteLocker locker(&m_httpServiceLock);
             m_discoveredServices.append(Peer);
         }
 
@@ -982,7 +978,7 @@ void TorcNetworkedContext::Remove(const QString &UUID, TorcNetworkService::Servi
     if (m_serviceList.contains(UUID))
     {
         {
-            QWriteLocker locker(&m_discoveredServicesLock);
+            QWriteLocker locker(&m_httpServiceLock);
             for (int i = 0; i < m_discoveredServices.size(); ++i)
             {
                 if (m_discoveredServices.at(i)->GetUuid() == UUID)
