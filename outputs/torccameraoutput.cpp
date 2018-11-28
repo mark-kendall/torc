@@ -36,7 +36,7 @@
 
 TorcCameraOutput::TorcCameraOutput(TorcOutput::Type Type, double Value, const QString &ModelId, const QVariantMap &Details,
                                    QObject *Output, const QMetaObject &MetaObject, const QString &Blacklist)
-  : TorcOutput(Type, Value, ModelId, Details, Output, MetaObject, Blacklist + "," + "CameraErrored"),
+  : TorcOutput(Type, Value, ModelId, Details, Output, MetaObject, Blacklist + "," + "CameraErrored,ParamsChanged"),
     m_thread(NULL),
     m_threadLock(QReadWriteLock::Recursive),
     m_params(Details),
