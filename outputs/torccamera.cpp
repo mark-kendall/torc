@@ -445,7 +445,7 @@ TorcCameraFactory* TorcCameraFactory::gTorcCameraFactory = NULL;
 TorcCameraFactory::TorcCameraFactory()
   : nextTorcCameraFactory(gTorcCameraFactory)
 {
-    qRegisterMetaType<TorcCameraParams>();
+    qRegisterMetaType<TorcCameraParams>("TorcCameraParams&");
     gTorcCameraFactory = this;
 }
 
