@@ -338,6 +338,15 @@ OMX_U32 TorcOMXComponent::GetAvailableBuffers(OMX_DIRTYPE Direction, OMX_U32 Ind
     return 0;
 }
 
+OMX_U32 TorcOMXComponent::GetInUseBuffers(OMX_DIRTYPE Direction, OMX_U32 Index, OMX_INDEXTYPE Domain)
+{
+    TorcOMXPort* port = FindPort(Direction, Index, Domain);
+    if (port)
+        return port->GetInUseBuffers();
+
+    return 0;
+}
+
 OMX_ERRORTYPE TorcOMXComponent::EmptyThisBuffer(OMX_BUFFERHEADERTYPE *Buffer)
 {
     if (!m_valid || !Buffer)

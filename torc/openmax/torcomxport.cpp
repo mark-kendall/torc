@@ -100,6 +100,14 @@ OMX_U32 TorcOMXPort::GetAvailableBuffers(void)
     return result;
 }
 
+OMX_U32 TorcOMXPort::GetInUseBuffers(void)
+{
+    m_lock.lock();
+    OMX_U32 result = m_buffers.size() - m_availableBuffers.size();
+    m_lock.unlock();
+    return result;
+}
+
 OMX_ERRORTYPE TorcOMXPort::CreateBuffers(QObject *Owner /*=NULL*/)
 {
     if (!m_handle)

@@ -26,6 +26,7 @@ class TorcOMXPort final : public QObject
     OMX_INDEXTYPE                 GetDomain      (void);
     OMX_ERRORTYPE                 EnablePort     (bool Enable, bool Wait = true);
     OMX_U32                       GetAvailableBuffers (void);
+    OMX_U32                       GetInUseBuffers (void);
     OMX_ERRORTYPE                 CreateBuffers  (QObject* Owner = NULL);
     OMX_ERRORTYPE                 DestroyBuffers (void);
     OMX_ERRORTYPE                 Flush          (void);
