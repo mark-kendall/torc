@@ -26,6 +26,7 @@
 
 // Torc
 #include "torclogging.h"
+#include "torctimer.h"
 #include "torccentral.h"
 #include "torcpicamera.h"
 #include "torcdirectories.h"
@@ -84,6 +85,8 @@ bool TorcPiCamera::gPiCameraDetected = false;
 TorcPiCamera::TorcPiCamera(const TorcCameraParams &Params)
   : TorcCameraDevice(Params),
     m_cameraType(Unknown),
+    m_stillsEnabled(true),
+    m_videoEnabled(true),
     m_core(),
     m_camera((char*)BROADCOM_CAMERA),
     m_videoEncoder((char*)BROADCOM_ENCODER),
@@ -273,6 +276,9 @@ void TorcPiCamera::BufferReady(OMX_BUFFERHEADERTYPE* Buffer, quint64 Type)
  */
 void TorcPiCamera::StartStill(void)
 {
+    if (!m_stillsEnabled)
+        return;
+
     OMX_BUFFERHEADERTYPE* buffer = m_imageEncoder.GetBuffer(OMX_DirOutput, 0, 1000, OMX_IndexParamImageInit);
     if (buffer)
         (void)m_imageEncoder.FillThisBuffer(buffer);
@@ -313,6 +319,9 @@ bool TorcPiCamera::EnableVideo(bool Video)
  */
 void TorcPiCamera::StartVideo(void)
 {
+    if (!m_videoEnabled)
+        return;
+
     OMX_BUFFERHEADERTYPE* buffer = m_videoEncoder.GetBuffer(OMX_DirOutput, 0, 1000, OMX_IndexParamVideoInit);
     if (buffer)
         (void)m_videoEncoder.FillThisBuffer(buffer);
@@ -416,6 +425,21 @@ void TorcPiCamera::ProcessVideoBuffer(OMX_BUFFERHEADERTYPE *Buffer)
 
 bool TorcPiCamera::Stop(void)
 {
+    // make sure no further buffers are requested
+    m_stillsEnabled = false;
+    m_videoEnabled  = false;
+
+    // and ensure all FillBufferDone callbacks are complete
+    // NB this assumes only one buffer is allocated
+    TorcTimer timer;
+    timer.Start();
+    while (m_imageEncoder.GetInUseBuffers(OMX_DirOutput, 0, OMX_IndexParamImageInit) &&
+           m_videoEncoder.GetInUseBuffers(OMX_DirOutput, 0, OMX_IndexParamVideoInit) &&
+           timer.Elapsed() < 1000)
+    {
+        QThread::msleep(50);
+    }
+
     emit WritingStopped();
 
     // stop camera

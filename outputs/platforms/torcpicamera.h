@@ -53,6 +53,8 @@ class TorcPiCamera final : public TorcCameraDevice
     Q_DISABLE_COPY(TorcPiCamera)
 
     PiCameraType             m_cameraType;
+    bool                     m_stillsEnabled;
+    bool                     m_videoEnabled;
 
     // OpenMax
     TorcOMXCore              m_core;
