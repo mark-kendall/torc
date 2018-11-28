@@ -38,15 +38,13 @@ TorcInputs* TorcInputs::gInputs = new TorcInputs();
  * Any subclass of TorcInput will automatically register itself on creation. Any class
  * creating inputs must DownRef AND call RemoveInput when deleting them.
  *
- * \todo Translations and constants for web client.
  * \note This class is thread safe.
 */
 TorcInputs::TorcInputs()
   : QObject(),
     TorcHTTPService(this, INPUTS_DIRECTORY, "inputs", TorcInputs::staticMetaObject, BLACKLIST),
     inputList(),
-    inputTypes(),
-    m_lock(QMutex::Recursive)
+    inputTypes()
 {
 }
 
@@ -103,7 +101,7 @@ void TorcInputs::SubscriberDeleted(QObject *Subscriber)
 QVariantMap TorcInputs::GetInputList(void)
 {
     QVariantMap result;
-    QMutexLocker locker(&m_lock);
+    QReadLocker locker(&m_httpServiceLock);
 
     // iterate over our list for each input type
     for (int type = TorcInput::Unknown; type < TorcInput::MaxType; type++)
@@ -129,7 +127,7 @@ QStringList TorcInputs::GetInputTypes(void)
 
 void TorcInputs::AddInput(TorcInput *Input)
 {
-    QMutexLocker locker(&m_lock);
+    QWriteLocker locker(&m_httpServiceLock);
     if (!Input)
         return;
 
@@ -147,7 +145,7 @@ void TorcInputs::AddInput(TorcInput *Input)
 
 void TorcInputs::RemoveInput(TorcInput *Input)
 {
-    QMutexLocker locker(&m_lock);
+    QWriteLocker locker(&m_httpServiceLock);
     if (!Input)
         return;
 

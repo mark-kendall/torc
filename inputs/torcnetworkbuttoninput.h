@@ -7,7 +7,7 @@
 // Torc
 #include "torcnetworkswitchinput.h"
 
-class TorcNetworkButtonInput Q_DECL_FINAL : public TorcNetworkSwitchInput
+class TorcNetworkButtonInput final : public TorcNetworkSwitchInput
 {
     Q_OBJECT
 
@@ -15,14 +15,14 @@ class TorcNetworkButtonInput Q_DECL_FINAL : public TorcNetworkSwitchInput
     TorcNetworkButtonInput(double Default, const QVariantMap &Details);
    ~TorcNetworkButtonInput();
 
-    QStringList GetDescription (void) Q_DECL_OVERRIDE;
-    void        Start          (void) Q_DECL_OVERRIDE;
+    QStringList GetDescription (void) override;
+    void        Start          (void) override;
 
   signals:
     void Pushed     (void);
 
   public slots:
-    void SetValue   (double Value) Q_DECL_FINAL;
+    void SetValue   (double Value) final;
 
   private slots:
     void EndPulse   (void);

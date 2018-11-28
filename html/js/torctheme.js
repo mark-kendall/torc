@@ -17,7 +17,7 @@ Navbar:
 NavbarDropdown:
 "<li class=\"nav-item dropdown <%=ddclass%>\">" +
 "  <a class=\"nav-link\" href=\"#\" id=\"navbarDropdown\" role=\"button\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">" +
-"    <i class=\"fa fa-<%=icon%> fa-lg\"></i>" +
+"    <i class=\"<%=icon%>\"></i>" +
 "  </a>" +
 "  <div class=\"dropdown-menu dropdown-menu-right <%=menuclass%>\" aria-labelledby=\"navbarDropdown\"></div>" +
 "</li>",
@@ -29,13 +29,13 @@ NavbarDropdownItem:
 "<a class=\"dropdown-item <%=id%>\" href=\"<%=link%>\"><%=text%></a>",
 
 DropdownItemWithIcon:
-"<i class=\"fa fa-<%=icon%>\"></i>&nbsp;<%=text%>",
+"<i class=\"<%=icon%>\"></i>&nbsp;<%=text%>",
 
 StategraphContainer:
 "<div id=\"torc-central\"></div>",
 
 StategraphNoConnection:
-"<div class=\"text-center\"><i class=\"fa fa-5x fa-exclamation-circle\"></i></div><div class=\"text-center\"><%=text%></div>",
+"<div class=\"text-center\"><i class=\"fas fa-fw fa-5x fa-exclamation-circle\"></i></div><div class=\"text-center\"><%=text%></div>",
 
 FileModal:
 "<div id=\"<%=id%>\" class=\"modal fade torcmodal\" role=\"dialog\">" +
@@ -82,10 +82,10 @@ APIModal:
 "</div>",
 
 APICollapseShow:
-"<i class=\"fa fa-chevron-down\"></i>",
+"<i class=\"fas fa-fw fa-chevron-down\"></i>",
 
 APICollapseHide:
-"<i class=\"fa fa-chevron-up\"></i>",
+"<i class=\"fas fa-fw fa-chevron-up\"></i>",
 
 APIServiceDetail:
 "torc-api-service-detail-",
@@ -117,7 +117,7 @@ APIServiceList:
 "          <td><%=prop%></td>" +
 "          <td><%=services[prop].name%></td>" +
 "          <td><%=services[prop].path%></td>" +
-"          <td><button type=\"button\" class=\"btn btn-primary btn-xs\" data-toggle=\"collapse\" aria-controls=\"api-detail-<%=prop%>\" data-target=\"#api-detail-<%=prop%>\"><i class=\"fa fa-chevron-down\"></i></button></td>" +
+"          <td><button type=\"button\" class=\"btn btn-primary btn-xs\" data-toggle=\"collapse\" aria-controls=\"api-detail-<%=prop%>\" data-target=\"#api-detail-<%=prop%>\"><i class=\"fas fa-fw fa-chevron-down\"></i></button></td>" +
 "        </tr>" +
 "        <tr id=\"api-detail-<%=prop%>\" class=\"collapse\" data-parent=\"#service-accordion\" aria-labelledby=\"api-detail2-<%=prop%>\">" +
 "          <td colspan=\"4\">" +

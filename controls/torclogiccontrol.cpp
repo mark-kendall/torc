@@ -45,15 +45,42 @@ TorcLogicControl::Operation TorcLogicControl::StringToOperation(const QString &O
     if ("MAXIMUM" == operation)            return TorcLogicControl::Maximum;
     if ("MINIMUM" == operation)            return TorcLogicControl::Minimum;
     if ("MULTIPLY" == operation)           return TorcLogicControl::Multiply;
+    if ("RUNNINGAVERAGE" == operation)     return TorcLogicControl::RunningAverage;
+    if ("RUNNINGMAX" == operation)         return TorcLogicControl::RunningMax;
+    if ("RUNNINGMIN" == operation)         return TorcLogicControl::RunningMin;
+
 
     return TorcLogicControl::UnknownLogicType;
+}
+
+inline bool IsComplexType(TorcLogicControl::Operation Type)
+{
+    if (Type == TorcLogicControl::Equal ||
+        Type == TorcLogicControl::LessThan ||
+        Type == TorcLogicControl::LessThanOrEqual ||
+        Type == TorcLogicControl::GreaterThan ||
+        Type == TorcLogicControl::GreaterThanOrEqual ||
+        Type == TorcLogicControl::RunningAverage ||
+        Type == TorcLogicControl::RunningMax ||
+        Type == TorcLogicControl::RunningMin)
+    {
+        return true;
+    }
+
+    return false;
 }
 
 TorcLogicControl::TorcLogicControl(const QString &Type, const QVariantMap &Details)
   : TorcControl(TorcControl::Logic, Details),
     m_operation(TorcLogicControl::StringToOperation(Type)),
     m_referenceDeviceId(),
-    m_referenceDevice(NULL)
+    m_referenceDevice(NULL),
+    m_inputDevice(NULL),
+    m_triggerDeviceId(),
+    m_triggerDevice(NULL),
+    m_average(),
+    m_firstRunningValue(true),
+    m_runningValue(0)
 {
     if (m_operation == TorcLogicControl::UnknownLogicType)
     {
@@ -62,34 +89,60 @@ TorcLogicControl::TorcLogicControl(const QString &Type, const QVariantMap &Detai
     }
 
     // these operations require a valid value to operate against
-    if (m_operation == TorcLogicControl::Equal ||
-        m_operation == TorcLogicControl::LessThan ||
-        m_operation == TorcLogicControl::LessThanOrEqual ||
-        m_operation == TorcLogicControl::GreaterThan ||
-        m_operation == TorcLogicControl::GreaterThanOrEqual)
+    if (IsComplexType(m_operation))
     {
-        if (!Details.contains("references"))
+        bool found = false;
+        if (Details.contains("references"))
+        {
+            QVariantMap reference = Details.value("references").toMap();
+            if (reference.contains("device"))
+            {
+                m_referenceDeviceId = reference.value("device").toString().trimmed();
+                // and treat it as a normal input - this ensures TorcControl takes care of all of the input value and
+                // valid logic. We just ensure we know which is the reference device/value.
+                m_inputList.append(m_referenceDeviceId);
+                found = true;
+            }
+        }
+        if (!found)
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Control '%1' has no reference device for operation").arg(uniqueId));
             return;
         }
 
-        QVariantMap reference = Details.value("references").toMap();
-        if (!reference.contains("device"))
+        if (m_operation == TorcLogicControl::RunningAverage)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Control '%1' has no reference device for operation").arg(uniqueId));
-            return;
+            // trigger device is used to update the average
+            found = false;
+            if (Details.contains("triggers"))
+            {
+                QVariantMap triggers = Details.value("triggers").toMap();
+                if (triggers.contains("device"))
+                {
+                    m_triggerDeviceId = triggers.value("device").toString().trimmed();
+                    m_inputList.append(m_triggerDeviceId);
+                    found = true;
+                }
+            }
+
+            if (!found)
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("Control '%1' has no trigger device for updating").arg(uniqueId));
+                return;
+            }
         }
-
-        m_referenceDeviceId = reference.value("device").toString().trimmed();
-
-        // and treat it as a normal input - this ensures TorcControl takes care of all of the input value and
-        // valid logic. We just ensure we know which is the reference device/value.
-        m_inputList.append(m_referenceDeviceId);
-        m_inputList.removeDuplicates();
+        else if (m_operation == TorcLogicControl::RunningMin)
+        {
+            m_runningValue = std::numeric_limits<double>::max();
+        }
+        else if (m_operation == TorcLogicControl::RunningMax)
+        {
+            m_runningValue = std::numeric_limits<double>::min();
+        }
     }
 
     // everything appears to be valid at this stage
+    m_inputList.removeDuplicates();
     m_parsed = true;
 }
 
@@ -108,7 +161,11 @@ QStringList TorcLogicControl::GetDescription(void)
     QString reference("Unknown");
     TorcDevice *device = qobject_cast<TorcDevice*>(m_referenceDevice);
     if (device)
+    {
         reference = device->GetUserName();
+        if (reference.isEmpty())
+            reference = device->GetUniqueId();
+    }
 
     switch (m_operation)
     {
@@ -157,6 +214,15 @@ QStringList TorcLogicControl::GetDescription(void)
         case TorcLogicControl::Multiply:
             result.append(tr("Multiply"));
             break;
+        case TorcLogicControl::RunningAverage:
+            result.append(tr("Running average"));
+            break;
+        case TorcLogicControl::RunningMax:
+            result.append(tr("Running max"));
+            break;
+        case TorcLogicControl::RunningMin:
+            result.append(tr("Running min"));
+            break;
         case TorcLogicControl::UnknownLogicType:
             result.append(tr("Unknown"));
             break;
@@ -197,9 +263,6 @@ bool TorcLogicControl::Validate(void)
     // common checks
     if (!TorcControl::Validate())
         return false;
-
-    // reference device must be valid if TorcControl::Validate is happy
-    m_referenceDevice = gDeviceList->value(m_referenceDeviceId);
 
     // we always need one or more outputs
     if (m_outputs.isEmpty())
@@ -243,6 +306,8 @@ bool TorcLogicControl::Validate(void)
         case TorcLogicControl::LessThanOrEqual:
         case TorcLogicControl::GreaterThan:
         case TorcLogicControl::GreaterThanOrEqual:
+        case TorcLogicControl::RunningMax:
+        case TorcLogicControl::RunningMin:
             // these should have one defined input and one reference device that is handled as an input
             {
                 if (m_inputs.size() != 2)
@@ -253,8 +318,48 @@ bool TorcLogicControl::Validate(void)
                 }
             }
             break;
+        case TorcLogicControl::RunningAverage:
+            // one input, one reference (reset) and one trigger (update)
+            {
+                if (m_inputs.size() != 3)
+                {
+                    LOG(VB_GENERAL, LOG_ERR, QString("%1 has %2 inputs for operation '%3' (must have 1 input, 1 reference and 1 trigger) - ignoring.")
+                        .arg(uniqueId).arg(m_inputs.size()).arg(GetDescription().join(",")));
+                    return false;
+                }
+            }
+            break;
         case TorcLogicControl::UnknownLogicType:
             break; // should be unreachable
+    }
+
+    // 'reference' devices must be valid if TorcControl::Validate is happy
+    if (IsComplexType(m_operation))
+    {
+        m_referenceDevice = gDeviceList->value(m_referenceDeviceId);
+        if (!m_referenceDevice)
+            return false;
+        if (TorcLogicControl::RunningAverage == m_operation)
+        {
+            m_triggerDevice   = gDeviceList->value(m_triggerDeviceId);
+            if (!m_triggerDevice)
+                return false;
+            QList<QObject*> inputs = m_inputs.uniqueKeys();
+            foreach(QObject *device, inputs)
+            {
+                if (device != m_referenceDevice && device != m_triggerDevice)
+                {
+                    m_inputDevice = device;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            m_inputDevice = m_referenceDevice == m_inputs.firstKey() ? m_inputs.lastKey() : m_inputs.firstKey();
+        }
+        if (!m_inputDevice)
+            return false;
     }
 
     // if we get this far, we can finish the device
@@ -272,34 +377,50 @@ void TorcLogicControl::CalculateOutput(void)
 
     double referencevalue = 0.0;
     double inputvalue     = 0.0;
+    double triggervalue   = 0.0;
 
-    if (TorcLogicControl::Equal == m_operation ||
-        TorcLogicControl::LessThan == m_operation ||
-        TorcLogicControl::LessThanOrEqual == m_operation ||
-        TorcLogicControl::GreaterThan == m_operation ||
-        TorcLogicControl::GreaterThanOrEqual == m_operation)
+    if ((TorcLogicControl::RunningAverage == m_operation) && m_triggerDevice)
+        triggervalue = m_inputValues.value(m_triggerDevice);
+
+    if (IsComplexType(m_operation) && m_inputDevice && m_referenceDevice)
     {
-        if (m_inputValues.size() == 2)
-        {
-            if (m_inputValues.firstKey() == m_referenceDevice)
-            {
-                referencevalue = m_inputValues.first();
-                inputvalue     = m_inputValues.last();
-            }
-            else
-            {
-                referencevalue = m_inputValues.last();
-                inputvalue     = m_inputValues.first();
-            }
-        }
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR, QString("Invalid control input size"));
-        }
+        inputvalue = m_inputValues.value(m_inputDevice);
+        referencevalue = m_inputValues.value(m_referenceDevice);
     }
 
     switch (m_operation)
     {
+        case TorcLogicControl::RunningAverage:
+            // We do not update for a change in value - only when triggered. Reference resets.
+            // NB trigger and reset can both be high at the same time - which should probably be avoided
+            if (referencevalue) // reset
+            {
+                m_average.Reset();
+                newvalue = m_average.GetAverage();
+            }
+            // trigger
+            if (triggervalue)
+            {
+                newvalue = m_average.AddValue(inputvalue);
+            }
+            break;
+        case TorcLogicControl::RunningMax:
+            // RunningMax/Min are updated each time the input value changes, reset when triggered via reference
+            // and always set on first pass.
+            // We don't reset to max/min double as inputvalue will provide a valid start point.
+            if (referencevalue || m_firstRunningValue || (inputvalue > m_runningValue))
+            {
+                m_runningValue = newvalue = inputvalue;
+                m_firstRunningValue = false;
+            }
+            break;
+        case TorcLogicControl::RunningMin:
+            if (referencevalue || m_firstRunningValue || (inputvalue < m_runningValue))
+            {
+                m_runningValue = newvalue = inputvalue;
+                m_firstRunningValue = false;
+            }
+            break;
         case TorcLogicControl::Passthrough:
             newvalue = m_inputValues.first();
             break;

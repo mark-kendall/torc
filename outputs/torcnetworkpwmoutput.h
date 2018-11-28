@@ -4,7 +4,7 @@
 // Torc
 #include "torcpwmoutput.h"
 
-class TorcNetworkPWMOutput Q_DECL_FINAL : public TorcPWMOutput
+class TorcNetworkPWMOutput final : public TorcPWMOutput
 {
     Q_OBJECT
 
@@ -12,10 +12,10 @@ class TorcNetworkPWMOutput Q_DECL_FINAL : public TorcPWMOutput
     TorcNetworkPWMOutput(double Default, const QVariantMap &Details);
    ~TorcNetworkPWMOutput();
 
-    QStringList GetDescription(void) Q_DECL_OVERRIDE;
+    QStringList GetDescription(void) override;
 
   public slots:
-    void        SetValue (double Value) Q_DECL_OVERRIDE;
+    void        SetValue (double Value) override;
 };
 
 #endif // TORCNETWORKPWMOUTPUT_H

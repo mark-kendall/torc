@@ -14,11 +14,10 @@ void TestSerialisers::testJSONSerialiser(void)
     QVariant      map              = doc.toVariant();
     TorcSerialiser* jsonserialiser = TorcSerialiser::GetSerialiser("application/json");
     QVERIFY(jsonserialiser);
-    QByteArray *data               = jsonserialiser->Serialise(map);
+    QByteArray data;
+    jsonserialiser->Serialise(data, map);
     delete jsonserialiser;
-    QVERIFY(data);
-    QJsonDocument doc2             = QJsonDocument::fromJson(*data);
-    delete data;
+    QJsonDocument doc2             = QJsonDocument::fromJson(data);
     QByteArray array2              = doc2.toJson(QJsonDocument::Compact).trimmed();
 
     QVERIFY(array.size() == array2.size());
@@ -35,11 +34,10 @@ void TestSerialisers::doTestXMLSerialiser(QByteArray &Data)
     QVariantMap map = reader.GetResult();
     TorcSerialiser *xmlserialiser = TorcSerialiser::GetSerialiser("application/xml");
     QVERIFY(xmlserialiser);
-    QByteArray *array2 = xmlserialiser->Serialise(map);
+    QByteArray array2;
+    xmlserialiser->Serialise(array2, map);
     delete xmlserialiser;
-    QVERIFY(array2);
-    QVERIFY(Data.size() == array2->size());
-    delete array2;
+    QVERIFY(Data.size() == array2.size());
 }
 
 void TestSerialisers::testXMLSerialiser(void)

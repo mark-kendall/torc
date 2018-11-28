@@ -30,21 +30,21 @@ class TorcTimerControl : public TorcControl
     TorcTimerControl(const QString &Type, const QVariantMap &Details);
    ~TorcTimerControl();
 
-    TorcControl::Type GetType         (void) const Q_DECL_OVERRIDE;
-    QStringList       GetDescription  (void) Q_DECL_OVERRIDE;
-    bool              Validate        (void) Q_DECL_OVERRIDE;
-    void              Start           (void) Q_DECL_OVERRIDE;
-    bool              AllowInputs     (void) const Q_DECL_OVERRIDE;
+    TorcControl::Type GetType         (void) const override;
+    QStringList       GetDescription  (void) override;
+    bool              Validate        (void) override;
+    void              Start           (void) override;
+    bool              AllowInputs     (void) const override;
     quint64           TimeSinceLastTransition (void);
     TorcTimerControl::TimerType GetTimerType  (void) const;
 
   public slots:
     void              TimerTimeout    (void);
-    bool              event           (QEvent *Event) Q_DECL_OVERRIDE;
+    bool              event           (QEvent *Event) override;
 
   private:
     void              GenerateTimings (void);
-    void              CalculateOutput (void) Q_DECL_OVERRIDE;
+    void              CalculateOutput (void) override;
     quint64           GetPeriodDuration(void) const;
     quint64           MsecsSincePeriodStart (void);
 

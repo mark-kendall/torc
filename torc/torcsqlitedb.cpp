@@ -33,7 +33,9 @@
  * All Sql specific code resides in TorcDB. TorcSQLiteDB applies SQLite specifics
  * when creating the database and upon first use after startup.
  *
- * \todo Check the exclusive lock handling. It's unclear whether this will lock out other threads.
+ * \note The SQLite database is not locked as this prevents access from all threads.
+ *       This is not best practice and can lead to strange behaviour if two instances of
+ *       Torc open the same database.
  *
  * \sa TorcDB
 */

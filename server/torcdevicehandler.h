@@ -4,6 +4,7 @@
 // Qt
 #include <QHash>
 #include <QMutex>
+#include <QReadWriteLock>
 #include <QVariant>
 
 class TorcDeviceHandler
@@ -22,7 +23,7 @@ class TorcDeviceHandler
     TorcDeviceHandler*               GetNextHandler   (void);
 
   protected:
-    QMutex                           m_lock;
+    QReadWriteLock                   m_handlerLock;
 
   private:
     static QList<TorcDeviceHandler*> gTorcDeviceHandlers;

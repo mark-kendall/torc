@@ -20,11 +20,11 @@ class TorcControls : public QObject, public TorcHTTPService, public TorcDeviceHa
 
     static TorcControls* gControls;
 
-    void                Create                    (const QVariantMap &Details) Q_DECL_OVERRIDE;
-    void                Destroy                   (void) Q_DECL_OVERRIDE;
+    void                Create                    (const QVariantMap &Details) override;
+    void                Destroy                   (void) override;
     void                Validate                  (void);
     void                Graph                     (QByteArray* Data);
-    QString             GetUIName                 (void) Q_DECL_OVERRIDE;
+    QString             GetUIName                 (void) override;
 
   public slots:
     // TorcHTTPService

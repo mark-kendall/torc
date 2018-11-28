@@ -12,9 +12,9 @@ class TorcPWMInput : public TorcInput
     TorcPWMInput(double Value, const QString &ModelId, const QVariantMap &Details);
     virtual ~TorcPWMInput();
 
-    QStringList      GetDescription (void) Q_DECL_OVERRIDE;
-    TorcInput::Type  GetType        (void) Q_DECL_OVERRIDE;
-    void             Start          (void) Q_DECL_OVERRIDE;
+    QStringList      GetDescription (void) override;
+    TorcInput::Type  GetType        (void) override;
+    void             Start          (void) override;
     double           ScaleValue     (double Value);
 };
 

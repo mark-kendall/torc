@@ -80,11 +80,8 @@ TorcSetting::TorcSetting(TorcSetting *Parent, const QString &DBName, const QStri
     isActive(false),
     m_active(0),
     m_activeThreshold(1),
-    m_children(),
-    m_lock(QReadWriteLock::Recursive)
+    m_children()
 {
-    QWriteLocker locker(&m_lock);
-
     setObjectName(DBName);
 
     if (m_parent)
@@ -135,7 +132,7 @@ void TorcSetting::SubscriberDeleted(QObject *Subscriber)
 
 QVariantMap TorcSetting::GetChildList(void)
 {
-    QReadLocker locker(&m_lock);
+    QReadLocker locker(&m_httpServiceLock);
 
     QVariantMap result;
     (void)GetChildList(result);
@@ -144,7 +141,7 @@ QVariantMap TorcSetting::GetChildList(void)
 
 QString TorcSetting::GetChildList(QVariantMap &Children)
 {
-    QReadLocker locker(&m_lock);
+    QReadLocker locker(&m_httpServiceLock);
 
     Children.insert("name", m_dbName);
     Children.insert("uiname", uiName);
@@ -162,19 +159,19 @@ QString TorcSetting::GetChildList(QVariantMap &Children)
 
 QVariantMap TorcSetting::GetSelections(void)
 {
-    QReadLocker locker(&m_lock);
+    QReadLocker locker(&m_httpServiceLock);
     return selections;
 }
 
 void TorcSetting::SetSelections(QVariantMap &Selections)
 {
-    QWriteLocker locker(&m_lock);
+    QWriteLocker locker(&m_httpServiceLock);
     selections = Selections;
 }
 
 void TorcSetting::AddChild(TorcSetting *Child)
 {
-    QWriteLocker locker(&m_lock);
+    QWriteLocker locker(&m_httpServiceLock);
     if (Child)
     {
         m_children.append(Child);
@@ -183,7 +180,7 @@ void TorcSetting::AddChild(TorcSetting *Child)
 }
 void TorcSetting::RemoveChild(TorcSetting *Child)
 {
-    QWriteLocker locker(&m_lock);
+    QWriteLocker locker(&m_httpServiceLock);
     if (Child)
     {
         {
@@ -203,7 +200,7 @@ void TorcSetting::RemoveChild(TorcSetting *Child)
 
 void TorcSetting::Remove(void)
 {
-    QWriteLocker locker(&m_lock);
+    QWriteLocker locker(&m_httpServiceLock);
     if (m_parent)
         m_parent->RemoveChild(this);
 
@@ -212,7 +209,7 @@ void TorcSetting::Remove(void)
 
 TorcSetting* TorcSetting::FindChild(const QString &Child, bool Recursive /*=false*/)
 {
-    QReadLocker locker(&m_lock);
+    QReadLocker locker(&m_httpServiceLock);
 
     foreach (TorcSetting* setting, m_children)
         if (setting->objectName() == Child)
@@ -235,74 +232,74 @@ QSet<TorcSetting*> TorcSetting::GetChildren(void)
 {
     QSet<TorcSetting*> result;
 
-    m_lock.lockForWrite();
+    m_httpServiceLock.lockForWrite();
     foreach (TorcSetting* setting, m_children)
     {
         result << setting;
         setting->UpRef();
     }
-    m_lock.unlock();
+    m_httpServiceLock.unlock();
 
     return result;
 }
 
 bool TorcSetting::GetIsActive(void)
 {
-    QReadLocker locker(&m_lock);
+    QReadLocker locker(&m_httpServiceLock);
     return isActive;
 }
 
 QString TorcSetting::GetUiName(void)
 {
-    QReadLocker locker(&m_lock);
+    QReadLocker locker(&m_httpServiceLock);
     return uiName;
 }
 
 QString TorcSetting::GetHelpText(void)
 {
-    QReadLocker locker(&m_lock);
+    QReadLocker locker(&m_httpServiceLock);
     return helpText;
 }
 
 QVariant TorcSetting::GetDefaultValue(void)
 {
-    QReadLocker locker(&m_lock);
+    QReadLocker locker(&m_httpServiceLock);
     return defaultValue;
 }
 
 QString TorcSetting::GetSettingType(void)
 {
-    QReadLocker locker(&m_lock);
+    QReadLocker locker(&m_httpServiceLock);
     return settingType;
 }
 
 int TorcSetting::GetBegin(void)
 {
-    QReadLocker locker(&m_lock);
+    QReadLocker locker(&m_httpServiceLock);
     return m_begin;
 }
 
 int TorcSetting::GetEnd(void)
 {
-    QReadLocker locker(&m_lock);
+    QReadLocker locker(&m_httpServiceLock);
     return m_end;
 }
 
 int TorcSetting::GetStep(void)
 {
-    QReadLocker locker(&m_lock);
+    QReadLocker locker(&m_httpServiceLock);
     return m_step;
 }
 
 void TorcSetting::SetActive(bool Value)
 {
-    m_lock.lockForWrite();
+    m_httpServiceLock.lockForWrite();
     bool wasactive = isActive;
     m_active       += Value ? 1 : -1;
     isActive       = m_active >= m_activeThreshold;
     bool changed   = wasactive != isActive;
     bool newactive = isActive;
-    m_lock.unlock();
+    m_httpServiceLock.unlock();
 
     if (changed)
         emit ActiveChanged(newactive);
@@ -310,13 +307,13 @@ void TorcSetting::SetActive(bool Value)
 
 void TorcSetting::SetActiveThreshold(int Threshold)
 {
-    m_lock.lockForWrite();
+    m_httpServiceLock.lockForWrite();
     bool wasactive    = isActive;
     m_activeThreshold = Threshold;
     isActive          = m_active >= m_activeThreshold;
     bool changed      = wasactive != isActive;
     bool newactive    = isActive;
-    m_lock.unlock();
+    m_httpServiceLock.unlock();
 
     if (changed)
         emit ActiveChanged(newactive);
@@ -324,7 +321,7 @@ void TorcSetting::SetActiveThreshold(int Threshold)
 
 bool TorcSetting::SetValue(const QVariant &Value)
 {
-    QWriteLocker locker(&m_lock);
+    QWriteLocker locker(&m_httpServiceLock);
     if (value == Value)
         return true;
 
@@ -390,7 +387,7 @@ bool TorcSetting::SetValue(const QVariant &Value)
 
 void TorcSetting::SetRange(int Begin, int End, int Step)
 {
-    QWriteLocker locker(&m_lock);
+    QWriteLocker locker(&m_httpServiceLock);
     if (type != Integer)
         return;
 
@@ -408,13 +405,13 @@ void TorcSetting::SetRange(int Begin, int End, int Step)
 
 void TorcSetting::SetHelpText(const QString &HelpText)
 {
-    QWriteLocker locker(&m_lock);
+    QWriteLocker locker(&m_httpServiceLock);
     helpText = HelpText;
 }
 
 QVariant TorcSetting::GetValue(void)
 {
-    QReadLocker locker(&m_lock);
+    QReadLocker locker(&m_httpServiceLock);
     switch (type)
     {
         case Integer:    return value.toInt();

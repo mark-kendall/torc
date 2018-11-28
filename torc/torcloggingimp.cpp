@@ -72,9 +72,9 @@ class LogItem
 {
   public:
     static LogItem* Create(const char* File, const char* Function,
-                           int Line, LogLevel Level, int Type)
+                           int Line, LogLevel Level, int Type, quint64 Mask)
     {
-        return new LogItem(File, Function, Line, Level, Type);
+        return new LogItem(File, Function, Line, Level, Type, Mask);
     }
 
     static void Delete(LogItem *Item)
@@ -87,8 +87,9 @@ class LogItem
         }
     }
 
+  protected:
     LogItem(const char *File, const char *Function,
-            int Line, LogLevel Level, int Type)
+            int Line, LogLevel Level, int Type, quint64 Mask)
       : refCount(),
         threadId((uint64_t)(QThread::currentThreadId())),
         usec(0),
@@ -96,7 +97,8 @@ class LogItem
         level(Level),
         tm(),
         file(File),
-        function(Function), threadName(NULL)
+        function(Function), threadName(NULL),
+        mask(Mask)
     {
         SetTime();
         SetThreadTid();
@@ -107,6 +109,7 @@ class LogItem
         refCount.ref();
     }
 
+  public:
     void SetTime(void)
     {
         time_t epoch;
@@ -159,6 +162,7 @@ class LogItem
     const char         *function;
     char               *threadName;
     char                message[LOGLINE_MAX+1];
+    quint64             mask;
 };
 
 class LoggingThread : public TorcQThread
@@ -437,9 +441,15 @@ FileLogger::FileLogger(QString Filename, bool ErrorsOnly, int Quiet)
         m_errorsOnly = false;
         m_quiet    = false;
         m_file.setFileName(m_fileName);
-        m_opened = m_file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Truncate |
-                               QIODevice::Text | QIODevice::Unbuffered);
-        LOG(VB_GENERAL, LOG_INFO, QString("Logging to '%1'").arg(m_fileName));
+        if (!m_file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Truncate |
+                               QIODevice::Text | QIODevice::Unbuffered))
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to open %1 for logging").arg(m_fileName));
+        }
+        {
+            LOG(VB_GENERAL, LOG_INFO, QString("Logging to '%1'").arg(m_fileName));
+            m_opened = true;
+        }
     }
 }
 
@@ -448,7 +458,7 @@ FileLogger::~FileLogger()
     if (m_opened)
     {
         LogItem *item = LogItem::Create(__FILE__, __FUNCTION__,
-                                        __LINE__, LOG_INFO, kMessage);
+                                        __LINE__, LOG_INFO, kMessage, VB_GENERAL);
 
         strcpy(item->message, m_file.isOpen() ? "Closing file logger." : "Closing console logger.");
         FileLogger::Logmsg(item);
@@ -484,14 +494,22 @@ bool FileLogger::PrintLine(QByteArray &Line)
     return true;
 }
 
+/*! \class WebLogger
+ *  \brief Serves log content to registered subscribers and HTTP clients.
+ *
+ * The latest, complete log can be downloaded via GetLog.
+ * Notifications of updates to the log are sent every 10 seconds.
+ *
+ * \note Subscribers to the 'tail' may not receive all log items if they do not retrieve the latest tail
+ *       before the next item is logged.
+*/
 WebLogger::WebLogger(QString Filename)
   : QObject(),
     TorcHTTPService(this, "log", "log", WebLogger::staticMetaObject, "event"),
     FileLogger(Filename, false, false),
     log(),
     tail(),
-    changed(false),
-    lock(QMutex::Recursive)
+    changed(false)
 {
     // we rate limit the LogChanged signal to once every 10 seconds
     startTimer(10000);
@@ -505,11 +523,17 @@ bool WebLogger::event(QEvent *event)
 {
     if (event && event->type() == QEvent::Timer)
     {
-        lock.lock();
-        if (changed)
+        m_httpServiceLock.lockForRead();
+        bool haschanged = changed;
+        m_httpServiceLock.unlock();
+
+        if (haschanged)
+        {
+            m_httpServiceLock.lockForWrite();
+            changed = false;
+            m_httpServiceLock.unlock();
             emit logChanged();
-        changed = false;
-        lock.unlock();
+        }
     }
     return QObject::event(event);
 }
@@ -531,7 +555,7 @@ QByteArray WebLogger::GetLog(void)
 
 QByteArray WebLogger::GetTail(void)
 {
-    QMutexLocker locker(&lock);
+    QReadLocker locker(&m_httpServiceLock);
     return tail;
 }
 
@@ -540,14 +564,19 @@ bool WebLogger::Logmsg(LogItem *Item)
     if (!m_opened || m_quiet || (m_errorsOnly && (Item->level > LOG_ERR)))
         return false;
 
+    bool filter = (Item->mask & VB_NETWORK) && (Item->level >= LOG_DEBUG);
+
     Item->refCount.ref();
     QByteArray line = GetLine(Item);
     LogItem::Delete(Item);
 
-    lock.lock();
+    if (filter)
+        return true;
+
+    m_httpServiceLock.lockForWrite();
     changed = true;
     tail = line;
-    lock.unlock();
+    m_httpServiceLock.unlock();
 
     emit tailChanged();
     return PrintLine(line);
@@ -620,7 +649,7 @@ void PrintLogLine(uint64_t Mask, LogLevel Level, const char *File, int Line,
     int type = kMessage;
     type |= (Mask & VB_FLUSH) ? kFlush : 0;
     type |= (Mask & VB_STDIO) ? kStandardIO : 0;
-    LogItem *item = LogItem::Create(File, Function, Line, Level, type);
+    LogItem *item = LogItem::Create(File, Function, Line, Level, type, Mask);
     if (!item)
         return;
 
@@ -773,7 +802,7 @@ void RegisterLoggingThread(void)
     QMutexLocker lock(&gLogQueueLock);
 
     LogItem *item = LogItem::Create(__FILE__, __FUNCTION__, __LINE__,
-                                   (LogLevel)LOG_DEBUG, kRegistering);
+                                   (LogLevel)LOG_DEBUG, kRegistering, VB_GENERAL);
     if (item)
     {
         item->threadName = strdup((char *)QThread::currentThread()->objectName().toLocal8Bit().constData());
@@ -789,7 +818,7 @@ void DeregisterLoggingThread(void)
     QMutexLocker lock(&gLogQueueLock);
 
     LogItem *item = LogItem::Create(__FILE__, __FUNCTION__, __LINE__,
-                                   (LogLevel)LOG_DEBUG, kDeregistering);
+                                   (LogLevel)LOG_DEBUG, kDeregistering, VB_GENERAL);
     if (item)
         gLogQueue.enqueue(item);
 }

@@ -12,6 +12,7 @@
 #include "torcdevicehandler.h"
 
 #define DEVICE_LINE_ITEM "|<FONT POINT-SIZE=\"10\">%1</FONT>"
+#define DEVICE_CONSTANT "Constant"
 
 class TorcDevice : public QObject, public TorcReferenceCounter
 {
@@ -22,8 +23,8 @@ class TorcDevice : public QObject, public TorcReferenceCounter
     Q_PROPERTY(double   value                   READ GetValue()                   NOTIFY   ValueChanged(Value))
     Q_PROPERTY(QString  modelId                 READ GetModelId()                 CONSTANT)
     Q_PROPERTY(QString  uniqueId                READ GetUniqueId()                CONSTANT)
-    Q_PROPERTY(QString  userName                READ GetUserName()                WRITE    SetUserName(Name)               NOTIFY UserNameChanged(Name))
-    Q_PROPERTY(QString  userDescription         READ GetUserDescription()         WRITE    SetUserDescription(Description) NOTIFY UserDescriptionChanged(Description))
+    Q_PROPERTY(QString  userName                READ GetUserName()                CONSTANT)
+    Q_PROPERTY(QString  userDescription         READ GetUserDescription()         CONSTANT)
 
   public:
     TorcDevice(bool Valid, double Value, double Default,
@@ -36,8 +37,6 @@ class TorcDevice : public QObject, public TorcReferenceCounter
   public slots:
     virtual void           SetValue               (double Value);
     virtual void           SetValid               (bool   Valid);
-    void                   SetUserName            (const QString &Name);
-    void                   SetUserDescription     (const QString &Description);
 
     bool                   GetValid               (void);
     double                 GetValue               (void);
@@ -50,8 +49,6 @@ class TorcDevice : public QObject, public TorcReferenceCounter
   signals:
     void                   ValidChanged           (bool   Valid);
     void                   ValueChanged           (double Value);
-    void                   UserNameChanged        (const QString &Name);
-    void                   UserDescriptionChanged (const QString &Description);
 
   protected:
     virtual ~TorcDevice();

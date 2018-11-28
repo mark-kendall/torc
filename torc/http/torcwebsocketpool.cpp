@@ -39,10 +39,10 @@ TorcWebSocketPool::~TorcWebSocketPool()
 void TorcWebSocketPool::CloseSockets(void)
 {
     QMutexLocker locker(&m_webSocketsLock);
-
+    if (!m_webSockets.isEmpty())
+        LOG(VB_GENERAL, LOG_INFO, "Closing outstanding websockets");
     while (!m_webSockets.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_INFO, "Closing outstanding websocket");
         TorcWebSocketThread* thread = m_webSockets.takeLast();
         thread->quit();
         thread->wait();

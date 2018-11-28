@@ -27,7 +27,8 @@ QMutex*      TorcDevice::gDeviceListLock         = new QMutex(QMutex::Recursive)
 
 TorcDevice::TorcDevice(bool Valid, double Value, double Default,
                        const QString &ModelId,   const QVariantMap &Details)
-  : TorcReferenceCounter(),
+  : QObject(),
+    TorcReferenceCounter(),
     valid(Valid),
     value(Value),
     defaultValue(Default),
@@ -60,9 +61,9 @@ TorcDevice::TorcDevice(bool Valid, double Value, double Default,
     }
 
     if (Details.contains("username"))
-        SetUserName(Details.value("username").toString());
+        userName = Details.value("username").toString();
     if (Details.contains("userdescription"))
-        SetUserDescription(Details.value("userdescription").toString());
+        userDescription = Details.value("userdescription").toString();
 }
 
 TorcDevice::~TorcDevice()
@@ -129,28 +130,6 @@ void TorcDevice::SetValue(double Value)
 
     value = Value;
     emit ValueChanged(value);
-}
-
-void TorcDevice::SetUserName(const QString &Name)
-{
-    QMutexLocker locker(&lock);
-
-    if (Name == userName)
-        return;
-
-    userName = Name;
-    emit UserNameChanged(userName);
-}
-
-void TorcDevice::SetUserDescription(const QString &Description)
-{
-    QMutexLocker locker(&lock);
-
-    if (Description == userDescription)
-        return;
-
-    userDescription = Description;
-    emit UserDescriptionChanged(userDescription);
 }
 
 bool TorcDevice::GetValid(void)

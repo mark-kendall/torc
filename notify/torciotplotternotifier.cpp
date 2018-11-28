@@ -99,9 +99,9 @@ void TorcIoTPlotterNotifier::ProcessRequest(TorcNetworkRequest *Request)
     (void)Request;
 }
 
-class TorcIoTPlotterNotifierFactory Q_DECL_FINAL : public TorcNotifierFactory
+class TorcIoTPlotterNotifierFactory final : public TorcNotifierFactory
 {
-    TorcNotifier* Create(const QString &Type, const QVariantMap &Details) Q_DECL_OVERRIDE
+    TorcNotifier* Create(const QString &Type, const QVariantMap &Details) override
     {
         if (Type == "iotplotter" && Details.contains("apikey") && Details.contains("fields") &&
             Details.contains("feedid"))

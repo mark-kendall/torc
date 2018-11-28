@@ -26,6 +26,9 @@
 TorcSwitchOutput::TorcSwitchOutput(double Value, const QString &ModelId, const QVariantMap &Details)
   : TorcOutput(TorcOutput::Switch, Value, ModelId, Details)
 {
+    // disallow inputs
+    if (ModelId.startsWith(DEVICE_CONSTANT))
+        SetOwner(this);
 }
 
 TorcSwitchOutput::~TorcSwitchOutput()

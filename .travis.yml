@@ -40,6 +40,8 @@ matrix:
           if [[ $TRAVIS_BRANCH != "coverity_scan" ]]; then
             travis_retry brew install qt5
             travis_retry brew link qt5 --force
+            travis_retry brew install ffmpeg
+            travis_retry brew link ffmpeg --force
           else
             echo Ignoring branch
           fi
@@ -47,8 +49,31 @@ matrix:
       script:
         - |
           if [[ $TRAVIS_BRANCH != "coverity_scan" ]]; then
-            qmake torc.pro
+            TORC_FFMPEG=1 qmake torc.pro
             make
+          else
+            echo Ignoring branch
+          fi
+
+    - os: osx
+      env: TORC=osx-codecov
+      compiler: clang
+      before_install:
+        - |
+          if [[ $TRAVIS_BRANCH != "coverity_scan" ]]; then
+            travis_retry brew install qt5
+            travis_retry brew link qt5 --force
+          else
+            echo Ignoring branch
+          fi
+
+      script:
+        - |
+          if [[ $TRAVIS_BRANCH != "coverity_scan" ]]; then
+            qmake CONFIG+=test torc.pro
+            make
+            ./torc-tests -c test/config -s . -t i18n
+            bash <(curl -s https://codecov.io/bash)
           else
             echo Ignoring branch
           fi
@@ -98,3 +123,34 @@ matrix:
           else
             echo Ignoring branch
           fi
+
+    - os: linux
+      env: TORC=linux-doxygen
+      dist: xenial
+      before_install:
+        - |
+          if [[ $TRAVIS_BRANCH != "coverity_scan" ]]; then
+            travis_retry sudo apt-get update
+            travis_retry sudo apt-get install graphviz doxygen
+          else
+            echo Ignoring branch
+          fi
+
+      script:
+        - |
+          if [[ $TRAVIS_BRANCH != "coverity_scan" ]]; then
+            cd docs
+            doxygen doxygen.cfg
+            cd ..
+          else
+            echo Ignoring branch
+          fi
+
+      deploy:
+        provider: pages
+        skip-cleanup: true
+        github-token: $GITHUB_TOKEN
+        keep-history: true
+        local-dir: docs/html
+        on:
+          branch: master

@@ -12,6 +12,8 @@ libxml2 = $$(TORC_LIBXML2)
 pi = $$(TORC_PI)
 # OpenMax - disabled by default
 openmax =
+# ffmpeg
+ffmpeg = $$(TORC_FFMPEG)
 
 TEMPLATE    = app
 CONFIG     += thread console
@@ -65,7 +67,6 @@ else
     LIBS    += -lz
 }
 
-!mac:!win32:LIBS += -ldns_sd
 !mac:!win32:LIBS += -lrt
 
 QMAKE_CXXFLAGS += -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE
@@ -95,7 +96,7 @@ install.files  = html/index.html
 install.files += html/torc.xsd
 install.files += html/manifest.json
 install.files += html/browserconfig.xml
-install.files += html/css html/fonts html/img html/js
+install.files += html/css html/webfonts html/img html/js
 INSTALLS      += install
 
 # libxml2 for xml validation
@@ -192,15 +193,7 @@ linux-rasp-pi-g++ | !isEmpty(pi) {
     INCLUDEPATH += /opt/vc/include/interface/vmcs_host/linux
     message("Linking to OpenMaxIL library (Raspberry Pi)")
 
-    DEFINES     += USING_FFMPEG
-    CONFIG      += link_pkgconfig
-    PKGCONFIG   += libavformat
-    PKGCONFIG   += libavcodec
-    PKGCONFIG   += libavutil
-    HEADERS     += torc/ffmpeg/torcmuxer.h
-    SOURCES     += torc/ffmpeg/torcmuxer.cpp
-    INCLUDEPATH += ./torc/ffmpeg
-    message("Linking to ffmpeg")
+    ffmpeg = true
 
     # install with suid permissions on Pi
     # this allows access to I2C and GPIO
@@ -212,6 +205,24 @@ linux-rasp-pi-g++ | !isEmpty(pi) {
     INSTALLS            += setpriv
 
     message("Building for Raspberry Pi")
+}
+
+!isEmpty(ffmpeg) {
+    DEFINES   += USING_FFMPEG
+    CONFIG    += link_pkgconfig
+    PKGCONFIG += libavformat
+    PKGCONFIG += libavcodec
+    PKGCONFIG += libavutil
+    HEADERS   += torc/ffmpeg/torcmuxer.h
+    HEADERS   += outputs/torccamera.h
+    HEADERS   += outputs/torccamerathread.h
+    HEADERS   += outputs/torccameraoutput.h
+    SOURCES   += torc/ffmpeg/torcmuxer.cpp
+    SOURCES   += outputs/torccamera.cpp
+    SOURCES   += outputs/torccamerathread.cpp
+    SOURCES   += outputs/torccameraoutput.cpp
+    INCLUDEPATH += ./torc/ffmpeg
+    message("Linking to ffmpeg for camera support")
 }
 
 !isEmpty(openmax) {
@@ -232,6 +243,10 @@ win32 {
     SOURCES += torc/platforms/torcbonjourwindows.cpp
     message("Bonjour NOT available for peer detection")
 } else {
+    linux {
+        CONFIG    += link_pkgconfig
+        PKGCONFIG += avahi-compat-libdns_sd
+    }
     SOURCES += torc/torcbonjour.cpp
     message("Bonjour available for peer detection")
 }
@@ -248,6 +263,7 @@ HEADERS += torc/torclocalcontext.h
 HEADERS += torc/torcnetworkedcontext.h
 HEADERS += torc/torcsqlitedb.h
 HEADERS += torc/torcdb.h
+HEADERS += torc/torcmaths.h
 HEADERS += torc/torcreferencecounted.h
 HEADERS += torc/torccoreutils.h
 HEADERS += torc/torccommandline.h
@@ -322,7 +338,6 @@ HEADERS += outputs/torcnetworkswitchoutput.h
 HEADERS += outputs/torcnetworktemperatureoutput.h
 HEADERS += outputs/torcnetworkphoutput.h
 HEADERS += outputs/torcnetworkbuttonoutput.h
-HEADERS += outputs/torccamera.h
 HEADERS += controls/torccontrol.h
 HEADERS += controls/torccontrols.h
 HEADERS += controls/torclogiccontrol.h
@@ -419,7 +434,6 @@ SOURCES += outputs/torcnetworkswitchoutput.cpp
 SOURCES += outputs/torcnetworktemperatureoutput.cpp
 SOURCES += outputs/torcnetworkphoutput.cpp
 SOURCES += outputs/torcnetworkbuttonoutput.cpp
-SOURCES += outputs/torccamera.cpp
 SOURCES += controls/torccontrol.cpp
 SOURCES += controls/torccontrols.cpp
 SOURCES += controls/torclogiccontrol.cpp
@@ -450,8 +464,8 @@ test {
     message("Building tests")
     DEFINES += TORC_TEST
     QMAKE_CXXFLAGS -= -O2
-    QMAKE_CXXFLAGS += -fprofile-arcs -ftest-coverage
-    LIBS += -lgcov
+    QMAKE_CXXFLAGS += --coverage
+    LIBS += --coverage
     QT += testlib
     TARGET = torc-tests
     target.path = ./

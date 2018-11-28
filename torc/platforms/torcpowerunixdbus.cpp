@@ -65,7 +65,6 @@ TorcPowerUnixDBus::TorcPowerUnixDBus()
   : TorcPower(),
     m_onBattery(false),
     m_devices(QMap<QString,int>()),
-    m_deviceLock(QMutex::Recursive),
     m_upowerInterface("org.freedesktop.UPower", "/org/freedesktop/UPower", "org.freedesktop.UPower", QDBusConnection::systemBus()),
     m_consoleInterface("org.freedesktop.ConsoleKit", "/org/freedesktop/ConsoleKit/Manager", "org.freedesktop.ConsoleKit.Manager", QDBusConnection::systemBus())
 {
@@ -90,12 +89,8 @@ TorcPowerUnixDBus::TorcPowerUnixDBus()
         QDBusReply<QList<QDBusObjectPath> > devicecheck = m_upowerInterface.call(QLatin1String("EnumerateDevices"));
 
         if (devicecheck.isValid())
-        {
-            QMutexLocker locker(&m_deviceLock);
-
             foreach (QDBusObjectPath device, devicecheck.value())
                 m_devices.insert(device.path(), GetBatteryLevel(device.path()));
-        }
     }
     else
     {
@@ -163,23 +158,26 @@ TorcPowerUnixDBus::~TorcPowerUnixDBus()
 
 bool TorcPowerUnixDBus::DoShutdown(void)
 {
+    m_httpServiceLock.lockForWrite();
     if (m_consoleInterface.isValid() && m_canShutdown->GetValue().toBool())
     {
         QList<QVariant> dummy;
         if (m_consoleInterface.callWithCallback(QLatin1String("Stop"), dummy, (QObject*)this, SLOT(DBusCallback()), SLOT(DBusError(QDBusError))))
         {
+            m_httpServiceLock.unlock();
             ShuttingDown();
             return true;
         }
 
         LOG(VB_GENERAL, LOG_ERR, "Shutdown call failed");
     }
-
+    m_httpServiceLock.unlock();
     return false;
 }
 
 bool TorcPowerUnixDBus::DoSuspend(void)
 {
+    m_httpServiceLock.lockForWrite();
     if (m_upowerInterface.isValid() && m_canSuspend->GetValue().toBool())
     {
         QList<QVariant> dummy;
@@ -187,6 +185,7 @@ bool TorcPowerUnixDBus::DoSuspend(void)
         {
             if (m_upowerInterface.callWithCallback(QLatin1String("Suspend"), dummy, (QObject*)this, SLOT(DBusCallback()), SLOT(DBusError(QDBusError))))
             {
+                m_httpServiceLock.unlock();
                 Suspending();
                 return true;
             }
@@ -194,12 +193,13 @@ bool TorcPowerUnixDBus::DoSuspend(void)
 
         LOG(VB_GENERAL, LOG_ERR, "Suspend call failed");
     }
-
+    m_httpServiceLock.unlock();
     return false;
 }
 
 bool TorcPowerUnixDBus::DoHibernate(void)
 {
+    m_httpServiceLock.lockForWrite();
     if (m_upowerInterface.isValid() && m_canHibernate->GetValue().toBool())
     {
         QList<QVariant> dummy;
@@ -207,6 +207,7 @@ bool TorcPowerUnixDBus::DoHibernate(void)
         {
             if (m_upowerInterface.callWithCallback(QLatin1String("Hibernate"), dummy, (QObject*)this, SLOT(DBusCallback()), SLOT(DBusError(QDBusError))))
             {
+                m_httpServiceLock.unlock();
                 Hibernating();
                 return true;
             }
@@ -214,31 +215,33 @@ bool TorcPowerUnixDBus::DoHibernate(void)
 
         LOG(VB_GENERAL, LOG_ERR, "Hibernate call failed");
     }
-
+    m_httpServiceLock.unlock();
     return false;
 }
 
 bool TorcPowerUnixDBus::DoRestart(void)
 {
+    m_httpServiceLock.lockForWrite();
     if (m_consoleInterface.isValid() && m_canRestart->GetValue().toBool())
     {
         QList<QVariant> dummy;
         if (m_consoleInterface.callWithCallback(QLatin1String("Restart"), dummy, (QObject*)this, SLOT(DBusCallback()), SLOT(DBusError(QDBusError))))
         {
+            m_httpServiceLock.unlock();
             Restarting();
             return true;
         }
 
         LOG(VB_GENERAL, LOG_ERR, "Restart call failed");
     }
-
+    m_httpServiceLock.unlock();
     return false;
 }
 
 void TorcPowerUnixDBus::DeviceAdded(QDBusObjectPath Device)
 {
     {
-        QMutexLocker locker(&m_deviceLock);
+        QWriteLocker locker(&m_httpServiceLock);
 
         if (m_devices.contains(Device.path()))
             return;
@@ -255,7 +258,7 @@ void TorcPowerUnixDBus::DeviceAdded(QDBusObjectPath Device)
 void TorcPowerUnixDBus::DeviceRemoved(QDBusObjectPath Device)
 {
     {
-        QMutexLocker locker(&m_deviceLock);
+        QWriteLocker locker(&m_httpServiceLock);
 
         if (!m_devices.contains(Device.path()))
             return;
@@ -272,7 +275,7 @@ void TorcPowerUnixDBus::DeviceRemoved(QDBusObjectPath Device)
 void TorcPowerUnixDBus::DeviceChanged(QDBusObjectPath Device)
 {
     {
-        QMutexLocker locker(&m_deviceLock);
+        QWriteLocker locker(&m_httpServiceLock);
 
         if (!m_devices.contains(Device.path()))
             return;
@@ -301,10 +304,9 @@ void TorcPowerUnixDBus::Changed(void)
 
 void TorcPowerUnixDBus::UpdateBattery(void)
 {
+    m_httpServiceLock.lockForWrite();
     if (m_onBattery)
     {
-        QMutexLocker locker(&m_deviceLock);
-
         qreal total = 0;
         int   count = 0;
 
@@ -331,12 +333,14 @@ void TorcPowerUnixDBus::UpdateBattery(void)
     {
         m_batteryLevel = TorcPower::ACPower;
     }
+    m_httpServiceLock.unlock();
 
     BatteryUpdated(m_batteryLevel);
 }
 
 int TorcPowerUnixDBus::GetBatteryLevel(const QString &Path)
 {
+    QWriteLocker locker(&m_httpServiceLock);
     QDBusInterface interface("org.freedesktop.UPower", Path, "org.freedesktop.UPower.Device",
                              QDBusConnection::systemBus());
 
@@ -364,6 +368,8 @@ int TorcPowerUnixDBus::GetBatteryLevel(const QString &Path)
 
 void TorcPowerUnixDBus::UpdateProperties(void)
 {
+    QWriteLocker locker(&m_httpServiceLock);
+
     m_canSuspend->SetValue(QVariant((bool)false));
     m_canHibernate->SetValue(QVariant((bool)false));
     m_onBattery = false;

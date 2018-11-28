@@ -6,18 +6,14 @@
 #include "torcomxport.h"
 #include "torcomxcomponent.h"
 #include "torcomxtunnel.h"
-#include "ffmpeg/torcmuxer.h"
 #include "torccamera.h"
 
-// FFmpeg
-#include <libavcodec/avcodec.h>
-
-class TorcPiCamera Q_DECL_FINAL : public TorcCameraDevice 
+class TorcPiCamera final : public TorcCameraDevice 
 {
     Q_OBJECT
 
   public:
-    enum CameraType
+    enum PiCameraType
     {
         Unknown = 0,
         V1      = 1,
@@ -28,9 +24,17 @@ class TorcPiCamera Q_DECL_FINAL : public TorcCameraDevice
     TorcPiCamera(const TorcCameraParams &Params);
     virtual ~TorcPiCamera();
 
-    bool Setup              (void) Q_DECL_OVERRIDE;
-    bool WriteFrame         (void) Q_DECL_OVERRIDE;
-    bool Stop               (void) Q_DECL_OVERRIDE;
+    bool Setup              (void) override;
+    bool Start              (void) override;
+    bool Stop               (void) override;
+
+  public slots:
+    void StreamVideo        (bool Video) override;
+    void BufferReady        (OMX_BUFFERHEADERTYPE *Buffer, quint64 Type);
+
+  protected:
+    bool EnableStills       (uint Count) override;
+    void StartStill         (void) override;
 
   private:
     bool LoadDrivers        (void);
@@ -38,12 +42,21 @@ class TorcPiCamera Q_DECL_FINAL : public TorcCameraDevice
     bool ConfigureCamera    (void);
     bool ConfigureVideoEncoder(void);
     bool ConfigureImageEncoder(void);
-    void ClearSnapshotBuffers(void);
+
+    void StartVideo         (void);
+    void ProcessVideoBuffer (OMX_BUFFERHEADERTYPE *Buffer);
+    bool EnableVideo        (bool Video);
+    void ProcessStillsBuffer(OMX_BUFFERHEADERTYPE *Buffer);
+
 
   private:
     Q_DISABLE_COPY(TorcPiCamera)
 
-    CameraType               m_cameraType;
+    PiCameraType             m_cameraType;
+    bool                     m_stillsEnabled;
+    bool                     m_videoEnabled;
+
+    // OpenMax
     TorcOMXCore              m_core;
     TorcOMXComponent         m_camera;
     TorcOMXComponent         m_videoEncoder;
@@ -59,14 +72,6 @@ class TorcPiCamera Q_DECL_FINAL : public TorcCameraDevice
     TorcOMXTunnel            m_videoTunnel;
     TorcOMXTunnel            m_previewTunnel;
     TorcOMXTunnel            m_imageTunnel;
-
-    TorcMuxer               *m_muxer;
-    int                      m_videoStream;
-    quint64                  m_frameCount;
-    AVPacket                *m_bufferedPacket;
-    bool                     m_haveInitSegment;
-    bool                     m_takeSnapshot;
-    QList<QPair<quint32, uint8_t*> > m_snapshotBuffers;
 };
 
 #endif // TORCPICAMERA_H

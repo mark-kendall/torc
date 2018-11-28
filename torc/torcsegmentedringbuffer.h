@@ -12,10 +12,11 @@ class TorcSegmentedRingBuffer : public QObject
     Q_OBJECT
 
   public:
-    explicit TorcSegmentedRingBuffer(int Size);
+    explicit TorcSegmentedRingBuffer(int Size, int MaxSegments);
     ~TorcSegmentedRingBuffer();
 
     int                     GetSize          (void);
+    int                     GetHead          (void);
     int                     GetSegmentsAvail (int &TailRef);
     int                     Write            (QByteArray    *Data, int Size);
     int                     Write            (const uint8_t *Data, int Size);
@@ -45,6 +46,7 @@ class TorcSegmentedRingBuffer : public QObject
     QQueue<QPair<int,int> > m_segments;
     QQueue<int>             m_segmentRefs;
     int                     m_segmentCounter;
+    int                     m_maxSegments;
     QByteArray              m_initSegment;
 };
 

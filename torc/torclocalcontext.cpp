@@ -50,13 +50,20 @@ qint64             gStartTime   = QDateTime::currentMSecsSinceEpoch();
 
 static void ExitHandler(int Sig)
 {
-    signal(SIGINT, SIG_DFL);
+    if (SIGPIPE == Sig)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Received SIGPIPE interrupt - ignoring");
+        return;
+    }
+
     LOG(VB_GENERAL, LOG_INFO, QString("Received %1")
         .arg(Sig == SIGINT ? "SIGINT" : "SIGTERM"));
 
+    signal(SIGINT, SIG_DFL);
     TorcLocalContext::NotifyEvent(Torc::Stop);
 }
 
+/// Return the string describing the given action.
 QString Torc::ActionToString(Actions Action)
 {
     const QMetaObject &mo = Torc::staticMetaObject;
@@ -65,12 +72,30 @@ QString Torc::ActionToString(Actions Action)
     return metaEnum.valueToKey(Action);
 }
 
-int Torc::StringToAction(const QString &Action)
+/*! \brief Return the Torc action that matches the given string.
+ *
+ * \note QMetaEnum::keyToValue is case sensitive but this routine is used
+ *       to validate system events from the config file - and we cannot be too
+ *       picky about case. So default to a case insensitive search.
+*/
+int Torc::StringToAction(const QString &Action, bool CaseSensitive /*=false*/)
 {
     const QMetaObject &mo = Torc::staticMetaObject;
     int enum_index        = mo.indexOfEnumerator("Actions");
     QMetaEnum metaEnum    = mo.enumerator(enum_index);
-    return metaEnum.keyToValue(Action.toLatin1());
+    if (CaseSensitive)
+        return metaEnum.keyToValue(Action.toLatin1());
+
+    QByteArray action = Action.toLower().toLatin1();
+    int count = metaEnum.keyCount();
+    for (int i = 0; i < count; i++)
+    {
+        QByteArray key = QByteArray(metaEnum.key(count)).toLower();
+        if (qstrcmp(action, key) == 0)
+            return metaEnum.value(count);
+    }
+
+    return -1; // for consistency with QMetaEnum::keyToValue
 }
 
 qint16 TorcLocalContext::Create(TorcCommandLine* CommandLine, bool Init /*=true*/)
@@ -102,9 +127,6 @@ void TorcLocalContext::NotifyEvent(int Event)
 
 /*! \class TorcLocalContext
  *  \brief TorcLocalContext is the core Torc object.
- *
- * \todo Add priority generation based on role and maybe user setting.
- * \todo Convert Q_INVOKABLEs to public slots.
 */
 TorcLocalContext::TorcLocalContext(TorcCommandLine* CommandLine)
   : QObject(),
@@ -135,6 +157,7 @@ TorcLocalContext::TorcLocalContext(TorcCommandLine* CommandLine)
     // Handle signals gracefully
     signal(SIGINT,  ExitHandler);
     signal(SIGTERM, ExitHandler);
+    signal(SIGPIPE, ExitHandler);
 
     // Initialise local directories
     InitialiseTorcDirectories(CommandLine);

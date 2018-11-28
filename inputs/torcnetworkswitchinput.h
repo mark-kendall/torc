@@ -10,8 +10,8 @@ class TorcNetworkSwitchInput : public TorcSwitchInput
     TorcNetworkSwitchInput(double Default, const QVariantMap &Details);
     virtual ~TorcNetworkSwitchInput();
 
-    QStringList GetDescription (void) Q_DECL_OVERRIDE;
-    void        Start          (void) Q_DECL_OVERRIDE;
+    QStringList GetDescription (void) override;
+    void        Start          (void) override;
 };
 
 #endif // TORCNETWORKSWITCHINPUT_H

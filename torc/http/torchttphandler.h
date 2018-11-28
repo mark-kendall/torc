@@ -10,9 +10,6 @@
 
 class TorcHTTPServer;
 
-#define STATIC_DIRECTORY QString("/css,/img,/fonts,/js")
-#define UPNP_DIRECTORY   QString("/upnp/")
-
 class TorcHTTPHandler
 {
   public:

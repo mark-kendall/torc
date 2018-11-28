@@ -21,7 +21,7 @@ class TorcSetting;
 class TorcHTTPHandler;
 class TorcSSDPThread;
 
-class TorcHTTPServer Q_DECL_FINAL : public QObject
+class TorcHTTPServer final : public QObject
 {
     Q_OBJECT
 
@@ -79,7 +79,7 @@ class TorcHTTPServer Q_DECL_FINAL : public QObject
 
   protected:
     TorcHTTPServer ();
-    bool           event              (QEvent *Event) Q_DECL_OVERRIDE Q_DECL_FINAL;
+    bool           event              (QEvent *Event) override final;
     bool           Open               (void);
     void           Close              (void);
     TorcWebSocketThread* TakeSocketPriv(TorcWebSocketThread *Socket);

@@ -4,6 +4,7 @@
 // Qt
 #include <QMap>
 #include <QMutex>
+#include <QReadWriteLock>
 #include <QMetaObject>
 #include <QCoreApplication>
 
@@ -23,8 +24,8 @@ class TorcHTTPService : public TorcHTTPHandler
                     const QMetaObject &MetaObject, const QString &Blacklist = QString(""));
     virtual ~TorcHTTPService();
 
-    void         ProcessHTTPRequest       (const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest &Request) Q_DECL_OVERRIDE;
-    QVariantMap  ProcessRequest           (const QString &Method, const QVariant &Parameters, QObject *Connection, bool Authenticated) Q_DECL_OVERRIDE;
+    void         ProcessHTTPRequest       (const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest &Request) override;
+    QVariantMap  ProcessRequest           (const QString &Method, const QVariant &Parameters, QObject *Connection, bool Authenticated) override;
     QString      GetMethod                (int Index);
     QVariant     GetProperty              (int Index);
     QVariantMap  GetServiceDetails        (void);
@@ -33,14 +34,14 @@ class TorcHTTPService : public TorcHTTPHandler
     virtual QString GetPresentationURL    (void);
 
   protected:
-    void         EnableMethod             (const QString &Method);
-    void         DisableMethod            (const QString &Method);
     void         HandleSubscriberDeleted  (QObject* Subscriber);
+    // this is a generic lock around data that may be accessed fro multiple sockets/threads
+    // use with care to ensure maximum concurrency.
+    QReadWriteLock                         m_httpServiceLock;
 
   private:
     QObject                               *m_parent;
     QString                                m_version;
-    QMetaObject                            m_metaObject;
     QMap<QString,MethodParameters*>        m_methods;
     QMap<int,int>                          m_properties;
     QList<QObject*>                        m_subscribers;

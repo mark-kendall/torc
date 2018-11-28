@@ -46,9 +46,6 @@
  *
  * For non-streamed requests, the complete download is copied to the internal buffer and can be
  * retrieved via ReadAll. Take care when downloading files of an unknown size.
- *
- * \todo Complete streamed support for seeking and peeking
- * \todo Add user messaging for network errors
 */
 
 TorcNetworkRequest::TorcNetworkRequest(const QNetworkRequest Request, QNetworkAccessManager::Operation Type, int BufferSize, int *Abort)
@@ -377,9 +374,7 @@ int TorcNetworkRequest::GetStatus(void) const
 
 /*! \brief Return the value of the given header, if present.
  *
- * \todo This is not very efficient. May be better for TorcNetworkRequest to retrieve pre-specified
- * headers that are of interest to the caller.
- * \todo An empty return value could signify an empty header or no header...
+ * \return The value of the requested header or a null QByteArray (isNull()) if not found.
 */
 QByteArray TorcNetworkRequest::GetHeader(const QByteArray &Header) const
 {

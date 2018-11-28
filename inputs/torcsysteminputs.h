@@ -7,15 +7,15 @@
 
 #define SYSTEM_INPUTS_STRING QString("system")
 
-class TorcSystemInputs Q_DECL_FINAL : public TorcDeviceHandler
+class TorcSystemInputs final : public TorcDeviceHandler
 {
   public:
     TorcSystemInputs();
 
     static TorcSystemInputs *gSystemInputs;
 
-    void                     Create      (const QVariantMap &Details) Q_DECL_OVERRIDE;
-    void                     Destroy     (void) Q_DECL_OVERRIDE;
+    void                     Create      (const QVariantMap &Details) override;
+    void                     Destroy     (void) override;
 
   private:
     QMap<QString,TorcInput*> m_inputs;

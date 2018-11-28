@@ -8,6 +8,7 @@
 #include "torcinputs.h"
 #include "torcoutputs.h"
 #include "torccontrols.h"
+#include "torccompat.h"
 
 // std
 #include <signal.h>

@@ -6,22 +6,22 @@
 
 class TorcDevice;
 
-class TorcTriggerNotification Q_DECL_FINAL : public TorcNotification
+class TorcTriggerNotification final : public TorcNotification
 {
     Q_OBJECT
 
   public:
     explicit TorcTriggerNotification(const QVariantMap &Details);
     ~TorcTriggerNotification();
-    bool         IsKnownInput      (const QString &UniqueId) Q_DECL_OVERRIDE;
-    QStringList  GetDescription    (void) Q_DECL_OVERRIDE;
-    void         Graph             (QByteArray *Data) Q_DECL_OVERRIDE;
+    bool         IsKnownInput      (const QString &UniqueId) override;
+    QStringList  GetDescription    (void) override;
+    void         Graph             (QByteArray *Data) override;
 
   public slots:
     void         InputValueChanged (double Value);
 
   protected:
-    virtual bool Setup             (void) Q_DECL_OVERRIDE;
+    virtual bool Setup             (void) override;
 
   private:
     QString      m_inputName;

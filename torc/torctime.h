@@ -41,7 +41,6 @@ class TorcTime : public QObject, public TorcHTTPService
     QDateTime m_lastTime;
     QTimer    m_timer;
     QString   m_dateTimeFormat;
-    QReadWriteLock m_timeLock;
 };
 
 #endif // TORCTIME_H

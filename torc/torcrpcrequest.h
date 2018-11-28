@@ -53,11 +53,13 @@ class TorcRPCRequest : public TorcReferenceCounter
     QByteArray&         GetData                (void);
 
   private:
-    explicit TorcRPCRequest(const QJsonObject &Object, bool Authenticated);
+    explicit TorcRPCRequest(const QJsonObject &Object, QObject *Parent, bool Authenticated);
     ~TorcRPCRequest();
     Q_DISABLE_COPY(TorcRPCRequest)
 
     void                ParseJSONObject        (const QJsonObject &Object);
+    void                ProcessNullContent     (bool HasMethod);
+    void                ProcessBatchCall       (const QJsonArray &Array);
 
 
   private:

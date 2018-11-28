@@ -7,7 +7,7 @@
 // Torc
 #include "torcnetworkswitchoutput.h"
 
-class TorcNetworkButtonOutput Q_DECL_FINAL : public TorcNetworkSwitchOutput
+class TorcNetworkButtonOutput final : public TorcNetworkSwitchOutput
 {
     Q_OBJECT
 
@@ -15,13 +15,13 @@ class TorcNetworkButtonOutput Q_DECL_FINAL : public TorcNetworkSwitchOutput
     TorcNetworkButtonOutput(double Default, const QVariantMap &Details);
    ~TorcNetworkButtonOutput();
 
-    QStringList GetDescription(void) Q_DECL_OVERRIDE;
+    QStringList GetDescription(void) override;
 
   signals:
     void Pushed     (void);
 
   public slots:
-    void SetValue   (double Value) Q_DECL_OVERRIDE;
+    void SetValue   (double Value) override;
 
   private slots:
     void EndPulse   (void);

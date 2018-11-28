@@ -32,9 +32,9 @@ class TorcHTTPServices : public QObject, public TorcHTTPService
     virtual ~TorcHTTPServices();
 
     static QString GetVersion           (void);
-    void           ProcessHTTPRequest   (const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest &Request) Q_DECL_OVERRIDE;
-    QVariantMap    ProcessRequest       (const QString &Method, const QVariant &Parameters, QObject *Connection, bool Authenticated) Q_DECL_OVERRIDE;
-    QString        GetUIName            (void) Q_DECL_OVERRIDE;
+    void           ProcessHTTPRequest   (const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest &Request) override;
+    QVariantMap    ProcessRequest       (const QString &Method, const QVariant &Parameters, QObject *Connection, bool Authenticated) override;
+    QString        GetUIName            (void) override;
 
   signals:
     void           ServiceListChanged   (void);

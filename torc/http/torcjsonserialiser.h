@@ -13,13 +13,13 @@ class TorcJSONSerialiser : public TorcSerialiser
     explicit TorcJSONSerialiser(bool Javascript = false);
     virtual ~TorcJSONSerialiser();
 
-    HTTPResponseType ResponseType       (void) Q_DECL_OVERRIDE;
+    HTTPResponseType ResponseType       (void) override;
 
   protected:
-    void             Prepare            (QByteArray &) Q_DECL_OVERRIDE;
-    void             Begin              (QByteArray &) Q_DECL_OVERRIDE;
-    void             AddProperty        (QByteArray &Dest, const QString &Name, const QVariant &Value) Q_DECL_OVERRIDE;
-    void             End                (QByteArray &) Q_DECL_OVERRIDE;
+    void             Prepare            (QByteArray &) override;
+    void             Begin              (QByteArray &) override;
+    void             AddProperty        (QByteArray &Dest, const QString &Name, const QVariant &Value) override;
+    void             End                (QByteArray &) override;
 
   private:
     bool             m_javaScriptType;

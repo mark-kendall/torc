@@ -24,7 +24,7 @@ class TorcOMXEvent
     OMX_U32       m_data2;
 };
 
-class TorcOMXComponent Q_DECL_FINAL
+class TorcOMXComponent final
 {
   public:
     static OMX_ERRORTYPE    EventHandlerCallback    (OMX_HANDLETYPE Component, OMX_PTR OMXComponent, OMX_EVENTTYPE Event, OMX_U32 Data1, OMX_U32 Data2, OMX_PTR EventData);
@@ -48,9 +48,10 @@ class TorcOMXComponent Q_DECL_FINAL
     OMX_ERRORTYPE           EnablePort              (OMX_DIRTYPE Direction, OMX_U32 Index, bool Enable, OMX_INDEXTYPE Domain, bool Wait = true);
     OMX_ERRORTYPE           DisablePorts            (OMX_INDEXTYPE Domain);
     OMX_U32                 GetAvailableBuffers     (OMX_DIRTYPE Direction, OMX_U32 Index, OMX_INDEXTYPE Domain);
+    OMX_U32                 GetInUseBuffers         (OMX_DIRTYPE Direction, OMX_U32 Index, OMX_INDEXTYPE Domain);
     OMX_ERRORTYPE           EmptyThisBuffer         (OMX_BUFFERHEADERTYPE *Buffer);
     OMX_ERRORTYPE           FillThisBuffer          (OMX_BUFFERHEADERTYPE *Buffer);
-    OMX_ERRORTYPE           CreateBuffers           (OMX_DIRTYPE Direction, OMX_U32 Index, OMX_INDEXTYPE Domain);
+    OMX_ERRORTYPE           CreateBuffers           (OMX_DIRTYPE Direction, OMX_U32 Index, OMX_INDEXTYPE Domain, QObject* Owner = NULL);
     OMX_ERRORTYPE           DestroyBuffers          (OMX_DIRTYPE Direction, OMX_U32 Index, OMX_INDEXTYPE Domain);
     OMX_BUFFERHEADERTYPE*   GetBuffer               (OMX_DIRTYPE Direction, OMX_U32 Index, OMX_U32 Timeout, OMX_INDEXTYPE Domain);
     OMX_ERRORTYPE           FlushBuffer             (OMX_DIRTYPE Direction, OMX_U32 Index, OMX_INDEXTYPE Domain);

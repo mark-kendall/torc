@@ -43,8 +43,8 @@ class TorcInput : public TorcDevice, public TorcHTTPService
 
 
     virtual TorcInput::Type  GetType           (void) = 0;
-    virtual void             Start             (void) Q_DECL_OVERRIDE;
-    QString                  GetUIName         (void) Q_DECL_OVERRIDE;
+    virtual void             Start             (void) override;
+    QString                  GetUIName         (void) override;
 
   protected:
     virtual ~TorcInput();
@@ -57,8 +57,8 @@ class TorcInput : public TorcDevice, public TorcHTTPService
     // TorcHTTPService
     void             SubscriberDeleted         (QObject *Subscriber);
 
-    void             SetValue                  (double Value) Q_DECL_OVERRIDE;
-    void             SetValid                  (bool Valid)   Q_DECL_FINAL;
+    void             SetValue                  (double Value) override;
+    void             SetValid                  (bool Valid)   final;
 
     double           GetOperatingRangeMin      (void);
     double           GetOperatingRangeMax      (void);

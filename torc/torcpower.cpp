@@ -127,10 +127,11 @@ TorcPower* TorcPowerFactory::CreatePower()
  * - though TorcPower may be accessed from multiple threads and hence implementations must
  * guard against concurrent access if necessary.
  *
- * \sa PowerFactory
- * \sa TorcPowerObject
+ * \note Locking in TorcPower is complicated by the public TorcSetting's that are HTTP services in their own right.
+ *       TorcSetting is however extensively locked for this reason.
  *
- * \todo Make HTTP acccess thread safe.
+ * \sa TorcPowerFactory
+ * \sa TorcPowerObject
 */
 
 TorcPower::TorcPower()
@@ -263,17 +264,6 @@ TorcPower::~TorcPower()
         m_powerGroupItem->Remove();
         m_powerGroupItem->DownRef();
     }
-
-    m_canShutdown    = NULL;
-    m_canSuspend     = NULL;
-    m_canHibernate   = NULL;
-    m_canRestart     = NULL;
-    m_allowShutdown  = NULL;
-    m_allowRestart   = NULL;
-    m_allowHibernate = NULL;
-    m_allowSuspend   = NULL;
-    m_powerEnabled   = NULL;
-    m_powerGroupItem = NULL;
 }
 
 void TorcPower::Debug(void)
@@ -302,23 +292,33 @@ QString TorcPower::GetUIName(void)
 
 void TorcPower::BatteryUpdated(int Level)
 {
-    if (m_lastBatteryLevel == Level)
-        return;
+    bool lowbattery = false;
+    int  level      = m_lastBatteryLevel;
 
-    bool wasalreadylow = m_lastBatteryLevel >= 0 && m_lastBatteryLevel <= BatteryLow;
-    m_lastBatteryLevel = Level;
+    {
+        QWriteLocker locker(&m_httpServiceLock);
 
-    if (m_lastBatteryLevel == ACPower)
-        LOG(VB_GENERAL, LOG_INFO, "On AC power");
-    else if (m_lastBatteryLevel == UnknownPower)
-        LOG(VB_GENERAL, LOG_INFO, "Unknown power status");
-    else
-        LOG(VB_GENERAL, LOG_INFO, QString("Battery level %1%").arg(m_lastBatteryLevel));
+        if (m_lastBatteryLevel == Level)
+            return;
 
-    if (!wasalreadylow && (m_lastBatteryLevel >= 0 && m_lastBatteryLevel <= BatteryLow))
+        bool wasalreadylow = m_lastBatteryLevel >= 0 && m_lastBatteryLevel <= BatteryLow;
+        m_lastBatteryLevel = Level;
+
+        if (m_lastBatteryLevel == ACPower)
+            LOG(VB_GENERAL, LOG_INFO, "On AC power");
+        else if (m_lastBatteryLevel == UnknownPower)
+            LOG(VB_GENERAL, LOG_INFO, "Unknown power status");
+        else
+            LOG(VB_GENERAL, LOG_INFO, QString("Battery level %1%").arg(m_lastBatteryLevel));
+
+
+        lowbattery = !wasalreadylow && (m_lastBatteryLevel >= 0 && m_lastBatteryLevel <= BatteryLow);
+        level = m_lastBatteryLevel;
+    }
+
+    if (lowbattery)
         LowBattery();
-
-    emit BatteryLevelChanged(m_lastBatteryLevel);
+    emit BatteryLevelChanged(level);
 }
 
 bool TorcPower::event(QEvent *Event)
@@ -346,45 +346,45 @@ bool TorcPower::event(QEvent *Event)
 
 bool TorcPower::Shutdown(void)
 {
-    if (m_allowShutdown->GetValue().toBool() && m_allowShutdown->GetIsActive())
-    {
-        if (gLocalContext->QueueShutdownEvent(Torc::Shutdown))
-            return true;
-        return DoShutdown();
-    }
+    m_httpServiceLock.lockForRead();
+    bool shutdown = m_allowShutdown->GetValue().toBool() && m_allowShutdown->GetIsActive();
+    m_httpServiceLock.unlock();
+
+    if (shutdown)
+        return gLocalContext->QueueShutdownEvent(Torc::Shutdown) ? true : DoShutdown();
     return false;
 }
 
 bool TorcPower::Suspend(void)
 {
-    if (m_allowSuspend->GetValue().toBool() && m_allowSuspend->GetIsActive())
-    {
-        if (gLocalContext->QueueShutdownEvent(Torc::Suspend))
-            return true;
-        return DoSuspend();
-    }
+    m_httpServiceLock.lockForRead();
+    bool suspend = m_allowSuspend->GetValue().toBool() && m_allowSuspend->GetIsActive();
+    m_httpServiceLock.unlock();
+
+    if (suspend)
+        return gLocalContext->QueueShutdownEvent(Torc::Suspend) ? true : DoSuspend();
     return false;
 }
 
 bool TorcPower::Hibernate(void)
 {
-    if (m_allowHibernate->GetValue().toBool() && m_allowHibernate->GetIsActive())
-    {
-        if (gLocalContext->QueueShutdownEvent(Torc::Hibernate))
-            return true;
-        return DoHibernate();
-    }
+    m_httpServiceLock.lockForRead();
+    bool hibernate = m_allowHibernate->GetValue().toBool() && m_allowHibernate->GetIsActive();
+    m_httpServiceLock.unlock();
+
+    if (hibernate)
+        return gLocalContext->QueueShutdownEvent(Torc::Hibernate) ? true : DoHibernate();
     return false;
 }
 
 bool TorcPower::Restart(void)
 {
-    if (m_allowRestart->GetValue().toBool() && m_allowRestart->GetIsActive())
-    {
-        if (gLocalContext->QueueShutdownEvent(Torc::Restart))
-            return true;
-        return DoRestart();
-    }
+    m_httpServiceLock.lockForRead();
+    bool restart = m_allowRestart->GetValue().toBool() && m_allowRestart->GetIsActive();
+    m_httpServiceLock.unlock();
+
+    if (restart)
+        return gLocalContext->QueueShutdownEvent(Torc::Restart) ? true : DoRestart();
     return false;
 }
 
@@ -395,74 +395,113 @@ void TorcPower::SubscriberDeleted(QObject *Subscriber)
 
 bool TorcPower::GetCanShutdown(void)
 {
-    return m_allowShutdown->GetValue().toBool() && m_allowShutdown->GetIsActive();
+    m_httpServiceLock.lockForRead();
+    bool result = m_allowShutdown->GetValue().toBool() && m_allowShutdown->GetIsActive();
+    m_httpServiceLock.unlock();
+    return result;
 }
 
 bool TorcPower::GetCanSuspend(void)
 {
-    return m_allowSuspend->GetValue().toBool() && m_allowSuspend->GetIsActive();
+    m_httpServiceLock.lockForRead();
+    bool result = m_allowSuspend->GetValue().toBool() && m_allowSuspend->GetIsActive();
+    m_httpServiceLock.unlock();
+    return result;
 }
 
 bool TorcPower::GetCanHibernate(void)
 {
-    return m_allowHibernate->GetValue().toBool() && m_allowHibernate->GetIsActive();
+    m_httpServiceLock.lockForRead();
+    bool result = m_allowHibernate->GetValue().toBool() && m_allowHibernate->GetIsActive();
+    m_httpServiceLock.unlock();
+    return result;
 }
 
 bool TorcPower::GetCanRestart(void)
 {
-    return m_allowRestart->GetValue().toBool() && m_allowRestart->GetIsActive();
+    m_httpServiceLock.lockForRead();
+    bool result = m_allowRestart->GetValue().toBool() && m_allowRestart->GetIsActive();
+    m_httpServiceLock.unlock();
+    return result;
 }
 
 int TorcPower::GetBatteryLevel(void)
 {
-    return m_batteryLevel;
+    m_httpServiceLock.lockForRead();
+    int result = m_batteryLevel;
+    m_httpServiceLock.unlock();
+    return result;
 }
 
 void TorcPower::CanShutdownActiveChanged(bool Active)
 {
-    emit CanShutdownChanged(m_allowShutdown->GetValue().toBool() && Active);
+    m_httpServiceLock.lockForRead();
+    bool changed = m_allowShutdown->GetValue().toBool() && Active;
+    m_httpServiceLock.unlock();
+    emit CanShutdownChanged(changed);
 }
 
 void TorcPower::CanShutdownValueChanged(bool Value)
 {
-    emit CanShutdownChanged(Value && m_allowShutdown->GetIsActive());
+    m_httpServiceLock.lockForRead();
+    bool changed = Value && m_allowShutdown->GetIsActive();
+    m_httpServiceLock.unlock();
+    emit CanShutdownChanged(changed);
 }
 
 void TorcPower::CanSuspendActiveChanged(bool Active)
 {
-    emit CanSuspendChanged(m_allowSuspend->GetValue().toBool() && Active);
+    m_httpServiceLock.lockForRead();
+    bool changed = m_allowSuspend->GetValue().toBool() && Active;
+    m_httpServiceLock.unlock();
+    emit CanSuspendChanged(changed);
 }
 
 void TorcPower::CanSuspendValueChanged(bool Value)
 {
-    emit CanSuspendChanged(Value && m_allowSuspend->GetIsActive());
+    m_httpServiceLock.lockForRead();
+    bool changed = Value && m_allowSuspend->GetIsActive();
+    m_httpServiceLock.unlock();
+    emit CanSuspendChanged(changed);
 }
 
 void TorcPower::CanHibernateActiveChanged(bool Active)
 {
-    emit CanHibernateChanged(m_allowHibernate->GetValue().toBool() && Active);
+    m_httpServiceLock.lockForRead();
+    bool changed = m_allowHibernate->GetValue().toBool() && Active;
+    m_httpServiceLock.unlock();
+    emit CanHibernateChanged(changed);
 }
 
 void TorcPower::CanHibernateValueChanged(bool Value)
 {
-    emit CanHibernateChanged(Value && m_allowHibernate->GetIsActive());
+    m_httpServiceLock.lockForRead();
+    bool changed = Value && m_allowHibernate->GetIsActive();
+    m_httpServiceLock.unlock();
+    emit CanHibernateChanged(changed);
 }
 
 void TorcPower::CanRestartActiveChanged(bool Active)
 {
-    emit CanRestartChanged(m_allowHibernate->GetValue().toBool() && Active);
+    m_httpServiceLock.lockForRead();
+    bool changed = m_allowHibernate->GetValue().toBool() && Active;
+    m_httpServiceLock.unlock();
+    emit CanRestartChanged(changed);
 }
 
 void TorcPower::CanRestartValueChanged(bool Value)
 {
-    emit CanRestartChanged(Value && m_allowHibernate->GetIsActive());
+    m_httpServiceLock.lockForRead();
+    bool changed = Value && m_allowHibernate->GetIsActive();
+    m_httpServiceLock.unlock();
+    emit CanRestartChanged(changed);
 }
 
 QVariantMap TorcPower::GetPowerStatus(void)
 {
     QVariantMap result;
-    result.insert("canShutdown", GetCanShutdown());
-    result.insert("canSuspend",  GetCanSuspend());
+    result.insert("canShutdown",  GetCanShutdown());
+    result.insert("canSuspend",   GetCanSuspend());
     result.insert("canHibernate", GetCanHibernate());
     result.insert("canRestart",   GetCanRestart());
     result.insert("batteryLevel", GetBatteryLevel());

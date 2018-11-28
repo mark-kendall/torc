@@ -9,7 +9,7 @@
 // Torc
 #include "torcpower.h"
 
-class TorcPowerOSX Q_DECL_FINAL : public TorcPower
+class TorcPowerOSX final : public TorcPower
 {
     Q_OBJECT
 
@@ -17,10 +17,10 @@ class TorcPowerOSX Q_DECL_FINAL : public TorcPower
     TorcPowerOSX();
     virtual ~TorcPowerOSX();
 
-    bool DoShutdown        (void) Q_DECL_OVERRIDE;
-    bool DoSuspend         (void) Q_DECL_OVERRIDE;
-    bool DoHibernate       (void) Q_DECL_OVERRIDE;
-    bool DoRestart         (void) Q_DECL_OVERRIDE;
+    bool DoShutdown        (void) override;
+    bool DoSuspend         (void) override;
+    bool DoHibernate       (void) override;
+    bool DoRestart         (void) override;
     void Refresh           (void);
 
   protected:

@@ -11,7 +11,7 @@
 
 class TorcNotifier;
 
-class TorcNotify Q_DECL_FINAL : public QObject, public TorcDeviceHandler
+class TorcNotify final : public QObject, public TorcDeviceHandler
 {
     Q_OBJECT
 
@@ -30,8 +30,8 @@ class TorcNotify Q_DECL_FINAL : public QObject, public TorcDeviceHandler
     void          ApplicationNameChanged (void);
 
   protected:
-    void          Create                 (const QVariantMap &Details) Q_DECL_OVERRIDE;
-    void          Destroy                (void) Q_DECL_OVERRIDE;
+    void          Create                 (const QVariantMap &Details) override;
+    void          Destroy                (void) override;
 
   private:
     QList<TorcNotifier*>                 m_notifiers;

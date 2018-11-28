@@ -4,14 +4,14 @@
 // Torc
 #include "torcpwminput.h"
 
-class TorcNetworkPWMInput Q_DECL_FINAL : public TorcPWMInput
+class TorcNetworkPWMInput final : public TorcPWMInput
 {
   public:
     TorcNetworkPWMInput(double Default, const QVariantMap &Details);
     ~TorcNetworkPWMInput();
 
-    QStringList GetDescription (void) Q_DECL_OVERRIDE;
-    void        Start          (void) Q_DECL_OVERRIDE;
+    QStringList GetDescription (void) override;
+    void        Start          (void) override;
 };
 
 #endif // TORCNETWORKPWMINPUT_H

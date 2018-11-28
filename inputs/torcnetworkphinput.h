@@ -4,14 +4,14 @@
 // Torc
 #include "torcphinput.h"
 
-class TorcNetworkpHInput Q_DECL_FINAL : public TorcpHInput
+class TorcNetworkpHInput final : public TorcpHInput
 {
   public:
     TorcNetworkpHInput(double Default, const QVariantMap &Details);
     ~TorcNetworkpHInput();
 
-    QStringList GetDescription (void) Q_DECL_OVERRIDE;
-    void        Start          (void) Q_DECL_OVERRIDE;
+    QStringList GetDescription (void) override;
+    void        Start          (void) override;
 };
 
 #endif // TORCNETWORKPHINPUT_H

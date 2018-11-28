@@ -19,20 +19,20 @@ class TorcTransitionControl : public TorcControl
 
     static QEasingCurve::Type EasingCurveFromString (const QString &Curve);
     static QString            StringFromEasingCurve (QEasingCurve::Type Type);
-    bool                      Validate              (void) Q_DECL_OVERRIDE;
-    TorcControl::Type         GetType               (void) const Q_DECL_OVERRIDE;
-    QStringList               GetDescription        (void) Q_DECL_OVERRIDE;
+    bool                      Validate              (void) override;
+    TorcControl::Type         GetType               (void) const override;
+    QStringList               GetDescription        (void) override;
 
     static qreal              LinearLEDFunction     (qreal progress);
 
   public slots:
-    bool                      event                 (QEvent *Event) Q_DECL_OVERRIDE;
+    bool                      event                 (QEvent *Event) override;
     void                      Restart               (void);
     void                      SetAnimationValue     (double Value);
     double                    GetAnimationValue     (void);
 
   private:
-    void                      CalculateOutput       (void) Q_DECL_OVERRIDE;
+    void                      CalculateOutput       (void) override;
 
   private:
     quint64                   m_duration;

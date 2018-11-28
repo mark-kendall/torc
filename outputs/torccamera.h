@@ -5,9 +5,12 @@
 #include <QObject>
 
 // Torc
-#include "torcqthread.h"
+#include "torcmaths.h"
 #include "torcsegmentedringbuffer.h"
-#include "torcoutput.h"
+#include "ffmpeg/torcmuxer.h"
+
+// FFmpeg
+#include <libavcodec/avcodec.h>
 
 // NB these are also enforced in the XSD
 #define VIDEO_WIDTH_MIN      640
@@ -21,15 +24,11 @@
 #define VIDEO_SEGMENT_TARGET 2  // 2 second segments
 #define VIDEO_GOPDURA_TARGET 1  // with IDR every second
 #define VIDEO_SEGMENT_NUMBER 10 // 10 segments for a total of 20 buffered seconds
+#define VIDEO_SEGMENT_MAX    20
 #define VIDEO_TIMEBASE       90000
-
-#define DASH_PLAYLIST        QString("dash.mpd")
-#define HLS_PLAYLIST_MAST    QString("master.m3u8")
-#define HLS_PLAYLIST         QString("playlist.m3u8")
-#define VIDEO_PAGE           QString("video.html")
-
-#define VIDEO_CODEC_ISO      QString("avc1.4d0028") // AVC Main Level 4
-#define AUDIO_CODEC_ISO      QString("mp4a.40.2")   // AAC LC
+#define VIDEO_DRIFT_SHORT    60 // short term drift average
+#define VIDEO_DRIFT_LONG     (60*5) // long term drift average
+#define VIDEO_H264_PROFILE   FF_PROFILE_H264_MAIN
 
 class TorcCameraParams
 {
@@ -37,7 +36,13 @@ class TorcCameraParams
     TorcCameraParams(void);
     explicit TorcCameraParams(const QVariantMap &Details);
     TorcCameraParams(const TorcCameraParams &Other);
-    TorcCameraParams& operator =(const TorcCameraParams &Other);
+    TorcCameraParams  Combine     (const TorcCameraParams &Add);
+    TorcCameraParams& operator =  (const TorcCameraParams &Other);
+    bool              operator == (const TorcCameraParams &Other) const;
+
+    bool    IsVideo      (void) const;
+    bool    IsStill      (void) const;
+    bool    IsCompatible (const TorcCameraParams &Other) const;
 
     bool    m_valid;
     int     m_width;
@@ -49,9 +54,11 @@ class TorcCameraParams
     int     m_timebase;
     int     m_segmentLength;
     int     m_gopSize;
-    QString m_model;
     QString m_videoCodec;
+    QString m_contentDir;
 };
+
+Q_DECLARE_METATYPE(TorcCameraParams)
 
 class TorcCameraDevice : public QObject
 {
@@ -61,110 +68,58 @@ class TorcCameraDevice : public QObject
     explicit TorcCameraDevice(const TorcCameraParams &Params);
     virtual ~TorcCameraDevice();
 
-    virtual bool     Setup           (void) = 0;
-    virtual bool     WriteFrame      (void) = 0;
+    virtual bool     Setup           (void);
+    virtual bool     Start           (void) = 0;
     virtual bool     Stop            (void) = 0;
     QByteArray       GetSegment      (int Segment);
     QByteArray       GetInitSegment  (void);
-    TorcCameraParams GetParams       (void);
+
+  public slots:
+    virtual void     TakeStills      (uint Count);
+    virtual void     StreamVideo     (bool Video) = 0;
 
   signals:
+    void             WritingStarted  (void);
+    void             WritingStopped  (void);
     void             SegmentRemoved  (int Segment);
     void             InitSegmentReady(void);
     void             SegmentReady    (int Segment);
     void             SetErrored      (bool Errored);
+    void             StillReady      (const QString File);
+    void             ParametersChanged (TorcCameraParams &Params);
 
   protected:
-    TorcCameraParams m_params;
+    // streaming
+    void             TrackDrift      (void);
+    // stills
+    virtual void     StartStill      (void) = 0;
+    virtual bool     EnableStills    (uint Count);
+    void             SaveStill       (void);
+    void             SaveStillBuffer (quint32 Length, uint8_t* Data);
+    void             ClearStillsBuffers (void);
+
+    TorcCameraParams         m_params;
+
+    // video/streaming
+    TorcMuxer               *m_muxer;
+    int                      m_videoStream;
+    quint64                  m_frameCount;
+    bool                     m_haveInitSegment;
+    AVPacket                *m_bufferedPacket;
     TorcSegmentedRingBuffer *m_ringBuffer;
+    QReadWriteLock           m_ringBufferLock;
+    quint64                  m_referenceTime;
+    int                      m_discardDrift;
+    TorcAverage<double>      m_shortAverage;
+    TorcAverage<double>      m_longAverage;
+
+    // stills
+    uint                     m_stillsRequired;
+    uint                     m_stillsExpected;
+    QList<QPair<quint32, uint8_t*> > m_stillsBuffers;
 
   private:
     Q_DISABLE_COPY(TorcCameraDevice)
-};
-
-class TorcCameraOutput;
-
-class TorcCameraThread Q_DECL_FINAL : public TorcQThread
-{
-    Q_OBJECT
-
-  public:
-    TorcCameraThread(TorcCameraOutput *Parent, const QString &Type, const TorcCameraParams &Params);
-    ~TorcCameraThread();
-
-    void              Start          (void) Q_DECL_OVERRIDE;
-    void              Finish         (void) Q_DECL_OVERRIDE;
-    QByteArray        GetSegment     (int Segment);
-    QByteArray        GetInitSegment (void);
-    TorcCameraParams  GetParams      (void);
-
-  public slots:
-    void              StopWriting    (void);
-
-  signals:
-    void              WritingStarted (void);
-    void              WritingStopped (void);
-
-  private:
-    Q_DISABLE_COPY(TorcCameraThread)
-    TorcCameraOutput *m_parent;
-    QString           m_type;
-    TorcCameraParams  m_params;
-    TorcCameraDevice *m_camera;
-    QReadWriteLock    m_cameraLock;
-    bool              m_stop;
-};
-
-class TorcCameraOutput Q_DECL_FINAL : public TorcOutput
-{
-    Q_OBJECT
-
-  public:
-    TorcCameraOutput(const QString &ModelId, const QVariantMap &Details);
-    virtual ~TorcCameraOutput();
-
-    TorcOutput::Type GetType            (void) Q_DECL_OVERRIDE;
-    void             Start              (void) Q_DECL_OVERRIDE;
-    void             Stop               (void) Q_DECL_OVERRIDE;
-    QString          GetPresentationURL (void) Q_DECL_OVERRIDE;
-    void             ProcessHTTPRequest (const QString &PeerAddress, int PeerPort, const QString &LocalAddress,
-                                         int LocalPort, TorcHTTPRequest &Request) Q_DECL_OVERRIDE;
-  public slots:
-    void             WritingStarted     (void);
-    void             WritingStopped     (void);
-    void             CameraErrored      (bool Errored);
-    void             SegmentRemoved     (int Segment);
-    void             InitSegmentReady   (void);
-    void             SegmentReady       (int Segment);
-
-  private:
-    QByteArray       GetMasterPlaylist  (void);
-    QByteArray       GetHLSPlaylist     (void);
-    QByteArray       GetPlayerPage      (void);
-    QByteArray       GetDashPlaylist    (void);
-
-  private:
-    Q_DISABLE_COPY(TorcCameraOutput)
-    TorcCameraThread *m_thread;
-    QReadWriteLock    m_threadLock;
-    TorcCameraParams  m_params;
-    QQueue<int>       m_segments;
-    QReadWriteLock    m_segmentLock;
-    QDateTime         m_cameraStartTime;
-};
-
-class TorcCameraOutputs Q_DECL_FINAL : public TorcDeviceHandler
-{
-  public:
-    TorcCameraOutputs();
-
-    static TorcCameraOutputs *gCameraOutputs;
-
-    void Create  (const QVariantMap &Details) Q_DECL_OVERRIDE;
-    void Destroy (void) Q_DECL_OVERRIDE;
-
-  private:
-    QHash<QString, TorcCameraOutput*> m_cameras;
 };
 
 class TorcCameraFactory

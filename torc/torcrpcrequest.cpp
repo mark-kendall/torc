@@ -31,11 +31,10 @@
  *
  * Remote Procedure Calls are currently only handled through TorcWebSocket.
  *
- * \sa TorcWebSocket
+ * \note The underlying protocol is restricted to JSON-RPC.
  *
- * \todo Add serialisation of protocols other than JSON-RPC.
- * \todo Add parsing of protocols other than JSON-RPC.
- * \todo Review memory consumption/performance.
+ * \sa TorcWebSocket
+ * \sa TorcHTTPService
 */
 
 /*! \brief Creates an RPC request owned by the given Parent.
@@ -84,13 +83,13 @@ TorcRPCRequest::TorcRPCRequest(const QString &Method)
 
 /*! \brief Creates a request from the given QJsonObject
 */
-TorcRPCRequest::TorcRPCRequest(const QJsonObject &Object, bool Authenticated)
+TorcRPCRequest::TorcRPCRequest(const QJsonObject &Object, QObject *Parent, bool Authenticated)
   : m_authenticated(Authenticated),
     m_notification(true),
     m_state(None),
     m_id(-1),
     m_method(),
-    m_parent(NULL),
+    m_parent(Parent),
     m_parentLock(new QMutex()),
     m_validParent(false),
     m_parameters(),
@@ -118,114 +117,118 @@ TorcRPCRequest::TorcRPCRequest(TorcWebSocketReader::WSSubProtocol Protocol, cons
     m_serialisedData(),
     m_reply()
 {
-    if (Protocol == TorcWebSocketReader::SubProtocolJSONRPC)
+    if (Protocol != TorcWebSocketReader::SubProtocolJSONRPC)
     {
-        // parse the JSON
-        QJsonDocument doc = QJsonDocument::fromJson(Data);
+        LOG(VB_GENERAL, LOG_ERR, "Unknown websocket subprotocol");
+        return;
+    }
 
-        if (doc.isNull())
-        {
-            // NB we are acting as both client and server, hence if we receive invalid JSON (that Qt cannot parse)
-            // we can only make a best efforts guess as to whether this was a request. Hence under
-            // certain circumstances, we may not send the appropriate error message or respond at all.
-            if (Data.contains("method"))
-            {
-                QJsonObject object;
-                QJsonObject error;
-                error.insert("code", -32700);
-                error.insert("message", QString("Parse error"));
+    // parse the JSON
+    QJsonDocument doc = QJsonDocument::fromJson(Data);
 
-                object.insert("error",   error);
-                object.insert("jsonrpc", QString("2.0"));
-                object.insert("id",      QJsonValue());
+    if (doc.isNull())
+    {
+        ProcessNullContent(Data.contains("method"));
+        return;
+    }
 
-                m_serialisedData = QJsonDocument(object).toJson();
+    LOG(VB_GENERAL, LOG_DEBUG, Data);
 
-                LOG(VB_GENERAL, LOG_INFO, m_serialisedData);
-            }
-
-            LOG(VB_GENERAL, LOG_ERR, "Error parsing JSON-RPC data");
-            AddState(Errored);
-            return;
-        }
-
-        LOG(VB_GENERAL, LOG_DEBUG, Data);
-
-        // single request, one JSON object
-        if (doc.isObject())
-        {
-            QJsonObject object = doc.object();
-            ParseJSONObject(object);
-            return;
-        }
-        else if (doc.isArray())
-        {
-            QJsonObject error;
-            QJsonObject object;
-            object.insert("code",    -32600);
-            object.insert("message", QString("Invalid request"));
-            error.insert("error",    object);
-            error.insert("jsonrpc",  QString("2.0"));
-            error.insert("id",       QJsonValue());
-
-            // this must be a batched request
-            QJsonArray array = doc.array();
-
-            // an empty array is an error
-            if (array.isEmpty())
-            {
-                m_serialisedData = QJsonDocument(error).toJson();
-                LOG(VB_GENERAL, LOG_ERR, "Invalid request - empty array");
-                return;
-            }
-
-            // iterate over each member
-            QByteArray result;
-            result.append("[\r\n");
-            bool first = true;
-
-            QJsonArray::iterator it = array.begin();
-            for ( ; it != array.end(); ++it)
-            {
-                // must be an object
-                if (!(*it).isObject())
-                {
-                    LOG(VB_GENERAL, LOG_ERR, "Invalid request - not an object");
-                    result.append(QJsonDocument(error).toJson());
-                    continue;
-                }
-
-                // process this object
-                TorcRPCRequest *request = new TorcRPCRequest((*it).toObject(), m_authenticated);
-
-                if (!request->GetData().isEmpty())
-                {
-                    if (first)
-                        first = false;
-                    else
-                        result.append(",\r\n");
-                    result.append(request->GetData());
-                }
-
-                request->DownRef();
-            }
-
-            result.append("\r\n]");
-
-            // don't return an empty array
-            if (!first)
-                m_serialisedData = result;
-        }
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR, "Unknown JsonDocument type");
-        }
+    // single request, one JSON object
+    if (doc.isObject())
+    {
+        ParseJSONObject(doc.object());
+        return;
+    }
+    // batch call
+    else if (doc.isArray())
+    {
+        ProcessBatchCall(doc.array());
+        return;
     }
 }
 
 TorcRPCRequest::~TorcRPCRequest()
 {
     delete m_parentLock;
+}
+
+void TorcRPCRequest::ProcessBatchCall(const QJsonArray &Array)
+{
+    QJsonObject error;
+    QJsonObject object;
+    object.insert("code",    -32600);
+    object.insert("message", QString("Invalid request"));
+    error.insert("error",    object);
+    error.insert("jsonrpc",  QString("2.0"));
+    error.insert("id",       QJsonValue());
+
+    // an empty array is an error
+    if (Array.isEmpty())
+    {
+        m_serialisedData = QJsonDocument(error).toJson();
+        LOG(VB_GENERAL, LOG_ERR, "Invalid request - empty array");
+        return;
+    }
+
+    // iterate over each member
+    QByteArray result;
+    result.append("[\r\n");
+    bool empty = true;
+
+    QJsonArray::const_iterator it = Array.constBegin();
+    for ( ; it != Array.constEnd(); ++it)
+    {
+        // must be an object
+        if (!(*it).isObject())
+        {
+            LOG(VB_GENERAL, LOG_ERR, "Invalid request - not an object");
+            result.append(QJsonDocument(error).toJson());
+            continue;
+        }
+
+        // process this object
+        TorcRPCRequest *request = new TorcRPCRequest((*it).toObject(), m_parent, m_authenticated);
+
+        if (!request->GetData().isEmpty())
+        {
+            if (empty)
+                empty = false;
+            else
+                result.append(",\r\n");
+            result.append(request->GetData());
+        }
+
+        request->DownRef();
+    }
+
+    result.append("\r\n]");
+
+    // don't return an empty array - which would/should be a group of notifications...
+    if (!empty)
+        m_serialisedData = result;
+}
+
+void TorcRPCRequest::ProcessNullContent(bool HasMethod)
+{
+    // NB we are acting as both client and server, hence if we receive invalid JSON (that Qt cannot parse)
+    // we can only make a best efforts guess as to whether this was a request. Hence under
+    // certain circumstances, we may not send the appropriate error message or respond at all.
+    if (HasMethod)
+    {
+        QJsonObject object;
+        QJsonObject error;
+        error.insert("code", -32700);
+        error.insert("message", QString("Parse error"));
+        object.insert("error",   error);
+        object.insert("jsonrpc", QString("2.0"));
+        object.insert("id",      QJsonValue());
+        m_serialisedData = QJsonDocument(object).toJson();
+        LOG(VB_GENERAL, LOG_INFO, m_serialisedData);
+    }
+
+    LOG(VB_GENERAL, LOG_ERR, "Error parsing JSON-RPC data");
+    AddState(Errored);
 }
 
 void TorcRPCRequest::ParseJSONObject(const QJsonObject &Object)
@@ -393,7 +396,8 @@ void TorcRPCRequest::SetID(int ID)
 
 /*! \brief Add Parameter and value to list of call parameters.
  *
- * \todo Check for duplicate parameters.
+ * Ideally this should check for duplicate parameter names but it is not a commonly
+ * used method, would be inneficient and the caller should control the duplication.
 */
 void TorcRPCRequest::AddParameter(const QString &Name, const QVariant &Value)
 {

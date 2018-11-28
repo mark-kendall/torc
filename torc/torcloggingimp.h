@@ -36,10 +36,10 @@ class FileLogger : public LoggerBase
     FileLogger(QString Filename, bool ErrorsOnly, int Quiet);
    ~FileLogger();
 
-    bool   Logmsg(LogItem *Item) Q_DECL_OVERRIDE;
+    bool   Logmsg(LogItem *Item) override;
 
   protected:
-    bool   PrintLine (QByteArray &Line) Q_DECL_OVERRIDE;
+    bool   PrintLine (QByteArray &Line) override;
 
   protected:
     bool   m_opened;
@@ -61,10 +61,10 @@ class WebLogger : public QObject, public TorcHTTPService, public FileLogger
     explicit WebLogger(QString Filename);
    ~WebLogger();
 
-    bool Logmsg (LogItem *Item) Q_DECL_OVERRIDE;
+    bool Logmsg (LogItem *Item) override;
 
   public slots:
-    bool       event             (QEvent *event) Q_DECL_OVERRIDE;
+    bool       event             (QEvent *event) override;
     void       SubscriberDeleted (QObject *Subscriber);
     QByteArray GetLog            (void);
     QByteArray GetTail           (void);
@@ -77,7 +77,6 @@ class WebLogger : public QObject, public TorcHTTPService, public FileLogger
     QByteArray log;
     QByteArray tail;
     bool       changed;
-    QMutex     lock;
 };
 
 #endif // TORCLOGGINGIMP_H

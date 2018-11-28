@@ -45,8 +45,7 @@ TorcUser::TorcUser()
    m_userNameSetting(new TorcSetting(NULL, "UserName", "User name", TorcSetting::String, TorcSetting::Persistent, QVariant(TORC_DEFAULT_USERNAME))),
    m_userCredentials(new TorcSetting(NULL, "UserCredentials", "Authentication string", TorcSetting::String, TorcSetting::Persistent, QVariant(TORC_DEFAULT_CREDENTIALS))),
    m_canRestartTorc(true),
-   m_canStopTorc(true),
-   m_lock(QMutex::Recursive)
+   m_canStopTorc(true)
 {
     {
         QMutexLocker locker(&gUserCredentialsLock);
@@ -102,7 +101,7 @@ void TorcUser::UpdateCredentials(const QString &Credentials)
 
 bool TorcUser::SetUserCredentials(const QString &Name, const QString &Credentials)
 {
-    QMutexLocker locker(&m_lock);
+    QWriteLocker locker(&m_httpServiceLock);
 
     if (Name == gUserName && Credentials.toLower() == GetCredentials())
     {
@@ -148,7 +147,7 @@ void TorcUser::StopTorc(void)
 
 bool TorcUser::GetCanStopTorc(void)
 {
-    QMutexLocker locker(&m_lock);
+    QReadLocker locker(&m_httpServiceLock);
     return m_canStopTorc;
 }
 
@@ -160,7 +159,7 @@ void TorcUser::RestartTorc(void)
 
 bool TorcUser::GetCanRestartTorc(void)
 {
-    QMutexLocker locker(&m_lock);
+    QReadLocker locker(&m_httpServiceLock);
     return m_canRestartTorc;
 }
 

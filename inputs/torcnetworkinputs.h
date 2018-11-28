@@ -12,15 +12,15 @@
 #define NETWORK_INPUTS_STRING QString("network")
 #define CONSTANT_INPUTS_STRING QString("constant")
 
-class TorcNetworkInputs Q_DECL_FINAL : public TorcDeviceHandler
+class TorcNetworkInputs final : public TorcDeviceHandler
 {
   public:
     TorcNetworkInputs();
 
     static TorcNetworkInputs*   gNetworkInputs;
 
-    void                        Create      (const QVariantMap &Details) Q_DECL_OVERRIDE;
-    void                        Destroy     (void) Q_DECL_OVERRIDE;
+    void                        Create      (const QVariantMap &Details) override;
+    void                        Destroy     (void) override;
 
   private:
     QMap<QString,TorcInput*>    m_inputs;

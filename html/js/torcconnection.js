@@ -34,15 +34,32 @@ var TorcConnection = function ($, torc, statusChanged) {
     var websocketprotocols;
     var that = this;
 
+    function recognisedcall (name, method) {
+        if (subscriptions[name] && subscriptions[name].methods[method]) { return true; }
+        if (serviceList.hasOwnProperty(name)) { return true; }
+        return false;
+    }
+
     this.call = function(serviceName, method, params, success, failure) {
-        if (socket !== null) {
-            // call to a subscribed service
-            if (subscriptions[serviceName] && subscriptions[serviceName].methods[method]) {
-                socket.call(serviceList[serviceName].path + method, params, success, failure);
-            // just a call, no subscription
-            } else if (serviceList.hasOwnProperty(serviceName)) {
-                socket.call(serviceList[serviceName].path + method, params, success, failure);
-            }
+        if (socket === null) { return; }
+        if ($.isArray(serviceName)) {
+            if (serviceName.length < 1) { return; }
+            var batchcall = [];
+            $.each(serviceName, function (index, value) {
+                var servicename = value.servicename;
+                var servicemethod = value.method;
+                if (recognisedcall(servicename, servicemethod)) {
+                    batchcall.push({ method: serviceList[servicename].path + servicemethod,
+                                     params: value.params,
+                                     success: value.success,
+                                     failure: value.failure });
+                }
+            });
+            socket.call(batchcall);
+            return;
+        }
+        if (recognisedcall(serviceName, method)) {
+            socket.call(serviceList[serviceName].path + method, params, success, failure);
         }
     };
 

@@ -1,4 +1,4 @@
-/* Class TorcPWMOutput
+/* Class TorcpHOutput
 *
 * This file is part of the Torc project.
 *
@@ -26,6 +26,9 @@
 TorcpHOutput::TorcpHOutput(double Value, const QString &ModelId, const QVariantMap &Details)
   : TorcOutput(TorcOutput::pH, Value, ModelId, Details)
 {
+    // disallow inputs
+    if (ModelId.startsWith(DEVICE_CONSTANT))
+        SetOwner(this);
 }
 
 TorcpHOutput::~TorcpHOutput()

@@ -17,8 +17,8 @@ class TorcWebSocketThread : public TorcQThread
                          TorcWebSocketReader::WSSubProtocol Protocol = TorcWebSocketReader::SubProtocolJSONRPC);
     ~TorcWebSocketThread();
 
-    void                Start    (void) Q_DECL_OVERRIDE;
-    void                Finish   (void) Q_DECL_OVERRIDE;
+    void                Start    (void) override;
+    void                Finish   (void) override;
     void                RemoteRequest         (TorcRPCRequest *Request);
     void                CancelRequest         (TorcRPCRequest *Request);
     bool                IsSecure              (void);

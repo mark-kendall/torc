@@ -42,7 +42,7 @@ class TorcSSDPSearchResponse
     int           m_port;
 };
 
-class TorcSSDP Q_DECL_FINAL : public QObject
+class TorcSSDP final : public QObject
 {
     friend class TorcSSDPThread;
 
@@ -76,7 +76,7 @@ class TorcSSDP Q_DECL_FINAL : public QObject
     void             SendSearch         (void);
     void             SendAnnounce       (bool IPv6, bool Alive);
 
-    bool             event              (QEvent *Event) Q_DECL_OVERRIDE;
+    bool             event              (QEvent *Event) override;
     void             Read               (void);
     void             ProcessResponses   (void);
 
@@ -101,6 +101,7 @@ class TorcSSDP Q_DECL_FINAL : public QObject
     TorcHTTPServer::Status              m_announceOptions;
     QString                             m_serverString;
     bool                                m_searching;
+    bool                                m_searchDebugged;
     int                                 m_firstSearchTimer;
     int                                 m_secondSearchTimer;
     int                                 m_firstAnnounceTimer;
@@ -121,14 +122,14 @@ class TorcSSDP Q_DECL_FINAL : public QObject
     QMap<qint64,TorcSSDPSearchResponse> m_responseQueue;
 };
 
-class TorcSSDPThread Q_DECL_FINAL : public TorcQThread
+class TorcSSDPThread final : public TorcQThread
 {
     Q_OBJECT
 
   public:
     TorcSSDPThread();
 
-    void Start(void) Q_DECL_OVERRIDE;
-    void Finish(void) Q_DECL_OVERRIDE;
+    void Start(void) override;
+    void Finish(void) override;
 };
 #endif // TORCSSDP_H

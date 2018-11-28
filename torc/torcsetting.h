@@ -14,7 +14,6 @@
 
 class TorcSetting : public QObject, public TorcHTTPService, public TorcReferenceCounter
 {
-
     Q_ENUMS(Type)
     Q_ENUMS(Role)
 
@@ -121,7 +120,6 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
     int                    m_active;
     int                    m_activeThreshold;
     QList<TorcSetting*>    m_children;
-    QReadWriteLock         m_lock;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(TorcSetting::Roles)

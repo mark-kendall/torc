@@ -79,9 +79,8 @@ void TorcHTMLStaticContent::ProcessHTTPRequest(const QString &PeerAddress, int P
 
 /*! \brief Construct a Javascript object that encapsulates Torc variables, enumerations and translated strings.
  *
- * The contents of this object are available as 'torcconfiguration.js'.
- *
- * \todo Translations are static and will need to be regenerated if the language is changed.
+ * The contents of this object are available as 'torcconfiguration.js' and it must be regenerated/requested following a
+ * language change.
 */
 void TorcHTMLStaticContent::GetJavascriptConfiguration(TorcHTTPRequest &Request)
 {

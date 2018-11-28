@@ -295,6 +295,18 @@
   </xs:all>
 </xs:complexType>
 
+<xs:complexType name="complexerLogicType">
+  <xs:all>
+    <xs:element name="name"       type="deviceNameType"/>
+    <xs:element name="username"   type="userNameType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="inputs"     type="deviceInputOutputType"/>
+    <xs:element name="outputs"    type="deviceInputsOutputsType"/>
+    <xs:element name="references" type="deviceInputOutputType"/>
+    <xs:element name="triggers"   type="deviceInputOutputType"/>
+  </xs:all>
+</xs:complexType>
+
 <xs:complexType name="logicType">
   <xs:choice minOccurs="1" maxOccurs="unbounded">
     <xs:element name="passthrough"        type="simpleLogicType"/>
@@ -311,6 +323,9 @@
     <xs:element name="greaterthan"        type="complexLogicType"/>
     <xs:element name="lessthanorequal"    type="complexLogicType"/>
     <xs:element name="greaterthanorequal" type="complexLogicType"/>
+    <xs:element name="runningaverage"     type="complexerLogicType"/>
+    <xs:element name="runningmax"         type="complexLogicType"/>
+    <xs:element name="runningmin"         type="complexLogicType"/>
   </xs:choice>
 </xs:complexType>
 
@@ -418,16 +433,32 @@
 
 <!-- outputs definitions -->
 <!--TORC_XSD_OUTPUTTYPES-->
-<xs:complexType name="cameraType">
+<xs:complexType name="cameraVideoType">
   <xs:all>
     <xs:element name="name"            type="deviceNameType"/>
     <xs:element name="username"        type="userNameType" minOccurs="0" maxOccurs="1"/>
     <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
-    <xs:element name="model"           type="validStringType"/>
     <xs:element name="width"           type="videoWidthType"/>
     <xs:element name="height"          type="videoHeightType"/>
     <xs:element name="framerate"       type="videoFrameRateType"/>
     <xs:element name="bitrate"         type="videoBitRateType"/>
+  </xs:all>
+</xs:complexType>
+
+<xs:complexType name="cameraStillsType">
+  <xs:all>
+    <xs:element name="name"            type="deviceNameType"/>
+    <xs:element name="username"        type="userNameType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="width"           type="videoWidthType"/>
+    <xs:element name="height"          type="videoHeightType"/>
+  </xs:all>
+</xs:complexType>
+
+<xs:complexType name="cameraType">
+  <xs:all>
+    <xs:element name="video"  type="cameraVideoType"  minOccurs="0" maxOccurs="1"/>
+    <xs:element name="stills" type="cameraStillsType" minOccurs="0" maxOccurs="1"/>
   </xs:all>
 </xs:complexType>
 
@@ -548,6 +579,8 @@
                 <xs:enumeration value="start"/>
                 <xs:enumeration value="stop"/>
                 <xs:enumeration value="restarttorc"/>
+                <xs:enumeration value="userchanged"/>
+                <xs:enumeration value="torcwillstop"/>
                 <xs:enumeration value="shutdown"/>
                 <xs:enumeration value="suspend"/>
                 <xs:enumeration value="hibernate"/>
@@ -564,6 +597,7 @@
                 <xs:enumeration value="networkhostnameschanged"/>
                 <xs:enumeration value="servicediscovered"/>
                 <xs:enumeration value="servicewentaway"/>
+                <xs:enumeration value="systemtimechanged"/>
               </xs:restriction>
             </xs:simpleType>
           </xs:element>
@@ -658,7 +692,7 @@
   </xs:key>
   <!-- list of devices that accept inputs (i.e. are valid output targets) -->
   <xs:key name="validOutputTargetDevices">
-    <xs:selector xpath="./outputs/*/*/name|./outputs/i2c/*/*/name|.//notifications/trigger/name|./controls/transition/*/name|./controls/logic/*/name" />
+    <xs:selector xpath="./outputs/*/*/*/name|./outputs/*/*/name|./outputs/i2c/*/*/name|.//notifications/trigger/name|./controls/transition/*/name|./controls/logic/*/name" />
     <xs:field xpath="."/>
   </xs:key>
   <!-- list of devices that are valid inputs to another device-->

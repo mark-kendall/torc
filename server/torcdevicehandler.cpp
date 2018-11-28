@@ -25,7 +25,7 @@ TorcDeviceHandler* TorcDeviceHandler::gTorcDeviceHandler = NULL;
 QMutex* TorcDeviceHandler::gTorcDeviceHandlersLock = new QMutex(QMutex::Recursive);
 
 TorcDeviceHandler::TorcDeviceHandler()
-  : m_lock(QMutex::Recursive),
+  : m_handlerLock(QReadWriteLock::Recursive),
     m_nextTorcDeviceHandler(NULL)
 {
     QMutexLocker lock(gTorcDeviceHandlersLock);

@@ -62,8 +62,6 @@ static void convert_float(quint8 *p, quint8 s)
  *
  *  TorcPList uses QVariant for internal storage. Values can be queried using GetValue
  *  and the structure can be exported to Xml with ToXml().
- *
- *  \todo Support for importing Xml formatted property lists.
  */
 TorcPList::TorcPList(const QByteArray &Data)
   : m_result(),
@@ -135,20 +133,27 @@ bool TorcPList::ToXML(const QVariant &Data, QXmlStreamWriter &XML)
         case QMetaType::QVariantList:
             ArrayToXML(Data, XML);
             break;
+        case QMetaType::Int:
+        case QMetaType::Short:
+        case QMetaType::Long:
+        case QMetaType::LongLong:
+        case QMetaType::Float:
         case QMetaType::Double:
-            XML.writeTextElement("real",
-                                 QString("%1").arg(Data.toDouble(), 0, 'f', 6));
+            XML.writeTextElement("real", QString("%1").arg(Data.toDouble(), 0, 'f', 6));
+            break;
+        case QMetaType::QUuid:
+            XML.writeTextElement("uid", Data.toByteArray().toHex().data());
             break;
         case QMetaType::QByteArray:
-            XML.writeTextElement("data",
-                                 Data.toByteArray().toBase64().data());
+            XML.writeTextElement("data", Data.toByteArray().toBase64().data());
             break;
+        case QMetaType::UInt:
+        case QMetaType::UShort:
+        case QMetaType::ULong:
         case QMetaType::ULongLong:
-            XML.writeTextElement("integer",
-                                 QString("%1").arg(Data.toULongLong()));
+            XML.writeTextElement("integer", QString("%1").arg(Data.toULongLong()));
             break;
-        case QMetaType::QString:
-            XML.writeTextElement("string", Data.toString());
+        case QMetaType::QString: XML.writeTextElement("string", Data.toString());
             break;
         case QMetaType::QDateTime:
             XML.writeTextElement("date", Data.toDateTime().toString(Qt::ISODate));
@@ -158,6 +163,9 @@ bool TorcPList::ToXML(const QVariant &Data, QXmlStreamWriter &XML)
                 bool val = Data.toBool();
                 XML.writeEmptyElement(val ? "true" : "false");
             }
+            break;
+        case QMetaType::Char:
+            XML.writeEmptyElement("fill");
             break;
         default:
             LOG(VB_GENERAL, LOG_WARNING, "Unknown type.");

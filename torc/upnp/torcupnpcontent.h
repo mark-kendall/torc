@@ -4,12 +4,14 @@
 // Torc
 #include "torchttphandler.h"
 
-class TorcUPnPContent Q_DECL_FINAL: public TorcHTTPHandler
+#define UPNP_DIRECTORY QString("/upnp/")
+
+class TorcUPnPContent final: public TorcHTTPHandler
 {
   public:
     TorcUPnPContent();
 
-    void ProcessHTTPRequest (const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest &Request) Q_DECL_OVERRIDE;
+    void ProcessHTTPRequest (const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest &Request) override;
 };
 
 #endif // TORCUPNPCONTENT_H

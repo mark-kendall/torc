@@ -21,11 +21,12 @@
 */
 
 // Qt
-#include <QFile>
 #include <QTime>
+#include <QThread>
 
 // Torc
 #include "torclogging.h"
+#include "torctimer.h"
 #include "torccentral.h"
 #include "torcpicamera.h"
 #include "torcdirectories.h"
@@ -76,7 +77,6 @@
 #define ENCODER_SEI                    OMX_FALSE
 #define ENCODER_EEDE                   OMX_FALSE
 #define ENCODER_EEDE_LOSS_RATE         0
-#define ENCODER_PROFILE                OMX_VIDEO_AVCProfileMain
 #define ENCODER_INLINE_HEADERS         OMX_TRUE
 #define ENCODER_SPS_TIMING             OMX_TRUE
 
@@ -85,6 +85,8 @@ bool TorcPiCamera::gPiCameraDetected = false;
 TorcPiCamera::TorcPiCamera(const TorcCameraParams &Params)
   : TorcCameraDevice(Params),
     m_cameraType(Unknown),
+    m_stillsEnabled(true),
+    m_videoEnabled(true),
     m_core(),
     m_camera((char*)BROADCOM_CAMERA),
     m_videoEncoder((char*)BROADCOM_ENCODER),
@@ -99,14 +101,7 @@ TorcPiCamera::TorcPiCamera(const TorcCameraParams &Params)
     m_splitterTunnel(&m_camera, 1, OMX_IndexParamVideoInit, &m_splitter, 0, OMX_IndexParamVideoInit),
     m_videoTunnel(&m_splitter, 0, OMX_IndexParamVideoInit, &m_videoEncoder,  0, OMX_IndexParamVideoInit),
     m_previewTunnel(&m_camera, 0, OMX_IndexParamVideoInit, &m_nullSink, 0, OMX_IndexParamVideoInit),
-    m_imageTunnel(&m_splitter, 1, OMX_IndexParamVideoInit, &m_imageEncoder,  0, OMX_IndexParamImageInit),
-    m_muxer(NULL),
-    m_videoStream(0),
-    m_frameCount(0),
-    m_bufferedPacket(NULL),
-    m_haveInitSegment(false),
-    m_takeSnapshot(false),
-    m_snapshotBuffers()
+    m_imageTunnel(&m_splitter, 1, OMX_IndexParamVideoInit, &m_imageEncoder,  0, OMX_IndexParamImageInit)
 {
     if (m_params.m_frameRate > 30 && (m_params.m_width > 1280 || m_params.m_height > 720))
     {
@@ -132,20 +127,11 @@ TorcPiCamera::TorcPiCamera(const TorcCameraParams &Params)
 
 TorcPiCamera::~TorcPiCamera()
 {
-    ClearSnapshotBuffers();
+}
 
-    if (m_bufferedPacket)
-    {
-        av_packet_free(&m_bufferedPacket);
-        m_bufferedPacket = NULL;
-    }
-
-    if (m_muxer)
-    {
-        m_muxer->Finish();
-        delete m_muxer;
-        m_muxer = NULL;
-    }
+void TorcPiCamera::StreamVideo(bool Video)
+{
+    (void)Video;
 }
 
 bool TorcPiCamera::Setup(void)
@@ -190,15 +176,11 @@ bool TorcPiCamera::Setup(void)
     m_nullSink.SetState(OMX_StateIdle);
 
     // set splitter to image encoder to single shot
-    m_takeSnapshot = true;
-    OMX_PARAM_U32TYPE single;
-    OMX_INITSTRUCTURE(single);
-    single.nPortIndex = m_splitter.GetPort(OMX_DirOutput, 1, OMX_IndexParamVideoInit);
-    single.nU32       = 1;
-    if (m_splitter.SetParameter(OMX_IndexConfigSingleStep, &single))
-        return  false;
-
-    LOG(VB_GENERAL, LOG_INFO, "Set image encoder to single shot");
+    // there is no setting for nothing - it is either streamed (0) or 1 or more single frames
+    // so request 1 frame and then ignore it
+    if (!EnableStills(1))
+        return false;
+    m_stillsRequired = 0;
 
     // TODO add error checking to these calls
     // enable ports
@@ -209,11 +191,11 @@ bool TorcPiCamera::Setup(void)
     m_splitter.EnablePort(OMX_DirOutput, 1, true, OMX_IndexParamVideoInit);
     m_videoEncoder.EnablePort(OMX_DirInput, 0, true, OMX_IndexParamVideoInit);
     m_videoEncoder.EnablePort(OMX_DirOutput, 0, true, OMX_IndexParamVideoInit, false);
-    m_videoEncoder.CreateBuffers(OMX_DirOutput, 0, OMX_IndexParamVideoInit);
+    m_videoEncoder.CreateBuffers(OMX_DirOutput, 0, OMX_IndexParamVideoInit, this);
     m_videoEncoder.WaitForResponse(OMX_CommandPortEnable, m_videoEncoderOutputPort, 1000);
     m_imageEncoder.EnablePort(OMX_DirInput, 0, true, OMX_IndexParamImageInit);
     m_imageEncoder.EnablePort(OMX_DirOutput, 0, true, OMX_IndexParamImageInit, false);
-    m_imageEncoder.CreateBuffers(OMX_DirOutput, 0, OMX_IndexParamImageInit);
+    m_imageEncoder.CreateBuffers(OMX_DirOutput, 0, OMX_IndexParamImageInit, this);
     m_imageEncoder.WaitForResponse(OMX_CommandPortEnable, m_imageEncoderOutputPort, 1000);
     m_nullSink.EnablePort(OMX_DirInput, 0, true, OMX_IndexParamVideoInit);
 
@@ -233,100 +215,126 @@ bool TorcPiCamera::Setup(void)
     if (m_camera.SetConfig(OMX_IndexConfigPortCapturing, &capture))
         return false;
 
-    int profile = FF_PROFILE_H264_BASELINE;
-    switch (ENCODER_PROFILE)
+    if (TorcCameraDevice::Setup())
     {
-        case OMX_VIDEO_AVCProfileBaseline: profile = FF_PROFILE_H264_BASELINE; break;
-        case OMX_VIDEO_AVCProfileMain:     profile = FF_PROFILE_H264_MAIN;     break;
-        case OMX_VIDEO_AVCProfileExtended: profile = FF_PROFILE_H264_EXTENDED; break;
-        case OMX_VIDEO_AVCProfileHigh:     profile = FF_PROFILE_H264_HIGH;     break;
-        case OMX_VIDEO_AVCProfileHigh10:   profile = FF_PROFILE_H264_HIGH_10;  break;
-        case OMX_VIDEO_AVCProfileHigh422:  profile = FF_PROFILE_H264_HIGH_422; break;
-        case OMX_VIDEO_AVCProfileHigh444:  profile = FF_PROFILE_H264_HIGH_444; break;
-        default:
-            LOG(VB_GENERAL, LOG_WARNING, "Unknown H264 profile. Defaulting to baseline");
+        LOG(VB_GENERAL, LOG_INFO, "Pi camera setup");
+        return true;
     }
 
-    int buffersize = (m_params.m_bitrate * (m_params.m_segmentLength / m_params.m_frameRate) * VIDEO_SEGMENT_NUMBER) / 8;
-    m_ringBuffer   = new TorcSegmentedRingBuffer(buffersize);    
-    m_muxer        = new TorcMuxer(m_ringBuffer);
-    if (!m_muxer)
-        return false;
+    LOG(VB_GENERAL, LOG_ERR, "Failed to setup Pi camera");
+    return false;
+}
 
-    m_videoStream = m_muxer->AddH264Stream(m_params.m_width, m_params.m_height, profile, m_params.m_bitrate);
-    if (!m_muxer->IsValid())
-        return false;
+/*! \brief Start the camera
+ *
+ * The camera device is event driven but we must kick off by asking for output
+ * buffers to be filled.
+ */
+bool TorcPiCamera::Start(void)
+{
+    // there should be one still pipelined. We need to flush it.
+    StartStill();
 
-    connect(m_ringBuffer, SIGNAL(SegmentReady(int)),    this, SIGNAL(SegmentReady(int)));
-    connect(m_ringBuffer, SIGNAL(SegmentRemoved(int)),  this, SIGNAL(SegmentRemoved(int)));
-    connect(m_ringBuffer, SIGNAL(InitSegmentReady()),   this, SIGNAL(InitSegmentReady()));
+    // video is currently just on...
+    StartVideo();
 
-    m_frameCount      = 0;
-    m_bufferedPacket  = NULL;
-    m_haveInitSegment = false;
-
-    LOG(VB_GENERAL, LOG_INFO, "Pi camera setup");
     return true;
 }
 
-bool TorcPiCamera::WriteFrame(void)
+/*! \brief An OpenMax buffer is ready (full)
+ *
+ * This method is signalled when a buffer becomes available - for our use case, this is
+ * after TorcOMXComponent::FillThisBuffer has completed.
+*/
+void TorcPiCamera::BufferReady(OMX_BUFFERHEADERTYPE* Buffer, quint64 Type)
 {
-    if (!m_muxer)
-        return false;
+    if (!Buffer)
+        return;
 
-    if (m_takeSnapshot && m_imageEncoder.GetAvailableBuffers(OMX_DirOutput, 0, OMX_IndexParamImageInit) > 0)
+    // Stills
+
+    // m_stillsExpected is always >= m_stillsRequired
+    if (m_stillsExpected && ((OMX_INDEXTYPE)Type == OMX_IndexParamImageInit) && (m_imageEncoder.GetAvailableBuffers(OMX_DirOutput, 0, OMX_IndexParamImageInit) > 0))
     {
-        OMX_BUFFERHEADERTYPE* buffer = m_imageEncoder.GetBuffer(OMX_DirOutput, 0, 1000, OMX_IndexParamImageInit);
-        m_imageEncoder.FillThisBuffer(buffer);
-        while (m_imageEncoder.GetAvailableBuffers(OMX_DirOutput, 0, OMX_IndexParamImageInit) < 1)
-            QThread::usleep(500);
-
-        if (buffer->nFilledLen > 0)
-        {
-            uint8_t* data = (uint8_t*)malloc(buffer->nFilledLen);
-            memcpy(data, buffer->pBuffer + buffer->nOffset, buffer->nFilledLen);
-            m_snapshotBuffers.append(QPair<quint32,uint8_t*>(buffer->nFilledLen, data));
-        }
-
-        if (buffer->nFlags & OMX_BUFFERFLAG_ENDOFFRAME)
-        {
-            QFile file(GetTorcContentDir() + QDateTime::currentDateTime().toString("dd_MM_yyyy_hh_mm_ss_zzz") + "_snapshot.jpg");
-            if (file.open(QIODevice::ReadWrite | QIODevice::Truncate))
-            {
-                QPair<quint32, uint8_t*> pair;
-                foreach(pair, m_snapshotBuffers)
-                    file.write((const char*)pair.second, pair.first);
-                file.close();
-                LOG(VB_GENERAL, LOG_INFO, QString("Saved snapshot as '%1'").arg(file.fileName()));
-            }
-            else
-            {
-                LOG(VB_GENERAL, LOG_ERR, QString("Failed to open %1 for writing").arg(file.fileName()));
-            }
-            ClearSnapshotBuffers();
-            m_takeSnapshot = false;
-        }
+        ProcessStillsBuffer(Buffer);
+        return;
     }
+
+    // Video
+    if (((OMX_INDEXTYPE)Type == OMX_IndexParamVideoInit) && m_videoEncoder.GetAvailableBuffers(OMX_DirOutput, 0, OMX_IndexParamVideoInit) > 0)
+    {
+        ProcessVideoBuffer(Buffer);
+        return;
+    }
+}
+
+/*! \brief Start capturing a still image buffer.
+ *
+ * \note This SHOULD be called at the start of stills capture or when the previous
+ *       still has been completed. In both cases a buffer should be available and this
+ *       method will then be non-blocking.
+ */
+void TorcPiCamera::StartStill(void)
+{
+    if (!m_stillsEnabled)
+        return;
+
+    OMX_BUFFERHEADERTYPE* buffer = m_imageEncoder.GetBuffer(OMX_DirOutput, 0, 1000, OMX_IndexParamImageInit);
+    if (buffer)
+        (void)m_imageEncoder.FillThisBuffer(buffer);
+
+    // else panic...
+
+}
+
+void TorcPiCamera::ProcessStillsBuffer(OMX_BUFFERHEADERTYPE *Buffer)
+{
+    if (!Buffer)
+        return;
+
+    if (Buffer->nFilledLen > 0)
+    {
+        uint8_t* data = (uint8_t*)malloc(Buffer->nFilledLen);
+        memcpy(data, Buffer->pBuffer + Buffer->nOffset, Buffer->nFilledLen);
+        SaveStillBuffer(Buffer->nFilledLen, data);
+    }
+
+    if (Buffer->nFlags & OMX_BUFFERFLAG_ENDOFFRAME)
+        SaveStill();
+
+    if (m_stillsExpected)
+        StartStill();
+}
+
+bool TorcPiCamera::EnableVideo(bool Video)
+{
+    (void)Video;
+    return true;
+}
+
+/*! \brief Start capturing a video buffer.
+ *
+ * \note This SHOULD be called at the start of video capture when a buffer should be available and this
+ *       method will then be non-blocking.
+ */
+void TorcPiCamera::StartVideo(void)
+{
+    if (!m_videoEnabled)
+        return;
 
     OMX_BUFFERHEADERTYPE* buffer = m_videoEncoder.GetBuffer(OMX_DirOutput, 0, 1000, OMX_IndexParamVideoInit);
-    if (!buffer)
-    {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to retrieve OMX buffer");
-        return false;
-    }
+    if (buffer)
+        (void)m_videoEncoder.FillThisBuffer(buffer);
+}
 
-    if (m_videoEncoder.FillThisBuffer(buffer))
-    {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to fill OMX buffer");
-        return false;
-    }
+void TorcPiCamera::ProcessVideoBuffer(OMX_BUFFERHEADERTYPE *Buffer)
+{
+    if (!Buffer || !m_muxer)
+        return;
 
-    while (m_videoEncoder.GetAvailableBuffers(OMX_DirOutput, 0, OMX_IndexParamVideoInit) < 1)
-        QThread::usleep(500);
-
-    bool idr      = buffer->nFlags & OMX_BUFFERFLAG_SYNCFRAME;
-    bool complete = buffer->nFlags & OMX_BUFFERFLAG_ENDOFFRAME;
-    bool sps      = buffer->nFlags & OMX_BUFFERFLAG_CODECCONFIG;
+    bool idr      = Buffer->nFlags & OMX_BUFFERFLAG_SYNCFRAME;
+    bool complete = Buffer->nFlags & OMX_BUFFERFLAG_ENDOFFRAME;
+    bool sps      = Buffer->nFlags & OMX_BUFFERFLAG_CODECCONFIG;
 
     if (!sps && complete)
         m_frameCount++;
@@ -343,8 +351,8 @@ bool TorcPiCamera::WriteFrame(void)
     if (m_bufferedPacket)
     {
         quint32 offset = m_bufferedPacket->size;
-        av_grow_packet(m_bufferedPacket, buffer->nFilledLen);
-        memcpy(m_bufferedPacket->data + offset, reinterpret_cast<uint8_t*>(buffer->pBuffer) + buffer->nOffset, buffer->nFilledLen);
+        av_grow_packet(m_bufferedPacket, Buffer->nFilledLen);
+        memcpy(m_bufferedPacket->data + offset, reinterpret_cast<uint8_t*>(Buffer->pBuffer) + Buffer->nOffset, Buffer->nFilledLen);
     }
 
     if (complete)
@@ -354,8 +362,8 @@ bool TorcPiCamera::WriteFrame(void)
         {
             packet = av_packet_alloc();
             av_init_packet(packet);
-            packet->size = buffer->nFilledLen;
-            packet->data = reinterpret_cast<uint8_t*>(buffer->pBuffer) + buffer->nOffset;
+            packet->size = Buffer->nFilledLen;
+            packet->data = reinterpret_cast<uint8_t*>(Buffer->pBuffer) + Buffer->nOffset;
         }
 
         packet->stream_index = m_videoStream;
@@ -363,71 +371,76 @@ bool TorcPiCamera::WriteFrame(void)
         packet->dts          = pts;
         packet->duration     = 1;
         packet->flags       |= idr ? AV_PKT_FLAG_KEY : 0;
-        m_muxer->AddPacket(packet, sps);
 
-        if (sps && !m_haveInitSegment)
         {
-            QByteArray config = QByteArray::fromRawData((char*)packet->data, packet->size);
-            m_params.m_videoCodec = m_muxer->GetAVCCodec(config);
-            m_haveInitSegment = true;
-            m_muxer->FinishSegment(true);
-        }
-        else if (!sps && !(m_frameCount % (m_params.m_frameRate * VIDEO_SEGMENT_TARGET)))
-        {
-            m_muxer->FinishSegment(false);
-        }
+            QWriteLocker locker(&m_ringBufferLock); // muxer accesses ringbuffer
+            m_muxer->AddPacket(packet, sps);
 
-        if (m_bufferedPacket)
-        {
-            av_packet_free(&m_bufferedPacket);
-            m_bufferedPacket = NULL;
-        }
-        else
-        {
-            packet->data = NULL;
-            av_packet_free(&packet);
+            if (sps && !m_haveInitSegment)
+            {
+                QByteArray config = QByteArray::fromRawData((char*)packet->data, packet->size);
+                m_params.m_videoCodec = m_muxer->GetAVCCodec(config);
+                m_haveInitSegment = true;
+                m_muxer->FinishSegment(true);
+                // video is notionally available once the init segment is available
+                emit ParametersChanged(m_params);
+                emit WritingStarted();
+            }
+            else if (!sps && !(m_frameCount % (m_params.m_frameRate * VIDEO_SEGMENT_TARGET)))
+            {
+                m_muxer->FinishSegment(false);
+                locker.unlock();
+                TrackDrift();
+                locker.relock();
+            }
+
+            if (m_bufferedPacket)
+            {
+                av_packet_free(&m_bufferedPacket);
+                m_bufferedPacket = NULL;
+            }
+            else
+            {
+                packet->data = NULL;
+                av_packet_free(&packet);
+            }
         }
     }
     else
     {
         if (!m_bufferedPacket)
         {
-            uint8_t* data = (uint8_t*)av_malloc(buffer->nFilledLen);
+            uint8_t* data = (uint8_t*)av_malloc(Buffer->nFilledLen);
             m_bufferedPacket = av_packet_alloc();
             av_init_packet(m_bufferedPacket);
-            av_packet_from_data(m_bufferedPacket, data, buffer->nFilledLen);
-            memcpy(m_bufferedPacket->data, reinterpret_cast<uint8_t*>(buffer->pBuffer) + buffer->nOffset, buffer->nFilledLen);
+            av_packet_from_data(m_bufferedPacket, data, Buffer->nFilledLen);
+            memcpy(m_bufferedPacket->data, reinterpret_cast<uint8_t*>(Buffer->pBuffer) + Buffer->nOffset, Buffer->nFilledLen);
             m_bufferedPacket->flags |= idr ? AV_PKT_FLAG_KEY : 0;
         }
     }
 
-    return true;
+    // and kick off another
+    StartVideo();
 }
 
 bool TorcPiCamera::Stop(void)
 {
-    if (m_bufferedPacket)
+    // make sure no further buffers are requested
+    m_stillsEnabled = false;
+    m_videoEnabled  = false;
+
+    // and ensure all FillBufferDone callbacks are complete
+    // NB this assumes only one buffer is allocated
+    TorcTimer timer;
+    timer.Start();
+    while (m_imageEncoder.GetInUseBuffers(OMX_DirOutput, 0, OMX_IndexParamImageInit) &&
+           m_videoEncoder.GetInUseBuffers(OMX_DirOutput, 0, OMX_IndexParamVideoInit) &&
+           timer.Elapsed() < 1000)
     {
-        av_packet_free(&m_bufferedPacket);
-        m_bufferedPacket = NULL;
+        QThread::msleep(50);
     }
 
-    if (m_muxer)
-    {
-        m_muxer->Finish();
-        delete m_muxer;
-        m_muxer = NULL;
-    }
-
-    if (m_ringBuffer)
-    {
-        delete m_ringBuffer;
-        m_ringBuffer = NULL;
-    }
-
-    m_frameCount      = 0;
-    m_videoStream     = 0;
-    m_haveInitSegment = false;
+    emit WritingStopped();
 
     // stop camera
     OMX_CONFIG_PORTBOOLEANTYPE capture;
@@ -856,12 +869,26 @@ bool TorcPiCamera::ConfigureVideoEncoder(void)
     LOG(VB_GENERAL, LOG_INFO, "Set video encoder output EEDE loss rate");
 
     // profile
+    OMX_VIDEO_AVCPROFILETYPE profile = OMX_VIDEO_AVCProfileMain;
+    switch (VIDEO_H264_PROFILE)
+    {
+        case FF_PROFILE_H264_BASELINE: profile = OMX_VIDEO_AVCProfileBaseline; break;
+        case FF_PROFILE_H264_MAIN:     profile = OMX_VIDEO_AVCProfileMain;     break;
+        case FF_PROFILE_H264_EXTENDED: profile = OMX_VIDEO_AVCProfileExtended; break;
+        case FF_PROFILE_H264_HIGH:     profile = OMX_VIDEO_AVCProfileHigh;     break;
+        case FF_PROFILE_H264_HIGH_10:  profile = OMX_VIDEO_AVCProfileHigh10;   break;
+        case FF_PROFILE_H264_HIGH_422: profile = OMX_VIDEO_AVCProfileHigh422;  break;
+        case FF_PROFILE_H264_HIGH_444: profile = OMX_VIDEO_AVCProfileHigh444;  break;
+        default:
+            LOG(VB_GENERAL, LOG_WARNING, "Unknown H264 profile. Defaulting to main");
+    }
+
     OMX_VIDEO_PARAM_AVCTYPE avc;
     OMX_INITSTRUCTURE(avc);
     avc.nPortIndex = m_videoEncoderOutputPort;
     if (m_videoEncoder.GetParameter(OMX_IndexParamVideoAvc, &avc))
         return false;
-    avc.eProfile = ENCODER_PROFILE;
+    avc.eProfile = profile;
     if (m_videoEncoder.SetParameter(OMX_IndexParamVideoAvc, &avc))
         return false;
 
@@ -889,12 +916,16 @@ bool TorcPiCamera::ConfigureVideoEncoder(void)
     return true;
 }
 
-void TorcPiCamera::ClearSnapshotBuffers(void)
+bool TorcPiCamera::EnableStills(uint Count)
 {
-    QPair<quint32, uint8_t*> buffer;
-    foreach(buffer, m_snapshotBuffers)
-        free(buffer.second);
-    m_snapshotBuffers.clear();
+    OMX_PARAM_U32TYPE single;
+    OMX_INITSTRUCTURE(single);
+    single.nPortIndex = m_splitter.GetPort(OMX_DirOutput, 1, OMX_IndexParamVideoInit);
+    single.nU32       = Count;
+    if (m_splitter.SetParameter(OMX_IndexConfigSingleStep, &single))
+        return false;
+
+    return TorcCameraDevice::EnableStills(Count);
 }
 
 static const QString piCameraType =
@@ -906,7 +937,7 @@ class TorcPiCameraXSDFactory : public TorcXSDFactory
     void GetXSD(QMultiMap<QString,QString> &XSD) { XSD.insert(XSD_CAMERATYPES, piCameraType); }
 } TorcPiCameraXSDFactory;
 
-class TorcPiCameraFactory Q_DECL_FINAL : public TorcCameraFactory
+class TorcPiCameraFactory final : public TorcCameraFactory
 {
   public:
     TorcPiCameraFactory() : TorcCameraFactory()
@@ -919,7 +950,7 @@ class TorcPiCameraFactory Q_DECL_FINAL : public TorcCameraFactory
         bcm_host_deinit();
     }
 
-    bool CanHandle(const QString &Type, const TorcCameraParams &Params) Q_DECL_OVERRIDE
+    bool CanHandle(const QString &Type, const TorcCameraParams &Params) override
     {
         (void)Params;
 
@@ -970,7 +1001,7 @@ class TorcPiCameraFactory Q_DECL_FINAL : public TorcCameraFactory
         return TorcPiCamera::gPiCameraDetected ? "pi" == Type : false;
     }
 
-    TorcCameraDevice* Create(const QString &Type, const TorcCameraParams &Params) Q_DECL_OVERRIDE
+    TorcCameraDevice* Create(const QString &Type, const TorcCameraParams &Params) override
     {
         if (("pi" == Type) && TorcPiCamera::gPiCameraDetected)
             return new TorcPiCamera(Params);
