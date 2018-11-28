@@ -72,6 +72,7 @@ var searchData=
   ['getinitsegment',['GetInitSegment',['../d3/dfd/class_torc_camera_device.html#a0675c4eb8cbb7a80acb31488ef7c211c',1,'TorcCameraDevice::GetInitSegment()'],['../de/dc9/class_torc_camera_thread.html#a23de6650ca34b823c6fe26472f4bc6ac',1,'TorcCameraThread::GetInitSegment()'],['../df/d16/class_torc_segmented_ring_buffer.html#a7f371f0bc18a6147de93d98e15b7da9c',1,'TorcSegmentedRingBuffer::GetInitSegment()']]],
   ['getinputlist',['GetInputList',['../d7/ddb/class_torc_inputs.html#a818c8736c1998584d087f0fc9710c9be',1,'TorcInputs']]],
   ['getinputtypes',['GetInputTypes',['../d7/ddb/class_torc_inputs.html#a23d774901c6a2aac6075d02ccbe60df8',1,'TorcInputs']]],
+  ['getinusebuffers',['GetInUseBuffers',['../de/d1d/class_torc_o_m_x_component.html#af77461c271e05a7c9908cfc14148ec1e',1,'TorcOMXComponent::GetInUseBuffers()'],['../d7/d61/class_torc_o_m_x_port.html#a386151a27bbd6b25f7c41e660bdea154',1,'TorcOMXPort::GetInUseBuffers()']]],
   ['getisactive',['GetIsActive',['../dd/d69/class_torc_setting.html#a5b6228815b22e77dfe6e7c97d49ffc19',1,'TorcSetting']]],
   ['getjavascriptconfiguration',['GetJavascriptConfiguration',['../d2/d5b/class_torc_h_t_m_l_static_content.html#a85ecc82e35afa549467566f7e9a95e26',1,'TorcHTMLStaticContent']]],
   ['getlanguage',['GetLanguage',['../d7/d17/class_torc_local_context.html#a3e40108691f4a62b1428018492ffdd92',1,'TorcLocalContext']]],

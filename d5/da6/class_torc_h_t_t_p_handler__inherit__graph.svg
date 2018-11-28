@@ -322,7 +322,7 @@ var sectionId = 'dynsection-0';
 </g>
 <!-- Node55 -->
 <g id="node55" class="node"><title>Node55</title>
-<g id="a_node55"><a xlink:href="../../d3/d3c/class_web_logger.html" target="_top" xlink:title="WebLogger">
+<g id="a_node55"><a xlink:href="../../d3/d3c/class_web_logger.html" target="_top" xlink:title="Serves log content to registered subscribers and HTTP clients. ">
 <polygon fill="white" stroke="black" points="338.5,-19.5 338.5,-38.5 407.5,-38.5 407.5,-19.5 338.5,-19.5"/>
 <text text-anchor="middle" x="373" y="-26.5" font-family="Helvetica,sans-Serif" font-size="10.00">WebLogger</text>
 </a>

@@ -19,7 +19,7 @@
 <area shape="rect" id="node51" href="$dd/d69/class_torc_setting.html" title="A wrapper around a database setting. " alt="" coords="456,689,549,716"/>
 <area shape="rect" id="node53" href="$d6/d7b/class_torc_time.html" title="A simple time service to confirm the time (and date) the system is currently operating with..." alt="" coords="463,740,542,767"/>
 <area shape="rect" id="node54" href="$d5/d47/class_torc_user.html" title="TorcUser" alt="" coords="464,791,541,817"/>
-<area shape="rect" id="node55" href="$d3/d3c/class_web_logger.html" title="WebLogger" alt="" coords="457,841,549,868"/>
+<area shape="rect" id="node55" href="$d3/d3c/class_web_logger.html" title="Serves log content to registered subscribers and HTTP clients. " alt="" coords="457,841,549,868"/>
 <area shape="rect" id="node8" href="$d5/d8f/class_torc_logic_control.html" title="TorcLogicControl" alt="" coords="656,5,783,32"/>
 <area shape="rect" id="node9" href="$d6/d72/class_torc_timer_control.html" title="TorcTimerControl" alt="" coords="655,56,784,83"/>
 <area shape="rect" id="node10" href="$df/d11/class_torc_transition_control.html" title="TorcTransitionControl" alt="" coords="643,107,796,133"/>

@@ -1,4 +1,4 @@
 <map id="LoggerBase" name="LoggerBase">
 <area shape="rect" id="node2" href="$de/db9/class_file_logger.html" title="FileLogger" alt="" coords="11,80,98,107"/>
-<area shape="rect" id="node3" href="$d3/d3c/class_web_logger.html" title="WebLogger" alt="" coords="9,155,101,181"/>
+<area shape="rect" id="node3" href="$d3/d3c/class_web_logger.html" title="Serves log content to registered subscribers and HTTP clients. " alt="" coords="9,155,101,181"/>
 </map>

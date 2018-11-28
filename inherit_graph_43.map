@@ -1,7 +1,7 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
 <area shape="rect" id="node1" href="$da/de4/class_logger_base.html" title="LoggerBase" alt="" coords="21,1779,119,1805"/>
 <area shape="rect" id="node2" href="$de/db9/class_file_logger.html" title="FileLogger" alt="" coords="234,1779,321,1805"/>
-<area shape="rect" id="node3" href="$d3/d3c/class_web_logger.html" title="WebLogger" alt="" coords="467,1931,559,1957"/>
+<area shape="rect" id="node3" href="$d3/d3c/class_web_logger.html" title="Serves log content to registered subscribers and HTTP clients. " alt="" coords="467,1931,559,1957"/>
 <area shape="rect" id="node5" href="$db/dd7/class_callback_object.html" title="A simple class encapusulating a single timer to start the CFRunLoop. " alt="" coords="455,1373,571,1400"/>
 <area shape="rect" id="node6" href="$df/dc8/class_test_serialisers.html" title="TestSerialisers" alt="" coords="457,1424,570,1451"/>
 <area shape="rect" id="node7" href="$dc/d01/class_test_torc_local_context.html" title="TestTorcLocalContext" alt="" coords="436,1525,591,1552"/>

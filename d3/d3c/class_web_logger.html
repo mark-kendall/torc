@@ -95,6 +95,9 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
+<p>Serves log content to registered subscribers and HTTP clients.  
+ <a href="../../d3/d3c/class_web_logger.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="../../d3/d0a/torcloggingimp_8h_source.html">torcloggingimp.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for WebLogger:</div>
@@ -222,7 +225,10 @@ Additional Inherited Members</h2></td></tr>
 <tr class="separator:aee38d9962b96bc3edf17d029ffa78cd9 inherit pro_attribs_class_logger_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock">
+<div class="textblock"><p>Serves log content to registered subscribers and HTTP clients. </p>
+<p>The latest, complete log can be downloaded via GetLog. Notifications of updates to the log are sent every 10 seconds.</p>
+<dl class="section note"><dt>Note</dt><dd>Subscribers to the 'tail' may not receive all log items if they do not retrieve the latest tail before the next item is logged. </dd></dl>
+
 <p>Definition at line <a class="el" href="../../d3/d0a/torcloggingimp_8h_source.html#l00051">51</a> of file <a class="el" href="../../d3/d0a/torcloggingimp_8h_source.html">torcloggingimp.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a9aaa0303de56db969b4ffaf20b7d722a"></a>
@@ -247,7 +253,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00497">497</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00506">506</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -264,7 +270,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00510">510</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00518">518</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -291,7 +297,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00514">514</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00522">522</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -317,7 +323,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00532">532</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00546">546</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -343,7 +349,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00542">542</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00556">556</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -395,7 +401,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="../../de/db9/class_file_logger.html#a3392abbe167739e8cf0fec60021f0fd0">FileLogger</a>.</p>
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00548">548</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00562">562</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -421,7 +427,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00527">527</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00541">541</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -501,7 +507,7 @@ Additional Inherited Members</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Nov 27 2018 18:32:50 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 28 2018 14:00:08 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>
