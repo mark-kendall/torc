@@ -41,7 +41,6 @@ class TorcPower : public QObject, public TorcHTTPService
 
   public:
     virtual ~TorcPower();
-    void BatteryUpdated  (int Level);
     QString GetUIName    (void) override;
     bool event           (QEvent *Event) override;
 
@@ -86,13 +85,13 @@ class TorcPower : public QObject, public TorcHTTPService
 
   protected:
     TorcPower();
+    void                  BatteryUpdated  (int Level);
     void                  Debug           (void);
     virtual bool          DoShutdown      (void) = 0;
     virtual bool          DoSuspend       (void) = 0;
     virtual bool          DoHibernate     (void) = 0;
     virtual bool          DoRestart       (void) = 0;
 
-    QMutex                m_lock;
     TorcSetting          *m_canShutdown;
     TorcSetting          *m_canSuspend;
     TorcSetting          *m_canHibernate;

@@ -122,7 +122,9 @@ TorcPowerOSX::~TorcPowerOSX()
 ///Shutdown the system.
 bool TorcPowerOSX::DoShutdown(void)
 {
+    m_httpServiceLock.lockForWrite();
     OSStatus error = SendAppleEventToSystemProcess(kAEShutDown);
+    m_httpServiceLock.unlock();
 
     if (noErr == error)
     {
@@ -138,7 +140,9 @@ bool TorcPowerOSX::DoShutdown(void)
 ///Suspend the system.
 bool TorcPowerOSX::DoSuspend(void)
 {
+    m_httpServiceLock.lockForWrite();
     OSStatus error = SendAppleEventToSystemProcess(kAESleep);
+    m_httpServiceLock.unlock();
 
     if (noErr == error)
     {
@@ -159,7 +163,9 @@ bool TorcPowerOSX::DoHibernate(void)
 ///Restart the system.
 bool TorcPowerOSX::DoRestart(void)
 {
+    m_httpServiceLock.lockForWrite();
     OSStatus error = SendAppleEventToSystemProcess(kAERestart);
+    m_httpServiceLock.unlock();
 
     if (noErr == error)
     {
@@ -178,8 +184,10 @@ bool TorcPowerOSX::DoRestart(void)
 */
 void TorcPowerOSX::Refresh(void)
 {
-    if (!m_powerRef)
+    if (m_powerRef)
         return;
+
+    m_httpServiceLock.LockedForWrite;
 
     CFTypeRef  info = IOPSCopyPowerSourcesInfo();
     CFArrayRef list = IOPSCopyPowerSourcesList(info);
@@ -219,6 +227,8 @@ void TorcPowerOSX::Refresh(void)
 
     CFRelease(list);
     CFRelease(info);
+
+    m_httpServiceLock.unlock();
 
     BatteryUpdated(m_batteryLevel);
 }
