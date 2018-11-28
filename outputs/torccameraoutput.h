@@ -28,7 +28,7 @@ class TorcCameraOutput : public TorcOutput
 
   public slots:
     virtual void CameraErrored (bool Errored) = 0;
-    void         ParamsChanged (TorcCameraParams Params);
+    void         ParamsChanged (TorcCameraParams &Params);
 
   protected:
     TorcCameraParams& GetParams (void);

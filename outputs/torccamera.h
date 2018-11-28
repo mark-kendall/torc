@@ -86,7 +86,7 @@ class TorcCameraDevice : public QObject
     void             SegmentReady    (int Segment);
     void             SetErrored      (bool Errored);
     void             StillReady      (const QString File);
-    void             ParametersChanged (TorcCameraParams Params);
+    void             ParametersChanged (TorcCameraParams &Params);
 
   protected:
     // streaming

@@ -64,7 +64,7 @@ void TorcCameraOutput::SetParams(TorcCameraParams &Params)
  *       code determined - which is needed before streaming has started. It should however have roughly 2
  *       seconds to arrive before the first video segment is available.
 */
-void TorcCameraOutput::ParamsChanged(TorcCameraParams Params)
+void TorcCameraOutput::ParamsChanged(TorcCameraParams &Params)
 {
     m_paramsLock.lockForWrite();
     m_params = Params;
