@@ -493,15 +493,16 @@ OMX_ERRORTYPE TorcOMXComponent::WaitForResponse(OMX_U32 Command, OMX_U32 Data2, 
             }
             else if ((*it).m_type == OMX_EventError)
             {
-                if ((*it).m_data1 == (OMX_U32)OMX_ErrorSameState && (*it).m_data2 == 1)
+                OMX_ERRORTYPE omxerror = (OMX_ERRORTYPE)(*it).m_data1;
+                if (omxerror == OMX_ErrorSameState && (*it).m_data2 == 1)
                 {
                     m_eventQueue.erase(it);
                     m_eventQueueLock.unlock();
                     return OMX_ErrorNone;
                 }
 
-                LOG(VB_GENERAL, LOG_ERR, QString("%1: Error event '%2' data2 %3")
-                    .arg(m_componentName).arg(ErrorToString((OMX_ERRORTYPE)(*it).m_data1)).arg((*it).m_data2));
+                LOG(VB_GENERAL, (omxerror ==  OMX_ErrorPortUnpopulated) ? LOG_DEBUG : LOG_ERR, QString("%1: Error event '%2' data2 %3")
+                    .arg(m_componentName).arg(ErrorToString(omxerror)).arg((*it).m_data2));
                 OMX_ERRORTYPE error = (OMX_ERRORTYPE)(*it).m_data1;
                 m_eventQueue.erase(it);
                 m_eventQueueLock.unlock();
