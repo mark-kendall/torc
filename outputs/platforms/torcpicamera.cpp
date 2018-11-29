@@ -468,7 +468,8 @@ bool TorcPiCamera::Stop(void)
 
     // disable remaining ports
     m_camera.DisablePorts(OMX_IndexParamVideoInit);
-    m_splitter.DisablePorts(OMX_IndexParamVideoInit);
+    // disabled due to inconsequential errors
+    //m_splitter.DisablePorts(OMX_IndexParamVideoInit);
     m_videoEncoder.DisablePorts(OMX_IndexParamVideoInit);
     m_imageEncoder.DisablePorts(OMX_IndexParamImageInit);
     m_nullSink.DisablePorts(OMX_IndexParamVideoInit);
