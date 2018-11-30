@@ -108,6 +108,6 @@ class TorcIoTPlotterNotifierFactory final : public TorcNotifierFactory
         {
             return new TorcIoTPlotterNotifier(Details);
         }
-        return NULL;
+        return nullptr;
     }
 } TorcIoTPlotterNotifierFactory;

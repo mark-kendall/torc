@@ -264,12 +264,12 @@ bool TorcCameraParams::IsCompatible(const TorcCameraParams &Other) const
 TorcCameraDevice::TorcCameraDevice(const TorcCameraParams &Params)
   : QObject(),
     m_params(Params),
-    m_muxer(NULL),
+    m_muxer(nullptr),
     m_videoStream(0),
     m_frameCount(0),
     m_haveInitSegment(false),
-    m_bufferedPacket(NULL),
-    m_ringBuffer(NULL),
+    m_bufferedPacket(nullptr),
+    m_ringBuffer(nullptr),
     m_ringBufferLock(QReadWriteLock::Recursive),
     m_referenceTime(0),
     m_discardDrift(2),
@@ -316,7 +316,7 @@ bool TorcCameraDevice::Setup(void)
     connect(m_ringBuffer, SIGNAL(InitSegmentReady()),   this, SIGNAL(InitSegmentReady()));
 
     m_frameCount      = 0;
-    m_bufferedPacket  = NULL;
+    m_bufferedPacket  = nullptr;
     m_haveInitSegment = false;
     return true;
 }
@@ -440,7 +440,7 @@ void TorcCameraDevice::TrackDrift(void)
         .arg((double)drift/1000, 0, 'f', 3).arg(shortaverage/1000, 0, 'f', 3).arg(longaverage/1000, 0, 'f', 3).arg(timetozero/1000, 0, 'f', 3));
 }
 
-TorcCameraFactory* TorcCameraFactory::gTorcCameraFactory = NULL;
+TorcCameraFactory* TorcCameraFactory::gTorcCameraFactory = nullptr;
 
 TorcCameraFactory::TorcCameraFactory()
   : nextTorcCameraFactory(gTorcCameraFactory)
@@ -465,7 +465,7 @@ TorcCameraFactory* TorcCameraFactory::NextFactory(void) const
 
 TorcCameraDevice* TorcCameraFactory::GetCamera(const QString &Type, const TorcCameraParams &Params)
 {
-    TorcCameraDevice* result = NULL;
+    TorcCameraDevice* result = nullptr;
 
     TorcCameraFactory* factory = TorcCameraFactory::GetTorcCameraFactory();
     for ( ; factory; factory = factory->NextFactory())

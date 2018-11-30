@@ -65,8 +65,8 @@ static void convert_float(quint8 *p, quint8 s)
  */
 TorcPList::TorcPList(const QByteArray &Data)
   : m_result(),
-    m_data(NULL),
-    m_offsetTable(NULL),
+    m_data(nullptr),
+    m_offsetTable(nullptr),
     m_rootObj(0),
     m_numObjs(0),
     m_offsetSize(0),
@@ -312,7 +312,7 @@ quint64 TorcPList::GetBinaryUInt(quint8 *Data, quint64 Size)
 quint8* TorcPList::GetBinaryObject(quint64 Num)
 {
     if (Num > m_numObjs)
-        return NULL;
+        return nullptr;
 
     quint8* p = m_offsetTable + (Num * m_offsetSize);
     quint64 offset = GetBinaryUInt(p, m_offsetSize);

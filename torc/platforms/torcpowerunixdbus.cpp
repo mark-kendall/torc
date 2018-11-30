@@ -403,6 +403,6 @@ class TorcPowerFactoryUnixDBus : public TorcPowerFactory
         if (Score <= 10 && TorcPowerUnixDBus::Available())
             return new TorcPowerUnixDBus();
 
-        return NULL;
+        return nullptr;
     }
 } TorcPowerFactoryUnixDBus;

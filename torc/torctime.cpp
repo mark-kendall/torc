@@ -95,7 +95,7 @@ static class TorcTimeObject : public TorcAdminObject
   public:
     TorcTimeObject()
       : TorcAdminObject(TORC_ADMIN_LOW_PRIORITY),
-        m_time(NULL)
+        m_time(nullptr)
     {
     }
 
@@ -114,7 +114,7 @@ static class TorcTimeObject : public TorcAdminObject
     {
         if (m_time)
             delete m_time;
-        m_time = NULL;
+        m_time = nullptr;
     }
 
   private:

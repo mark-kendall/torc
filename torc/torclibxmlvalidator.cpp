@@ -81,12 +81,12 @@ void TorcXmlValidator::HandleMessage(void *ctx, const char *format, ...)
 
 void TorcXmlValidator::Validate(void)
 {
-    xmlSetStructuredErrorFunc(NULL, NULL);
+    xmlSetStructuredErrorFunc(nullptr, nullptr);
     xmlSetGenericErrorFunc(this, HandleMessage);
-    xmlThrDefSetStructuredErrorFunc(NULL, NULL);
+    xmlThrDefSetStructuredErrorFunc(nullptr, nullptr);
     xmlThrDefSetGenericErrorFunc(this, HandleMessage);
 
-    xmlSchemaParserCtxtPtr parsercontext = NULL;
+    xmlSchemaParserCtxtPtr parsercontext = nullptr;
 
     if (!m_xsdFile.isEmpty())
     {

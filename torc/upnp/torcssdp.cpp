@@ -33,7 +33,7 @@
 #include "torcupnp.h"
 #include "torcssdp.h"
 
-TorcSSDP* TorcSSDP::gSSDP        = NULL;
+TorcSSDP* TorcSSDP::gSSDP        = nullptr;
 QMutex*   TorcSSDP::gSSDPLock    = new QMutex(QMutex::Recursive);
 bool TorcSSDP::gSearchEnabled    = false;
 TorcHTTPServer::Status TorcSSDP::gSearchOptions = TorcHTTPServer::Status();
@@ -77,12 +77,12 @@ TorcSSDP::TorcSSDP()
     m_ipv6Address(),
     m_addressess(),
     m_ipv4GroupAddress(TORC_IPV4_UDP_MULTICAST_ADDR),
-    m_ipv4MulticastSocket(NULL),
+    m_ipv4MulticastSocket(nullptr),
     m_ipv6LinkGroupBaseAddress(TORC_IPV6_UDP_MULTICAST_ADDR2),
-    m_ipv6LinkMulticastSocket(NULL),
+    m_ipv6LinkMulticastSocket(nullptr),
     m_discoveredDevices(),
-    m_ipv4UnicastSocket(NULL),
-    m_ipv6UnicastSocket(NULL),
+    m_ipv4UnicastSocket(nullptr),
+    m_ipv6UnicastSocket(nullptr),
     m_responseTimer(),
     m_responseQueue()
 {
@@ -255,10 +255,10 @@ void TorcSSDP::Stop(void)
     delete m_ipv4UnicastSocket;
     delete m_ipv6UnicastSocket;
 
-    m_ipv4MulticastSocket     = NULL;
-    m_ipv6LinkMulticastSocket = NULL;
-    m_ipv4UnicastSocket       = NULL;
-    m_ipv6UnicastSocket       = NULL;
+    m_ipv4MulticastSocket     = nullptr;
+    m_ipv6LinkMulticastSocket = nullptr;
+    m_ipv4UnicastSocket       = nullptr;
+    m_ipv6UnicastSocket       = nullptr;
 }
 
 /*! \fn    TorcSSDP::Search
@@ -323,8 +323,8 @@ TorcSSDP* TorcSSDP::Create(bool Destroy)
     }
 
     delete gSSDP;
-    gSSDP = NULL;
-    return NULL;
+    gSSDP = nullptr;
+    return nullptr;
 }
 
 QUdpSocket* TorcSSDP::CreateSearchSocket(const QHostAddress &HostAddress, QObject *Owner)
@@ -346,7 +346,7 @@ QUdpSocket* TorcSSDP::CreateSearchSocket(const QHostAddress &HostAddress, QObjec
         .arg(HostAddress.protocol() == QAbstractSocket::IPv6Protocol ? "IPv6" : "IPv4").arg(socket->errorString())
         .arg(HostAddress.toString()));
     delete socket;
-    return NULL;
+    return nullptr;
 }
 
 QUdpSocket* TorcSSDP::CreateMulticastSocket(const QHostAddress &HostAddress, QObject *Owner, const QNetworkInterface &Interface)
@@ -376,7 +376,7 @@ QUdpSocket* TorcSSDP::CreateMulticastSocket(const QHostAddress &HostAddress, QOb
     }
 
     delete socket;
-    return NULL;
+    return nullptr;
 }
 
 void TorcSSDP::SendSearch(void)

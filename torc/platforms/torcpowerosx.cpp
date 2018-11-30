@@ -42,10 +42,10 @@
 static OSStatus SendAppleEventToSystemProcess(AEEventID EventToSend);
 
 TorcPowerOSX::TorcPowerOSX()
-  : m_powerRef(NULL),
+  : m_powerRef(nullptr),
     m_rootPowerDomain(0),
     m_powerNotifier(MACH_PORT_NULL),
-    m_powerNotifyPort(NULL)
+    m_powerNotifyPort(nullptr)
 {
     CocoaAutoReleasePool pool;
 
@@ -69,7 +69,7 @@ TorcPowerOSX::TorcPowerOSX()
     }
 
     // Is there a battery?
-    CFArrayRef batteryinfo = NULL;
+    CFArrayRef batteryinfo = nullptr;
 
     if (IOPMCopyBatteryInfo(kIOMasterPortDefault, &batteryinfo) == kIOReturnSuccess)
     {
@@ -299,8 +299,8 @@ OSStatus SendAppleEventToSystemProcess(AEEventID EventToSend)
 {
     AEAddressDesc targetDesc;
     static const ProcessSerialNumber kPSNOfSystemProcess = { 0, kSystemProcess };
-    AppleEvent eventReply       = { typeNull, NULL };
-    AppleEvent appleEventToSend = { typeNull, NULL };
+    AppleEvent eventReply       = { typeNull, nullptr };
+    AppleEvent appleEventToSend = { typeNull, nullptr };
 
     OSStatus error = AECreateDesc(typeProcessSerialNumber, &kPSNOfSystemProcess,
                                   sizeof(kPSNOfSystemProcess), &targetDesc);
@@ -341,7 +341,7 @@ class TorcPowerFactoryOSX : public TorcPowerFactory
         if (Score <= 10)
             return new TorcPowerOSX();
 
-        return NULL;
+        return nullptr;
     }
 } TorcPowerFactoryOSX;
 

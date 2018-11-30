@@ -103,11 +103,11 @@ OMX_ERRORTYPE TorcOMXTunnel::Destroy(void)
     m_source->EnablePort(OMX_DirOutput, m_sourceIndex, false, m_sourceDomain);
     m_destination->EnablePort(OMX_DirInput, m_destinationIndex, false, m_destinationDomain);
 
-    OMX_ERRORTYPE error = OMX_SetupTunnel(m_source->GetHandle(), m_sourcePort, NULL, 0);
+    OMX_ERRORTYPE error = OMX_SetupTunnel(m_source->GetHandle(), m_sourcePort, nullptr, 0);
     if (OMX_ErrorNone != error)
         OMX_ERROR(error, m_source->GetName(), "Failed to destroy tunnel input");
 
-    error = OMX_SetupTunnel(m_destination->GetHandle(), m_destinationPort, NULL, 0);
+    error = OMX_SetupTunnel(m_destination->GetHandle(), m_destinationPort, nullptr, 0);
     if (OMX_ErrorNone != error)
         OMX_ERROR(error, m_destination->GetName(), "Failed to destroy tunnel output");
 

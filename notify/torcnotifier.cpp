@@ -42,7 +42,7 @@ TorcNotifier::~TorcNotifier()
 {
 }
 
-TorcNotifierFactory* TorcNotifierFactory::gTorcNotifierFactory = NULL;
+TorcNotifierFactory* TorcNotifierFactory::gTorcNotifierFactory = nullptr;
 
 TorcNotifierFactory::TorcNotifierFactory()
   : nextTorcNotifierFactory(gTorcNotifierFactory)

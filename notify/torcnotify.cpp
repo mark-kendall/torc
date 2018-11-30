@@ -58,7 +58,7 @@ TorcNotifier* TorcNotify::FindNotifierByName(const QString &Name)
         if (notifier->GetUniqueId() == Name)
             return notifier;
 
-    return NULL;
+    return nullptr;
 }
 
 void TorcNotify::Graph(QByteArray *Data)

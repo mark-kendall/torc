@@ -36,7 +36,7 @@
 Torc1WireReadThread::Torc1WireReadThread(Torc1WireDS18B20 *Parent, const QString &Filename)
   : TorcQThread("1Wire"),
     m_parent(Parent),
-    m_timer(NULL),
+    m_timer(nullptr),
     m_file(ONE_WIRE_DIRECTORY + Filename + "/w1_slave") 
 {   
 }   
@@ -62,7 +62,7 @@ void Torc1WireReadThread::Start(void)
 void Torc1WireReadThread::Finish(void)
 {
     delete m_timer;
-    m_timer = NULL;
+    m_timer = nullptr;
 }
 
 void Torc1WireReadThread::Read(void)
@@ -163,7 +163,7 @@ class Torc1WireDS18B20Factory : public Torc1WireDeviceFactory
     {
         if (DeviceType == DS18B20NAME)
             return new Torc1WireDS18B20(Details);
-        return NULL;
+        return nullptr;
     }
 } Torc1WireDS18B20Factory;
 

@@ -28,7 +28,7 @@
 #include "torcnetwork.h"
 #include "torccoreutils.h"
 
-TorcNetwork*    gNetwork = NULL;
+TorcNetwork*    gNetwork = nullptr;
 QMutex*         gNetworkLock = new QMutex(QMutex::Recursive);
 QStringList     gNetworkHostNames;
 QReadWriteLock* gNetworkHostNamesLock = new QReadWriteLock();
@@ -278,7 +278,7 @@ void TorcNetwork::Setup(bool Create)
             return;
 
         delete gNetwork;
-        gNetwork = NULL;
+        gNetwork = nullptr;
         return;
     }
 
@@ -289,7 +289,7 @@ void TorcNetwork::Setup(bool Create)
     }
 
     delete gNetwork;
-    gNetwork = NULL;
+    gNetwork = nullptr;
 }
 
 QString ConfigurationTypeToString(QNetworkConfiguration::Type Type)
@@ -373,7 +373,7 @@ void TorcNetwork::GetSafe(TorcNetworkRequest* Request)
         // some servers require a recognised user agent...
         Request->m_request.setRawHeader("User-Agent", DEFAULT_USER_AGENT);
 
-        QNetworkReply* reply = NULL;
+        QNetworkReply* reply = nullptr;
 
         if (Request->m_type == QNetworkAccessManager::GetOperation)
             reply = get(Request->m_request);
@@ -578,7 +578,7 @@ void TorcNetwork::ReadyRead(void)
 {
     QNetworkReply *reply = dynamic_cast<QNetworkReply*>(sender());
 
-    TorcNetworkRequest* request = NULL;
+    TorcNetworkRequest* request = nullptr;
     if (reply && m_requests.contains(reply) && (request = m_requests.value(reply)))
     {
         if (!request->m_started)
@@ -607,7 +607,7 @@ void TorcNetwork::Finished(void)
 {
     QNetworkReply *reply = dynamic_cast<QNetworkReply*>(sender());
 
-    TorcNetworkRequest *request = NULL;
+    TorcNetworkRequest *request = nullptr;
     if (reply && m_requests.contains(reply) && (request = m_requests.value(reply)))
     {
         if (request->m_type == QNetworkAccessManager::HeadOperation)
@@ -639,7 +639,7 @@ void TorcNetwork::Error(QNetworkReply::NetworkError Code)
 {
     QNetworkReply *reply = dynamic_cast<QNetworkReply*>(sender());
 
-    TorcNetworkRequest *request = NULL;
+    TorcNetworkRequest *request = nullptr;
     if (reply && m_requests.contains(reply) && (request = m_requests.value(reply)) && (Code != QNetworkReply::OperationCanceledError))
     {
         request->SetReplyError(Code);
@@ -704,7 +704,7 @@ void TorcNetwork::DownloadProgress(qint64 Received, qint64 Total)
 {
     QNetworkReply *reply = dynamic_cast<QNetworkReply*>(sender());
 
-    TorcNetworkRequest *request = NULL;
+    TorcNetworkRequest *request = nullptr;
     if (reply && m_requests.contains(reply) && (request = m_requests.value(reply)))
         request->DownloadProgress(Received, Total);
 }

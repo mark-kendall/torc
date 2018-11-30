@@ -28,7 +28,7 @@
 #include "torcomxport.h"
 
 TorcOMXPort::TorcOMXPort(TorcOMXComponent *Parent, OMX_HANDLETYPE Handle, OMX_U32 Port, OMX_INDEXTYPE Domain)
-  : m_owner(NULL),
+  : m_owner(nullptr),
     m_parent(Parent),
     m_handle(Handle),
     m_port(Port),
@@ -71,7 +71,7 @@ OMX_ERRORTYPE TorcOMXPort::EnablePort(bool Enable, bool Wait /*=true*/)
     if (portdefinition.bEnabled == OMX_FALSE && Enable)
     {
         LOG(VB_GENERAL, LOG_INFO, QString("%1: Enabling port %2").arg(m_parent->GetName()).arg(m_port));
-        error = OMX_SendCommand(m_handle, OMX_CommandPortEnable, m_port, NULL);
+        error = OMX_SendCommand(m_handle, OMX_CommandPortEnable, m_port, nullptr);
         OMX_CHECK(error, m_parent->GetName(), "Failed to send command");
         if (Wait)
             return m_parent->WaitForResponse(OMX_CommandPortEnable, m_port, 1000);
@@ -81,7 +81,7 @@ OMX_ERRORTYPE TorcOMXPort::EnablePort(bool Enable, bool Wait /*=true*/)
     else if (portdefinition.bEnabled == OMX_TRUE && !Enable)
     {
         LOG(VB_GENERAL, LOG_INFO, QString("%1: Disabling port %2").arg(m_parent->GetName()).arg(m_port));
-        error = OMX_SendCommand(m_handle, OMX_CommandPortDisable, m_port, NULL);
+        error = OMX_SendCommand(m_handle, OMX_CommandPortDisable, m_port, nullptr);
         OMX_CHECK(error, m_parent->GetName(), "Failed to send command");
         if (Wait)
             return m_parent->WaitForResponse(OMX_CommandPortDisable, m_port, 1000);
@@ -108,7 +108,7 @@ OMX_U32 TorcOMXPort::GetInUseBuffers(void)
     return result;
 }
 
-OMX_ERRORTYPE TorcOMXPort::CreateBuffers(QObject *Owner /*=NULL*/)
+OMX_ERRORTYPE TorcOMXPort::CreateBuffers(QObject *Owner /*=nullptr*/)
 {
     if (!m_handle)
         return OMX_ErrorUndefined;
@@ -130,8 +130,8 @@ OMX_ERRORTYPE TorcOMXPort::CreateBuffers(QObject *Owner /*=NULL*/)
 
     for (OMX_U32 i = 0; i < portdefinition.nBufferCountActual; ++i)
     {
-        OMX_BUFFERHEADERTYPE *buffer = NULL;
-        error = OMX_AllocateBuffer(m_handle, &buffer, m_port, NULL, portdefinition.nBufferSize);
+        OMX_BUFFERHEADERTYPE *buffer = nullptr;
+        error = OMX_AllocateBuffer(m_handle, &buffer, m_port, nullptr, portdefinition.nBufferSize);
         if (OMX_ErrorNone != error)
         {
             OMX_ERROR(error, m_parent->GetName(), "Failed to allocate buffer");
@@ -161,7 +161,7 @@ OMX_ERRORTYPE TorcOMXPort::DestroyBuffers(void)
     if (m_owner)
     {
         disconnect(this, SIGNAL(BufferReady(OMX_BUFFERHEADERTYPE*, quint64)), m_owner, SLOT(BufferReady(OMX_BUFFERHEADERTYPE*, quint64)));
-        m_owner = NULL;
+        m_owner = nullptr;
     }
 
     (void)EnablePort(false);
@@ -189,7 +189,7 @@ OMX_ERRORTYPE TorcOMXPort::Flush(void)
 
     QMutexLocker locker(&m_lock);
 
-    OMX_ERRORTYPE error = OMX_SendCommand(m_handle, OMX_CommandFlush, m_port, NULL);
+    OMX_ERRORTYPE error = OMX_SendCommand(m_handle, OMX_CommandFlush, m_port, nullptr);
     OMX_CHECK(error, m_parent->GetName(), "Failed to send command");
 
     return OMX_ErrorNone;
@@ -210,7 +210,7 @@ OMX_ERRORTYPE TorcOMXPort::MakeAvailable(OMX_BUFFERHEADERTYPE *Buffer)
 
 OMX_BUFFERHEADERTYPE* TorcOMXPort::GetBuffer(OMX_S32 Timeout)
 {
-    OMX_BUFFERHEADERTYPE* result = NULL;
+    OMX_BUFFERHEADERTYPE* result = nullptr;
 
     m_lock.lock();
 

@@ -579,7 +579,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
                     do
                     {
                         bytessent = qMin(size - sent, (qint64)READ_CHUNK_SIZE);
-                        if (sendfile(file.handle(), Socket->socketDescriptor(), off, &bytessent, NULL, 0) < 0)
+                        if (sendfile(file.handle(), Socket->socketDescriptor(), off, &bytessent, nullptr, 0) < 0)
                         {
                             if (errno != EAGAIN)
                             {
@@ -682,7 +682,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
                 {
                     bytessent = qMin(size - sent, (qint64)READ_CHUNK_SIZE);;
 
-                    if (sendfile(file.handle(), Socket->socketDescriptor(), off, &bytessent, NULL, 0) < 0)
+                    if (sendfile(file.handle(), Socket->socketDescriptor(), off, &bytessent, nullptr, 0) < 0)
                     {
                         if (errno != EAGAIN)
                         {

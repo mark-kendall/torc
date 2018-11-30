@@ -995,7 +995,7 @@ bool TorcWebSocket::event(QEvent *Event)
                 m_requestTimers.remove(timerid);
 
                 // handle the timeout
-                TorcRPCRequest *request = NULL;
+                TorcRPCRequest *request = nullptr;
                 if (m_currentRequests.contains(requestid) && (request = m_currentRequests.value(requestid)))
                 {
                     request->AddState(TorcRPCRequest::TimedOut);
@@ -1050,7 +1050,7 @@ void TorcWebSocket::ProcessPayload(const QByteArray &Payload)
         else if (request->GetID() > -1)
         {
             int id = request->GetID();
-            TorcRPCRequest *requestor = NULL;
+            TorcRPCRequest *requestor = nullptr;
             if (m_currentRequests.contains(id) && (requestor = m_currentRequests.value(id)))
             {
                 requestor->AddState(TorcRPCRequest::ReplyReceived);
@@ -1129,7 +1129,7 @@ void TorcWebSocket::ProcessPayload(const QByteArray &Payload)
 
                         // and disconnect the destroyed signal if we have no more subscriptions for this object
                         if (!m_subscribers.values().contains(parent))
-                            (void)disconnect(parent, 0, this, 0);
+                            (void)disconnect(parent, nullptr, this, nullptr);
                     }
 
                     requestor->SetReply(request->GetReply());

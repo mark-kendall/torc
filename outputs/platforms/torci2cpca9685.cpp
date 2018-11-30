@@ -167,7 +167,7 @@ TorcI2CPCA9685::~TorcI2CPCA9685()
         {
             TorcOutputs::gOutputs->RemoveOutput(m_outputs[i]);
             m_outputs[i]->DownRef();
-            m_outputs[i] = NULL;
+            m_outputs[i] = nullptr;
         }
     }
 
@@ -216,6 +216,6 @@ class TorcI2CPCA9685Factory : public TorcI2CDeviceFactory
     {
         if (PCA9685 == Name)
             return new TorcI2CPCA9685(Address, Details);
-        return NULL;
+        return nullptr;
     }
 } TorcI2CPCA9685Factory;

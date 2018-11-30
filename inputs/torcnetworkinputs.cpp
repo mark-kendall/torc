@@ -118,8 +118,8 @@ void TorcNetworkInputs::Create(const QVariantMap &Details)
                         if (!ok)
                             defaultdouble = 0.0;
 
-                        TorcInput*  newinput  = NULL;
-                        TorcOutput* newoutput = NULL;
+                        TorcInput*  newinput  = nullptr;
+                        TorcOutput* newoutput = nullptr;
                         switch (type)
                         {
                             case TorcInput::PWM:

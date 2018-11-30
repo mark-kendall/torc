@@ -39,7 +39,7 @@ static OMX_CALLBACKTYPE gCallbacks;
 
 TorcOMXComponent::TorcOMXComponent(OMX_STRING Component)
   : m_valid(false),
-    m_handle(NULL),
+    m_handle(nullptr),
     m_lock(QMutex::NonRecursive),
     m_componentName(Component),
     m_inputPorts(),
@@ -161,7 +161,7 @@ TorcOMXPort* TorcOMXComponent::FindPort(OMX_DIRTYPE Direction, OMX_U32 Index, OM
 
     LOG(VB_GENERAL, LOG_ERR, QString("%1: Failed to find port (Dir: %1, Index %2, Domain %3)")
         .arg(m_componentName).arg(Index).arg(DomainToString(Domain)));
-    return NULL;
+    return nullptr;
 }
 
 TorcOMXComponent::~TorcOMXComponent()
@@ -175,7 +175,7 @@ TorcOMXComponent::~TorcOMXComponent()
 
     if (m_handle)
         OMX_FreeHandle(m_handle);
-    m_handle = NULL;
+    m_handle = nullptr;
 }
 
 bool TorcOMXComponent::IsValid(void)
@@ -226,7 +226,7 @@ OMX_ERRORTYPE TorcOMXComponent::SetState(OMX_STATETYPE State, bool Wait/*=true*/
         return OMX_ErrorUndefined;
 
     QMutexLocker locker(&m_lock);
-    OMX_ERRORTYPE error = OMX_SendCommand(m_handle, OMX_CommandStateSet, State, NULL);
+    OMX_ERRORTYPE error = OMX_SendCommand(m_handle, OMX_CommandStateSet, State, nullptr);
 
     if (OMX_ErrorSameState == error)
     {
@@ -365,7 +365,7 @@ OMX_ERRORTYPE TorcOMXComponent::FillThisBuffer(OMX_BUFFERHEADERTYPE *Buffer)
     return OMX_ErrorNone;
 }
 
-OMX_ERRORTYPE TorcOMXComponent::CreateBuffers(OMX_DIRTYPE Direction, OMX_U32 Index, OMX_INDEXTYPE Domain, QObject* Owner /*=NULL*/)
+OMX_ERRORTYPE TorcOMXComponent::CreateBuffers(OMX_DIRTYPE Direction, OMX_U32 Index, OMX_INDEXTYPE Domain, QObject* Owner /*=nullptr*/)
 {
     QMutexLocker locker(&m_lock);
 
@@ -393,7 +393,7 @@ OMX_BUFFERHEADERTYPE* TorcOMXComponent::GetBuffer(OMX_DIRTYPE Direction, OMX_U32
     if (port)
         return port->GetBuffer(Timeout);
 
-    return NULL;
+    return nullptr;
 }
 
 OMX_ERRORTYPE TorcOMXComponent::FlushBuffer(OMX_DIRTYPE Direction, OMX_U32 Index, OMX_INDEXTYPE Domain)
@@ -540,7 +540,7 @@ OMX_ERRORTYPE TorcOMXComponent::DisablePorts(OMX_INDEXTYPE Domain)
 
         if (OMX_GetParameter(m_handle, OMX_IndexParamPortDefinition, &portdefinition) == OMX_ErrorNone)
         {
-            OMX_ERRORTYPE error = OMX_SendCommand(m_handle, OMX_CommandPortDisable, portnumber, NULL);
+            OMX_ERRORTYPE error = OMX_SendCommand(m_handle, OMX_CommandPortDisable, portnumber, nullptr);
             if (OMX_ErrorNone == error)
             {
                 error = WaitForResponse(OMX_CommandPortDisable, portnumber, 100);

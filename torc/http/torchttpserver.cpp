@@ -263,7 +263,7 @@ QString TorcHTTPServer::PlatformName(void)
  * \sa TorcHTTPHandler
 */
 
-TorcHTTPServer* TorcHTTPServer::gWebServer = NULL;
+TorcHTTPServer* TorcHTTPServer::gWebServer = nullptr;
 TorcHTTPServer::Status TorcHTTPServer::gWebServerStatus = TorcHTTPServer::Status();
 QMutex          TorcHTTPServer::gWebServerLock(QMutex::Recursive);
 QString         TorcHTTPServer::gPlatform = QString("");
@@ -272,24 +272,24 @@ QReadWriteLock  TorcHTTPServer::gOriginWhitelistLock(QReadWriteLock::Recursive);
 
 TorcHTTPServer::TorcHTTPServer()
   : QObject(),
-    m_serverSettings(NULL),
-    m_port(NULL),
-    m_secure(NULL),
-    m_upnp(NULL),
-    m_upnpSearch(NULL),
-    m_upnpAdvertise(NULL),
-    m_bonjour(NULL),
-    m_bonjourSearch(NULL),
-    m_bonjourAdvert(NULL),
-    m_ipv6(NULL),
-    m_listener(NULL),
+    m_serverSettings(nullptr),
+    m_port(nullptr),
+    m_secure(nullptr),
+    m_upnp(nullptr),
+    m_upnpSearch(nullptr),
+    m_upnpAdvertise(nullptr),
+    m_bonjour(nullptr),
+    m_bonjourSearch(nullptr),
+    m_bonjourAdvert(nullptr),
+    m_ipv6(nullptr),
+    m_listener(nullptr),
     m_user(),
     m_defaultHandler("", TORC_TORC), // default top level handler
     m_servicesHandler(this),         // services 'helper' service for '/services'
     m_staticContent(),               // static files - for /css /fonts /js /img etc
     m_dynamicContent(),              // dynamic files - for config files etc (typically served from ~/.torc/content)
     m_upnpContent(),                 // upnp - device description
-    m_ssdpThread(NULL),
+    m_ssdpThread(nullptr),
     m_bonjourBrowserReference(0),
     m_httpBonjourReference(0),
     m_torcBonjourReference(0),
@@ -408,70 +408,70 @@ TorcHTTPServer::~TorcHTTPServer()
     {
         m_bonjourAdvert->Remove();
         m_bonjourAdvert->DownRef();
-        m_bonjourAdvert = NULL;
+        m_bonjourAdvert = nullptr;
     }
 
     if (m_bonjourSearch)
     {
         m_bonjourSearch->Remove();
         m_bonjourSearch->DownRef();
-        m_bonjourSearch = NULL;
+        m_bonjourSearch = nullptr;
     }
 
     if (m_bonjour)
     {
         m_bonjour->Remove();
         m_bonjour->DownRef();
-        m_bonjour = NULL;
+        m_bonjour = nullptr;
     }
 
     if (m_ipv6)
     {
         m_ipv6->Remove();
         m_ipv6->DownRef();
-        m_ipv6 = NULL;
+        m_ipv6 = nullptr;
     }
 
     if (m_upnpAdvertise)
     {
         m_upnpAdvertise->Remove();
         m_upnpAdvertise->DownRef();
-        m_upnpAdvertise = NULL;
+        m_upnpAdvertise = nullptr;
     }
 
     if (m_upnpSearch)
     {
         m_upnpSearch->Remove();
         m_upnpSearch->DownRef();
-        m_upnpSearch = NULL;
+        m_upnpSearch = nullptr;
     }
 
     if (m_upnp)
     {
         m_upnp->Remove();
         m_upnp->DownRef();
-        m_upnp = NULL;
+        m_upnp = nullptr;
     }
 
     if (m_port)
     {
         m_port->Remove();
         m_port->DownRef();
-        m_port = NULL;
+        m_port = nullptr;
     }
 
     if (m_secure)
     {
         m_secure->Remove();
         m_secure->DownRef();
-        m_secure = NULL;
+        m_secure = nullptr;
     }
 
     if (m_serverSettings)
     {
         m_serverSettings->Remove();
         m_serverSettings->DownRef();
-        m_serverSettings = NULL;
+        m_serverSettings = nullptr;
     }
 
     TorcBonjour::TearDown();
@@ -482,7 +482,7 @@ TorcWebSocketThread* TorcHTTPServer::TakeSocket(TorcWebSocketThread *Socket)
     QMutexLocker locker(&gWebServerLock);
     if (gWebServer)
         return gWebServer->TakeSocketPriv(Socket);
-    return NULL;
+    return nullptr;
 }
 
 /*! \brief Ensures remote user is authorised to access this request.
@@ -817,7 +817,7 @@ void TorcHTTPServer::Close(void)
     // actually close
     if (m_listener)
         delete m_listener;
-    m_listener = NULL;
+    m_listener = nullptr;
 
     LOG(VB_GENERAL, LOG_INFO, "Webserver closed");
 }
@@ -874,7 +874,7 @@ void TorcHTTPServer::StopUPnP(void)
         m_ssdpThread->quit();
         m_ssdpThread->wait();
         delete m_ssdpThread;
-        m_ssdpThread = NULL;
+        m_ssdpThread = nullptr;
     }
 }
 
@@ -1013,7 +1013,7 @@ class TorcHTTPServerObject : public TorcAdminObject, public TorcStringFactory
         if (TorcHTTPServer::gWebServer)
             delete TorcHTTPServer::gWebServer;
 
-        TorcHTTPServer::gWebServer = NULL;
+        TorcHTTPServer::gWebServer = nullptr;
     }
 } TorcHTTPServerObject;
 

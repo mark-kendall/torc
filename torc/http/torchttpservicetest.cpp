@@ -125,7 +125,7 @@ QVariantHash TorcHTTPServiceTest::GetUnsupportedHash(void)
 ///\brief This function should be rejected at startup.
 void* TorcHTTPServiceTest::GetUnsupportedPointer(void)
 {
-    return NULL;
+    return nullptr;
 }
 
 ///\brief This function should be rejected at startup
@@ -142,7 +142,7 @@ static class TorcServiceTestObject : public TorcAdminObject
   public:
     TorcServiceTestObject()
       : TorcAdminObject(TORC_ADMIN_LOW_PRIORITY),
-        m_test(NULL)
+        m_test(nullptr)
     {
     }
 

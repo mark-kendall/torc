@@ -225,7 +225,7 @@ TorcSetting* TorcSetting::FindChild(const QString &Child, bool Recursive /*=fals
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 QSet<TorcSetting*> TorcSetting::GetChildren(void)

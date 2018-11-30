@@ -102,16 +102,16 @@ static void TorcAVLog(void *Ptr, int Level, const char *Fmt, va_list VAL)
 }
 
 TorcMuxer::TorcMuxer(TorcSegmentedRingBuffer *Buffer)
-  : m_formatCtx(NULL),
+  : m_formatCtx(nullptr),
     m_created(false),
     m_started(false),
     m_outputFile(),
     m_ringBuffer(Buffer),
-    m_ioContext(NULL),
-    m_audioContext(NULL),
+    m_ioContext(nullptr),
+    m_audioContext(nullptr),
     m_audioStream(0),
-    m_audioFrame(NULL),
-    m_audioPacket(NULL),
+    m_audioFrame(nullptr),
+    m_audioPacket(nullptr),
     m_lastVideoPts(AV_NOPTS_VALUE),
     m_lastAudioPts(AV_NOPTS_VALUE)
 {
@@ -121,16 +121,16 @@ TorcMuxer::TorcMuxer(TorcSegmentedRingBuffer *Buffer)
 }
 
 TorcMuxer::TorcMuxer(const QString &File)
-  : m_formatCtx(NULL),
+  : m_formatCtx(nullptr),
     m_created(false),
     m_started(false),
     m_outputFile(File),
-    m_ringBuffer(NULL),
-    m_ioContext(NULL),
-    m_audioContext(NULL),
+    m_ringBuffer(nullptr),
+    m_ioContext(nullptr),
+    m_audioContext(nullptr),
     m_audioStream(0),
-    m_audioFrame(NULL),
-    m_audioPacket(NULL),
+    m_audioFrame(nullptr),
+    m_audioPacket(nullptr),
     m_lastVideoPts(AV_NOPTS_VALUE),
     m_lastAudioPts(AV_NOPTS_VALUE)
 {
@@ -146,34 +146,34 @@ TorcMuxer::~TorcMuxer()
         if (m_ioContext->buffer)
         {
             av_free(m_ioContext->buffer);
-            m_ioContext->buffer = NULL;
+            m_ioContext->buffer = nullptr;
         }
         av_free(m_ioContext);
-        m_ioContext = NULL;
+        m_ioContext = nullptr;
     }
 
     if (m_formatCtx)
     {
         avformat_free_context(m_formatCtx);
-        m_formatCtx = NULL;
+        m_formatCtx = nullptr;
     }
 
     if (m_audioFrame)
     {
         av_frame_free(&m_audioFrame);
-        m_audioFrame = NULL;
+        m_audioFrame = nullptr;
     }
 
     if (m_audioPacket)
     {
         av_packet_free(&m_audioPacket);
-        m_audioPacket = NULL;
+        m_audioPacket = nullptr;
     }
 
     if (m_audioContext)
     {
         avcodec_free_context(&m_audioContext);
-        m_audioContext = NULL;
+        m_audioContext = nullptr;
     }
 }
 
@@ -183,7 +183,7 @@ void TorcMuxer::SetupContext(void)
     av_register_all();
 #endif
 
-    AVOutputFormat *format = av_guess_format("mp4", NULL, NULL);
+    AVOutputFormat *format = av_guess_format("mp4", nullptr, nullptr);
     if (!format)
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to find MPEGTS muxer");
@@ -220,7 +220,7 @@ void TorcMuxer::SetupIO(void)
     if (m_ringBuffer)
     {
         uint8_t* iobuffer  = (uint8_t *)av_malloc(FFMPEG_BUFFER_SIZE);
-        m_ioContext        = avio_alloc_context(iobuffer, FFMPEG_BUFFER_SIZE, 1, this, NULL, &AVWritePacket, NULL);
+        m_ioContext        = avio_alloc_context(iobuffer, FFMPEG_BUFFER_SIZE, 1, this, nullptr, &AVWritePacket, nullptr);
         m_formatCtx->pb    = m_ioContext;
         m_formatCtx->flags = AVFMT_FLAG_CUSTOM_IO;
         m_created = true;
@@ -294,10 +294,10 @@ bool TorcMuxer::IsValid(void)
 
 int TorcMuxer::AddDummyAudioStream(void)
 {
-    if (!m_formatCtx)
+    if (m_formatCtx == nullptr)
         return -1;
 
-    AVStream *audiostream = avformat_new_stream(m_formatCtx, 0);
+    AVStream *audiostream = avformat_new_stream(m_formatCtx, nullptr);
     if (!audiostream)
         return -1;
 
@@ -332,7 +332,7 @@ int TorcMuxer::AddDummyAudioStream(void)
     m_audioContext->sample_fmt = AV_SAMPLE_FMT_FLTP;
     if (m_formatCtx->oformat->flags & AVFMT_GLOBALHEADER)
         m_audioContext->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
-    if (avcodec_open2(m_audioContext, codec, NULL) < 0)
+    if (avcodec_open2(m_audioContext, codec, nullptr) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Failed to open codec '%1'").arg(codec->name));
         return -1;
@@ -399,7 +399,7 @@ int TorcMuxer::AddH264Stream(int Width, int Height, int Profile, int Bitrate)
     if (!m_formatCtx)
         return -1;
 
-    AVStream *h264video = avformat_new_stream(m_formatCtx, 0);
+    AVStream *h264video = avformat_new_stream(m_formatCtx, nullptr);
     if (!h264video)
         return -1;
 
@@ -470,7 +470,7 @@ void TorcMuxer::FinishSegment(bool Init)
 {
     if (m_formatCtx)
     {
-        av_write_frame(m_formatCtx, NULL);
+        av_write_frame(m_formatCtx, nullptr);
         if (m_ringBuffer)
             m_ringBuffer->FinishSegment(Init);
     }
@@ -481,7 +481,7 @@ void TorcMuxer::Start(void)
     if (m_formatCtx)
     {
         av_dump_format(m_formatCtx, 0, "stdout", 1);
-        AVDictionary *opts = NULL;
+        AVDictionary *opts = nullptr;
         av_dict_set(&opts, "movflags", "frag_custom+dash+delay_moov", 0);
         if (avformat_write_header(m_formatCtx, &opts))
             LOG(VB_GENERAL, LOG_ERR, "Failed to set demuxer options");
@@ -494,7 +494,7 @@ void TorcMuxer::Finish(void)
     if (m_audioContext && m_audioPacket)
     {
         // flush
-        avcodec_send_frame(m_audioContext, NULL);
+        avcodec_send_frame(m_audioContext, nullptr);
         while (avcodec_receive_packet(m_audioContext, m_audioPacket) >= 0)
             av_packet_unref(m_audioPacket);
     }

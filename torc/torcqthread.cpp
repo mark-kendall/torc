@@ -40,7 +40,7 @@
  * \todo Make run private again and enfore event driven loops for all classes.
 */
 
-static QThread *gMainThread  = NULL;
+static QThread *gMainThread  = nullptr;
 
 void TorcQThread::SetMainThread(void)
 {

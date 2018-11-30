@@ -21,12 +21,12 @@
 #include "torcdevicehandler.h"
 
 QList<TorcDeviceHandler*> TorcDeviceHandler::gTorcDeviceHandlers;
-TorcDeviceHandler* TorcDeviceHandler::gTorcDeviceHandler = NULL;
+TorcDeviceHandler* TorcDeviceHandler::gTorcDeviceHandler = nullptr;
 QMutex* TorcDeviceHandler::gTorcDeviceHandlersLock = new QMutex(QMutex::Recursive);
 
 TorcDeviceHandler::TorcDeviceHandler()
   : m_handlerLock(QReadWriteLock::Recursive),
-    m_nextTorcDeviceHandler(NULL)
+    m_nextTorcDeviceHandler(nullptr)
 {
     QMutexLocker lock(gTorcDeviceHandlersLock);
     m_nextTorcDeviceHandler = gTorcDeviceHandler;

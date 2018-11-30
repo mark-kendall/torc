@@ -54,7 +54,7 @@ QAtomicInt   gAdminRunLoopRunning(0);
 
 TorcOSXCallbackThread::TorcOSXCallbackThread()
   : TorcQThread("OSXRunLoop"),
-    m_object(NULL)
+    m_object(nullptr)
 {
 }
 
@@ -75,7 +75,7 @@ void TorcOSXCallbackThread::Finish(void)
     if (m_object)
         m_object->disconnect();
     delete m_object;
-    m_object = NULL;
+    m_object = nullptr;
     gAdminRunLoop = 0;
     LOG(VB_GENERAL, LOG_INFO, "OSX callback thread stopping");
 }
@@ -109,7 +109,7 @@ static class TorcRunLoopOSX : public TorcAdminObject
   public:
     TorcRunLoopOSX()
       : TorcAdminObject(TORC_ADMIN_CRIT_PRIORITY + 10),
-        m_thread(NULL),
+        m_thread(nullptr),
         m_createdThread(false)
     {
     }
@@ -162,7 +162,7 @@ static class TorcRunLoopOSX : public TorcAdminObject
         }
 
         delete m_thread;
-        m_thread = NULL;
+        m_thread = nullptr;
     }
 
   private:

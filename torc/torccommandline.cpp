@@ -55,7 +55,7 @@ class TorcEnvironmentVariable
     Q_DISABLE_COPY(TorcEnvironmentVariable)
 };
 
-TorcEnvironmentVariable* TorcEnvironmentVariable::gEnvironmentVariable = NULL;
+TorcEnvironmentVariable* TorcEnvironmentVariable::gEnvironmentVariable = nullptr;
 
 /*! \class TorcArgument
  *  \brief Simple wrapper around a command line argument.

@@ -191,7 +191,7 @@ class TorcPushbulletNotifierFactory final : public TorcNotifierFactory
     {
         if (Type == "pushbullet" && Details.contains("accesstoken"))
             return new TorcPushbulletNotifier(Details);
-        return NULL;
+        return nullptr;
     }
 } TorcPushbulletNotifierFactory;
 

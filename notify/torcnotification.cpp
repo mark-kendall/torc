@@ -92,7 +92,7 @@ bool TorcNotification::IsKnownInput(const QString &UniqueId)
     return false;
 }
 
-TorcNotificationFactory* TorcNotificationFactory::gTorcNotificationFactory = NULL;
+TorcNotificationFactory* TorcNotificationFactory::gTorcNotificationFactory = nullptr;
 
 TorcNotificationFactory::TorcNotificationFactory()
   : nextTorcNotificationFactory(gTorcNotificationFactory)

@@ -53,7 +53,7 @@ QMutex                   gLogThreadLock;
 QHash<uint64_t, char *>  gLogThreadHash;
 QMutex                   gLogThreadTidLock;
 QHash<uint64_t, int64_t> gLogThreadtidHash;
-LoggingThread           *gLogThread = NULL;
+LoggingThread           *gLogThread = nullptr;
 bool                     gLogThreadFinished = false;
 bool                     gDebugRegistration = false;
 
@@ -97,7 +97,7 @@ class LogItem
         level(Level),
         tm(),
         file(File),
-        function(Function), threadName(NULL),
+        function(Function), threadName(nullptr),
         mask(Mask)
     {
         SetTime();
@@ -116,7 +116,7 @@ class LogItem
 
 #if HAVE_GETTIMEOFDAY
         struct timeval  tv;
-        gettimeofday(&tv, NULL);
+        gettimeofday(&tv, nullptr);
         epoch = tv.tv_sec;
         usec  = tv.tv_usec;
 #else
@@ -653,7 +653,7 @@ void PrintLogLine(uint64_t Mask, LogLevel Level, const char *File, int Line,
     if (!item)
         return;
 
-    char* copy = NULL;
+    char* copy = nullptr;
     if (FromQString && strchr(Format, '%'))
     {
         QString string(Format);
@@ -766,7 +766,7 @@ void StopLogging(void)
     {
         QMutexLocker lock(&gLogQueueLock);
         delete gLogThread;
-        gLogThread = NULL;
+        gLogThread = nullptr;
     }
 
     {

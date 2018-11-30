@@ -34,7 +34,7 @@
 #include "torchttpserver.h"
 #include "torcnetworkedcontext.h"
 
-TorcNetworkedContext *gNetworkedContext = NULL;
+TorcNetworkedContext *gNetworkedContext = nullptr;
 
 /*! \class TorcNetworkService
  *  \brief Encapsulates information on a discovered Torc peer.
@@ -60,9 +60,9 @@ TorcNetworkService::TorcNetworkService(const QString &Name, const QString &UUID,
     m_addresses(Addresses),
     m_preferredAddressIndex(0),
     m_abort(0),
-    m_getPeerDetailsRPC(NULL),
-    m_getPeerDetails(NULL),
-    m_webSocketThread(NULL),
+    m_getPeerDetailsRPC(nullptr),
+    m_getPeerDetails(nullptr),
+    m_webSocketThread(nullptr),
     m_retryScheduled(false),
     m_retryInterval(10000)
 {
@@ -102,14 +102,14 @@ TorcNetworkService::~TorcNetworkService()
     {
         m_webSocketThread->CancelRequest(m_getPeerDetailsRPC);
         m_getPeerDetailsRPC->DownRef();
-        m_getPeerDetailsRPC = NULL;
+        m_getPeerDetailsRPC = nullptr;
     }
 
     if (m_getPeerDetails)
     {
         TorcNetwork::Cancel(m_getPeerDetails);
         m_getPeerDetails->DownRef();
-        m_getPeerDetails = NULL;
+        m_getPeerDetails = nullptr;
     }
 
     // delete websocket
@@ -118,7 +118,7 @@ TorcNetworkService::~TorcNetworkService()
         m_webSocketThread->quit();
         m_webSocketThread->wait();
         delete m_webSocketThread;
-        m_webSocketThread = NULL;
+        m_webSocketThread = nullptr;
     }
 }
 
@@ -263,7 +263,7 @@ void TorcNetworkService::Disconnected(void)
         m_webSocketThread->quit();
         m_webSocketThread->wait();
         delete m_webSocketThread;
-        m_webSocketThread = NULL;
+        m_webSocketThread = nullptr;
 
         // try and reconnect. If this is a discovered service, the socket was probably closed
         // deliberately and this object is about to be deleted anyway.
@@ -290,7 +290,7 @@ void TorcNetworkService::RequestReady(TorcNetworkRequest *Request)
     {
         QJsonDocument jsonresult = QJsonDocument::fromJson(Request->GetBuffer());
         m_getPeerDetails->DownRef();
-        m_getPeerDetails = NULL;
+        m_getPeerDetails = nullptr;
 
         if (!jsonresult.isNull() && jsonresult.isObject())
         {
@@ -406,7 +406,7 @@ void TorcNetworkService::RequestReady(TorcRPCRequest *Request)
         }
 
         m_getPeerDetailsRPC->DownRef();
-        m_getPeerDetailsRPC = NULL;
+        m_getPeerDetailsRPC = nullptr;
 
         if (success)
         {
@@ -1021,7 +1021,7 @@ static class TorcNetworkedContextObject : public TorcAdminObject, public TorcStr
     {
         Strings.insert("NoPeers", QCoreApplication::translate("TorcNetworkedContext", "No other Torc devices detected"));
         // this is here to capture the plural translation
-        (void)QCoreApplication::translate("TorcNetworkedContext", "%n other Torc device(s) discovered", NULL, 2);
+        (void)QCoreApplication::translate("TorcNetworkedContext", "%n other Torc device(s) discovered", nullptr, 2);
     }
 
     void Create(void)
@@ -1034,7 +1034,7 @@ static class TorcNetworkedContextObject : public TorcAdminObject, public TorcStr
     void Destroy(void)
     {
         delete gNetworkedContext;
-        gNetworkedContext = NULL;
+        gNetworkedContext = nullptr;
     }
 
 } TorcNetworkedContextObject;

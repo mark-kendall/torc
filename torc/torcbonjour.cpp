@@ -34,7 +34,7 @@
 #include <stdlib.h>
 #include <arpa/inet.h>
 
-TorcBonjour* gBonjour = NULL;                               //!< Global TorcBonjour singleton
+TorcBonjour* gBonjour = nullptr;                            //!< Global TorcBonjour singleton
 QMutex*      gBonjourLock = new QMutex(QMutex::Recursive);  //!< Lock around access to gBonjour
 
 void DNSSD_API BonjourRegisterCallback (DNSServiceRef        Ref,
@@ -73,7 +73,7 @@ void DNSSD_API BonjourResolveCallback  (DNSServiceRef        Ref,
 */
 TorcBonjourService::TorcBonjourService()
   : m_serviceType(Service),
-    m_dnssRef(NULL),
+    m_dnssRef(nullptr),
     m_name(QByteArray()),
     m_type(QByteArray()),
     m_txt(QByteArray()),
@@ -84,7 +84,7 @@ TorcBonjourService::TorcBonjourService()
     m_port(0),
     m_lookupID(-1),
     m_fd(-1),
-    m_socketNotifier(NULL)
+    m_socketNotifier(nullptr)
 {
     // the default constructor only exists to keep QMap happy - it should never be used
     LOG(VB_GENERAL, LOG_WARNING, "Invalid TorcBonjourService object");
@@ -103,7 +103,7 @@ TorcBonjourService::TorcBonjourService(const TorcBonjourService &Other)
     m_port(0),             // NB
     m_lookupID(-1),        // NB
     m_fd(-1),              // NB
-    m_socketNotifier(NULL) // NB
+    m_socketNotifier(nullptr) // NB
 {
 }
 
@@ -121,7 +121,7 @@ TorcBonjourService& TorcBonjourService::operator =(const TorcBonjourService &Oth
     m_port           = 0;    // NB
     m_lookupID       = -1;   // NB
     m_fd             = -1;   // NB
-    m_socketNotifier = NULL; // NB
+    m_socketNotifier = nullptr; // NB
     return *this;
 }
 
@@ -138,7 +138,7 @@ TorcBonjourService::TorcBonjourService(ServiceType BonjourType, DNSServiceRef DN
     m_port(0),
     m_lookupID(-1),
     m_fd(-1),
-    m_socketNotifier(NULL)
+    m_socketNotifier(nullptr)
 {
 }
 
@@ -146,7 +146,7 @@ TorcBonjourService::TorcBonjourService(ServiceType BonjourType,
                    const QByteArray &Name, const QByteArray &Type,
                    const QByteArray &Domain, uint32_t InterfaceIndex)
   : m_serviceType(BonjourType),
-    m_dnssRef(NULL),
+    m_dnssRef(nullptr),
     m_name(Name),
     m_type(Type),
     m_txt(QByteArray()),
@@ -157,7 +157,7 @@ TorcBonjourService::TorcBonjourService(ServiceType BonjourType,
     m_port(0),
     m_lookupID(-1),
     m_fd(-1),
-    m_socketNotifier(NULL)
+    m_socketNotifier(nullptr)
 {
 }
 
@@ -220,12 +220,12 @@ void TorcBonjourService::Deregister(void)
         }
 
         DNSServiceRefDeallocate(m_dnssRef);
-        m_dnssRef = NULL;
+        m_dnssRef = nullptr;
     }
 
     if (m_socketNotifier)
         m_socketNotifier->deleteLater();
-    m_socketNotifier = NULL;
+    m_socketNotifier = nullptr;
 }
 
 /*! \fn    BonjourRegisterCallback
@@ -359,7 +359,7 @@ void TorcBonjour::TearDown(void)
 {
     QMutexLocker locker(gBonjourLock);
     delete gBonjour;
-    gBonjour = NULL;
+    gBonjour = nullptr;
 }
 
 /*! \fn    TorcBonjour::MapToTxtRecord
@@ -402,7 +402,7 @@ QMap<QByteArray,QByteArray> TorcBonjour::TxtRecordToMap(const QByteArray &TxtRec
 }
 
 TorcBonjour::TorcBonjour()
-  : QObject(NULL),
+  : QObject(nullptr),
     m_suspended(false),
     m_serviceLock(QMutex::Recursive),
     m_services(QMap<quint32,TorcBonjourService>()),
@@ -478,7 +478,7 @@ quint32 TorcBonjour::Register(quint16 Port, const QByteArray &Type, const QByteA
     {
         QMutexLocker locker(&m_serviceLock);
 
-        TorcBonjourService service(TorcBonjourService::Service, NULL, Name, Type);
+        TorcBonjourService service(TorcBonjourService::Service, nullptr, Name, Type);
         service.m_txt  = Txt;
         service.m_port = Port;
         quint32 reference = Reference;
@@ -491,7 +491,7 @@ quint32 TorcBonjour::Register(quint16 Port, const QByteArray &Type, const QByteA
         return reference;
     }
 
-    DNSServiceRef dnssref = NULL;
+    DNSServiceRef dnssref = nullptr;
     DNSServiceErrorType result = kDNSServiceErr_NameConflict;
     int tries = 0;
 
@@ -504,7 +504,7 @@ quint32 TorcBonjour::Register(quint16 Port, const QByteArray &Type, const QByteA
         result = DNSServiceRegister(&dnssref, 0,
                                     0, (const char*)name.data(),
                                     (const char*)Type.data(),
-                                    NULL, 0, htons(Port), Txt.size(), (void*)Txt.data(),
+                                    nullptr, nullptr, htons(Port), Txt.size(), (void*)Txt.data(),
                                     BonjourRegisterCallback, this);
         tries++;
     }
@@ -553,7 +553,7 @@ quint32 TorcBonjour::Browse(const QByteArray &Type, quint32 Reference /*=0*/)
     {
         QMutexLocker locker(&m_serviceLock);
 
-        TorcBonjourService service(TorcBonjourService::Browse, NULL, dummy, Type);
+        TorcBonjourService service(TorcBonjourService::Browse, nullptr, dummy, Type);
         quint32 reference = Reference;
         while (!reference || m_services.contains(reference))
             reference++;
@@ -563,10 +563,10 @@ quint32 TorcBonjour::Browse(const QByteArray &Type, quint32 Reference /*=0*/)
         return reference;
     }
 
-    DNSServiceRef dnssref = NULL;
+    DNSServiceRef dnssref = nullptr;
     DNSServiceErrorType result = DNSServiceBrowse(&dnssref, 0,
                                                   kDNSServiceInterfaceIndexAny,
-                                                  Type, NULL, BonjourBrowseCallback, this);
+                                                  Type, nullptr, BonjourBrowseCallback, this);
     if (kDNSServiceErr_NoError != result)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Browse error: %1").arg(result));
@@ -710,7 +710,7 @@ void TorcBonjour::SuspendPriv(bool Suspend)
             QMap<quint32,TorcBonjourService>::iterator it = m_services.begin();
             for (; it != m_services.end(); ++it)
             {
-                TorcBonjourService service((*it).m_serviceType, NULL, (*it).m_name, (*it).m_type);
+                TorcBonjourService service((*it).m_serviceType, nullptr, (*it).m_name, (*it).m_type);
                 service.m_txt  = (*it).m_txt;
                 service.m_port = (*it).m_port;
                 (*it).Deregister();
@@ -797,7 +797,7 @@ void TorcBonjour::AddBrowseResult(DNSServiceRef Reference, const TorcBonjourServ
         }
 
         // kick off resolve
-        DNSServiceRef reference = NULL;
+        DNSServiceRef reference = nullptr;
         DNSServiceErrorType error =
             DNSServiceResolve(&reference, 0, Service.m_interfaceIndex,
                               Service.m_name.data(), Service.m_type.data(),

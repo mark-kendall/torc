@@ -57,7 +57,7 @@ QMap<QString,int> TorcLanguage::gLanguageMap;
 TorcLanguage::TorcLanguage(TorcSetting *SettingParent)
   : QObject(),
     TorcHTTPService(this, "languages", "languages", TorcLanguage::staticMetaObject, BLACKLIST),
-    m_languageSetting(NULL), // Don't initialise setting until we have a local default
+    m_languageSetting(nullptr), // Don't initialise setting until we have a local default
     languageCode(),
     languageString(),
     m_locale(),
@@ -519,7 +519,7 @@ void TorcLanguage::Initialise(void)
  * The string list is made available to web interfaces via the dynamically generated torcconfiguration.js file
  * and is exported directly to all QML contexts.
 */
-TorcStringFactory* TorcStringFactory::gTorcStringFactory = NULL;
+TorcStringFactory* TorcStringFactory::gTorcStringFactory = nullptr;
 
 TorcStringFactory::TorcStringFactory()
   : nextTorcStringFactory(gTorcStringFactory)

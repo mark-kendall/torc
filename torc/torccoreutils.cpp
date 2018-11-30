@@ -73,7 +73,7 @@ quint64 TorcCoreUtils::GetMicrosecondCount(void)
     return GetTickCount() * 1000;
 #elif defined(Q_OS_MAC)
     struct timeval timenow;
-    gettimeofday(&timenow, NULL);
+    gettimeofday(&timenow, nullptr);
     return (timenow.tv_sec * 1000000) + timenow.tv_usec;
 #else
     timespec timenow;
@@ -146,9 +146,9 @@ QByteArray TorcCoreUtils::GZipCompress(QByteArray &Source)
     char outputbuffer[chunksize];
 
     z_stream stream;
-    stream.zalloc   = NULL;
-    stream.zfree    = NULL;
-    stream.opaque   = NULL;
+    stream.zalloc   = nullptr;
+    stream.zfree    = nullptr;
+    stream.opaque   = nullptr;
     stream.avail_in = Source.size();
     stream.next_in  = (Bytef*)Source.data();
 
@@ -203,9 +203,9 @@ QByteArray TorcCoreUtils::GZipCompressFile(QFile &Source)
     char outputbuffer[chunksize];
 
     z_stream stream;
-    stream.zalloc   = NULL;
-    stream.zfree    = NULL;
-    stream.opaque   = NULL;
+    stream.zalloc   = nullptr;
+    stream.zfree    = nullptr;
+    stream.opaque   = nullptr;
 
     if (Z_OK != deflateInit2(&stream, Z_DEFAULT_COMPRESSION, Z_DEFLATED, 15 + 16, 8, Z_DEFAULT_STRATEGY))
     {

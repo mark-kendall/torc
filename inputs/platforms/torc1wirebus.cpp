@@ -117,7 +117,7 @@ void Torc1WireBus::Create(const QVariantMap &Details)
                     }
                     else
                     {
-                        TorcInput* device = NULL;
+                        TorcInput* device = nullptr;
                         Torc1WireDeviceFactory* factory = Torc1WireDeviceFactory::GetTorc1WireDeviceFactory();
                         for ( ; factory; factory = factory->NextFactory())
                         {
@@ -158,7 +158,7 @@ void Torc1WireBus::Destroy(void)
     m_inputs.clear();
 }
 
-Torc1WireDeviceFactory* Torc1WireDeviceFactory::gTorc1WireDeviceFactory = NULL;
+Torc1WireDeviceFactory* Torc1WireDeviceFactory::gTorc1WireDeviceFactory = nullptr;
 
 Torc1WireDeviceFactory::Torc1WireDeviceFactory()
   : nextTorc1WireDeviceFactory(gTorc1WireDeviceFactory)

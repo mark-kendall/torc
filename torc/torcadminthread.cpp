@@ -84,7 +84,7 @@ void TorcAdminThread::Finish(void)
  *   public:
  *     MyBackgroundActivity()
  *       : TorcAdminObject(TORC_ADMIN_HIGH_PRIORITY),
- *         MyWorldDominationObject(NULL)
+ *         MyWorldDominationObject(nullptr)
  *     {
  *     }
  *
@@ -102,11 +102,11 @@ void TorcAdminThread::Finish(void)
 */
 
 QList<TorcAdminObject*> TorcAdminObject::gTorcAdminObjects;
-TorcAdminObject* TorcAdminObject::gTorcAdminObject = NULL;
+TorcAdminObject* TorcAdminObject::gTorcAdminObject = nullptr;
 QMutex* TorcAdminObject::gTorcAdminObjectsLock = new QMutex(QMutex::Recursive);
 
 TorcAdminObject::TorcAdminObject(int Priority)
-  : m_nextTorcAdminObject(NULL),
+  : m_nextTorcAdminObject(nullptr),
     m_priority(Priority)
 {
     QMutexLocker lock(gTorcAdminObjectsLock);

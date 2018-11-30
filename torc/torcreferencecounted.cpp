@@ -93,5 +93,5 @@ TorcReferenceLocker::~TorcReferenceLocker(void)
 {
     if (m_refCountedObject)
         m_refCountedObject->DownRef();
-    m_refCountedObject = NULL;
+    m_refCountedObject = nullptr;
 }

@@ -458,7 +458,7 @@ class TorcCentralObject : public TorcAdminObject, public TorcStringFactory
   public:
     TorcCentralObject()
       : TorcAdminObject(TORC_ADMIN_LOW_PRIORITY - 5), // start last
-        m_object(NULL)
+        m_object(nullptr)
     {
         TorcCommandLine::RegisterEnvironmentVariable("TORC_NO_VALIDATION", "Disable validation of configuration file. This may speed up start times.");
     }
@@ -485,7 +485,7 @@ class TorcCentralObject : public TorcAdminObject, public TorcStringFactory
     void Destroy(void)
     {
         delete m_object;
-        m_object = NULL;
+        m_object = nullptr;
     }
 
   private:
@@ -493,7 +493,7 @@ class TorcCentralObject : public TorcAdminObject, public TorcStringFactory
     TorcCentral *m_object;
 } TorcCentralObject;
 
-TorcXSDFactory* TorcXSDFactory::gTorcXSDFactory = NULL;
+TorcXSDFactory* TorcXSDFactory::gTorcXSDFactory = nullptr;
 
 TorcXSDFactory::TorcXSDFactory()
   : nextTorcXSDFactory(gTorcXSDFactory)

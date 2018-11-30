@@ -142,7 +142,7 @@ class TorcSystemNotificationFactory final : public TorcNotificationFactory
     {
         if (Type == "system" && Details.contains("inputs"))
             return new TorcSystemNotification(Details);
-        return NULL;
+        return nullptr;
     }
 } TorcSystemNotificationFactory;
 

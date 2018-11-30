@@ -50,7 +50,7 @@ TorcRPCRequest::TorcRPCRequest(const QString &Method, QObject *Parent)
     m_state(None),
     m_id(-1),
     m_method(Method),
-    m_parent(NULL),
+    m_parent(nullptr),
     m_parentLock(new QMutex()),
     m_validParent(true),
     m_parameters(),
@@ -71,7 +71,7 @@ TorcRPCRequest::TorcRPCRequest(const QString &Method)
     m_state(None),
     m_id(-1),
     m_method(Method),
-    m_parent(NULL),
+    m_parent(nullptr),
     m_parentLock(new QMutex()),
     m_validParent(false),
     m_parameters(),
@@ -329,7 +329,7 @@ void TorcRPCRequest::SetParent(QObject *Parent)
     QMutexLocker locker(m_parentLock);
 
     m_parent = Parent;
-    m_validParent = m_parent != NULL;
+    m_validParent = m_parent != nullptr;
 
     if (m_parent && m_parent->metaObject()->indexOfMethod(QMetaObject::normalizedSignature("RequestReady(TorcRPCRequest*)")) < 0)
     {

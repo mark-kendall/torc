@@ -83,7 +83,7 @@ void TorcSerialiser::Serialise(QByteArray &Dest, const QVariant &Data, const QSt
     End(Dest);
 }
 
-TorcSerialiserFactory* TorcSerialiserFactory::gTorcSerialiserFactory = NULL;
+TorcSerialiserFactory* TorcSerialiserFactory::gTorcSerialiserFactory = nullptr;
 
 TorcSerialiserFactory::TorcSerialiserFactory(const QString &Type, const QString &SubType, const QString &Description)
   : m_nextTorcSerialiserFactory(gTorcSerialiserFactory),

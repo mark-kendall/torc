@@ -37,7 +37,7 @@
 TorcCameraOutput::TorcCameraOutput(TorcOutput::Type Type, double Value, const QString &ModelId, const QVariantMap &Details,
                                    QObject *Output, const QMetaObject &MetaObject, const QString &Blacklist)
   : TorcOutput(Type, Value, ModelId, Details, Output, MetaObject, Blacklist + "," + "CameraErrored,ParamsChanged"),
-    m_thread(NULL),
+    m_thread(nullptr),
     m_threadLock(QReadWriteLock::Recursive),
     m_params(Details),
     m_paramsLock(QReadWriteLock::Recursive)
@@ -106,7 +106,7 @@ void TorcCameraStillsOutput::Stop(void)
     if (m_thread)
     {
         TorcCameraThread::CreateOrDestroy(m_thread, modelId);
-        m_thread = NULL;
+        m_thread = nullptr;
     }
     m_threadLock.unlock();
 }
@@ -171,7 +171,7 @@ TorcCameraVideoOutput::TorcCameraVideoOutput(const QString &ModelId, const QVari
     m_segmentLock(QReadWriteLock::Recursive),
     m_cameraStartTime(),
     m_networkTimeAbort(0),
-    m_networkTimeRequest(NULL)
+    m_networkTimeRequest(nullptr)
 {
     // keep time checks in this thread
     connect(this, SIGNAL(CheckTime()), this, SLOT(TimeCheck()));
@@ -212,7 +212,7 @@ void TorcCameraVideoOutput::RequestReady(TorcNetworkRequest *Request)
     {
         LOG(VB_GENERAL, LOG_INFO, QString("Network time  : %1").arg(Request->GetBuffer().constData()));
         m_networkTimeRequest->DownRef();
-        m_networkTimeRequest = NULL;
+        m_networkTimeRequest = nullptr;
     }
 }
 
@@ -267,7 +267,7 @@ void TorcCameraVideoOutput::Stop(void)
     if (m_thread)
     {
         TorcCameraThread::CreateOrDestroy(m_thread, modelId);
-        m_thread = NULL;
+        m_thread = nullptr;
     }
     m_threadLock.unlock();
 }
@@ -681,7 +681,7 @@ void TorcCameraOutputs::Create(const QVariantMap &Details)
 
                     // NB TorcCameraFactory checks that the underlying class can handle the specified camera
                     // which ensures the TorcCameraOutput instance will be able to create the camera.
-                    TorcCameraOutput *newcamera = NULL;
+                    TorcCameraOutput *newcamera = nullptr;
                     TorcCameraFactory* factory = TorcCameraFactory::GetTorcCameraFactory();
                     TorcCameraParams params(Details);
                     for ( ; factory; factory = factory->NextFactory())
@@ -701,7 +701,7 @@ void TorcCameraOutputs::Create(const QVariantMap &Details)
                             }
                         }
                     }
-                    if (NULL == newcamera)
+                    if (nullptr == newcamera)
                         LOG(VB_GENERAL, LOG_WARNING, QString("Failed to find handler for camera '%1'").arg(it.key()));
                 }
             }

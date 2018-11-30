@@ -397,11 +397,11 @@ void TorcPiCamera::ProcessVideoBuffer(OMX_BUFFERHEADERTYPE *Buffer)
             if (m_bufferedPacket)
             {
                 av_packet_free(&m_bufferedPacket);
-                m_bufferedPacket = NULL;
+                m_bufferedPacket = nullptr;
             }
             else
             {
-                packet->data = NULL;
+                packet->data = nullptr;
                 av_packet_free(&packet);
             }
         }
@@ -1006,7 +1006,7 @@ class TorcPiCameraFactory final : public TorcCameraFactory
     {
         if (("pi" == Type) && TorcPiCamera::gPiCameraDetected)
             return new TorcPiCamera(Params);
-        return NULL;
+        return nullptr;
     }
 } TorcPiCameraFactory;
 

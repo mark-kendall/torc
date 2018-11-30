@@ -44,8 +44,8 @@
 #include "torccoreutils.h"
 #include "torcdirectories.h"
 
-TorcLocalContext *gLocalContext = NULL;
-TorcSetting       *gRootSetting = NULL;
+TorcLocalContext *gLocalContext = nullptr;
+TorcSetting       *gRootSetting = nullptr;
 qint64             gStartTime   = QDateTime::currentMSecsSinceEpoch();
 
 static void ExitHandler(int Sig)
@@ -115,7 +115,7 @@ qint16 TorcLocalContext::Create(TorcCommandLine* CommandLine, bool Init /*=true*
 void TorcLocalContext::TearDown(void)
 {
     delete gLocalContext;
-    gLocalContext = NULL;
+    gLocalContext = nullptr;
 }
 
 void TorcLocalContext::NotifyEvent(int Event)
@@ -130,12 +130,12 @@ void TorcLocalContext::NotifyEvent(int Event)
 */
 TorcLocalContext::TorcLocalContext(TorcCommandLine* CommandLine)
   : QObject(),
-    m_sqliteDB(NULL),
+    m_sqliteDB(nullptr),
     m_dbName(QString("")),
     m_localSettings(),
     m_localSettingsLock(QReadWriteLock::Recursive),
-    m_adminThread(NULL),
-    m_language(NULL),
+    m_adminThread(nullptr),
+    m_language(nullptr),
     m_uuid(),
     m_shutdownDelay(0),
     m_shutdownEvent(Torc::None)
@@ -194,7 +194,7 @@ TorcLocalContext::~TorcLocalContext()
         m_adminThread->quit();
         m_adminThread->wait();
         delete m_adminThread;
-        m_adminThread = NULL;
+        m_adminThread = nullptr;
     }
     else
     {
@@ -209,15 +209,15 @@ TorcLocalContext::~TorcLocalContext()
     {
         gRootSetting->Remove();
         gRootSetting->DownRef();
-        gRootSetting = NULL;
+        gRootSetting = nullptr;
     }
 
     // delete the database connection(s)
     delete m_sqliteDB;
-    m_sqliteDB = NULL;
+    m_sqliteDB = nullptr;
 
     // revert to the default message handler
-    qInstallMessageHandler(0);
+    qInstallMessageHandler(nullptr);
 
     // stop listening to self..
     RemoveObserver(this);
@@ -257,7 +257,7 @@ bool TorcLocalContext::Init(void)
     }
 
     // Create the root settings object
-    gRootSetting = new TorcSettingGroup(NULL, TORC_ROOT_SETTING);
+    gRootSetting = new TorcSettingGroup(nullptr, TORC_ROOT_SETTING);
 
     // create/load the UUID - make this persistent to ensure peers do not think
     // there are multiple devices after a number of restarts.
@@ -266,11 +266,11 @@ bool TorcLocalContext::Init(void)
         uuid = uuid.mid(1);
     if (uuid.endsWith('}'))
         uuid.chop(1);
-    TorcSetting* uuidsaved = new TorcSetting(NULL, QString("uuid"),QString("UUID"), TorcSetting::String, TorcSetting::Persistent, QVariant(uuid));
+    TorcSetting* uuidsaved = new TorcSetting(nullptr, QString("uuid"),QString("UUID"), TorcSetting::String, TorcSetting::Persistent, QVariant(uuid));
     m_uuid = uuidsaved->GetValue().toString();
     uuidsaved->Remove();
     uuidsaved->DownRef();
-    uuidsaved = NULL;
+    uuidsaved = nullptr;
 
     LOG(VB_GENERAL, LOG_INFO, QString("UUID: %1").arg(m_uuid));
 

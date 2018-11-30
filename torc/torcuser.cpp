@@ -42,8 +42,8 @@ TorcUser::TorcUser()
  : QObject(),
    TorcHTTPService(this, TORC_USER_SERVICE, "user", TorcUser::staticMetaObject, ""),
    m_userName(),
-   m_userNameSetting(new TorcSetting(NULL, "UserName", "User name", TorcSetting::String, TorcSetting::Persistent, QVariant(TORC_DEFAULT_USERNAME))),
-   m_userCredentials(new TorcSetting(NULL, "UserCredentials", "Authentication string", TorcSetting::String, TorcSetting::Persistent, QVariant(TORC_DEFAULT_CREDENTIALS))),
+   m_userNameSetting(new TorcSetting(nullptr, "UserName", "User name", TorcSetting::String, TorcSetting::Persistent, QVariant(TORC_DEFAULT_USERNAME))),
+   m_userCredentials(new TorcSetting(nullptr, "UserCredentials", "Authentication string", TorcSetting::String, TorcSetting::Persistent, QVariant(TORC_DEFAULT_CREDENTIALS))),
    m_canRestartTorc(true),
    m_canStopTorc(true)
 {
@@ -62,10 +62,8 @@ TorcUser::~TorcUser()
 {
     m_userNameSetting->Remove();
     m_userNameSetting->DownRef();
-    m_userNameSetting = NULL;
     m_userCredentials->Remove();
     m_userCredentials->DownRef();
-    m_userCredentials = NULL;
 }
 
 QString TorcUser::GetName(void)

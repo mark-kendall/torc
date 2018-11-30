@@ -24,7 +24,7 @@
 #include "torclogging.h"
 #include "torcbonjour.h"
 
-TorcBonjour* gBonjour = NULL;                               //!< Global TorcBonjour singleton
+TorcBonjour* gBonjour = nullptr;                               //!< Global TorcBonjour singleton
 QMutex*      gBonjourLock = new QMutex(QMutex::Recursive);  //!< Lock around access to gBonjour
 
 
@@ -61,7 +61,7 @@ void TorcBonjour::TearDown(void)
 {
     QMutexLocker locker(gBonjourLock);
     delete gBonjour;
-    gBonjour = NULL;
+    gBonjour = nullptr;
 }
 
 QByteArray TorcBonjour::MapToTxtRecord(const QMap<QByteArray, QByteArray> &Map)
@@ -79,7 +79,7 @@ QMap<QByteArray,QByteArray> TorcBonjour::TxtRecordToMap(const QByteArray &TxtRec
 }
 
 TorcBonjour::TorcBonjour()
-  : QObject(NULL), m_priv(new TorcBonjourPriv())
+  : QObject(nullptr), m_priv(new TorcBonjourPriv())
 {
 }
 
@@ -87,7 +87,7 @@ TorcBonjour::~TorcBonjour()
 {
     // delete private implementation
     delete m_priv;
-    m_priv = NULL;
+    m_priv = nullptr;
 }
 
 quint32 TorcBonjour::Register(quint16 Port, const QByteArray &Type, const QByteArray &Name,

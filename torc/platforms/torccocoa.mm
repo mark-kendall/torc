@@ -49,7 +49,7 @@ CocoaAutoReleasePool::CocoaAutoReleasePool()
         [pool release];
     }
 
-    NSAutoreleasePool *pool = NULL;
+    NSAutoreleasePool *pool = nullptr;
     pool = [[NSAutoreleasePool alloc] init];
     m_pool = pool;
 }

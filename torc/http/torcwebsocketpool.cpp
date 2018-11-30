@@ -95,7 +95,7 @@ void TorcWebSocketPool::IncomingConnection(qintptr SocketDescriptor, bool Secure
 TorcWebSocketThread* TorcWebSocketPool::TakeSocket(TorcWebSocketThread *Socket)
 {
     if (!Socket)
-        return NULL;
+        return nullptr;
 
     QMutexLocker locker(&m_webSocketsLock);
     for (int i = 0; i < m_webSockets.size(); ++i)
@@ -104,5 +104,5 @@ TorcWebSocketThread* TorcWebSocketPool::TakeSocket(TorcWebSocketThread *Socket)
             return m_webSockets.takeAt(i);
     }
 
-    return NULL;
+    return nullptr;
 }

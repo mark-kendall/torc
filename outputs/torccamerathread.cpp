@@ -64,7 +64,7 @@ void TorcCameraThread::CreateOrDestroy(TorcCameraThread *&Thread, const QString 
     }
     else
     {
-        TorcCameraThread* thread = NULL;
+        TorcCameraThread* thread = nullptr;
         if (threads.contains(Type))
         {
             LOG(VB_GENERAL, LOG_INFO, QString("Sharing existing camera thread '%1'").arg(Type));
@@ -88,7 +88,7 @@ TorcCameraThread::TorcCameraThread( const QString &Type, const TorcCameraParams 
   : TorcQThread("Camera"),
     m_type(Type),
     m_params(Params),
-    m_camera(NULL),
+    m_camera(nullptr),
     m_cameraLock(QReadWriteLock::Recursive)
 {
 }
@@ -195,7 +195,7 @@ void TorcCameraThread::Finish(void)
     {
         m_camera->Stop();
         delete m_camera;
-        m_camera = NULL;
+        m_camera = nullptr;
     }
 
     LOG(VB_GENERAL, LOG_INFO, "Camera thread stopping");

@@ -61,7 +61,7 @@
 
 TorcWebSocketThread::TorcWebSocketThread(qintptr SocketDescriptor, bool Secure)
   : TorcQThread("SocketIn"),
-    m_webSocket(NULL),
+    m_webSocket(nullptr),
     m_secure(Secure),
     m_socketDescriptor(SocketDescriptor),
     m_address(QHostAddress::Null),
@@ -72,7 +72,7 @@ TorcWebSocketThread::TorcWebSocketThread(qintptr SocketDescriptor, bool Secure)
 
 TorcWebSocketThread::TorcWebSocketThread(const QHostAddress &Address, quint16 Port, bool Secure, TorcWebSocketReader::WSSubProtocol Protocol)
   : TorcQThread("SocketOut"),
-    m_webSocket(NULL),
+    m_webSocket(nullptr),
     m_secure(Secure),
     m_socketDescriptor(0),
     m_address(Address),
@@ -101,10 +101,10 @@ bool TorcWebSocketThread::CreateCerts(const QString &CertFile, const QString &Ke
 
 #if OPENSSL_VERSION_NUMBER < 0x10100000L
     BN_GENCB cb;
-    BN_GENCB_set(&cb, &SSLCallback, NULL);
+    BN_GENCB_set(&cb, &SSLCallback, nullptr);
 #else
     BN_GENCB *cb = BN_GENCB_new();
-    BN_GENCB_set(cb, &SSLCallback, NULL);
+    BN_GENCB_set(cb, &SSLCallback, nullptr);
 #endif
     BIGNUM *e;
     e = BN_new();
@@ -118,7 +118,7 @@ bool TorcWebSocketThread::CreateCerts(const QString &CertFile, const QString &Ke
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
     BN_GENCB_free(cb);
 #endif
-    if (NULL == rsa)
+    if (nullptr == rsa)
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to generate RSA key");
         return false;
@@ -189,7 +189,7 @@ bool TorcWebSocketThread::CreateCerts(const QString &CertFile, const QString &Ke
         return false;
     }
 
-    success = PEM_write_PrivateKey(keyfile, privatekey, NULL, NULL, 0, NULL, NULL);
+    success = PEM_write_PrivateKey(keyfile, privatekey, nullptr, nullptr, 0, nullptr, nullptr);
     fclose(keyfile);
     X509_free(x509);
     EVP_PKEY_free(privatekey);
@@ -322,7 +322,7 @@ void TorcWebSocketThread::Finish(void)
 {
     if (m_webSocket)
         delete m_webSocket;
-    m_webSocket = NULL;
+    m_webSocket = nullptr;
 }
 
 bool TorcWebSocketThread::IsSecure(void)

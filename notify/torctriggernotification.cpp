@@ -85,7 +85,7 @@
 TorcTriggerNotification::TorcTriggerNotification(const QVariantMap &Details)
   : TorcNotification(Details),
     m_inputName(),
-    m_input(NULL),
+    m_input(nullptr),
     m_lastValue(0.0),
     m_triggerHigh(true),
     m_customData(),
@@ -196,7 +196,7 @@ bool TorcTriggerNotification::Setup(void)
         return false;
 
     // setup the input
-    TorcDevice* input = NULL;
+    TorcDevice* input = nullptr;
     {
         QMutexLocker locker(gDeviceListLock);
         if (!m_inputName.isEmpty() && gDeviceList->contains(m_inputName))
@@ -229,6 +229,6 @@ class TorcTriggerNotificationFactory final : public TorcNotificationFactory
     {
         if (Type == "trigger" && Details.contains("inputs"))
             return new TorcTriggerNotification(Details);
-        return NULL;
+        return nullptr;
     }
 } TorcTriggerNotificationFactory;

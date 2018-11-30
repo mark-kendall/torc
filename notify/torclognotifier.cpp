@@ -56,7 +56,7 @@ class TorcLogNotifierFactory final : public TorcNotifierFactory
     {
         if (Type == "log")
             return new TorcLogNotifier(Details);
-        return NULL;
+        return nullptr;
     }
 } TorcLogNotifierFactory;
 

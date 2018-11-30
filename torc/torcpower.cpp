@@ -58,7 +58,7 @@ class TorcPowerFactoryNull : public TorcPowerFactory
         if (Score <= 1)
             return new TorcPowerNull();
 
-        return NULL;
+        return nullptr;
     }
 } TorcPowerFactoryNull;
 
@@ -67,7 +67,7 @@ class TorcPowerFactoryNull : public TorcPowerFactory
  *  \sa TorcPower
 */
 
-TorcPowerFactory* TorcPowerFactory::gPowerFactory = NULL;
+TorcPowerFactory* TorcPowerFactory::gPowerFactory = nullptr;
 
 TorcPowerFactory::TorcPowerFactory()
   : nextPowerFactory(gPowerFactory)
@@ -91,7 +91,7 @@ TorcPowerFactory* TorcPowerFactory::NextPowerFactory(void) const
 
 TorcPower* TorcPowerFactory::CreatePower()
 {
-    TorcPower *power = NULL;
+    TorcPower *power = nullptr;
 
     int score = 0;
     TorcPowerFactory* factory = TorcPowerFactory::GetTorcPowerFactory();
@@ -137,10 +137,10 @@ TorcPower* TorcPowerFactory::CreatePower()
 TorcPower::TorcPower()
   : QObject(),
     TorcHTTPService(this, "power", "power", TorcPower::staticMetaObject, "ShuttingDown,Suspending,Hibernating,Restarting,WokeUp,LowBattery,Refresh"),
-    m_canShutdown(new TorcSetting(NULL,  QString("CanShutdown"),  QString(), TorcSetting::Bool, TorcSetting::None, QVariant((bool)false))),
-    m_canSuspend(new TorcSetting(NULL,   QString("CanSuspend"),   QString(), TorcSetting::Bool, TorcSetting::None, QVariant((bool)false))),
-    m_canHibernate(new TorcSetting(NULL, QString("CanHibernate"), QString(), TorcSetting::Bool, TorcSetting::None, QVariant((bool)false))),
-    m_canRestart(new TorcSetting(NULL,   QString("CanRestart"),   QString(), TorcSetting::Bool, TorcSetting::None, QVariant((bool)false))),
+    m_canShutdown(new TorcSetting(nullptr,  QString("CanShutdown"),  QString(), TorcSetting::Bool, TorcSetting::None, QVariant((bool)false))),
+    m_canSuspend(new TorcSetting(nullptr,   QString("CanSuspend"),   QString(), TorcSetting::Bool, TorcSetting::None, QVariant((bool)false))),
+    m_canHibernate(new TorcSetting(nullptr, QString("CanHibernate"), QString(), TorcSetting::Bool, TorcSetting::None, QVariant((bool)false))),
+    m_canRestart(new TorcSetting(nullptr,   QString("CanRestart"),   QString(), TorcSetting::Bool, TorcSetting::None, QVariant((bool)false))),
     m_batteryLevel(TorcPower::UnknownPower),
     m_powerGroupItem(new TorcSettingGroup(gRootSetting, tr("Power"))),
     m_powerEnabled(new TorcSetting(m_powerGroupItem, QString("EnablePower"),
@@ -554,7 +554,7 @@ static class TorcPowerObject : public TorcAdminObject, public TorcStringFactory
   public:
     TorcPowerObject()
       : TorcAdminObject(TORC_ADMIN_MED_PRIORITY),
-        m_power(NULL)
+        m_power(nullptr)
     {
     }
 
@@ -590,7 +590,7 @@ static class TorcPowerObject : public TorcAdminObject, public TorcStringFactory
     {
         if (m_power)
             delete m_power;
-        m_power = NULL;
+        m_power = nullptr;
     }
 
   private:

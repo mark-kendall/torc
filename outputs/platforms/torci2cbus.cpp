@@ -34,7 +34,7 @@ TorcI2CDevice::~TorcI2CDevice()
 {
 }
 
-TorcI2CDeviceFactory* TorcI2CDeviceFactory::gTorcI2CDeviceFactory = NULL;
+TorcI2CDeviceFactory* TorcI2CDeviceFactory::gTorcI2CDeviceFactory = nullptr;
 
 TorcI2CDeviceFactory::TorcI2CDeviceFactory()
   : nextTorcI2CDeviceFactory(gTorcI2CDeviceFactory)
@@ -113,7 +113,7 @@ void TorcI2CBus::Create(const QVariantMap &Details)
                     continue;
                 }
 
-                TorcI2CDevice* device = NULL;
+                TorcI2CDevice* device = nullptr;
                 TorcI2CDeviceFactory* factory = TorcI2CDeviceFactory::GetTorcI2CDeviceFactory();
                 for ( ; factory; factory = factory->NextFactory())
                 {

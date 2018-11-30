@@ -88,7 +88,7 @@ class TorcThingSpeakNotifierFactory final : public TorcNotifierFactory
     {
         if (Type == "thingspeak" && Details.contains("apikey") && Details.contains("fields"))
             return new TorcThingSpeakNotifier(Details);
-        return NULL;
+        return nullptr;
     }
 } TorcThingSpeakNotifierFactory;
 
