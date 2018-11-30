@@ -18,6 +18,7 @@
 */
 
 // Qt
+#include <QMetaEnum>
 #include <QMutex>
 
 // Torc
@@ -30,29 +31,21 @@
 
 QString TorcInput::TypeToString(TorcInput::Type Type)
 {
-    switch (Type)
-    {
-        case TorcInput::Temperature:   return QString("temperature");
-        case TorcInput::pH:            return QString("ph");
-        case TorcInput::Switch:        return QString("switch");
-        case TorcInput::PWM:           return QString("pwm");
-        case TorcInput::Button:        return QString("button");
-        case TorcInput::SystemStarted: return QString("started");
-        default: break;
-    }
-
-    return QString("unknown");
+    return QString(QMetaEnum::fromType<TorcInput::Type>().valueToKey(Type)).toLower();
 }
 
-TorcInput::Type TorcInput::StringToType(const QString &Type)
+int TorcInput::StringToType(const QString &Type, bool CaseSensitive)
 {
-    QString type = Type.toLower();
-    if ("temperature" == type) return TorcInput::Temperature;
-    if ("ph"          == type) return TorcInput::pH;
-    if ("switch"      == type) return TorcInput::Switch;
-    if ("pwm"         == type) return TorcInput::PWM;
-    if ("started"     == type) return TorcInput::SystemStarted;
-    return TorcInput::Unknown;
+    const QMetaEnum metaEnum = QMetaEnum::fromType<TorcInput::Type>();
+    if (CaseSensitive)
+        return metaEnum.keyToValue(Type.toLatin1());
+
+    QByteArray type = Type.toLower().toLatin1();
+    int count = metaEnum.keyCount();
+    for (int i = 0; i < count; i++)
+        if (qstrcmp(type, QByteArray(metaEnum.key(count)).toLower()) == 0)
+            return metaEnum.value(count);
+    return -1; // for consistency with QMetaEnum::keyToValue
 }
 
 /*! \class Torcinput

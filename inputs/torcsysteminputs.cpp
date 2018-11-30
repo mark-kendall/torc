@@ -58,7 +58,7 @@ void TorcSystemInputs::Create(const QVariantMap &Details)
             for ( ; it != details.constEnd(); ++it)
             {
                 // iterate over known types - currently only 'started'
-                if (it.key() == TorcInput::TypeToString(TorcInput::SystemStarted))
+                if (it.key() == TorcInput::TypeToString(TorcInput::Started))
                 {
                     QVariantMap system   = it.value().toMap();
                     QString uniqueid     = system.value("name").toString();

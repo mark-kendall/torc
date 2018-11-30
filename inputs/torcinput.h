@@ -29,14 +29,14 @@ class TorcInput : public TorcDevice, public TorcHTTPService
         Switch,
         PWM,
         Button,
-        SystemStarted,
+        Started,
         MaxType
     };
 
     Q_ENUM(Type)
 
-    static QString          TypeToString(TorcInput::Type Type);
-    static TorcInput::Type  StringToType(const QString &Type);
+    static QString           TypeToString(TorcInput::Type Type);
+    static int               StringToType(const QString &Type, bool CaseSensitive = false);
 
   public:
     TorcInput(TorcInput::Type Type, double Value, double RangeMinimum, double RangeMaximum,

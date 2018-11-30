@@ -36,7 +36,7 @@
  * allow for dimming etc.
 */
 TorcSystemInput::TorcSystemInput(double Value, const QVariantMap &Details)
-  : TorcInput(TorcInput::SystemStarted, Value, 0, 1, "SystemStarted", Details),
+  : TorcInput(TorcInput::Started, Value, 0, 1, "SystemStarted", Details),
     m_shutdownDelay(0)
 {
     gLocalContext->AddObserver(this);
@@ -65,7 +65,7 @@ TorcSystemInput::~TorcSystemInput(void)
 
 TorcInput::Type TorcSystemInput::GetType(void)
 {
-    return TorcInput::SystemStarted;
+    return TorcInput::Started;
 }
 
 QStringList TorcSystemInput::GetDescription(void)
