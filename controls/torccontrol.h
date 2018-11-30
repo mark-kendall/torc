@@ -18,7 +18,6 @@ class TorcControl : public TorcDevice, public TorcHTTPService
 
     Q_OBJECT
     Q_CLASSINFO("Version", "1.0.0")
-    Q_ENUMS(Operation)
 
   public:
     enum Type
