@@ -77,7 +77,12 @@ void TorcNetworkButtonInput::SetValue(double Value)
     (void)Value;
     QMutexLocker locker(&lock);
 
+    // don't re-trigger until current pulse is finished
     if (m_pulseTimer.isActive())
+        return;
+
+    // only trigger on a 'push' - not release
+    if (qFuzzyCompare(Value + 1.0, 1.0))
         return;
 
     TorcNetworkSwitchInput::SetValue(value < 1.0 ? 1.0 : 0.0);
