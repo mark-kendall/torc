@@ -10,7 +10,7 @@ class TorcEvent : public QEvent
 {
   public:
     TorcEvent(int Event, const QVariantMap Data = QVariantMap());
-    virtual ~TorcEvent();
+    virtual ~TorcEvent() = default;
 
     int          GetEvent (void);
     QVariantMap& Data     (void);

@@ -7,7 +7,7 @@
 #include "torccentral.h"
 #include "torccontrol.h"
 
-class TorcControls : public QObject, public TorcHTTPService, public TorcDeviceHandler
+class TorcControls final : public QObject, public TorcHTTPService, public TorcDeviceHandler
 {
     Q_OBJECT
     Q_CLASSINFO("Version",        "1.0.0")
@@ -17,6 +17,7 @@ class TorcControls : public QObject, public TorcHTTPService, public TorcDeviceHa
 
   public:
     TorcControls();
+    ~TorcControls() = default;
 
     static TorcControls* gControls;
 

@@ -45,10 +45,6 @@ TorcAdminThread::TorcAdminThread()
 {
 }
 
-TorcAdminThread::~TorcAdminThread()
-{
-}
-
 void TorcAdminThread::Start(void)
 {
     LOG(VB_GENERAL, LOG_INFO, "Admin thread starting");
@@ -112,10 +108,6 @@ TorcAdminObject::TorcAdminObject(int Priority)
     QMutexLocker lock(gTorcAdminObjectsLock);
     m_nextTorcAdminObject = gTorcAdminObject;
     gTorcAdminObject = this;
-}
-
-TorcAdminObject::~TorcAdminObject()
-{
 }
 
 int TorcAdminObject::Priority(void) const

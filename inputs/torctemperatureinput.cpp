@@ -26,10 +26,6 @@ TorcTemperatureInput::TorcTemperatureInput(double Value, double RangeMinimum, do
 {
 }
 
-TorcTemperatureInput::~TorcTemperatureInput()
-{
-}
-
 QStringList TorcTemperatureInput::GetDescription(void)
 {
     return QStringList() << tr("Constant Temp");

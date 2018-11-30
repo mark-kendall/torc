@@ -35,7 +35,7 @@ class TorcLogicControl : public TorcControl
 
   public:
     TorcLogicControl(const QString &Type, const QVariantMap &Details);
-   ~TorcLogicControl();
+   ~TorcLogicControl() = default;
 
     bool                        Validate         (void) override;
     TorcControl::Type           GetType          (void) const override;

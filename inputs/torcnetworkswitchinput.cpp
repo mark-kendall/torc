@@ -28,10 +28,6 @@ TorcNetworkSwitchInput::TorcNetworkSwitchInput(double Default, const QVariantMap
 {
 }
 
-TorcNetworkSwitchInput::~TorcNetworkSwitchInput()
-{
-}
-
 QStringList TorcNetworkSwitchInput::GetDescription(void)
 {
     return QStringList() << tr("Network switch");

@@ -113,7 +113,3 @@ void TorcOutput::SubscriberDeleted(QObject *Subscriber)
 {
     TorcHTTPService::HandleSubscriberDeleted(Subscriber);
 }
-
-TorcOutput::~TorcOutput()
-{
-}

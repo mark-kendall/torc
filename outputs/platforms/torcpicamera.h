@@ -22,7 +22,7 @@ class TorcPiCamera final : public TorcCameraDevice
 
     static bool             gPiCameraDetected;
     TorcPiCamera(const TorcCameraParams &Params);
-    virtual ~TorcPiCamera();
+    virtual ~TorcPiCamera() = default;
 
     bool Setup              (void) override;
     bool Start              (void) override;

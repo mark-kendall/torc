@@ -28,10 +28,6 @@ TorcNetworkSwitchOutput::TorcNetworkSwitchOutput(double Default, const QVariantM
 {
 }
 
-TorcNetworkSwitchOutput::~TorcNetworkSwitchOutput()
-{
-}
-
 QStringList TorcNetworkSwitchOutput::GetDescription(void)
 {
     return QStringList() << tr("Network switch");

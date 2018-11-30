@@ -15,7 +15,7 @@
 class TorcSerialiser
 {
   public:
-    virtual ~TorcSerialiser() {}
+    virtual ~TorcSerialiser() = default;
 
     static TorcSerialiser*   GetSerialiser  (const QString &MimeType);
     void                     Serialise      (QByteArray &Dest, const QVariant &Data, const QString &Type = QString());
@@ -32,7 +32,7 @@ class TorcSerialiserFactory
 {
   public:
     TorcSerialiserFactory(const QString &Type, const QString &SubType, const QString &Description);
-    virtual ~TorcSerialiserFactory();
+    virtual ~TorcSerialiserFactory() = default;
 
     static TorcSerialiserFactory* GetTorcSerialiserFactory  (void);
     TorcSerialiserFactory*        NextTorcSerialiserFactory (void) const;

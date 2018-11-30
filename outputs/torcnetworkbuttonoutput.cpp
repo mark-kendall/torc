@@ -50,10 +50,6 @@ TorcNetworkButtonOutput::TorcNetworkButtonOutput(double Default, const QVariantM
     connect(&m_pulseTimer, SIGNAL(timeout()), this, SLOT(EndPulse()));
 }
 
-TorcNetworkButtonOutput::~TorcNetworkButtonOutput()
-{
-}
-
 QStringList TorcNetworkButtonOutput::GetDescription(void)
 {
     return QStringList() << tr("Network button");

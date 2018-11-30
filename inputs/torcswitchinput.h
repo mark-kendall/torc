@@ -8,7 +8,7 @@ class TorcSwitchInput : public TorcInput
 {
   public:
     TorcSwitchInput(double Default, const QString &ModelId, const QVariantMap &Details);
-    virtual ~TorcSwitchInput();
+    virtual ~TorcSwitchInput() = default;
 
     QStringList      GetDescription (void) override;
     TorcInput::Type  GetType        (void) override;

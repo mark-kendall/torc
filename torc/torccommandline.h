@@ -36,7 +36,7 @@ class TorcCommandLine
 
   public:
     explicit TorcCommandLine(TorcCommandLine::Options Flags);
-    ~TorcCommandLine();
+    ~TorcCommandLine() = default;
 
     static bool   RegisterEnvironmentVariable  (const QString &Var, const QString &Description);
 

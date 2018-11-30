@@ -37,10 +37,6 @@ TorcXMLSerialiser::TorcXMLSerialiser()
 {
 }
 
-TorcXMLSerialiser::~TorcXMLSerialiser()
-{
-}
-
 HTTPResponseType TorcXMLSerialiser::ResponseType(void)
 {
     return HTTPResponseXML;

@@ -13,7 +13,7 @@ class TorcNetworkButtonInput final : public TorcNetworkSwitchInput
 
   public:
     TorcNetworkButtonInput(double Default, const QVariantMap &Details);
-   ~TorcNetworkButtonInput();
+   ~TorcNetworkButtonInput() = default;
 
     QStringList GetDescription (void) override;
     void        Start          (void) override;

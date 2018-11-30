@@ -13,7 +13,7 @@ class TorcNetworkButtonOutput final : public TorcNetworkSwitchOutput
 
   public:
     TorcNetworkButtonOutput(double Default, const QVariantMap &Details);
-   ~TorcNetworkButtonOutput();
+   ~TorcNetworkButtonOutput() = default;
 
     QStringList GetDescription(void) override;
 

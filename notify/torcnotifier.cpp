@@ -38,20 +38,12 @@ TorcNotifier::TorcNotifier(const QVariantMap &Details)
 {
 }
 
-TorcNotifier::~TorcNotifier()
-{
-}
-
 TorcNotifierFactory* TorcNotifierFactory::gTorcNotifierFactory = nullptr;
 
 TorcNotifierFactory::TorcNotifierFactory()
   : nextTorcNotifierFactory(gTorcNotifierFactory)
 {
     gTorcNotifierFactory = this;
-}
-
-TorcNotifierFactory::~TorcNotifierFactory()
-{
 }
 
 TorcNotifierFactory* TorcNotifierFactory::GetTorcNotifierFactory(void)

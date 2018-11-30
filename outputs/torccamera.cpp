@@ -149,22 +149,6 @@ TorcCameraParams::TorcCameraParams(const QVariantMap &Details)
     m_valid = true;
 }
 
-TorcCameraParams::TorcCameraParams(const TorcCameraParams &Other)
-  : m_valid(Other.m_valid),
-    m_width(Other.m_width),
-    m_height(Other.m_height),
-    m_stride(Other.m_stride),
-    m_sliceHeight(Other.m_sliceHeight),
-    m_frameRate(Other.m_frameRate),
-    m_bitrate(Other.m_bitrate),
-    m_timebase(Other.m_timebase),
-    m_segmentLength(Other.m_segmentLength),
-    m_gopSize(Other.m_gopSize),
-    m_videoCodec(Other.m_videoCodec),
-    m_contentDir(Other.m_contentDir)
-{
-}
-
 TorcCameraParams& TorcCameraParams::operator =(const TorcCameraParams &Other)
 {
     if (&Other != this)
@@ -447,10 +431,6 @@ TorcCameraFactory::TorcCameraFactory()
 {
     qRegisterMetaType<TorcCameraParams>("TorcCameraParams&");
     gTorcCameraFactory = this;
-}
-
-TorcCameraFactory::~TorcCameraFactory()
-{
 }
 
 TorcCameraFactory* TorcCameraFactory::GetTorcCameraFactory(void)

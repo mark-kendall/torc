@@ -119,10 +119,6 @@ TorcNetworkRequest::TorcNetworkRequest(const QNetworkRequest Request, const QByt
 {
 }
 
-TorcNetworkRequest::~TorcNetworkRequest()
-{
-}
-
 int TorcNetworkRequest::BytesAvailable(void)
 {
     if (!m_bufferSize)

@@ -10,7 +10,7 @@ class TorcpHInput : public TorcInput
 
   public:
     TorcpHInput(double Value, const QString &ModelId, const QVariantMap &Details);
-    virtual ~TorcpHInput();
+    virtual ~TorcpHInput() = default;
 
     QStringList      GetDescription (void) override;
     TorcInput::Type  GetType        (void) override;

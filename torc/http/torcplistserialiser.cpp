@@ -25,10 +25,6 @@ TorcPListSerialiser::TorcPListSerialiser()
 {
 }
 
-TorcPListSerialiser::~TorcPListSerialiser()
-{
-}
-
 HTTPResponseType TorcPListSerialiser::ResponseType(void)
 {
     return HTTPResponsePList;

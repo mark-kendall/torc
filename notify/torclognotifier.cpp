@@ -35,10 +35,6 @@ TorcLogNotifier::TorcLogNotifier(const QVariantMap &Details)
     SetValid(true);
 }
 
-TorcLogNotifier::~TorcLogNotifier()
-{
-}
-
 QStringList TorcLogNotifier::GetDescription(void)
 {
     return QStringList() << tr("Log");

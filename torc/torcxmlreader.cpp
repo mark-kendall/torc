@@ -77,10 +77,6 @@ TorcXMLReader::TorcXMLReader(QByteArray &Data)
     m_valid = ReadXML();
 }
 
-TorcXMLReader::~TorcXMLReader()
-{
-}
-
 bool TorcXMLReader::IsValid(QString &Message) const
 {
     Message = m_message;

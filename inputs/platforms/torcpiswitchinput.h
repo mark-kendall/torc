@@ -17,7 +17,7 @@ class TorcPiSwitchInputThread : public TorcQThread
 
   public:
     TorcPiSwitchInputThread(TorcPiSwitchInput* Parent, int Pin);
-    virtual ~TorcPiSwitchInputThread();
+    virtual ~TorcPiSwitchInputThread() = default;
 
     void         Start    (void);
     void         Finish   (void);

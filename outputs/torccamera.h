@@ -35,7 +35,8 @@ class TorcCameraParams
   public:
     TorcCameraParams(void);
     explicit TorcCameraParams(const QVariantMap &Details);
-    TorcCameraParams(const TorcCameraParams &Other);
+    ~TorcCameraParams() = default;
+    TorcCameraParams(const TorcCameraParams &Other) = default;
     TorcCameraParams  Combine     (const TorcCameraParams &Add);
     TorcCameraParams& operator =  (const TorcCameraParams &Other);
     bool              operator == (const TorcCameraParams &Other) const;
@@ -126,7 +127,7 @@ class TorcCameraFactory
 {
   public:
     TorcCameraFactory();
-    virtual ~TorcCameraFactory();
+    virtual ~TorcCameraFactory() = default;
 
     static TorcCameraDevice*    GetCamera            (const QString &Type, const TorcCameraParams &Params);
     static TorcCameraFactory*   GetTorcCameraFactory (void);

@@ -11,7 +11,7 @@ class TorcDeviceHandler
 {
   public:
     TorcDeviceHandler();
-    virtual ~TorcDeviceHandler();
+    virtual ~TorcDeviceHandler() = default;
 
     static  void Start   (const QVariantMap &Details);
     static  void Stop    (void);

@@ -43,10 +43,6 @@ TorcObservable::TorcObservable()
 {
 }
 
-TorcObservable::~TorcObservable()
-{
-}
-
 ///brief Register the given object to receive events.
 void TorcObservable::AddObserver(QObject *Observer)
 {

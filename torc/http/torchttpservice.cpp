@@ -111,9 +111,7 @@ class MethodParameters
         m_valid = true;
     }
 
-    ~MethodParameters()
-    {
-    }
+    ~MethodParameters() = default;
 
     /*! \brief Call the stored method with the arguments passed in via Queries.
      *

@@ -146,10 +146,6 @@ TorcLogicControl::TorcLogicControl(const QString &Type, const QVariantMap &Detai
     m_parsed = true;
 }
 
-TorcLogicControl::~TorcLogicControl()
-{
-}
-
 TorcControl::Type TorcLogicControl::GetType(void) const
 {
     return TorcControl::Logic;

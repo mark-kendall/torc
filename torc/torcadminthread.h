@@ -14,7 +14,7 @@ class TorcAdminThread : public TorcQThread
 
   public:
     TorcAdminThread();
-    virtual ~TorcAdminThread();
+    virtual ~TorcAdminThread() = default;
 
     void Start  (void);
     void Finish (void);
@@ -35,7 +35,7 @@ class TorcAdminObject
 
   public:
     explicit TorcAdminObject(int Priority = TORC_ADMIN_LOW_PRIORITY);
-    virtual ~TorcAdminObject();
+    virtual ~TorcAdminObject() = default;
 
     int              Priority      (void) const;
     TorcAdminObject* GetNextObject (void);

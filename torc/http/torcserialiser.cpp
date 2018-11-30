@@ -94,10 +94,6 @@ TorcSerialiserFactory::TorcSerialiserFactory(const QString &Type, const QString 
     gTorcSerialiserFactory      = this;
 }
 
-TorcSerialiserFactory::~TorcSerialiserFactory()
-{
-}
-
 TorcSerialiserFactory* TorcSerialiserFactory::GetTorcSerialiserFactory(void)
 {
     return gTorcSerialiserFactory;

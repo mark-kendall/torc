@@ -30,7 +30,7 @@ class Torc1WireDeviceFactory
 {
   public:
     Torc1WireDeviceFactory();
-    virtual ~Torc1WireDeviceFactory();
+    virtual ~Torc1WireDeviceFactory() = default;
 
     static Torc1WireDeviceFactory*   GetTorc1WireDeviceFactory (void);
     Torc1WireDeviceFactory*          NextFactory               (void) const;

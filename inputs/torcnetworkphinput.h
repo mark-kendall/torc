@@ -8,7 +8,7 @@ class TorcNetworkpHInput final : public TorcpHInput
 {
   public:
     TorcNetworkpHInput(double Default, const QVariantMap &Details);
-    ~TorcNetworkpHInput();
+    ~TorcNetworkpHInput() = default;
 
     QStringList GetDescription (void) override;
     void        Start          (void) override;

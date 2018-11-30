@@ -91,12 +91,13 @@ TorcBonjour::~TorcBonjour()
 }
 
 quint32 TorcBonjour::Register(quint16 Port, const QByteArray &Type, const QByteArray &Name,
-                              const QMap<QByteArray, QByteArray> &TxtRecords)
+                              const QMap<QByteArray, QByteArray> &TxtRecords, quint32 Reference /*=0*/)
 {
     (void)Port;
     (void)Type;
     (void)Name;
     (void)TxtRecords;
+    (void)Reference;
     return 0;
 }
 

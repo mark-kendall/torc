@@ -45,10 +45,6 @@ TorcPiSwitchInputThread::TorcPiSwitchInputThread(TorcPiSwitchInput *Parent, int 
    connect(this, SIGNAL(Changed(double)), m_parent, SLOT(SetValue(double)));
 }
 
-TorcPiSwitchInputThread::~TorcPiSwitchInputThread()
-{
-}
-
 void TorcPiSwitchInputThread::Finish(void)
 {
     // close input file

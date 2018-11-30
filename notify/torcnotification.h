@@ -20,7 +20,7 @@ class TorcNotification : public TorcDevice
     void                 Notify       (const QVariantMap &Message);
 
   protected:
-    virtual ~TorcNotification();
+    virtual ~TorcNotification() = default;
 
   protected:
     QStringList          m_notifierNames;
@@ -33,7 +33,7 @@ class TorcNotificationFactory
 {
   public:
     TorcNotificationFactory();
-    virtual ~TorcNotificationFactory();
+    virtual ~TorcNotificationFactory() = default;
 
     static TorcNotificationFactory*   GetTorcNotificationFactory (void);
     TorcNotificationFactory*          NextFactory                (void) const;

@@ -126,10 +126,6 @@ TorcCommandLine::TorcCommandLine(Options Flags)
         AddPriv(QString("t,trans"), QString(""), QString("Override the translations directory"));
 }
 
-TorcCommandLine::~TorcCommandLine()
-{
-}
-
 /*! \brief Implement custom command line options.
  *
  * \param Keys            A comma separated list of synonymous command line options (e.g. "h,help").

@@ -11,7 +11,7 @@ class TorcJSONSerialiser : public TorcSerialiser
 {
   public:
     explicit TorcJSONSerialiser(bool Javascript = false);
-    virtual ~TorcJSONSerialiser();
+    virtual ~TorcJSONSerialiser() = default;
 
     HTTPResponseType ResponseType       (void) override;
 

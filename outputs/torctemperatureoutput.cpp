@@ -31,10 +31,6 @@ TorcTemperatureOutput::TorcTemperatureOutput(double Value, const QString &ModelI
         SetOwner(this);
 }
 
-TorcTemperatureOutput::~TorcTemperatureOutput()
-{
-}
-
 QStringList TorcTemperatureOutput::GetDescription(void)
 {
     return QStringList() << tr("Constant Temp");

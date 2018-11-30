@@ -24,7 +24,7 @@ class TorcCameraOutput : public TorcOutput
   public:
     TorcCameraOutput(TorcOutput::Type Type, double Value, const QString &ModelId, const QVariantMap &Details,
                      QObject *Output, const QMetaObject &MetaObject, const QString &Blacklist = QString(""));
-    virtual ~TorcCameraOutput();
+    virtual ~TorcCameraOutput() = default;
 
   public slots:
     virtual void CameraErrored (bool Errored) = 0;

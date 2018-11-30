@@ -125,10 +125,6 @@ TorcPiCamera::TorcPiCamera(const TorcCameraParams &Params)
     LOG(VB_GENERAL, LOG_INFO, QString("Camera encoder stride: %1 slice height: %2").arg(m_params.m_stride).arg(m_params.m_sliceHeight));
 }
 
-TorcPiCamera::~TorcPiCamera()
-{
-}
-
 void TorcPiCamera::StreamVideo(bool Video)
 {
     (void)Video;

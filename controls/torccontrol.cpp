@@ -222,10 +222,6 @@ TorcControl::TorcControl(TorcControl::Type Type, const QVariantMap &Details)
     m_outputList.removeDuplicates();
 }
 
-TorcControl::~TorcControl()
-{
-}
-
 bool TorcControl::Validate(void)
 {
     QMutexLocker locker(&lock);

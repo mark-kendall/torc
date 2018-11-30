@@ -16,6 +16,7 @@ class TorcNetworkInputs final : public TorcDeviceHandler
 {
   public:
     TorcNetworkInputs();
+    ~TorcNetworkInputs() = default;
 
     static TorcNetworkInputs*   gNetworkInputs;
 

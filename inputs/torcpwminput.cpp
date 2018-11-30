@@ -28,10 +28,6 @@ TorcPWMInput::TorcPWMInput(double Value, const QString &ModelId, const QVariantM
 {
 }
 
-TorcPWMInput::~TorcPWMInput()
-{
-}
-
 QStringList TorcPWMInput::GetDescription(void)
 {
     return QStringList() << tr("Constant PWM");

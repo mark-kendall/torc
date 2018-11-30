@@ -180,10 +180,6 @@ void TorcHTTPRequest::Initialise(const QString &Method)
     LOG(VB_GENERAL, LOG_DEBUG, QString("HTTP request: path '%1' method '%2'").arg(m_path).arg(m_method));
 }
 
-TorcHTTPRequest::~TorcHTTPRequest()
-{
-}
-
 void TorcHTTPRequest::SetConnection(HTTPConnection Connection)
 {
     m_connection = Connection;

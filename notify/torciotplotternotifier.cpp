@@ -51,10 +51,6 @@ TorcIoTPlotterNotifier::TorcIoTPlotterNotifier(const QVariantMap &Details)
     SetValid(Initialise(Details));
 }
 
-TorcIoTPlotterNotifier::~TorcIoTPlotterNotifier()
-{
-}
-
 TorcNetworkRequest* TorcIoTPlotterNotifier::CreateRequest(void)
 {
     QUrl url(IOTPLOTTER_UPDATE_URL + m_feedId);

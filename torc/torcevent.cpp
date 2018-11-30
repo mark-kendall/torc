@@ -61,10 +61,6 @@ TorcEvent::TorcEvent(int Event, const QVariantMap Data/* = QVariantMap()*/)
 {
 }
 
-TorcEvent::~TorcEvent()
-{
-}
-
 /// \brief Return the Torc action associated with this event.
 int TorcEvent::GetEvent(void)
 {

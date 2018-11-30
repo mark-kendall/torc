@@ -32,10 +32,6 @@ TorcJSONSerialiser::TorcJSONSerialiser(bool Javascript)
 {
 }
 
-TorcJSONSerialiser::~TorcJSONSerialiser()
-{
-}
-
 HTTPResponseType TorcJSONSerialiser::ResponseType(void)
 {
     return m_javaScriptType ? HTTPResponseJSONJavascript : HTTPResponseJSON;

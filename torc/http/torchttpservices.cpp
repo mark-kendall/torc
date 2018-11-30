@@ -61,10 +61,6 @@ TorcHTTPServices::TorcHTTPServices(TorcHTTPServer *Server)
     }
 }
 
-TorcHTTPServices::~TorcHTTPServices()
-{
-}
-
 QString TorcHTTPServices::GetVersion(void)
 {
     int index = TorcHTTPServices::staticMetaObject.indexOfClassInfo("Version");

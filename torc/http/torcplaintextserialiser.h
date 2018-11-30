@@ -8,7 +8,7 @@ class TorcPlainTextSerialiser : public TorcSerialiser
 {
   public:
     TorcPlainTextSerialiser();
-   ~TorcPlainTextSerialiser();
+   ~TorcPlainTextSerialiser() = default;
 
     HTTPResponseType ResponseType       (void) override;
 

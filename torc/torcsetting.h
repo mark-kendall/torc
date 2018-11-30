@@ -89,8 +89,8 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
     void                   Removed              (void);
 
   protected:
-    virtual               ~TorcSetting();
-    QString                GetChildList         (QMap<QString,QVariant> &Children);
+    virtual               ~TorcSetting() = default;
+    QString                GetChildList         (QVariantMap &Children);
     TorcSetting*           FindChild            (const QString &Child, bool Recursive = false);
     QSet<TorcSetting*>     GetChildren          (void);
     void                   AddChild             (TorcSetting *Child);

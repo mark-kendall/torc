@@ -44,10 +44,6 @@ TorcCameraOutput::TorcCameraOutput(TorcOutput::Type Type, double Value, const QS
 {
 }
 
-TorcCameraOutput::~TorcCameraOutput()
-{
-}
-
 TorcCameraParams& TorcCameraOutput::GetParams(void)
 {
     return m_params;

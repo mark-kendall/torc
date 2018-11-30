@@ -26,10 +26,6 @@ TorcPlainTextSerialiser::TorcPlainTextSerialiser() : TorcSerialiser()
 {
 }
 
-TorcPlainTextSerialiser::~TorcPlainTextSerialiser()
-{
-}
-
 HTTPResponseType TorcPlainTextSerialiser::ResponseType(void)
 {
     return HTTPResponsePlainText;

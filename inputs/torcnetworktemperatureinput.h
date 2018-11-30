@@ -8,7 +8,7 @@ class TorcNetworkTemperatureInput final : public TorcTemperatureInput
 {
   public:
     TorcNetworkTemperatureInput(double Default, const QVariantMap &Details);
-    ~TorcNetworkTemperatureInput();
+    ~TorcNetworkTemperatureInput() = default;
 
     QStringList GetDescription (void) override;
     void        Start          (void) override;

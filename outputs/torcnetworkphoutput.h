@@ -10,7 +10,7 @@ class TorcNetworkpHOutput final : public TorcpHOutput
 
   public:
     TorcNetworkpHOutput(double Default, const QVariantMap &Details);
-    ~TorcNetworkpHOutput();
+    ~TorcNetworkpHOutput() = default;
 
     QStringList GetDescription(void) override;
 };

@@ -11,7 +11,7 @@ class TorcBinaryPListSerialiser : public TorcSerialiser
 {
   public:
     TorcBinaryPListSerialiser();
-    virtual ~TorcBinaryPListSerialiser();
+    virtual ~TorcBinaryPListSerialiser() = default;
 
     HTTPResponseType ResponseType         (void) override;
 

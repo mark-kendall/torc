@@ -28,10 +28,6 @@ TorcpHInput::TorcpHInput(double Value, const QString &ModelId, const QVariantMap
 {
 }
 
-TorcpHInput::~TorcpHInput()
-{
-}
-
 QStringList TorcpHInput::GetDescription(void)
 {
     return QStringList() << tr("Constant pH");

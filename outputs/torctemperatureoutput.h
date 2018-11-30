@@ -8,7 +8,7 @@ class TorcTemperatureOutput : public TorcOutput
 {
   public:
     TorcTemperatureOutput(double Value, const QString &ModelId, const QVariantMap &Details);
-    virtual ~TorcTemperatureOutput();
+    virtual ~TorcTemperatureOutput() = default;
 
     QStringList      GetDescription (void) override;
     TorcOutput::Type GetType        (void) override;

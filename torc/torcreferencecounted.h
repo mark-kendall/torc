@@ -10,7 +10,7 @@ class TorcReferenceCounter
     static void EventLoopEnding(bool Ending);
 
     TorcReferenceCounter(void);
-    virtual ~TorcReferenceCounter(void);
+    virtual ~TorcReferenceCounter(void) = default;
 
     void UpRef(void);
     virtual bool DownRef(void);

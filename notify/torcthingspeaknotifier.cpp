@@ -40,10 +40,6 @@ TorcThingSpeakNotifier::TorcThingSpeakNotifier(const QVariantMap &Details)
     SetValid(Initialise(Details));
 }
 
-TorcThingSpeakNotifier::~TorcThingSpeakNotifier()
-{
-}
-
 void TorcThingSpeakNotifier::ProcessRequest(TorcNetworkRequest *Request)
 {
     if (!Request)

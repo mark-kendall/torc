@@ -30,20 +30,12 @@ TorcI2CDevice::TorcI2CDevice(int Address)
 {
 }
 
-TorcI2CDevice::~TorcI2CDevice()
-{
-}
-
 TorcI2CDeviceFactory* TorcI2CDeviceFactory::gTorcI2CDeviceFactory = nullptr;
 
 TorcI2CDeviceFactory::TorcI2CDeviceFactory()
   : nextTorcI2CDeviceFactory(gTorcI2CDeviceFactory)
 {
     gTorcI2CDeviceFactory = this;
-}
-
-TorcI2CDeviceFactory::~TorcI2CDeviceFactory()
-{
 }
 
 TorcI2CDeviceFactory* TorcI2CDeviceFactory::GetTorcI2CDeviceFactory(void)

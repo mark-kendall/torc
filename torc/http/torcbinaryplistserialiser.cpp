@@ -45,10 +45,6 @@ TorcBinaryPListSerialiser::TorcBinaryPListSerialiser()
 {
 }
 
-TorcBinaryPListSerialiser::~TorcBinaryPListSerialiser()
-{
-}
-
 static inline void WriteReference(quint64 Reference, quint8 Size, quint8* Pointer, quint64 &Counter)
 {
     switch (Size)

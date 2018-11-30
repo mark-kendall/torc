@@ -43,10 +43,6 @@ TorcHTTPReader::TorcHTTPReader()
 {
 }
 
-TorcHTTPReader::~TorcHTTPReader()
-{
-}
-
 ///\brief Take ownership of the contents and headers. New owner is responsible for deleting.
 void TorcHTTPReader::TakeRequest(QByteArray& Content, QMap<QString,QString>& Headers)
 {

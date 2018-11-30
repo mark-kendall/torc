@@ -12,7 +12,7 @@ class TorcTriggerNotification final : public TorcNotification
 
   public:
     explicit TorcTriggerNotification(const QVariantMap &Details);
-    ~TorcTriggerNotification();
+    ~TorcTriggerNotification() = default;
     bool         IsKnownInput      (const QString &UniqueId) override;
     QStringList  GetDescription    (void) override;
     void         Graph             (QByteArray *Data) override;

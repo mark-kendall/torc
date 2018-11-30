@@ -48,10 +48,6 @@ TorcTime::TorcTime()
     m_timer.start();
 }
 
-TorcTime::~TorcTime()
-{
-}
-
 QString TorcTime::GetCurrentTime(void)
 {
     QReadLocker locker(&m_httpServiceLock);

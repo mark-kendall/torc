@@ -28,11 +28,6 @@ TorcNetworkPWMInput::TorcNetworkPWMInput(double Default, const QVariantMap &Deta
 {
 }
 
-TorcNetworkPWMInput::~TorcNetworkPWMInput()
-{
-}
-
-
 QStringList TorcNetworkPWMInput::GetDescription(void)
 {
     return QStringList() << tr("Network PWM");

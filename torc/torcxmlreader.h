@@ -10,7 +10,7 @@ class TorcXMLReader
   public:
     explicit TorcXMLReader(const QString &File);
     explicit TorcXMLReader(QByteArray &Data);
-   ~TorcXMLReader();
+   ~TorcXMLReader() = default;
 
     bool              IsValid     (QString &Message) const;
     QVariantMap       GetResult   (void) const;

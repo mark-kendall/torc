@@ -80,13 +80,6 @@
  * -# Multiple inputs to an output.
  * -# Reciprocal outputs/inputs (i.e. matched)
 */
-TorcXSDTest::TorcXSDTest()
-{
-}
-
-TorcXSDTest::~TorcXSDTest()
-{
-}
 
 /*! \brief Perform XSD test validation of XML files.
  *

@@ -47,7 +47,7 @@ class TorcInput : public TorcDevice, public TorcHTTPService
     QString                  GetUIName         (void) override;
 
   protected:
-    virtual ~TorcInput();
+    virtual ~TorcInput() = default;
 
   signals:
     void             OutOfRangeLowChanged      (bool Value);

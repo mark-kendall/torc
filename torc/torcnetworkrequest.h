@@ -36,7 +36,7 @@ class TorcNetworkRequest : public TorcReferenceCounter
     void            SetReplyError     (QNetworkReply::NetworkError Error);
 
   protected:
-    virtual ~TorcNetworkRequest();
+    virtual ~TorcNetworkRequest() = default;
     void            Write             (QNetworkReply *Reply);
 
   private:

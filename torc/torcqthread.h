@@ -15,7 +15,7 @@ class TorcQThread : public QThread
 
   public:
     explicit TorcQThread(const QString &Name);
-    virtual ~TorcQThread();
+    virtual ~TorcQThread() = default;
     
   signals:
     void            Started          (void);

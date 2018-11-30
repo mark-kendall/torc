@@ -10,7 +10,7 @@ class TorcThingSpeakNotifier final : public TorcIOTLogger
 
   public:
     explicit TorcThingSpeakNotifier(const QVariantMap &Details);
-    virtual ~TorcThingSpeakNotifier();
+    virtual ~TorcThingSpeakNotifier() = default;
 
     void ProcessRequest(TorcNetworkRequest* Request) override;
     TorcNetworkRequest* CreateRequest(void) override;

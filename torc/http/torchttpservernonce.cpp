@@ -234,10 +234,6 @@ TorcHTTPServerNonce::TorcHTTPServerNonce(const QDateTime &Time)
 {
 }
 
-TorcHTTPServerNonce::~TorcHTTPServerNonce()
-{
-}
-
 QString TorcHTTPServerNonce::GetOpaque(void) const
 {
     return m_opaque;

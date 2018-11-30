@@ -38,7 +38,7 @@ class TorcPowerNull : public TorcPower
 {
   public:
     TorcPowerNull() : TorcPower() { Debug(); }
-   ~TorcPowerNull()               { }
+   ~TorcPowerNull() = default;
     bool DoShutdown        (void) { return false; }
     bool DoSuspend         (void) { return false; }
     bool DoHibernate       (void) { return false; }
@@ -73,10 +73,6 @@ TorcPowerFactory::TorcPowerFactory()
   : nextPowerFactory(gPowerFactory)
 {
     gPowerFactory = this;
-}
-
-TorcPowerFactory::~TorcPowerFactory()
-{
 }
 
 TorcPowerFactory* TorcPowerFactory::GetTorcPowerFactory(void)

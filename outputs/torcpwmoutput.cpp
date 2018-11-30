@@ -71,10 +71,6 @@ TorcPWMOutput::TorcPWMOutput(double Value, const QString &ModelId, const QVarian
     }
 }
 
-TorcPWMOutput::~TorcPWMOutput()
-{
-}
-
 QStringList TorcPWMOutput::GetDescription(void)
 {
     return QStringList() << tr("Constant PWM");

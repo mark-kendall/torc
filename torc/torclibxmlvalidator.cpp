@@ -51,10 +51,6 @@ TorcXmlValidator::TorcXmlValidator(const QString &XmlFile, const QByteArray &XSD
     Validate();
 }
 
-TorcXmlValidator::~TorcXmlValidator()
-{
-}
-
 void TorcXmlValidator::HandleMessage(void *ctx, const char *format, ...)
 {
     bool silent = false;

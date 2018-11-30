@@ -12,7 +12,7 @@ class TorcXMLSerialiser : public TorcSerialiser
 {
   public:
     TorcXMLSerialiser();
-    virtual ~TorcXMLSerialiser();
+    virtual ~TorcXMLSerialiser() = default;
 
     virtual HTTPResponseType ResponseType    (void) override;
 

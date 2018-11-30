@@ -28,10 +28,6 @@ TorcSwitchInput::TorcSwitchInput(double Default, const QString &ModelId, const Q
 {
 }
 
-TorcSwitchInput::~TorcSwitchInput()
-{
-}
-
 QStringList TorcSwitchInput::GetDescription(void)
 {
     return QStringList() << tr("Constant Switch");

@@ -38,7 +38,7 @@ class TorcOutput : public TorcDevice, public TorcHTTPService
     TorcOutput(TorcOutput::Type Type, double Value, const QString &ModelId, const QVariantMap &Details,
                QObject *Output, const QMetaObject &MetaObject, const QString &Blacklist = QString(""));
 
-    virtual ~TorcOutput();
+    virtual ~TorcOutput() = default;
 
     virtual TorcOutput::Type GetType (void) = 0;
 

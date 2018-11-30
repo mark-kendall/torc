@@ -15,7 +15,7 @@ class TorcI2CDevice
 {
   public:
     explicit TorcI2CDevice(int Address);
-    virtual ~TorcI2CDevice();
+    virtual ~TorcI2CDevice()= default;
 
   protected:
     int  m_address;
@@ -26,7 +26,7 @@ class TorcI2CDeviceFactory
 {
   public:
     TorcI2CDeviceFactory();
-    virtual ~TorcI2CDeviceFactory();
+    virtual ~TorcI2CDeviceFactory() = default;
 
     static TorcI2CDeviceFactory*   GetTorcI2CDeviceFactory (void);
     TorcI2CDeviceFactory*          NextFactory             (void) const;

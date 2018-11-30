@@ -16,7 +16,7 @@ class TorcPowerUnixDBus final : public TorcPower
 
   public:
     TorcPowerUnixDBus();
-    virtual ~TorcPowerUnixDBus();
+    virtual ~TorcPowerUnixDBus() = default;
 
     bool DoShutdown         (void) override;
     bool DoSuspend          (void) override;

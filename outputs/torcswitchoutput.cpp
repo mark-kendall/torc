@@ -31,10 +31,6 @@ TorcSwitchOutput::TorcSwitchOutput(double Value, const QString &ModelId, const Q
         SetOwner(this);
 }
 
-TorcSwitchOutput::~TorcSwitchOutput()
-{
-}
-
 QStringList TorcSwitchOutput::GetDescription(void)
 {
     return QStringList() << tr("Constant Switch");

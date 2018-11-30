@@ -68,10 +68,6 @@ TorcQThread::TorcQThread(const QString &Name)
     setObjectName(Name);
 }
 
-TorcQThread::~TorcQThread()
-{
-}
-
 void TorcQThread::run(void)
 {
     Initialise();

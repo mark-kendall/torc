@@ -43,10 +43,6 @@ TorcReferenceCounter::TorcReferenceCounter(void)
     UpRef();
 }
 
-TorcReferenceCounter::~TorcReferenceCounter()
-{
-}
-
 void TorcReferenceCounter::UpRef(void)
 {
     m_refCount.ref();

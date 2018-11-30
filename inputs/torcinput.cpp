@@ -88,10 +88,6 @@ TorcInput::TorcInput(TorcInput::Type Type, double Value, double RangeMinimum, do
         TorcInputs::gInputs->AddInput(this);
 }
 
-TorcInput::~TorcInput()
-{
-}
-
 void TorcInput::Start(void)
 {
     // emit value first, as this will indicate a valid value.

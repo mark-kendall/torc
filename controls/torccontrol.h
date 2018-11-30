@@ -38,7 +38,7 @@ class TorcControl : public TorcDevice, public TorcHTTPService
 
   protected:
     TorcControl(TorcControl::Type Type, const QVariantMap &Details);
-    virtual ~TorcControl();
+    virtual ~TorcControl() = default;
 
   public:
     virtual bool           Validate               (void);

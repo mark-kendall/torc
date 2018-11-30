@@ -466,7 +466,7 @@ TorcBonjour::~TorcBonjour()
  * \sa TorcBonjour::MapToTxtRecord
 */
 quint32 TorcBonjour::Register(quint16 Port, const QByteArray &Type, const QByteArray &Name,
-                              const QMap<QByteArray, QByteArray> &TxtRecords, quint32 Reference /*=0*/)
+                              const QMap<QByteArray, QByteArray> &TxtRecords, quint32 Reference)
 {
     QByteArray txt = MapToTxtRecord(TxtRecords);
     return Register(Port, Type, Name, txt, Reference);

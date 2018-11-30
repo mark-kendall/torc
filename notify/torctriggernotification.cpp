@@ -129,10 +129,6 @@ TorcTriggerNotification::TorcTriggerNotification(const QVariantMap &Details)
     }
 }
 
-TorcTriggerNotification::~TorcTriggerNotification()
-{
-}
-
 bool TorcTriggerNotification::IsKnownInput(const QString &UniqueId)
 {
     QMutexLocker locker(&lock);

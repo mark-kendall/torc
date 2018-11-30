@@ -31,10 +31,6 @@ TorcpHOutput::TorcpHOutput(double Value, const QString &ModelId, const QVariantM
         SetOwner(this);
 }
 
-TorcpHOutput::~TorcpHOutput()
-{
-}
-
 QStringList TorcpHOutput::GetDescription(void)
 {
     return QStringList() << tr("Constant pH");

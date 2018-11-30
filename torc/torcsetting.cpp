@@ -121,10 +121,6 @@ TorcSetting::TorcSetting(TorcSetting *Parent, const QString &DBName, const QStri
     }
 }
 
-TorcSetting::~TorcSetting()
-{
-}
-
 void TorcSetting::SubscriberDeleted(QObject *Subscriber)
 {
     return TorcHTTPService::HandleSubscriberDeleted(Subscriber);

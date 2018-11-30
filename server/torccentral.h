@@ -69,7 +69,7 @@ class TorcXSDFactory
 {
   public:
     TorcXSDFactory();
-    virtual ~TorcXSDFactory();
+    virtual ~TorcXSDFactory() = default;
 
     static void               CustomiseXSD        (QByteArray &XSD);
     static TorcXSDFactory*    GetTorcXSDFactory   (void);

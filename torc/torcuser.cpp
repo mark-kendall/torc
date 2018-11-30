@@ -170,9 +170,7 @@ class TorcUserObject : public TorcAdminObject, public TorcStringFactory
     {
     }
 
-    ~TorcUserObject()
-    {
-    }
+    ~TorcUserObject() = default;
 
     void GetStrings(QVariantMap &Strings)
     {

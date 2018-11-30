@@ -8,7 +8,7 @@ class TorcLogNotifier final : public TorcNotifier
 {
   public:
     explicit TorcLogNotifier(const QVariantMap &Details);
-    ~TorcLogNotifier();
+    ~TorcLogNotifier() = default;
 
     void Notify (const QVariantMap &Notification) override;
     QStringList GetDescription (void) override;

@@ -15,7 +15,7 @@ class TorcWebSocketThread : public TorcQThread
     TorcWebSocketThread (qintptr SocketDescriptor, bool Secure);
     TorcWebSocketThread (const QHostAddress &Address, quint16 Port, bool Secure,
                          TorcWebSocketReader::WSSubProtocol Protocol = TorcWebSocketReader::SubProtocolJSONRPC);
-    ~TorcWebSocketThread();
+    ~TorcWebSocketThread() = default;
 
     void                Start    (void) override;
     void                Finish   (void) override;

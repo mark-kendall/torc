@@ -19,7 +19,7 @@ class TorcHTTPServerNonce
 
     TorcHTTPServerNonce();
     explicit TorcHTTPServerNonce(const QDateTime &Time);
-   ~TorcHTTPServerNonce();
+   ~TorcHTTPServerNonce() = default;
 
     QString     GetOpaque(void) const;
     bool        UseOnce(quint64 ClientCount, const QDateTime &Current);

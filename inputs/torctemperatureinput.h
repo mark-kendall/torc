@@ -11,7 +11,7 @@ class TorcTemperatureInput : public TorcInput
   public:
     TorcTemperatureInput(double Value, double RangeMinimum, double RangeMaximum,
                          const QString &ModelId, const QVariantMap &Details);
-    virtual ~TorcTemperatureInput();
+    virtual ~TorcTemperatureInput() = default;
 
     QStringList      GetDescription   (void) override;
     TorcInput::Type  GetType          (void) override;

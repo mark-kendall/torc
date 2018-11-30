@@ -166,10 +166,6 @@ Torc1WireDeviceFactory::Torc1WireDeviceFactory()
     gTorc1WireDeviceFactory = this;
 }
 
-Torc1WireDeviceFactory::~Torc1WireDeviceFactory()
-{
-}
-
 Torc1WireDeviceFactory* Torc1WireDeviceFactory::GetTorc1WireDeviceFactory(void)
 {
     return gTorc1WireDeviceFactory;

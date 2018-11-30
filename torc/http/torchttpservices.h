@@ -29,7 +29,7 @@ class TorcHTTPServices : public QObject, public TorcHTTPService
 
   public:
     explicit TorcHTTPServices(TorcHTTPServer *Server);
-    virtual ~TorcHTTPServices();
+    virtual ~TorcHTTPServices() = default;
 
     static QString GetVersion           (void);
     void           ProcessHTTPRequest   (const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest &Request) override;

@@ -12,8 +12,8 @@ class TorcXSDTest
     static int RunXSDTestSuite (TorcCommandLine *CommandLine);
 
   private:
-    TorcXSDTest();
-    ~TorcXSDTest();
+    TorcXSDTest() = default;
+    ~TorcXSDTest() = default;
 };
 
 #endif // TORCXSDTEST_H

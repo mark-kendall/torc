@@ -527,10 +527,6 @@ TorcStringFactory::TorcStringFactory()
     gTorcStringFactory = this;
 }
 
-TorcStringFactory::~TorcStringFactory()
-{
-}
-
 TorcStringFactory* TorcStringFactory::GetTorcStringFactory(void)
 {
     return gTorcStringFactory;

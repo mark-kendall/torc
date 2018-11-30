@@ -10,7 +10,7 @@ class TorcIoTPlotterNotifier final : public TorcIOTLogger
 
   public:
     explicit TorcIoTPlotterNotifier(const QVariantMap &Details);
-    virtual ~TorcIoTPlotterNotifier();
+    virtual ~TorcIoTPlotterNotifier() = default;
 
     void ProcessRequest(TorcNetworkRequest* Request) override;
     TorcNetworkRequest* CreateRequest(void) override;

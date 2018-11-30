@@ -28,10 +28,6 @@ TorcNetworkpHInput::TorcNetworkpHInput(double Default, const QVariantMap &Detail
 {
 }
 
-TorcNetworkpHInput::~TorcNetworkpHInput()
-{
-}
-
 QStringList TorcNetworkpHInput::GetDescription(void)
 {
     return QStringList() << tr("Network pH");

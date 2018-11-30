@@ -11,7 +11,7 @@ class TorcHTTPReader
 
   public:
     TorcHTTPReader();
-   ~TorcHTTPReader();
+   ~TorcHTTPReader() = default;
 
     void                   TakeRequest      (QByteArray& Content, QMap<QString,QString>& Headers);
     QString                GetMethod        (void) const;

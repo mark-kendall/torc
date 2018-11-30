@@ -164,7 +164,7 @@ class TorcHTTPRequest
     HTTPAuthorisation      IsAuthorised             (void) const;
 
   protected:
-   ~TorcHTTPRequest();
+   ~TorcHTTPRequest() = default;
     void                   Initialise               (const QString &Method);
 
   protected:

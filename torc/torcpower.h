@@ -121,7 +121,7 @@ class TorcPowerFactory
 {
   public:
     TorcPowerFactory();
-    virtual ~TorcPowerFactory();
+    virtual ~TorcPowerFactory() = default;
 
     static TorcPower*          CreatePower         (void);
     static TorcPowerFactory*   GetTorcPowerFactory (void);

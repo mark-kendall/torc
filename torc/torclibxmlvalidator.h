@@ -9,7 +9,7 @@ class TorcXmlValidator
   public:
     TorcXmlValidator(const QString &XmlFile, const QString &XSDFile,    bool Silent = false);
     TorcXmlValidator(const QString &XmlFile, const QByteArray &XSDData, bool Silent = false);
-    ~TorcXmlValidator();
+    ~TorcXmlValidator() = default;
 
     bool        GetSilent     (void) const;
     bool        Validated     (void) const;

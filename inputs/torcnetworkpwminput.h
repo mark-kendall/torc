@@ -8,7 +8,7 @@ class TorcNetworkPWMInput final : public TorcPWMInput
 {
   public:
     TorcNetworkPWMInput(double Default, const QVariantMap &Details);
-    ~TorcNetworkPWMInput();
+    ~TorcNetworkPWMInput() = default;
 
     QStringList GetDescription (void) override;
     void        Start          (void) override;

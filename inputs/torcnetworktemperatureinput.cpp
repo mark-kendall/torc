@@ -29,10 +29,6 @@ TorcNetworkTemperatureInput::TorcNetworkTemperatureInput(double Default, const Q
 {
 }
 
-TorcNetworkTemperatureInput::~TorcNetworkTemperatureInput()
-{
-}
-
 QStringList TorcNetworkTemperatureInput::GetDescription(void)
 {
     return QStringList() << tr("Network temperature");

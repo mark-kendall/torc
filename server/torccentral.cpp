@@ -501,10 +501,6 @@ TorcXSDFactory::TorcXSDFactory()
     gTorcXSDFactory = this;
 }
 
-TorcXSDFactory::~TorcXSDFactory()
-{
-}
-
 TorcXSDFactory* TorcXSDFactory::GetTorcXSDFactory(void)
 {
     return gTorcXSDFactory;

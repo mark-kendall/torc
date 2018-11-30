@@ -11,7 +11,7 @@ class TorcObservable
 {
   public:
     TorcObservable();
-    virtual ~TorcObservable();
+    virtual ~TorcObservable() = default;
 
     void            AddObserver    (QObject* Observer);
     void            RemoveObserver (QObject* Observer);

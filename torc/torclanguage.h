@@ -67,7 +67,7 @@ class TorcStringFactory
 {
   public:
     TorcStringFactory();
-    virtual ~TorcStringFactory();
+    virtual ~TorcStringFactory() = default;
 
     static QVariantMap           GetTorcStrings         (void);
     static TorcStringFactory*    GetTorcStringFactory   (void);

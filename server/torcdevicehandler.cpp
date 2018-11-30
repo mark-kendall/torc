@@ -33,10 +33,6 @@ TorcDeviceHandler::TorcDeviceHandler()
     gTorcDeviceHandler = this;
 }
 
-TorcDeviceHandler::~TorcDeviceHandler()
-{
-}
-
 TorcDeviceHandler* TorcDeviceHandler::GetNextHandler(void)
 {
     return m_nextTorcDeviceHandler;

@@ -144,10 +144,6 @@ TorcWebSocketReader::TorcWebSocketReader(QTcpSocket &Socket, WSSubProtocol Proto
 {
 }
 
-TorcWebSocketReader::~TorcWebSocketReader()
-{
-}
-
 const QByteArray& TorcWebSocketReader::GetPayload(void)
 {
     return m_haveBufferedPayload ? m_bufferedPayload : m_framePayload;

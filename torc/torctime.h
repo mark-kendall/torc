@@ -19,7 +19,7 @@ class TorcTime : public QObject, public TorcHTTPService
     Q_PROPERTY(QString currentTime  READ GetCurrentTime  NOTIFY currentTimeChanged)
 
   public:
-    virtual  ~TorcTime();
+    virtual  ~TorcTime() = default;
 
   protected:
     explicit  TorcTime();

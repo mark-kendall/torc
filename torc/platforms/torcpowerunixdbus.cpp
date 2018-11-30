@@ -152,10 +152,6 @@ TorcPowerUnixDBus::TorcPowerUnixDBus()
     Debug();
 }
 
-TorcPowerUnixDBus::~TorcPowerUnixDBus()
-{
-}
-
 bool TorcPowerUnixDBus::DoShutdown(void)
 {
     m_httpServiceLock.lockForWrite();

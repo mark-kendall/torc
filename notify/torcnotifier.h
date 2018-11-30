@@ -21,14 +21,14 @@ class TorcNotifier : public TorcDevice
 
   protected:
     explicit TorcNotifier(const QVariantMap &Details);
-    virtual ~TorcNotifier();
+    virtual ~TorcNotifier() = default;
 };
 
 class TorcNotifierFactory
 {
   public:
     TorcNotifierFactory();
-    virtual ~TorcNotifierFactory();
+    virtual ~TorcNotifierFactory() = default;
 
     static TorcNotifierFactory*   GetTorcNotifierFactory (void);
     TorcNotifierFactory*          NextFactory            (void) const;

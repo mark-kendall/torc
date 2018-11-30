@@ -10,7 +10,7 @@ class TorcNetworkPWMOutput final : public TorcPWMOutput
 
   public:
     TorcNetworkPWMOutput(double Default, const QVariantMap &Details);
-   ~TorcNetworkPWMOutput();
+   ~TorcNetworkPWMOutput() = default;
 
     QStringList GetDescription(void) override;
 

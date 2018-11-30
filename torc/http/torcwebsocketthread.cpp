@@ -81,10 +81,6 @@ TorcWebSocketThread::TorcWebSocketThread(const QHostAddress &Address, quint16 Po
 {
 }
 
-TorcWebSocketThread::~TorcWebSocketThread()
-{
-}
-
 int SSLCallback(int, int, BN_GENCB*)
 {
     static int count = 0;

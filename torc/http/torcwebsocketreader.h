@@ -72,7 +72,7 @@ class TorcWebSocketReader
         SubProtocolJSONRPC        = (1 << 0)
     };
 
-    Q_DECLARE_FLAGS(WSSubProtocols, WSSubProtocol);
+    Q_DECLARE_FLAGS(WSSubProtocols, WSSubProtocol)
 
   protected:
     static QString              OpCodeToString                    (OpCode Code);
@@ -83,7 +83,7 @@ class TorcWebSocketReader
     static QList<WSSubProtocol> SubProtocolsFromPrioritisedString (const QString &Protocols);
 
     TorcWebSocketReader(QTcpSocket &Socket, WSSubProtocol Protocol, bool ServerSide);
-   ~TorcWebSocketReader();
+   ~TorcWebSocketReader() = default;
 
     const QByteArray& GetPayload         (void);
     void              Reset              (void);
@@ -131,5 +131,5 @@ class TorcWebSocketReader
     QByteArray     m_framePayload;
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(TorcWebSocketReader::WSSubProtocols);
+Q_DECLARE_OPERATORS_FOR_FLAGS(TorcWebSocketReader::WSSubProtocols)
 #endif // TORCWEBSOCKETREADER_H

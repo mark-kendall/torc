@@ -58,10 +58,6 @@ TorcNotification::TorcNotification(const QVariantMap &Details)
         LOG(VB_GENERAL, LOG_ERR, "Notifier is incomplete");
 }
 
-TorcNotification::~TorcNotification()
-{
-}
-
 bool TorcNotification::Setup(void)
 {
     QMutexLocker locker(&lock);
@@ -98,10 +94,6 @@ TorcNotificationFactory::TorcNotificationFactory()
   : nextTorcNotificationFactory(gTorcNotificationFactory)
 {
     gTorcNotificationFactory = this;
-}
-
-TorcNotificationFactory::~TorcNotificationFactory()
-{
 }
 
 TorcNotificationFactory* TorcNotificationFactory::GetTorcNotificationFactory(void)
