@@ -75,7 +75,7 @@ void TorcControls::Create(const QVariantMap &Details)
                     continue;
                 }
 
-                TorcControl* control = NULL;
+                TorcControl* control = nullptr;
                 if (type == TorcControl::Logic)
                     control = new TorcLogicControl(it3.key(), details);
                 else if (type == TorcControl::Timer)

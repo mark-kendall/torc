@@ -74,10 +74,10 @@ TorcLogicControl::TorcLogicControl(const QString &Type, const QVariantMap &Detai
   : TorcControl(TorcControl::Logic, Details),
     m_operation(TorcLogicControl::StringToOperation(Type)),
     m_referenceDeviceId(),
-    m_referenceDevice(NULL),
-    m_inputDevice(NULL),
+    m_referenceDevice(nullptr),
+    m_inputDevice(nullptr),
     m_triggerDeviceId(),
-    m_triggerDevice(NULL),
+    m_triggerDevice(nullptr),
     m_average(),
     m_firstRunningValue(true),
     m_runningValue(0)
