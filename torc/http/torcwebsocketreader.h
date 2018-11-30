@@ -12,11 +12,6 @@ class TorcWebSocketReader
     friend class TorcWebSocket;
 
   public:
-    Q_ENUMS(OpCode)
-    Q_ENUMS(CloseCode)
-    Q_ENUMS(WSVersion)
-    Q_FLAGS(WSSubProtocol)
-
     enum OpCode
     {
         OpContinuation = 0x0,
@@ -71,7 +66,7 @@ class TorcWebSocketReader
         SubProtocolNone           = (0 << 0),
         SubProtocolJSONRPC        = (1 << 0)
     };
-
+    Q_FLAGS(WSSubProtocol)
     Q_DECLARE_FLAGS(WSSubProtocols, WSSubProtocol)
 
   protected:
