@@ -292,29 +292,29 @@ QString TorcPower::GetUIName(void)
 
 void TorcPower::BatteryUpdated(int Level)
 {
-    bool lowbattery = false;
-    int  level      = m_lastBatteryLevel;
+    m_httpServiceLock.lockForWrite();
 
+    if (m_lastBatteryLevel == Level)
     {
-        QWriteLocker locker(&m_httpServiceLock);
-
-        if (m_lastBatteryLevel == Level)
-            return;
-
-        bool wasalreadylow = m_lastBatteryLevel >= 0 && m_lastBatteryLevel <= BatteryLow;
-        m_lastBatteryLevel = Level;
-
-        if (m_lastBatteryLevel == ACPower)
-            LOG(VB_GENERAL, LOG_INFO, "On AC power");
-        else if (m_lastBatteryLevel == UnknownPower)
-            LOG(VB_GENERAL, LOG_INFO, "Unknown power status");
-        else
-            LOG(VB_GENERAL, LOG_INFO, QString("Battery level %1%").arg(m_lastBatteryLevel));
-
-
-        lowbattery = !wasalreadylow && (m_lastBatteryLevel >= 0 && m_lastBatteryLevel <= BatteryLow);
-        level = m_lastBatteryLevel;
+        m_httpServiceLock.unlock();
+        return;
     }
+
+    bool wasalreadylow = m_lastBatteryLevel >= 0 && m_lastBatteryLevel <= BatteryLow;
+    m_lastBatteryLevel = Level;
+
+    if (m_lastBatteryLevel == ACPower)
+        LOG(VB_GENERAL, LOG_INFO, "On AC power");
+    else if (m_lastBatteryLevel == UnknownPower)
+        LOG(VB_GENERAL, LOG_INFO, "Unknown power status");
+    else
+        LOG(VB_GENERAL, LOG_INFO, QString("Battery level %1%").arg(m_lastBatteryLevel));
+
+
+    bool lowbattery = !wasalreadylow && (m_lastBatteryLevel >= 0 && m_lastBatteryLevel <= BatteryLow);
+    int level = m_lastBatteryLevel;
+
+    m_httpServiceLock.unlock();
 
     if (lowbattery)
         LowBattery();
