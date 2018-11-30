@@ -20,40 +20,19 @@
 * USA.
 */
 
-// Qt
-#include <QMetaEnum>
-
 // Torc
 #include "torclogging.h"
+#include "torccoreutils.h"
 #include "torcoutputs.h"
 #include "torcoutput.h"
 
 #define BLACKLIST QString("SetValue,SetValid")
 
-QString TorcOutput::TypeToString(TorcOutput::Type Type)
-{
-    return QString(QMetaEnum::fromType<TorcOutput::Type>().valueToKey(Type)).toLower();
-}
-
-int TorcOutput::StringToType(const QString &Type, bool CaseSensitive)
-{
-    const QMetaEnum metaEnum = QMetaEnum::fromType<TorcOutput::Type>();
-    if (CaseSensitive)
-        return metaEnum.keyToValue(Type.toLatin1());
-
-    QByteArray type = Type.toLower().toLatin1();
-    int count = metaEnum.keyCount();
-    for (int i = 0; i < count; i++)
-        if (qstrcmp(type, QByteArray(metaEnum.key(count)).toLower()) == 0)
-            return metaEnum.value(count);
-    return -1; // for consistency with QMetaEnum::keyToValue
-}
-
 // N.B. We need to pass the staticMetaObject to TorcHTTPService as the object is not yet complete.
 //      If we pass 'this' during construction, this->metaObject() only contains details of the super class.
 TorcOutput::TorcOutput(TorcOutput::Type Type, double Value, const QString &ModelId, const QVariantMap &Details)
   : TorcDevice(true, Value, Value, ModelId, Details),
-    TorcHTTPService(this, OUTPUTS_DIRECTORY + "/" + TypeToString(Type) + "/" + Details.value("name").toString(),
+    TorcHTTPService(this, OUTPUTS_DIRECTORY + "/" + TorcCoreUtils::EnumToLowerString<TorcOutput::Type>(Type) + "/" + Details.value("name").toString(),
                     Details.value("name").toString(), TorcOutput::staticMetaObject, BLACKLIST),
     m_owner(nullptr)
 {
@@ -63,7 +42,7 @@ TorcOutput::TorcOutput(TorcOutput::Type Type, double Value, const QString &Model
 TorcOutput::TorcOutput(TorcOutput::Type Type, double Value, const QString &ModelId, const QVariantMap &Details,
                        QObject *Output, const QMetaObject &MetaObject, const QString &Blacklist)
   : TorcDevice(true, Value, Value, ModelId, Details),
-    TorcHTTPService(Output, OUTPUTS_DIRECTORY + "/" + TypeToString(Type) + "/" + Details.value("name").toString(),
+    TorcHTTPService(Output, OUTPUTS_DIRECTORY + "/" + TorcCoreUtils::EnumToLowerString<TorcOutput::Type>(Type) + "/" + Details.value("name").toString(),
                     Details.value("name").toString(), MetaObject, BLACKLIST + "," + Blacklist),
     m_owner(nullptr)
 {

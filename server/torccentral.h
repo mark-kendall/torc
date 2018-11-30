@@ -32,7 +32,6 @@ class TorcCentral final : public QObject, public TorcHTTPService
     bool            event                 (QEvent *Event) override;
     static QByteArray GetCustomisedXSD    (const QString &BaseXSDFile);
     static TemperatureUnits GetGlobalTemperatureUnits (void);
-    static QString   TemperatureUnitsToString(TemperatureUnits Units);
 
   public slots:
     // TorcHTTPService

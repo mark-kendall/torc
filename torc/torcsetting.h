@@ -35,7 +35,6 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
     Q_DECLARE_FLAGS(Roles, Role)
 
   public:
-    static QString TypeToString(Type type);
     TorcSetting(TorcSetting *Parent, const QString &DBName, const QString &UIName,
                 Type SettingType, Roles SettingRoles, const QVariant &Default);
 

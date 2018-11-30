@@ -22,6 +22,7 @@
 
 // Torc
 #include "torclogging.h"
+#include "torccoreutils.h"
 #include "torcinputs.h"
 #include "torcnetworkpwmoutput.h"
 #include "torcnetworkswitchoutput.h"
@@ -107,7 +108,8 @@ void TorcNetworkInputs::Create(const QVariantMap &Details)
                 // iterate over known types <pwm>, <switch> etc
                 for (int type = TorcInput::Unknown; type != TorcInput::MaxType; type++)
                 {
-                    if (it.key() == TorcInput::TypeToString(static_cast<TorcInput::Type>(type)))
+                    // FIXME using TorcInput::Type to validate both inputs and outputs - will break at some point
+                    if (it.key() == TorcCoreUtils::EnumToLowerString<TorcInput::Type>(static_cast<TorcInput::Type>(type)))
                     {
                         QVariantMap input    = it.value().toMap();
                         QString defaultvalue = network ? input.value("default").toString() : input.value("value").toString();
@@ -125,33 +127,33 @@ void TorcNetworkInputs::Create(const QVariantMap &Details)
                             case TorcInput::PWM:
                                 {
                                     if (isinput)
-                                        newinput = network ? new TorcNetworkPWMInput(defaultdouble, input) : new TorcPWMInput(defaultdouble, DEVICE_CONSTANT + TorcInput::TypeToString(TorcInput::PWM), input);
+                                        newinput = network ? new TorcNetworkPWMInput(defaultdouble, input) : new TorcPWMInput(defaultdouble, DEVICE_CONSTANT + TorcCoreUtils::EnumToLowerString<TorcInput::Type>(TorcInput::PWM), input);
                                     else
-                                        newoutput = network ? new TorcNetworkPWMOutput(defaultdouble, input) : new TorcPWMOutput(defaultdouble, DEVICE_CONSTANT + TorcOutput::TypeToString(TorcOutput::PWM), input);
+                                        newoutput = network ? new TorcNetworkPWMOutput(defaultdouble, input) : new TorcPWMOutput(defaultdouble, DEVICE_CONSTANT + TorcCoreUtils::EnumToLowerString<TorcOutput::Type>(TorcOutput::PWM), input);
                                 }
                                 break;
                             case TorcInput::Switch:
                                 {
                                     if (isinput)
-                                        newinput = network ? new TorcNetworkSwitchInput(defaultdouble, input) : new TorcSwitchInput(defaultdouble, DEVICE_CONSTANT + TorcInput::TypeToString(TorcInput::Switch), input);
+                                        newinput = network ? new TorcNetworkSwitchInput(defaultdouble, input) : new TorcSwitchInput(defaultdouble, DEVICE_CONSTANT + TorcCoreUtils::EnumToLowerString<TorcInput::Type>(TorcInput::Switch), input);
                                     else
-                                        newoutput = network ? new TorcNetworkSwitchOutput(defaultdouble, input) : new TorcSwitchOutput(defaultdouble, DEVICE_CONSTANT + TorcOutput::TypeToString(TorcOutput::Switch), input);
+                                        newoutput = network ? new TorcNetworkSwitchOutput(defaultdouble, input) : new TorcSwitchOutput(defaultdouble, DEVICE_CONSTANT + TorcCoreUtils::EnumToLowerString<TorcOutput::Type>(TorcOutput::Switch), input);
                                 }
                                 break;
                             case TorcInput::Temperature:
                                 {
                                     if (isinput)
-                                        newinput = network ? new TorcNetworkTemperatureInput(defaultdouble, input) : new TorcTemperatureInput(defaultdouble, -1000, 1000, DEVICE_CONSTANT + TorcInput::TypeToString(TorcInput::Temperature), input);
+                                        newinput = network ? new TorcNetworkTemperatureInput(defaultdouble, input) : new TorcTemperatureInput(defaultdouble, -1000, 1000, DEVICE_CONSTANT + TorcCoreUtils::EnumToLowerString<TorcInput::Type>(TorcInput::Temperature), input);
                                     else
-                                        newoutput = network ? new TorcNetworkTemperatureOutput(defaultdouble, input) : new TorcTemperatureOutput(defaultdouble, DEVICE_CONSTANT + TorcOutput::TypeToString(TorcOutput::Temperature), input);
+                                        newoutput = network ? new TorcNetworkTemperatureOutput(defaultdouble, input) : new TorcTemperatureOutput(defaultdouble, DEVICE_CONSTANT + TorcCoreUtils::EnumToLowerString<TorcOutput::Type>(TorcOutput::Temperature), input);
                                 }
                                 break;
                             case TorcInput::pH:
                                 {
                                     if (isinput)
-                                        newinput = network ? new TorcNetworkpHInput(defaultdouble, input) : new TorcpHInput(defaultdouble, DEVICE_CONSTANT + TorcInput::TypeToString(TorcInput::pH), input);
+                                        newinput = network ? new TorcNetworkpHInput(defaultdouble, input) : new TorcpHInput(defaultdouble, DEVICE_CONSTANT + TorcCoreUtils::EnumToLowerString<TorcInput::Type>(TorcInput::pH), input);
                                     else
-                                        newoutput = network ? new TorcNetworkpHOutput(defaultdouble, input) : new TorcpHOutput(defaultdouble, DEVICE_CONSTANT + TorcOutput::TypeToString(TorcOutput::pH), input);
+                                        newoutput = network ? new TorcNetworkpHOutput(defaultdouble, input) : new TorcpHOutput(defaultdouble, DEVICE_CONSTANT + TorcCoreUtils::EnumToLowerString<TorcOutput::Type>(TorcOutput::pH), input);
                                 }
                                 break;
                             case TorcInput::Button:

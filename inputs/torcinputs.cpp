@@ -22,6 +22,7 @@
 
 // Torc
 #include "torclogging.h"
+#include "torccoreutils.h"
 #include "torcadminthread.h"
 #include "torccentral.h"
 #include "torcinputs.h"
@@ -112,7 +113,7 @@ QVariantMap TorcInputs::GetInputList(void)
                 inputsfortype.append(input->GetUniqueId());
 
         if (!inputsfortype.isEmpty())
-            result.insert(TorcInput::TypeToString(static_cast<TorcInput::Type>(type)), inputsfortype);
+            result.insert(TorcCoreUtils::EnumToLowerString<TorcInput::Type>(static_cast<TorcInput::Type>(type)), inputsfortype);
     }
     return result;
 }
@@ -121,7 +122,7 @@ QStringList TorcInputs::GetInputTypes(void)
 {
     QStringList result;
         for (int i = 0; i < TorcInput::MaxType; ++i)
-            result << TorcInput::TypeToString((TorcInput::Type)i);
+            result << TorcCoreUtils::EnumToLowerString<TorcInput::Type>(static_cast<TorcInput::Type>(i));
     return result;
 }
 

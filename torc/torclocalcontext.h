@@ -69,9 +69,6 @@ class Torc
     };
 
     Q_ENUM(Actions)
-
-    static QString ActionToString(enum Actions Action);
-    static int     StringToAction(const QString &Action, bool CaseSensitive = false);
 };
 
 class TorcLocalContext : public QObject, public TorcObservable

@@ -21,11 +21,11 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QProcess>
-#include <QMetaEnum>
 #include <QJsonDocument>
 
 // Torc
 #include "torcexitcodes.h"
+#include "torccoreutils.h"
 #include "torcevent.h"
 #include "torclogging.h"
 #include "torcdirectories.h"
@@ -54,11 +54,6 @@
 
 // default to metric temperature measurements
 TorcCentral::TemperatureUnits TorcCentral::gTemperatureUnits = TorcCentral::Celsius;
-
-QString TorcCentral::TemperatureUnitsToString(TorcCentral::TemperatureUnits Units)
-{
-    return QString(QMetaEnum::fromType<TorcCentral::TemperatureUnits>().valueToKey(Units)).toLower();
-}
 
 TorcCentral::TemperatureUnits TorcCentral::GetGlobalTemperatureUnits(void)
 {
@@ -126,9 +121,9 @@ TorcCentral::TorcCentral()
             }
         }
 
-        LOG(VB_GENERAL, LOG_INFO, QString("Using '%1' temperature units").arg(TemperatureUnitsToString(temperatureunits)));
         TorcCentral::gTemperatureUnits = temperatureunits;
-        temperatureUnits               = TemperatureUnitsToString(temperatureunits);
+        temperatureUnits               = TorcCoreUtils::EnumToLowerString<TorcCentral::TemperatureUnits>(temperatureunits);
+        LOG(VB_GENERAL, LOG_INFO, QString("Using '%1' temperature units").arg(temperatureUnits));
 
         // create the devices
         TorcDeviceHandler::Start(m_config);

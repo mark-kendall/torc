@@ -63,32 +63,6 @@ static void ExitHandler(int Sig)
     TorcLocalContext::NotifyEvent(Torc::Stop);
 }
 
-/// Return the string describing the given action.
-QString Torc::ActionToString(Actions Action)
-{
-    return QMetaEnum::fromType<Torc::Actions>().valueToKey(Action);
-}
-
-/*! \brief Return the Torc action that matches the given string.
- *
- * \note QMetaEnum::keyToValue is case sensitive but this routine is used
- *       to validate system events from the config file - and we cannot be too
- *       picky about case. So default to a case insensitive search.
-*/
-int Torc::StringToAction(const QString &Action, bool CaseSensitive /*=false*/)
-{
-    const QMetaEnum metaEnum = QMetaEnum::fromType<Torc::Actions>();
-    if (CaseSensitive)
-        return metaEnum.keyToValue(Action.toLatin1());
-
-    QByteArray action = Action.toLower().toLatin1();
-    int count = metaEnum.keyCount();
-    for (int i = 0; i < count; i++)
-        if (qstrcmp(action, QByteArray(metaEnum.key(count)).toLower()) == 0)
-            return metaEnum.value(count);
-    return -1; // for consistency with QMetaEnum::keyToValue
-}
-
 qint16 TorcLocalContext::Create(TorcCommandLine* CommandLine, bool Init /*=true*/)
 {
     if (gLocalContext)
@@ -415,12 +389,12 @@ bool TorcLocalContext::QueueShutdownEvent(int Event)
 
     if (m_shutdownEvent != Torc::None)
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Shutdown already queued - ignoring '%1' event").arg(Torc::ActionToString((Torc::Actions)newevent)));
+        LOG(VB_GENERAL, LOG_INFO, QString("Shutdown already queued - ignoring '%1' event").arg(TorcCoreUtils::EnumToString<Torc::Actions>((Torc::Actions)newevent)));
         return true;
     }
 
     m_shutdownEvent = newevent;
-    LOG(VB_GENERAL, LOG_INFO, QString("Queued '%1' event for %2 seconds").arg(Torc::ActionToString((Torc::Actions)m_shutdownEvent)).arg(m_shutdownDelay));
+    LOG(VB_GENERAL, LOG_INFO, QString("Queued '%1' event for %2 seconds").arg(TorcCoreUtils::EnumToString<Torc::Actions>((Torc::Actions)m_shutdownEvent)).arg(m_shutdownDelay));
     TorcEvent torcevent(Torc::TorcWillStop);
     Notify(torcevent);
     QTimer::singleShot(m_shutdownDelay * 1000, this, SLOT(ShutdownTimeout()));

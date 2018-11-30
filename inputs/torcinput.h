@@ -35,9 +35,6 @@ class TorcInput : public TorcDevice, public TorcHTTPService
 
     Q_ENUM(Type)
 
-    static QString           TypeToString(TorcInput::Type Type);
-    static int               StringToType(const QString &Type, bool CaseSensitive = false);
-
   public:
     TorcInput(TorcInput::Type Type, double Value, double RangeMinimum, double RangeMaximum,
               const QString &ModelId,    const QVariantMap &Details);

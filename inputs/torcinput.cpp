@@ -18,35 +18,16 @@
 */
 
 // Qt
-#include <QMetaEnum>
 #include <QMutex>
 
 // Torc
 #include "torclogging.h"
+#include "torccoreutils.h"
 #include "torcinputs.h"
 #include "torcnetworkinputs.h"
 #include "torcinput.h"
 
 #define BLACKLIST QString("SetValue,SetValid")
-
-QString TorcInput::TypeToString(TorcInput::Type Type)
-{
-    return QString(QMetaEnum::fromType<TorcInput::Type>().valueToKey(Type)).toLower();
-}
-
-int TorcInput::StringToType(const QString &Type, bool CaseSensitive)
-{
-    const QMetaEnum metaEnum = QMetaEnum::fromType<TorcInput::Type>();
-    if (CaseSensitive)
-        return metaEnum.keyToValue(Type.toLatin1());
-
-    QByteArray type = Type.toLower().toLatin1();
-    int count = metaEnum.keyCount();
-    for (int i = 0; i < count; i++)
-        if (qstrcmp(type, QByteArray(metaEnum.key(count)).toLower()) == 0)
-            return metaEnum.value(count);
-    return -1; // for consistency with QMetaEnum::keyToValue
-}
 
 /*! \class Torcinput
  *  \brief An abstract class representing an external input.
@@ -60,7 +41,7 @@ int TorcInput::StringToType(const QString &Type, bool CaseSensitive)
 TorcInput::TorcInput(TorcInput::Type Type, double Value, double RangeMinimum, double RangeMaximum,
                      const QString &ModelId, const QVariantMap &Details)
   : TorcDevice(false, Value, Value, ModelId, Details),
-    TorcHTTPService(this, INPUTS_DIRECTORY + "/" + TypeToString(Type) + "/" + Details.value("name").toString(),
+    TorcHTTPService(this, INPUTS_DIRECTORY + "/" + TorcCoreUtils::EnumToLowerString<TorcInput::Type>(Type) + "/" + Details.value("name").toString(),
                     Details.value("name").toString(), TorcInput::staticMetaObject,
                     ModelId.startsWith("Network") ? QString("") : BLACKLIST),
     operatingRangeMin(RangeMinimum),

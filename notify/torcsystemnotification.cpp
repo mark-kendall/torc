@@ -19,6 +19,7 @@
 
 // Torc
 #include "torclogging.h"
+#include "torccoreutils.h"
 #include "torcnotify.h"
 #include "torcsystemnotification.h"
 
@@ -71,7 +72,7 @@ TorcSystemNotification::TorcSystemNotification(const QVariantMap &Details)
         {
             if (it.key() == "event")
             {
-                int event = Torc::StringToAction(it.value().toString().trimmed());
+                int event = TorcCoreUtils::StringToEnum<Torc::Actions>(it.value().toString().trimmed());
                 if (event != -1)
                     m_events.append((Torc::Actions)event);
             }
@@ -99,7 +100,7 @@ QStringList TorcSystemNotification::GetDescription(void)
     QStringList result;
     result.append(tr("System event"));
     foreach (Torc::Actions event, m_events)
-        result.append(Torc::ActionToString(event));
+        result.append(TorcCoreUtils::EnumToString<Torc::Actions>(event));
     return result;
 }
 
@@ -125,7 +126,7 @@ bool TorcSystemNotification::event(QEvent *Event)
             if (m_events.contains(event))
             {
                 QMap<QString,QString> custom;
-                custom.insert("event", Torc::ActionToString(event));
+                custom.insert("event", TorcCoreUtils::EnumToString<Torc::Actions>(event));
                 QVariantMap message = TorcNotify::gNotify->SetNotificationText(m_title, m_body, custom);
                 emit Notify(message);
             }

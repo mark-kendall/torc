@@ -20,11 +20,9 @@
 * USA.
 */
 
-// Qt
-#include <QMetaEnum>
-
 // Torc
 #include "torclocalcontext.h"
+#include "torccoreutils.h"
 #include "torcsetting.h"
 
 /*! \class TorcSetting
@@ -49,11 +47,6 @@
  * \sa TorcUISetting
  */
 
-QString TorcSetting::TypeToString(Type type)
-{
-    return QString(QMetaEnum::fromType<TorcSetting::Type>().valueToKey(type)).toLower();
-}
-
 TorcSetting::TorcSetting(TorcSetting *Parent, const QString &DBName, const QString &UIName,
                          Type SettingType, Roles SettingRoles, const QVariant &Default)
   : QObject(),
@@ -61,7 +54,7 @@ TorcSetting::TorcSetting(TorcSetting *Parent, const QString &DBName, const QStri
                     TorcSetting::staticMetaObject, "SetActive,SetTrue,SetFalse"),
     m_parent(Parent),
     type(SettingType),
-    settingType(TypeToString(SettingType)),
+    settingType(TorcCoreUtils::EnumToLowerString<TorcSetting::Type>(SettingType)),
     roles(SettingRoles),
     m_dbName(DBName),
     uiName(UIName),
@@ -136,7 +129,7 @@ QString TorcSetting::GetChildList(QVariantMap &Children)
 
     Children.insert("name", m_dbName);
     Children.insert("uiname", uiName);
-    Children.insert("type", TypeToString(type));
+    Children.insert("type", TorcCoreUtils::EnumToLowerString<TorcSetting::Type>(type));
     QVariantMap children;
     foreach (TorcSetting* child, m_children)
     {
