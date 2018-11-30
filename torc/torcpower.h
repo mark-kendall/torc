@@ -33,8 +33,6 @@ class TorcPower : public QObject, public TorcHTTPService
         UnknownPower  = 101
     };
 
-    Q_ENUM(PowerLevels)
-
   public:
     static void    Create(void);
     static void    TearDown(void);
