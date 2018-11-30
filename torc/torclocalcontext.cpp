@@ -66,10 +66,7 @@ static void ExitHandler(int Sig)
 /// Return the string describing the given action.
 QString Torc::ActionToString(Actions Action)
 {
-    const QMetaObject &mo = Torc::staticMetaObject;
-    int enum_index        = mo.indexOfEnumerator("Actions");
-    QMetaEnum metaEnum    = mo.enumerator(enum_index);
-    return metaEnum.valueToKey(Action);
+    return QMetaEnum::fromType<Torc::Actions>().valueToKey(Action);
 }
 
 /*! \brief Return the Torc action that matches the given string.
@@ -80,21 +77,15 @@ QString Torc::ActionToString(Actions Action)
 */
 int Torc::StringToAction(const QString &Action, bool CaseSensitive /*=false*/)
 {
-    const QMetaObject &mo = Torc::staticMetaObject;
-    int enum_index        = mo.indexOfEnumerator("Actions");
-    QMetaEnum metaEnum    = mo.enumerator(enum_index);
+    const QMetaEnum metaEnum = QMetaEnum::fromType<Torc::Actions>();
     if (CaseSensitive)
         return metaEnum.keyToValue(Action.toLatin1());
 
     QByteArray action = Action.toLower().toLatin1();
     int count = metaEnum.keyCount();
     for (int i = 0; i < count; i++)
-    {
-        QByteArray key = QByteArray(metaEnum.key(count)).toLower();
-        if (qstrcmp(action, key) == 0)
+        if (qstrcmp(action, QByteArray(metaEnum.key(count)).toLower()) == 0)
             return metaEnum.value(count);
-    }
-
     return -1; // for consistency with QMetaEnum::keyToValue
 }
 
