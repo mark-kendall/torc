@@ -155,7 +155,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <b>Initial value:</b><div class="fragment"><div class="line">=</div><div class="line"><span class="stringliteral">&quot;    &lt;xs:element minOccurs=&#39;0&#39; maxOccurs=&#39;1&#39; name=&#39;wire1&#39;   type=&#39;wire1Type&#39;/&gt;\r\n&quot;</span></div></div><!-- fragment -->
-<p>Definition at line <a class="el" href="../../d8/d63/torc1wirebus_8cpp_source.html#l00203">203</a> of file <a class="el" href="../../d8/d63/torc1wirebus_8cpp_source.html">torc1wirebus.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/d63/torc1wirebus_8cpp_source.html#l00199">199</a> of file <a class="el" href="../../d8/d63/torc1wirebus_8cpp_source.html">torc1wirebus.cpp</a>.</p>
 
 </div>
 </div>
@@ -177,7 +177,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <b>Initial value:</b><div class="fragment"><div class="line">=</div><div class="line"><span class="stringliteral">&quot;&lt;xs:simpleType name=&#39;ds18b20SerialType&#39;&gt;\r\n&quot;</span></div><div class="line"><span class="stringliteral">&quot;  &lt;xs:restriction base=&#39;xs:string&#39;&gt;\r\n&quot;</span></div><div class="line"><span class="stringliteral">&quot;    &lt;xs:pattern value=&#39;28-[0-9a-fA-F]{12}&#39;/&gt;\r\n&quot;</span></div><div class="line"><span class="stringliteral">&quot;  &lt;/xs:restriction&gt;\r\n&quot;</span></div><div class="line"><span class="stringliteral">&quot;&lt;/xs:simpleType&gt;\r\n&quot;</span></div><div class="line"><span class="stringliteral">&quot;&lt;xs:complexType name=&#39;ds18b20Type&#39;&gt;\r\n&quot;</span></div><div class="line"><span class="stringliteral">&quot;  &lt;xs:all&gt;\r\n&quot;</span></div><div class="line"><span class="stringliteral">&quot;    &lt;xs:element name=&#39;name&#39;            type=&#39;deviceNameType&#39;/&gt;\r\n&quot;</span></div><div class="line"><span class="stringliteral">&quot;    &lt;xs:element name=&#39;username&#39;        type=&#39;userNameType&#39; minOccurs=&#39;0&#39; maxOccurs=&#39;1&#39;/&gt;\r\n&quot;</span></div><div class="line"><span class="stringliteral">&quot;    &lt;xs:element name=&#39;userdescription&#39; type=&#39;userDescriptionType&#39; minOccurs=&#39;0&#39; maxOccurs=&#39;1&#39;/&gt;\r\n&quot;</span></div><div class="line"><span class="stringliteral">&quot;    &lt;xs:element name=&#39;wire1serial&#39;     type=&#39;ds18b20SerialType&#39;/&gt;\r\n&quot;</span></div><div class="line"><span class="stringliteral">&quot;  &lt;/xs:all&gt;\r\n&quot;</span></div><div class="line"><span class="stringliteral">&quot;&lt;/xs:complexType&gt;\r\n\r\n&quot;</span></div><div class="line"><span class="stringliteral">&quot;&lt;xs:complexType name=&#39;wire1Type&#39;&gt;\r\n&quot;</span></div><div class="line"><span class="stringliteral">&quot;  &lt;xs:choice minOccurs=&#39;1&#39; maxOccurs=&#39;unbounded&#39;&gt;\r\n&quot;</span></div><div class="line"><span class="stringliteral">&quot;    &lt;xs:element name=&#39;ds18b20&#39; type=&#39;ds18b20Type&#39;/&gt;\r\n&quot;</span></div><div class="line"><span class="stringliteral">&quot;  &lt;/xs:choice&gt;\r\n&quot;</span></div><div class="line"><span class="stringliteral">&quot;&lt;/xs:complexType&gt;\r\n&quot;</span></div></div><!-- fragment -->
-<p>Definition at line <a class="el" href="../../d8/d63/torc1wirebus_8cpp_source.html#l00183">183</a> of file <a class="el" href="../../d8/d63/torc1wirebus_8cpp_source.html">torc1wirebus.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/d63/torc1wirebus_8cpp_source.html#l00179">179</a> of file <a class="el" href="../../d8/d63/torc1wirebus_8cpp_source.html">torc1wirebus.cpp</a>.</p>
 
 </div>
 </div>
@@ -199,14 +199,14 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <b>Initial value:</b><div class="fragment"><div class="line">=</div><div class="line"><span class="stringliteral">&quot;&lt;!-- enforce unique 1Wire serial numbers --&gt;\r\n&quot;</span></div><div class="line"><span class="stringliteral">&quot;&lt;xs:unique name=&#39;uniqueWire1Serial&#39;&gt;\r\n&quot;</span></div><div class="line"><span class="stringliteral">&quot;&lt;xs:selector xpath=&#39;.//wire1serial&#39; /&gt;\r\n&quot;</span></div><div class="line"><span class="stringliteral">&quot;  &lt;xs:field xpath=&#39;.&#39; /&gt;\r\n&quot;</span></div><div class="line"><span class="stringliteral">&quot;&lt;/xs:unique&gt;\r\n&quot;</span></div></div><!-- fragment -->
-<p>Definition at line <a class="el" href="../../d8/d63/torc1wirebus_8cpp_source.html#l00206">206</a> of file <a class="el" href="../../d8/d63/torc1wirebus_8cpp_source.html">torc1wirebus.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/d63/torc1wirebus_8cpp_source.html#l00202">202</a> of file <a class="el" href="../../d8/d63/torc1wirebus_8cpp_source.html">torc1wirebus.cpp</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Nov 30 2018 12:49:00 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Nov 30 2018 14:31:26 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

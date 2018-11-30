@@ -103,8 +103,8 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ad6de70bbafbb4048f76cc6fa7c5ede66"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d37/class_torc_h_t_t_p_reader.html#ad6de70bbafbb4048f76cc6fa7c5ede66">TorcHTTPReader</a> ()</td></tr>
 <tr class="separator:ad6de70bbafbb4048f76cc6fa7c5ede66"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1ca7085233c62f3a5231c6990d830912"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d37/class_torc_h_t_t_p_reader.html#a1ca7085233c62f3a5231c6990d830912">~TorcHTTPReader</a> ()</td></tr>
-<tr class="separator:a1ca7085233c62f3a5231c6990d830912"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5c746a1c6405354b14393146c51c8eb9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d37/class_torc_h_t_t_p_reader.html#a5c746a1c6405354b14393146c51c8eb9">~TorcHTTPReader</a> ()=default</td></tr>
+<tr class="separator:a5c746a1c6405354b14393146c51c8eb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa27e2afdcbf0fdb23b312f2574b45a60"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d37/class_torc_h_t_t_p_reader.html#aa27e2afdcbf0fdb23b312f2574b45a60">TakeRequest</a> (QByteArray &amp;Content, QMap&lt; QString, QString &gt; &amp;Headers)</td></tr>
 <tr class="memdesc:aa27e2afdcbf0fdb23b312f2574b45a60"><td class="mdescLeft">&#160;</td><td class="mdescRight">Take ownership of the contents and headers. New owner is responsible for deleting.  <a href="#aa27e2afdcbf0fdb23b312f2574b45a60">More...</a><br /></td></tr>
 <tr class="separator:aa27e2afdcbf0fdb23b312f2574b45a60"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -152,9 +152,12 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a1ca7085233c62f3a5231c6990d830912"></a>
+<a class="anchor" id="a5c746a1c6405354b14393146c51c8eb9"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">TorcHTTPReader::~TorcHTTPReader </td>
@@ -163,9 +166,12 @@ Friends</h2></td></tr>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">default</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
-
-<p>Definition at line <a class="el" href="../../d6/d21/torchttpreader_8cpp_source.html#l00046">46</a> of file <a class="el" href="../../d6/d21/torchttpreader_8cpp_source.html">torchttpreader.cpp</a>.</p>
 
 </div>
 </div>
@@ -184,7 +190,7 @@ Friends</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d6/d21/torchttpreader_8cpp_source.html#l00064">64</a> of file <a class="el" href="../../d6/d21/torchttpreader_8cpp_source.html">torchttpreader.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/d21/torchttpreader_8cpp_source.html#l00060">60</a> of file <a class="el" href="../../d6/d21/torchttpreader_8cpp_source.html">torchttpreader.cpp</a>.</p>
 
 </div>
 </div>
@@ -202,7 +208,7 @@ Friends</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d6/d21/torchttpreader_8cpp_source.html#l00069">69</a> of file <a class="el" href="../../d6/d21/torchttpreader_8cpp_source.html">torchttpreader.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/d21/torchttpreader_8cpp_source.html#l00065">65</a> of file <a class="el" href="../../d6/d21/torchttpreader_8cpp_source.html">torchttpreader.cpp</a>.</p>
 
 </div>
 </div>
@@ -220,7 +226,7 @@ Friends</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d6/d21/torchttpreader_8cpp_source.html#l00059">59</a> of file <a class="el" href="../../d6/d21/torchttpreader_8cpp_source.html">torchttpreader.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/d21/torchttpreader_8cpp_source.html#l00055">55</a> of file <a class="el" href="../../d6/d21/torchttpreader_8cpp_source.html">torchttpreader.cpp</a>.</p>
 
 </div>
 </div>
@@ -241,7 +247,7 @@ Friends</h2></td></tr>
 <p>Read and parse data from the given socket. </p>
 <p>The HTTP method (e.g. GET / 200 OK), headers and content will be split out for further processing. </p>
 
-<p>Definition at line <a class="el" href="../../d6/d21/torchttpreader_8cpp_source.html#l00093">93</a> of file <a class="el" href="../../d6/d21/torchttpreader_8cpp_source.html">torchttpreader.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/d21/torchttpreader_8cpp_source.html#l00089">89</a> of file <a class="el" href="../../d6/d21/torchttpreader_8cpp_source.html">torchttpreader.cpp</a>.</p>
 
 </div>
 </div>
@@ -269,7 +275,7 @@ Friends</h2></td></tr>
 
 <p>Reset the read state. </p>
 
-<p>Definition at line <a class="el" href="../../d6/d21/torchttpreader_8cpp_source.html#l00075">75</a> of file <a class="el" href="../../d6/d21/torchttpreader_8cpp_source.html">torchttpreader.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/d21/torchttpreader_8cpp_source.html#l00071">71</a> of file <a class="el" href="../../d6/d21/torchttpreader_8cpp_source.html">torchttpreader.cpp</a>.</p>
 
 </div>
 </div>
@@ -299,7 +305,7 @@ Friends</h2></td></tr>
 
 <p>Take ownership of the contents and headers. New owner is responsible for deleting. </p>
 
-<p>Definition at line <a class="el" href="../../d6/d21/torchttpreader_8cpp_source.html#l00051">51</a> of file <a class="el" href="../../d6/d21/torchttpreader_8cpp_source.html">torchttpreader.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/d21/torchttpreader_8cpp_source.html#l00047">47</a> of file <a class="el" href="../../d6/d21/torchttpreader_8cpp_source.html">torchttpreader.cpp</a>.</p>
 
 </div>
 </div>
@@ -333,7 +339,7 @@ Friends</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Nov 30 2018 12:49:00 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Nov 30 2018 14:31:26 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

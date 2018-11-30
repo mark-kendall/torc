@@ -28,6 +28,6 @@ var searchData=
   ['userchanged',['UserChanged',['../d6/db6/class_torc.html#ae24951db8926b98a75762aef8448e473ab3fb6e2644b907cb6e2ca2e34587d0f8',1,'Torc']]],
   ['userdescription',['userDescription',['../d5/d76/class_torc_device.html#a6263a21a0c49d8c5b3175009f559eaeb',1,'TorcDevice']]],
   ['username',['userName',['../d5/d76/class_torc_device.html#a4d55f183366faeb82224164742839dc4',1,'TorcDevice::userName()'],['../d5/d47/class_torc_user.html#ad878f68c04984d247c01563ddc063009',1,'TorcUser::userName()']]],
-  ['uuid',['UUID',['../d9/d91/class_torc_s_s_d_p_search_response.html#a6d4e6702aa1e073a7cf325081651769cae0a196c14b34c27685c313971a85e03a',1,'TorcSSDPSearchResponse::UUID()'],['../dd/d3a/class_torc_network_service.html#a75aafd9a77926767a20ea31eccfd9ef1',1,'TorcNetworkService::uuid()']]],
+  ['uuid',['uuid',['../dd/d3a/class_torc_network_service.html#a75aafd9a77926767a20ea31eccfd9ef1',1,'TorcNetworkService::uuid()'],['../d9/d91/class_torc_s_s_d_p_search_response.html#a6d4e6702aa1e073a7cf325081651769cae0a196c14b34c27685c313971a85e03a',1,'TorcSSDPSearchResponse::UUID()']]],
   ['uuidfromusn',['UUIDFromUSN',['../de/d6d/class_torc_u_p_n_p.html#af84429403e58c1e70a2bc4abfd7f1b73',1,'TorcUPNP']]]
 ];

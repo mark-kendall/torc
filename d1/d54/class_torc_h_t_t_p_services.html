@@ -145,8 +145,8 @@ Signals</h2></td></tr>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a949479fe1a64b4621f0c4839e3a03a48"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d54/class_torc_h_t_t_p_services.html#a949479fe1a64b4621f0c4839e3a03a48">TorcHTTPServices</a> (<a class="el" href="../../db/dc7/class_torc_h_t_t_p_server.html">TorcHTTPServer</a> *Server)</td></tr>
 <tr class="separator:a949479fe1a64b4621f0c4839e3a03a48"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a655ce006e96dee95a2e8883cefa146e3"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d54/class_torc_h_t_t_p_services.html#a655ce006e96dee95a2e8883cefa146e3">~TorcHTTPServices</a> ()</td></tr>
-<tr class="separator:a655ce006e96dee95a2e8883cefa146e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a96689b09269dafa7e8feb742109b9b20"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d54/class_torc_h_t_t_p_services.html#a96689b09269dafa7e8feb742109b9b20">~TorcHTTPServices</a> ()=default</td></tr>
+<tr class="separator:a96689b09269dafa7e8feb742109b9b20"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab43184c25a3f3557192e28b3c6296850"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d54/class_torc_h_t_t_p_services.html#ab43184c25a3f3557192e28b3c6296850">ProcessHTTPRequest</a> (const QString &amp;PeerAddress, int PeerPort, const QString &amp;LocalAddress, int LocalPort, <a class="el" href="../../da/dfc/class_torc_h_t_t_p_request.html">TorcHTTPRequest</a> &amp;Request) override</td></tr>
 <tr class="separator:ab43184c25a3f3557192e28b3c6296850"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a807da57bdf99de4c62061c3cbf73dba7"><td class="memItemLeft" align="right" valign="top">QVariantMap&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d54/class_torc_h_t_t_p_services.html#a807da57bdf99de4c62061c3cbf73dba7">ProcessRequest</a> (const QString &amp;Method, const QVariant &amp;Parameters, QObject *Connection, bool Authenticated) override</td></tr>
@@ -252,7 +252,7 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a655ce006e96dee95a2e8883cefa146e3"></a>
+<a class="anchor" id="a96689b09269dafa7e8feb742109b9b20"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -260,7 +260,7 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">TorcHTTPServices::~TorcHTTPServices </td>
+          <td class="memname">virtual TorcHTTPServices::~TorcHTTPServices </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -268,12 +268,10 @@ Additional Inherited Members</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">virtual</span><span class="mlabel">default</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
-
-<p>Definition at line <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html#l00064">64</a> of file <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html">torchttpservices.cpp</a>.</p>
 
 </div>
 </div>
@@ -303,7 +301,7 @@ Additional Inherited Members</h2></td></tr>
 <p>Return complete application information. </p>
 <p>This acts as a convenience method for peers to retrieve pertinant application information with one remote call. </p>
 
-<p>Definition at line <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html#l00173">173</a> of file <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html">torchttpservices.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html#l00169">169</a> of file <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html">torchttpservices.cpp</a>.</p>
 
 </div>
 </div>
@@ -329,7 +327,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html#l00213">213</a> of file <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html">torchttpservices.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html#l00209">209</a> of file <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html">torchttpservices.cpp</a>.</p>
 
 </div>
 </div>
@@ -355,7 +353,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html#l00198">198</a> of file <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html">torchttpservices.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html#l00194">194</a> of file <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html">torchttpservices.cpp</a>.</p>
 
 </div>
 </div>
@@ -381,7 +379,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html#l00192">192</a> of file <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html">torchttpservices.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html#l00188">188</a> of file <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html">torchttpservices.cpp</a>.</p>
 
 </div>
 </div>
@@ -407,7 +405,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html#l00187">187</a> of file <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html">torchttpservices.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html#l00183">183</a> of file <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html">torchttpservices.cpp</a>.</p>
 
 </div>
 </div>
@@ -433,7 +431,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html#l00208">208</a> of file <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html">torchttpservices.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html#l00204">204</a> of file <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html">torchttpservices.cpp</a>.</p>
 
 </div>
 </div>
@@ -461,7 +459,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="../../d6/d70/class_torc_h_t_t_p_service.html#ac1ad2d6a8450afa4314dc9a35b67426d">TorcHTTPService</a>.</p>
 
-<p>Definition at line <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html#l00074">74</a> of file <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html">torchttpservices.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html#l00070">70</a> of file <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html">torchttpservices.cpp</a>.</p>
 
 </div>
 </div>
@@ -487,7 +485,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html#l00218">218</a> of file <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html">torchttpservices.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html#l00214">214</a> of file <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html">torchttpservices.cpp</a>.</p>
 
 </div>
 </div>
@@ -513,7 +511,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html#l00068">68</a> of file <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html">torchttpservices.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html#l00064">64</a> of file <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html">torchttpservices.cpp</a>.</p>
 
 </div>
 </div>
@@ -539,7 +537,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html#l00203">203</a> of file <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html">torchttpservices.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html#l00199">199</a> of file <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html">torchttpservices.cpp</a>.</p>
 
 </div>
 </div>
@@ -568,7 +566,7 @@ Additional Inherited Members</h2></td></tr>
 <p>Return a WebSocket token for connecting a WebSocket when authentication is required. </p>
 <dl class="section note"><dt>Note</dt><dd>This is a dummy method as there is no point in calling it internally. The actual implementation is captured in ProcessHTTPRequest as it requires access to the underlying HTTP headers to authenticate. </dd></dl>
 
-<p>Definition at line <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html#l00228">228</a> of file <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html">torchttpservices.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html#l00224">224</a> of file <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html">torchttpservices.cpp</a>.</p>
 
 </div>
 </div>
@@ -594,7 +592,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html#l00238">238</a> of file <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html">torchttpservices.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html#l00234">234</a> of file <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html">torchttpservices.cpp</a>.</p>
 
 </div>
 </div>
@@ -620,7 +618,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html#l00233">233</a> of file <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html">torchttpservices.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html#l00229">229</a> of file <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html">torchttpservices.cpp</a>.</p>
 
 </div>
 </div>
@@ -676,7 +674,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="../../d6/d70/class_torc_h_t_t_p_service.html#a6f7bb8865122783c5aac6ff25e706d39">TorcHTTPService</a>.</p>
 
-<p>Definition at line <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html#l00101">101</a> of file <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html">torchttpservices.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html#l00097">97</a> of file <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html">torchttpservices.cpp</a>.</p>
 
 </div>
 </div>
@@ -726,7 +724,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="../../d6/d70/class_torc_h_t_t_p_service.html#aba33abce11b5a783a2735b5a971aadf7">TorcHTTPService</a>.</p>
 
-<p>Definition at line <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html#l00079">79</a> of file <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html">torchttpservices.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html#l00075">75</a> of file <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html">torchttpservices.cpp</a>.</p>
 
 </div>
 </div>
@@ -776,7 +774,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html#l00163">163</a> of file <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html">torchttpservices.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html#l00159">159</a> of file <a class="el" href="../../da/d1a/torchttpservices_8cpp_source.html">torchttpservices.cpp</a>.</p>
 
 </div>
 </div>
@@ -854,7 +852,7 @@ Additional Inherited Members</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Nov 30 2018 12:49:00 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Nov 30 2018 14:31:26 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

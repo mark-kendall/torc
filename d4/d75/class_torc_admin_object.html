@@ -108,8 +108,8 @@ Inheritance diagram for TorcAdminObject:</div>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a1863a2612721aa6f9664578a2de188ed"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d75/class_torc_admin_object.html#a1863a2612721aa6f9664578a2de188ed">TorcAdminObject</a> (int <a class="el" href="../../d4/d75/class_torc_admin_object.html#ad435c7ffa44a584b85288af9c5f43e69">Priority</a>=<a class="el" href="../../dd/dd5/torcadminthread_8h.html#a72681f4a90d286399e4aee92dbb8b294">TORC_ADMIN_LOW_PRIORITY</a>)</td></tr>
 <tr class="separator:a1863a2612721aa6f9664578a2de188ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a15e6cd64e776e1bee64afd72b20fad3c"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d75/class_torc_admin_object.html#a15e6cd64e776e1bee64afd72b20fad3c">~TorcAdminObject</a> ()</td></tr>
-<tr class="separator:a15e6cd64e776e1bee64afd72b20fad3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac5f1e1afecfa48425201bfe15f642569"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d75/class_torc_admin_object.html#ac5f1e1afecfa48425201bfe15f642569">~TorcAdminObject</a> ()=default</td></tr>
+<tr class="separator:ac5f1e1afecfa48425201bfe15f642569"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad435c7ffa44a584b85288af9c5f43e69"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d75/class_torc_admin_object.html#ad435c7ffa44a584b85288af9c5f43e69">Priority</a> (void) const </td></tr>
 <tr class="separator:ad435c7ffa44a584b85288af9c5f43e69"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8da1af788fff113b630a573bceb86dce"><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../d4/d75/class_torc_admin_object.html">TorcAdminObject</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d75/class_torc_admin_object.html#a8da1af788fff113b630a573bceb86dce">GetNextObject</a> (void)</td></tr>
@@ -163,11 +163,11 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d5/d95/torcadminthread_8cpp_source.html#l00108">108</a> of file <a class="el" href="../../d5/d95/torcadminthread_8cpp_source.html">torcadminthread.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d5/d95/torcadminthread_8cpp_source.html#l00104">104</a> of file <a class="el" href="../../d5/d95/torcadminthread_8cpp_source.html">torcadminthread.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a15e6cd64e776e1bee64afd72b20fad3c"></a>
+<a class="anchor" id="ac5f1e1afecfa48425201bfe15f642569"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -175,7 +175,7 @@ Static Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">TorcAdminObject::~TorcAdminObject </td>
+          <td class="memname">virtual TorcAdminObject::~TorcAdminObject </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -183,12 +183,10 @@ Static Public Member Functions</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">virtual</span><span class="mlabel">default</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
-
-<p>Definition at line <a class="el" href="../../d5/d95/torcadminthread_8cpp_source.html#l00117">117</a> of file <a class="el" href="../../d5/d95/torcadminthread_8cpp_source.html">torcadminthread.cpp</a>.</p>
 
 </div>
 </div>
@@ -243,7 +241,7 @@ Static Public Member Functions</h2></td></tr>
 
 <p>Iterates through the list of registered <a class="el" href="../../d4/d75/class_torc_admin_object.html" title="A factory class for automatically running objects outside of the main loop. ">TorcAdminObject</a>'s and creates them. </p>
 
-<p>Definition at line <a class="el" href="../../d5/d95/torcadminthread_8cpp_source.html#l00142">142</a> of file <a class="el" href="../../d5/d95/torcadminthread_8cpp_source.html">torcadminthread.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d5/d95/torcadminthread_8cpp_source.html#l00134">134</a> of file <a class="el" href="../../d5/d95/torcadminthread_8cpp_source.html">torcadminthread.cpp</a>.</p>
 
 </div>
 </div>
@@ -297,7 +295,7 @@ Static Public Member Functions</h2></td></tr>
 
 <p>Destroys each created admin object. </p>
 
-<p>Definition at line <a class="el" href="../../d5/d95/torcadminthread_8cpp_source.html#l00175">175</a> of file <a class="el" href="../../d5/d95/torcadminthread_8cpp_source.html">torcadminthread.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d5/d95/torcadminthread_8cpp_source.html#l00167">167</a> of file <a class="el" href="../../d5/d95/torcadminthread_8cpp_source.html">torcadminthread.cpp</a>.</p>
 
 </div>
 </div>
@@ -315,7 +313,7 @@ Static Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d5/d95/torcadminthread_8cpp_source.html#l00126">126</a> of file <a class="el" href="../../d5/d95/torcadminthread_8cpp_source.html">torcadminthread.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d5/d95/torcadminthread_8cpp_source.html#l00118">118</a> of file <a class="el" href="../../d5/d95/torcadminthread_8cpp_source.html">torcadminthread.cpp</a>.</p>
 
 </div>
 </div>
@@ -353,7 +351,7 @@ Static Public Member Functions</h2></td></tr>
 
 <p>Sort <a class="el" href="../../d4/d75/class_torc_admin_object.html" title="A factory class for automatically running objects outside of the main loop. ">TorcAdminObject</a>'s based on relative priorities. </p>
 
-<p>Definition at line <a class="el" href="../../d5/d95/torcadminthread_8cpp_source.html#l00134">134</a> of file <a class="el" href="../../d5/d95/torcadminthread_8cpp_source.html">torcadminthread.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d5/d95/torcadminthread_8cpp_source.html#l00126">126</a> of file <a class="el" href="../../d5/d95/torcadminthread_8cpp_source.html">torcadminthread.cpp</a>.</p>
 
 </div>
 </div>
@@ -371,7 +369,7 @@ Static Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d5/d95/torcadminthread_8cpp_source.html#l00121">121</a> of file <a class="el" href="../../d5/d95/torcadminthread_8cpp_source.html">torcadminthread.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d5/d95/torcadminthread_8cpp_source.html#l00113">113</a> of file <a class="el" href="../../d5/d95/torcadminthread_8cpp_source.html">torcadminthread.cpp</a>.</p>
 
 </div>
 </div>
@@ -382,7 +380,7 @@ Static Public Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Nov 30 2018 12:49:00 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Nov 30 2018 14:31:26 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>
