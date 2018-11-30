@@ -32,7 +32,7 @@ class TorcOutput : public TorcDevice, public TorcHTTPService
     Q_ENUM(Type)
 
     static QString          TypeToString(TorcOutput::Type Type);
-    static TorcOutput::Type StringToType(const QString &Type);
+    static int              StringToType(const QString &Type, bool CaseSensitive = false);
 
   public:
     TorcOutput(TorcOutput::Type Type, double Value, const QString &ModelId, const QVariantMap &Details);

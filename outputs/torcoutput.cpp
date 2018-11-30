@@ -20,6 +20,9 @@
 * USA.
 */
 
+// Qt
+#include <QMetaEnum>
+
 // Torc
 #include "torclogging.h"
 #include "torcoutputs.h"
@@ -29,28 +32,21 @@
 
 QString TorcOutput::TypeToString(TorcOutput::Type Type)
 {
-    switch (Type)
-    {
-        case TorcOutput::PWM:         return QString("pwm");
-        case TorcOutput::Switch:      return QString("switch");
-        case TorcOutput::Temperature: return QString("temperature");
-        case TorcOutput::pH:          return QString("pH");
-        case TorcOutput::Camera:      return QString("camera");
-        default: break;
-    }
-
-    return QString("unknown");
+    return QString(QMetaEnum::fromType<TorcOutput::Type>().valueToKey(Type)).toLower();
 }
 
-TorcOutput::Type TorcOutput::StringToType(const QString &Type)
+int TorcOutput::StringToType(const QString &Type, bool CaseSensitive)
 {
-    QString type = Type.toLower();
-    if ("pwm" == type)         return TorcOutput::PWM;
-    if ("switch" == type)      return TorcOutput::Switch;
-    if ("temperature" == type) return TorcOutput::Temperature;
-    if ("ph" == type)          return TorcOutput::pH;
-    if ("camera" == type)      return TorcOutput::Camera;
-    return TorcOutput::Unknown;
+    const QMetaEnum metaEnum = QMetaEnum::fromType<TorcOutput::Type>();
+    if (CaseSensitive)
+        return metaEnum.keyToValue(Type.toLatin1());
+
+    QByteArray type = Type.toLower().toLatin1();
+    int count = metaEnum.keyCount();
+    for (int i = 0; i < count; i++)
+        if (qstrcmp(type, QByteArray(metaEnum.key(count)).toLower()) == 0)
+            return metaEnum.value(count);
+    return -1; // for consistency with QMetaEnum::keyToValue
 }
 
 // N.B. We need to pass the staticMetaObject to TorcHTTPService as the object is not yet complete.
