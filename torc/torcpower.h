@@ -23,8 +23,6 @@ class TorcPower : public QObject, public TorcHTTPService
     Q_PROPERTY(bool canRestart   READ GetCanRestart   NOTIFY CanRestartChanged)
     Q_PROPERTY(int  batteryLevel READ GetBatteryLevel NOTIFY BatteryLevelChanged)
 
-    Q_ENUMS(PowerLevels)
-
   public:
     enum PowerLevels
     {
@@ -34,6 +32,8 @@ class TorcPower : public QObject, public TorcHTTPService
         BatteryFull   = 100,
         UnknownPower  = 101
     };
+
+    Q_ENUM(PowerLevels)
 
   public:
     static void    Create(void);

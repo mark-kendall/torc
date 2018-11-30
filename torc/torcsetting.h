@@ -14,9 +14,6 @@
 
 class TorcSetting : public QObject, public TorcHTTPService, public TorcReferenceCounter
 {
-    Q_ENUMS(Type)
-    Q_ENUMS(Role)
-
   public:
     enum Type
     {
@@ -33,6 +30,9 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
         Persistent = (1 << 0),
         Public     = (1 << 1)
     };
+
+    Q_ENUM(Type)
+    Q_ENUM(Role)
 
     Q_DECLARE_FLAGS(Roles, Role)
 

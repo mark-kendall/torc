@@ -14,7 +14,6 @@
 class TorcInput : public TorcDevice, public TorcHTTPService
 {
     Q_OBJECT
-    Q_ENUMS(Type)
     Q_CLASSINFO("Version", "1.0.0")
     Q_PROPERTY(double   operatingRangeMin       READ GetOperatingRangeMin       CONSTANT)
     Q_PROPERTY(double   operatingRangeMax       READ GetOperatingRangeMax       CONSTANT)
@@ -33,6 +32,8 @@ class TorcInput : public TorcDevice, public TorcHTTPService
         SystemStarted,
         MaxType
     };
+
+    Q_ENUM(Type)
 
     static QString          TypeToString(TorcInput::Type Type);
     static TorcInput::Type  StringToType(const QString &Type);

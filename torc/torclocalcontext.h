@@ -25,7 +25,6 @@ class TorcLanguage;
 class Torc
 {
     Q_GADGET
-    Q_ENUMS(Actions)
 
   public:
     enum Actions
@@ -68,6 +67,8 @@ class Torc
         // plugins etc
         MaxUser = 65535
     };
+
+    Q_ENUM(Actions)
 
     static QString ActionToString(enum Actions Action);
     static int     StringToAction(const QString &Action, bool CaseSensitive = false);

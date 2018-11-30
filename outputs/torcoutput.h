@@ -15,13 +15,12 @@
 class TorcOutput : public TorcDevice, public TorcHTTPService
 {
     Q_OBJECT
-    Q_ENUMS(Type)
     Q_CLASSINFO("Version",        "1.0.0")
 
   public:
     enum Type
     {
-        Unknown    = 0,
+        Unknown = 0,
         Temperature,
         pH,
         Switch,
@@ -29,6 +28,8 @@ class TorcOutput : public TorcDevice, public TorcHTTPService
         Camera,
         MaxType
      };
+
+    Q_ENUM(Type)
 
     static QString          TypeToString(TorcOutput::Type Type);
     static TorcOutput::Type StringToType(const QString &Type);

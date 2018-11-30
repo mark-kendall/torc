@@ -18,7 +18,7 @@ class TorcCentral final : public QObject, public TorcHTTPService
         Celsius = 0,
         Fahrenheit = 1
     };
-    Q_ENUMS(TemperatureUnits)
+    Q_ENUM(TemperatureUnits)
 
     Q_OBJECT
     Q_CLASSINFO("Version",     "1.0.0")
