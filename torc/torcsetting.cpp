@@ -20,6 +20,9 @@
 * USA.
 */
 
+// Qt
+#include <QMetaEnum>
+
 // Torc
 #include "torclocalcontext.h"
 #include "torcsetting.h"
@@ -48,15 +51,7 @@
 
 QString TorcSetting::TypeToString(Type type)
 {
-    switch (type)
-    {
-        case Bool:       return QString("bool");
-        case Integer:    return QString("integer");
-        case String:     return QString("string");
-        case StringList: return QString("stringlist");
-        case Group:      return QString("group");
-    }
-    return QString("erRor");
+    return QString(QMetaEnum::fromType<TorcSetting::Type>().valueToKey(type)).toLower();
 }
 
 TorcSetting::TorcSetting(TorcSetting *Parent, const QString &DBName, const QString &UIName,

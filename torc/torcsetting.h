@@ -32,8 +32,6 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
     };
 
     Q_ENUM(Type)
-    Q_ENUM(Role)
-
     Q_DECLARE_FLAGS(Roles, Role)
 
   public:
