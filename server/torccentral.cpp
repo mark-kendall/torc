@@ -21,6 +21,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QProcess>
+#include <QMetaEnum>
 #include <QJsonDocument>
 
 // Torc
@@ -56,13 +57,7 @@ TorcCentral::TemperatureUnits TorcCentral::gTemperatureUnits = TorcCentral::Cels
 
 QString TorcCentral::TemperatureUnitsToString(TorcCentral::TemperatureUnits Units)
 {
-    switch (Units)
-    {
-        case TorcCentral::Celsius:    return "celsius";
-        case TorcCentral::Fahrenheit: return "fahrenheit";
-    }
-
-    return "Unknown";
+    return QString(QMetaEnum::fromType<TorcCentral::TemperatureUnits>().valueToKey(Units)).toLower();
 }
 
 TorcCentral::TemperatureUnits TorcCentral::GetGlobalTemperatureUnits(void)
