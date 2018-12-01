@@ -74,10 +74,8 @@ void TorcHTTPServerNonce::ProcessDigestAuth(TorcHTTPRequest &Request, bool Check
         // NB SHA-256 doesn't seem to be implemented anywhere yet - so just offer MD5
         // should probably use insertMulti for SetResponseHeader
           QString auth = QString("Digest realm=\"%1\", qop=\"auth\", algorithm=MD5, nonce=\"%2\", opaque=\"%3\"%4")
-                .arg(TORC_REALM)
-                .arg(nonce)
-                .arg(nonceobj.GetOpaque())
-                .arg(Request.IsAuthorised() == HTTPAuthorisedStale ? QString(", stale=\"true\"") : QString(""));
+                .arg(TORC_REALM, nonce, nonceobj.GetOpaque(),
+                 Request.IsAuthorised() == HTTPAuthorisedStale ? QString(", stale=\"true\"") : QString(""));
         lock.unlock();
         Request.SetResponseHeader("WWW-Authenticate", auth);
     }
@@ -130,7 +128,7 @@ void TorcHTTPServerNonce::ProcessDigestAuth(TorcHTTPRequest &Request, bool Check
         // username must match
         if (TorcUser::GetName() != params.value("username"))
         {
-            LOG(VB_GENERAL, LOG_WARNING, QString("Expected '%1' username, got '%2'").arg(TorcUser::GetName()).arg(params.value("username")));
+            LOG(VB_GENERAL, LOG_WARNING, QString("Expected '%1' username, got '%2'").arg(TorcUser::GetName(), params.value("username")));
             return;
         }
 
@@ -142,10 +140,10 @@ void TorcHTTPServerNonce::ProcessDigestAuth(TorcHTTPRequest &Request, bool Check
         QString       URI = Request.GetUrl();
         QString  noncestr = params.value("nonce");
         QString    ncstr  = params.value("nc");
-        QString    second = QString("%1:%2").arg(TorcHTTPRequest::RequestTypeToString(Request.GetHTTPRequestType())).arg(URI);
+        QString    second = QString("%1:%2").arg(TorcHTTPRequest::RequestTypeToString(Request.GetHTTPRequestType()), URI);
         QByteArray hash1  = TorcUser::GetCredentials();
         QByteArray hash2  = QCryptographicHash::hash(second.toLatin1(), QCryptographicHash::Md5).toHex();
-        QString    third  = QString("%1:%2:%3:%4:%5:%6").arg(QString(hash1)).arg(noncestr).arg(ncstr).arg(params.value("cnonce")).arg("auth").arg(QString(hash2));
+        QString    third  = QString("%1:%2:%3:%4:%5:%6").arg(QString(hash1), noncestr, ncstr, params.value("cnonce"), "auth", QString(hash2));
         QByteArray hash3  = QCryptographicHash::hash(third.toLatin1(), QCryptographicHash::Md5).toHex();
 
         if (hash3 != params.value("response"))

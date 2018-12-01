@@ -158,7 +158,7 @@ bool TorcHTTPReader::Read(QTcpSocket *Socket)
                     if (key == "Content-Length")
                         m_contentLength = value.toULongLong();
 
-                    LOG(VB_NETWORK, LOG_DEBUG, QString("%1: %2").arg(key.data()).arg(value.data()));
+                    LOG(VB_NETWORK, LOG_DEBUG, QString("%1: %2").arg(key.data(), value.data()));
 
                     m_headers.insert(key, value);
                 }

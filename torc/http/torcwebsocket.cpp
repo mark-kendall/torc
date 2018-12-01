@@ -357,7 +357,7 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest &Request)
     SetState(SocketState::Upgraded);
     m_authenticated = Request.IsAuthorised();
 
-    LOG(VB_GENERAL, LOG_INFO, QString("%1 socket upgraded  (%2)").arg(m_debug).arg(m_authenticated ? "Authenticated" : "Unauthenticated"));
+    LOG(VB_GENERAL, LOG_INFO, QString("%1 socket upgraded  (%2)").arg(m_debug, m_authenticated ? "Authenticated" : "Unauthenticated"));
 
     if (Request.Headers().contains("Torc-UUID"))
     {
@@ -402,7 +402,7 @@ QVariantList TorcWebSocket::GetSupportedSubProtocols(void)
 void TorcWebSocket::Encrypted(void)
 {
     if (m_debug.isEmpty())
-        m_debug = QString(">> %1 %2 -").arg(TorcNetwork::IPAddressToLiteral(peerAddress(), peerPort())).arg(m_secure ? "secure" : "insecure");
+        m_debug = QString(">> %1 %2 -").arg(TorcNetwork::IPAddressToLiteral(peerAddress(), peerPort()), m_secure ? "secure" : "insecure");
     connect(this, SIGNAL(readyRead()), this, SLOT(ReadyRead()));
     emit ConnectionEstablished();
     LOG(VB_GENERAL, LOG_INFO, QString("%1 encrypted").arg(m_debug));
@@ -448,8 +448,8 @@ void TorcWebSocket::Start(void)
     {
         if (setSocketDescriptor(m_socketDescriptor))
         {
-            m_debug = QString("<< %1 %2 -").arg(TorcNetwork::IPAddressToLiteral(peerAddress(), peerPort())).arg(m_secure ? "secure" : "insecure");
-            LOG(VB_GENERAL, LOG_INFO, QString("%1 socket connected (%2)").arg(m_debug).arg(m_authenticated ? "Authenticated" : "Unauthenticated"));
+            m_debug = QString("<< %1 %2 -").arg(TorcNetwork::IPAddressToLiteral(peerAddress(), peerPort()), m_secure ? "secure" : "insecure");
+            LOG(VB_GENERAL, LOG_INFO, QString("%1 socket connected (%2)").arg(m_debug, m_authenticated ? "Authenticated" : "Unauthenticated"));
             SetState(SocketState::ConnectedTo);
 
             if (m_secure)
@@ -507,8 +507,8 @@ bool TorcWebSocket::HandleNotification(const QString &Method)
 {
     if (m_subscribers.contains(Method))
     {
-        QMap<QString,QObject*>::const_iterator it = m_subscribers.find(Method);
-        while (it != m_subscribers.end() && it.key() == Method)
+        QMap<QString,QObject*>::const_iterator it = m_subscribers.constFind(Method);
+        while (it != m_subscribers.constEnd() && it.key() == Method)
         {
             QMetaObject::invokeMethod(it.value(), "ServiceNotification", Q_ARG(QString, Method));
             ++it;
@@ -744,8 +744,8 @@ void TorcWebSocket::SubscriberDeleted(QObject *Object)
 {
     QList<QString> remove;
 
-    QMap<QString,QObject*>::const_iterator it = m_subscribers.begin();
-    for ( ; it != m_subscribers.end(); ++it)
+    QMap<QString,QObject*>::const_iterator it = m_subscribers.constBegin();
+    for ( ; it != m_subscribers.constEnd(); ++it)
         if (it.value() == Object)
             remove.append(it.key());
 
@@ -771,7 +771,7 @@ void TorcWebSocket::CloseSocket(void)
 
 void TorcWebSocket::Connected(void)
 {
-    m_debug = QString(">> %1 %2 -").arg(TorcNetwork::IPAddressToLiteral(peerAddress(), peerPort())).arg(m_secure ? "secure" : "insecure");
+    m_debug = QString(">> %1 %2 -").arg(TorcNetwork::IPAddressToLiteral(peerAddress(), peerPort()), m_secure ? "secure" : "insecure");
     LOG(VB_GENERAL, LOG_INFO, QString("%1 connection to remote host").arg(m_debug));
     SetState(SocketState::Upgrading);
     SendHandshake();
@@ -836,7 +836,7 @@ void TorcWebSocket::SendHandshake(void)
     }
 
     LOG(VB_GENERAL, LOG_DEBUG, QString("%1 client WebSocket connected (SubProtocol: %2)")
-        .arg(m_debug).arg(TorcWebSocketReader::SubProtocolsToString(m_subProtocol)));
+        .arg(m_debug, TorcWebSocketReader::SubProtocolsToString(m_subProtocol)));
 
     LOG(VB_NETWORK, LOG_DEBUG, QString("Data...\r\n%1").arg(upgrade->data()));
 }
@@ -886,8 +886,8 @@ void TorcWebSocket::ReadHandshake(void)
     if (valid && request.GetHTTPStatus() != HTTP_SwitchingProtocols)
     {
         valid = false;
-        error = QString("Expected '%1' - got '%2'").arg(TorcHTTPRequest::StatusToString(HTTP_SwitchingProtocols))
-                .arg(TorcHTTPRequest::StatusToString(request.GetHTTPStatus()));
+        error = QString("Expected '%1' - got '%2'").arg(TorcHTTPRequest::StatusToString(HTTP_SwitchingProtocols),
+                                                        TorcHTTPRequest::StatusToString(request.GetHTTPStatus()));
     }
 
     // does it contain the correct headers
@@ -1070,7 +1070,7 @@ void TorcWebSocket::ProcessPayload(const QByteArray &Payload)
 
                         if (parent->metaObject()->indexOfSlot(QMetaObject::normalizedSignature("ServiceNotification(QString)")) < 0)
                         {
-                            LOG(VB_GENERAL, LOG_ERR, QString("Cannot monitor subscription to '%1' for object '%2' - no notification slot").arg(method).arg(parent->objectName()));
+                            LOG(VB_GENERAL, LOG_ERR, QString("Cannot monitor subscription to '%1' for object '%2' - no notification slot").arg(method, parent->objectName()));
                         }
                         else if (request->GetReply().type() == QVariant::Map)
                         {
@@ -1083,8 +1083,8 @@ void TorcWebSocket::ProcessPayload(const QByteArray &Payload)
                                 QVariantList properties = map.value("properties").toList();
 
                                 // add each notification/parent pair to the subscriber list
-                                QVariantList::const_iterator it = properties.begin();
-                                for ( ; it != properties.end(); ++it)
+                                QVariantList::const_iterator it = properties.constBegin();
+                                for ( ; it != properties.constEnd(); ++it)
                                 {
                                     if (it->type() == QVariant::Map)
                                     {
@@ -1094,12 +1094,12 @@ void TorcWebSocket::ProcessPayload(const QByteArray &Payload)
                                             QString service = method + property.value("notification").toString();
                                             if (m_subscribers.contains(service, parent))
                                             {
-                                                LOG(VB_GENERAL, LOG_WARNING, QString("Object '%1' already has subscription to '%2'").arg(parent->objectName()).arg(service));
+                                                LOG(VB_GENERAL, LOG_WARNING, QString("Object '%1' already has subscription to '%2'").arg(parent->objectName(), service));
                                             }
                                             else
                                             {
                                                 m_subscribers.insertMulti(service, parent);
-                                                LOG(VB_GENERAL, LOG_INFO, QString("Object '%1' subscribed to '%2'").arg(parent->objectName()).arg(service));
+                                                LOG(VB_GENERAL, LOG_INFO, QString("Object '%1' subscribed to '%2'").arg(parent->objectName(), service));
                                             }
                                         }
                                     }
@@ -1116,20 +1116,24 @@ void TorcWebSocket::ProcessPayload(const QByteArray &Payload)
                         // iterate over our subscriber list and remove anything that starts with method and points to parent
                         QStringList remove;
 
-                        QMap<QString,QObject*>::const_iterator it = m_subscribers.begin();
-                        for ( ; it != m_subscribers.end(); ++it)
+                        QMap<QString,QObject*>::const_iterator it = m_subscribers.constBegin();
+                        for ( ; it != m_subscribers.constEnd(); ++it)
                             if (it.value() == parent && it.key().startsWith(method))
                                 remove.append(it.key());
 
                         foreach (QString signature, remove)
                         {
-                            LOG(VB_GENERAL, LOG_INFO, QString("Object '%1' unsubscribed from '%2'").arg(parent->objectName()).arg(signature));
+                            LOG(VB_GENERAL, LOG_INFO, QString("Object '%1' unsubscribed from '%2'").arg(parent->objectName(), signature));
                             m_subscribers.remove(signature, parent);
                         }
 
                         // and disconnect the destroyed signal if we have no more subscriptions for this object
-                        if (!m_subscribers.values().contains(parent))
+                        if (std::find(m_subscribers.cbegin(), m_subscribers.cend(), parent) == m_subscribers.cend())
+                        {
+                            // temporary logging to ensure clazy optimisation is working correctly
+                            LOG(VB_GENERAL, LOG_INFO, QString("'%1' disconnect - no more subscriptions").arg(parent->objectName()));
                             (void)disconnect(parent, nullptr, this, nullptr);
+                        }
                     }
 
                     requestor->SetReply(request->GetReply());

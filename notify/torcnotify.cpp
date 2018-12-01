@@ -78,8 +78,7 @@ void TorcNotify::Graph(QByteArray *Data)
 
         if (label.isEmpty())
             label = id;
-        Data->append(QString("        \"%1\" [shape=record style=rounded id=\"%1\" label=<<B>%2</B>%3>];\r\n")
-            .arg(id).arg(label).arg(desc));
+        Data->append(QString("        \"%1\" [shape=record style=rounded id=\"%1\" label=<<B>%2</B>%3>];\r\n").arg(id, label, desc));
 
         // and add links
         notification->Graph(Data);
@@ -96,8 +95,7 @@ void TorcNotify::Graph(QByteArray *Data)
 
         if (label.isEmpty())
             label = id;
-        Data->append(QString("        \"%1\" [shape=record style=rounded id=\"%1\" label=<<B>%2</B>%3>];\r\n")
-            .arg(id).arg(label).arg(desc));
+        Data->append(QString("        \"%1\" [shape=record style=rounded id=\"%1\" label=<<B>%2</B>%3>];\r\n").arg(id, label, desc));
     }
 }
 
@@ -151,7 +149,7 @@ QVariantMap TorcNotify::SetNotificationText(const QString &Title, const QString 
         {
             QString key = regexp.cap(4).toLower().trimmed();
             if (data.contains(key))
-                title.replace(regexp.cap(0), QString("%1%2%3%4").arg(regexp.cap(2)).arg(regexp.cap(3)).arg(data.value(key)).arg(regexp.cap(6)));
+                title.replace(regexp.cap(0), QString("%1%2%3%4").arg(regexp.cap(2), regexp.cap(3), data.value(key), regexp.cap(6)));
             pos += regexp.matchedLength();
         }
         pos = 0;
@@ -159,7 +157,7 @@ QVariantMap TorcNotify::SetNotificationText(const QString &Title, const QString 
         {
             QString key = regexp.cap(4).toLower().trimmed();
             if (data.contains(key))
-                body.replace(regexp.cap(0), QString("%1%2%3%4").arg(regexp.cap(2)).arg(regexp.cap(3)).arg(data.value(key)).arg(regexp.cap(6)));
+                body.replace(regexp.cap(0), QString("%1%2%3%4").arg(regexp.cap(2), regexp.cap(3), data.value(key), regexp.cap(6)));
             pos += regexp.matchedLength();
         }
     }
@@ -169,7 +167,7 @@ QVariantMap TorcNotify::SetNotificationText(const QString &Title, const QString 
     {
         QString key = regexp.cap(4).toLower().trimmed();
         if (Custom.contains(key))
-            title.replace(regexp.cap(0), QString("%1%2%3%4").arg(regexp.cap(2)).arg(regexp.cap(3)).arg(Custom.value(key)).arg(regexp.cap(6)));
+            title.replace(regexp.cap(0), QString("%1%2%3%4").arg(regexp.cap(2), regexp.cap(3), Custom.value(key), regexp.cap(6)));
         pos += regexp.matchedLength();
     }
     pos = 0;
@@ -177,7 +175,7 @@ QVariantMap TorcNotify::SetNotificationText(const QString &Title, const QString 
     {
         QString key = regexp.cap(4).toLower().trimmed();
         if (Custom.contains(key))
-            body.replace(regexp.cap(0), QString("%1%2%3%4").arg(regexp.cap(2)).arg(regexp.cap(3)).arg(Custom.value(key)).arg(regexp.cap(6)));
+            body.replace(regexp.cap(0), QString("%1%2%3%4").arg(regexp.cap(2), regexp.cap(3), Custom.value(key), regexp.cap(6)));
         pos += regexp.matchedLength();
     }
 

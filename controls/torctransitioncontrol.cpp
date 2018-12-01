@@ -154,7 +154,7 @@ TorcTransitionControl::TorcTransitionControl(const QString &Type, const QVariant
     m_type = EasingCurveFromString(Type);
     if (m_type == QEasingCurve::TCBSpline /*invalid*/)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Unknown transition type '%1' for device '%2'").arg(Type).arg(uniqueId));
+        LOG(VB_GENERAL, LOG_ERR, QString("Unknown transition type '%1' for device '%2'").arg(Type, uniqueId));
         return;
     }
 
@@ -302,7 +302,7 @@ bool TorcTransitionControl::Validate(void)
     m_animation.setDuration(m_duration * 1000);
 
     // debug
-    LOG(VB_GENERAL, LOG_DEBUG, QString("%1: %2").arg(uniqueId).arg(GetDescription().join(",")));
+    LOG(VB_GENERAL, LOG_DEBUG, QString("%1: %2").arg(uniqueId, GetDescription().join(",")));
 
     return true;
 }

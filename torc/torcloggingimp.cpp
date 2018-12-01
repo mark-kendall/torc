@@ -431,8 +431,7 @@ FileLogger::FileLogger(QString Filename, bool ErrorsOnly, int Quiet)
         {
             QString old = m_fileName + ".old";
 
-            LOG(VB_GENERAL, LOG_INFO, QString("Moving '%1' to '%2'")
-                .arg(m_fileName).arg(old));
+            LOG(VB_GENERAL, LOG_INFO, QString("Moving '%1' to '%2'").arg(m_fileName, old));
 
             QFile::remove(old);
             QFile::rename(m_fileName, old);
@@ -626,7 +625,7 @@ LoggingThread::LoggingThread()
     m_waitEmpty(),
     m_aborted(false)
 {
-    if (!qgetenv("VERBOSE_THREADS").isEmpty())
+    if (!qEnvironmentVariableIsEmpty("VERBOSE_THREADS"))
     {
         LOG(VB_GENERAL, LOG_NOTICE,
             "Logging thread registration/deregistration enabled!");

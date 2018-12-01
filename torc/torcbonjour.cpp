@@ -211,7 +211,7 @@ void TorcBonjourService::Deregister(void)
         {
             LOG(VB_GENERAL, LOG_INFO,
                 QString("De-registering service '%1' on '%2'")
-                .arg(m_type.data()).arg(m_name.data()));
+                .arg(m_type.data(), m_name.data()));
         }
         else if (m_serviceType == Resolve)
         {
@@ -249,7 +249,7 @@ void BonjourRegisterCallback(DNSServiceRef Ref, DNSServiceFlags Flags,
     {
         LOG(VB_GENERAL, LOG_INFO,
             QString("Service registration complete: name '%1' type '%2'")
-            .arg(QString::fromUtf8(Name)).arg(QString::fromUtf8(Type)));
+            .arg(QString::fromUtf8(Name), QString::fromUtf8(Type)));
     }
     else
     {
@@ -872,8 +872,8 @@ void TorcBonjour::RemoveBrowseResult(DNSServiceRef Reference,
                 gLocalContext->Notify(event);
 
                 LOG(VB_GENERAL, LOG_INFO, QString("Service '%1' on '%2' went away")
-                    .arg(it.value().m_type.data())
-                    .arg(it.value().m_host.isEmpty() ? it.value().m_name.data() : it.value().m_host.data()));
+                    .arg(it.value().m_type.data(),
+                         it.value().m_host.isEmpty() ? it.value().m_name.data() : it.value().m_host.data()));
                 it.value().Deregister();
                 it.remove();
             }
@@ -926,7 +926,7 @@ void TorcBonjour::Resolve(DNSServiceRef Reference, DNSServiceErrorType ErrorType
                 (*it).m_host = HostTarget;
                 (*it).m_port = port;
                 LOG(VB_NETWORK, LOG_INFO, QString("%1 (%2) resolved to %3:%4")
-                    .arg((*it).m_name.data()).arg((*it).m_type.data()).arg(HostTarget).arg(port));
+                    .arg((*it).m_name.data(), (*it).m_type.data(), HostTarget).arg(port));
                 QString name(HostTarget);
                 (*it).m_lookupID = QHostInfo::lookupHost(name, this, SLOT(HostLookup(QHostInfo)));
                 (*it).m_txt      = QByteArray((const char *)TxtRecord, TxtLen);
@@ -956,14 +956,13 @@ void TorcBonjour::HostLookup(const QHostInfo &HostInfo)
                 // igore if errored
                 if (HostInfo.error() != QHostInfo::NoError)
                 {
-                    LOG(VB_GENERAL, LOG_ERR, QString("Lookup failed for '%1' with error '%2'").arg(HostInfo.hostName()).arg(HostInfo.errorString()));
+                    LOG(VB_GENERAL, LOG_ERR, QString("Lookup failed for '%1' with error '%2'").arg(HostInfo.hostName(), HostInfo.errorString()));
                     return;
                 }
 
                 (*it).m_ipAddresses = HostInfo.addresses();
                 LOG(VB_GENERAL, LOG_INFO, QString("Service '%1' on '%2:%3' resolved to %4 address(es) on interface %5")
-                    .arg((*it).m_type.data())
-                    .arg((*it).m_host.data())
+                    .arg((*it).m_type.data(), (*it).m_host.data())
                     .arg((*it).m_port)
                     .arg((*it).m_ipAddresses.size())
                     .arg((*it).m_interfaceIndex));
@@ -990,8 +989,8 @@ void TorcBonjour::HostLookup(const QHostInfo &HostInfo)
                 }
                 else
                 {
-                    LOG(VB_GENERAL, LOG_WARNING, QString("No valid addresses resolved for Service '%1' on '%2:%3'").arg((*it).m_type.data())
-                        .arg((*it).m_host.data())
+                    LOG(VB_GENERAL, LOG_WARNING, QString("No valid addresses resolved for Service '%1' on '%2:%3'")
+                        .arg((*it).m_type.data(), (*it).m_host.data())
                         .arg((*it).m_port));
                     // NB this is experimental!!!
                     TorcEvent event(Torc::ServiceWentAway, data);

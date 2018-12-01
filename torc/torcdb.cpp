@@ -138,9 +138,7 @@ QString TorcDB::GetThreadConnection(void)
         return QString();
     }
 
-    QString name = QString("%1-%2")
-                       .arg(thread->objectName())
-                       .arg(QString::number((unsigned long long)thread));
+    QString name = QString("%1-%2").arg(thread->objectName(), QString::number((unsigned long long)thread));
     QSqlDatabase newdb = QSqlDatabase::addDatabase(m_databaseType, name);
 
     if (m_databaseType == "QSQLITE")
@@ -241,7 +239,7 @@ void TorcDB::LoadSettings(QMap<QString, QString> &Settings)
 
     while (query.next())
     {
-        LOG(VB_GENERAL, LOG_DEBUG, QString("'%1' : '%2'").arg(query.value(0).toString()).arg(query.value(1).toString()));
+        LOG(VB_GENERAL, LOG_DEBUG, QString("'%1' : '%2'").arg(query.value(0).toString(), query.value(1).toString()));
         Settings.insert(query.value(0).toString(), query.value(1).toString());
     }
 }

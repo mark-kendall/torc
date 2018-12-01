@@ -52,11 +52,11 @@ void TorcThingSpeakNotifier::ProcessRequest(TorcNetworkRequest *Request)
     if (ok)
     {
         if (id == 0)
-            LOG(VB_GENERAL, LOG_ERR, QString("%1 update failed for '%2'").arg(m_description).arg(uniqueId));
+            LOG(VB_GENERAL, LOG_ERR, QString("%1 update failed for '%2'").arg(m_description, uniqueId));
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse update id from %1 response (%2)").arg(m_description).arg(uniqueId));
+        LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse update id from %1 response (%2)").arg(m_description, uniqueId));
     }
 }
 

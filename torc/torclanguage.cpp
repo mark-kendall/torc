@@ -67,9 +67,8 @@ TorcLanguage::TorcLanguage(TorcSetting *SettingParent)
     QCoreApplication::installTranslator(&m_translator);
 
     LOG(VB_GENERAL, LOG_INFO, QString("System language: %1 (%2) (%3)(env - %4)")
-        .arg(QLocale::languageToString(m_locale.language()))
-        .arg(QLocale::countryToString(m_locale.country()))
-        .arg(m_locale.name()).arg(qgetenv("LANG").data()));
+        .arg(QLocale::languageToString(m_locale.language()), QLocale::countryToString(m_locale.country()),
+             m_locale.name(), qgetenv("LANG").data()));
 
     Initialise();
 
@@ -134,9 +133,8 @@ void TorcLanguage::SetLanguageCode(const QString &Language)
     languageString = m_locale.nativeLanguageName();
 
     LOG(VB_GENERAL, LOG_INFO, QString("Language changed: %1 (%2) (%3)(env - %4)")
-        .arg(QLocale::languageToString(m_locale.language()))
-        .arg(QLocale::countryToString(m_locale.country()))
-        .arg(m_locale.name()).arg(qgetenv("LANG").data()));
+        .arg(QLocale::languageToString(m_locale.language()), QLocale::countryToString(m_locale.country()),
+             m_locale.name(), qgetenv("LANG").data()));
 
     // load the new translation. This will replace the existing translation.
     // NB it's not clear from the docs whether this is thread safe.
@@ -145,7 +143,7 @@ void TorcLanguage::SetLanguageCode(const QString &Language)
 
     QString filename = QString("torc_%1.qm").arg(m_locale.name());
     if (!m_translator.load(filename, GetTorcTransDir()))
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to load translation file '%1' from '%2'").arg(filename).arg(GetTorcTransDir()));
+        LOG(VB_GENERAL, LOG_ERR, QString("Failed to load translation file '%1' from '%2'").arg(filename, GetTorcTransDir()));
 
     // notify change
     emit LanguageCodeChanged(languageCode);

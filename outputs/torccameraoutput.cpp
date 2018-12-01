@@ -219,7 +219,7 @@ TorcOutput::Type TorcCameraVideoOutput::GetType(void)
 
 QString TorcCameraVideoOutput::GetPresentationURL(void)
 {
-    return QString("%1%2").arg(m_signature).arg(VIDEO_PAGE);
+    return QString("%1%2").arg(m_signature, VIDEO_PAGE);
 }
 
 void TorcCameraVideoOutput::Start(void)
@@ -527,7 +527,7 @@ QByteArray TorcCameraVideoOutput::GetMasterPlaylist(void)
 
     m_paramsLock.lockForRead();
     QByteArray result(playlist.arg(m_params.m_bitrate).arg(m_params.m_width).arg(m_params.m_height)
-                                  .arg(HLS_PLAYLIST).arg(m_params.m_videoCodec)/*.arg(AUDIO_CODEC_ISO)*/.toLocal8Bit());
+                                  .arg(HLS_PLAYLIST, m_params.m_videoCodec)/*.arg(AUDIO_CODEC_ISO)*/.toLocal8Bit());
     m_paramsLock.unlock();
     return result;
 }
@@ -576,19 +576,18 @@ QByteArray TorcCameraVideoOutput::GetDashPlaylist(void)
 
     m_paramsLock.lockForRead();
     double duration = m_params.m_segmentLength / (float)m_params.m_frameRate;
-    QByteArray result(dash.arg(start)
-                          .arg(QString::number(duration * 5, 'f', 2))
-                          .arg(QString::number(duration * 4, 'f', 2))
-                          .arg(QString::number(duration * 2, 'f', 2))
-                          .arg(TorcHTTPRequest::ResponseTypeToString(HTTPResponseMP4/*HTTPResponseMPEGTS*/))
-                          .arg(m_params.m_width)
-                          .arg(m_params.m_height)
-                          .arg(m_params.m_bitrate)
-                          .arg(QString("%1").arg(m_params.m_videoCodec))
-                          //.arg(QString("%1,%2").arg(VIDEO_CODEC_ISO).arg(AUDIO_CODEC_ISO))
-                          .arg(QString("%1").arg(m_params.m_frameRate))
-                          .arg(duration * m_params.m_timebase)
-                          .arg(m_params.m_timebase).toLocal8Bit());
+    QByteArray result(dash.arg(start,
+                               QString::number(duration * 5, 'f', 2),
+                               QString::number(duration * 4, 'f', 2),
+                               QString::number(duration * 2, 'f', 2))
+                          .arg(TorcHTTPRequest::ResponseTypeToString(HTTPResponseMP4/*HTTPResponseMPEGTS*/),
+                               QString::number(m_params.m_width),
+                               QString::number(m_params.m_height),
+                               QString::number(m_params.m_bitrate),
+                               m_params.m_videoCodec,
+                               QString::number(m_params.m_frameRate),
+                               QString::number(duration * m_params.m_timebase),
+                               QString::number(m_params.m_timebase)).toLocal8Bit());
     m_paramsLock.unlock();
     return result;
 }
@@ -692,7 +691,7 @@ void TorcCameraOutputs::Create(const QVariantMap &Details)
                             if (newcamera)
                             {
                                 m_cameras.insertMulti(it.key(), newcamera);
-                                LOG(VB_GENERAL, LOG_INFO, QString("New '%1' camera '%2'").arg(it.key()).arg(newcamera->GetUniqueId()));
+                                LOG(VB_GENERAL, LOG_INFO, QString("New '%1' camera '%2'").arg(it.key(), newcamera->GetUniqueId()));
                                 break;
                             }
                         }

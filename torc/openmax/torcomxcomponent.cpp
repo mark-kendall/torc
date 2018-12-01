@@ -126,8 +126,7 @@ void TorcOMXComponent::AnalysePorts(OMX_INDEXTYPE Domain)
     if (input || output)
     {
         LOG(VB_GENERAL, LOG_INFO, QString("%1, %2: %3 input ports (%4), %5 output ports (%6)")
-            .arg(m_componentName).arg(DomainToString(Domain)).arg(input)
-            .arg(inports).arg(output).arg(outports));
+            .arg(m_componentName, DomainToString(Domain)).arg(input).arg(inports).arg(output).arg(outports));
     }
 }
 
@@ -238,7 +237,7 @@ OMX_ERRORTYPE TorcOMXComponent::SetState(OMX_STATETYPE State, bool Wait/*=true*/
             error = WaitForResponse(OMX_CommandStateSet, State, 1000);
         if (OMX_ErrorSameState == error || OMX_ErrorNone == error)
         {
-            LOG(VB_GENERAL, LOG_INFO, QString("%1: Set state to %2").arg(m_componentName).arg(StateToString(State)));
+            LOG(VB_GENERAL, LOG_INFO, QString("%1: Set state to %2").arg(m_componentName, StateToString(State)));
             return OMX_ErrorNone;
         }
     }
@@ -419,7 +418,7 @@ OMX_ERRORTYPE TorcOMXComponent::EventHandler(OMX_HANDLETYPE Component, OMX_EVENT
     m_eventQueueLock.lock();
     m_eventQueue.append(TorcOMXEvent(Event, Data1, Data2));
     m_eventQueueLock.unlock();
-    LOG(VB_GENERAL, LOG_DEBUG, QString("%1: Event %2 %3 %4").arg(m_componentName).arg(EventToString(Event)).arg(Data1).arg(Data2));
+    LOG(VB_GENERAL, LOG_DEBUG, QString("%1: Event %2 %3 %4").arg(m_componentName, EventToString(Event)).arg(Data1).arg(Data2));
 
     m_eventQueueWait.wakeAll();
 
@@ -468,7 +467,7 @@ OMX_ERRORTYPE TorcOMXComponent::WaitForResponse(OMX_U32 Command, OMX_U32 Data2, 
     timer.start();
 
     LOG(VB_GENERAL, LOG_DEBUG, QString("%1: Waiting for %2 %3")
-        .arg(m_componentName).arg(CommandToString((OMX_COMMANDTYPE)Command)).arg(Data2));
+        .arg(m_componentName, CommandToString((OMX_COMMANDTYPE)Command)).arg(Data2));
 
     while (timer.elapsed() < Timeout)
     {
@@ -502,7 +501,7 @@ OMX_ERRORTYPE TorcOMXComponent::WaitForResponse(OMX_U32 Command, OMX_U32 Data2, 
                 }
 
                 LOG(VB_GENERAL, (omxerror ==  OMX_ErrorPortUnpopulated) ? LOG_DEBUG : LOG_ERR, QString("%1: Error event '%2' data2 %3")
-                    .arg(m_componentName).arg(ErrorToString(omxerror)).arg((*it).m_data2));
+                    .arg(m_componentName, ErrorToString(omxerror)).arg((*it).m_data2));
                 OMX_ERRORTYPE error = (OMX_ERRORTYPE)(*it).m_data1;
                 m_eventQueue.erase(it);
                 m_eventQueueLock.unlock();
@@ -515,7 +514,7 @@ OMX_ERRORTYPE TorcOMXComponent::WaitForResponse(OMX_U32 Command, OMX_U32 Data2, 
     }
 
     LOG(VB_GENERAL, LOG_INFO, QString("%1: Response never received for command %2 %3")
-        .arg(m_componentName).arg(CommandToString((OMX_COMMANDTYPE)Command)).arg(Data2));
+        .arg(m_componentName, CommandToString((OMX_COMMANDTYPE)Command)).arg(Data2));
     return OMX_ErrorMax;
 }
 

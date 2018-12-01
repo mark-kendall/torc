@@ -285,7 +285,7 @@ void TorcPowerUnixDBus::DeviceChanged(QDBusObjectPath Device)
 void TorcPowerUnixDBus::DBusError(QDBusError Error)
 {
     LOG(VB_GENERAL, LOG_ERR, QString("DBus callback error: %1, %2")
-        .arg(Error.name()).arg(Error.message().trimmed()));
+        .arg(Error.name(), Error.message().trimmed()));
 }
 
 void TorcPowerUnixDBus::DBusCallback(void)

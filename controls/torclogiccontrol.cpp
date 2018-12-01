@@ -84,7 +84,7 @@ TorcLogicControl::TorcLogicControl(const QString &Type, const QVariantMap &Detai
 {
     if (m_operation == TorcLogicControl::UnknownLogicType)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Unrecognised control operation '%1' for device '%2'").arg(Type).arg(uniqueId));
+        LOG(VB_GENERAL, LOG_ERR, QString("Unrecognised control operation '%1' for device '%2'").arg(Type, uniqueId));
         return;
     }
 

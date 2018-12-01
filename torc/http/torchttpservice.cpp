@@ -74,7 +74,7 @@ class MethodParameters
         // discard slots with an unsupported return type
         if (unsupportedtypes.contains(returntype))
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Method '%1' has unsupported return type '%2'").arg(Method.name().data()).arg(Method.typeName()));
+            LOG(VB_GENERAL, LOG_ERR, QString("Method '%1' has unsupported return type '%2'").arg(Method.name().data(), Method.typeName()));
             return;
         }
 
@@ -100,7 +100,7 @@ class MethodParameters
             if (unsupportedparameters.contains(type))
             {
                 LOG(VB_GENERAL, LOG_ERR, QString("Method '%1' has unsupported parameter type '%2'")
-                    .arg(Method.name().data()).arg(types[i].data()));
+                    .arg(Method.name().data(), types[i].data()));
                 return;
             }
 
@@ -144,7 +144,7 @@ class MethodParameters
                 if (it == Queries.end())
                 {
                     LOG(VB_GENERAL, LOG_ERR, QString("Parameter '%1' for method '%2' is missing")
-                        .arg(m_names[i].data()).arg(m_names[0].data()));
+                        .arg(m_names[i].data(), m_names[0].data()));
                     return QVariant();
                 }
                 SetValue(parameters[i], it.value(), m_types[i]);
@@ -362,7 +362,7 @@ TorcHTTPService::TorcHTTPService(QObject *Parent, const QString &Signature, cons
                 }
                 else
                 {
-                    LOG(VB_GENERAL, LOG_ERR, QString("Unable to determine request types of method '%1' for '%2' - ignoring").arg(name).arg(m_name));
+                    LOG(VB_GENERAL, LOG_ERR, QString("Unable to determine request types of method '%1' for '%2' - ignoring").arg(name, m_name));
                     continue;
                 }
 
@@ -382,7 +382,7 @@ TorcHTTPService::TorcHTTPService(QObject *Parent, const QString &Signature, cons
                             existing->m_method.returnType()      == method.returnType())
                         {
                             LOG(VB_GENERAL, LOG_DEBUG, QString("Method '%1' in class '%2' already found in superclass - overriding")
-                                .arg(method.methodSignature().constData()).arg(meta->className()));
+                                .arg(method.methodSignature().constData(), meta->className()));
                             existing = m_methods.take(name);
                             delete existing;
                         }
@@ -544,9 +544,9 @@ QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVarian
             if (disabled || unauthorised)
             {
                 if (disabled)
-                    LOG(VB_GENERAL, LOG_ERR, QString("'%1' method '%2' is disabled").arg(m_signature).arg(method));
+                    LOG(VB_GENERAL, LOG_ERR, QString("'%1' method '%2' is disabled").arg(m_signature, method));
                 else
-                    LOG(VB_GENERAL, LOG_ERR, QString("'%1' method '%2' unauthorised").arg(m_signature).arg(method));
+                    LOG(VB_GENERAL, LOG_ERR, QString("'%1' method '%2' unauthorised").arg(m_signature, method));
                 QVariantMap result;
                 QVariantMap error;
                 error.insert("code", -401); // HTTP 401!
@@ -705,7 +705,7 @@ QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVarian
         }
     }
 
-    LOG(VB_GENERAL, LOG_ERR, QString("'%1' service has no '%2' method").arg(m_signature).arg(method));
+    LOG(VB_GENERAL, LOG_ERR, QString("'%1' service has no '%2' method").arg(m_signature, method));
 
     QVariantMap result;
     QVariantMap error;
@@ -748,17 +748,17 @@ QVariantMap TorcHTTPService::GetServiceDetails(void)
         if (m_parent->metaObject()->indexOfSlot(QMetaObject::normalizedSignature(QString(read + "()").toLatin1())) > -1)
             description.insert("read", read);
         else
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed to deduce 'read' slot for property '%1' in service '%2'").arg(name).arg(m_signature));
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to deduce 'read' slot for property '%1' in service '%2'").arg(name, m_signature));
 
         // for writable properties, we need to infer the signature including the type
         if (property.isWritable())
         {
-            QString write = QString("Set%1%2").arg(name.left(1).toUpper()).arg(name.mid(1));
+            QString write = QString("Set%1%2").arg(name.left(1).toUpper(), name.mid(1));
 
-            if (m_parent->metaObject()->indexOfSlot(QMetaObject::normalizedSignature(QString("%1(%2)").arg(write).arg(property.typeName()).toLatin1())) > -1)
+            if (m_parent->metaObject()->indexOfSlot(QMetaObject::normalizedSignature(QString("%1(%2)").arg(write, property.typeName()).toLatin1())) > -1)
                 description.insert("write", write);
             else
-                LOG(VB_GENERAL, LOG_ERR, QString("Failed to deduce 'write' slot for property '%1' in service '%2'").arg(name).arg(m_signature));
+                LOG(VB_GENERAL, LOG_ERR, QString("Failed to deduce 'write' slot for property '%1' in service '%2'").arg(name, m_signature));
         }
 
         // and add the initial value

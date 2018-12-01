@@ -110,7 +110,7 @@ void TorcSystemNotification::Graph(QByteArray *Data)
         return;
 
     foreach (TorcNotifier* notifier, m_notifiers)
-        Data->append(QString("    \"%1\"->\"%2\"\r\n").arg(uniqueId).arg(notifier->GetUniqueId()));
+        Data->append(QString("    \"%1\"->\"%2\"\r\n").arg(uniqueId, notifier->GetUniqueId()));
 }
 
 /// Listen for system events (TorcEvent).

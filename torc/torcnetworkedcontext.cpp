@@ -401,7 +401,7 @@ void TorcNetworkService::RequestReady(TorcRPCRequest *Request)
 
         if (!success)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Call to '%1' failed (%2)").arg(m_getPeerDetailsRPC->GetMethod()).arg(message));
+            LOG(VB_GENERAL, LOG_ERR, QString("Call to '%1' failed (%2)").arg(m_getPeerDetailsRPC->GetMethod(), message));
             ScheduleRetry();
         }
 
@@ -933,7 +933,7 @@ void TorcNetworkedContext::HandleNewPeer(TorcWebSocketThread *Thread, const QVar
             if (m_discoveredServices[i]->GetUuid() == UUID && !TorcNetworkService::WeActAsServer(priority, starttime, UUID))
             {
                 LOG(VB_GENERAL, LOG_INFO, QString("Received unexpected WebSocket from peer '%1' (%2) - closing")
-                    .arg(m_discoveredServices[i]->GetName()).arg(UUID));
+                    .arg(m_discoveredServices[i]->GetName(), UUID));
                 Thread->quit();
                 return;
             }
@@ -943,7 +943,7 @@ void TorcNetworkedContext::HandleNewPeer(TorcWebSocketThread *Thread, const QVar
     TorcWebSocketThread* thread = TorcHTTPServer::TakeSocket(Thread);
     if (Thread == thread)
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Received WebSocket for new peer '%1' (%2)").arg(name).arg(UUID));
+        LOG(VB_GENERAL, LOG_INFO, QString("Received WebSocket for new peer '%1' (%2)").arg(name, UUID));
         QList<QHostAddress> addresses;
         addresses << address;
         TorcNetworkService *service = new TorcNetworkService(name, UUID, port, Data.contains("secure"), addresses);
@@ -969,7 +969,7 @@ void TorcNetworkedContext::Add(TorcNetworkService *Peer)
 
         m_serviceList.append(Peer->GetUuid());
         emit PeersChanged();
-        LOG(VB_GENERAL, LOG_INFO, QString("New Torc peer '%1' %2").arg(Peer->GetName()).arg(Peer->GetUuid()));
+        LOG(VB_GENERAL, LOG_INFO, QString("New Torc peer '%1' %2").arg(Peer->GetName(), Peer->GetUuid()));
     }
 }
 

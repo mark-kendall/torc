@@ -196,7 +196,7 @@ void TorcIOTLogger::RequestReady(TorcNetworkRequest *Request)
     {
         // not sure whether it is my network or the thingspeak server - but I get intermittent Host Not Found errors
         // which end up disabling ThingSpeak. So check for HostNotFound...
-        LOG(VB_GENERAL, LOG_ERR, QString("%2 update error '%1'").arg(TorcHTTPRequest::StatusToString((HTTPStatus)status)).arg(m_description));
+        LOG(VB_GENERAL, LOG_ERR, QString("%2 update error '%1'").arg(TorcHTTPRequest::StatusToString((HTTPStatus)status), m_description));
 
         if (Request->GetReplyError() != QNetworkReply::HostNotFoundError)
         {

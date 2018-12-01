@@ -148,13 +148,13 @@ void TorcTriggerNotification::Graph(QByteArray *Data)
         return;
 
     if (m_input)
-        Data->append(QString("    \"%2\"->\"%1\"\r\n").arg(uniqueId).arg(m_input->GetUniqueId()));
+        Data->append(QString("    \"%2\"->\"%1\"\r\n").arg(uniqueId, m_input->GetUniqueId()));
 
     foreach (TorcDevice *device, m_referenceDevices)
-        Data->append(QString("    \"%1\"->\"%2\" [style=dashed]\r\n").arg(device->GetUniqueId()).arg(uniqueId));
+        Data->append(QString("    \"%1\"->\"%2\" [style=dashed]\r\n").arg(device->GetUniqueId(), uniqueId));
 
     foreach (TorcNotifier* notifier, m_notifiers)
-        Data->append(QString("    \"%1\"->\"%2\"\r\n").arg(uniqueId).arg(notifier->GetUniqueId()));
+        Data->append(QString("    \"%1\"->\"%2\"\r\n").arg(uniqueId, notifier->GetUniqueId()));
 }
 
 void TorcTriggerNotification::InputValueChanged(double Value)
@@ -201,7 +201,7 @@ bool TorcTriggerNotification::Setup(void)
 
     if (!input)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to find input '%1' for trigger notification '%2'").arg(m_inputName).arg(uniqueId));
+        LOG(VB_GENERAL, LOG_ERR, QString("Failed to find input '%1' for trigger notification '%2'").arg(m_inputName, uniqueId));
         return false;
     }
 

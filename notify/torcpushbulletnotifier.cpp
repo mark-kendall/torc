@@ -153,7 +153,7 @@ void TorcPushbulletNotifier::RequestReady(TorcNetworkRequest *Request)
         else
         {
             QJsonDocument result = QJsonDocument::fromJson(Request->GetBuffer());
-            LOG(VB_GENERAL, LOG_ERR, QString("Pushbullet notifier '%1' - bad request ('%2')").arg(uniqueId).arg(TorcHTTPRequest::StatusToString((HTTPStatus)status)));
+            LOG(VB_GENERAL, LOG_ERR, QString("Pushbullet notifier '%1' - bad request ('%2')").arg(uniqueId, TorcHTTPRequest::StatusToString((HTTPStatus)status)));
             LOG(VB_GENERAL, LOG_ERR, QString("Pushbullet replied with:\r\n%1").arg(result.toJson().constData()));
             if (++m_badRequestCount >= MAX_BAD_REQUESTS)
             {

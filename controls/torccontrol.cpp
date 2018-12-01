@@ -220,7 +220,7 @@ bool TorcControl::Validate(void)
         // valid object
         if (!gDeviceList->contains(input))
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed to find input '%1' for '%2'").arg(input).arg(uniqueId));
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to find input '%1' for '%2'").arg(input, uniqueId));
             return false;
         }
 
@@ -231,7 +231,7 @@ bool TorcControl::Validate(void)
         if (control && !control->IsKnownOutput(uniqueId))
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Device '%1' does not recognise '%2' as an output")
-                .arg(input).arg(uniqueId));
+                .arg(input, uniqueId));
             return false;
         }
 
@@ -250,7 +250,7 @@ bool TorcControl::Validate(void)
         // valid object?
         if (!gDeviceList->contains(output))
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed to find output '%1' for device %2").arg(output).arg(uniqueId));
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to find output '%1' for device %2").arg(output, uniqueId));
             return false;
         }
 
@@ -261,7 +261,7 @@ bool TorcControl::Validate(void)
         if (out && out->HasOwner())
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Output '%1' (for control '%2') already has an owner")
-                .arg(out->GetUniqueId()).arg(uniqueId));
+                .arg(out->GetUniqueId(), uniqueId));
             return false;
         }
 
@@ -270,7 +270,7 @@ bool TorcControl::Validate(void)
         if (control && !control->IsKnownInput(uniqueId))
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Device '%1' does not recognise '%2' as an input")
-                .arg(output).arg(uniqueId));
+                .arg(output, uniqueId));
             return false;
         }
 
@@ -343,8 +343,7 @@ void TorcControl::Graph(QByteArray* Data)
         desc.append(QString(DEVICE_LINE_ITEM).arg(tr("Valid %1").arg(GetValid())));
         desc.append(QString(DEVICE_LINE_ITEM).arg(tr("Value %1").arg(GetValue())));
 
-        Data->append(QString("    \"%1\" [shape=record id=\"%1\" label=<<B>%2</B>%3>];\r\n")
-                             .arg(uniqueId).arg(userName.isEmpty() ? uniqueId : userName).arg(desc));
+        Data->append(QString("    \"%1\" [shape=record id=\"%1\" label=<<B>%2</B>%3>];\r\n").arg(uniqueId, userName.isEmpty() ? uniqueId : userName, desc));
     }
 
     QMap<QObject*,QString>::const_iterator it = m_outputs.constBegin();
@@ -354,12 +353,12 @@ void TorcControl::Graph(QByteArray* Data)
         {
             TorcOutput* output = qobject_cast<TorcOutput*>(it.key());
             QString source = passthrough ? qobject_cast<TorcInput*>(m_inputs.firstKey())->GetUniqueId() : uniqueId;
-            Data->append(QString("    \"%1\"->\"%2\"\r\n").arg(source).arg(output->GetUniqueId()));
+            Data->append(QString("    \"%1\"->\"%2\"\r\n").arg(source, output->GetUniqueId()));
         }
         else if (qobject_cast<TorcControl*>(it.key()))
         {
             TorcControl* control = qobject_cast<TorcControl*>(it.key());
-            Data->append(QString("    \"%1\"->\"%2\"\r\n").arg(uniqueId).arg(control->GetUniqueId()));
+            Data->append(QString("    \"%1\"->\"%2\"\r\n").arg(uniqueId, control->GetUniqueId()));
         }
         else if (qobject_cast<TorcNotification*>(it.key()))
         {
@@ -385,7 +384,7 @@ void TorcControl::Graph(QByteArray* Data)
         else
             LOG(VB_GENERAL, LOG_ERR, "Unknown input type");
 
-        Data->append(QString("    \"%1\"->\"%2\"\r\n").arg(inputid).arg(uniqueId));
+        Data->append(QString("    \"%1\"->\"%2\"\r\n").arg(inputid, uniqueId));
     }
 }
 
@@ -420,7 +419,7 @@ bool TorcControl::Finish(void)
             if (!output->SetOwner(this))
             {
                 LOG(VB_GENERAL, LOG_ERR, QString("Cannot set control '%1' as owner of output '%2'")
-                    .arg(uniqueId).arg(output->GetUniqueId()));
+                    .arg(uniqueId, output->GetUniqueId()));
                 return false;
             }
 
@@ -435,7 +434,7 @@ bool TorcControl::Finish(void)
             if (!control->IsKnownInput(uniqueId))
             {
                 LOG(VB_GENERAL, LOG_ERR, QString("Control '%1' does not recognise '%2' as an input")
-                    .arg(control->GetUniqueId()).arg(uniqueId));
+                    .arg(control->GetUniqueId(), uniqueId));
                 return false;
             }
 
@@ -451,7 +450,7 @@ bool TorcControl::Finish(void)
             if (!notification->IsKnownInput(uniqueId))
             {
                 LOG(VB_GENERAL, LOG_INFO, QString("Notification '%1' does not recognise '%2' as an input")
-                    .arg(notification->GetUniqueId()).arg(uniqueId));
+                    .arg(notification->GetUniqueId(), uniqueId));
                 return false;
             }
         }
@@ -478,7 +477,7 @@ bool TorcControl::Finish(void)
         if (control && !control->IsKnownOutput(uniqueId))
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Control '%1' does not recognise control '%2' as an output")
-                .arg(control->GetUniqueId()).arg(uniqueId));
+                .arg(control->GetUniqueId(), uniqueId));
             return false;
         }
 
@@ -639,7 +638,7 @@ bool TorcControl::CheckForCircularReferences(const QString &UniqueId, QString Pa
         // check first for a direct match with the output
         if (it.value() == UniqueId)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Circular reference found: %1->%2").arg(path).arg(UniqueId));
+            LOG(VB_GENERAL, LOG_ERR, QString("Circular reference found: %1->%2").arg(path, UniqueId));
             return false;
         }
 

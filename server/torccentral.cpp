@@ -196,14 +196,14 @@ TorcCentral::TorcCentral()
         }
         else
         {
-            LOG(VB_GENERAL, LOG_WARNING, QString("Failed to open '%1' for writing (err: %2)").arg(graphsvg).arg(strerror(errno)));
+            LOG(VB_GENERAL, LOG_WARNING, QString("Failed to open '%1' for writing (err: %2)").arg(graphsvg, strerror(errno)));
         }
 
         if (!created)
         {
 #endif
             // NB QProcess appears to be fatally broken. Just use system instead
-            QString command = QString("dot -Tsvg -o %1 %2").arg(graphsvg).arg(graphdot);
+            QString command = QString("dot -Tsvg -o %1 %2").arg(graphsvg, graphdot);
             int err = system(command.toLocal8Bit());
             if (err < 0)
             {
@@ -251,7 +251,7 @@ bool TorcCentral::LoadConfig(void)
 {
     bool skipvalidation = false;
 
-    if (!qgetenv("TORC_NO_VALIDATION").isEmpty())
+    if (!qEnvironmentVariableIsEmpty("TORC_NO_VALIDATION"))
     {
         LOG(VB_GENERAL, LOG_INFO, "Skipping configuration file validation (command line).");
         skipvalidation = true;

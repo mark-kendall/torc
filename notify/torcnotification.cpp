@@ -75,7 +75,7 @@ bool TorcNotification::Setup(void)
         }
         else
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Notification '%1' failed to find notifier '%2'").arg(uniqueId).arg(notifiername));
+            LOG(VB_GENERAL, LOG_ERR, QString("Notification '%1' failed to find notifier '%2'").arg(uniqueId, notifiername));
         }
     }
 

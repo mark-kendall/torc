@@ -113,7 +113,7 @@ void Torc1WireBus::Create(const QVariantMap &Details)
                     if (!details.contains("wire1serial"))
                     {
                         LOG(VB_GENERAL, LOG_ERR, QString("Cannot create 1Wire device without unique 1Wire ID ('%1' '%2')")
-                            .arg(devicetype).arg(details.value("name").toString()));
+                            .arg(devicetype, details.value("name").toString()));
                     }
                     else
                     {

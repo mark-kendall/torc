@@ -328,8 +328,8 @@ quint64 TorcBinaryPListSerialiser::BinaryFromStringList(QByteArray &Dest, const 
     QByteArray references(size * m_referenceSize, 0);
     Dest.append(references);
 
-    QStringList::const_iterator it = Value.begin();
-    for ( ; it != Value.end(); ++it)
+    QStringList::const_iterator it = Value.constBegin();
+    for ( ; it != Value.constEnd(); ++it)
         WriteReference(BinaryFromQString(Dest, (*it)), m_referenceSize, (quint8*)Dest.data(), offset);
 
     return result;
@@ -341,8 +341,8 @@ quint64 TorcBinaryPListSerialiser::BinaryFromArray(QByteArray &Dest, const QStri
     {
         int type = Value[0].type();
 
-        QVariantList::const_iterator it = Value.begin();
-        for ( ; it != Value.end(); ++it)
+        QVariantList::const_iterator it = Value.constBegin();
+        for ( ; it != Value.constEnd(); ++it)
             if ((int)(*it).type() != type)
                 return BinaryFromQString(Dest, "Error: QVariantList is not valid service return type");
     }
@@ -359,8 +359,8 @@ quint64 TorcBinaryPListSerialiser::BinaryFromArray(QByteArray &Dest, const QStri
     QByteArray references(size * m_referenceSize, 0);
     Dest.append(references);
 
-    QVariantList::const_iterator it = Value.begin();
-    for ( ; it != Value.end(); ++it)
+    QVariantList::const_iterator it = Value.constBegin();
+    for ( ; it != Value.constEnd(); ++it)
         WriteReference(BinaryFromVariant(Dest, Name, (*it)), m_referenceSize, (quint8*)Dest.data(), offset);
 
     return result;
@@ -382,8 +382,8 @@ quint64 TorcBinaryPListSerialiser::BinaryFromMap(QByteArray &Dest, const QString
     QByteArray references(size * 2 * m_referenceSize, 0);
     Dest.append(references);
 
-    QVariantMap::const_iterator it = Value.begin();
-    for ( ; it != Value.end(); ++it)
+    QVariantMap::const_iterator it = Value.constBegin();
+    for ( ; it != Value.constEnd(); ++it)
         WriteReference(BinaryFromQString(Dest, it.key()), m_referenceSize, (quint8*)Dest.data(), offset);
 
     it = Value.begin();
@@ -397,8 +397,8 @@ quint64 TorcBinaryPListSerialiser::BinaryFromQString(QByteArray &Dest, const QSt
 {
     static QTextCodec* textCodec = QTextCodec::codecForName("UTF-16BE");
 
-    QHash<QString,quint64>::const_iterator it = m_strings.find(Value);
-    if (it != m_strings.end())
+    QHash<QString,quint64>::const_iterator it = m_strings.constFind(Value);
+    if (it != m_strings.constEnd())
         return it.value();
 
     quint64 result = (quint64)m_objectOffsets.size();
@@ -502,8 +502,8 @@ void TorcBinaryPListSerialiser::CountObjects(quint64 &Count, const QVariant &Val
         case QMetaType::QVariantMap:
         {
             QVariantMap map = Value.toMap();
-            QVariantMap::const_iterator it = map.begin();
-            for ( ; it != map.end(); ++it)
+            QVariantMap::const_iterator it = map.constBegin();
+            for ( ; it != map.constEnd(); ++it)
                 CountObjects(Count, it.value());
             Count += map.size();
             return;
@@ -513,9 +513,9 @@ void TorcBinaryPListSerialiser::CountObjects(quint64 &Count, const QVariant &Val
             Count++;
             bool dict = false;
             QVariantList list = Value.toList();
-            QVariantList::const_iterator it = list.begin();
+            QVariantList::const_iterator it = list.constBegin();
             uint type = list.isEmpty() ? QMetaType::UnknownType : static_cast<QMetaType::Type>(list[0].type());
-            for ( ; it != list.end(); ++it)
+            for ( ; it != list.constEnd(); ++it)
             {
                 if ((*it).type() != type)
                     dict = true;

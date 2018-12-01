@@ -81,8 +81,7 @@ void TorcInputs::Graph(QByteArray *Data)
 
         if (label.isEmpty())
             label = id;
-        Data->append(QString("        \"%1\" [shape=record id=\"%1\" label=<<B>%2</B>%3>];\r\n")
-            .arg(id).arg(label).arg(desc));
+        Data->append(QString("        \"%1\" [shape=record id=\"%1\" label=<<B>%2</B>%3>];\r\n").arg(id, label, desc));
     }
 
     Data->append("    }\r\n\r\n");

@@ -177,7 +177,7 @@ void TorcHTTPRequest::Initialise(const QString &Method)
     else if (connection == "close")
         m_connection = HTTPConnectionClose;
 
-    LOG(VB_GENERAL, LOG_DEBUG, QString("HTTP request: path '%1' method '%2'").arg(m_path).arg(m_method));
+    LOG(VB_GENERAL, LOG_DEBUG, QString("HTTP request: path '%1' method '%2'").arg(m_path, m_method));
 }
 
 void TorcHTTPRequest::SetConnection(HTTPConnection Connection)
@@ -373,8 +373,8 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
 
             if (multipart)
             {
-                QList<QPair<quint64,quint64> >::const_iterator it = m_ranges.begin();
-                for ( ; it != m_ranges.end(); ++it)
+                QList<QPair<quint64,quint64> >::const_iterator it = m_ranges.constBegin();
+                for ( ; it != m_ranges.constEnd(); ++it)
                 {
                     QByteArray header = seperator + contentheader + QString("Content-Range: bytes %1\r\n\r\n").arg(RangeToString((*it), totalsize)).toLatin1();
                     partheaders << header;
@@ -479,9 +479,9 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
     {
         if (multipart)
         {
-            QList<QPair<quint64,quint64> >::const_iterator it = m_ranges.begin();
-            QList<QByteArray>::const_iterator bit = partheaders.begin();
-            for ( ; it != m_ranges.end(); ++it, ++bit)
+            QList<QPair<quint64,quint64> >::const_iterator it = m_ranges.constBegin();
+            QList<QByteArray>::const_iterator bit = partheaders.constBegin();
+            for ( ; it != m_ranges.constEnd(); ++it, ++bit)
             {
                 qint64 sent = Socket->write((*bit).data(), (*bit).size());
                 if ((*bit).size() != sent)
@@ -518,9 +518,9 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
         {
             QScopedPointer<QByteArray> buffer(new QByteArray(READ_CHUNK_SIZE, 0));
 
-            QList<QPair<quint64,quint64> >::const_iterator it = m_ranges.begin();
-            QList<QByteArray>::const_iterator bit = partheaders.begin();
-            for ( ; it != m_ranges.end(); ++it, ++bit)
+            QList<QPair<quint64,quint64> >::const_iterator it = m_ranges.constBegin();
+            QList<QByteArray>::const_iterator bit = partheaders.constBegin();
+            for ( ; it != m_ranges.constEnd(); ++it, ++bit)
             {
                 off64_t sent = Socket->write((*bit).data(), (*bit).size());
                 if ((*bit).size() != sent)

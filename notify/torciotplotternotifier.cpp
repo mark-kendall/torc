@@ -70,8 +70,8 @@ TorcNetworkRequest* TorcIoTPlotterNotifier::CreateRequest(void)
             if (m_reverseFields.contains(i))
             {
                 QJsonObject pair;
-                pair.insert("value", 55);//m_fieldValues[i].toLongLong());
-                //pair.insert("epoch", epoch.toLongLong());
+                pair.insert("value", m_fieldValues[i].toLongLong());
+                pair.insert("epoch", epoch.toLongLong());
                 QJsonArray values;
                 values.append(pair);
                 raw.insert(m_reverseFields[i].toLocal8Bit(), values);

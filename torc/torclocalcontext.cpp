@@ -258,7 +258,7 @@ bool TorcLocalContext::Init(void)
 
     // Qt version?
     LOG(VB_GENERAL, LOG_INFO, QString("Qt runtime version '%1' (compiled with '%2')")
-        .arg(qVersion()).arg(QT_VERSION_STR));
+        .arg(qVersion(), QT_VERSION_STR));
 
     // we don't use an admin thread as purely a server (i.e. no gui) - may need to revisit
 #ifdef TORC_TEST

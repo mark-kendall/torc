@@ -94,7 +94,7 @@ void TorcI2CBus::Create(const QVariantMap &Details)
                 if (!ok)
                 {
                     LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse I2C address from '%1' for device '%2'")
-                        .arg(details.value("address").toString()).arg(it2.key()));
+                        .arg(details.value("address").toString(), it2.key()));
                     continue;
                 }
 

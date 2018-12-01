@@ -77,11 +77,11 @@ void TorcHTTPServer::RegisterHandler(TorcHTTPHandler *Handler)
         {
             if (gHandlers.contains(signature))
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("Handler '%1' for '%2' already registered - ignoring").arg(Handler->Name()).arg(signature));
+                LOG(VB_GENERAL, LOG_ERR, QString("Handler '%1' for '%2' already registered - ignoring").arg(Handler->Name(), signature));
             }
             else if (!signature.isEmpty())
             {
-                LOG(VB_GENERAL, LOG_DEBUG, QString("Added handler '%1' for %2").arg(Handler->Name()).arg(signature));
+                LOG(VB_GENERAL, LOG_DEBUG, QString("Added handler '%1' for %2").arg(Handler->Name(), signature));
                 gHandlers.insert(signature, Handler);
                 changed = true;
             }
@@ -135,8 +135,8 @@ void TorcHTTPServer::HandleRequest(const QString &PeerAddress, int PeerPort, con
 
         QString path = Request.GetPath();
 
-        QMap<QString,TorcHTTPHandler*>::const_iterator it = gHandlers.find(path);
-        if (it != gHandlers.end())
+        QMap<QString,TorcHTTPHandler*>::const_iterator it = gHandlers.constFind(path);
+        if (it != gHandlers.constEnd())
         {
             // direct path match
             (*it)->ProcessHTTPRequest(PeerAddress, PeerPort, LocalAddress, LocalPort, Request);
@@ -144,8 +144,8 @@ void TorcHTTPServer::HandleRequest(const QString &PeerAddress, int PeerPort, con
         else
         {
             // fully recursive handler
-            it = gHandlers.begin();
-            for ( ; it != gHandlers.end(); ++it)
+            it = gHandlers.constBegin();
+            for ( ; it != gHandlers.constEnd(); ++it)
             {
                 if ((*it)->GetRecursive() && path.startsWith(it.key()))
                 {
@@ -182,8 +182,8 @@ QVariantMap TorcHTTPServer::HandleRequest(const QString &Method, const QVariant 
     if (path.startsWith(gServicesDirectory))
     {
         // NB no recursive path handling here
-        QMap<QString,TorcHTTPHandler*>::const_iterator it = gHandlers.find(path);
-        if (it != gHandlers.end())
+        QMap<QString,TorcHTTPHandler*>::const_iterator it = gHandlers.constFind(path);
+        if (it != gHandlers.constEnd())
             return (*it)->ProcessRequest(Method, Parameters, Connection, Authenticated);
     }
 
@@ -203,8 +203,8 @@ QVariantMap TorcHTTPServer::GetServiceHandlers(void)
 
     QVariantMap result;
 
-    QMap<QString,TorcHTTPHandler*>::const_iterator it = gHandlers.begin();
-    for ( ; it != gHandlers.end(); ++it)
+    QMap<QString,TorcHTTPHandler*>::const_iterator it = gHandlers.constBegin();
+    for ( ; it != gHandlers.constEnd(); ++it)
     {
         TorcHTTPService *service = dynamic_cast<TorcHTTPService*>(it.value());
         if (service)
@@ -222,8 +222,8 @@ QVariantMap TorcHTTPServer::GetServiceDescription(const QString &Service)
 {
     QReadLocker locker(gHandlersLock);
 
-    QMap<QString,TorcHTTPHandler*>::const_iterator it = gHandlers.begin();
-    for ( ; it != gHandlers.end(); ++it)
+    QMap<QString,TorcHTTPHandler*>::const_iterator it = gHandlers.constBegin();
+    for ( ; it != gHandlers.constEnd(); ++it)
     {
         if (it.value()->Name() == Service)
         {
@@ -377,12 +377,12 @@ TorcHTTPServer::TorcHTTPServer()
     if (!initialised)
     {
         initialised = true;
-        gPlatform = QString("%1, Version: %2 ").arg(TORC_TORC).arg(GIT_VERSION);
+        gPlatform = QString("%1, Version: %2 ").arg(TORC_TORC, GIT_VERSION);
 #ifdef Q_OS_WIN
         gPlatform += QString("(Windows %1.%2)").arg(LOBYTE(LOWORD(GetVersion()))).arg(HIBYTE(LOWORD(GetVersion())));
 #else
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
-        gPlatform += QString("(%1 %2)").arg(QSysInfo::kernelType()).arg(QSysInfo::kernelVersion());
+        gPlatform += QString("(%1 %2)").arg(QSysInfo::kernelType(), QSysInfo::kernelVersion());
 #else
         gPlatform += QString("(OldTorc OldVersion)");
 #endif
@@ -633,13 +633,13 @@ void TorcHTTPServer::UpdateOriginWhitelist(TorcHTTPServer::Status Status)
     // all known raw IP addresses
     QList<QHostAddress> addresses = QNetworkInterface::allAddresses();
     for (int i = 0; i < addresses.size(); ++i)
-        gOriginWhitelist += QString("%1%2 ").arg(protocol).arg(TorcNetwork::IPAddressToLiteral(addresses[i], Status.port, false));
+        gOriginWhitelist += QString("%1%2 ").arg(protocol, TorcNetwork::IPAddressToLiteral(addresses[i], Status.port, false));
 
     // and any known host names
     QStringList hosts = TorcNetwork::GetHostNames();
     foreach (QString host, hosts)
     {
-        QString newhost = QString("%1%2:%3 ").arg(protocol).arg(host).arg(Status.port);
+        QString newhost = QString("%1%2:%3 ").arg(protocol, host).arg(Status.port);
         if (!host.isEmpty() && !gOriginWhitelist.contains(newhost))
             gOriginWhitelist += newhost;
     }
@@ -802,7 +802,7 @@ QString TorcHTTPServer::ServerDescription(void)
     QString host = QHostInfo::localHostName();
     if (host.isEmpty())
         host = tr("Unknown");
-    return QString("%1@%2").arg(QCoreApplication::applicationName()).arg(host);
+    return QString("%1@%2").arg(QCoreApplication::applicationName(), host);
 }
 
 void TorcHTTPServer::Close(void)

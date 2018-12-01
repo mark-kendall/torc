@@ -257,7 +257,7 @@ int TorcCommandLine::Evaluate(int argc, const char * const *argv, bool &Exit)
             {
                 // unexpected value
                 parserror = true;
-                error = QString("Option '%1' does not expect a value ('%2')").arg(key).arg(value);
+                error = QString("Option '%1' does not expect a value ('%2')").arg(key, value);
                 break;
             }
             else

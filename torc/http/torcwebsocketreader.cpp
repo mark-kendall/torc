@@ -343,7 +343,7 @@ void TorcWebSocketReader::HandleCloseRequest(QByteArray &Close)
     }
     else
     {
-        LOG(VB_NETWORK, LOG_INFO, QString("Received Close: %1 ('%2')").arg(CloseCodeToString((CloseCode)closecode)).arg(reason));
+        LOG(VB_NETWORK, LOG_INFO, QString("Received Close: %1 ('%2')").arg(CloseCodeToString((CloseCode)closecode), reason));
     }
 
     m_closeReceived = true;
@@ -453,7 +453,7 @@ bool TorcWebSocketReader::Read(void)
 
             if (error != CloseNormal)
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("Read error: %1 (%2)").arg(CloseCodeToString(error)).arg(reason));
+                LOG(VB_GENERAL, LOG_ERR, QString("Read error: %1 (%2)").arg(CloseCodeToString(error), reason));
                 InitiateClose(error, reason);
                 return false;
             }

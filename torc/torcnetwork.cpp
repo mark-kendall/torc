@@ -137,7 +137,7 @@ void TorcNetwork::AddHostName(const QString &Host)
 
         if (gNetworkHostNames.size() > 10)
         {
-            LOG(VB_GENERAL, LOG_WARNING, QString("Number of host names > 10 - ignoring new name '%1' (%2)").arg(Host).arg(gNetworkHostNames.join(",")));
+            LOG(VB_GENERAL, LOG_WARNING, QString("Number of host names > 10 - ignoring new name '%1' (%2)").arg(Host, gNetworkHostNames.join(",")));
         }
         else if (!gNetworkHostNames.contains(Host))
         {
@@ -552,7 +552,7 @@ bool TorcNetwork::Redirected(TorcNetworkRequest *Request, QNetworkReply *Reply)
         if (newurl.isRelative())
             newurl = oldurl.resolved(newurl);
 
-        LOG(VB_GENERAL, LOG_INFO, QString("Redirected from '%1' to '%2'").arg(oldurl.toString()).arg(newurl.toString()));
+        LOG(VB_GENERAL, LOG_INFO, QString("Redirected from '%1' to '%2'").arg(oldurl.toString(), newurl.toString()));
         if (Request->m_redirectionCount++ < DEFAULT_MAX_REDIRECTIONS)
         {
             // delete the reply and create a new one
@@ -763,7 +763,7 @@ void TorcNetwork::UpdateConfiguration(bool Creating)
 
         if (m_configuration.isValid())
         {
-            LOG(VB_GENERAL, LOG_INFO, QString("Network interface: %1 Bearer: %2").arg(configuration.name()).arg(configuration.bearerTypeName()));
+            LOG(VB_GENERAL, LOG_INFO, QString("Network interface: %1 Bearer: %2").arg(configuration.name(), configuration.bearerTypeName()));
             m_online = true;
         }
         else
