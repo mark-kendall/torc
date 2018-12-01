@@ -58,7 +58,7 @@ bool TorcQThread::IsMainThread(void)
 
 void TorcQThread::InitRand(void)
 {
-    qsrand(QDateTime::currentDateTime().toTime_t() ^ QTime::currentTime().msec());
+    qsrand(QDateTime::currentDateTimeUtc().toTime_t() ^ QTime::currentTime().msec());
 }
 
 TorcQThread::TorcQThread(const QString &Name)
