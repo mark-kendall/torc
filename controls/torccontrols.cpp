@@ -45,45 +45,38 @@ void TorcControls::Create(const QVariantMap &Details)
 {
     QWriteLocker locker(&m_handlerLock);
 
-    QVariantMap::const_iterator it = Details.constBegin();
-    for( ; it != Details.constEnd(); ++it)
+    QVariantMap::const_iterator it = Details.constFind("controls");
+    if (Details.constEnd() == it)
+        return;
+
+    QVariantMap control = it.value().toMap();
+    it = control.constBegin();
+    for ( ; it != control.constEnd(); ++it)
     {
-        if (it.key() != "controls")
-            continue;
-
-        QVariantMap control       = it.value().toMap();
-        QVariantMap::iterator it2 = control.begin();
-        for ( ; it2 != control.end(); ++it2)
+        TorcControl::Type type = (TorcControl::Type)TorcCoreUtils::StringToEnum<TorcControl::Type>(it.key());
+        if (type == TorcControl::Unknown)
         {
-            TorcControl::Type type = (TorcControl::Type)TorcCoreUtils::StringToEnum<TorcControl::Type>(it2.key());
+            LOG(VB_GENERAL, LOG_ERR, QString("Unknown control type '%1'").arg(it.key()));
+            continue;
+        }
 
-            // logic, timer or transition
-            if (type == TorcControl::Unknown)
+        QVariantMap controls = it.value().toMap();
+        QVariantMap::const_iterator it2 = controls.constBegin();
+        for ( ; it2 != controls.constEnd(); ++it2)
+        {
+            QVariantMap details = it2.value().toMap();
+            if (!details.contains("name"))
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("Unknown control type '%1'").arg(it2.key()));
+                LOG(VB_GENERAL, LOG_ERR, QString("Ignoring control type '%1' with no <name>").arg(TorcCoreUtils::EnumToLowerString<TorcControl::Type>(type)));
                 continue;
             }
 
-            QVariantMap controls = it2.value().toMap();
-            QVariantMap::iterator it3 = controls.begin();
-            for ( ; it3 != controls.end(); ++it3)
+            switch (type)
             {
-                QVariantMap details = it3.value().toMap();
-
-                if (!details.contains("name"))
-                {
-                    LOG(VB_GENERAL, LOG_ERR, QString("Ignoring control type '%1' with no <name>").arg(TorcCoreUtils::EnumToLowerString<TorcControl::Type>(type)));
-                    continue;
-                }
-
-                TorcControl* control = nullptr;
-                if (type == TorcControl::Logic)
-                    control = new TorcLogicControl(it3.key(), details);
-                else if (type == TorcControl::Timer)
-                    control = new TorcTimerControl(it3.key(), details);
-                else
-                    control = new TorcTransitionControl(it3.key(), details);
-                controlList.append(control);
+                case TorcControl::Logic:      controlList.append(new TorcLogicControl(it2.key(), details));
+                case TorcControl::Timer:      controlList.append(new TorcTimerControl(it2.key(), details));
+                case TorcControl::Transition: controlList.append(new TorcTransitionControl(it2.key(), details));
+                default: break;
             }
         }
     }
@@ -159,9 +152,9 @@ void TorcControls::SubscriberDeleted(QObject *Subscriber)
 
 QVariantMap TorcControls::GetControlList(void)
 {
-    QVariantMap result;
     QReadLocker locker(&m_handlerLock);
 
+    QVariantMap result;
     // iterate over our list for each control type
     for (int type = TorcControl::Unknown; type < TorcControl::MaxType; type++)
     {
