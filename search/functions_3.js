@@ -1,7 +1,7 @@
 var searchData=
 [
   ['data',['Data',['../d6/d78/class_torc_event.html#a8e9b1456a4112c25444dc3a502a82ca7',1,'TorcEvent']]],
-  ['datetimefromstring',['DateTimeFromString',['../d5/dfc/class_torc_core_utils.html#a118850206711512d204b652cc8c58579',1,'TorcCoreUtils']]],
+  ['datetimefromstring',['DateTimeFromString',['../df/d4d/namespace_torc_core_utils.html#a118850206711512d204b652cc8c58579',1,'TorcCoreUtils']]],
   ['dbuscallback',['DBusCallback',['../d6/df0/class_torc_power_unix_d_bus.html#a55d1d4e86d3e7af12c9f0171b2305ba1',1,'TorcPowerUnixDBus']]],
   ['dbuserror',['DBusError',['../d6/df0/class_torc_power_unix_d_bus.html#a61f88cf653f2197257f555031fbc407a',1,'TorcPowerUnixDBus']]],
   ['debug',['Debug',['../d7/da5/class_torc_power.html#ab0e74ea6d047e3a8c3e48090579669ef',1,'TorcPower']]],

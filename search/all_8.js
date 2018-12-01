@@ -12,7 +12,7 @@ var searchData=
   ['handlerschanged',['HandlersChanged',['../db/dc7/class_torc_h_t_t_p_server.html#afef03317c15b44618d375d0c02fc105c',1,'TorcHTTPServer::HandlersChanged()'],['../d1/d54/class_torc_h_t_t_p_services.html#a28fbab2c5181f0bcc899525dc83a7cf2',1,'TorcHTTPServices::HandlersChanged()']]],
   ['handlesubscriberdeleted',['HandleSubscriberDeleted',['../d6/d70/class_torc_h_t_t_p_service.html#acd54087b95fabdfb71fb7e7e7ffa90c9',1,'TorcHTTPService']]],
   ['hasowner',['HasOwner',['../d1/dc7/class_torc_output.html#a297350232eac419cac92d08c114c15eb',1,'TorcOutput']]],
-  ['haszlib',['HasZlib',['../d5/dfc/class_torc_core_utils.html#ade5f57357433a8fc3952e67dc2263e69',1,'TorcCoreUtils']]],
+  ['haszlib',['HasZlib',['../df/d4d/namespace_torc_core_utils.html#ade5f57357433a8fc3952e67dc2263e69',1,'TorcCoreUtils']]],
   ['headers',['Headers',['../da/dfc/class_torc_h_t_t_p_request.html#a9e82b042fb67936910250c4833a62c1c',1,'TorcHTTPRequest']]],
   ['headerscomplete',['HeadersComplete',['../d2/d37/class_torc_h_t_t_p_reader.html#a7ba4ef0a58ad1ae40a4633e74ea1319b',1,'TorcHTTPReader']]],
   ['help',['Help',['../dc/dee/class_torc_command_line.html#a1ce038f9cd42849bc4cdb065819afa63afb7801414ccfca1f775128ada7bc917f',1,'TorcCommandLine']]],

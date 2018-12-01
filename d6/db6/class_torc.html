@@ -40,6 +40,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
     <ul class="tablist">
       <li><a href="../../index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="../../pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="../../namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="../../annotated.html"><span>Classes</span></a></li>
       <li><a href="../../files.html"><span>Files</span></a></li>
       <li>
@@ -86,7 +87,6 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
-<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="../../d2/d1b/class_torc-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">Torc Class Reference</div>  </div>
@@ -137,15 +137,6 @@ Public Types</h2></td></tr>
 <br />
  }</td></tr>
 <tr class="separator:ae24951db8926b98a75762aef8448e473"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
-Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a072fdb5bbcbbbe8af1f6b1d093c37aa5"><td class="memItemLeft" align="right" valign="top">static QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/db6/class_torc.html#a072fdb5bbcbbbe8af1f6b1d093c37aa5">ActionToString</a> (enum <a class="el" href="../../d6/db6/class_torc.html#ae24951db8926b98a75762aef8448e473">Actions</a> Action)</td></tr>
-<tr class="memdesc:a072fdb5bbcbbbe8af1f6b1d093c37aa5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the string describing the given action.  <a href="#a072fdb5bbcbbbe8af1f6b1d093c37aa5">More...</a><br /></td></tr>
-<tr class="separator:a072fdb5bbcbbbe8af1f6b1d093c37aa5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a902cfc75d86c7d6aefccd17d956eeb3f"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/db6/class_torc.html#a902cfc75d86c7d6aefccd17d956eeb3f">StringToAction</a> (const QString &amp;Action, bool CaseSensitive=<a class="el" href="../../d1/d37/torcloggingdefs_8h.html#a93519f65dd0ef21fc5be0c286a833ae4">false</a>)</td></tr>
-<tr class="memdesc:a902cfc75d86c7d6aefccd17d956eeb3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the <a class="el" href="../../d6/db6/class_torc.html">Torc</a> action that matches the given string.  <a href="#a902cfc75d86c7d6aefccd17d956eeb3f">More...</a><br /></td></tr>
-<tr class="separator:a902cfc75d86c7d6aefccd17d956eeb3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock">
@@ -225,82 +216,13 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a072fdb5bbcbbbe8af1f6b1d093c37aa5"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">QString Torc::ActionToString </td>
-          <td>(</td>
-          <td class="paramtype">enum <a class="el" href="../../d6/db6/class_torc.html#ae24951db8926b98a75762aef8448e473">Actions</a>&#160;</td>
-          <td class="paramname"><em>Action</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Return the string describing the given action. </p>
-
-<p>Definition at line <a class="el" href="../../da/d67/torclocalcontext_8cpp_source.html#l00067">67</a> of file <a class="el" href="../../da/d67/torclocalcontext_8cpp_source.html">torclocalcontext.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a902cfc75d86c7d6aefccd17d956eeb3f"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">int Torc::StringToAction </td>
-          <td>(</td>
-          <td class="paramtype">const QString &amp;&#160;</td>
-          <td class="paramname"><em>Action</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>CaseSensitive</em> = <code><a class="el" href="../../d1/d37/torcloggingdefs_8h.html#a93519f65dd0ef21fc5be0c286a833ae4">false</a></code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Return the <a class="el" href="../../d6/db6/class_torc.html">Torc</a> action that matches the given string. </p>
-<dl class="section note"><dt>Note</dt><dd>QMetaEnum::keyToValue is case sensitive but this routine is used to validate system events from the config file - and we cannot be too picky about case. So default to a case insensitive search. </dd></dl>
-
-<p>Definition at line <a class="el" href="../../da/d67/torclocalcontext_8cpp_source.html#l00081">81</a> of file <a class="el" href="../../da/d67/torclocalcontext_8cpp_source.html">torclocalcontext.cpp</a>.</p>
-
-</div>
-</div>
-<hr/>The documentation for this class was generated from the following files:<ul>
+<hr/>The documentation for this class was generated from the following file:<ul>
 <li><a class="el" href="../../dd/dbd/torclocalcontext_8h_source.html">torclocalcontext.h</a></li>
-<li><a class="el" href="../../da/d67/torclocalcontext_8cpp_source.html">torclocalcontext.cpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Nov 30 2018 15:27:59 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Dec 1 2018 09:52:54 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

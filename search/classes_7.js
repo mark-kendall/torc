@@ -35,7 +35,6 @@ var searchData=
   ['torccommandline',['TorcCommandLine',['../dc/dee/class_torc_command_line.html',1,'']]],
   ['torccontrol',['TorcControl',['../d1/d34/class_torc_control.html',1,'']]],
   ['torccontrols',['TorcControls',['../d9/dac/class_torc_controls.html',1,'']]],
-  ['torccoreutils',['TorcCoreUtils',['../d5/dfc/class_torc_core_utils.html',1,'']]],
   ['torcdb',['TorcDB',['../d1/d2e/class_torc_d_b.html',1,'']]],
   ['torcdevice',['TorcDevice',['../d5/d76/class_torc_device.html',1,'']]],
   ['torcdevicehandler',['TorcDeviceHandler',['../dc/dfc/class_torc_device_handler.html',1,'']]],

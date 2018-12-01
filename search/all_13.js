@@ -12,7 +12,6 @@ var searchData=
   ['teardown',['TearDown',['../d0/d9f/class_torc_bonjour.html#a03d9612d584534def92e2658c84c850d',1,'TorcBonjour::TearDown()'],['../d7/d17/class_torc_local_context.html#aa32a79d18b005ec505118ea24a7053b9',1,'TorcLocalContext::TearDown()'],['../d7/da5/class_torc_power.html#a115a907966c7bbeec85a0239a1b05cfc',1,'TorcPower::TearDown()']]],
   ['temperature',['Temperature',['../d8/d61/class_torc_input.html#afb288ada1ecb4b2593398a9ae8df145aacc28a9a05702859b3ffff0670b23b57c',1,'TorcInput::Temperature()'],['../d1/dc7/class_torc_output.html#a68bfe71abbe6a4a7634c22458da29391a085b87c01fa46e403caa9f0a4d7f33cc',1,'TorcOutput::Temperature()']]],
   ['temperatureunits',['TemperatureUnits',['../d9/d56/class_torc_central.html#af007e56605ccea8cc30e355e9085fae2',1,'TorcCentral::TemperatureUnits()'],['../d9/d56/class_torc_central.html#a2f11dde886dfd9e8c601395944be6b8e',1,'TorcCentral::temperatureUnits()']]],
-  ['temperatureunitstostring',['TemperatureUnitsToString',['../d9/d56/class_torc_central.html#a96d5c3ff2653943f4cd25c25633874da',1,'TorcCentral']]],
   ['testserialisers',['TestSerialisers',['../df/dc8/class_test_serialisers.html',1,'']]],
   ['testserialisers_2ecpp',['testserialisers.cpp',['../dc/d6d/testserialisers_8cpp.html',1,'']]],
   ['testserialisers_2eh',['testserialisers.h',['../d4/d0c/testserialisers_8h.html',1,'']]],
@@ -132,7 +131,7 @@ var searchData=
   ['torccontrols',['TorcControls',['../d9/dac/class_torc_controls.html',1,'TorcControls'],['../d1/d34/class_torc_control.html#a7c215486ff73968176ff7b2acc5e8083',1,'TorcControl::TorcControls()']]],
   ['torccontrols_2ecpp',['torccontrols.cpp',['../d4/d91/torccontrols_8cpp.html',1,'']]],
   ['torccontrols_2eh',['torccontrols.h',['../db/d27/torccontrols_8h.html',1,'']]],
-  ['torccoreutils',['TorcCoreUtils',['../d5/dfc/class_torc_core_utils.html',1,'']]],
+  ['torccoreutils',['TorcCoreUtils',['../df/d4d/namespace_torc_core_utils.html',1,'']]],
   ['torccoreutils_2ecpp',['torccoreutils.cpp',['../d1/d98/torccoreutils_8cpp.html',1,'']]],
   ['torccoreutils_2eh',['torccoreutils.h',['../d1/d49/torccoreutils_8h.html',1,'']]],
   ['torcdb',['TorcDB',['../d1/d2e/class_torc_d_b.html',1,'TorcDB'],['../d1/d2e/class_torc_d_b.html#a92348e9893800ec8bae5ad3b4dba0342',1,'TorcDB::TorcDB()']]],
@@ -529,5 +528,5 @@ var searchData=
   ['trynotify',['TryNotify',['../d0/db9/class_torc_i_o_t_logger.html#a47917ff5decf4a7f9710f0128bbbc210',1,'TorcIOTLogger']]],
   ['txtrecordtomap',['TxtRecordToMap',['../d0/d9f/class_torc_bonjour.html#a6d602ba5fb9021f2cb7be12ecc90e70a',1,'TorcBonjour']]],
   ['type',['Type',['../d1/d34/class_torc_control.html#a9674689dc841799e823c26856123a8b0',1,'TorcControl::Type()'],['../d8/d61/class_torc_input.html#afb288ada1ecb4b2593398a9ae8df145a',1,'TorcInput::Type()'],['../d1/dc7/class_torc_output.html#a68bfe71abbe6a4a7634c22458da29391',1,'TorcOutput::Type()'],['../dd/d69/class_torc_setting.html#a8fde92f4624b2ba1c9ec6a2bc910ecb5',1,'TorcSetting::Type()'],['../df/dd2/class_log_item.html#af55b2ff94a7fbf8d818dcda9e768fa05',1,'LogItem::type()']]],
-  ['typetostring',['TypeToString',['../d1/d34/class_torc_control.html#ad22db3f90fac5ac863209990900fbcb6',1,'TorcControl::TypeToString()'],['../d8/d61/class_torc_input.html#a9f34862e2d832febd71b31fe9f8394cd',1,'TorcInput::TypeToString()'],['../d1/dc7/class_torc_output.html#abda35f186a5f1a93f89b190a84034a03',1,'TorcOutput::TypeToString()'],['../dd/d69/class_torc_setting.html#a5ac17804d42082f5713cff19ef2ec60c',1,'TorcSetting::TypeToString()']]]
+  ['typetostring',['TypeToString',['../d1/d34/class_torc_control.html#ad22db3f90fac5ac863209990900fbcb6',1,'TorcControl']]]
 ];

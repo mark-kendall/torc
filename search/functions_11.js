@@ -6,7 +6,6 @@ var searchData=
   ['takesocketpriv',['TakeSocketPriv',['../db/dc7/class_torc_h_t_t_p_server.html#a1c7c7c2243e2d64a000d9227d0c303aa',1,'TorcHTTPServer']]],
   ['takestills',['TakeStills',['../d3/dfd/class_torc_camera_device.html#aab8573ec3aebd6e118bf4f244017e354',1,'TorcCameraDevice::TakeStills()'],['../d4/dbb/class_torc_camera_stills_output.html#ac0fbd550e068e78f5bcccc5d24c1c69c',1,'TorcCameraStillsOutput::TakeStills()'],['../de/dc9/class_torc_camera_thread.html#a8cede6ea194f351b153bbeb4c280f7d0',1,'TorcCameraThread::TakeStills()']]],
   ['teardown',['TearDown',['../d0/d9f/class_torc_bonjour.html#a03d9612d584534def92e2658c84c850d',1,'TorcBonjour::TearDown()'],['../d7/d17/class_torc_local_context.html#aa32a79d18b005ec505118ea24a7053b9',1,'TorcLocalContext::TearDown()'],['../d7/da5/class_torc_power.html#a115a907966c7bbeec85a0239a1b05cfc',1,'TorcPower::TearDown()']]],
-  ['temperatureunitstostring',['TemperatureUnitsToString',['../d9/d56/class_torc_central.html#a96d5c3ff2653943f4cd25c25633874da',1,'TorcCentral']]],
   ['testtorclocalcontext',['TestTorcLocalContext',['../dc/d01/class_test_torc_local_context.html#aaee90a51659f7e45ca1e6d821815033e',1,'TestTorcLocalContext']]],
   ['tick',['Tick',['../d6/d7b/class_torc_time.html#ad0e2b2366316a77ae6ed8a89dedffbed',1,'TorcTime']]],
   ['timecheck',['TimeCheck',['../df/d01/class_torc_camera_video_output.html#a24e1b7ea538621b124527421ecb0ed00',1,'TorcCameraVideoOutput']]],
@@ -180,5 +179,5 @@ var searchData=
   ['tryconnect',['TryConnect',['../dd/d3a/class_torc_network_service.html#a25801b8d95abe55ae17fc1fe38c71b97',1,'TorcNetworkService']]],
   ['trynotify',['TryNotify',['../d0/db9/class_torc_i_o_t_logger.html#a47917ff5decf4a7f9710f0128bbbc210',1,'TorcIOTLogger']]],
   ['txtrecordtomap',['TxtRecordToMap',['../d0/d9f/class_torc_bonjour.html#a6d602ba5fb9021f2cb7be12ecc90e70a',1,'TorcBonjour']]],
-  ['typetostring',['TypeToString',['../d1/d34/class_torc_control.html#ad22db3f90fac5ac863209990900fbcb6',1,'TorcControl::TypeToString()'],['../d8/d61/class_torc_input.html#a9f34862e2d832febd71b31fe9f8394cd',1,'TorcInput::TypeToString()'],['../d1/dc7/class_torc_output.html#abda35f186a5f1a93f89b190a84034a03',1,'TorcOutput::TypeToString()'],['../dd/d69/class_torc_setting.html#a5ac17804d42082f5713cff19ef2ec60c',1,'TorcSetting::TypeToString()']]]
+  ['typetostring',['TypeToString',['../d1/d34/class_torc_control.html#ad22db3f90fac5ac863209990900fbcb6',1,'TorcControl']]]
 ];
