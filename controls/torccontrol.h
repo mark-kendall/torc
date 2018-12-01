@@ -22,11 +22,9 @@ class TorcControl : public TorcDevice, public TorcHTTPService
   public:
     enum Type
     {
-        Unknown,
         Logic,
         Timer,
-        Transition,
-        MaxType
+        Transition
     };
 
     Q_ENUM(Type)

@@ -53,8 +53,8 @@ void TorcControls::Create(const QVariantMap &Details)
     it = control.constBegin();
     for ( ; it != control.constEnd(); ++it)
     {
-        TorcControl::Type type = (TorcControl::Type)TorcCoreUtils::StringToEnum<TorcControl::Type>(it.key());
-        if (type == TorcControl::Unknown)
+        int type = TorcCoreUtils::StringToEnum<TorcControl::Type>(it.key());
+        if (type == -1)
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Unknown control type '%1'").arg(it.key()));
             continue;
@@ -67,15 +67,15 @@ void TorcControls::Create(const QVariantMap &Details)
             QVariantMap details = it2.value().toMap();
             if (!details.contains("name"))
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("Ignoring control type '%1' with no <name>").arg(TorcCoreUtils::EnumToLowerString<TorcControl::Type>(type)));
+                LOG(VB_GENERAL, LOG_ERR, QString("Ignoring control type '%1' with no <name>").arg(TorcCoreUtils::EnumToLowerString<TorcControl::Type>((TorcControl::Type)type)));
                 continue;
             }
 
-            switch (type)
+            switch ((TorcControl::Type)type)
             {
-                case TorcControl::Logic:      controlList.append(new TorcLogicControl(it2.key(), details));
-                case TorcControl::Timer:      controlList.append(new TorcTimerControl(it2.key(), details));
-                case TorcControl::Transition: controlList.append(new TorcTransitionControl(it2.key(), details));
+                case TorcControl::Logic:      controlList.append(new TorcLogicControl(it2.key(), details)); break;
+                case TorcControl::Timer:      controlList.append(new TorcTimerControl(it2.key(), details)); break;
+                case TorcControl::Transition: controlList.append(new TorcTransitionControl(it2.key(), details)); break;
                 default: break;
             }
         }
@@ -155,9 +155,11 @@ QVariantMap TorcControls::GetControlList(void)
     QReadLocker locker(&m_handlerLock);
 
     QVariantMap result;
-    // iterate over our list for each control type
-    for (int type = TorcControl::Unknown; type < TorcControl::MaxType; type++)
+    QMetaEnum meta = QMetaEnum::fromType<TorcControl::Type>();
+    int count = meta.keyCount() - 1;
+    for ( ; count >= 0; --count)
     {
+        TorcControl::Type type = (TorcControl::Type)meta.value(count);
         QStringList controlsfortype;
         foreach (TorcControl *control, controlList)
             if (control->GetType() == type)
@@ -167,15 +169,10 @@ QVariantMap TorcControls::GetControlList(void)
             result.insert(TorcCoreUtils::EnumToLowerString<TorcControl::Type>(static_cast<TorcControl::Type>(type)), controlsfortype);
     }
     return result;
-
 }
 
 QStringList TorcControls::GetControlTypes(void) const
 {
-    QStringList result;
-        for (int i = 0; i < TorcControl::MaxType; ++i)
-            result << TorcCoreUtils::EnumToLowerString<TorcControl::Type>((TorcControl::Type)i);
-    return result;
-
+    return TorcCoreUtils::EnumList<TorcControl::Type>();
 }
 
