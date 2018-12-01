@@ -31,11 +31,21 @@ namespace TorcCoreUtils
         if (CaseSensitive)
             return metaEnum.keyToValue(Value.toLatin1());
         QByteArray value = Value.toLower().toLatin1();
-        int count = metaEnum.keyCount();
-        for (int i = 0; i < count; i++)
-            if (qstrcmp(value, QByteArray(metaEnum.key(i)).toLower()) == 0)
-                return metaEnum.value(i);
+        int count = metaEnum.keyCount() - 1;
+        for ( ; count >= 0; --count)
+            if (qstrcmp(value, QByteArray(metaEnum.key(count)).toLower()) == 0)
+                return metaEnum.value(count);
         return -1; // for consistency with QMetaEnum::keyToValue
+    }
+
+    template <typename T> QStringList EnumList()
+    {
+        const QMetaEnum metaEnum = QMetaEnum::fromType<T>();
+        int count = metaEnum.keyCount() - 1;
+        QStringList result;
+        for ( ; count >= 0; --count)
+            result << QString(metaEnum.key(count)).toLower();
+        return result;
     }
 }
 
