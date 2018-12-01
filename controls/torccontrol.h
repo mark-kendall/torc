@@ -29,8 +29,8 @@ class TorcControl : public TorcDevice, public TorcHTTPService
         MaxType
     };
 
-    static TorcControl::Type      StringToType      (const QString &Type);
-    static QString                TypeToString      (TorcControl::Type Type);
+    Q_ENUM(Type)
+
     static bool                   ParseTimeString   (const QString &Time, int &Days, int &Hours,
                                                      int &Minutes, int &Seconds, quint64 &DurationInSeconds);
     static QString                DurationToString  (int Days, quint64 Duration);

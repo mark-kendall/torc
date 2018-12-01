@@ -22,6 +22,7 @@
 
 // Torc
 #include "torclogging.h"
+#include "torccoreutils.h"
 #include "torclogiccontrol.h"
 #include "torctimercontrol.h"
 #include "torctransitioncontrol.h"
@@ -54,7 +55,7 @@ void TorcControls::Create(const QVariantMap &Details)
         QVariantMap::iterator it2 = control.begin();
         for ( ; it2 != control.end(); ++it2)
         {
-            TorcControl::Type type = TorcControl::StringToType(it2.key());
+            TorcControl::Type type = (TorcControl::Type)TorcCoreUtils::StringToEnum<TorcControl::Type>(it2.key());
 
             // logic, timer or transition
             if (type == TorcControl::Unknown)
@@ -71,7 +72,7 @@ void TorcControls::Create(const QVariantMap &Details)
 
                 if (!details.contains("name"))
                 {
-                    LOG(VB_GENERAL, LOG_ERR, QString("Ignoring control type '%1' with no <name>").arg(TorcControl::TypeToString(type)));
+                    LOG(VB_GENERAL, LOG_ERR, QString("Ignoring control type '%1' with no <name>").arg(TorcCoreUtils::EnumToLowerString<TorcControl::Type>(type)));
                     continue;
                 }
 
@@ -170,7 +171,7 @@ QVariantMap TorcControls::GetControlList(void)
                 controlsfortype.append(control->GetUniqueId());
 
         if (!controlsfortype.isEmpty())
-            result.insert(TorcControl::TypeToString(static_cast<TorcControl::Type>(type)), controlsfortype);
+            result.insert(TorcCoreUtils::EnumToLowerString<TorcControl::Type>(static_cast<TorcControl::Type>(type)), controlsfortype);
     }
     return result;
 
@@ -180,7 +181,7 @@ QStringList TorcControls::GetControlTypes(void) const
 {
     QStringList result;
         for (int i = 0; i < TorcControl::MaxType; ++i)
-            result << TorcControl::TypeToString((TorcControl::Type)i);
+            result << TorcCoreUtils::EnumToLowerString<TorcControl::Type>((TorcControl::Type)i);
     return result;
 
 }

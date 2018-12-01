@@ -22,35 +22,12 @@
 
 // Torc
 #include "torclogging.h"
+#include "torccoreutils.h"
 #include "torccentral.h"
 #include "torcinput.h"
 #include "torcoutput.h"
 #include "../notify/torcnotification.h"
 #include "torccontrol.h"
-
-TorcControl::Type TorcControl::StringToType(const QString &Type)
-{
-    QString type = Type.trimmed().toUpper();
-
-    if (type == "LOGIC")      return TorcControl::Logic;
-    if (type == "TIMER")      return TorcControl::Timer;
-    if (type == "TRANSITION") return TorcControl::Transition;
-
-    return TorcControl::Unknown;
-}
-
-QString TorcControl::TypeToString(TorcControl::Type Type)
-{
-    switch (Type)
-    {
-        case TorcControl::Logic:      return QString("logic");
-        case TorcControl::Timer:      return QString("timer");
-        case TorcControl::Transition: return QString("transition");
-        default: break;
-    }
-
-    return QString("Unknown");
-}
 
 /*! \brief Parse a Torc time string into days, hours, minutes and, if present, seconds.
  *
@@ -192,7 +169,7 @@ QString TorcControl::DurationToString(int Days, quint64 Duration)
 */
 TorcControl::TorcControl(TorcControl::Type Type, const QVariantMap &Details)
   : TorcDevice(false, 0, 0, QString("Control"), Details),
-    TorcHTTPService(this, CONTROLS_DIRECTORY + "/" + TypeToString(Type) + "/" + Details.value("name").toString(),
+    TorcHTTPService(this, CONTROLS_DIRECTORY + "/" + TorcCoreUtils::EnumToLowerString<TorcControl::Type>(Type) + "/" + Details.value("name").toString(),
                     Details.value("name").toString(), TorcControl::staticMetaObject, BLACKLIST),
     m_parsed(false),
     m_validated(false),
