@@ -196,7 +196,7 @@ var searchData=
   ['maximum',['Maximum',['../d5/d8f/class_torc_logic_control.html#a9a534064891b32f43f8210c3ff211b38a1076cdf22e7fcf72b51dc578fcc96133',1,'TorcLogicControl']]],
   ['maxresolution',['maxResolution',['../d9/db0/class_torc_p_w_m_output.html#a7ca0dd2cbc6fe26c40bebee02ecfd283',1,'TorcPWMOutput']]],
   ['maxtorc',['MaxTorc',['../d6/db6/class_torc.html#ae24951db8926b98a75762aef8448e473ab326e3a39dcd6352b185caa17e386445',1,'Torc']]],
-  ['maxtype',['MaxType',['../d1/d34/class_torc_control.html#a9674689dc841799e823c26856123a8b0a62338430c31bd0f993de5680f7d9af30',1,'TorcControl::MaxType()'],['../d8/d61/class_torc_input.html#afb288ada1ecb4b2593398a9ae8df145aa12ba88086f4885b529e9a789fdca6e65',1,'TorcInput::MaxType()'],['../d1/dc7/class_torc_output.html#a68bfe71abbe6a4a7634c22458da29391a6c18ff090bf8ae7e866ccfd39abc235a',1,'TorcOutput::MaxType()']]],
+  ['maxtype',['MaxType',['../d8/d61/class_torc_input.html#afb288ada1ecb4b2593398a9ae8df145aa12ba88086f4885b529e9a789fdca6e65',1,'TorcInput::MaxType()'],['../d1/dc7/class_torc_output.html#a68bfe71abbe6a4a7634c22458da29391a6c18ff090bf8ae7e866ccfd39abc235a',1,'TorcOutput::MaxType()']]],
   ['maxuser',['MaxUser',['../d6/db6/class_torc.html#ae24951db8926b98a75762aef8448e473af790a1b54020ca5c482a888d98993221',1,'Torc']]],
   ['message',['message',['../df/dd2/class_log_item.html#a07fa36379ff1c7be6990531be56ece3c',1,'LogItem']]],
   ['methodisauthorised',['MethodIsAuthorised',['../d5/d15/class_torc_h_t_t_p_handler.html#a1c097265c2fecdab79725e73bbfedeab',1,'TorcHTTPHandler']]],

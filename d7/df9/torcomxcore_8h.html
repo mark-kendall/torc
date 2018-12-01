@@ -132,7 +132,7 @@ Macros</h2></td></tr>
 <tr class="separator:aee76e73275e3eab4b8b12168ee1f555e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a40673723bd05b7de217749e909cc5370"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df9/torcomxcore_8h.html#a40673723bd05b7de217749e909cc5370">OMX_INITSTRUCTURE</a>(Struct)</td></tr>
 <tr class="separator:a40673723bd05b7de217749e909cc5370"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab22f83edaaa27dbaf0b896e0a71f886a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df9/torcomxcore_8h.html#ab22f83edaaa27dbaf0b896e0a71f886a">OMX_ERROR</a>(Error,  Component,  Message)&#160;&#160;&#160;<a class="el" href="../../d4/df9/torclogging_8h.html#a73a147108bf0df6442820b82b022ef94">LOG</a>(VB_GENERAL, LOG_ERR, QString(&quot;%1: %2 (Error '%3')&quot;).arg(Component).arg(Message).arg(<a class="el" href="../../d7/df9/torcomxcore_8h.html#a14460e458523c8a223bb23f7aa0a0235">ErrorToString</a>(Error)));</td></tr>
+<tr class="memitem:ab22f83edaaa27dbaf0b896e0a71f886a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df9/torcomxcore_8h.html#ab22f83edaaa27dbaf0b896e0a71f886a">OMX_ERROR</a>(Error,  Component,  Message)&#160;&#160;&#160;<a class="el" href="../../d4/df9/torclogging_8h.html#a73a147108bf0df6442820b82b022ef94">LOG</a>(VB_GENERAL, LOG_ERR, QString(&quot;%1: %2 (Error '%3')&quot;).arg(Component, Message, <a class="el" href="../../d7/df9/torcomxcore_8h.html#a14460e458523c8a223bb23f7aa0a0235">ErrorToString</a>(Error)));</td></tr>
 <tr class="separator:ab22f83edaaa27dbaf0b896e0a71f886a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a548f8474d9bac05c5b1d836c0a68aed0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df9/torcomxcore_8h.html#a548f8474d9bac05c5b1d836c0a68aed0">OMX_CHECK</a>(Error,  Component,  Message)&#160;&#160;&#160;if (OMX_ErrorNone != Error) { <a class="el" href="../../d7/df9/torcomxcore_8h.html#ab22f83edaaa27dbaf0b896e0a71f886a">OMX_ERROR</a>(Error, Component, Message); return Error; }</td></tr>
 <tr class="separator:a548f8474d9bac05c5b1d836c0a68aed0"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -246,7 +246,7 @@ Functions</h2></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;<a class="el" href="../../d4/df9/torclogging_8h.html#a73a147108bf0df6442820b82b022ef94">LOG</a>(VB_GENERAL, LOG_ERR, QString(&quot;%1: %2 (Error '%3')&quot;).arg(Component).arg(Message).arg(<a class="el" href="../../d7/df9/torcomxcore_8h.html#a14460e458523c8a223bb23f7aa0a0235">ErrorToString</a>(Error)));</td>
+          <td></td><td>&#160;&#160;&#160;<a class="el" href="../../d4/df9/torclogging_8h.html#a73a147108bf0df6442820b82b022ef94">LOG</a>(VB_GENERAL, LOG_ERR, QString(&quot;%1: %2 (Error '%3')&quot;).arg(Component, Message, <a class="el" href="../../d7/df9/torcomxcore_8h.html#a14460e458523c8a223bb23f7aa0a0235">ErrorToString</a>(Error)));</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -441,7 +441,7 @@ Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Dec 1 2018 09:52:54 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Dec 1 2018 19:48:44 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

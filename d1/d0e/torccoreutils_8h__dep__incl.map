@@ -1,18 +1,20 @@
 <map id="torccoreutils.h" name="torccoreutils.h">
-<area shape="rect" id="node2" href="$da/d5d/torcinput_8cpp.html" title="torcinput.cpp" alt="" coords="5,80,112,107"/>
-<area shape="rect" id="node3" href="$d1/d0c/torcinputs_8cpp.html" title="torcinputs.cpp" alt="" coords="137,80,250,107"/>
-<area shape="rect" id="node4" href="$df/dc7/torcnetworkinputs_8cpp.html" title="torcnetworkinputs.cpp" alt="" coords="275,80,437,107"/>
-<area shape="rect" id="node5" href="$dd/d56/torcsysteminputs_8cpp.html" title="torcsysteminputs.cpp" alt="" coords="461,80,621,107"/>
-<area shape="rect" id="node6" href="$d8/de9/torcsystemnotification_8cpp.html" title="torcsystemnotification.cpp" alt="" coords="646,80,837,107"/>
-<area shape="rect" id="node7" href="$d5/d6d/torcoutput_8cpp.html" title="torcoutput.cpp" alt="" coords="861,80,977,107"/>
-<area shape="rect" id="node8" href="$d5/da7/torcoutputs_8cpp.html" title="torcoutputs.cpp" alt="" coords="1001,80,1124,107"/>
-<area shape="rect" id="node9" href="$d1/d81/torccentral_8cpp.html" title="torccentral.cpp" alt="" coords="1149,80,1267,107"/>
-<area shape="rect" id="node10" href="$d6/da3/torchttprequest_8cpp.html" title="torchttprequest.cpp" alt="" coords="1291,80,1440,107"/>
-<area shape="rect" id="node11" href="$d8/db8/torcwebsockettoken_8cpp.html" title="torcwebsockettoken.cpp" alt="" coords="1465,80,1642,107"/>
-<area shape="rect" id="node12" href="$d1/d98/torccoreutils_8cpp.html" title="torccoreutils.cpp" alt="" coords="1667,80,1795,107"/>
-<area shape="rect" id="node13" href="$da/d67/torclocalcontext_8cpp.html" title="torclocalcontext.cpp" alt="" coords="1819,80,1970,107"/>
-<area shape="rect" id="node14" href="$da/d9c/torcnetwork_8cpp.html" title="torcnetwork.cpp" alt="" coords="1994,80,2118,107"/>
-<area shape="rect" id="node15" href="$d8/dcb/torcnetworkrequest_8cpp.html" title="torcnetworkrequest.cpp" alt="" coords="2143,80,2316,107"/>
-<area shape="rect" id="node16" href="$de/d3c/torcsetting_8cpp.html" title="torcsetting.cpp" alt="" coords="2341,80,2459,107"/>
-<area shape="rect" id="node17" href="$d9/de1/torcssdp_8cpp.html" title="torcssdp.cpp" alt="" coords="2484,80,2588,107"/>
+<area shape="rect" id="node2" href="$d5/d16/torccontrol_8cpp.html" title="torccontrol.cpp" alt="" coords="5,80,124,107"/>
+<area shape="rect" id="node3" href="$d4/d91/torccontrols_8cpp.html" title="torccontrols.cpp" alt="" coords="149,80,274,107"/>
+<area shape="rect" id="node4" href="$da/d5d/torcinput_8cpp.html" title="torcinput.cpp" alt="" coords="298,80,405,107"/>
+<area shape="rect" id="node5" href="$d1/d0c/torcinputs_8cpp.html" title="torcinputs.cpp" alt="" coords="429,80,543,107"/>
+<area shape="rect" id="node6" href="$df/dc7/torcnetworkinputs_8cpp.html" title="torcnetworkinputs.cpp" alt="" coords="567,80,730,107"/>
+<area shape="rect" id="node7" href="$dd/d56/torcsysteminputs_8cpp.html" title="torcsysteminputs.cpp" alt="" coords="754,80,914,107"/>
+<area shape="rect" id="node8" href="$d8/de9/torcsystemnotification_8cpp.html" title="torcsystemnotification.cpp" alt="" coords="939,80,1129,107"/>
+<area shape="rect" id="node9" href="$d5/d6d/torcoutput_8cpp.html" title="torcoutput.cpp" alt="" coords="1153,80,1269,107"/>
+<area shape="rect" id="node10" href="$d5/da7/torcoutputs_8cpp.html" title="torcoutputs.cpp" alt="" coords="1294,80,1417,107"/>
+<area shape="rect" id="node11" href="$d1/d81/torccentral_8cpp.html" title="torccentral.cpp" alt="" coords="1441,80,1560,107"/>
+<area shape="rect" id="node12" href="$d6/da3/torchttprequest_8cpp.html" title="torchttprequest.cpp" alt="" coords="1583,80,1733,107"/>
+<area shape="rect" id="node13" href="$d8/db8/torcwebsockettoken_8cpp.html" title="torcwebsockettoken.cpp" alt="" coords="1757,80,1935,107"/>
+<area shape="rect" id="node14" href="$d1/d98/torccoreutils_8cpp.html" title="torccoreutils.cpp" alt="" coords="1959,80,2087,107"/>
+<area shape="rect" id="node15" href="$da/d67/torclocalcontext_8cpp.html" title="torclocalcontext.cpp" alt="" coords="2112,80,2263,107"/>
+<area shape="rect" id="node16" href="$da/d9c/torcnetwork_8cpp.html" title="torcnetwork.cpp" alt="" coords="2287,80,2411,107"/>
+<area shape="rect" id="node17" href="$d8/dcb/torcnetworkrequest_8cpp.html" title="torcnetworkrequest.cpp" alt="" coords="2435,80,2609,107"/>
+<area shape="rect" id="node18" href="$de/d3c/torcsetting_8cpp.html" title="torcsetting.cpp" alt="" coords="2633,80,2752,107"/>
+<area shape="rect" id="node19" href="$d9/de1/torcssdp_8cpp.html" title="torcssdp.cpp" alt="" coords="2777,80,2881,107"/>
 </map>

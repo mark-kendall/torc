@@ -100,7 +100,6 @@ var searchData=
   ['stringtooperation',['StringToOperation',['../d5/d8f/class_torc_logic_control.html#a8a1c6223e6548ef8b7143715e4cbd6d1',1,'TorcLogicControl']]],
   ['stringtoranges',['StringToRanges',['../da/dfc/class_torc_h_t_t_p_request.html#a6013ebedc71f5be0381c3b5763ea83cd',1,'TorcHTTPRequest']]],
   ['stringtotimertype',['StringToTimerType',['../d6/d72/class_torc_timer_control.html#a1fe778f5263991533237d64ce9bc240f',1,'TorcTimerControl']]],
-  ['stringtotype',['StringToType',['../d1/d34/class_torc_control.html#a8d5eafe562781abc1514aa08c9ab8257',1,'TorcControl']]],
   ['subprotocolsfromprioritisedstring',['SubProtocolsFromPrioritisedString',['../d3/d9a/class_torc_web_socket_reader.html#abcbceefdad1e6575f426bd216c950530',1,'TorcWebSocketReader']]],
   ['subprotocolsfromstring',['SubProtocolsFromString',['../d3/d9a/class_torc_web_socket_reader.html#a914891256c98eeefa90011b7fc36adab',1,'TorcWebSocketReader']]],
   ['subprotocolstostring',['SubProtocolsToString',['../d3/d9a/class_torc_web_socket_reader.html#afaa4f56bb539c6cf2a5c6c25e39ee99f',1,'TorcWebSocketReader']]],
