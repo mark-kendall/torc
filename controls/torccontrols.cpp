@@ -156,8 +156,7 @@ QVariantMap TorcControls::GetControlList(void)
 
     QVariantMap result;
     QMetaEnum meta = QMetaEnum::fromType<TorcControl::Type>();
-    int count = meta.keyCount() - 1;
-    for ( ; count >= 0; --count)
+    for (int count = meta.keyCount() - 1 ; count >= 0; --count)
     {
         TorcControl::Type type = (TorcControl::Type)meta.value(count);
         QStringList controlsfortype;
