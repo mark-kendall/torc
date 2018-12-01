@@ -33,8 +33,8 @@ namespace TorcCoreUtils
         QByteArray value = Value.toLower().toLatin1();
         int count = metaEnum.keyCount();
         for (int i = 0; i < count; i++)
-            if (qstrcmp(value, QByteArray(metaEnum.key(count)).toLower()) == 0)
-                return metaEnum.value(count);
+            if (qstrcmp(value, QByteArray(metaEnum.key(i)).toLower()) == 0)
+                return metaEnum.value(i);
         return -1; // for consistency with QMetaEnum::keyToValue
     }
 }
