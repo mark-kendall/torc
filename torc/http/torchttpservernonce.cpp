@@ -99,7 +99,7 @@ void TorcHTTPServerNonce::ProcessDigestAuth(TorcHTTPRequest &Request, bool Check
 
         // create a filtered hash of the parameters
         QHash<QString,QString> params;
-        foreach (QString auth, authentication)
+        foreach (const QString &auth, authentication)
         {
             // various parameters can contain an '=' in the body, so only search for the first '='
             QString key   = auth.section('=', 0, 0).trimmed().toLower();

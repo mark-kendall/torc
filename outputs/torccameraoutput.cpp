@@ -84,10 +84,10 @@ TorcCameraStillsOutput::TorcCameraStillsOutput(const QString &ModelId, const QVa
         stillsdir.mkpath(m_stillsDirectory);
     QStringList namefilters;
     QStringList imagefilters = TorcMime::ExtensionsForType("image");
-    foreach (QString image, imagefilters)
+    foreach (const QString &image, imagefilters)
         { namefilters << QString("*." + image); }
     QFileInfoList stills = stillsdir.entryInfoList(namefilters, QDir::NoDotAndDotDot | QDir::Files | QDir::Readable, QDir::Name);
-    foreach (QFileInfo file, stills)
+    foreach (const QFileInfo &file, stills)
         m_stillsList.append(file.fileName());
 }
 
@@ -169,10 +169,6 @@ TorcCameraVideoOutput::TorcCameraVideoOutput(const QString &ModelId, const QVari
     m_networkTimeAbort(0),
     m_networkTimeRequest(nullptr)
 {
-    // keep time checks in this thread
-    connect(this, SIGNAL(CheckTime()), this, SLOT(TimeCheck()));
-    // and check initially
-    emit CheckTime();
 }
 
 TorcCameraVideoOutput::~TorcCameraVideoOutput()
@@ -206,7 +202,7 @@ void TorcCameraVideoOutput::RequestReady(TorcNetworkRequest *Request)
 {
     if (Request && m_networkTimeRequest && (Request == m_networkTimeRequest))
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Network time  : %1").arg(Request->GetBuffer().constData()));
+        LOG(VB_GENERAL, LOG_INFO, QString("Network time (%1) : %2").arg(AKAMAI_TIME_ISO, Request->GetBuffer().constData()));
         m_networkTimeRequest->DownRef();
         m_networkTimeRequest = nullptr;
     }
@@ -225,6 +221,9 @@ QString TorcCameraVideoOutput::GetPresentationURL(void)
 void TorcCameraVideoOutput::Start(void)
 {
     Stop();
+
+    connect(this, SIGNAL(CheckTime()), this, SLOT(TimeCheck()));
+    emit CheckTime();
 
     m_threadLock.lockForWrite();
     m_paramsLock.lockForRead();
@@ -706,7 +705,7 @@ void TorcCameraOutputs::Create(const QVariantMap &Details)
     // we now need to analyse our list of cameras and combine the parameters for output devices that
     // reference the same camera device
     QList<QString> keys = m_cameras.uniqueKeys();
-    foreach (QString key, keys)
+    foreach (const QString &key, keys)
     {
         QList<TorcCameraOutput*> outputs = m_cameras.values(key);
         TorcCameraParams params;

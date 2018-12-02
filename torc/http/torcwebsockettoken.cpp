@@ -65,7 +65,7 @@ QString TorcWebSocketToken::GetWebSocketToken(const QString &Host, const QString
         if (it.value().m_timeStamp < tooold)
             old.append(it.key());
 
-    foreach (QString expire, old)
+    foreach (const QString &expire, old)
         tokens.remove(expire);
 
     // if a current token is supplied, validate it

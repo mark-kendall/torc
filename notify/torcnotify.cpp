@@ -72,7 +72,7 @@ void TorcNotify::Graph(QByteArray *Data)
         QString label = notification->GetUserName();
         QString desc;
         QStringList source = notification->GetDescription();
-        foreach (QString item, source)
+        foreach (const QString &item, source)
             if (!item.isEmpty())
                 desc.append(QString(DEVICE_LINE_ITEM).arg(item));
 
@@ -90,7 +90,7 @@ void TorcNotify::Graph(QByteArray *Data)
         QString label = notifier->GetUserName();
         QString desc;
         QStringList source = notifier->GetDescription();
-        foreach (QString item, source)
+        foreach (const QString &item, source)
             desc.append(QString(DEVICE_LINE_ITEM).arg(item));
 
         if (label.isEmpty())

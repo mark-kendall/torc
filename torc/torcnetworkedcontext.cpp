@@ -331,7 +331,7 @@ void TorcNetworkService::RequestReady(TorcNetworkRequest *Request)
             LOG(VB_GENERAL, LOG_ERR, "Error parsing API return - expecting JSON object");
         }
 
-        LOG(VB_GENERAL, LOG_ERR, QString("Response:\r\n%1").arg(jsonresult.toJson().data()));
+        LOG(VB_GENERAL, LOG_ERR, QString("Response:\r\n%1").arg(jsonresult.toJson().constData()));
 
         // try again...
         ScheduleRetry();
@@ -689,7 +689,7 @@ bool TorcNetworkedContext::event(QEvent *Event)
                             QStringList addresses = event->Data().value("addresses").toStringList();
 
                             QList<QHostAddress> hosts;
-                            foreach (QString address, addresses)
+                            foreach (const QString &address, addresses)
                             {
                                 // filter out link local addresses for external peers that have network problems...
                                 // but allow loopback addresses for other Torc instances running on the same device...

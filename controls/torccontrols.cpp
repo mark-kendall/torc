@@ -170,7 +170,7 @@ QVariantMap TorcControls::GetControlList(void)
     return result;
 }
 
-QStringList TorcControls::GetControlTypes(void) const
+QStringList TorcControls::GetControlTypes(void)
 {
     return TorcCoreUtils::EnumList<TorcControl::Type>();
 }

@@ -162,7 +162,7 @@ void TorcIOTLogger::DoNotify(void)
         if (m_timer.isActive())
             return;
 
-        StartTimer(m_lastUpdate.msecsTo(now));
+        emit StartTimer(m_lastUpdate.msecsTo(now));
         return;
     }
 

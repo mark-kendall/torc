@@ -749,7 +749,7 @@ void TorcWebSocket::SubscriberDeleted(QObject *Object)
         if (it.value() == Object)
             remove.append(it.key());
 
-    foreach (QString service, remove)
+    foreach (const QString &service, remove)
     {
         m_subscribers.remove(service, Object);
         LOG(VB_GENERAL, LOG_WARNING, QString("Removed stale subscription to '%1'").arg(service));
@@ -1121,7 +1121,7 @@ void TorcWebSocket::ProcessPayload(const QByteArray &Payload)
                             if (it.value() == parent && it.key().startsWith(method))
                                 remove.append(it.key());
 
-                        foreach (QString signature, remove)
+                        foreach (const QString &signature, remove)
                         {
                             LOG(VB_GENERAL, LOG_INFO, QString("Object '%1' unsubscribed from '%2'").arg(parent->objectName(), signature));
                             m_subscribers.remove(signature, parent);

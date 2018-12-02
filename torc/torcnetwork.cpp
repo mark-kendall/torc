@@ -654,7 +654,7 @@ QList<QSslError> TorcNetwork::AllowableSslErrors(const QList<QSslError> &Errors)
     QSslError mismatch;
 
     QList<QSslError> allowed;
-    foreach (QSslError error, Errors)
+    foreach (const QSslError &error, Errors)
     {
         if (error.error() == QSslError::SelfSignedCertificate)
         {
@@ -779,7 +779,7 @@ void TorcNetwork::UpdateConfiguration(bool Creating)
 
         QStringList addresses;
         QList<QHostAddress> entries = QNetworkInterface::allAddresses();
-        foreach (QHostAddress entry, entries)
+        foreach (const QHostAddress &entry, entries)
         {
             QString address = entry.toString();
             addresses << address;

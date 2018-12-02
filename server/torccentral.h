@@ -36,7 +36,7 @@ class TorcCentral final : public QObject, public TorcHTTPService
   public slots:
     // TorcHTTPService
     void            SubscriberDeleted     (QObject *Subscriber);
-    QString         GetTemperatureUnits   (void) const;
+    QString         GetTemperatureUnits   (void);
 
   protected:
     static TemperatureUnits gTemperatureUnits;

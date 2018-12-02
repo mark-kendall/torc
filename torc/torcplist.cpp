@@ -197,7 +197,7 @@ void TorcPList::ArrayToXML(const QVariant &Data, QXmlStreamWriter &XML)
     XML.writeStartElement("array");
 
     QList<QVariant> list = Data.toList();
-    foreach (QVariant item, list)
+    foreach (const QVariant &item, list)
         ToXML(item, XML);
 
     XML.writeEndElement();

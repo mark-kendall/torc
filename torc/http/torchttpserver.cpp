@@ -73,7 +73,7 @@ void TorcHTTPServer::RegisterHandler(TorcHTTPHandler *Handler)
         if (!Handler)
             return;
 
-        foreach (QString signature, Handler->Signature().split(","))
+        foreach (const QString &signature, Handler->Signature().split(","))
         {
             if (gHandlers.contains(signature))
             {
@@ -105,7 +105,7 @@ void TorcHTTPServer::DeregisterHandler(TorcHTTPHandler *Handler)
         if (!Handler)
             return;
 
-        foreach (QString signature, Handler->Signature().split(","))
+        foreach (const QString &signature, Handler->Signature().split(","))
         {
             QMap<QString,TorcHTTPHandler*>::iterator it = gHandlers.find(signature);
             if (it != gHandlers.end())
@@ -637,7 +637,7 @@ void TorcHTTPServer::UpdateOriginWhitelist(TorcHTTPServer::Status Status)
 
     // and any known host names
     QStringList hosts = TorcNetwork::GetHostNames();
-    foreach (QString host, hosts)
+    foreach (const QString &host, hosts)
     {
         QString newhost = QString("%1%2:%3 ").arg(protocol, host).arg(Status.port);
         if (!host.isEmpty() && !gOriginWhitelist.contains(newhost))

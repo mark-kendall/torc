@@ -146,7 +146,7 @@ void TorcCommandLine::AddPriv(const QString Keys, const QVariant &Default, const
 
     bool first = true;
     QString master;
-    foreach (QString key, keys)
+    foreach (const QString &key, keys)
     {
         if (key.contains("="))
         {

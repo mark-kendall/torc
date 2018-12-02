@@ -122,7 +122,7 @@ int TorcXSDTest::RunXSDTestSuite(TorcCommandLine *CommandLine)
 
     LOG(VB_GENERAL, LOG_INFO, QString("Found %1 files.").arg(testfiles.size()));
     int passcount = 0;
-    foreach (QString file, testfiles)
+    foreach (const QString &file, testfiles)
     {
         // these should all FAIL!
         QString path = directory + "/" + file;

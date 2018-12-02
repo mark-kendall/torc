@@ -68,7 +68,7 @@ TorcLanguage::TorcLanguage(TorcSetting *SettingParent)
 
     LOG(VB_GENERAL, LOG_INFO, QString("System language: %1 (%2) (%3)(env - %4)")
         .arg(QLocale::languageToString(m_locale.language()), QLocale::countryToString(m_locale.country()),
-             m_locale.name(), qgetenv("LANG").data()));
+             m_locale.name(), qgetenv("LANG").constData()));
 
     Initialise();
 
@@ -134,7 +134,7 @@ void TorcLanguage::SetLanguageCode(const QString &Language)
 
     LOG(VB_GENERAL, LOG_INFO, QString("Language changed: %1 (%2) (%3)(env - %4)")
         .arg(QLocale::languageToString(m_locale.language()), QLocale::countryToString(m_locale.country()),
-             m_locale.name(), qgetenv("LANG").data()));
+             m_locale.name(), qgetenv("LANG").constData()));
 
     // load the new translation. This will replace the existing translation.
     // NB it's not clear from the docs whether this is thread safe.

@@ -151,7 +151,7 @@ void TorcHTTPRequest::Initialise(const QString &Method)
                 if (url.hasQuery())
                 {
                     QStringList pairs = url.query().split('&');
-                    foreach (QString pair, pairs)
+                    foreach (const QString &pair, pairs)
                     {
                         int index = pair.indexOf('=');
                         QString key = pair.left(index);
@@ -926,7 +926,7 @@ QList<QPair<quint64,quint64> > TorcHTTPRequest::StringToRanges(const QString &Ra
         {
             QStringList rangelist = newranges[1].split(",", QString::SkipEmptyParts);
 
-            foreach (QString range, rangelist)
+            foreach (const QString &range, rangelist)
             {
                 QStringList parts = range.split("-");
 

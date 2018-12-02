@@ -11,7 +11,7 @@
 class TorcTransitionControl : public TorcControl
 {
     Q_OBJECT
-    Q_PROPERTY(double animationValue READ GetAnimationValue() WRITE SetAnimationValue(Value))
+    Q_PROPERTY(double animationValue READ GetAnimationValue() WRITE SetAnimationValue(Value) CONSTANT)
 
   public:
     TorcTransitionControl(const QString &Type, const QVariantMap &Details);

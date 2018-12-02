@@ -32,7 +32,7 @@ class TorcControls final : public QObject, public TorcHTTPService, public TorcDe
     void                SubscriberDeleted         (QObject *Subscriber);
 
     QVariantMap         GetControlList            (void);
-    QStringList         GetControlTypes           (void) const;
+    QStringList         GetControlTypes           (void);
 
   signals:
     void                ControlsChanged           (void);

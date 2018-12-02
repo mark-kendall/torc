@@ -969,7 +969,7 @@ void TorcBonjour::HostLookup(const QHostInfo &HostInfo)
 
                 QStringList addresses;
 
-                foreach (QHostAddress address, (*it).m_ipAddresses)
+                foreach (const QHostAddress &address, (*it).m_ipAddresses)
                 {
                     LOG(VB_NETWORK, LOG_INFO, QString("Address: %1").arg(address.toString()));
                     addresses << address.toString();

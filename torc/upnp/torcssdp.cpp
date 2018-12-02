@@ -126,7 +126,7 @@ void TorcSSDP::Start(void)
     // try and get the interface the network is using
     QNetworkInterface interface;
     QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
-    foreach (QNetworkInterface i, interfaces)
+    foreach (const QNetworkInterface &i, interfaces)
     {
         QNetworkInterface::InterfaceFlags flags = i.flags();
         if (flags & QNetworkInterface::IsUp &&

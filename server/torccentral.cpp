@@ -237,7 +237,7 @@ QString TorcCentral::GetUIName(void)
     return tr("Central");
 }
 
-QString TorcCentral::GetTemperatureUnits(void) const
+QString TorcCentral::GetTemperatureUnits(void)
 {
     return temperatureUnits;
 }
@@ -515,7 +515,7 @@ void TorcXSDFactory::CustomiseXSD(QByteArray &XSD)
     for ( ; factory; factory = factory->NextFactory())
         factory->GetXSD(xsds);
 
-    foreach (QString ident, identifiers)
+    foreach (const QString &ident, identifiers)
     {
         QString replacewith;
         QMultiMap<QString,QString>::const_iterator it = xsds.constBegin();

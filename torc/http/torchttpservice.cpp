@@ -74,14 +74,14 @@ class MethodParameters
         // discard slots with an unsupported return type
         if (unsupportedtypes.contains(returntype))
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Method '%1' has unsupported return type '%2'").arg(Method.name().data(), Method.typeName()));
+            LOG(VB_GENERAL, LOG_ERR, QString("Method '%1' has unsupported return type '%2'").arg(Method.name().constData(), Method.typeName()));
             return;
         }
 
         // discard overly complicated slots not supported by QMetaMethod
         if (Method.parameterCount() > 10)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Method '%1' takes more than 10 parameters - ignoring").arg(Method.name().data()));
+            LOG(VB_GENERAL, LOG_ERR, QString("Method '%1' takes more than 10 parameters - ignoring").arg(Method.name().constData()));
             return;
         }
 
@@ -100,7 +100,7 @@ class MethodParameters
             if (unsupportedparameters.contains(type))
             {
                 LOG(VB_GENERAL, LOG_ERR, QString("Method '%1' has unsupported parameter type '%2'")
-                    .arg(Method.name().data(), types[i].data()));
+                    .arg(Method.name().constData(), types[i].constData()));
                 return;
             }
 
@@ -334,7 +334,7 @@ TorcHTTPService::TorcHTTPService(QObject *Parent, const QString &Signature, cons
                 if (index > -1)
                 {
                     QStringList infos = QString(MetaObject.classInfo(index).value()).split(",", QString::SkipEmptyParts);
-                    foreach (QString info, infos)
+                    foreach (const QString &info, infos)
                     {
                         if (info.startsWith("methods="))
                             customallowed = TorcHTTPRequest::StringToAllowed(info.mid(8));
@@ -739,11 +739,14 @@ QVariantMap TorcHTTPService::GetServiceDetails(void)
         QMetaProperty property = m_parent->metaObject()->property(it.value());
         QVariantMap description;
         QString name = QString::fromLatin1(property.name());
+        if (name.isEmpty())
+            continue;
 
         description.insert("notification", QString::fromLatin1(m_parent->metaObject()->method(it.key()).name()));
 
         // a property is always readable
-        QString read = QString("Get") + name.left(1).toUpper() + name.mid(1);
+        QString camelname = name.at(0).toUpper() + name.mid(1);
+        QString read = QString("Get") + camelname;
 
         if (m_parent->metaObject()->indexOfSlot(QMetaObject::normalizedSignature(QString(read + "()").toLatin1())) > -1)
             description.insert("read", read);
@@ -753,8 +756,7 @@ QVariantMap TorcHTTPService::GetServiceDetails(void)
         // for writable properties, we need to infer the signature including the type
         if (property.isWritable())
         {
-            QString write = QString("Set%1%2").arg(name.left(1).toUpper(), name.mid(1));
-
+            QString write = QString("Set") + camelname;
             if (m_parent->metaObject()->indexOfSlot(QMetaObject::normalizedSignature(QString("%1(%2)").arg(write, property.typeName()).toLatin1())) > -1)
                 description.insert("write", write);
             else

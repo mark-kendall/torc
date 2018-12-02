@@ -89,7 +89,7 @@ TorcPowerUnixDBus::TorcPowerUnixDBus()
         QDBusReply<QList<QDBusObjectPath> > devicecheck = m_upowerInterface.call(QLatin1String("EnumerateDevices"));
 
         if (devicecheck.isValid())
-            foreach (QDBusObjectPath device, devicecheck.value())
+            foreach (const QDBusObjectPath &device, devicecheck.value())
                 m_devices.insert(device.path(), GetBatteryLevel(device.path()));
     }
     else
