@@ -21,7 +21,7 @@ var searchData=
   ['operatingrangemax',['operatingRangeMax',['../d8/d61/class_torc_input.html#a958f2828ddf36838904878832b482396',1,'TorcInput']]],
   ['operatingrangemin',['operatingRangeMin',['../d8/d61/class_torc_input.html#a2b3cbfe90f81b0b5b7a98d606138c748',1,'TorcInput']]],
   ['operation',['Operation',['../d5/d8f/class_torc_logic_control.html#a9a534064891b32f43f8210c3ff211b38',1,'TorcLogicControl']]],
-  ['operator_3d',['operator=',['../da/dfa/class_torc_camera_params.html#a44127a03ffa7b2b8736d775891a00d1a',1,'TorcCameraParams::operator=()'],['../db/dff/class_torc_bonjour_service.html#a56bd12031640fa004cd34e33d51fa511',1,'TorcBonjourService::operator=()']]],
+  ['operator_3d',['operator=',['../da/dfa/class_torc_camera_params.html#a44127a03ffa7b2b8736d775891a00d1a',1,'TorcCameraParams::operator=()'],['../df/d7a/class_torc_o_m_x_core.html#a1ca1a228673bd1655f7da4d8bb212d07',1,'TorcOMXCore::operator=()'],['../db/dff/class_torc_bonjour_service.html#a56bd12031640fa004cd34e33d51fa511',1,'TorcBonjourService::operator=()']]],
   ['operator_3d_3d',['operator==',['../da/dfa/class_torc_camera_params.html#ac260cdfddac3e64ea507278ad271a89b',1,'TorcCameraParams::operator==()'],['../d4/dee/class_torc_h_t_t_p_server_1_1_status.html#aeff0adbb17832a70a5dec86fa13a4d50',1,'TorcHTTPServer::Status::operator==()']]],
   ['opping',['OpPing',['../d3/d9a/class_torc_web_socket_reader.html#aa8aecc8cf0ef1a43304ae93df7767893a4043045b24175cf772e62069f311b9b9',1,'TorcWebSocketReader']]],
   ['oppong',['OpPong',['../d3/d9a/class_torc_web_socket_reader.html#aa8aecc8cf0ef1a43304ae93df7767893a8b4acd8ccc82fd5a727cfbcf2c404528',1,'TorcWebSocketReader']]],

@@ -1,7 +1,9 @@
 <map id="torcwebsocketpool.h" name="torcwebsocketpool.h">
-<area shape="rect" id="node4" href="$dd/d9e/torcwebsocketthread_8h.html" title="torcwebsocketthread.h" alt="" coords="175,80,343,107"/>
-<area shape="rect" id="node5" href="$da/dbe/torcwebsocket_8h.html" title="torcwebsocket.h" alt="" coords="255,155,381,181"/>
-<area shape="rect" id="node10" href="$de/de6/torchttpreader_8h.html" title="torchttpreader.h" alt="" coords="529,229,656,256"/>
-<area shape="rect" id="node13" href="$d7/d28/torcwebsocketreader_8h.html" title="torcwebsocketreader.h" alt="" coords="680,229,847,256"/>
-<area shape="rect" id="node14" href="$dd/db0/torcqthread_8h.html" title="torcqthread.h" alt="" coords="871,229,981,256"/>
+<area shape="rect" id="node4" href="$dd/d9e/torcwebsocketthread_8h.html" title="torcwebsocketthread.h" alt="" coords="393,80,561,107"/>
+<area shape="rect" id="node5" href="$da/dbe/torcwebsocket_8h.html" title="torcwebsocket.h" alt="" coords="413,229,540,256"/>
+<area shape="rect" id="node16" href="$dd/d52/torcrpcrequest_8h.html" title="torcrpcrequest.h" alt="" coords="710,155,838,181"/>
+<area shape="rect" id="node10" href="$de/de6/torchttpreader_8h.html" title="torchttpreader.h" alt="" coords="243,304,369,331"/>
+<area shape="rect" id="node13" href="$d7/d28/torcwebsocketreader_8h.html" title="torcwebsocketreader.h" alt="" coords="393,304,560,331"/>
+<area shape="rect" id="node14" href="$dd/db0/torcqthread_8h.html" title="torcqthread.h" alt="" coords="585,304,694,331"/>
+<area shape="rect" id="node20" href="$d8/dfe/torcreferencecounted_8h.html" title="torcreferencecounted.h" alt="" coords="688,229,860,256"/>
 </map>

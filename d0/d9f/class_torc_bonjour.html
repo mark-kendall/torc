@@ -86,6 +86,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-slots">Public Slots</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
@@ -106,6 +107,12 @@ Inheritance diagram for TorcBonjour:</div>
 </div>
 <center><span class="legend">[<a href="../../graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-slots"></a>
+Public Slots</h2></td></tr>
+<tr class="memitem:a9abaac861a185175124b0a666564245c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d9f/class_torc_bonjour.html#a9abaac861a185175124b0a666564245c">socketReadyRead</a> (int Socket)</td></tr>
+<tr class="memdesc:a9abaac861a185175124b0a666564245c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read from a socket.  <a href="#a9abaac861a185175124b0a666564245c">More...</a><br /></td></tr>
+<tr class="separator:a9abaac861a185175124b0a666564245c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:aa5fe7198c28ad431018b709e94941931"><td class="memItemLeft" align="right" valign="top">quint32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d9f/class_torc_bonjour.html#aa5fe7198c28ad431018b709e94941931">Register</a> (quint16 Port, const QByteArray &amp;Type, const QByteArray &amp;Name, const QMap&lt; QByteArray, QByteArray &gt; &amp;TxtRecords, quint32 Reference=0)</td></tr>
@@ -163,7 +170,7 @@ Protected Member Functions</h2></td></tr>
 <dd>
 <a class="el" href="../../db/dff/class_torc_bonjour_service.html" title="Wrapper around a DNS service reference, either advertised or discovered. ">TorcBonjourService</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../de/d53/torcbonjour_8h_source.html#l00050">50</a> of file <a class="el" href="../../de/d53/torcbonjour_8h_source.html">torcbonjour.h</a>.</p>
+<p>Definition at line <a class="el" href="../../de/d53/torcbonjour_8h_source.html#l00052">52</a> of file <a class="el" href="../../de/d53/torcbonjour_8h_source.html">torcbonjour.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="ad4fb8660dc021de472212e2abbec9468"></a>
 <div class="memitem">
@@ -243,7 +250,7 @@ Protected Member Functions</h2></td></tr>
 <p>Handle newly discovered service. </p>
 <p>Services that have not been seen before are added to the list of known services and a name resolution is kicked off. </p>
 
-<p>Definition at line <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html#l00759">759</a> of file <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html">torcbonjour.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html#l00758">758</a> of file <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html">torcbonjour.cpp</a>.</p>
 
 </div>
 </div>
@@ -461,7 +468,7 @@ Protected Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html#l00475">475</a> of file <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html">torcbonjour.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html#l00474">474</a> of file <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html">torcbonjour.cpp</a>.</p>
 
 </div>
 </div>
@@ -491,7 +498,7 @@ Protected Member Functions</h2></td></tr>
 
 <p>Handle removed services. </p>
 
-<p>Definition at line <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html#l00830">830</a> of file <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html">torcbonjour.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html#l00829">829</a> of file <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html">torcbonjour.cpp</a>.</p>
 
 </div>
 </div>
@@ -553,7 +560,36 @@ Protected Member Functions</h2></td></tr>
 <p>This function is called from the Bonjour library when a discovered service is resolved to a target and port. Before we can use this target, we attempt to discover its IP addresses via QHostInfo.</p>
 <dl class="section see"><dt>See also</dt><dd>HostLookup </dd></dl>
 
-<p>Definition at line <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html#l00893">893</a> of file <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html">torcbonjour.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html#l00892">892</a> of file <a class="el" href="../../dc/d96/torcbonjour_8cpp_source.html">torcbonjour.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a9abaac861a185175124b0a666564245c"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void TorcBonjour::socketReadyRead </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>Socket</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">slot</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read from a socket. </p>
+<p><a class="el" href="../../dd/d16/class_torc_bonjour_priv.html">TorcBonjourPriv</a> does not inherit QObject hence needs <a class="el" href="../../d0/d9f/class_torc_bonjour.html" title="Advertises and searches for services via Bonjour (aka Zero Configuration Networking/Avahi) ...">TorcBonjour</a> to handle slots and events. </p>
+
+<p>Definition at line <a class="el" href="../../df/d0b/torcbonjourwindows_8cpp_source.html#l00115">115</a> of file <a class="el" href="../../df/d0b/torcbonjourwindows_8cpp_source.html">torcbonjourwindows.cpp</a>.</p>
 
 </div>
 </div>
@@ -649,7 +685,7 @@ Protected Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Dec 3 2018 12:11:30 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Dec 3 2018 14:28:06 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>
