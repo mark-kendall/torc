@@ -23,7 +23,7 @@ class TorcPushbulletNotifier final : public TorcNotifier
     QStringList GetDescription(void) override;
 
   signals:
-    void StartResetTimer      (int Seconds);
+    void StartResetTimer      (int MSeconds);
 
   public slots:
     void RequestReady         (TorcNetworkRequest* Request);

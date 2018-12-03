@@ -97,10 +97,10 @@ bool TorcIOTLogger::Initialise(const QVariantMap &Details)
     }
 
     // at this point, all should be good. Set up the timer
-    connect(this, SIGNAL(TryNotify()), this, SLOT(DoNotify()));
+    connect(this, &TorcIOTLogger::TryNotify, this, &TorcIOTLogger::DoNotify);
     m_timer.setSingleShot(true);
-    connect(this,    SIGNAL(StartTimer(int)), &m_timer, SLOT(start(int)));
-    connect(&m_timer, SIGNAL(timeout()), this, SLOT(DoNotify()));
+    connect(this,    &TorcIOTLogger::StartTimer, &m_timer, QOverload<int>::of(&QTimer::start));
+    connect(&m_timer, &QTimer::timeout, this, &TorcIOTLogger::DoNotify);
 
     return true;
 }

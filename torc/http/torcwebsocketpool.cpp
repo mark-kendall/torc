@@ -78,7 +78,7 @@ void TorcWebSocketPool::IncomingConnection(qintptr SocketDescriptor, bool Secure
     {
         TorcWebSocketThread *thread = new TorcWebSocketThread(SocketDescriptor, Secure);
         m_webSockets.append(thread);
-        connect(thread, SIGNAL(Finished()), this, SLOT(WebSocketClosed()));
+        connect(thread, &TorcWebSocketThread::Finished, this, &TorcWebSocketPool::WebSocketClosed);
         thread->start();
     }
     else

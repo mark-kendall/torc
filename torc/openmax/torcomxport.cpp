@@ -117,7 +117,7 @@ OMX_ERRORTYPE TorcOMXPort::CreateBuffers(QObject *Owner /*=nullptr*/)
 
     m_owner = Owner;
     if (m_owner)
-        connect(this, SIGNAL(BufferReady(OMX_BUFFERHEADERTYPE*, quint64)), m_owner, SLOT(BufferReady(OMX_BUFFERHEADERTYPE*, quint64)), Qt::QueuedConnection);
+        connect(this, SIGNAL(BufferReady(OMX_BUFFERHEADERTYPE*, quint64)), m_owner, SLOT(BufferReady(OMX_BUFFERHEADERTYPE*, quint64)), Qt::QueuedConnection); // clazy:exclude=old-style-connect
 
     OMX_PARAM_PORTDEFINITIONTYPE portdefinition;
     OMX_INITSTRUCTURE(portdefinition);
@@ -160,7 +160,7 @@ OMX_ERRORTYPE TorcOMXPort::DestroyBuffers(void)
 
     if (m_owner)
     {
-        disconnect(this, SIGNAL(BufferReady(OMX_BUFFERHEADERTYPE*, quint64)), m_owner, SLOT(BufferReady(OMX_BUFFERHEADERTYPE*, quint64)));
+        disconnect(this, SIGNAL(BufferReady(OMX_BUFFERHEADERTYPE*, quint64)), m_owner, SLOT(BufferReady(OMX_BUFFERHEADERTYPE*, quint64))); // clazy:exclude=old-style-connect
         m_owner = nullptr;
     }
 

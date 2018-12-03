@@ -42,12 +42,12 @@ TorcNetworkButtonOutput::TorcNetworkButtonOutput(double Default, const QVariantM
     m_pulseTimer()
 {
     // timers cannot be started from other threads, so use some signalling
-    connect(this, SIGNAL(Pushed()), this, SLOT(StartTimer()));
+    connect(this, &TorcNetworkButtonOutput::Pushed, this, &TorcNetworkButtonOutput::StartTimer);
 
     // setup the timer
     m_pulseTimer.setSingleShot(true);
     m_pulseTimer.setInterval(5);
-    connect(&m_pulseTimer, SIGNAL(timeout()), this, SLOT(EndPulse()));
+    connect(&m_pulseTimer, &QTimer::timeout, this, &TorcNetworkButtonOutput::EndPulse);
 }
 
 QStringList TorcNetworkButtonOutput::GetDescription(void)

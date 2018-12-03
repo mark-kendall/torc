@@ -44,7 +44,7 @@ TorcTime::TorcTime()
     // NB if the language changes, the device will be restarted so no need to worry about format changes
     m_dateTimeFormat = gLocalContext->GetLocale().dateTimeFormat(QLocale::LongFormat);
     m_timer.setInterval(1000);
-    connect(&m_timer, SIGNAL(timeout()), this, SLOT(Tick()));
+    connect(&m_timer, &QTimer::timeout, this, &TorcTime::Tick);
     m_timer.start();
 }
 

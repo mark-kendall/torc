@@ -295,9 +295,9 @@ bool TorcCameraDevice::Setup(void)
     if (!m_muxer->IsValid())
         return false;
 
-    connect(m_ringBuffer, SIGNAL(SegmentReady(int)),    this, SIGNAL(SegmentReady(int)));
-    connect(m_ringBuffer, SIGNAL(SegmentRemoved(int)),  this, SIGNAL(SegmentRemoved(int)));
-    connect(m_ringBuffer, SIGNAL(InitSegmentReady()),   this, SIGNAL(InitSegmentReady()));
+    connect(m_ringBuffer, &TorcSegmentedRingBuffer::SegmentReady,     this, &TorcCameraDevice::SegmentReady);
+    connect(m_ringBuffer, &TorcSegmentedRingBuffer::SegmentRemoved,   this, &TorcCameraDevice::SegmentRemoved);
+    connect(m_ringBuffer, &TorcSegmentedRingBuffer::InitSegmentReady, this, &TorcCameraDevice::InitSegmentReady);
 
     m_frameCount      = 0;
     m_bufferedPacket  = nullptr;

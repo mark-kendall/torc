@@ -80,7 +80,7 @@ TorcWebSocket::TorcWebSocket(TorcWebSocketThread* Parent, qintptr SocketDescript
     m_requestTimers(),
     m_subscribers()
 {
-    connect(&m_watchdogTimer, SIGNAL(timeout()), this, SLOT(TimedOut()));
+    connect(&m_watchdogTimer, &QTimer::timeout, this, &TorcWebSocket::TimedOut);
     m_watchdogTimer.start(HTTP_SOCKET_TIMEOUT);
 }
 
@@ -403,7 +403,7 @@ void TorcWebSocket::Encrypted(void)
 {
     if (m_debug.isEmpty())
         m_debug = QString(">> %1 %2 -").arg(TorcNetwork::IPAddressToLiteral(peerAddress(), peerPort()), m_secure ? "secure" : "insecure");
-    connect(this, SIGNAL(readyRead()), this, SLOT(ReadyRead()));
+    connect(this, &TorcWebSocket::readyRead, this, &TorcWebSocket::ReadyRead);
     emit ConnectionEstablished();
     LOG(VB_GENERAL, LOG_INFO, QString("%1 encrypted").arg(m_debug));
 
@@ -426,17 +426,17 @@ bool TorcWebSocket::IsSecure(void)
 ///\brief Initialise the websocket once its parent thread is ready.
 void TorcWebSocket::Start(void)
 {
-    connect(this, SIGNAL(Disconnect()), this, SLOT(CloseSocket()));
-    connect(this, SIGNAL(bytesWritten(qint64)), this, SLOT(BytesWritten(qint64)));
+    connect(this, &TorcWebSocket::Disconnect, this, &TorcWebSocket::CloseSocket);
+    connect(this, &TorcWebSocket::bytesWritten, this, &TorcWebSocket::BytesWritten);
 
     // common setup
     m_reader.Reset();
     m_wsReader.Reset();
 
-    connect(this, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(Error(QAbstractSocket::SocketError)));
-    connect(this, SIGNAL(disconnected()),                      this, SIGNAL(Disconnected()));
-    connect(this, SIGNAL(encrypted()),                         this, SLOT(Encrypted()));
-    connect(this, SIGNAL(sslErrors(QList<QSslError>)),         this, SLOT(SSLErrors(QList<QSslError>)));
+    connect(this, QOverload<QAbstractSocket::SocketError>::of(&TorcWebSocket::error), this, &TorcWebSocket::Error);
+    connect(this, &TorcWebSocket::disconnected, this, &TorcWebSocket::Disconnected);
+    connect(this, &TorcWebSocket::encrypted,    this, &TorcWebSocket::Encrypted);
+    connect(this, QOverload<const QList<QSslError>&>::of(&TorcWebSocket::sslErrors),  this, &TorcWebSocket::SSLErrors);
 
     // Ignore errors for Self signed certificates
     QList<QSslError> ignore;
@@ -458,7 +458,7 @@ void TorcWebSocket::Start(void)
             }
             else
             {
-                connect(this, SIGNAL(readyRead()), this, SLOT(ReadyRead()));
+                connect(this, &TorcWebSocket::readyRead, this, &TorcWebSocket::ReadyRead);
                 emit ConnectionEstablished();
             }
             return;
@@ -478,8 +478,8 @@ void TorcWebSocket::Start(void)
         }
         else
         {
-            connect(this, SIGNAL(connected()), this, SLOT(Connected()));
-            connect(this, SIGNAL(readyRead()), this, SLOT(ReadyRead()));
+            connect(this, &TorcWebSocket::connected, this, &TorcWebSocket::Connected);
+            connect(this, &TorcWebSocket::readyRead, this, &TorcWebSocket::ReadyRead);
             connectToHost(m_address, m_port);
         }
         return;
@@ -1075,7 +1075,7 @@ void TorcWebSocket::ProcessPayload(const QByteArray &Payload)
                         else if (request->GetReply().type() == QVariant::Map)
                         {
                             // listen for destroyed signals to ensure the subscriptions are cleaned up
-                            connect(parent, SIGNAL(destroyed(QObject*)), this, SLOT(SubscriberDeleted(QObject*)));
+                            connect(parent, &QObject::destroyed, this, &TorcWebSocket::SubscriberDeleted);
 
                             QVariantMap map = request->GetReply().toMap();
                             if (map.contains("properties") && map.value("properties").type() == QVariant::List)

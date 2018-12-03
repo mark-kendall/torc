@@ -53,7 +53,7 @@ void Torc1WireReadThread::Start(void)
     // 'this' is in the parent's thread and connect will by default use an indirect connection,
     // so force a direct connection to ensure Read operates in the 1Wire thread.
     // This way we don't need an extra object created in the read thread to handle one function...
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(Read()), Qt::DirectConnection);
+    connect(m_timer, &QTimer::timeout, this, &Torc1WireReadThread::Read, Qt::DirectConnection);
 
     // randomise start time for each input
     m_timer->start(qrand() % MIN_READ_INTERVAL);

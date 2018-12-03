@@ -102,7 +102,7 @@ TorcSSDP::TorcSSDP()
 
     // start the response timer here and connect its signal
     // we use a full QTimer as we need to know how long it has remaining
-    connect(&m_responseTimer, SIGNAL(timeout()), this, SLOT(ProcessResponses()));
+    connect(&m_responseTimer, &QTimer::timeout, this, &TorcSSDP::ProcessResponses);
     m_responseTimer.start(5000);
 }
 
@@ -327,14 +327,14 @@ TorcSSDP* TorcSSDP::Create(bool Destroy)
     return nullptr;
 }
 
-QUdpSocket* TorcSSDP::CreateSearchSocket(const QHostAddress &HostAddress, QObject *Owner)
+QUdpSocket* TorcSSDP::CreateSearchSocket(const QHostAddress &HostAddress, TorcSSDP *Owner)
 {
     QUdpSocket *socket = new QUdpSocket();
     if (socket->bind(HostAddress, 1900, QUdpSocket::ShareAddress))
     {
         socket->setSocketOption(QAbstractSocket::MulticastTtlOption, 4);
         socket->setSocketOption(QAbstractSocket::MulticastLoopbackOption, 1);
-        QObject::connect(socket, SIGNAL(readyRead()), Owner, SLOT(Read()));
+        QObject::connect(socket, &QUdpSocket::readyRead, Owner, &TorcSSDP::Read);
         LOG(VB_NETWORK, LOG_INFO, QString("%1 SSDP unicast socket %2:%3")
             .arg(HostAddress.protocol() == QAbstractSocket::IPv6Protocol ? "IPv6" : "IPv4",
                  socket->localAddress().toString(), QString::number(socket->localPort())));
@@ -347,14 +347,14 @@ QUdpSocket* TorcSSDP::CreateSearchSocket(const QHostAddress &HostAddress, QObjec
     return nullptr;
 }
 
-QUdpSocket* TorcSSDP::CreateMulticastSocket(const QHostAddress &HostAddress, QObject *Owner, const QNetworkInterface &Interface)
+QUdpSocket* TorcSSDP::CreateMulticastSocket(const QHostAddress &HostAddress, TorcSSDP *Owner, const QNetworkInterface &Interface)
 {
     QUdpSocket *socket = new QUdpSocket();
     if (socket->bind(HostAddress, TORC_SSDP_UDP_MULTICAST_PORT, QUdpSocket::ShareAddress))
     {
         if (socket->joinMulticastGroup(HostAddress, Interface))
         {
-            QObject::connect(socket, SIGNAL(readyRead()), Owner, SLOT(Read()));
+            QObject::connect(socket, &QUdpSocket::readyRead, Owner, &TorcSSDP::Read);
             LOG(VB_NETWORK, LOG_INFO, QString("%1 SSDP multicast socket %2:%3")
                 .arg(HostAddress.protocol() == QAbstractSocket::IPv6Protocol ? "IPv6" : "IPv4",
                      socket->localAddress().toString(),

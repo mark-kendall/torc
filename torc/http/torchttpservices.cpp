@@ -49,7 +49,7 @@ TorcHTTPServices::TorcHTTPServices(TorcHTTPServer *Server)
     returnFormats(),
     webSocketProtocols()
 {
-    connect(Server, SIGNAL(HandlersChanged()), this, SLOT(HandlersChanged()));
+    connect(Server, &TorcHTTPServer::HandlersChanged, this, &TorcHTTPServices::HandlersChanged);
 
     TorcSerialiserFactory *factory = TorcSerialiserFactory::GetTorcSerialiserFactory();
     for ( int i = 0; factory; factory = factory->NextTorcSerialiserFactory(), i++)

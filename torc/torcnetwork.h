@@ -19,7 +19,7 @@
 
 class TorcNetworkRequest;
 
-class TorcNetwork : QNetworkAccessManager
+class TorcNetwork : public QNetworkAccessManager
 {
     friend class TorcNetworkObject;
 

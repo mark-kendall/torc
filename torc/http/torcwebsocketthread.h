@@ -6,6 +6,7 @@
 
 // Torc
 #include "torcwebsocket.h"
+#include "torcrpcrequest.h"
 
 class TorcWebSocketThread : public TorcQThread
 {

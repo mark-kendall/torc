@@ -82,8 +82,8 @@ class TorcSSDP final : public QObject
 
   private:
     Q_DISABLE_COPY(TorcSSDP)
-    static QUdpSocket* CreateSearchSocket    (const QHostAddress &HostAddress, QObject *Owner);
-    static QUdpSocket* CreateMulticastSocket (const QHostAddress &HostAddress, QObject *Owner, const QNetworkInterface &Interface);
+    static QUdpSocket* CreateSearchSocket    (const QHostAddress &HostAddress, TorcSSDP *Owner);
+    static QUdpSocket* CreateMulticastSocket (const QHostAddress &HostAddress, TorcSSDP *Owner, const QNetworkInterface &Interface);
 
     void             Start              (void);
     void             Stop               (void);

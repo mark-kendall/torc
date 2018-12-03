@@ -423,8 +423,8 @@ bool TorcControl::Finish(void)
                 return false;
             }
 
-            connect(this, SIGNAL(ValueChanged(double)), output, SLOT(SetValue(double)), Qt::UniqueConnection);
-            connect(this, SIGNAL(ValidChanged(bool)),   output, SLOT(SetValid(bool)),   Qt::UniqueConnection);
+            connect(this, &TorcControl::ValueChanged, output, &TorcOutput::SetValue, Qt::UniqueConnection);
+            connect(this, &TorcControl::ValidChanged, output, &TorcOutput::SetValid, Qt::UniqueConnection);
         }
         else if (qobject_cast<TorcControl*>(it.key()))
         {
@@ -438,8 +438,8 @@ bool TorcControl::Finish(void)
                 return false;
             }
 
-            connect(this, SIGNAL(ValidChanged(bool)), control, SLOT(InputValidChanged(bool)), Qt::UniqueConnection);
-            connect(this, SIGNAL(ValueChanged(double)), control, SLOT(InputValueChanged(double)), Qt::UniqueConnection);
+            connect(this, &TorcControl::ValidChanged, control, &TorcControl::InputValidChanged, Qt::UniqueConnection);
+            connect(this, &TorcControl::ValueChanged, control, &TorcControl::InputValueChanged, Qt::UniqueConnection);
         }
         else if (qobject_cast<TorcNotification*>(it.key()))
         {
@@ -465,9 +465,10 @@ bool TorcControl::Finish(void)
     for ( ; it != m_inputs.constEnd(); ++it)
     {
         TorcControl *control = qobject_cast<TorcControl*>(it.key());
+        TorcInput     *input = qobject_cast<TorcInput*>(it.key());
 
         // an input must be a sensor or control
-        if (!qobject_cast<TorcInput*>(it.key()) && !control)
+        if (!control && !input)
         {
             LOG(VB_GENERAL, LOG_ERR, "Unknown input type");
             return false;
@@ -481,8 +482,16 @@ bool TorcControl::Finish(void)
             return false;
         }
 
-        connect(it.key(), SIGNAL(ValidChanged(bool)), this, SLOT(InputValidChanged(bool)), Qt::UniqueConnection);
-        connect(it.key(), SIGNAL(ValueChanged(double)), this, SLOT(InputValueChanged(double)), Qt::UniqueConnection);
+        if (control)
+        {
+            connect(control, &TorcControl::ValidChanged, this, &TorcControl::InputValidChanged, Qt::UniqueConnection);
+            connect(control, &TorcControl::ValueChanged, this, &TorcControl::InputValueChanged, Qt::UniqueConnection);
+        }
+        else
+        {
+            connect(input, &TorcInput::ValidChanged, this, &TorcControl::InputValidChanged, Qt::UniqueConnection);
+            connect(input, &TorcInput::ValueChanged, this, &TorcControl::InputValueChanged, Qt::UniqueConnection);
+        }
         m_inputValids.insert(it.key(), false);
     }
 

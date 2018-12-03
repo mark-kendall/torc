@@ -79,7 +79,7 @@ TorcNetworkService::TorcNetworkService(const QString &Name, const QString &UUID,
     else
         m_debugString = TorcNetwork::IPAddressToLiteral(m_addresses[m_preferredAddressIndex], port);
 
-    connect(this, SIGNAL(TryConnect()), this, SLOT(Connect()));
+    connect(this, &TorcNetworkService::TryConnect, this, &TorcNetworkService::Connect);
 }
 
 /*! \brief Destroy this service.
@@ -189,8 +189,8 @@ void TorcNetworkService::Connect(void)
     LOG(VB_GENERAL, LOG_INFO, QString("Trying to connect to %1").arg(m_debugString));
 
     m_webSocketThread = new TorcWebSocketThread(m_addresses.at(m_preferredAddressIndex), port, secure);
-    connect(m_webSocketThread, SIGNAL(Finished()),           this, SLOT(Disconnected()));
-    connect(m_webSocketThread, SIGNAL(ConnectionUpgraded()), this, SLOT(Connected()));
+    connect(m_webSocketThread, &TorcWebSocketThread::Finished,           this, &TorcNetworkService::Disconnected);
+    connect(m_webSocketThread, &TorcWebSocketThread::ConnectionUpgraded, this, &TorcNetworkService::Connected);
 
     m_webSocketThread->start();
 }
@@ -424,7 +424,7 @@ void TorcNetworkService::ScheduleRetry(void)
 {
     if (!m_retryScheduled)
     {
-        QTimer::singleShot(m_retryInterval, Qt::VeryCoarseTimer, this, SLOT(Connect()));
+        QTimer::singleShot(m_retryInterval, Qt::VeryCoarseTimer, this, &TorcNetworkService::Connect);
         m_retryScheduled = true;
     }
 }
@@ -483,7 +483,7 @@ void TorcNetworkService::SetWebSocketThread(TorcWebSocketThread *Thread)
 
     // create the socket
     m_webSocketThread = Thread;
-    connect(m_webSocketThread, SIGNAL(Finished()), this, SLOT(Disconnected()));
+    connect(m_webSocketThread, &TorcWebSocketThread::Finished, this, &TorcNetworkService::Disconnected);
 }
 
 void TorcNetworkService::RemoteRequest(TorcRPCRequest *Request)
@@ -596,9 +596,9 @@ TorcNetworkedContext::TorcNetworkedContext()
     gLocalContext->AddObserver(this);
 
     // connect signals
-    connect(this, SIGNAL(NewRequest(QString,TorcRPCRequest*)), this, SLOT(HandleNewRequest(QString,TorcRPCRequest*)));
-    connect(this, SIGNAL(RequestCancelled(QString,TorcRPCRequest*)), this, SLOT(HandleCancelRequest(QString,TorcRPCRequest*)));
-    connect(this, SIGNAL(NewPeer(TorcWebSocketThread*,QVariantMap)), this, SLOT(HandleNewPeer(TorcWebSocketThread*,QVariantMap)));
+    connect(this, &TorcNetworkedContext::NewRequest,       this, &TorcNetworkedContext::HandleNewRequest);
+    connect(this, &TorcNetworkedContext::RequestCancelled, this, &TorcNetworkedContext::HandleCancelRequest);
+    connect(this, &TorcNetworkedContext::NewPeer,          this, &TorcNetworkedContext::HandleNewPeer);
 
     // always create the global instance
     TorcBonjour::Instance();

@@ -5,10 +5,9 @@
 # non-pod-global-static         doesn't fair well with factory classes
 # ctor-missing-parent-argument  we simply don't need the QObject parenting in most cases (any?)
 # qstring-allocations           soooo many
-# old-style-connect             have been meaning to fix anyway
 
 make clean
-export CLAZY_CHECKS="level0,level1,level2,no-inefficient-qlist,no-non-pod-global-static,no-ctor-missing-parent-argument,no-qstring-allocations,no-old-style-connect"
+export CLAZY_CHECKS="level0,level1,level2,no-inefficient-qlist,no-non-pod-global-static,no-ctor-missing-parent-argument,no-qstring-allocations"
 clazy --list
 TORC_FFMPEG=1 qmake -spec linux-clang QMAKE_CXX="clazy"
 make -j8

@@ -10,6 +10,8 @@
 // DNS Service Discovery
 #include <dns_sd.h>
 
+class TorcBonjour;
+
 class TorcBonjourService
 {
   public:
@@ -27,7 +29,7 @@ class TorcBonjourService
     TorcBonjourService(ServiceType BonjourType, const QByteArray &Name, const QByteArray &Type, const QByteArray &Domain, uint32_t InterfaceIndex);
     TorcBonjourService& operator =(const TorcBonjourService &Other);
    ~TorcBonjourService() = default;
-    void SetFileDescriptor(int FileDescriptor, QObject *Object);
+    void SetFileDescriptor(int FileDescriptor, TorcBonjour *Object);
     bool IsResolved(void);
     void Deregister(void);
 
@@ -72,9 +74,11 @@ class TorcBonjour : public QObject
                  const char *HostTarget, uint16_t Port, uint16_t TxtLen,
                  const unsigned char *TxtRecord);
 
+  public slots:
+    void    socketReadyRead (int Socket);
+
   private slots:
     void    SuspendPriv     (bool Suspend);
-    void    socketReadyRead (int Socket);
     void    HostLookup      (const QHostInfo &HostInfo);
 
 

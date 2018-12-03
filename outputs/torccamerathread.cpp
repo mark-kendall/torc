@@ -106,14 +106,14 @@ void TorcCameraThread::SetVideoParent(TorcCameraVideoOutput *Parent)
         return;
 
     QWriteLocker locker(&m_cameraLock);
-    connect(Parent, SIGNAL(StreamVideo(bool)), this, SIGNAL(StreamVideo(bool)));
-    connect(this, SIGNAL(WritingStarted()),    Parent, SLOT(WritingStarted()));
-    connect(this, SIGNAL(WritingStopped()),    Parent, SLOT(WritingStopped()));
-    connect(this, SIGNAL(InitSegmentReady()),  Parent, SLOT(InitSegmentReady()));
-    connect(this, SIGNAL(SegmentReady(int)),   Parent, SLOT(SegmentReady(int)));
-    connect(this, SIGNAL(SegmentRemoved(int)), Parent, SLOT(SegmentRemoved(int)));
-    connect(this, SIGNAL(CameraErrored(bool)), Parent, SLOT(CameraErrored(bool)));
-    connect(this, SIGNAL(ParamsChanged(TorcCameraParams&)), Parent, SLOT(ParamsChanged(TorcCameraParams&)));
+    connect(Parent, &TorcCameraVideoOutput::StreamVideo, this, &TorcCameraThread::StreamVideo);
+    connect(this, &TorcCameraThread::WritingStarted,     Parent, &TorcCameraVideoOutput::WritingStarted);
+    connect(this, &TorcCameraThread::WritingStopped,     Parent, &TorcCameraVideoOutput::WritingStopped);
+    connect(this, &TorcCameraThread::InitSegmentReady,   Parent, &TorcCameraVideoOutput::InitSegmentReady);
+    connect(this, &TorcCameraThread::SegmentReady,       Parent, &TorcCameraVideoOutput::SegmentReady);
+    connect(this, &TorcCameraThread::SegmentRemoved,     Parent, &TorcCameraVideoOutput::SegmentRemoved);
+    connect(this, &TorcCameraThread::CameraErrored,      Parent, &TorcCameraVideoOutput::CameraErrored);
+    connect(this, &TorcCameraThread::ParamsChanged,      Parent, &TorcCameraVideoOutput::ParamsChanged);
 }
 
 /*! \brief Connect camera signals for stills capture.
@@ -124,10 +124,10 @@ void TorcCameraThread::SetStillsParent(TorcCameraStillsOutput *Parent)
         return;
 
     QWriteLocker locker(&m_cameraLock);
-    connect(this, SIGNAL(CameraErrored(bool)), Parent, SLOT(CameraErrored(bool)));
-    connect(this, SIGNAL(StillReady(QString&)), Parent, SLOT(StillReady(QString&)));
-    connect(this, SIGNAL(ParamsChanged(TorcCameraParams&)), Parent, SLOT(ParamsChanged(TorcCameraParams&)));
-    connect(Parent, SIGNAL(TakeStills(uint)), this, SIGNAL(TakeStills(uint)));
+    connect(this, &TorcCameraThread::CameraErrored,      Parent, &TorcCameraStillsOutput::CameraErrored);
+    connect(this, &TorcCameraThread::StillReady,         Parent, &TorcCameraStillsOutput::StillReady);
+    connect(this, &TorcCameraThread::ParamsChanged,      Parent, &TorcCameraStillsOutput::ParamsChanged);
+    connect(Parent, &TorcCameraStillsOutput::TakeStills, this,   &TorcCameraThread::TakeStills);
 }
 
 /*! \brief Decrement the reference count for this thread.
@@ -171,19 +171,19 @@ void TorcCameraThread::Start(void)
     }
 
     // outbound streaming signals
-    connect(m_camera, SIGNAL(WritingStarted()),    this, SIGNAL(WritingStarted()));
-    connect(m_camera, SIGNAL(WritingStopped()),    this, SIGNAL(WritingStopped()));
-    connect(m_camera, SIGNAL(InitSegmentReady()),  this, SIGNAL(InitSegmentReady()));
-    connect(m_camera, SIGNAL(SegmentReady(int)),   this, SIGNAL(SegmentReady(int)));
-    connect(m_camera, SIGNAL(SegmentRemoved(int)), this, SIGNAL(SegmentRemoved(int)));
-    connect(m_camera, SIGNAL(SetErrored(bool)),    this, SIGNAL(CameraErrored(bool)));
-    connect(m_camera, SIGNAL(ParametersChanged(TorcCameraParams&)), this, SIGNAL(ParamsChanged(TorcCameraParams&)));
+    connect(m_camera, &TorcCameraDevice::WritingStarted,    this, &TorcCameraThread::WritingStarted);
+    connect(m_camera, &TorcCameraDevice::WritingStopped,    this, &TorcCameraThread::WritingStopped);
+    connect(m_camera, &TorcCameraDevice::InitSegmentReady,  this, &TorcCameraThread::InitSegmentReady);
+    connect(m_camera, &TorcCameraDevice::SegmentReady,      this, &TorcCameraThread::SegmentReady);
+    connect(m_camera, &TorcCameraDevice::SegmentRemoved,    this, &TorcCameraThread::SegmentRemoved);
+    connect(m_camera, &TorcCameraDevice::SetErrored,        this, &TorcCameraThread::CameraErrored);
+    connect(m_camera, &TorcCameraDevice::ParametersChanged, this, &TorcCameraThread::ParamsChanged);
     // inbound streaming signals
-    connect(this, SIGNAL(StreamVideo(bool)), m_camera, SLOT(StreamVideo(bool)));
+    connect(this, &TorcCameraThread::StreamVideo, m_camera, &TorcCameraDevice::StreamVideo);
     // outbound stills signals
-    connect(m_camera, SIGNAL(StillReady(QString&)), this, SIGNAL(StillReady(QString&)));
+    connect(m_camera, &TorcCameraDevice::StillReady, this,  &TorcCameraThread::StillReady);
     // inbound stills signals
-    connect(this, SIGNAL(TakeStills(uint)), m_camera, SLOT(TakeStills(uint)));
+    connect(this, &TorcCameraThread::TakeStills, m_camera,  &TorcCameraDevice::TakeStills);
 
     if (!m_camera->Setup() || !m_camera->Start())
         quit();

@@ -25,13 +25,13 @@
 #include "torcnetwork.h"
 #include "torchttpserverlistener.h"
 
-TorcHTTPServerListener::TorcHTTPServerListener(QObject *Parent, const QHostAddress &Address, int Port)
+TorcHTTPServerListener::TorcHTTPServerListener(TorcHTTPServer *Parent, const QHostAddress &Address, int Port)
   : QTcpServer()
 {
     if (!Parent)
         return;
 
-    connect(this, SIGNAL(NewConnection(qintptr)), Parent, SLOT(NewConnection(qintptr)));
+    connect(this, &TorcHTTPServerListener::NewConnection, Parent, &TorcHTTPServer::NewConnection);
 
     (void)Listen(Address, Port);
 }

@@ -205,7 +205,7 @@ bool TorcTriggerNotification::Setup(void)
         return false;
     }
 
-    connect(input, SIGNAL(ValueChanged(double)), this, SLOT(InputValueChanged(double)));
+    connect(input, &TorcDevice::ValueChanged, this, &TorcTriggerNotification::InputValueChanged);
     m_input = input;
 
     // check for the existence of reference devices

@@ -43,8 +43,8 @@ TorcPushbulletNotifier::TorcPushbulletNotifier(const QVariantMap &Details)
 {
     // setup timer
     m_resetTimer.setSingleShot(true);
-    connect(this, SIGNAL(StartResetTimer(int)), &m_resetTimer, SLOT(start(int)));
-    connect(&m_resetTimer, SIGNAL(timeout()), this, SLOT(ResetTimerTimeout()));
+    connect(this, &TorcPushbulletNotifier::StartResetTimer, &m_resetTimer, QOverload<int>::of(&QTimer::start));
+    connect(&m_resetTimer, &QTimer::timeout, this, &TorcPushbulletNotifier::ResetTimerTimeout);
 
     if (Details.contains("accesstoken"))
     {

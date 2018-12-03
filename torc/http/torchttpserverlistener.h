@@ -4,12 +4,15 @@
 // Qt
 #include <QTcpServer>
 
+// Torc
+#include "torchttpserver.h"
+
 class TorcHTTPServerListener final : public QTcpServer
 {
     Q_OBJECT
 
   public:
-    TorcHTTPServerListener(QObject *Parent, const QHostAddress &Address, int Port = 0);
+    TorcHTTPServerListener(TorcHTTPServer *Parent, const QHostAddress &Address, int Port = 0);
    ~TorcHTTPServerListener();
 
     bool Listen(const QHostAddress &Address, int Port = 0);

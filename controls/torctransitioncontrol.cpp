@@ -245,7 +245,7 @@ bool TorcTransitionControl::event(QEvent *Event)
         {
             // we don't know in which order this event is received, so we don't know
             // whether any timer inputs have been reset. So wait a short period.
-            QTimer::singleShot(10, this, SLOT(Restart()));
+            QTimer::singleShot(10, this, &TorcTransitionControl::Restart);
             return true;
         }
     }

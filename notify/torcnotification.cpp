@@ -70,7 +70,7 @@ bool TorcNotification::Setup(void)
         TorcNotifier* notifier = TorcNotify::gNotify->FindNotifierByName(notifiername);
         if (notifier)
         {
-            connect(this, SIGNAL(Notify(QVariantMap)), notifier, SLOT(Notify(QVariantMap)));
+            connect(this,&TorcNotification::Notify, notifier, &TorcNotifier::Notify);
             m_notifiers.append(notifier);
         }
         else

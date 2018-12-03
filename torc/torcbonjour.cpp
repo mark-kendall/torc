@@ -164,14 +164,13 @@ TorcBonjourService::TorcBonjourService(ServiceType BonjourType,
 /*! \fn    TorcBonjourService::SetFileDescriptor
  *  \brief Sets the file descriptor and creates a QSocketNotifier to listen for socket events
 */
-void TorcBonjourService::SetFileDescriptor(int FileDescriptor, QObject *Object)
+void TorcBonjourService::SetFileDescriptor(int FileDescriptor, TorcBonjour *Object)
 {
     if (FileDescriptor != -1 && Object)
     {
         m_fd = FileDescriptor;
         m_socketNotifier = new QSocketNotifier(FileDescriptor, QSocketNotifier::Read, Object);
-        QObject::connect(m_socketNotifier, SIGNAL(activated(int)),
-                         Object, SLOT(socketReadyRead(int)));
+        QObject::connect(m_socketNotifier, &QSocketNotifier::activated, Object, &TorcBonjour::socketReadyRead);
         m_socketNotifier->setEnabled(true);
     }
 }

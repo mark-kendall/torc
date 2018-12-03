@@ -20,6 +20,7 @@
 class TorcSetting;
 class TorcHTTPHandler;
 class TorcSSDPThread;
+class TorcHTTPServerListener;
 
 class TorcHTTPServer final : public QObject
 {

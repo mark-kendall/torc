@@ -323,24 +323,19 @@ TorcNetwork::TorcNetwork()
     LOG(VB_GENERAL, LOG_INFO, "Opening network access manager");
     LOG(VB_GENERAL, LOG_INFO, QString("SSL support is %1available").arg(QSslSocket::supportsSsl() ? "" : "not "));
 
-    connect(&m_manager, SIGNAL(configurationAdded(const QNetworkConfiguration&)),
-            this,      SLOT(ConfigurationAdded(const QNetworkConfiguration&)));
-    connect(&m_manager, SIGNAL(configurationChanged(const QNetworkConfiguration&)),
-            this,      SLOT(ConfigurationChanged(const QNetworkConfiguration&)));
-    connect(&m_manager, SIGNAL(configurationRemoved(const QNetworkConfiguration&)),
-            this,      SLOT(ConfigurationRemoved(const QNetworkConfiguration&)));
-    connect(&m_manager, SIGNAL(onlineStateChanged(bool)),
-            this,      SLOT(OnlineStateChanged(bool)));
-    connect(&m_manager, SIGNAL(updateCompleted()),
-            this,      SLOT(UpdateCompleted()));
+    connect(&m_manager, &QNetworkConfigurationManager::configurationAdded,   this, &TorcNetwork::ConfigurationAdded);
+    connect(&m_manager, &QNetworkConfigurationManager::configurationChanged, this, &TorcNetwork::ConfigurationChanged);
+    connect(&m_manager, &QNetworkConfigurationManager::configurationRemoved, this, &TorcNetwork::ConfigurationRemoved);
+    connect(&m_manager, &QNetworkConfigurationManager::onlineStateChanged,   this, &TorcNetwork::OnlineStateChanged);
+    connect(&m_manager, &QNetworkConfigurationManager::updateCompleted,      this, &TorcNetwork::UpdateCompleted);
 
-    connect(this, SIGNAL(NewRequest(TorcNetworkRequest*)),    this, SLOT(GetSafe(TorcNetworkRequest*)));
-    connect(this, SIGNAL(CancelRequest(TorcNetworkRequest*)), this, SLOT(CancelSafe(TorcNetworkRequest*)));
-    connect(this, SIGNAL(PokeRequest(TorcNetworkRequest*)),   this, SLOT(PokeSafe(TorcNetworkRequest*)));
-    connect(this, SIGNAL(NewAsyncRequest(TorcNetworkRequest*,QObject*)), this, SLOT(GetAsynchronousSafe(TorcNetworkRequest*,QObject*)));
+    connect(this, &TorcNetwork::NewRequest,    this, &TorcNetwork::GetSafe);
+    connect(this, &TorcNetwork::CancelRequest, this, &TorcNetwork::CancelSafe);
+    connect(this, &TorcNetwork::PokeRequest,   this, &TorcNetwork::PokeSafe);
+    connect(this, &TorcNetwork::NewAsyncRequest, this, &TorcNetwork::GetAsynchronousSafe);
 
     // direct connection for authentication requests
-    connect(this, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)), this, SLOT(Authenticate(QNetworkReply*,QAuthenticator*)), Qt::DirectConnection);
+    connect(this, &TorcNetwork::authenticationRequired, this, &TorcNetwork::Authenticate, Qt::DirectConnection);
 
     // set initial state
     UpdateConfiguration(true);
@@ -390,11 +385,11 @@ void TorcNetwork::GetSafe(TorcNetworkRequest* Request)
         }
 
         // join the dots
-        connect(reply, SIGNAL(readyRead()), this, SLOT(ReadyRead()));
-        connect(reply, SIGNAL(finished()),  this, SLOT(Finished()));
-        connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(DownloadProgress(qint64,qint64)));
-        connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(Error(QNetworkReply::NetworkError)));
-        connect(reply, SIGNAL(sslErrors(const QList<QSslError> & )), this, SLOT(SSLErrors(const QList<QSslError> & )));
+        connect(reply, &QNetworkReply::readyRead,        this, &TorcNetwork::ReadyRead);
+        connect(reply, &QNetworkReply::finished,         this, &TorcNetwork::Finished);
+        connect(reply, &QNetworkReply::downloadProgress, this, &TorcNetwork::DownloadProgress);
+        connect(reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error), this, &TorcNetwork::Error);
+        connect(reply, &QNetworkReply::sslErrors,        this, &TorcNetwork::SSLErrors);
 
         m_requests.insert(reply, Request);
         m_reverseRequests.insert(Request, reply);

@@ -77,7 +77,6 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
     int                    GetStep              (void);
 
   signals:
-    void                   ValueChanged         (QVariant &Value);
     void                   ValueChanged         (int  Value);
     void                   ValueChanged         (bool Value);
     void                   ValueChanged         (QString &Value);

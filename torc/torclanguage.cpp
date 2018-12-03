@@ -84,7 +84,7 @@ TorcLanguage::TorcLanguage(TorcSetting *SettingParent)
         selections.insert(locale.name(), locale.nativeLanguageName());
     m_languageSetting->SetSelections(selections);
     SetLanguageCode(m_languageSetting->GetValue().toString());
-    connect(m_languageSetting, SIGNAL(ValueChanged(QString&)), this, SLOT(LanguageSettingChanged(QString&)));
+    connect(m_languageSetting, QOverload<QString&>::of(&TorcSetting::ValueChanged), this, &TorcLanguage::LanguageSettingChanged);
 }
 
 TorcLanguage::~TorcLanguage()

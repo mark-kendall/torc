@@ -397,7 +397,7 @@ bool TorcLocalContext::QueueShutdownEvent(int Event)
     LOG(VB_GENERAL, LOG_INFO, QString("Queued '%1' event for %2 seconds").arg(TorcCoreUtils::EnumToString<Torc::Actions>((Torc::Actions)m_shutdownEvent)).arg(m_shutdownDelay));
     TorcEvent torcevent(Torc::TorcWillStop);
     Notify(torcevent);
-    QTimer::singleShot(m_shutdownDelay * 1000, this, SLOT(ShutdownTimeout()));
+    QTimer::singleShot(m_shutdownDelay * 1000, this, &TorcLocalContext::ShutdownTimeout);
     return true;
 }
 

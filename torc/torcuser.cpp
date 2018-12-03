@@ -54,8 +54,8 @@ TorcUser::TorcUser()
         m_userName = gUserName;
     }
 
-    connect(m_userNameSetting, SIGNAL(ValueChanged(QString&)), this, SLOT(UpdateUserName(QString&)));
-    connect(m_userCredentials, SIGNAL(ValueChanged(QString&)), this, SLOT(UpdateCredentials(QString&)));
+    connect(m_userNameSetting, QOverload<QString&>::of(&TorcSetting::ValueChanged), this, &TorcUser::UpdateUserName);
+    connect(m_userCredentials, QOverload<QString&>::of(&TorcSetting::ValueChanged), this, &TorcUser::UpdateCredentials);
 }
 
 TorcUser::~TorcUser()

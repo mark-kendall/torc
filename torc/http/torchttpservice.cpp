@@ -649,7 +649,7 @@ QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVarian
                             QObject::connect(m_parent, m_parent->metaObject()->method(it.key()), Connection, Connection->metaObject()->method(change));
 
                         // clean up subscriptions if the subscriber is deleted
-                        QObject::connect(Connection, SIGNAL(destroyed(QObject*)), m_parent, SLOT(SubscriberDeleted(QObject*)));
+                        QObject::connect(Connection, SIGNAL(destroyed(QObject*)), m_parent, SLOT(SubscriberDeleted(QObject*)));// clazy:exclude=old-style-connect
                     }
 
                     QVariantMap result;

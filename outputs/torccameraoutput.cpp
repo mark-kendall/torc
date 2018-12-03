@@ -222,7 +222,7 @@ void TorcCameraVideoOutput::Start(void)
 {
     Stop();
 
-    connect(this, SIGNAL(CheckTime()), this, SLOT(TimeCheck()));
+    connect(this, &TorcCameraVideoOutput::CheckTime, this, &TorcCameraVideoOutput::TimeCheck);
     emit CheckTime();
 
     m_threadLock.lockForWrite();

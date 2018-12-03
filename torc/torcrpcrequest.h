@@ -77,6 +77,6 @@ class TorcRPCRequest : public TorcReferenceCounter
     QVariant            m_reply;
 };
 
-Q_DECLARE_METATYPE(TorcRPCRequest*);
+Q_DECLARE_METATYPE(TorcRPCRequest*)
 
 #endif // TORCRPCREQUEST_H
