@@ -70,7 +70,7 @@ OMX_ERRORTYPE TorcOMXPort::EnablePort(bool Enable, bool Wait /*=true*/)
 
     if (portdefinition.bEnabled == OMX_FALSE && Enable)
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("%1: Enabling port %2").arg(m_parent->GetName(), m_port));
+        LOG(VB_GENERAL, LOG_INFO, QString("%1: Enabling port %2").arg(m_parent->GetName()).arg(m_port));
         error = OMX_SendCommand(m_handle, OMX_CommandPortEnable, m_port, nullptr);
         OMX_CHECK(error, m_parent->GetName(), "Failed to send command");
         if (Wait)
