@@ -433,10 +433,10 @@ void TorcWebSocket::Start(void)
     m_reader.Reset();
     m_wsReader.Reset();
 
-    connect(this, QOverload<QAbstractSocket::SocketError>::of(&TorcWebSocket::error), this, &TorcWebSocket::Error);
+    connect(this, static_cast<void (TorcWebSocket::*)(QAbstractSocket::SocketError)>(&TorcWebSocket::error), this, &TorcWebSocket::Error);
     connect(this, &TorcWebSocket::disconnected, this, &TorcWebSocket::Disconnected);
     connect(this, &TorcWebSocket::encrypted,    this, &TorcWebSocket::Encrypted);
-    connect(this, QOverload<const QList<QSslError>&>::of(&TorcWebSocket::sslErrors),  this, &TorcWebSocket::SSLErrors);
+    connect(this, static_cast<void (TorcWebSocket::*)(const QList<QSslError>&)>(&TorcWebSocket::sslErrors),  this, &TorcWebSocket::SSLErrors);
 
     // Ignore errors for Self signed certificates
     QList<QSslError> ignore;

@@ -304,45 +304,45 @@ TorcHTTPServer::TorcHTTPServer()
                                TorcSetting::Persistent | TorcSetting::Public, QVariant((int)(root ? 80 : 4840)));
     m_port->SetRange(root ? 1 : 1024, 65535, 1);
     m_port->SetActive(true);
-    connect(m_port, QOverload<int>::of(&TorcSetting::ValueChanged), this, &TorcHTTPServer::PortChanged);
+    connect(m_port, static_cast<void (TorcSetting::*)(int)>(&TorcSetting::ValueChanged), this, &TorcHTTPServer::PortChanged);
     m_port->SetHelpText(tr("The port the server will listen on for incoming connections"));
 
     m_secure = new TorcSetting(m_serverSettings, TORC_SSL_SERVICE, tr("Secure sockets"), TorcSetting::Bool,
                                TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)false));
     m_secure->SetHelpText(tr("Use encrypted (SSL/TLS) connections to the server"));
     m_secure->SetActive(true);
-    connect(m_secure, QOverload<bool>::of(&TorcSetting::ValueChanged), this, &TorcHTTPServer::SecureChanged);
+    connect(m_secure, static_cast<void (TorcSetting::*)(bool)>(&TorcSetting::ValueChanged), this, &TorcHTTPServer::SecureChanged);
 
     m_upnp =  new TorcSetting(m_serverSettings, "ServerUPnP", tr("UPnP"), TorcSetting::Bool,
                               TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true));
     m_upnp->SetActive(true);
-    connect(m_upnp, QOverload<bool>::of(&TorcSetting::ValueChanged), this, &TorcHTTPServer::UPnPChanged);
+    connect(m_upnp, static_cast<void (TorcSetting::*)(bool)>(&TorcSetting::ValueChanged), this, &TorcHTTPServer::UPnPChanged);
 
     m_upnpSearch = new TorcSetting(m_upnp, "ServerUPnPSearch", tr("UPnP Search"), TorcSetting::Bool,
                                    TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true));
     m_upnpSearch->SetHelpText(tr("Use UPnP to search for other devices"));
     m_upnpSearch->SetActive(m_upnp->GetValue().toBool());
-    connect(m_upnpSearch, QOverload<bool>::of(&TorcSetting::ValueChanged), this, &TorcHTTPServer::UPnPSearchChanged);
-    connect(m_upnp,       QOverload<bool>::of(&TorcSetting::ValueChanged), m_upnpSearch, &TorcSetting::SetActive);
+    connect(m_upnpSearch, static_cast<void (TorcSetting::*)(bool)>(&TorcSetting::ValueChanged), this, &TorcHTTPServer::UPnPSearchChanged);
+    connect(m_upnp,       static_cast<void (TorcSetting::*)(bool)>(&TorcSetting::ValueChanged), m_upnpSearch, &TorcSetting::SetActive);
 
     m_upnpAdvertise = new TorcSetting(m_upnp, "ServerUPnpAdvert", tr("UPnP Advertisement"), TorcSetting::Bool,
                                       TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true));
     m_upnpAdvertise->SetHelpText(tr("Use UPnP to advertise this device"));
     m_upnpAdvertise->SetActive(m_upnp->GetValue().toBool());
-    connect(m_upnpAdvertise, QOverload<bool>::of(&TorcSetting::ValueChanged), this, &TorcHTTPServer::UPnPAdvertChanged);
-    connect(m_upnp,          QOverload<bool>::of(&TorcSetting::ValueChanged), m_upnpAdvertise, &TorcSetting::SetActive);
+    connect(m_upnpAdvertise, static_cast<void (TorcSetting::*)(bool)>(&TorcSetting::ValueChanged), this, &TorcHTTPServer::UPnPAdvertChanged);
+    connect(m_upnp,          static_cast<void (TorcSetting::*)(bool)>(&TorcSetting::ValueChanged), m_upnpAdvertise, &TorcSetting::SetActive);
 
     m_ipv6 = new TorcSetting(m_serverSettings, "ServerIPv6", tr("IPv6"), TorcSetting::Bool,
                              TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true));
     m_ipv6->SetHelpText(tr("Enable IPv6"));
     m_ipv6->SetActive(true);
-    connect(m_ipv6, QOverload<bool>::of(&TorcSetting::ValueChanged), this, &TorcHTTPServer::IPv6Changed);
+    connect(m_ipv6, static_cast<void (TorcSetting::*)(bool)>(&TorcSetting::ValueChanged), this, &TorcHTTPServer::IPv6Changed);
 
     m_bonjour = new TorcSetting(m_ipv6, "ServerBonjour", tr("Bonjour"), TorcSetting::Bool,
                                 TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true));
     m_bonjour->SetActive(m_ipv6->GetValue().toBool());
-    connect(m_bonjour, QOverload<bool>::of(&TorcSetting::ValueChanged), this, &TorcHTTPServer::BonjourChanged);
-    connect(m_ipv6,    QOverload<bool>::of(&TorcSetting::ValueChanged), m_bonjour, &TorcSetting::SetActive);
+    connect(m_bonjour, static_cast<void (TorcSetting::*)(bool)>(&TorcSetting::ValueChanged), this, &TorcHTTPServer::BonjourChanged);
+    connect(m_ipv6,    static_cast<void (TorcSetting::*)(bool)>(&TorcSetting::ValueChanged), m_bonjour, &TorcSetting::SetActive);
 
     m_bonjourSearch = new TorcSetting(m_bonjour, "ServerBonjourSearch", tr("Bonjour search"), TorcSetting::Bool,
                                       TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true));
@@ -350,9 +350,9 @@ TorcHTTPServer::TorcHTTPServer()
     m_bonjourSearch->SetActiveThreshold(2);
     m_bonjourSearch->SetActive(m_bonjour->GetValue().toBool());
     m_bonjourSearch->SetActive(m_ipv6->GetValue().toBool());
-    connect(m_bonjourSearch, QOverload<bool>::of(&TorcSetting::ValueChanged), this, &TorcHTTPServer::BonjourSearchChanged);
-    connect(m_bonjour,       QOverload<bool>::of(&TorcSetting::ValueChanged), m_bonjourSearch, &TorcSetting::SetActive);
-    connect(m_ipv6,          QOverload<bool>::of(&TorcSetting::ValueChanged), m_bonjourSearch, &TorcSetting::SetActive);
+    connect(m_bonjourSearch, static_cast<void (TorcSetting::*)(bool)>(&TorcSetting::ValueChanged), this, &TorcHTTPServer::BonjourSearchChanged);
+    connect(m_bonjour,       static_cast<void (TorcSetting::*)(bool)>(&TorcSetting::ValueChanged), m_bonjourSearch, &TorcSetting::SetActive);
+    connect(m_ipv6,          static_cast<void (TorcSetting::*)(bool)>(&TorcSetting::ValueChanged), m_bonjourSearch, &TorcSetting::SetActive);
 
     m_bonjourAdvert = new TorcSetting(m_bonjour, "ServerBonjourAdvert", tr("Bonjour Advertisement"), TorcSetting::Bool,
                                       TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true));
@@ -360,9 +360,9 @@ TorcHTTPServer::TorcHTTPServer()
     m_bonjourAdvert->SetActiveThreshold(2);
     m_bonjourAdvert->SetActive(m_bonjour->GetValue().toBool());
     m_bonjourAdvert->SetActive(m_ipv6->GetValue().toBool());
-    connect(m_bonjourAdvert, QOverload<bool>::of(&TorcSetting::ValueChanged), this, &TorcHTTPServer::BonjourAdvertChanged);
-    connect(m_bonjour,       QOverload<bool>::of(&TorcSetting::ValueChanged), m_bonjourAdvert, &TorcSetting::SetActive);
-    connect(m_ipv6,          QOverload<bool>::of(&TorcSetting::ValueChanged), m_bonjourAdvert, &TorcSetting::SetActive);
+    connect(m_bonjourAdvert, static_cast<void (TorcSetting::*)(bool)>(&TorcSetting::ValueChanged), this, &TorcHTTPServer::BonjourAdvertChanged);
+    connect(m_bonjour,       static_cast<void (TorcSetting::*)(bool)>(&TorcSetting::ValueChanged), m_bonjourAdvert, &TorcSetting::SetActive);
+    connect(m_ipv6,          static_cast<void (TorcSetting::*)(bool)>(&TorcSetting::ValueChanged), m_bonjourAdvert, &TorcSetting::SetActive);
 
     // initialise external status
     {

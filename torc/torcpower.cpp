@@ -171,25 +171,25 @@ TorcPower::TorcPower()
     }
 
     // listen for changes
-    connect(m_allowShutdown,  QOverload<bool>::of(&TorcSetting::ActiveChanged), this, &TorcPower::CanShutdownActiveChanged);
-    connect(m_allowSuspend,   QOverload<bool>::of(&TorcSetting::ActiveChanged), this, &TorcPower::CanSuspendActiveChanged);
-    connect(m_allowHibernate, QOverload<bool>::of(&TorcSetting::ActiveChanged), this, &TorcPower::CanHibernateActiveChanged);
-    connect(m_allowRestart,   QOverload<bool>::of(&TorcSetting::ActiveChanged), this, &TorcPower::CanRestartActiveChanged);
+    connect(m_allowShutdown,  static_cast<void (TorcSetting::*)(bool)>(&TorcSetting::ActiveChanged), this, &TorcPower::CanShutdownActiveChanged);
+    connect(m_allowSuspend,   static_cast<void (TorcSetting::*)(bool)>(&TorcSetting::ActiveChanged), this, &TorcPower::CanSuspendActiveChanged);
+    connect(m_allowHibernate, static_cast<void (TorcSetting::*)(bool)>(&TorcSetting::ActiveChanged), this, &TorcPower::CanHibernateActiveChanged);
+    connect(m_allowRestart,   static_cast<void (TorcSetting::*)(bool)>(&TorcSetting::ActiveChanged), this, &TorcPower::CanRestartActiveChanged);
 
-    connect(m_allowShutdown,  QOverload<bool>::of(&TorcSetting::ValueChanged),  this, &TorcPower::CanShutdownValueChanged);
-    connect(m_allowSuspend,   QOverload<bool>::of(&TorcSetting::ValueChanged),  this, &TorcPower::CanSuspendValueChanged);
-    connect(m_allowHibernate, QOverload<bool>::of(&TorcSetting::ValueChanged),  this, &TorcPower::CanHibernateValueChanged);
-    connect(m_allowRestart,   QOverload<bool>::of(&TorcSetting::ValueChanged),  this, &TorcPower::CanRestartValueChanged);
+    connect(m_allowShutdown,  static_cast<void (TorcSetting::*)(bool)>(&TorcSetting::ValueChanged),  this, &TorcPower::CanShutdownValueChanged);
+    connect(m_allowSuspend,   static_cast<void (TorcSetting::*)(bool)>(&TorcSetting::ValueChanged),  this, &TorcPower::CanSuspendValueChanged);
+    connect(m_allowHibernate, static_cast<void (TorcSetting::*)(bool)>(&TorcSetting::ValueChanged),  this, &TorcPower::CanHibernateValueChanged);
+    connect(m_allowRestart,   static_cast<void (TorcSetting::*)(bool)>(&TorcSetting::ValueChanged),  this, &TorcPower::CanRestartValueChanged);
 
-    connect(m_canShutdown,    QOverload<bool>::of(&TorcSetting::ValueChanged), m_allowShutdown,  &TorcSetting::SetActive);
-    connect(m_canSuspend,     QOverload<bool>::of(&TorcSetting::ValueChanged), m_allowSuspend,   &TorcSetting::SetActive);
-    connect(m_canHibernate,   QOverload<bool>::of(&TorcSetting::ValueChanged), m_allowHibernate, &TorcSetting::SetActive);
-    connect(m_canRestart,     QOverload<bool>::of(&TorcSetting::ValueChanged), m_allowRestart,   &TorcSetting::SetActive);
+    connect(m_canShutdown,    static_cast<void (TorcSetting::*)(bool)>(&TorcSetting::ValueChanged), m_allowShutdown,  &TorcSetting::SetActive);
+    connect(m_canSuspend,     static_cast<void (TorcSetting::*)(bool)>(&TorcSetting::ValueChanged), m_allowSuspend,   &TorcSetting::SetActive);
+    connect(m_canHibernate,   static_cast<void (TorcSetting::*)(bool)>(&TorcSetting::ValueChanged), m_allowHibernate, &TorcSetting::SetActive);
+    connect(m_canRestart,     static_cast<void (TorcSetting::*)(bool)>(&TorcSetting::ValueChanged), m_allowRestart,   &TorcSetting::SetActive);
 
-    connect(m_powerEnabled,   QOverload<bool>::of(&TorcSetting::ValueChanged), m_allowShutdown,  &TorcSetting::SetActive);
-    connect(m_powerEnabled,   QOverload<bool>::of(&TorcSetting::ValueChanged), m_allowSuspend,   &TorcSetting::SetActive);
-    connect(m_powerEnabled,   QOverload<bool>::of(&TorcSetting::ValueChanged), m_allowHibernate, &TorcSetting::SetActive);
-    connect(m_powerEnabled,   QOverload<bool>::of(&TorcSetting::ValueChanged), m_allowRestart,   &TorcSetting::SetActive);
+    connect(m_powerEnabled,   static_cast<void (TorcSetting::*)(bool)>(&TorcSetting::ValueChanged), m_allowShutdown,  &TorcSetting::SetActive);
+    connect(m_powerEnabled,   static_cast<void (TorcSetting::*)(bool)>(&TorcSetting::ValueChanged), m_allowSuspend,   &TorcSetting::SetActive);
+    connect(m_powerEnabled,   static_cast<void (TorcSetting::*)(bool)>(&TorcSetting::ValueChanged), m_allowHibernate, &TorcSetting::SetActive);
+    connect(m_powerEnabled,   static_cast<void (TorcSetting::*)(bool)>(&TorcSetting::ValueChanged), m_allowRestart,   &TorcSetting::SetActive);
 
     // listen for delayed shutdown events
     gLocalContext->AddObserver(this);

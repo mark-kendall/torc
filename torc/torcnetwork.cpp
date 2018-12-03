@@ -388,7 +388,7 @@ void TorcNetwork::GetSafe(TorcNetworkRequest* Request)
         connect(reply, &QNetworkReply::readyRead,        this, &TorcNetwork::ReadyRead);
         connect(reply, &QNetworkReply::finished,         this, &TorcNetwork::Finished);
         connect(reply, &QNetworkReply::downloadProgress, this, &TorcNetwork::DownloadProgress);
-        connect(reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error), this, &TorcNetwork::Error);
+        connect(reply, static_cast<void (QNetworkReply::*)(QNetworkReply::NetworkError)>(&QNetworkReply::error), this, &TorcNetwork::Error);
         connect(reply, &QNetworkReply::sslErrors,        this, &TorcNetwork::SSLErrors);
 
         m_requests.insert(reply, Request);
