@@ -14,7 +14,6 @@
 #include <QHash>
 #include <QMap>
 #include <QByteArray>
-#include <QWaitCondition>
 #include <QFileInfo>
 #include <QStringList>
 #include <QQueue>
@@ -22,7 +21,6 @@
 // Torc
 #include "torcexitcodes.h"
 #include "torccompat.h"
-#include "torcqthread.h"
 #include "torclogging.h"
 #include "torcloggingimp.h"
 
@@ -165,147 +163,134 @@ class LogItem
     quint64             mask;
 };
 
-class LoggingThread : public TorcQThread
+void LoggingThread::run(void)
 {
-  public:
-    LoggingThread();
-   ~LoggingThread();
+    Initialise();
 
-    // TorcQThread
-    void run(void)
+    gLogThreadFinished = false;
+
+    QMutexLocker lock(&gLogQueueLock);
+
+    while (!m_aborted || !gLogQueue.isEmpty())
     {
-        Initialise();
-
-        gLogThreadFinished = false;
-
-        QMutexLocker lock(&gLogQueueLock);
-
-        while (!m_aborted || !gLogQueue.isEmpty())
+        if (gLogQueue.isEmpty())
         {
-            if (gLogQueue.isEmpty())
-            {
-                m_waitEmpty.wakeAll();
-                m_waitNotEmpty.wait(lock.mutex(), 100);
-                continue;
-            }
-
-            LogItem *item = gLogQueue.dequeue();
-            lock.unlock();
-
-            HandleItem(item);
-            LogItem::Delete(item);
-
-            lock.relock();
+            m_waitEmpty.wakeAll();
+            m_waitNotEmpty.wait(lock.mutex(), 100);
+            continue;
         }
 
-        gLogThreadFinished = true;
-
+        LogItem *item = gLogQueue.dequeue();
         lock.unlock();
 
-        Deinitialise();
+        HandleItem(item);
+        LogItem::Delete(item);
+
+        lock.relock();
     }
 
-    void Start(void)
+    gLogThreadFinished = true;
+
+    lock.unlock();
+
+    Deinitialise();
+}
+
+void LoggingThread::Start(void)
+{
+}
+
+void LoggingThread::Finish(void)
+{
+}
+
+void LoggingThread::Stop(void)
+{
+    if (m_aborted)
+        return;
+
     {
+        QMutexLocker lock(&gLogQueueLock);
+        Flush(1000);
+        m_aborted = true;
     }
+    m_waitNotEmpty.wakeAll();
+}
 
-    void Finish(void)
+bool LoggingThread::Flush(int TimeoutMS)
+{
+    QTime t;
+    t.start();
+    while (!m_aborted && !gLogQueue.isEmpty() && t.elapsed() < TimeoutMS)
     {
-    }
-
-    void Stop(void)
-    {
-        if (m_aborted)
-            return;
-
-        {
-            QMutexLocker lock(&gLogQueueLock);
-            Flush(1000);
-            m_aborted = true;
-        }
         m_waitNotEmpty.wakeAll();
+        int left = TimeoutMS - t.elapsed();
+        if (left > 0)
+            m_waitEmpty.wait(&gLogQueueLock, left);
     }
+    return gLogQueue.isEmpty();
+}
 
-    bool Flush(int TimeoutMS = 200000)
+void LoggingThread::HandleItem(LogItem *Item)
+{
+    if (Item->type & kRegistering)
     {
-        QTime t;
-        t.start();
-        while (!m_aborted && !gLogQueue.isEmpty() && t.elapsed() < TimeoutMS)
+        int64_t tid = GetThreadTid(Item);
+
+        QMutexLocker locker(&gLogThreadLock);
+        if (gLogThreadHash.contains(Item->threadId))
+            free(gLogThreadHash.take(Item->threadId));
+
+        gLogThreadHash[Item->threadId] = strdup(Item->threadName);
+
+        if (gDebugRegistration)
         {
-            m_waitNotEmpty.wakeAll();
-            int left = TimeoutMS - t.elapsed();
-            if (left > 0)
-                m_waitEmpty.wait(&gLogQueueLock, left);
+            snprintf(Item->message, LOGLINE_MAX,
+                     "Thread 0x%" PREFIX64 "X (%" PREFIX64
+                     "d) registered as \'%s\'",
+                     (long long unsigned int)Item->threadId,
+                     (long long int)tid,
+                     gLogThreadHash[Item->threadId]);
         }
-        return gLogQueue.isEmpty();
     }
-
-    void HandleItem(LogItem *Item)
+    else if (Item->type & kDeregistering)
     {
-        if (Item->type & kRegistering)
+        int64_t tid = 0;
         {
-            int64_t tid = GetThreadTid(Item);
+            QMutexLocker locker(&gLogThreadTidLock);
+            if (gLogThreadtidHash.contains(Item->threadId))
+            {
+                tid = gLogThreadtidHash[Item->threadId];
+                gLogThreadtidHash.remove(Item->threadId);
+            }
+        }
 
-            QMutexLocker locker(&gLogThreadLock);
-            if (gLogThreadHash.contains(Item->threadId))
-                free(gLogThreadHash.take(Item->threadId));
-
-            gLogThreadHash[Item->threadId] = strdup(Item->threadName);
-
+        QMutexLocker locker(&gLogThreadLock);
+        if (gLogThreadHash.contains(Item->threadId))
+        {
             if (gDebugRegistration)
             {
                 snprintf(Item->message, LOGLINE_MAX,
                          "Thread 0x%" PREFIX64 "X (%" PREFIX64
-                         "d) registered as \'%s\'",
+                         "d) deregistered as \'%s\'",
                          (long long unsigned int)Item->threadId,
                          (long long int)tid,
                          gLogThreadHash[Item->threadId]);
             }
-        }
-        else if (Item->type & kDeregistering)
-        {
-            int64_t tid = 0;
-            {
-                QMutexLocker locker(&gLogThreadTidLock);
-                if (gLogThreadtidHash.contains(Item->threadId))
-                {
-                    tid = gLogThreadtidHash[Item->threadId];
-                    gLogThreadtidHash.remove(Item->threadId);
-                }
-            }
-
-            QMutexLocker locker(&gLogThreadLock);
-            if (gLogThreadHash.contains(Item->threadId))
-            {
-                if (gDebugRegistration)
-                {
-                    snprintf(Item->message, LOGLINE_MAX,
-                             "Thread 0x%" PREFIX64 "X (%" PREFIX64
-                             "d) deregistered as \'%s\'",
-                             (long long unsigned int)Item->threadId,
-                             (long long int)tid,
-                             gLogThreadHash[Item->threadId]);
-                }
-                char* threadname = gLogThreadHash.take(Item->threadId);
-                free(threadname);
-            }
-        }
-
-        if (Item->message[0] != '\0')
-        {
-            QMutexLocker locker(&gLoggerListLock);
-
-            QList<LoggerBase *>::iterator it;
-            for (it = gLoggerList.begin(); it != gLoggerList.end(); ++it)
-                (*it)->Logmsg(Item);
+            char* threadname = gLogThreadHash.take(Item->threadId);
+            free(threadname);
         }
     }
 
-  private:
-    QWaitCondition m_waitNotEmpty;
-    QWaitCondition m_waitEmpty;
-    bool           m_aborted;
-};
+    if (Item->message[0] != '\0')
+    {
+        QMutexLocker locker(&gLoggerListLock);
+
+        QList<LoggerBase *>::iterator it;
+        for (it = gLoggerList.begin(); it != gLoggerList.end(); ++it)
+            (*it)->Logmsg(Item);
+    }
+}
 
 typedef struct {
     bool    propagate;
@@ -345,7 +330,7 @@ QMutex         gLoglevelMapLock;
 
 bool           gVerboseInitialised    = false;
 const uint64_t gVerboseDefaultInt     = VB_GENERAL;
-const char    *gVerboseDefaultStr     = " general";
+QString        gVerboseDefaultStr     = QStringLiteral(" general");
 uint64_t       gVerboseMask           = gVerboseDefaultInt;
 QString        gVerboseString         = QString(gVerboseDefaultStr);
 uint64_t       gUserDefaultValueInt   = gVerboseDefaultInt;
@@ -357,14 +342,10 @@ void AddLogLevel(int value, QString name, char shortname);
 void InitVerbose(void);
 void VerboseHelp(void);
 
-LoggerBase::LoggerBase(QString FileName) : m_fileName(FileName)
+LoggerBase::LoggerBase(const QString &FileName) : m_fileName(FileName)
 {
     QMutexLocker locker(&gLoggerListLock);
     gLoggerList.append(this);
-}
-
-LoggerBase::~LoggerBase()
-{
 }
 
 QByteArray LoggerBase::GetLine(LogItem *Item)
@@ -413,7 +394,7 @@ QByteArray LoggerBase::GetLine(LogItem *Item)
     return line.trimmed();
 }
 
-FileLogger::FileLogger(QString Filename, bool ErrorsOnly, int Quiet)
+FileLogger::FileLogger(const QString &Filename, bool ErrorsOnly, int Quiet)
   : LoggerBase(Filename),
     m_opened(false),
     m_file(),
@@ -501,7 +482,7 @@ bool FileLogger::PrintLine(QByteArray &Line)
  * \note Subscribers to the 'tail' may not receive all log items if they do not retrieve the latest tail
  *       before the next item is logged.
 */
-WebLogger::WebLogger(QString Filename)
+WebLogger::WebLogger(const QString &Filename)
   : QObject(),
     TorcHTTPService(this, "log", "log", WebLogger::staticMetaObject, "event"),
     FileLogger(Filename, false, false),
@@ -511,10 +492,6 @@ WebLogger::WebLogger(QString Filename)
 {
     // we rate limit the LogChanged signal to once every 10 seconds
     startTimer(10000);
-}
-
-WebLogger::~WebLogger()
-{
 }
 
 bool WebLogger::event(QEvent *event)
@@ -710,8 +687,8 @@ bool GetQuietLogPropagation(void)
     return gLogPropagationOpts.quiet;
 }
 
-void StartLogging(QString Logfile, int progress, int quiet,
-                  QString Level, bool Propagate)
+void StartLogging(const QString &Logfile, int progress, int quiet,
+                  const QString &Level, bool Propagate)
 {
     RegisterLoggingThread();
 
@@ -821,7 +798,7 @@ void DeregisterLoggingThread(void)
         gLogQueue.enqueue(item);
 }
 
-LogLevel GetLogLevel(QString level)
+LogLevel GetLogLevel(const QString &level)
 {
     QMutexLocker locker(&gLoglevelMapLock);
     if (!gVerboseInitialised)
@@ -937,7 +914,7 @@ void VerboseHelp(void)
       "Some debug levels may not apply to this program.\n\n";
 }
 
-int ParseVerboseArgument(QString arg)
+int ParseVerboseArgument(const QString &arg)
 {
     QString option;
 

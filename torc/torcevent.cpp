@@ -54,7 +54,7 @@
 QEvent::Type TorcEvent::TorcEventType = (QEvent::Type) QEvent::registerEventType();
 
 /// The default implementation contains no data.
-TorcEvent::TorcEvent(int Event, const QVariantMap Data/* = QVariantMap()*/)
+TorcEvent::TorcEvent(int Event, const QVariantMap &Data/* = QVariantMap()*/)
   : QEvent(TorcEventType),
     m_event(Event),
     m_data(Data)

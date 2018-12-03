@@ -55,7 +55,7 @@ TorcHTTPServer::Status::Status()
 {
 }
 
-bool TorcHTTPServer::Status::operator ==(const Status &Other) const
+bool TorcHTTPServer::Status::operator ==(Status Other) const
 {
     return port   == Other.port &&
            secure == Other.secure &&

@@ -41,6 +41,7 @@ namespace TorcCoreUtils
     {
         const QMetaEnum metaEnum = QMetaEnum::fromType<T>();
         QStringList result;
+        result.reserve(metaEnum.keyCount());
         for (int count = metaEnum.keyCount() - 1 ; count >= 0; --count)
             result << QString(metaEnum.key(count)).toLower();
         return result;

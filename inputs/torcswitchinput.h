@@ -6,6 +6,7 @@
 
 class TorcSwitchInput : public TorcInput
 {
+    Q_OBJECT
   public:
     TorcSwitchInput(double Default, const QString &ModelId, const QVariantMap &Details);
     virtual ~TorcSwitchInput() = default;

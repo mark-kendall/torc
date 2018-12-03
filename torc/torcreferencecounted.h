@@ -19,6 +19,9 @@ class TorcReferenceCounter
   protected:
     QAtomicInt   m_refCount;
     static bool  m_eventLoopEnding;
+
+  private:
+    Q_DISABLE_COPY(TorcReferenceCounter)
 };
 
 class TorcReferenceLocker

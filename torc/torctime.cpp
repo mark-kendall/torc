@@ -75,7 +75,8 @@ void TorcTime::Tick(void)
         gLocalContext->NotifyEvent(Torc::SystemTimeChanged);
     }
 
-    emit currentTimeChanged(m_lastTime.toString(m_dateTimeFormat));
+    QString time = m_lastTime.toString(m_dateTimeFormat);
+    emit currentTimeChanged(time);
 }
 
 void TorcTime::SubscriberDeleted(QObject *Subscriber)

@@ -60,12 +60,12 @@ class TorcCameraStillsOutput final : public TorcCameraOutput
 
   public slots:
     void             CameraErrored     (bool Errored) override;
-    void             StillReady        (const QString File);
+    void             StillReady        (const QString &File);
     QStringList      GetStillsList     (void);
 
   signals:
     void             TakeStills        (uint Count);
-    void             StillsListChanged (QStringList);
+    void             StillsListChanged (QStringList &List);
 
  private:
     Q_DISABLE_COPY(TorcCameraStillsOutput)

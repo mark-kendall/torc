@@ -106,10 +106,7 @@ QVariantMap TorcOutputs::GetOutputList(void)
 
 QStringList TorcOutputs::GetOutputTypes(void)
 {
-    QStringList result;
-        for (int i = 0; i < TorcOutput::MaxType; ++i)
-            result << TorcCoreUtils::EnumToLowerString<TorcOutput::Type>(static_cast<TorcOutput::Type>(i));
-    return result;
+    return TorcCoreUtils::EnumList<TorcOutput::Type>();
 }
 
 void TorcOutputs::AddOutput(TorcOutput *Output)

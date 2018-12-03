@@ -20,6 +20,8 @@
 * USA.
 */
 
+// clazy:excludeall=function-args-by-ref
+
 // Torc
 #include "torclogging.h"
 #include "torcpowerunixdbus.h"

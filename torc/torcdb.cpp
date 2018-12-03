@@ -82,7 +82,7 @@ void TorcDB::CloseConnections(void)
 
     CloseThreadConnection();
 
-    if (!m_connectionMap.size())
+    if (m_connectionMap.isEmpty())
         return;
 
     LOG(VB_GENERAL, LOG_WARNING, QString("%1 open connections.").arg(m_connectionMap.size()));

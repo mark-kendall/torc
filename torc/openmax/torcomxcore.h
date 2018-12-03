@@ -50,6 +50,8 @@ class TorcOMXCore
 {
   public:
     TorcOMXCore();
+
+  protected:
    ~TorcOMXCore();
 };
 

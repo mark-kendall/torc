@@ -33,7 +33,7 @@ class TorcCameraThread final : public TorcQThread, public TorcReferenceCounter
     void              SegmentRemoved (int);
     void              CameraErrored  (bool);
     void              ParamsChanged  (TorcCameraParams &Params);
-    void              StillReady     (const QString File);
+    void              StillReady     (const QString &File);
     void              TakeStills     (uint Count);
 
   private:

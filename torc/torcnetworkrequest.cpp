@@ -48,7 +48,7 @@
  * retrieved via ReadAll. Take care when downloading files of an unknown size.
 */
 
-TorcNetworkRequest::TorcNetworkRequest(const QNetworkRequest Request, QNetworkAccessManager::Operation Type, int BufferSize, int *Abort)
+TorcNetworkRequest::TorcNetworkRequest(const QNetworkRequest &Request, QNetworkAccessManager::Operation Type, int BufferSize, int *Abort)
   : m_type(Type),
     m_abort(Abort),
     m_started(false),
@@ -85,7 +85,7 @@ TorcNetworkRequest::TorcNetworkRequest(const QNetworkRequest Request, QNetworkAc
         LOG(VB_GENERAL, LOG_INFO, QString("Request buffer size %1bytes (%2 reserved)").arg(m_bufferSize).arg(m_bufferSize - m_writeBufferSize));
 }
 
-TorcNetworkRequest::TorcNetworkRequest(const QNetworkRequest Request, const QByteArray &PostData, int *Abort)
+TorcNetworkRequest::TorcNetworkRequest(const QNetworkRequest &Request, const QByteArray &PostData, int *Abort)
   : m_type(QNetworkAccessManager::PostOperation),
     m_abort(Abort),
     m_started(false),

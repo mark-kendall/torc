@@ -368,6 +368,7 @@ QList<QVariant> TorcPList::ParseBinaryArray(quint8 *Data)
     if (!count)
         return result;
 
+    result.reserve(count);
     for (quint64 i = 0; i < count; i++, Data += m_parmSize)
     {
         quint64 obj = GetBinaryUInt(Data, m_parmSize);

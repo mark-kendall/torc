@@ -31,6 +31,8 @@ DEALINGS IN THE SOFTWARE.
 #include "core.h"
 #include <stdexcept>
 
+// clazy:skip
+
 namespace utf8
 {
     // Base for the exceptions that may be thrown from the library

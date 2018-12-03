@@ -41,11 +41,11 @@ class TorcCommandLine
     static bool   RegisterEnvironmentVariable  (const QString &Var, const QString &Description);
 
     int           Evaluate                     (int argc, const char * const * argv, bool &Exit);
-    void          Add                          (const QString Keys, const QVariant &Default, const QString &HelpText, bool ExitImmediately/*=false*/);
+    void          Add                          (const QString &Keys, const QVariant &Default, const QString &HelpText, bool ExitImmediately/*=false*/);
     QVariant      GetValue                     (const QString &Key);
 
   private:
-    void          AddPriv                      (const QString Keys, const QVariant &Default, const QString &HelpText, TorcCommandLine::Options Flags = TorcCommandLine::None, bool ExitImmediately = false);
+    void          AddPriv                      (const QString &Keys, const QVariant &Default, const QString &HelpText, TorcCommandLine::Options Flags = TorcCommandLine::None, bool ExitImmediately = false);
 
   private:
     QHash<QString,TorcArgument> m_options;

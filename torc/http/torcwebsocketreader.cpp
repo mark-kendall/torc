@@ -111,15 +111,11 @@ TorcWebSocketReader::WSSubProtocols TorcWebSocketReader::SubProtocolsFromString(
 QList<TorcWebSocketReader::WSSubProtocol> TorcWebSocketReader::SubProtocolsFromPrioritisedString(const QString &Protocols)
 {
     QList<WSSubProtocol> results;
-
+    results.reserve(1);
     QStringList protocols = Protocols.split(",");
     for (int i = 0; i < protocols.size(); ++i)
-    {
-        QString protocol = protocols[i].trimmed();
-
-        if (!QString::compare(protocol, TORC_JSON_RPC.toLatin1(), Qt::CaseInsensitive)) results.append(SubProtocolJSONRPC);
-    }
-
+        if (!QString::compare(protocols[i].trimmed(), TORC_JSON_RPC.toLatin1(), Qt::CaseInsensitive))
+            results.append(SubProtocolJSONRPC);
     return results;
 }
 TorcWebSocketReader::TorcWebSocketReader(QTcpSocket &Socket, WSSubProtocol Protocol, bool ServerSide)
@@ -245,7 +241,7 @@ void TorcWebSocketReader::SendFrame(OpCode Code, QByteArray &Payload)
     }
 
     frame.append(byte);
-    if (size.size())
+    if (!size.isEmpty())
         frame.append(size);
 
     if (!m_serverSide)
@@ -257,7 +253,7 @@ void TorcWebSocketReader::SendFrame(OpCode Code, QByteArray &Payload)
 
     if (m_socket.write(frame) == frame.size())
     {
-        if ((Payload.size() && m_socket.write(Payload) == Payload.size()) || !Payload.size())
+        if ((!Payload.isEmpty() && m_socket.write(Payload) == Payload.size()) || Payload.isEmpty())
         {
             LOG(VB_NETWORK, LOG_DEBUG, QString("Sent frame (Final), OpCode: '%1' Masked: %2 Length: %3")
                 .arg(OpCodeToString(Code)).arg(!m_serverSide).arg(Payload.size()));

@@ -51,15 +51,15 @@ extern uint64_t gVerboseMask;
 extern QString    gLogPropagationArgs;
 extern QString    gVerboseString;
 
-void     StartLogging(QString Logfile, int progress = 0,
-                                       int quiet = 0, QString level = "info",
+void     StartLogging(const QString &Logfile, int progress = 0,
+                      int quiet = 0, const QString &level = QStringLiteral("info"),
                                        bool Propagate = false);
 void     StopLogging(void);
 void     CalculateLogPropagation(void);
 bool     GetQuietLogPropagation(void);
-LogLevel GetLogLevel(QString level);
+LogLevel GetLogLevel(const QString &level);
 QString  GetLogLevelName(LogLevel level);
-int      ParseVerboseArgument(QString arg);
+int      ParseVerboseArgument(const QString &arg);
 QString  LogErrorToString(int errnum);
 
 /// This can be appended to the LOG args with 

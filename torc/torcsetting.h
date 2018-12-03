@@ -77,11 +77,11 @@ class TorcSetting : public QObject, public TorcHTTPService, public TorcReference
     int                    GetStep              (void);
 
   signals:
-    void                   ValueChanged         (const QVariant &Value);
+    void                   ValueChanged         (QVariant &Value);
     void                   ValueChanged         (int  Value);
     void                   ValueChanged         (bool Value);
-    void                   ValueChanged         (QString Value);
-    void                   ValueChanged         (QStringList Value);
+    void                   ValueChanged         (QString &Value);
+    void                   ValueChanged         (QStringList &Value);
     void                   ActiveChanged        (bool Active);
     void                   Removed              (void);
 
@@ -123,6 +123,7 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(TorcSetting::Roles)
 
 class TorcSettingGroup : public TorcSetting
 {
+    Q_OBJECT
   public:
     TorcSettingGroup(TorcSetting *Parent, const QString &UIName);
 };

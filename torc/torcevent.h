@@ -9,7 +9,7 @@
 class TorcEvent : public QEvent
 {
   public:
-    TorcEvent(int Event, const QVariantMap Data = QVariantMap());
+    TorcEvent(int Event, const QVariantMap &Data = QVariantMap());
     virtual ~TorcEvent() = default;
 
     int          GetEvent (void);
@@ -19,6 +19,7 @@ class TorcEvent : public QEvent
     static       Type      TorcEventType;
 
   private:
+    Q_DISABLE_COPY(TorcEvent)
     int         m_event;
     QVariantMap m_data;
 };

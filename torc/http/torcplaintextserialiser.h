@@ -17,6 +17,9 @@ class TorcPlainTextSerialiser : public TorcSerialiser
     void             Begin              (QByteArray &) override;
     void             AddProperty        (QByteArray &Dest, const QString &Name, const QVariant &Value) override;
     void             End                (QByteArray &) override;
+
+  private:
+    Q_DISABLE_COPY(TorcPlainTextSerialiser)
 };
 
 #endif // TORCPLAINTEXTSERIALISER_H

@@ -6,6 +6,7 @@
 
 class TorcNetworkTemperatureInput final : public TorcTemperatureInput
 {
+    Q_OBJECT
   public:
     TorcNetworkTemperatureInput(double Default, const QVariantMap &Details);
     ~TorcNetworkTemperatureInput() = default;

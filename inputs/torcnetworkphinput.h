@@ -6,6 +6,7 @@
 
 class TorcNetworkpHInput final : public TorcpHInput
 {
+    Q_OBJECT
   public:
     TorcNetworkpHInput(double Default, const QVariantMap &Details);
     ~TorcNetworkpHInput() = default;

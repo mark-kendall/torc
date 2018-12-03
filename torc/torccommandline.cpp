@@ -133,12 +133,12 @@ TorcCommandLine::TorcCommandLine(Options Flags)
  * \param HelpText        Brief help text for the option.
  * \param ExitImmediately Tell the application to exit immediately after processing the command line.
 */
-void TorcCommandLine::Add(const QString Keys, const QVariant &Default, const QString &HelpText, bool ExitImmediately/*=false*/)
+void TorcCommandLine::Add(const QString &Keys, const QVariant &Default, const QString &HelpText, bool ExitImmediately/*=false*/)
 {
     AddPriv(Keys, Default, HelpText, TorcCommandLine::None, ExitImmediately);
 }
 
-void TorcCommandLine::AddPriv(const QString Keys, const QVariant &Default, const QString &HelpText, TorcCommandLine::Options Flags /*= TorcCommandLine::None*/, bool ExitImmediately /*=false*/)
+void TorcCommandLine::AddPriv(const QString &Keys, const QVariant &Default, const QString &HelpText, TorcCommandLine::Options Flags /*= TorcCommandLine::None*/, bool ExitImmediately /*=false*/)
 {
     QStringList keys = Keys.split(",");
 

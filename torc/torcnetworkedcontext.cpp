@@ -638,7 +638,9 @@ void TorcNetworkedContext::Connected(TorcNetworkService *Peer)
     if (!Peer)
         return;
 
-    emit PeerConnected(Peer->GetName(), Peer->GetUuid());
+    QString name = Peer->GetName();
+    QString uuid = Peer->GetUuid();
+    emit PeerConnected(name, uuid);
 }
 
 void TorcNetworkedContext::Disconnected(TorcNetworkService *Peer)
@@ -646,11 +648,13 @@ void TorcNetworkedContext::Disconnected(TorcNetworkService *Peer)
     if (!Peer)
         return;
 
-    emit PeerDisconnected(Peer->GetName(), Peer->GetUuid());
+    QString name = Peer->GetName();
+    QString uuid = Peer->GetUuid();
+    emit PeerDisconnected(name, uuid);
 
     // we need to delete the service if it was not discovered (i.e. a disconnection means it went away
     // and we will receive no other notifications).
-    Remove(Peer->GetUuid());
+    Remove(uuid);
 }
 
 bool TorcNetworkedContext::event(QEvent *Event)

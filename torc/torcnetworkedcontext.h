@@ -137,8 +137,8 @@ class TorcNetworkedContext: public QObject, public TorcHTTPService
 
   signals:
     void                       PeersChanged        (void);
-    void                       PeerConnected       (QString Name, QString UUID);
-    void                       PeerDisconnected    (QString Name, QString UUID);
+    void                       PeerConnected       (QString &Name, QString &UUID);
+    void                       PeerDisconnected    (QString &Name, QString &UUID);
     void                       NewPeer             (TorcWebSocketThread* Socket, const QVariantMap &Data);
     void                       NewRequest          (const QString &UUID, TorcRPCRequest *Request);
     void                       RequestCancelled    (const QString &UUID, TorcRPCRequest *Request);

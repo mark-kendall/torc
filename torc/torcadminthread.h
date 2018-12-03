@@ -11,7 +11,7 @@ class QMutex;
 
 class TorcAdminThread : public TorcQThread
 {
-
+    Q_OBJECT
   public:
     TorcAdminThread();
     virtual ~TorcAdminThread() = default;

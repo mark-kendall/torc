@@ -7,6 +7,7 @@
 
 class TorcLogicControl : public TorcControl
 {
+    Q_OBJECT
   public:
     enum Operation
     {

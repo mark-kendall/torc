@@ -28,8 +28,8 @@ class TorcUser : public QObject, public TorcHTTPService
     static QString    GetName           (void);
 
   protected slots:
-    void           UpdateUserName       (const QString &Name);
-    void           UpdateCredentials    (const QString &Credentials);
+    void           UpdateUserName       (QString &Name);
+    void           UpdateCredentials    (QString &Credentials);
 
   public slots:
     // TorcHTTPService

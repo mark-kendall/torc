@@ -30,6 +30,9 @@ class TorcXMLSerialiser : public TorcSerialiser
   protected:
     QXmlStreamWriter m_xmlStream;
     QBuffer          m_buffer;
+
+  private:
+    Q_DISABLE_COPY(TorcXMLSerialiser)
 };
 
 #endif // TORCXMLSERIALISER_H

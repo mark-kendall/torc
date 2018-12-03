@@ -5,8 +5,10 @@
 
 // Qt
 #include <QFile>
+#include <QWaitCondition>
 
 // Torc
+#include "torcqthread.h"
 #include "torchttpservice.h"
 
 class LogItem;
@@ -14,11 +16,32 @@ class LogItem;
 void RegisterLoggingThread(void);
 void DeregisterLoggingThread(void);
 
+class LoggingThread : public TorcQThread
+{
+    Q_OBJECT
+  public:
+    LoggingThread();
+   ~LoggingThread();
+
+    // TorcQThread
+    void run(void);
+    void Start(void);
+    void Finish(void);
+    void Stop(void);
+    bool Flush(int TimeoutMS = 200000);
+    void HandleItem(LogItem *Item);
+
+  private:
+    QWaitCondition m_waitNotEmpty;
+    QWaitCondition m_waitEmpty;
+    bool           m_aborted;
+};
+
 class LoggerBase
 {
   public:
-    explicit LoggerBase(QString FileName);
-    virtual ~LoggerBase();
+    explicit LoggerBase(const QString &FileName);
+    virtual ~LoggerBase() = default;
 
     virtual bool Logmsg(LogItem *Item) = 0;
 
@@ -28,12 +51,15 @@ class LoggerBase
 
   protected:
     QString      m_fileName;
+
+  private:
+    Q_DISABLE_COPY(LoggerBase)
 };
 
 class FileLogger : public LoggerBase
 {
   public:
-    FileLogger(QString Filename, bool ErrorsOnly, int Quiet);
+    FileLogger(const QString &Filename, bool ErrorsOnly, int Quiet);
    ~FileLogger();
 
     bool   Logmsg(LogItem *Item) override;
@@ -58,8 +84,8 @@ class WebLogger : public QObject, public TorcHTTPService, public FileLogger
     Q_PROPERTY(QByteArray tail READ GetTail NOTIFY tailChanged)
 
   public:
-    explicit WebLogger(QString Filename);
-   ~WebLogger();
+    explicit WebLogger(const QString &Filename);
+   ~WebLogger() = default;
 
     bool Logmsg (LogItem *Item) override;
 

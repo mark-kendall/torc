@@ -86,7 +86,7 @@ class TorcCameraDevice : public QObject
     void             InitSegmentReady(void);
     void             SegmentReady    (int Segment);
     void             SetErrored      (bool Errored);
-    void             StillReady      (const QString File);
+    void             StillReady      (const QString &File);
     void             ParametersChanged (TorcCameraParams &Params);
 
   protected:

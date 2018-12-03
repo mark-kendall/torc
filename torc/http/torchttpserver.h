@@ -32,7 +32,7 @@ class TorcHTTPServer final : public QObject
     {
       public:
         Status();
-        bool operator==(const Status &Other) const;
+        bool operator==(Status Other) const;
         int  port;
         bool secure;
         bool ipv4;

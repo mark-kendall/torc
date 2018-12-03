@@ -31,6 +31,9 @@ class TorcHTTPHandler
     QString             m_signature;
     bool                m_recursive;
     QString             m_name;
+
+  private:
+    Q_DISABLE_COPY(TorcHTTPHandler)
 };
 
 #endif // TORCHTTPHANDLER_H

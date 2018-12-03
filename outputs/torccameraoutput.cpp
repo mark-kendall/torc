@@ -146,7 +146,7 @@ void TorcCameraStillsOutput::CameraErrored(bool Errored)
     }
 }
 
-void TorcCameraStillsOutput::StillReady(const QString File)
+void TorcCameraStillsOutput::StillReady(const QString &File)
 {
     QWriteLocker locker(&m_threadLock);
     if (m_stillsList.contains(File))

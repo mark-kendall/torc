@@ -228,7 +228,7 @@ void TorcSSDP::Stop(void)
     {
         QVariantMap data;
         data.insert("usn", it2.value().GetUSN());
-        TorcEvent event = TorcEvent(Torc::ServiceWentAway, data);
+        TorcEvent event(Torc::ServiceWentAway, data);
         gLocalContext->Notify(event);
     }
     m_discoveredDevices.clear();
@@ -870,7 +870,7 @@ void TorcSSDP::Refresh(void)
 
     // remove stale discovered devices (if still present, they should have notified
     // a refresh)
-    QList<TorcUPNPDescription> removed;
+    QVector<TorcUPNPDescription> removed;
     QMutableHashIterator<QString,TorcUPNPDescription> it(m_discoveredDevices);
     while (it.hasNext())
     {
@@ -883,12 +883,12 @@ void TorcSSDP::Refresh(void)
     }
 
     // notify removal
-    QList<TorcUPNPDescription>::const_iterator it2 = removed.constBegin();
+    QVector<TorcUPNPDescription>::const_iterator it2 = removed.constBegin();
     for ( ; it2 != removed.constEnd(); ++it2)
     {
         QVariantMap data;
         data.insert("usn", (*it2).GetUSN());
-        TorcEvent event = TorcEvent(Torc::ServiceWentAway, data);
+        TorcEvent event(Torc::ServiceWentAway, data);
         gLocalContext->Notify(event);
     }
 

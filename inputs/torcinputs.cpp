@@ -119,10 +119,7 @@ QVariantMap TorcInputs::GetInputList(void)
 
 QStringList TorcInputs::GetInputTypes(void)
 {
-    QStringList result;
-        for (int i = 0; i < TorcInput::MaxType; ++i)
-            result << TorcCoreUtils::EnumToLowerString<TorcInput::Type>(static_cast<TorcInput::Type>(i));
-    return result;
+    return TorcCoreUtils::EnumList<TorcInput::Type>();
 }
 
 void TorcInputs::AddInput(TorcInput *Input)

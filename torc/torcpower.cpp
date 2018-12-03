@@ -30,21 +30,6 @@
 #include "torclanguage.h"
 #include "torcpower.h"
 
-/*! \class TorcPowerNull
- *  \brief A dummy/default power implementation.
-*/
-
-class TorcPowerNull : public TorcPower
-{
-  public:
-    TorcPowerNull() : TorcPower() { Debug(); }
-   ~TorcPowerNull() = default;
-    bool DoShutdown        (void) { return false; }
-    bool DoSuspend         (void) { return false; }
-    bool DoHibernate       (void) { return false; }
-    bool DoRestart         (void) { return false; }
-};
-
 class TorcPowerFactoryNull : public TorcPowerFactory
 {
     void Score(int &Score)

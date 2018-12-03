@@ -61,7 +61,7 @@ class TorcControl : public TorcDevice, public TorcHTTPService
     void                   SetValue               (double Value) override;
     void                   SetValid               (bool Valid) override;
     virtual void           CalculateOutput        (void) = 0;
-    bool                   CheckForCircularReferences (const QString &UniqueId, QString Path) const;
+    bool                   CheckForCircularReferences (const QString &UniqueId, const QString &Path) const;
 
   protected:
     bool                   m_parsed;

@@ -124,8 +124,8 @@ class TorcHTTPRequest
     static QString         AllowedToString          (int Allowed);
     static QString         ConnectionToString       (HTTPConnection Connection);
     static int             StringToAllowed          (const QString &Allowed);
-    static QList<QPair<quint64,quint64> > StringToRanges (const QString &Ranges, qint64 Size, qint64& SizeToSend);
-    static QString         RangeToString            (const QPair<quint64,quint64> &Range, qint64 Size);
+    static QVector<QPair<quint64,quint64> > StringToRanges (const QString &Ranges, qint64 Size, qint64& SizeToSend);
+    static QString         RangeToString            (QPair<quint64,quint64> Range, qint64 Size);
 
     static char            DateFormat[];
 
@@ -141,7 +141,7 @@ class TorcHTTPRequest
     void                   SetAllowed               (int Allowed);
     void                   SetAllowGZip             (bool Allowed);
     void                   SetAllowCORS             (bool Allowed);
-    void                   SetCache                 (int Cache, const QString Tag = QString(""));
+    void                   SetCache                 (int Cache, const QString &Tag = QString(""));
     void                   SetSecure                (bool Secure);
     bool                   GetSecure                (void);
     HTTPStatus             GetHTTPStatus            (void) const;
@@ -177,7 +177,7 @@ class TorcHTTPRequest
     HTTPRequestType        m_requestType;
     HTTPProtocol           m_protocol;
     HTTPConnection         m_connection;
-    QList<QPair<quint64,quint64> > m_ranges;
+    QVector<QPair<quint64,quint64> > m_ranges;
     QMap<QString,QString>  m_headers;
     QMap<QString,QString>  m_queries;
     QByteArray             m_content;

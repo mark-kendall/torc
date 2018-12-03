@@ -72,6 +72,8 @@ TorcSetting::TorcSetting(TorcSetting *Parent, const QString &DBName, const QStri
 {
     setObjectName(DBName);
 
+    qRegisterMetaType<QString>("QString&");
+
     if (m_parent)
         m_parent->AddChild(this);
 
@@ -111,7 +113,7 @@ TorcSetting::TorcSetting(TorcSetting *Parent, const QString &DBName, const QStri
 
 void TorcSetting::SubscriberDeleted(QObject *Subscriber)
 {
-    return TorcHTTPService::HandleSubscriberDeleted(Subscriber);
+    TorcHTTPService::HandleSubscriberDeleted(Subscriber);
 }
 
 QVariantMap TorcSetting::GetChildList(void)

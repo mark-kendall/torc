@@ -6,6 +6,7 @@
 
 class TorcNetworkPWMInput final : public TorcPWMInput
 {
+    Q_OBJECT
   public:
     TorcNetworkPWMInput(double Default, const QVariantMap &Details);
     ~TorcNetworkPWMInput() = default;

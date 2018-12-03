@@ -81,11 +81,11 @@ class TorcLocalContext : public QObject, public TorcObservable
 
     static void              NotifyEvent         (int Event);
     QString                  GetSetting          (const QString &Name, const QString &DefaultValue);
-    bool                     GetSetting          (const QString &Name, const bool    &DefaultValue);
-    int                      GetSetting          (const QString &Name, const int     &DefaultValue);
+    bool                     GetSetting          (const QString &Name, bool DefaultValue);
+    int                      GetSetting          (const QString &Name, int  DefaultValue);
     void                     SetSetting          (const QString &Name, const QString &Value);
-    void                     SetSetting          (const QString &Name, const bool    &Value);
-    void                     SetSetting          (const QString &Name, const int     &Value);
+    void                     SetSetting          (const QString &Name, bool Value);
+    void                     SetSetting          (const QString &Name, int  Value);
     QString                  GetUuid             (void) const;
     TorcSetting*             GetRootSetting      (void);
     qint64                   GetStartTime        (void);

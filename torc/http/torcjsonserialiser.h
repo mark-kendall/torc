@@ -22,6 +22,7 @@ class TorcJSONSerialiser : public TorcSerialiser
     void             End                (QByteArray &) override;
 
   private:
+    Q_DISABLE_COPY(TorcJSONSerialiser)
     bool             m_javaScriptType;
 };
 

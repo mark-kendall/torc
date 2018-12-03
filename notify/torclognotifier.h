@@ -6,6 +6,7 @@
 
 class TorcLogNotifier final : public TorcNotifier
 {
+    Q_OBJECT
   public:
     explicit TorcLogNotifier(const QVariantMap &Details);
     ~TorcLogNotifier() = default;

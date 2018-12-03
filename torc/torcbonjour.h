@@ -26,7 +26,7 @@ class TorcBonjourService
     TorcBonjourService(ServiceType BonjourType, DNSServiceRef DNSSRef, const QByteArray &Name, const QByteArray &Type);
     TorcBonjourService(ServiceType BonjourType, const QByteArray &Name, const QByteArray &Type, const QByteArray &Domain, uint32_t InterfaceIndex);
     TorcBonjourService& operator =(const TorcBonjourService &Other);
-
+   ~TorcBonjourService() = default;
     void SetFileDescriptor(int FileDescriptor, QObject *Object);
     bool IsResolved(void);
     void Deregister(void);

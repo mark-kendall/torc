@@ -84,7 +84,7 @@ TorcLanguage::TorcLanguage(TorcSetting *SettingParent)
         selections.insert(locale.name(), locale.nativeLanguageName());
     m_languageSetting->SetSelections(selections);
     SetLanguageCode(m_languageSetting->GetValue().toString());
-    connect(m_languageSetting, SIGNAL(ValueChanged(QString)), this, SLOT(LanguageSettingChanged(QString)));
+    connect(m_languageSetting, SIGNAL(ValueChanged(QString&)), this, SLOT(LanguageSettingChanged(QString&)));
 }
 
 TorcLanguage::~TorcLanguage()
@@ -94,7 +94,7 @@ TorcLanguage::~TorcLanguage()
     m_languageSetting->DownRef();
 }
 
-void TorcLanguage::LanguageSettingChanged(const QString &Language)
+void TorcLanguage::LanguageSettingChanged(QString &Language)
 {
     LOG(VB_GENERAL, LOG_ALERT, QString("Language setting changed to '%1' - restarting").arg(Language));
     TorcLocalContext::NotifyEvent(Torc::RestartTorc);

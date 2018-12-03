@@ -25,7 +25,7 @@ class TorcTime : public QObject, public TorcHTTPService
     explicit  TorcTime();
 
   signals:
-    void      currentTimeChanged (QString Time);
+    void      currentTimeChanged (QString &Time);
 
   public slots:
     // TorcHTTPService requirement

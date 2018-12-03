@@ -6,6 +6,7 @@
 
 class TorcNetworkSwitchInput : public TorcSwitchInput
 {
+    Q_OBJECT
   public:
     TorcNetworkSwitchInput(double Default, const QVariantMap &Details);
     virtual ~TorcNetworkSwitchInput() = default;

@@ -242,7 +242,7 @@ bool TorcHTTPRequest::GetAllowCORS(void) const
  * \note If a subclass of TorcHTTPHandler uses the 'last-modified' or 'ETag' headers, it must also
  * be capable of handling the appropriate conditional requests and responding with a '304 Not Modified' as necessary.
  */
-void TorcHTTPRequest::SetCache(int Cache, const QString Tag /* = QString("")*/)
+void TorcHTTPRequest::SetCache(int Cache, const QString &Tag /* = QString("")*/)
 {
     m_cache = Cache;
     m_cacheTag = Tag;
@@ -373,7 +373,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
 
             if (multipart)
             {
-                QList<QPair<quint64,quint64> >::const_iterator it = m_ranges.constBegin();
+                QVector<QPair<quint64,quint64> >::const_iterator it = m_ranges.constBegin();
                 for ( ; it != m_ranges.constEnd(); ++it)
                 {
                     QByteArray header = seperator + contentheader + QString("Content-Range: bytes %1\r\n\r\n").arg(RangeToString((*it), totalsize)).toLatin1();
@@ -479,7 +479,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
     {
         if (multipart)
         {
-            QList<QPair<quint64,quint64> >::const_iterator it = m_ranges.constBegin();
+            QVector<QPair<quint64,quint64> >::const_iterator it = m_ranges.constBegin();
             QList<QByteArray>::const_iterator bit = partheaders.constBegin();
             for ( ; it != m_ranges.constEnd(); ++it, ++bit)
             {
@@ -518,7 +518,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
         {
             QScopedPointer<QByteArray> buffer(new QByteArray(READ_CHUNK_SIZE, 0));
 
-            QList<QPair<quint64,quint64> >::const_iterator it = m_ranges.constBegin();
+            QVector<QPair<quint64,quint64> >::const_iterator it = m_ranges.constBegin();
             QList<QByteArray>::const_iterator bit = partheaders.constBegin();
             for ( ; it != m_ranges.constEnd(); ++it, ++bit)
             {
@@ -912,10 +912,10 @@ int TorcHTTPRequest::StringToAllowed(const QString &Allowed)
     return allowed;
 }
 
-QList<QPair<quint64,quint64> > TorcHTTPRequest::StringToRanges(const QString &Ranges, qint64 Size, qint64 &SizeToSend)
+QVector<QPair<quint64,quint64> > TorcHTTPRequest::StringToRanges(const QString &Ranges, qint64 Size, qint64 &SizeToSend)
 {
     qint64 tosend = 0;
-    QList<QPair<quint64,quint64> > results;
+    QVector<QPair<quint64,quint64> > results;
     if (Size < 1)
         return results;
 
@@ -1034,7 +1034,7 @@ QList<QPair<quint64,quint64> > TorcHTTPRequest::StringToRanges(const QString &Ra
     return results;
 }
 
-QString TorcHTTPRequest::RangeToString(const QPair<quint64, quint64> &Range, qint64 Size)
+QString TorcHTTPRequest::RangeToString(QPair<quint64, quint64> Range, qint64 Size)
 {
     return QString("%1-%2/%3").arg(Range.first).arg(Range.second).arg(Size);
 }

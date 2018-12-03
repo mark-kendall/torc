@@ -15,6 +15,7 @@
 class TorcSerialiser
 {
   public:
+    TorcSerialiser() = default;
     virtual ~TorcSerialiser() = default;
 
     static TorcSerialiser*   GetSerialiser  (const QString &MimeType);
@@ -26,6 +27,9 @@ class TorcSerialiser
     virtual void             Begin          (QByteArray &Dest) = 0;
     virtual void             AddProperty    (QByteArray &Dest, const QString &Name, const QVariant &Value) = 0;
     virtual void             End            (QByteArray &Dest) = 0;
+
+  private:
+    Q_DISABLE_COPY(TorcSerialiser)
 };
 
 class TorcSerialiserFactory

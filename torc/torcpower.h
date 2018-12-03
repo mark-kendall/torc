@@ -115,6 +115,22 @@ class TorcPower : public QObject, public TorcHTTPService
     Q_DISABLE_COPY(TorcPower)
 };
 
+/*! \class TorcPowerNull
+ *  \brief A dummy/default power implementation.
+*/
+
+class TorcPowerNull : public TorcPower
+{
+    Q_OBJECT
+  public:
+    TorcPowerNull() : TorcPower() { Debug(); }
+   ~TorcPowerNull() = default;
+    bool DoShutdown        (void) { return false; }
+    bool DoSuspend         (void) { return false; }
+    bool DoHibernate       (void) { return false; }
+    bool DoRestart         (void) { return false; }
+};
+
 class TorcPowerFactory
 {
   public:

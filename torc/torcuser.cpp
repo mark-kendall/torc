@@ -54,8 +54,8 @@ TorcUser::TorcUser()
         m_userName = gUserName;
     }
 
-    connect(m_userNameSetting, SIGNAL(ValueChanged(QString)), this, SLOT(UpdateUserName(QString)));
-    connect(m_userCredentials, SIGNAL(ValueChanged(QString)), this, SLOT(UpdateCredentials(QString)));
+    connect(m_userNameSetting, SIGNAL(ValueChanged(QString&)), this, SLOT(UpdateUserName(QString&)));
+    connect(m_userCredentials, SIGNAL(ValueChanged(QString&)), this, SLOT(UpdateCredentials(QString&)));
 }
 
 TorcUser::~TorcUser()
@@ -84,14 +84,14 @@ QByteArray TorcUser::GetCredentials(void)
     return gUserCredentials;
 }
 
-void TorcUser::UpdateUserName(const QString &Name)
+void TorcUser::UpdateUserName(QString &Name)
 {
     QMutexLocker locker(&gUserCredentialsLock);
     m_userName = Name;
     gUserName  = Name;
 }
 
-void TorcUser::UpdateCredentials(const QString &Credentials)
+void TorcUser::UpdateCredentials(QString &Credentials)
 {
     QMutexLocker locker(&gUserCredentialsLock);
     gUserCredentials = Credentials.toLower().toLatin1();

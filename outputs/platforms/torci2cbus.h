@@ -20,6 +20,9 @@ class TorcI2CDevice
   protected:
     int  m_address;
     int  m_fd;
+
+  private:
+    Q_DISABLE_COPY(TorcI2CDevice)
 };
 
 class TorcI2CDeviceFactory

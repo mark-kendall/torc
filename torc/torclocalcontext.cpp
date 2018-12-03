@@ -276,13 +276,13 @@ QString TorcLocalContext::GetSetting(const QString &Name, const QString &Default
     return GetDBSetting(Name, DefaultValue);
 }
 
-bool TorcLocalContext::GetSetting(const QString &Name, const bool &DefaultValue)
+bool TorcLocalContext::GetSetting(const QString &Name, bool DefaultValue)
 {
     QString value = GetDBSetting(Name, DefaultValue ? QString("1") : QString("0"));
     return value.trimmed() == "1";
 }
 
-int TorcLocalContext::GetSetting(const QString &Name, const int &DefaultValue)
+int TorcLocalContext::GetSetting(const QString &Name, int DefaultValue)
 {
     QString value = GetDBSetting(Name, QString::number(DefaultValue));
     return value.toInt();
@@ -293,12 +293,12 @@ void TorcLocalContext::SetSetting(const QString &Name, const QString &Value)
     SetDBSetting(Name, Value);
 }
 
-void TorcLocalContext::SetSetting(const QString &Name, const bool &Value)
+void TorcLocalContext::SetSetting(const QString &Name, bool Value)
 {
     SetDBSetting(Name, Value ? QString("1") : QString("0"));
 }
 
-void TorcLocalContext::SetSetting(const QString &Name, const int &Value)
+void TorcLocalContext::SetSetting(const QString &Name, int Value)
 {
     SetDBSetting(Name, QString::number(Value));
 }

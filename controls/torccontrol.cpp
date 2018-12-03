@@ -618,7 +618,7 @@ void TorcControl::SetValid(bool Valid)
     }
 }
 
-bool TorcControl::CheckForCircularReferences(const QString &UniqueId, QString Path) const
+bool TorcControl::CheckForCircularReferences(const QString &UniqueId, const QString &Path) const
 {
     if (UniqueId.isEmpty())
     {

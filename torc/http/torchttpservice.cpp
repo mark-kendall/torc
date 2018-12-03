@@ -41,7 +41,7 @@
 class MethodParameters
 {
   public:
-    MethodParameters(int Index, const QMetaMethod &Method, int AllowedRequestTypes, const QString &ReturnType)
+    MethodParameters(int Index, QMetaMethod Method, int AllowedRequestTypes, const QString &ReturnType)
       : m_valid(false),
         m_index(Index),
         m_names(),
@@ -769,11 +769,11 @@ QVariantMap TorcHTTPService::GetServiceDetails(void)
         properties.insert(name, description);
     }
 
+    QVariantList params;
     QMap<QString,MethodParameters*>::const_iterator it2 = m_methods.constBegin();
     for ( ; it2 != m_methods.constEnd(); ++it2)
     {
         QVariantMap map;
-        QVariantList params;
 
         MethodParameters *parameters = it2.value();
         for (int i = 1; i < parameters->m_types.size(); ++i)
@@ -781,13 +781,14 @@ QVariantMap TorcHTTPService::GetServiceDetails(void)
         map.insert("params", params);
         map.insert("returns", TorcJSONRPC::QMetaTypetoJavascriptType(parameters->m_types[0]));
         methods.insert(it2.key(), map);
+        params.clear();
     }
 
     // and implicit Subscribe/Unsubscribe/GetServiceVersion
     // NB these aren't implemented as public slots and property (for serviceVersion)
     // as TorcHTTPService is not a QObject. Not ideal as the full API is not
     // visible in the code.
-    QVariantList params;
+    params.clear();
     QVariant returns("object");
 
     QVariantMap subscribe;
