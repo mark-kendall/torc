@@ -352,13 +352,28 @@
   </xs:all>
 </xs:complexType>
 
+<xs:complexType name="singleShotTimerType">
+  <xs:all>
+    <xs:element name="name"     type="deviceNameType"/>
+    <xs:element name="username" type="userNameType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="userdescription" type="userDescriptionType" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="inputs"   type="deviceInputOutputType"/>
+    <xs:element name="outputs"  type="deviceInputsOutputsType"/>
+    <xs:element name="start"    type="validStringType"/> <!-- TODO can we do better than string? -->
+    <xs:element name="duration" type="validStringType"/> <!-- TODO can we do better than string? -->
+    <!-- a normal single shot timer needs no period - unless either start or duration are random -->
+    <xs:element name="period"   type="validStringType" minOccurs="0" maxOccurs="1"/> <!-- TODO can we do better than string? -->
+  </xs:all>
+</xs:complexType>
+
 <xs:complexType name="timersType">
   <xs:choice minOccurs="1" maxOccurs="unbounded">
-    <xs:element name="custom"   type="customTimerType"/>
-    <xs:element name="minutely" type="timerType"/>
-    <xs:element name="hourly"   type="timerType"/>
-    <xs:element name="daily"    type="timerType"/>
-    <xs:element name="weekly"   type="timerType"/>
+    <xs:element name="custom"     type="customTimerType"/>
+    <xs:element name="minutely"   type="timerType"/>
+    <xs:element name="hourly"     type="timerType"/>
+    <xs:element name="daily"      type="timerType"/>
+    <xs:element name="weekly"     type="timerType"/>
+    <xs:element name="singleshot" type="singleShotTimerType"/>
   </xs:choice>
 </xs:complexType>
 
@@ -692,7 +707,7 @@
   </xs:key>
   <!-- list of devices that accept inputs (i.e. are valid output targets) -->
   <xs:key name="validOutputTargetDevices">
-    <xs:selector xpath="./outputs/*/*/*/name|./outputs/*/*/name|./outputs/i2c/*/*/name|.//notifications/trigger/name|./controls/transition/*/name|./controls/logic/*/name" />
+    <xs:selector xpath="./outputs/*/*/*/name|./outputs/*/*/name|./outputs/i2c/*/*/name|.//notifications/trigger/name|./controls/transition/*/name|./controls/logic/*/name|./controls/timer/singleshot/name" />
     <xs:field xpath="."/>
   </xs:key>
   <!-- list of devices that are valid inputs to another device-->
