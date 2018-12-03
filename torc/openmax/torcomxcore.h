@@ -51,7 +51,7 @@ class TorcOMXCore
   public:
     TorcOMXCore();
     TorcOMXCore(const TorcOMXCore &Other) { (void)Other; }
-    TorcOMXCore operator =(const TorcOMXCore &Other) { return Other;}
+    TorcOMXCore& operator =(const TorcOMXCore &Other) { (void)Other; return *this; }
    ~TorcOMXCore();
 };
 
