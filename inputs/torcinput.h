@@ -30,6 +30,7 @@ class TorcInput : public TorcDevice, public TorcHTTPService
         PWM,
         Button,
         Started,
+        Integer,
         MaxType
     };
 

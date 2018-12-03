@@ -35,6 +35,7 @@
 #include "torcnetworktemperatureinput.h"
 #include "torcnetworkphinput.h"
 #include "torcnetworkbuttoninput.h"
+#include "torcnetworkintegerinput.h"
 #include "torcnetworkinputs.h"
 
 /*! \class TorcNetworkInputs
@@ -154,6 +155,14 @@ void TorcNetworkInputs::Create(const QVariantMap &Details)
                                         newinput = network ? new TorcNetworkpHInput(defaultdouble, input) : new TorcpHInput(defaultdouble, DEVICE_CONSTANT + TorcCoreUtils::EnumToLowerString<TorcInput::Type>(TorcInput::pH), input);
                                     else
                                         newoutput = network ? new TorcNetworkpHOutput(defaultdouble, input) : new TorcpHOutput(defaultdouble, DEVICE_CONSTANT + TorcCoreUtils::EnumToLowerString<TorcOutput::Type>(TorcOutput::pH), input);
+                                }
+                                break;
+                            case TorcInput::Integer:
+                                {
+                                    if (isinput)
+                                        newinput = network ? new TorcNetworkIntegerInput(defaultdouble, input) : new TorcIntegerInput(defaultdouble, DEVICE_CONSTANT + TorcCoreUtils::EnumToLowerString<TorcInput::Type>(TorcInput::Integer), input);
+                                    //else
+                                    //    newoutput = network ? new TorcNetworkIntegerOutput(defaultdouble, input) : new TorcIntegerOutput(defaultdouble, DEVICE_CONSTANT + TorcCoreUtils::EnumToLowerString<TorcOutput::Type>(TorcOutput::Integer), input);
                                 }
                                 break;
                             case TorcInput::Button:
