@@ -50,8 +50,8 @@ class TorcOMXCore
 {
   public:
     TorcOMXCore();
-
-  protected:
+    TorcOMXCore(const TorcOMXCore &Other) { (void)Other; }
+    TorcOMXCore operator =(const TorcOMXCore &Other) { return Other;}
    ~TorcOMXCore();
 };
 
