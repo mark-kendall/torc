@@ -86,7 +86,7 @@ var searchData=
   ['guserdefaultvaluestr',['gUserDefaultValueStr',['../d7/d24/torcloggingimp_8cpp.html#ace5b1411cf35dccaa3c9c9a59cbe15fb',1,'torcloggingimp.cpp']]],
   ['gusername',['gUserName',['../d5/d47/class_torc_user.html#a06c69b419d1247a7d78d228f295f717c',1,'TorcUser']]],
   ['gverbosedefaultint',['gVerboseDefaultInt',['../d7/d24/torcloggingimp_8cpp.html#a71dd883a26ad2d4cc4a6112c4e661956',1,'torcloggingimp.cpp']]],
-  ['gverbosedefaultstr',['gVerboseDefaultStr',['../d7/d24/torcloggingimp_8cpp.html#ad79d869ceaf786a018916ec87f9c50a3',1,'torcloggingimp.cpp']]],
+  ['gverbosedefaultstr',['gVerboseDefaultStr',['../d7/d24/torcloggingimp_8cpp.html#adb8ae764479db70f32764b2d5a8b8b19',1,'torcloggingimp.cpp']]],
   ['gverboseinitialised',['gVerboseInitialised',['../d7/d24/torcloggingimp_8cpp.html#a3e8e64ac6f7073431e0b356298199c29',1,'torcloggingimp.cpp']]],
   ['gverbosemap',['gVerboseMap',['../d7/d24/torcloggingimp_8cpp.html#a29f57bf32c3020feeb1ab3cf8d38552e',1,'torcloggingimp.cpp']]],
   ['gverbosemaplock',['gVerboseMapLock',['../d7/d24/torcloggingimp_8cpp.html#a62f549d1b9c18469cd7e7b4e08250a7e',1,'torcloggingimp.cpp']]],

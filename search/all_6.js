@@ -5,7 +5,7 @@ var searchData=
   ['false',['false',['../d1/d37/torcloggingdefs_8h.html#a93519f65dd0ef21fc5be0c286a833ae4',1,'torcloggingdefs.h']]],
   ['ffmpeg_5fbuffer_5fsize',['FFMPEG_BUFFER_SIZE',['../d3/d5e/torcmuxer_8cpp.html#a0643743717c68ae8cb01fd198a71d3df',1,'torcmuxer.cpp']]],
   ['file',['file',['../df/dd2/class_log_item.html#aed52f0a4653e4363109c2a8cf27979ec',1,'LogItem']]],
-  ['filelogger',['FileLogger',['../de/db9/class_file_logger.html',1,'FileLogger'],['../de/db9/class_file_logger.html#a768e7b46465044d65142c48341a0bd9c',1,'FileLogger::FileLogger()']]],
+  ['filelogger',['FileLogger',['../de/db9/class_file_logger.html',1,'FileLogger'],['../de/db9/class_file_logger.html#a9f013139eaee5939b6e37944c2cd8fa2',1,'FileLogger::FileLogger()']]],
   ['fillbufferdone',['FillBufferDone',['../de/d1d/class_torc_o_m_x_component.html#a24f3d8e8a55ccb6bc384a9129686742c',1,'TorcOMXComponent']]],
   ['fillbufferdonecallback',['FillBufferDoneCallback',['../de/d1d/class_torc_o_m_x_component.html#a6e86c94c22be1ba922006443dcbdf163',1,'TorcOMXComponent']]],
   ['fillthisbuffer',['FillThisBuffer',['../de/d1d/class_torc_o_m_x_component.html#aadca0a2e0d591a065f98fdc0db669b75',1,'TorcOMXComponent']]],

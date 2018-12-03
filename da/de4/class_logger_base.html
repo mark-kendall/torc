@@ -105,10 +105,10 @@ Inheritance diagram for LoggerBase:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:af9c8a698bb83ee4be79dfc2015e9d0a7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/de4/class_logger_base.html#af9c8a698bb83ee4be79dfc2015e9d0a7">LoggerBase</a> (QString FileName)</td></tr>
-<tr class="separator:af9c8a698bb83ee4be79dfc2015e9d0a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1c6d7880ada1aae670c7b8c41389ee91"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/de4/class_logger_base.html#a1c6d7880ada1aae670c7b8c41389ee91">~LoggerBase</a> ()</td></tr>
-<tr class="separator:a1c6d7880ada1aae670c7b8c41389ee91"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afa910d789835322db1c3cd0da17583a8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/de4/class_logger_base.html#afa910d789835322db1c3cd0da17583a8">LoggerBase</a> (const QString &amp;FileName)</td></tr>
+<tr class="separator:afa910d789835322db1c3cd0da17583a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae5993d8e5de600a979bc7ca686102cc3"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/de4/class_logger_base.html#ae5993d8e5de600a979bc7ca686102cc3">~LoggerBase</a> ()=default</td></tr>
+<tr class="separator:ae5993d8e5de600a979bc7ca686102cc3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af7b1678540c35fcdba61c7be980b6955"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/de4/class_logger_base.html#af7b1678540c35fcdba61c7be980b6955">Logmsg</a> (<a class="el" href="../../df/dd2/class_log_item.html">LogItem</a> *Item)=0</td></tr>
 <tr class="separator:af7b1678540c35fcdba61c7be980b6955"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -126,9 +126,9 @@ Protected Attributes</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock">
-<p>Definition at line <a class="el" href="../../d3/d0a/torcloggingimp_8h_source.html#l00017">17</a> of file <a class="el" href="../../d3/d0a/torcloggingimp_8h_source.html">torcloggingimp.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d0a/torcloggingimp_8h_source.html#l00040">40</a> of file <a class="el" href="../../d3/d0a/torcloggingimp_8h_source.html">torcloggingimp.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="af9c8a698bb83ee4be79dfc2015e9d0a7"></a>
+<a class="anchor" id="afa910d789835322db1c3cd0da17583a8"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -138,7 +138,7 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="memname">LoggerBase::LoggerBase </td>
           <td>(</td>
-          <td class="paramtype">QString&#160;</td>
+          <td class="paramtype">const QString &amp;&#160;</td>
           <td class="paramname"><em>FileName</em></td><td>)</td>
           <td></td>
         </tr>
@@ -150,11 +150,11 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00360">360</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00345">345</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a1c6d7880ada1aae670c7b8c41389ee91"></a>
+<a class="anchor" id="ae5993d8e5de600a979bc7ca686102cc3"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -162,7 +162,7 @@ Protected Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">LoggerBase::~LoggerBase </td>
+          <td class="memname">virtual LoggerBase::~LoggerBase </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -170,12 +170,10 @@ Protected Attributes</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">virtual</span><span class="mlabel">default</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
-
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00366">366</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -202,7 +200,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00370">370</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00351">351</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -277,7 +275,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d0a/torcloggingimp_8h_source.html#l00030">30</a> of file <a class="el" href="../../d3/d0a/torcloggingimp_8h_source.html">torcloggingimp.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d0a/torcloggingimp_8h_source.html#l00053">53</a> of file <a class="el" href="../../d3/d0a/torcloggingimp_8h_source.html">torcloggingimp.h</a>.</p>
 
 </div>
 </div>
@@ -288,7 +286,7 @@ Protected Attributes</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Dec 2 2018 11:05:40 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Dec 3 2018 11:03:13 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

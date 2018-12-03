@@ -1,57 +1,59 @@
 <map id="TorcHTTPHandler" name="TorcHTTPHandler">
-<area shape="rect" id="node2" href="$d8/dfc/class_torc_h_t_m_l_dynamic_content.html" title="Handles the provision of dynamic content as typically located in ~/.torc/content. ..." alt="" coords="183,309,372,336"/>
-<area shape="rect" id="node3" href="$df/dd1/class_torc_h_t_m_l_handler.html" title="Base HTML handler. " alt="" coords="211,360,343,387"/>
-<area shape="rect" id="node4" href="$d2/d5b/class_torc_h_t_m_l_static_content.html" title="Handles the provision of static server content such as html, css, js etc. " alt="" coords="192,411,363,437"/>
-<area shape="rect" id="node5" href="$d6/d70/class_torc_h_t_t_p_service.html" title="TorcHTTPService" alt="" coords="214,461,341,488"/>
-<area shape="rect" id="node56" href="$d9/d74/class_torc_u_pn_p_content.html" title="TorcUPnPContent" alt="" coords="211,512,343,539"/>
+<area shape="rect" id="node2" href="$d8/dfc/class_torc_h_t_m_l_dynamic_content.html" title="Handles the provision of dynamic content as typically located in ~/.torc/content. ..." alt="" coords="183,335,372,361"/>
+<area shape="rect" id="node3" href="$df/dd1/class_torc_h_t_m_l_handler.html" title="Base HTML handler. " alt="" coords="211,385,343,412"/>
+<area shape="rect" id="node4" href="$d2/d5b/class_torc_h_t_m_l_static_content.html" title="Handles the provision of static server content such as html, css, js etc. " alt="" coords="192,436,363,463"/>
+<area shape="rect" id="node5" href="$d6/d70/class_torc_h_t_t_p_service.html" title="TorcHTTPService" alt="" coords="214,487,341,513"/>
+<area shape="rect" id="node58" href="$d9/d74/class_torc_u_pn_p_content.html" title="TorcUPnPContent" alt="" coords="211,537,343,564"/>
 <area shape="rect" id="node6" href="$d9/d56/class_torc_central.html" title="TorcCentral" alt="" coords="456,56,549,83"/>
 <area shape="rect" id="node7" href="$d1/d34/class_torc_control.html" title="TorcControl" alt="" coords="456,107,549,133"/>
-<area shape="rect" id="node11" href="$d9/dac/class_torc_controls.html" title="TorcControls" alt="" coords="453,183,553,209"/>
-<area shape="rect" id="node12" href="$d1/d54/class_torc_h_t_t_p_services.html" title="Top level interface into services. " alt="" coords="436,233,569,260"/>
-<area shape="rect" id="node13" href="$de/d9b/class_torc_h_t_t_p_service_test.html" title="Implements an HTTP service for testing purposes. " alt="" coords="427,284,578,311"/>
-<area shape="rect" id="node14" href="$d8/d61/class_torc_input.html" title="TorcInput" alt="" coords="463,335,542,361"/>
-<area shape="rect" id="node27" href="$d7/ddb/class_torc_inputs.html" title="TorcInputs" alt="" coords="459,385,546,412"/>
-<area shape="rect" id="node28" href="$d5/d34/class_torc_language.html" title="A class to track and manage language and locale settings and available translations. " alt="" coords="447,436,558,463"/>
-<area shape="rect" id="node29" href="$d8/d93/class_torc_networked_context.html" title="A class to discover and connect to other Torc applications. " alt="" coords="420,487,585,513"/>
-<area shape="rect" id="node30" href="$d1/dc7/class_torc_output.html" title="TorcOutput" alt="" coords="457,537,548,564"/>
-<area shape="rect" id="node46" href="$df/da4/class_torc_outputs.html" title="TorcOutputs" alt="" coords="453,588,552,615"/>
-<area shape="rect" id="node47" href="$d7/da5/class_torc_power.html" title="A generic power status class. " alt="" coords="460,639,545,665"/>
-<area shape="rect" id="node51" href="$dd/d69/class_torc_setting.html" title="A wrapper around a database setting. " alt="" coords="456,689,549,716"/>
-<area shape="rect" id="node53" href="$d6/d7b/class_torc_time.html" title="A simple time service to confirm the time (and date) the system is currently operating with..." alt="" coords="463,740,542,767"/>
-<area shape="rect" id="node54" href="$d5/d47/class_torc_user.html" title="TorcUser" alt="" coords="464,791,541,817"/>
-<area shape="rect" id="node55" href="$d3/d3c/class_web_logger.html" title="Serves log content to registered subscribers and HTTP clients. " alt="" coords="457,841,549,868"/>
+<area shape="rect" id="node11" href="$d9/dac/class_torc_controls.html" title="TorcControls" alt="" coords="453,208,553,235"/>
+<area shape="rect" id="node12" href="$d1/d54/class_torc_h_t_t_p_services.html" title="Top level interface into services. " alt="" coords="436,259,569,285"/>
+<area shape="rect" id="node13" href="$de/d9b/class_torc_h_t_t_p_service_test.html" title="Implements an HTTP service for testing purposes. " alt="" coords="427,309,578,336"/>
+<area shape="rect" id="node14" href="$d8/d61/class_torc_input.html" title="TorcInput" alt="" coords="463,360,542,387"/>
+<area shape="rect" id="node29" href="$d7/ddb/class_torc_inputs.html" title="TorcInputs" alt="" coords="459,411,546,437"/>
+<area shape="rect" id="node30" href="$d5/d34/class_torc_language.html" title="A class to track and manage language and locale settings and available translations. " alt="" coords="447,461,558,488"/>
+<area shape="rect" id="node31" href="$d8/d93/class_torc_networked_context.html" title="A class to discover and connect to other Torc applications. " alt="" coords="420,512,585,539"/>
+<area shape="rect" id="node32" href="$d1/dc7/class_torc_output.html" title="TorcOutput" alt="" coords="457,563,548,589"/>
+<area shape="rect" id="node48" href="$df/da4/class_torc_outputs.html" title="TorcOutputs" alt="" coords="453,613,552,640"/>
+<area shape="rect" id="node49" href="$d7/da5/class_torc_power.html" title="A generic power status class. " alt="" coords="460,664,545,691"/>
+<area shape="rect" id="node53" href="$dd/d69/class_torc_setting.html" title="A wrapper around a database setting. " alt="" coords="456,715,549,741"/>
+<area shape="rect" id="node55" href="$d6/d7b/class_torc_time.html" title="A simple time service to confirm the time (and date) the system is currently operating with..." alt="" coords="463,765,542,792"/>
+<area shape="rect" id="node56" href="$d5/d47/class_torc_user.html" title="TorcUser" alt="" coords="464,816,541,843"/>
+<area shape="rect" id="node57" href="$d3/d3c/class_web_logger.html" title="Serves log content to registered subscribers and HTTP clients. " alt="" coords="457,867,549,893"/>
 <area shape="rect" id="node8" href="$d5/d8f/class_torc_logic_control.html" title="TorcLogicControl" alt="" coords="656,5,783,32"/>
 <area shape="rect" id="node9" href="$d6/d72/class_torc_timer_control.html" title="TorcTimerControl" alt="" coords="655,56,784,83"/>
 <area shape="rect" id="node10" href="$df/d11/class_torc_transition_control.html" title="TorcTransitionControl" alt="" coords="643,107,796,133"/>
-<area shape="rect" id="node15" href="$db/d20/class_torcp_h_input.html" title="TorcpHInput" alt="" coords="671,157,768,184"/>
-<area shape="rect" id="node17" href="$d1/d8b/class_torc_p_w_m_input.html" title="TorcPWMInput" alt="" coords="665,208,774,235"/>
-<area shape="rect" id="node19" href="$db/dd0/class_torc_switch_input.html" title="TorcSwitchInput" alt="" coords="659,259,779,285"/>
-<area shape="rect" id="node23" href="$d7/df7/class_torc_system_input.html" title="TorcSystemInput" alt="" coords="655,309,783,336"/>
-<area shape="rect" id="node24" href="$de/d14/class_torc_temperature_input.html" title="TorcTemperatureInput" alt="" coords="639,360,799,387"/>
-<area shape="rect" id="node16" href="$d5/d8a/class_torc_networkp_h_input.html" title="TorcNetworkpHInput" alt="" coords="891,107,1040,133"/>
-<area shape="rect" id="node18" href="$da/d14/class_torc_network_p_w_m_input.html" title="TorcNetworkPWMInput" alt="" coords="885,157,1046,184"/>
-<area shape="rect" id="node20" href="$df/d5c/class_torc_network_switch_input.html" title="TorcNetworkSwitchInput" alt="" coords="879,208,1051,235"/>
-<area shape="rect" id="node22" href="$de/d6d/class_torc_pi_switch_input.html" title="TorcPiSwitchInput" alt="" coords="900,259,1031,285"/>
-<area shape="rect" id="node21" href="$d7/d4b/class_torc_network_button_input.html" title="A network input that mimics the behaviour of a mechanical push button. " alt="" coords="1131,208,1306,235"/>
-<area shape="rect" id="node25" href="$d5/dd1/class_torc1_wire_d_s18_b20.html" title="Torc1WireDS18B20" alt="" coords="894,309,1037,336"/>
-<area shape="rect" id="node26" href="$d9/dc9/class_torc_network_temperature_input.html" title="TorcNetworkTemperatureInput" alt="" coords="859,360,1071,387"/>
-<area shape="rect" id="node31" href="$db/dc8/class_torc_camera_output.html" title="TorcCameraOutput" alt="" coords="648,461,791,488"/>
-<area shape="rect" id="node34" href="$d2/d21/class_torcp_h_output.html" title="TorcpHOutput" alt="" coords="665,512,774,539"/>
-<area shape="rect" id="node36" href="$d9/db0/class_torc_p_w_m_output.html" title="TorcPWMOutput" alt="" coords="659,563,780,589"/>
-<area shape="rect" id="node40" href="$d9/d5b/class_torc_switch_output.html" title="TorcSwitchOutput" alt="" coords="653,613,785,640"/>
-<area shape="rect" id="node44" href="$d5/dda/class_torc_temperature_output.html" title="TorcTemperatureOutput" alt="" coords="633,664,805,691"/>
-<area shape="rect" id="node32" href="$d4/dbb/class_torc_camera_stills_output.html" title="TorcCameraStillsOutput" alt="" coords="879,411,1051,437"/>
-<area shape="rect" id="node33" href="$df/d01/class_torc_camera_video_output.html" title="TorcCameraVideoOutput" alt="" coords="876,461,1055,488"/>
-<area shape="rect" id="node35" href="$d0/d23/class_torc_networkp_h_output.html" title="TorcNetworkpHOutput" alt="" coords="885,512,1046,539"/>
-<area shape="rect" id="node37" href="$d6/d33/class_torc_i2_c_p_c_a9685_channel.html" title="TorcI2CPCA9685Channel" alt="" coords="877,563,1054,589"/>
-<area shape="rect" id="node38" href="$d0/db8/class_torc_network_p_w_m_output.html" title="TorcNetworkPWMOutput" alt="" coords="879,613,1052,640"/>
-<area shape="rect" id="node39" href="$d3/d08/class_torc_pi_p_w_m_output.html" title="A device to output PWM signals on the Raspberry Pi. " alt="" coords="899,664,1031,691"/>
-<area shape="rect" id="node41" href="$d1/d71/class_torc_network_switch_output.html" title="TorcNetworkSwitchOutput" alt="" coords="873,715,1057,741"/>
-<area shape="rect" id="node43" href="$dc/d7e/class_torc_pi_switch_output.html" title="TorcPiSwitchOutput" alt="" coords="894,765,1037,792"/>
-<area shape="rect" id="node42" href="$d0/da9/class_torc_network_button_output.html" title="A network output that mimics the behaviour of a mechanical push button. " alt="" coords="1125,715,1312,741"/>
-<area shape="rect" id="node45" href="$d2/dd7/class_torc_network_temperature_output.html" title="TorcNetworkTemperatureOutput" alt="" coords="853,816,1077,843"/>
-<area shape="rect" id="node48" href="$d4/d2f/class_torc_power_null.html" title="A dummy/default power implementation. " alt="" coords="665,715,774,741"/>
-<area shape="rect" id="node49" href="$d7/d52/class_torc_power_o_s_x.html" title="A power monitoring class for OS X. " alt="" coords="663,765,775,792"/>
-<area shape="rect" id="node50" href="$d6/df0/class_torc_power_unix_d_bus.html" title="A power monitoring class for Unix based systems. " alt="" coords="646,816,793,843"/>
-<area shape="rect" id="node52" href="$d0/d84/class_torc_setting_group.html" title="High level group of related settings. " alt="" coords="653,867,785,893"/>
+<area shape="rect" id="node15" href="$d9/d9c/class_torc_integer_input.html" title="TorcIntegerInput" alt="" coords="657,157,781,184"/>
+<area shape="rect" id="node17" href="$db/d20/class_torcp_h_input.html" title="TorcpHInput" alt="" coords="671,208,768,235"/>
+<area shape="rect" id="node19" href="$d1/d8b/class_torc_p_w_m_input.html" title="TorcPWMInput" alt="" coords="665,259,774,285"/>
+<area shape="rect" id="node21" href="$db/dd0/class_torc_switch_input.html" title="TorcSwitchInput" alt="" coords="659,309,779,336"/>
+<area shape="rect" id="node25" href="$d7/df7/class_torc_system_input.html" title="TorcSystemInput" alt="" coords="655,360,783,387"/>
+<area shape="rect" id="node26" href="$de/d14/class_torc_temperature_input.html" title="TorcTemperatureInput" alt="" coords="639,411,799,437"/>
+<area shape="rect" id="node16" href="$d0/d36/class_torc_network_integer_input.html" title="TorcNetworkIntegerInput" alt="" coords="877,107,1053,133"/>
+<area shape="rect" id="node18" href="$d5/d8a/class_torc_networkp_h_input.html" title="TorcNetworkpHInput" alt="" coords="891,157,1040,184"/>
+<area shape="rect" id="node20" href="$da/d14/class_torc_network_p_w_m_input.html" title="TorcNetworkPWMInput" alt="" coords="885,208,1046,235"/>
+<area shape="rect" id="node22" href="$df/d5c/class_torc_network_switch_input.html" title="TorcNetworkSwitchInput" alt="" coords="879,259,1051,285"/>
+<area shape="rect" id="node24" href="$de/d6d/class_torc_pi_switch_input.html" title="TorcPiSwitchInput" alt="" coords="900,309,1031,336"/>
+<area shape="rect" id="node23" href="$d7/d4b/class_torc_network_button_input.html" title="A network input that mimics the behaviour of a mechanical push button. " alt="" coords="1131,259,1306,285"/>
+<area shape="rect" id="node27" href="$d5/dd1/class_torc1_wire_d_s18_b20.html" title="Torc1WireDS18B20" alt="" coords="894,360,1037,387"/>
+<area shape="rect" id="node28" href="$d9/dc9/class_torc_network_temperature_input.html" title="TorcNetworkTemperatureInput" alt="" coords="859,411,1071,437"/>
+<area shape="rect" id="node33" href="$db/dc8/class_torc_camera_output.html" title="TorcCameraOutput" alt="" coords="648,512,791,539"/>
+<area shape="rect" id="node36" href="$d2/d21/class_torcp_h_output.html" title="TorcpHOutput" alt="" coords="665,563,774,589"/>
+<area shape="rect" id="node38" href="$d9/db0/class_torc_p_w_m_output.html" title="TorcPWMOutput" alt="" coords="659,613,780,640"/>
+<area shape="rect" id="node42" href="$d9/d5b/class_torc_switch_output.html" title="TorcSwitchOutput" alt="" coords="653,664,785,691"/>
+<area shape="rect" id="node46" href="$d5/dda/class_torc_temperature_output.html" title="TorcTemperatureOutput" alt="" coords="633,715,805,741"/>
+<area shape="rect" id="node34" href="$d4/dbb/class_torc_camera_stills_output.html" title="TorcCameraStillsOutput" alt="" coords="879,461,1051,488"/>
+<area shape="rect" id="node35" href="$df/d01/class_torc_camera_video_output.html" title="TorcCameraVideoOutput" alt="" coords="876,512,1055,539"/>
+<area shape="rect" id="node37" href="$d0/d23/class_torc_networkp_h_output.html" title="TorcNetworkpHOutput" alt="" coords="885,563,1046,589"/>
+<area shape="rect" id="node39" href="$d6/d33/class_torc_i2_c_p_c_a9685_channel.html" title="TorcI2CPCA9685Channel" alt="" coords="877,613,1054,640"/>
+<area shape="rect" id="node40" href="$d0/db8/class_torc_network_p_w_m_output.html" title="TorcNetworkPWMOutput" alt="" coords="879,664,1052,691"/>
+<area shape="rect" id="node41" href="$d3/d08/class_torc_pi_p_w_m_output.html" title="A device to output PWM signals on the Raspberry Pi. " alt="" coords="899,715,1031,741"/>
+<area shape="rect" id="node43" href="$d1/d71/class_torc_network_switch_output.html" title="TorcNetworkSwitchOutput" alt="" coords="873,765,1057,792"/>
+<area shape="rect" id="node45" href="$dc/d7e/class_torc_pi_switch_output.html" title="TorcPiSwitchOutput" alt="" coords="894,816,1037,843"/>
+<area shape="rect" id="node44" href="$d0/da9/class_torc_network_button_output.html" title="A network output that mimics the behaviour of a mechanical push button. " alt="" coords="1125,765,1312,792"/>
+<area shape="rect" id="node47" href="$d2/dd7/class_torc_network_temperature_output.html" title="TorcNetworkTemperatureOutput" alt="" coords="853,867,1077,893"/>
+<area shape="rect" id="node50" href="$d4/d2f/class_torc_power_null.html" title="A dummy/default power implementation. " alt="" coords="665,765,774,792"/>
+<area shape="rect" id="node51" href="$d7/d52/class_torc_power_o_s_x.html" title="A power monitoring class for OS X. " alt="" coords="663,816,775,843"/>
+<area shape="rect" id="node52" href="$d6/df0/class_torc_power_unix_d_bus.html" title="A power monitoring class for Unix based systems. " alt="" coords="646,867,793,893"/>
+<area shape="rect" id="node54" href="$d0/d84/class_torc_setting_group.html" title="High level group of related settings. " alt="" coords="653,917,785,944"/>
 </map>

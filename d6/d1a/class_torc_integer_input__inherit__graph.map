@@ -1,0 +1,8 @@
+<map id="TorcIntegerInput" name="TorcIntegerInput">
+<area shape="rect" id="node8" href="$d0/d36/class_torc_network_integer_input.html" title="TorcNetworkIntegerInput" alt="" coords="170,304,346,331"/>
+<area shape="rect" id="node2" href="$d8/d61/class_torc_input.html" title="TorcInput" alt="" coords="219,155,297,181"/>
+<area shape="rect" id="node3" href="$d5/d76/class_torc_device.html" title="TorcDevice" alt="" coords="138,80,229,107"/>
+<area shape="rect" id="node5" href="$d6/dad/class_torc_reference_counter.html" title="A reference counting implementation. " alt="" coords="103,5,264,32"/>
+<area shape="rect" id="node6" href="$d6/d70/class_torc_h_t_t_p_service.html" title="TorcHTTPService" alt="" coords="271,80,397,107"/>
+<area shape="rect" id="node7" href="$d5/d15/class_torc_h_t_t_p_handler.html" title="Base HTTP response handler class. " alt="" coords="288,5,417,32"/>
+</map>

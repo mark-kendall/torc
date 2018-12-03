@@ -4,7 +4,7 @@ var searchData=
   ['waitforstart',['WaitForStart',['../d3/ded/class_torc_network_request.html#ae138491e99c454ff954c8f613d38accb',1,'TorcNetworkRequest']]],
   ['wasinvalid',['wasInvalid',['../d5/d76/class_torc_device.html#a52167b5ead4b1cc34c8a56c031c6f3af',1,'TorcDevice']]],
   ['weactasserver',['WeActAsServer',['../dd/d3a/class_torc_network_service.html#a88620f3f40edd32e3d57b4ec83e624ed',1,'TorcNetworkService']]],
-  ['weblogger',['WebLogger',['../d3/d3c/class_web_logger.html',1,'WebLogger'],['../d3/d3c/class_web_logger.html#a9aaa0303de56db969b4ffaf20b7d722a',1,'WebLogger::WebLogger()']]],
+  ['weblogger',['WebLogger',['../d3/d3c/class_web_logger.html',1,'WebLogger'],['../d3/d3c/class_web_logger.html#a93bdd24efddd1bf2f8218f76a1419658',1,'WebLogger::WebLogger()']]],
   ['websocketauthentication',['WebSocketAuthentication',['../d0/d08/class_web_socket_authentication.html',1,'WebSocketAuthentication'],['../d0/d08/class_web_socket_authentication.html#a1ebf4f26a4874b7e7bcaa606d25251ae',1,'WebSocketAuthentication::WebSocketAuthentication()'],['../d0/d08/class_web_socket_authentication.html#ae4196c5ac5a491025d246987d25b3c11',1,'WebSocketAuthentication::WebSocketAuthentication(quint64 Timestamp, const QString &amp;Host)']]],
   ['websocketclosed',['WebSocketClosed',['../df/d41/class_torc_web_socket_pool.html#abefec27c79cd5d4ee68752ee22c775fd',1,'TorcWebSocketPool']]],
   ['websocketprotocols',['webSocketProtocols',['../d1/d54/class_torc_h_t_t_p_services.html#acfe254b6bc6bc797607164f72538e41c',1,'TorcHTTPServices']]],

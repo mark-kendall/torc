@@ -2,7 +2,7 @@ var searchData=
 [
   ['_7ecocoaautoreleasepool',['~CocoaAutoReleasePool',['../d2/d83/class_cocoa_auto_release_pool.html#acfea334b5b0abe5bf61be3be810e30b9',1,'CocoaAutoReleasePool']]],
   ['_7efilelogger',['~FileLogger',['../de/db9/class_file_logger.html#ab08af44f2de3fe1b51158132f9a399dd',1,'FileLogger']]],
-  ['_7eloggerbase',['~LoggerBase',['../da/de4/class_logger_base.html#a1c6d7880ada1aae670c7b8c41389ee91',1,'LoggerBase']]],
+  ['_7eloggerbase',['~LoggerBase',['../da/de4/class_logger_base.html#ae5993d8e5de600a979bc7ca686102cc3',1,'LoggerBase']]],
   ['_7eloggingthread',['~LoggingThread',['../da/d38/class_logging_thread.html#a2c46311ca624b2fdb1291046309cdbb7',1,'LoggingThread']]],
   ['_7emethodparameters',['~MethodParameters',['../de/db3/class_method_parameters.html#a7dd5e158f53870a4838291202314b53a',1,'MethodParameters']]],
   ['_7etorc1wiredevicefactory',['~Torc1WireDeviceFactory',['../d5/d71/class_torc1_wire_device_factory.html#a676b76defbbc1494a47cdfe37deea2c1',1,'Torc1WireDeviceFactory']]],
@@ -12,6 +12,7 @@ var searchData=
   ['_7etorcbinaryplistserialiser',['~TorcBinaryPListSerialiser',['../d7/dfd/class_torc_binary_p_list_serialiser.html#acf5b27030b9a07def9a3661f9935ef2a',1,'TorcBinaryPListSerialiser']]],
   ['_7etorcbonjour',['~TorcBonjour',['../d0/d9f/class_torc_bonjour.html#ac14fa1d63dd99f7215a19c30326d9153',1,'TorcBonjour']]],
   ['_7etorcbonjourpriv',['~TorcBonjourPriv',['../dd/d16/class_torc_bonjour_priv.html#a7e68710905582e263a04ac62ae357b4d',1,'TorcBonjourPriv']]],
+  ['_7etorcbonjourservice',['~TorcBonjourService',['../db/dff/class_torc_bonjour_service.html#a3b2f21ff8559ef706193a6f8a5af946e',1,'TorcBonjourService']]],
   ['_7etorccameradevice',['~TorcCameraDevice',['../d3/dfd/class_torc_camera_device.html#af52879f8d2daf6d8f656379899630817',1,'TorcCameraDevice']]],
   ['_7etorccamerafactory',['~TorcCameraFactory',['../d8/d67/class_torc_camera_factory.html#a0ebd2c58f70cea86ddc28a50d8e84155',1,'TorcCameraFactory']]],
   ['_7etorccameraoutput',['~TorcCameraOutput',['../db/dc8/class_torc_camera_output.html#ab08da28f2b5435999ff868b3e9957fef',1,'TorcCameraOutput']]],
@@ -40,6 +41,7 @@ var searchData=
   ['_7etorci2cpca9685',['~TorcI2CPCA9685',['../df/d66/class_torc_i2_c_p_c_a9685.html#ac7d89340fcec398a382a58da2033c076',1,'TorcI2CPCA9685']]],
   ['_7etorci2cpca9685channel',['~TorcI2CPCA9685Channel',['../d6/d33/class_torc_i2_c_p_c_a9685_channel.html#a01a3fae39a0d99dfb7805c00dad0d789',1,'TorcI2CPCA9685Channel']]],
   ['_7etorcinput',['~TorcInput',['../d8/d61/class_torc_input.html#a74ae79905d7f43f4798c65ef0c54782f',1,'TorcInput']]],
+  ['_7etorcintegerinput',['~TorcIntegerInput',['../d9/d9c/class_torc_integer_input.html#a19401bdd7e67f83cd74920e64918e1ac',1,'TorcIntegerInput']]],
   ['_7etorciotlogger',['~TorcIOTLogger',['../d0/db9/class_torc_i_o_t_logger.html#a214ede35ec21e6f6bba8c3a679372fc2',1,'TorcIOTLogger']]],
   ['_7etorciotplotternotifier',['~TorcIoTPlotterNotifier',['../df/d10/class_torc_io_t_plotter_notifier.html#ae46db150159351b72aeaeccf95f342fe',1,'TorcIoTPlotterNotifier']]],
   ['_7etorcjsonserialiser',['~TorcJSONSerialiser',['../d7/d3e/class_torc_j_s_o_n_serialiser.html#aed0b3da8bf628614bc72ac4b34983f3a',1,'TorcJSONSerialiser']]],
@@ -53,6 +55,7 @@ var searchData=
   ['_7etorcnetworkedcontext',['~TorcNetworkedContext',['../d8/d93/class_torc_networked_context.html#abfdd0b11b27eb436808b32080f3d2ef5',1,'TorcNetworkedContext']]],
   ['_7etorcnetworkedcontextobject',['~TorcNetworkedContextObject',['../d8/d0c/class_torc_networked_context_object.html#a08271d8c4edce3144c7b343a160218ac',1,'TorcNetworkedContextObject']]],
   ['_7etorcnetworkinputs',['~TorcNetworkInputs',['../d1/d27/class_torc_network_inputs.html#ad2dfc3300b54366ccd6eb63768570981',1,'TorcNetworkInputs']]],
+  ['_7etorcnetworkintegerinput',['~TorcNetworkIntegerInput',['../d0/d36/class_torc_network_integer_input.html#aea4a47cacb7de74336df89984bb82436',1,'TorcNetworkIntegerInput']]],
   ['_7etorcnetworkphinput',['~TorcNetworkpHInput',['../d5/d8a/class_torc_networkp_h_input.html#a052a5f1c8d7032b4aa8e3c6b5948f895',1,'TorcNetworkpHInput']]],
   ['_7etorcnetworkphoutput',['~TorcNetworkpHOutput',['../d0/d23/class_torc_networkp_h_output.html#aa7a9cff2df6b3486a5cc57d8a5878c93',1,'TorcNetworkpHOutput']]],
   ['_7etorcnetworkpwminput',['~TorcNetworkPWMInput',['../da/d14/class_torc_network_p_w_m_input.html#aeaa126ede5e7f62d737a2cf84f563b71',1,'TorcNetworkPWMInput']]],
@@ -127,5 +130,5 @@ var searchData=
   ['_7etorcxmlserialiser',['~TorcXMLSerialiser',['../de/d44/class_torc_x_m_l_serialiser.html#a0495d34eaf23fc733890a68542630e6f',1,'TorcXMLSerialiser']]],
   ['_7etorcxmlvalidator',['~TorcXmlValidator',['../d9/da2/class_torc_xml_validator.html#a4787588f9ee416187a27c671b4d77475',1,'TorcXmlValidator::~TorcXmlValidator()=default'],['../d9/da2/class_torc_xml_validator.html#a95e1f43217bd575f96a03a3ddb6904d4',1,'TorcXmlValidator::~TorcXmlValidator()']]],
   ['_7etorcxsdfactory',['~TorcXSDFactory',['../d5/d5d/class_torc_x_s_d_factory.html#af96574109ce4650cec2992c4baee761f',1,'TorcXSDFactory']]],
-  ['_7eweblogger',['~WebLogger',['../d3/d3c/class_web_logger.html#ae5ea096b3ea22e0f6350647c64e82538',1,'WebLogger']]]
+  ['_7eweblogger',['~WebLogger',['../d3/d3c/class_web_logger.html#afda6a8aefaadcf3f55db675823269092',1,'WebLogger']]]
 ];

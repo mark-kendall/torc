@@ -64,7 +64,7 @@ var searchData=
   ['celsiustofahrenheit',['CelsiusToFahrenheit',['../de/d14/class_torc_temperature_input.html#a7786a260a95656cc3f8d5f623a2519ad',1,'TorcTemperatureInput']]],
   ['cfstringreftoqstring',['CFStringReftoQString',['../d2/d6f/torcosxutils_8cpp.html#a5661c7baa38b34593eb03d7716b9b4da',1,'CFStringReftoQString(CFStringRef String):&#160;torcosxutils.cpp'],['../d6/df3/torcosxutils_8h.html#a5661c7baa38b34593eb03d7716b9b4da',1,'CFStringReftoQString(CFStringRef String):&#160;torcosxutils.cpp']]],
   ['changed',['Changed',['../d6/d3b/class_torc_pi_switch_input_thread.html#a4c53f896776b1927dfada09e6767ceb8',1,'TorcPiSwitchInputThread::Changed()'],['../d6/df0/class_torc_power_unix_d_bus.html#af1c8f0b22d8043d7f1813b30e45975f6',1,'TorcPowerUnixDBus::Changed()']]],
-  ['checkforcircularreferences',['CheckForCircularReferences',['../d1/d34/class_torc_control.html#adaecf5b9de01f3473107c2ee5a24a9ea',1,'TorcControl']]],
+  ['checkforcircularreferences',['CheckForCircularReferences',['../d1/d34/class_torc_control.html#aa4e30485cd974bc4abceb57dfd2ac6e8',1,'TorcControl']]],
   ['checkheaders',['CheckHeaders',['../d8/d73/class_torc_network.html#a00b8a9893069d128e2d6109b569d5d42',1,'TorcNetwork']]],
   ['checkinputvalues',['CheckInputValues',['../d1/d34/class_torc_control.html#a723bf0ffb99ccb44f7bbf5262f51d092',1,'TorcControl']]],
   ['checktime',['CheckTime',['../df/d01/class_torc_camera_video_output.html#a8d21cb664eb19ad641cb449dcd07bb3a',1,'TorcCameraVideoOutput']]],
@@ -122,7 +122,7 @@ var searchData=
   ['createpower',['CreatePower',['../d5/d8c/class_torc_power_factory.html#a61fdda1c017ca61120c99ec2aa667b54',1,'TorcPowerFactory']]],
   ['createrequest',['CreateRequest',['../d0/db9/class_torc_i_o_t_logger.html#afdbdeeda0444e0086742dfbfb165c37e',1,'TorcIOTLogger::CreateRequest()'],['../df/d10/class_torc_io_t_plotter_notifier.html#a37d44d5b4b9fba4c2a0e9740b9d3fac1',1,'TorcIoTPlotterNotifier::CreateRequest()'],['../d0/d1f/class_torc_thing_speak_notifier.html#af2524b38f12251841e579b0830195187',1,'TorcThingSpeakNotifier::CreateRequest()']]],
   ['currenttime',['currentTime',['../d6/d7b/class_torc_time.html#aedd66fa648e08285ef4a843bc6fcb3ec',1,'TorcTime']]],
-  ['currenttimechanged',['currentTimeChanged',['../d6/d7b/class_torc_time.html#ad99ea5c02bfdeacfe03c670d98f77e84',1,'TorcTime']]],
+  ['currenttimechanged',['currentTimeChanged',['../d6/d7b/class_torc_time.html#a7c5a1844a486661ada48179cdf462be2',1,'TorcTime']]],
   ['custom',['Custom',['../d6/d72/class_torc_timer_control.html#a4f8f01816ff0addffb4f269028050371a679ffd6156c5b06ae4fc0ee0d366617b',1,'TorcTimerControl']]],
   ['customisexsd',['CustomiseXSD',['../d5/d5d/class_torc_x_s_d_factory.html#af286c17f18852ab8cf48b6e12300306e',1,'TorcXSDFactory']]],
   ['configuration_20file_20format',['Configuration file format',['../xsd.html',1,'']]]

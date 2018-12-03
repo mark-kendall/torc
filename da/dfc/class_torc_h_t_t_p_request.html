@@ -126,9 +126,9 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a4ca53162a0293fc06e9cbdbce271be85"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a974c8f961c93f721c7d6d12b49ff0746"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/dfc/class_torc_h_t_t_p_request.html#a974c8f961c93f721c7d6d12b49ff0746">SetAllowCORS</a> (bool Allowed)</td></tr>
 <tr class="separator:a974c8f961c93f721c7d6d12b49ff0746"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1d8052712fcaff363fa112f732fdd80f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/dfc/class_torc_h_t_t_p_request.html#a1d8052712fcaff363fa112f732fdd80f">SetCache</a> (int Cache, const QString Tag=QString(&quot;&quot;))</td></tr>
-<tr class="memdesc:a1d8052712fcaff363fa112f732fdd80f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the caching behaviour for this response.  <a href="#a1d8052712fcaff363fa112f732fdd80f">More...</a><br /></td></tr>
-<tr class="separator:a1d8052712fcaff363fa112f732fdd80f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae8eaaa305020f35ad29db1fe03157179"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/dfc/class_torc_h_t_t_p_request.html#ae8eaaa305020f35ad29db1fe03157179">SetCache</a> (int Cache, const QString &amp;Tag=QString(&quot;&quot;))</td></tr>
+<tr class="memdesc:ae8eaaa305020f35ad29db1fe03157179"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the caching behaviour for this response.  <a href="#ae8eaaa305020f35ad29db1fe03157179">More...</a><br /></td></tr>
+<tr class="separator:ae8eaaa305020f35ad29db1fe03157179"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa83d3c746b0ea4ee16b037daee4828fe"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/dfc/class_torc_h_t_t_p_request.html#aa83d3c746b0ea4ee16b037daee4828fe">SetSecure</a> (bool Secure)</td></tr>
 <tr class="separator:aa83d3c746b0ea4ee16b037daee4828fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a343c37c825b9363e88a3b588f469029f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/dfc/class_torc_h_t_t_p_request.html#a343c37c825b9363e88a3b588f469029f">GetSecure</a> (void)</td></tr>
@@ -194,10 +194,10 @@ Static Public Member Functions</h2></td></tr>
 <tr class="separator:aeee049660ab59205f838106dfc776530"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a21d32c9d1185514906bd91dc6e034280"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/dfc/class_torc_h_t_t_p_request.html#a21d32c9d1185514906bd91dc6e034280">StringToAllowed</a> (const QString &amp;Allowed)</td></tr>
 <tr class="separator:a21d32c9d1185514906bd91dc6e034280"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6013ebedc71f5be0381c3b5763ea83cd"><td class="memItemLeft" align="right" valign="top">static QList&lt; QPair&lt; quint64, quint64 &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/dfc/class_torc_h_t_t_p_request.html#a6013ebedc71f5be0381c3b5763ea83cd">StringToRanges</a> (const QString &amp;Ranges, qint64 Size, qint64 &amp;SizeToSend)</td></tr>
-<tr class="separator:a6013ebedc71f5be0381c3b5763ea83cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3aa355542852f918461ba99971936f8b"><td class="memItemLeft" align="right" valign="top">static QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/dfc/class_torc_h_t_t_p_request.html#a3aa355542852f918461ba99971936f8b">RangeToString</a> (const QPair&lt; quint64, quint64 &gt; &amp;Range, qint64 Size)</td></tr>
-<tr class="separator:a3aa355542852f918461ba99971936f8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acef3da0887b0fb9413ffc67c9cf3d594"><td class="memItemLeft" align="right" valign="top">static QVector&lt; QPair&lt; quint64, quint64 &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/dfc/class_torc_h_t_t_p_request.html#acef3da0887b0fb9413ffc67c9cf3d594">StringToRanges</a> (const QString &amp;Ranges, qint64 Size, qint64 &amp;SizeToSend)</td></tr>
+<tr class="separator:acef3da0887b0fb9413ffc67c9cf3d594"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5521d969ca65b888e5fbcf791513aa42"><td class="memItemLeft" align="right" valign="top">static QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/dfc/class_torc_h_t_t_p_request.html#a5521d969ca65b888e5fbcf791513aa42">RangeToString</a> (QPair&lt; quint64, quint64 &gt; Range, qint64 Size)</td></tr>
+<tr class="separator:a5521d969ca65b888e5fbcf791513aa42"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
@@ -231,8 +231,8 @@ Protected Attributes</h2></td></tr>
 <tr class="separator:aa818038e047458cdda2306873c863d37"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0b390de2db1848bd3c07c954b37b931c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../df/dd7/torchttprequest_8h.html#a31e443b1967b3fd821d92e7d65de593d">HTTPConnection</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/dfc/class_torc_h_t_t_p_request.html#a0b390de2db1848bd3c07c954b37b931c">m_connection</a></td></tr>
 <tr class="separator:a0b390de2db1848bd3c07c954b37b931c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae6ebb9557fb902b0c1bef9bf3838cc4f"><td class="memItemLeft" align="right" valign="top">QList&lt; QPair&lt; quint64, quint64 &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/dfc/class_torc_h_t_t_p_request.html#ae6ebb9557fb902b0c1bef9bf3838cc4f">m_ranges</a></td></tr>
-<tr class="separator:ae6ebb9557fb902b0c1bef9bf3838cc4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6a2fb7499bb5faaba0bd05e00719a692"><td class="memItemLeft" align="right" valign="top">QVector&lt; QPair&lt; quint64, quint64 &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/dfc/class_torc_h_t_t_p_request.html#a6a2fb7499bb5faaba0bd05e00719a692">m_ranges</a></td></tr>
+<tr class="separator:a6a2fb7499bb5faaba0bd05e00719a692"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7780aabb73a979e775d436d41ab613ee"><td class="memItemLeft" align="right" valign="top">QMap&lt; QString, QString &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/dfc/class_torc_h_t_t_p_request.html#a7780aabb73a979e775d436d41ab613ee">m_headers</a></td></tr>
 <tr class="separator:a7780aabb73a979e775d436d41ab613ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aff2aa8a885984aa80badb7773014e09a"><td class="memItemLeft" align="right" valign="top">QMap&lt; QString, QString &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/dfc/class_torc_h_t_t_p_request.html#aff2aa8a885984aa80badb7773014e09a">m_queries</a></td></tr>
@@ -713,7 +713,7 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a3aa355542852f918461ba99971936f8b"></a>
+<a class="anchor" id="a5521d969ca65b888e5fbcf791513aa42"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -723,7 +723,7 @@ Friends</h2></td></tr>
         <tr>
           <td class="memname">QString TorcHTTPRequest::RangeToString </td>
           <td>(</td>
-          <td class="paramtype">const QPair&lt; quint64, quint64 &gt; &amp;&#160;</td>
+          <td class="paramtype">QPair&lt; quint64, quint64 &gt;&#160;</td>
           <td class="paramname"><em>Range</em>, </td>
         </tr>
         <tr>
@@ -947,7 +947,7 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a1d8052712fcaff363fa112f732fdd80f"></a>
+<a class="anchor" id="ae8eaaa305020f35ad29db1fe03157179"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -960,7 +960,7 @@ Friends</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const QString&#160;</td>
+          <td class="paramtype">const QString &amp;&#160;</td>
           <td class="paramname"><em>Tag</em> = <code>QString(&quot;&quot;)</code>&#160;</td>
         </tr>
         <tr>
@@ -1193,7 +1193,7 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a6013ebedc71f5be0381c3b5763ea83cd"></a>
+<a class="anchor" id="acef3da0887b0fb9413ffc67c9cf3d594"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1201,7 +1201,7 @@ Friends</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">QList&lt; QPair&lt; quint64, quint64 &gt; &gt; TorcHTTPRequest::StringToRanges </td>
+          <td class="memname">QVector&lt; QPair&lt; quint64, quint64 &gt; &gt; TorcHTTPRequest::StringToRanges </td>
           <td>(</td>
           <td class="paramtype">const QString &amp;&#160;</td>
           <td class="paramname"><em>Ranges</em>, </td>
@@ -1654,7 +1654,7 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ae6ebb9557fb902b0c1bef9bf3838cc4f"></a>
+<a class="anchor" id="a6a2fb7499bb5faaba0bd05e00719a692"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1662,7 +1662,7 @@ Friends</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">QList&lt;QPair&lt;quint64,quint64&gt; &gt; TorcHTTPRequest::m_ranges</td>
+          <td class="memname">QVector&lt;QPair&lt;quint64,quint64&gt; &gt; TorcHTTPRequest::m_ranges</td>
         </tr>
       </table>
   </td>
@@ -1881,7 +1881,7 @@ Friends</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Dec 2 2018 11:05:40 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Dec 3 2018 11:03:13 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

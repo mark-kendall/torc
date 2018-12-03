@@ -1,10 +1,10 @@
 var searchData=
 [
   ['languagecode',['languageCode',['../d5/d34/class_torc_language.html#abc01ef14fd42749dfc4f85e319377636',1,'TorcLanguage']]],
-  ['languagecodechanged',['LanguageCodeChanged',['../d5/d34/class_torc_language.html#af0d11bf249809115ca6ba39545682d95',1,'TorcLanguage']]],
-  ['languagesettingchanged',['LanguageSettingChanged',['../d5/d34/class_torc_language.html#a6ef2d96f8429f6591729e6c657ada5ee',1,'TorcLanguage']]],
+  ['languagecodechanged',['LanguageCodeChanged',['../d5/d34/class_torc_language.html#a6242a5e8a5e728771c761246765e52b8',1,'TorcLanguage']]],
+  ['languagesettingchanged',['LanguageSettingChanged',['../d5/d34/class_torc_language.html#aa83bc9c68d17b9081547522249753d3f',1,'TorcLanguage']]],
   ['languagestring',['languageString',['../d5/d34/class_torc_language.html#adfb3b5507667caaab6555ff3b80666f5',1,'TorcLanguage']]],
-  ['languagestringchanged',['LanguageStringChanged',['../d5/d34/class_torc_language.html#aac6fe92405552e0ca49b84ac110ee3e9',1,'TorcLanguage']]],
+  ['languagestringchanged',['LanguageStringChanged',['../d5/d34/class_torc_language.html#af2c27207bbc3ed6ba3e0ae48a56992a0',1,'TorcLanguage']]],
   ['led0_5foff_5fhigh',['LED0_OFF_HIGH',['../d9/d02/torci2cpca9685_8cpp.html#a3bbbfd115af36517264e9d9768330f12',1,'torci2cpca9685.cpp']]],
   ['led0_5foff_5flow',['LED0_OFF_LOW',['../d9/d02/torci2cpca9685_8cpp.html#a4ba395d0a4c36c58a259dfb525599369',1,'torci2cpca9685.cpp']]],
   ['led0_5fon_5fhigh',['LED0_ON_HIGH',['../d9/d02/torci2cpca9685_8cpp.html#ac979feec276ef1b68fece8539f0f1799',1,'torci2cpca9685.cpp']]],
@@ -21,7 +21,7 @@ var searchData=
   ['logchanged',['logChanged',['../d3/d3c/class_web_logger.html#a13559c1e365c59d8e7d1bf16412f4c8d',1,'WebLogger']]],
   ['logerrortostring',['LogErrorToString',['../d7/d24/torcloggingimp_8cpp.html#a78f45dcc6606633b7a984d62bdd5f810',1,'torcloggingimp.cpp']]],
   ['logfile',['LogFile',['../dc/dee/class_torc_command_line.html#a1ce038f9cd42849bc4cdb065819afa63a2c3308a748ae09c5e978ca77c2a39ba3',1,'TorcCommandLine']]],
-  ['loggerbase',['LoggerBase',['../da/de4/class_logger_base.html',1,'LoggerBase'],['../da/de4/class_logger_base.html#af9c8a698bb83ee4be79dfc2015e9d0a7',1,'LoggerBase::LoggerBase()']]],
+  ['loggerbase',['LoggerBase',['../da/de4/class_logger_base.html',1,'LoggerBase'],['../da/de4/class_logger_base.html#afa910d789835322db1c3cd0da17583a8',1,'LoggerBase::LoggerBase()']]],
   ['loggingthread',['LoggingThread',['../da/d38/class_logging_thread.html',1,'LoggingThread'],['../da/d38/class_logging_thread.html#ac89e583f05c24a9bff3b6dca48aebc7b',1,'LoggingThread::LoggingThread()']]],
   ['loggingtype',['LoggingType',['../d7/d24/torcloggingimp_8cpp.html#a91d409898e51bded499875cd40c3c4d3',1,'torcloggingimp.cpp']]],
   ['logic',['Logic',['../d1/d34/class_torc_control.html#a9674689dc841799e823c26856123a8b0ae719f03f63389b8577d03b47de860d1d',1,'TorcControl']]],

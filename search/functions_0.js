@@ -2,7 +2,7 @@ var searchData=
 [
   ['accepts',['Accepts',['../d2/d51/class_torc_serialiser_factory.html#ad98d92729714e7a2d418bf0d9a43d52e',1,'TorcSerialiserFactory']]],
   ['activechanged',['ActiveChanged',['../dd/d69/class_torc_setting.html#a1eb7893e5d4d963812b07c0e6acf670f',1,'TorcSetting']]],
-  ['add',['Add',['../dc/dee/class_torc_command_line.html#aed9333a65a558c22105424a643f9e816',1,'TorcCommandLine']]],
+  ['add',['Add',['../dc/dee/class_torc_command_line.html#a6121f068e79ef3167786168a637f005f',1,'TorcCommandLine']]],
   ['addauthenticationheader',['AddAuthenticationHeader',['../db/dc7/class_torc_h_t_t_p_server.html#a30bf5e721e0ed0f64fdfd9830c9c2e07',1,'TorcHTTPServer']]],
   ['addbrowseresult',['AddBrowseResult',['../d0/d9f/class_torc_bonjour.html#ac4e1f1690af1bdea773fe68b114efe74',1,'TorcBonjour']]],
   ['addchild',['AddChild',['../dd/d69/class_torc_setting.html#ae014fc7786cb0142e648587996f24f1f',1,'TorcSetting']]],
