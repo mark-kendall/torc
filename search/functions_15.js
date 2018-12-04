@@ -7,6 +7,7 @@ var searchData=
   ['_7emethodparameters',['~MethodParameters',['../de/db3/class_method_parameters.html#a7dd5e158f53870a4838291202314b53a',1,'MethodParameters']]],
   ['_7etorc1wiredevicefactory',['~Torc1WireDeviceFactory',['../d5/d71/class_torc1_wire_device_factory.html#a676b76defbbc1494a47cdfe37deea2c1',1,'Torc1WireDeviceFactory']]],
   ['_7etorc1wireds18b20',['~Torc1WireDS18B20',['../d5/dd1/class_torc1_wire_d_s18_b20.html#a385f4d5fd6da3aa31f1ac3b76589680f',1,'Torc1WireDS18B20']]],
+  ['_7etorc1wirereader',['~Torc1WireReader',['../d1/dab/class_torc1_wire_reader.html#ae8041b4b5b52e8dac347ba8587092625',1,'Torc1WireReader']]],
   ['_7etorcadminobject',['~TorcAdminObject',['../d4/d75/class_torc_admin_object.html#ac5f1e1afecfa48425201bfe15f642569',1,'TorcAdminObject']]],
   ['_7etorcadminthread',['~TorcAdminThread',['../dd/d56/class_torc_admin_thread.html#ae1dd9c43597f8ca83f3ea5bdb6173f5e',1,'TorcAdminThread']]],
   ['_7etorcbinaryplistserialiser',['~TorcBinaryPListSerialiser',['../d7/dfd/class_torc_binary_p_list_serialiser.html#acf5b27030b9a07def9a3661f9935ef2a',1,'TorcBinaryPListSerialiser']]],

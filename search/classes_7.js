@@ -7,6 +7,7 @@ var searchData=
   ['torc1wiredevicefactory',['Torc1WireDeviceFactory',['../d5/d71/class_torc1_wire_device_factory.html',1,'']]],
   ['torc1wireds18b20',['Torc1WireDS18B20',['../d5/dd1/class_torc1_wire_d_s18_b20.html',1,'']]],
   ['torc1wireds18b20factory',['Torc1WireDS18B20Factory',['../d9/d88/class_torc1_wire_d_s18_b20_factory.html',1,'']]],
+  ['torc1wirereader',['Torc1WireReader',['../d1/dab/class_torc1_wire_reader.html',1,'']]],
   ['torc1wirereadthread',['Torc1WireReadThread',['../d8/d54/class_torc1_wire_read_thread.html',1,'']]],
   ['torc1wirexsdfactory',['Torc1WireXSDFactory',['../d5/d83/class_torc1_wire_x_s_d_factory.html',1,'']]],
   ['torcadminobject',['TorcAdminObject',['../d4/d75/class_torc_admin_object.html',1,'']]],
