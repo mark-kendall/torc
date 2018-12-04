@@ -156,8 +156,8 @@ void TorcAdminObject::CreateObjects(void)
 
     qSort(gTorcAdminObjects.begin(), gTorcAdminObjects.end(), TorcAdminObject::HigherPriority);
 
-    QList<TorcAdminObject*>::iterator it = gTorcAdminObjects.begin();
-    for ( ; it != gTorcAdminObjects.end(); ++it)
+    QList<TorcAdminObject*>::const_iterator it = gTorcAdminObjects.constBegin();
+    for ( ; it != gTorcAdminObjects.constEnd(); ++it)
         (*it)->Create();
 }
 
@@ -169,8 +169,8 @@ void TorcAdminObject::DestroyObjects(void)
     QMutexLocker lock(gTorcAdminObjectsLock);
 
     // destroy in the reverse order of creation
-    QList<TorcAdminObject*>::iterator it = gTorcAdminObjects.end();
-    while (it != gTorcAdminObjects.begin())
+    QList<TorcAdminObject*>::const_iterator it = gTorcAdminObjects.constEnd();
+    while (it != gTorcAdminObjects.constBegin())
     {
         --it;
         (*it)->Destroy();

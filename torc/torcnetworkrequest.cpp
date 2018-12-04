@@ -224,15 +224,15 @@ int TorcNetworkRequest::Read(char *Buffer, qint32 BufferSize, int Timeout, bool 
     if (m_readPosition + available > m_bufferSize)
     {
         int rest = m_bufferSize - m_readPosition;
-        memcpy(Buffer, m_buffer.data() + m_readPosition, rest);
-        memcpy(Buffer + rest, m_buffer.data(), available - rest);
+        memcpy(Buffer, (void*)(m_buffer.constData() + m_readPosition), rest);
+        memcpy(Buffer + rest, (void*)m_buffer.constData(), available - rest);
 
         if (!Peek)
             m_readPosition = available - rest;
     }
     else
     {
-        memcpy(Buffer, m_buffer.data() + m_readPosition, available);
+        memcpy(Buffer, (void*)(m_buffer.constData() + m_readPosition), available);
         if (!Peek)
             m_readPosition += available;
     }
@@ -252,11 +252,12 @@ int TorcNetworkRequest::Read(char *Buffer, qint32 BufferSize, int Timeout, bool 
     return available;
 }
 
-bool TorcNetworkRequest::WritePriv(QNetworkReply *Reply, char *Buffer, int Size)
+bool TorcNetworkRequest::WritePriv(QNetworkReply *Reply, const char *Buffer, int Size)
 {
     if (Reply && Buffer && Size)
     {
-        int read = Reply->read(Buffer, Size);
+        char *buffer = const_cast<char *>(Buffer);
+        int read = Reply->read(buffer, Size);
 
         if (read < 0)
         {
@@ -299,14 +300,14 @@ void TorcNetworkRequest::Write(QNetworkReply *Reply)
     {
         int rest = m_bufferSize - m_writePosition;
 
-        if (!WritePriv(Reply, m_buffer.data() + m_writePosition, rest))
+        if (!WritePriv(Reply, m_buffer.constData() + m_writePosition, rest))
             return;
-        if (!WritePriv(Reply, m_buffer.data(), available - rest))
+        if (!WritePriv(Reply, m_buffer.constData(), available - rest))
             return;
     }
     else
     {
-        WritePriv(Reply, m_buffer.data() + m_writePosition, available);
+        WritePriv(Reply, m_buffer.constData() + m_writePosition, available);
     }
 }
 

@@ -446,7 +446,7 @@ void TorcNetworkService::QueryPeerDetails(void)
         QUrl url;
         url.setScheme(secure ? "https" : "http");
         url.setPort(port);
-        url.setHost(m_addresses[m_preferredAddressIndex].toString());
+        url.setHost(m_addresses.value(m_preferredAddressIndex).toString());
         url.setPath("/services/GetDetails");
         QNetworkRequest networkrequest(url);
         networkrequest.setRawHeader("Accept", "application/json");
@@ -875,9 +875,9 @@ void TorcNetworkedContext::HandleNewRequest(const QString &UUID, TorcRPCRequest 
         QReadLocker locker(&m_httpServiceLock);
         for (int i = 0; i < m_discoveredServices.size(); ++i)
         {
-            if (m_discoveredServices[i]->GetUuid() == UUID)
+            if (m_discoveredServices.value(i)->GetUuid() == UUID)
             {
-                m_discoveredServices[i]->RemoteRequest(Request);
+                m_discoveredServices.value(i)->RemoteRequest(Request);
                 return;
             }
         }
@@ -893,9 +893,9 @@ void TorcNetworkedContext::HandleCancelRequest(const QString &UUID, TorcRPCReque
         QReadLocker locker(&m_httpServiceLock);
         for (int i = 0; i < m_discoveredServices.size(); ++i)
         {
-            if (m_discoveredServices[i]->GetUuid() == UUID)
+            if (m_discoveredServices.value(i)->GetUuid() == UUID)
             {
-                m_discoveredServices[i]->CancelRequest(Request);
+                m_discoveredServices.value(i)->CancelRequest(Request);
                 return;
             }
         }
@@ -937,7 +937,7 @@ void TorcNetworkedContext::HandleNewPeer(TorcWebSocketThread *Thread, const QVar
             if (m_discoveredServices[i]->GetUuid() == UUID && !TorcNetworkService::WeActAsServer(priority, starttime, UUID))
             {
                 LOG(VB_GENERAL, LOG_INFO, QString("Received unexpected WebSocket from peer '%1' (%2) - closing")
-                    .arg(m_discoveredServices[i]->GetName(), UUID));
+                    .arg(m_discoveredServices.value(i)->GetName(), UUID));
                 Thread->quit();
                 return;
             }

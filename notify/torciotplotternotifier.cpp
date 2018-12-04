@@ -74,7 +74,7 @@ TorcNetworkRequest* TorcIoTPlotterNotifier::CreateRequest(void)
                 pair.insert("epoch", epoch.toLongLong());
                 QJsonArray values;
                 values.append(pair);
-                raw.insert(m_reverseFields[i].toLocal8Bit(), values);
+                raw.insert(m_reverseFields.value(i).toLocal8Bit(), values);
             }
         }
 

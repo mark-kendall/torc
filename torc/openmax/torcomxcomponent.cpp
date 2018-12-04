@@ -473,37 +473,38 @@ OMX_ERRORTYPE TorcOMXComponent::WaitForResponse(OMX_U32 Command, OMX_U32 Data2, 
     {
         m_eventQueueLock.lock();
 
-        QList<TorcOMXEvent>::iterator it = m_eventQueue.begin();
-
-        for ( ; it != m_eventQueue.end(); ++it)
+        QMutableListIterator<TorcOMXEvent> it(m_eventQueue);
+        while (it.hasNext())
         {
-            if ((*it).m_type == OMX_EventCmdComplete && (*it).m_data1 == Command && (*it).m_data2 == Data2)
+            it.next();
+            TorcOMXEvent event = it.value();
+            if (event.m_type == OMX_EventCmdComplete && event.m_data1 == Command && event.m_data2 == Data2)
             {
-                m_eventQueue.erase(it);
+                it.remove();
                 m_eventQueueLock.unlock();
                 return OMX_ErrorNone;
             }
-	    else if ((*it).m_type == Command)
+            else if (event.m_type == Command)
             {
-                LOG(VB_GENERAL, LOG_DEBUG, QString("1 %1 2 %2").arg((*it).m_data1).arg((*it).m_data2));
-                m_eventQueue.erase(it);
+                LOG(VB_GENERAL, LOG_DEBUG, QString("1 %1 2 %2").arg(event.m_data1).arg(event.m_data2));
+                it.remove();
                 m_eventQueueLock.unlock();
                 return OMX_ErrorNone;
             }
-            else if ((*it).m_type == OMX_EventError)
+            else if (event.m_type == OMX_EventError)
             {
-                OMX_ERRORTYPE omxerror = (OMX_ERRORTYPE)(*it).m_data1;
-                if (omxerror == OMX_ErrorSameState && (*it).m_data2 == 1)
+                OMX_ERRORTYPE omxerror = (OMX_ERRORTYPE)event.m_data1;
+                if (omxerror == OMX_ErrorSameState && event.m_data2 == 1)
                 {
-                    m_eventQueue.erase(it);
+                    it.remove();
                     m_eventQueueLock.unlock();
                     return OMX_ErrorNone;
                 }
 
                 LOG(VB_GENERAL, (omxerror ==  OMX_ErrorPortUnpopulated) ? LOG_DEBUG : LOG_ERR, QString("%1: Error event '%2' data2 %3")
-                    .arg(m_componentName, ErrorToString(omxerror)).arg((*it).m_data2));
-                OMX_ERRORTYPE error = (OMX_ERRORTYPE)(*it).m_data1;
-                m_eventQueue.erase(it);
+                    .arg(m_componentName, ErrorToString(omxerror)).arg(event.m_data2));
+                OMX_ERRORTYPE error = (OMX_ERRORTYPE)event.m_data1;
+                it.remove();
                 m_eventQueueLock.unlock();
                 return error;
             }

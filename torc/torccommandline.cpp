@@ -229,7 +229,7 @@ int TorcCommandLine::Evaluate(int argc, const char * const *argv, bool &Exit)
             }
         }
 
-        TorcArgument& argument = m_options[key];
+        TorcArgument argument = m_options.value(key);
 
         // --key value format
         if (!simpleformat && argument.m_value.isValid())
@@ -288,6 +288,8 @@ int TorcCommandLine::Evaluate(int argc, const char * const *argv, bool &Exit)
                 default:
                     argument.m_value = QVariant(value);
             }
+            // replace option with updated argument
+            m_options.insert(key, argument);
         }
     }
 
@@ -303,8 +305,8 @@ int TorcCommandLine::Evaluate(int argc, const char * const *argv, bool &Exit)
     {
         std::cout << "Command line options:" << std::endl << std::endl;
 
-        QHash<QString,QString>::iterator it = m_help.begin();
-        for ( ; it != m_help.end(); ++it)
+        QHash<QString,QString>::const_iterator it = m_help.constBegin();
+        for ( ; it != m_help.constEnd(); ++it)
         {
             QByteArray option(it.key().toLocal8Bit().constData());
             QByteArray padding(m_maxLength - option.size(), 32);
@@ -346,10 +348,10 @@ int TorcCommandLine::Evaluate(int argc, const char * const *argv, bool &Exit)
 QVariant TorcCommandLine::GetValue(const QString &Key)
 {
     if (m_options.contains(Key))
-        return m_options[Key].m_value;
+        return m_options.value(Key).m_value;
 
     if (m_aliases.contains(Key))
-        return m_options[m_aliases[Key]].m_value;
+        return m_options.value(m_aliases.value(Key)).m_value;
 
     return QVariant();
 }

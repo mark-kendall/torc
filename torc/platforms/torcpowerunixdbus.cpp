@@ -308,8 +308,8 @@ void TorcPowerUnixDBus::UpdateBattery(void)
         qreal total = 0;
         int   count = 0;
 
-        QMap<QString,int>::iterator it = m_devices.begin();
-        for ( ; it != m_devices.end(); ++it)
+        QMap<QString,int>::const_iterator it = m_devices.constBegin();
+        for ( ; it != m_devices.constEnd(); ++it)
         {
             if (it.value() >= 0 && it.value() <= 100)
             {

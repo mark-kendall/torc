@@ -81,8 +81,8 @@ void TorcNetworkInputs::Create(const QVariantMap &Details)
 {
     QWriteLocker locker(&m_handlerLock);
 
-    QVariantMap::const_iterator i = Details.begin();
-    for ( ; i != Details.end(); ++i)
+    QVariantMap::const_iterator i = Details.constBegin();
+    for ( ; i != Details.constEnd(); ++i)
     {
         // network devices can be <inputs> or <outputs>
         if ((i.key() != INPUTS_DIRECTORY) && (i.key() != OUTPUTS_DIRECTORY))
@@ -200,16 +200,16 @@ void TorcNetworkInputs::Destroy(void)
 {
     QWriteLocker locker(&m_handlerLock);
 
-    QMap<QString,TorcInput*>::iterator it = m_inputs.begin();
-    for ( ; it != m_inputs.end(); ++it)
+    QMap<QString,TorcInput*>::const_iterator it = m_inputs.constBegin();
+    for ( ; it != m_inputs.constEnd(); ++it)
     {
         it.value()->DownRef();
         TorcInputs::gInputs->RemoveInput(it.value());
     }
     m_inputs.clear();
 
-    QMap<QString,TorcOutput*>::iterator it2 = m_outputs.begin();
-    for ( ; it2 != m_outputs.end(); ++it2)
+    QMap<QString,TorcOutput*>::const_iterator it2 = m_outputs.constBegin();
+    for ( ; it2 != m_outputs.constEnd(); ++it2)
     {
         it2.value()->DownRef();
         TorcOutputs::gOutputs->RemoveOutput(it2.value());

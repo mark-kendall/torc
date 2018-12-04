@@ -128,8 +128,11 @@ class MethodParameters
         // check parameter count
         if (Queries.size() != size - 1)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Method '%1' expects %2 parameters, sent %3")
-                .arg(m_names[0].data()).arg(size - 1).arg(Queries.size()));
+            if (!m_names.isEmpty())
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("Method '%1' expects %2 parameters, sent %3")
+                   .arg(m_names.value(0).constData()).arg(size - 1).arg(Queries.size()));
+            }
             return QVariant();
         }
 
@@ -137,17 +140,17 @@ class MethodParameters
         QMap<QString,QString>::const_iterator it;
         for (int i = 0; i < size; ++i)
         {
-            parameters[i] = QMetaType::create(m_types[i]);
+            parameters[i] = QMetaType::create(m_types.value(i));
             if (i)
             {
-                it = Queries.constFind(m_names[i]);
+                it = Queries.constFind(m_names.value(i));
                 if (it == Queries.end())
                 {
                     LOG(VB_GENERAL, LOG_ERR, QString("Parameter '%1' for method '%2' is missing")
-                        .arg(m_names[i].data(), m_names[0].data()));
+                        .arg(m_names.value(i).constData(), m_names.value(0).constData()));
                     return QVariant();
                 }
-                SetValue(parameters[i], it.value(), m_types[i]);
+                SetValue(parameters[i], it.value(), m_types.value(i));
             }
         }
 
@@ -155,7 +158,7 @@ class MethodParameters
             LOG(VB_GENERAL, LOG_ERR, "qt_metacall error");
 
         // handle QVariant return type where we don't want to lose visibility of the underlying type
-        int type = m_types[0];
+        int type = m_types.value(0);
         if (type == QMetaType::QVariant)
         {
             int newtype = static_cast<int>(reinterpret_cast<QVariant*>(parameters[0])->type());
@@ -171,7 +174,7 @@ class MethodParameters
         // free allocated parameters
         for (int i = 0; i < size; ++i)
             if (parameters[i])
-                QMetaType::destroy(m_types.data()[i], parameters[i]);
+                QMetaType::destroy(m_types.at(i), parameters[i]);
 
         ReturnType = m_returnType;
         return result;
@@ -777,7 +780,7 @@ QVariantMap TorcHTTPService::GetServiceDetails(void)
 
         MethodParameters *parameters = it2.value();
         for (int i = 1; i < parameters->m_types.size(); ++i)
-            params.append(parameters->m_names[i].data());
+            params.append(parameters->m_names.value(i).constData());
         map.insert("params", params);
         map.insert("returns", TorcJSONRPC::QMetaTypetoJavascriptType(parameters->m_types[0]));
         methods.insert(it2.key(), map);

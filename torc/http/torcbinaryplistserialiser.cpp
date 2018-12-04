@@ -124,18 +124,18 @@ void TorcBinaryPListSerialiser::End(QByteArray &Dest)
                         table < 0x0000ffff ? 2 :
                         table < 0xffffffff ? 4 : 8;
 
-    QList<quint64>::iterator it = m_objectOffsets.begin();
+    QList<quint64>::const_iterator it = m_objectOffsets.constBegin();
     switch (offsetsize)
     {
         case 1:
         {
-            for ( ; it != m_objectOffsets.end(); ++it)
+            for ( ; it != m_objectOffsets.constEnd(); ++it)
                 Dest.append((quint8)((*it) & 0xff));
             break;
         }
         case 2:
         {
-            for ( ; it != m_objectOffsets.end(); ++it)
+            for ( ; it != m_objectOffsets.constEnd(); ++it)
             {
                 quint16 buffer = qToBigEndian((quint16)((*it) & 0xffff));
                 Dest.append(*((quint8*)&buffer));
@@ -145,7 +145,7 @@ void TorcBinaryPListSerialiser::End(QByteArray &Dest)
         }
         case 4:
         {
-            for ( ; it != m_objectOffsets.end(); ++it)
+            for ( ; it != m_objectOffsets.constEnd(); ++it)
             {
                 quint32 buffer= qToBigEndian((quint32)((*it) & 0xffffffff));
                 Dest.append(*((quint8*)&buffer));
@@ -157,7 +157,7 @@ void TorcBinaryPListSerialiser::End(QByteArray &Dest)
         }
         case 8:
         {
-            for ( ; it != m_objectOffsets.end(); ++it)
+            for ( ; it != m_objectOffsets.constEnd(); ++it)
             {
                 quint64 buffer = qToBigEndian((*it));
                 Dest.append(*((quint8*)&buffer));

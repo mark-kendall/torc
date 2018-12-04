@@ -418,7 +418,7 @@ void TorcLogicControl::CalculateOutput(void)
             }
             break;
         case TorcLogicControl::Passthrough:
-            newvalue = m_inputValues.first();
+            newvalue = m_inputValues.constBegin().value();
             break;
         case TorcLogicControl::Multiply:
             {
@@ -486,13 +486,13 @@ void TorcLogicControl::CalculateOutput(void)
             {
                 // the output is toggled for every 'rising' input (i.e. when the input changes from
                 // a value that is less than 1 to a value that is greater than or equal to 1
-                if (m_lastInputValues.first() < 1.0 && m_inputValues.first() >= 1.0)
+                if (m_lastInputValues.constBegin().value() < 1.0 && m_inputValues.constBegin().value() >= 1.0)
                     newvalue = value >= 1.0 ? 0.0 : 1.0;
             }
             break;
         case TorcLogicControl::Invert:
             {
-                newvalue = m_inputValues.first() < 1.0 ? 1.0 : 0.0;
+                newvalue = m_inputValues.constBegin().value() < 1.0 ? 1.0 : 0.0;
             }
             break;
         case TorcLogicControl::Maximum:

@@ -457,8 +457,8 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
         response << "Location: " << m_redirectedTo.toLatin1() << "\r\n";
 
     // process any custom headers
-    QMap<QString,QString>::iterator it = m_responseHeaders.begin();
-    for ( ; it != m_responseHeaders.end(); ++it)
+    QMap<QString,QString>::const_iterator it = m_responseHeaders.constBegin();
+    for ( ; it != m_responseHeaders.constEnd(); ++it)
         response << it.key().toLatin1() << ": " << it.value().toLatin1() << "\r\n";
 
     response << "\r\n";
@@ -466,7 +466,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
 
     // send headers
     qint64 headersize = headers.data()->size();
-    qint64 sent = Socket->write(headers.data()->data(), headersize);
+    qint64 sent = Socket->write(headers.data()->constData(), headersize);
     if (headersize != sent)
         LOG(VB_GENERAL, LOG_WARNING, QString("Buffer size %1 - but sent %2").arg(headersize).arg(sent));
     else
@@ -501,7 +501,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
         else
         {
             qint64 size = sendsize;
-            qint64 offset = m_ranges.isEmpty() ? 0 : m_ranges[0].first;
+            qint64 offset = m_ranges.isEmpty() ? 0 : m_ranges.value(0).first;
             qint64 sent = Socket->write(m_responseContent.constData() + offset, size);
             if (size != sent)
                 LOG(VB_GENERAL, LOG_WARNING, QString("Buffer size %1 - but sent %2").arg(size).arg(sent));
@@ -632,7 +632,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
         {
             off64_t sent = 0;
             off64_t size = sendsize;
-            off64_t offset = m_ranges.isEmpty() ? 0 : m_ranges[0].first;
+            off64_t offset = m_ranges.isEmpty() ? 0 : m_ranges.value(0).first;
 
 #if defined(Q_OS_LINUX)
             if (size > sent)

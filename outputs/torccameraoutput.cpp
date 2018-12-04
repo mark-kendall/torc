@@ -306,9 +306,9 @@ void TorcCameraVideoOutput::SegmentReady(int Segment)
     QWriteLocker locker(&m_segmentLock);
     if (!m_segments.contains(Segment))
     {
-        if (!m_segments.isEmpty() && m_segments.head() >= Segment)
+        if (!m_segments.isEmpty() && m_segments.constFirst() >= Segment)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Segment %1 is not greater than head (%2)").arg(Segment).arg(m_segments.head()));
+            LOG(VB_GENERAL, LOG_ERR, QString("Segment %1 is not greater than head (%2)").arg(Segment).arg(m_segments.constFirst()));
         }
         else
         {
@@ -333,7 +333,7 @@ void TorcCameraVideoOutput::SegmentRemoved(int Segment)
     }
     else
     {
-        if (m_segments.first() != Segment)
+        if (m_segments.constFirst() != Segment)
             LOG(VB_GENERAL, LOG_ERR, QString("Segment %1 is not at tail of queue").arg(Segment));
         else
             m_segments.dequeue();
@@ -457,11 +457,11 @@ void TorcCameraVideoOutput::ProcessHTTPRequest(const QString &PeerAddress, int P
                     QDateTime start = m_cameraStartTime;
                     m_threadLock.unlock();
                     LOG(VB_GENERAL, LOG_WARNING, QString("Segment %1 not found - we have %2-%3")
-                        .arg(num).arg(m_segments.first()).arg(m_segments.last()));
+                        .arg(num).arg(m_segments.constFirst()).arg(m_segments.constLast()));
                     LOG(VB_GENERAL, LOG_WARNING, QString("Our start time: %1").arg(start.toString(Qt::ISODate)));
                     LOG(VB_GENERAL, LOG_WARNING, QString("Start+request : %1").arg(start.addSecs(num *2).toString(Qt::ISODate)));
-                    LOG(VB_GENERAL, LOG_WARNING, QString("Start+first   : %1").arg(start.addSecs(m_segments.first() * 2).toString(Qt::ISODate)));
-                    LOG(VB_GENERAL, LOG_WARNING, QString("Start+last    : %1").arg(start.addSecs(m_segments.last() * 2).toString(Qt::ISODate)));
+                    LOG(VB_GENERAL, LOG_WARNING, QString("Start+first   : %1").arg(start.addSecs(m_segments.constFirst() * 2).toString(Qt::ISODate)));
+                    LOG(VB_GENERAL, LOG_WARNING, QString("Start+last    : %1").arg(start.addSecs(m_segments.constLast() * 2).toString(Qt::ISODate)));
                     LOG(VB_GENERAL, LOG_WARNING, QString("System time   : %1").arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate)));
                     emit CheckTime();
                 }
@@ -543,7 +543,7 @@ QByteArray TorcCameraVideoOutput::GetHLSPlaylist(void)
     QString duration = QString::number(m_params.m_segmentLength / (float) m_params.m_frameRate, 'f', 2);
     m_paramsLock.unlock();
     m_segmentLock.lockForRead();
-    QString result = playlist.arg(duration).arg(m_segments.first());
+    QString result = playlist.arg(duration).arg(m_segments.constFirst());
     foreach (int segment, m_segments)
     {
         result += QString("#EXTINF:%1,\r\n").arg(duration);
@@ -719,8 +719,8 @@ void TorcCameraOutputs::Create(const QVariantMap &Details)
 void TorcCameraOutputs::Destroy(void)
 {
     QWriteLocker locker(&m_handlerLock);
-    QHash<QString, TorcCameraOutput*>::iterator it = m_cameras.begin();
-    for ( ; it != m_cameras.end(); ++it)
+    QHash<QString, TorcCameraOutput*>::const_iterator it = m_cameras.constBegin();
+    for ( ; it != m_cameras.constEnd(); ++it)
     {
         TorcOutputs::gOutputs->RemoveOutput(it.value());
         it.value()->DownRef();

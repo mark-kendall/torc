@@ -58,7 +58,7 @@ void TorcWebSocketPool::WebSocketClosed(void)
 
     for (int i = 0; i < m_webSockets.size(); ++i)
     {
-        if (m_webSockets[i] == thread)
+        if (m_webSockets.value(i) == thread)
         {
             TorcWebSocketThread *socket = m_webSockets.takeAt(i);
 
@@ -100,7 +100,7 @@ TorcWebSocketThread* TorcWebSocketPool::TakeSocket(TorcWebSocketThread *Socket)
     QMutexLocker locker(&m_webSocketsLock);
     for (int i = 0; i < m_webSockets.size(); ++i)
     {
-        if (m_webSockets[i] == Socket)
+        if (m_webSockets.value(i) == Socket)
             return m_webSockets.takeAt(i);
     }
 

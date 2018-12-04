@@ -75,8 +75,8 @@ void TorcSystemInputs::Destroy(void)
 {
     QWriteLocker locker(&m_handlerLock);
 
-    QMap<QString,TorcInput*>::iterator it = m_inputs.begin();
-    for ( ; it != m_inputs.end(); ++it)
+    QMap<QString,TorcInput*>::const_iterator it = m_inputs.constBegin();
+    for ( ; it != m_inputs.constEnd(); ++it)
     {
         it.value()->DownRef();
         TorcInputs::gInputs->RemoveInput(it.value());

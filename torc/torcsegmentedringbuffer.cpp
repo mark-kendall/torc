@@ -80,7 +80,7 @@ int TorcSegmentedRingBuffer::GetHead(void)
     int result = -1;
     m_segmentsLock.lockForRead();
     if (!m_segments.isEmpty())
-        result = m_segmentRefs.last();
+        result = m_segmentRefs.constLast();
     m_segmentsLock.unlock();
     return result;
 }
@@ -96,7 +96,7 @@ int TorcSegmentedRingBuffer::GetSegmentsAvail(int &TailRef)
     m_segmentsLock.lockForRead();
     result = m_segments.size();
     if (result > 0)
-        TailRef = m_segmentRefs.first();
+        TailRef = m_segmentRefs.constFirst();
     m_segmentsLock.unlock();
     return result;
 }
@@ -158,9 +158,9 @@ int TorcSegmentedRingBuffer::Write(const uint8_t *Data, int Size)
     }
 
     int copy = qMin(Size, m_size - m_writePosition);
-    memcpy(m_data.data() + m_writePosition, Data, copy);
+    memcpy((void*)(m_data.constData() + m_writePosition), Data, copy);
     if (copy < Size) // wrap
-        memcpy(m_data.data(), Data + copy, Size - copy);
+        memcpy((void*)m_data.constData(), Data + copy, Size - copy);
     m_writePosition = (m_writePosition + Size) % m_size;
     m_currentSize  += Size;
     return Size;
@@ -201,9 +201,9 @@ int TorcSegmentedRingBuffer::ReadSegment(uint8_t* Dst, int Max, int SegmentRef, 
         return 0;
     int readpos = (segment.first + Offset) % m_size;
     int read    = qMin(size, m_size - readpos);
-    memcpy(Dst, m_data.data() + readpos, read);
+    memcpy(Dst, m_data.constData() + readpos, read);
     if (read < size)
-        memcpy(Dst + read, m_data.data(), size - read);
+        memcpy(Dst + read, m_data.constData(), size - read);
     return size;
 }
 
@@ -223,9 +223,9 @@ int TorcSegmentedRingBuffer::ReadSegment(QIODevice *Dst, int SegmentRef)
 
     QPair<int,int> segment = m_segments[m_segmentRefs.indexOf(SegmentRef)];
     int read = qMin(segment.second, m_size - segment.first);
-    Dst->write((const char*)(m_data.data() + segment.first), read);
+    Dst->write((const char*)(m_data.constData() + segment.first), read);
     if (read < segment.second)
-        Dst->write((const char*)m_data.data(), segment.second - read);
+        Dst->write((const char*)m_data.constData(), segment.second - read);
     return segment.second;
 }
 
@@ -247,9 +247,9 @@ void TorcSegmentedRingBuffer::SaveInitSegment(void)
     QPair<int,int> segment = m_segments.dequeue();
     m_initSegment = QByteArray(segment.second, '0');
     int read = qMin(segment.second, m_size - segment.first);
-    memcpy(m_initSegment.data(), m_data.data() + segment.first, read);
+    memcpy((void*)m_initSegment.constData(), m_data.constData() + segment.first, read);
     if (read < segment.second)
-        memcpy(m_initSegment.data() + read, m_data.data(), segment.second - read);
+        memcpy((void*)(m_initSegment.constData() + read), m_data.constData(), segment.second - read);
 
     // reset the ringbuffer
     LOG(VB_GENERAL, LOG_INFO, QString("Init segment saved (%1 bytes) - resetting ringbuffer").arg(m_initSegment.size()));
@@ -277,9 +277,9 @@ QByteArray TorcSegmentedRingBuffer::GetSegment(int SegmentRef)
     QPair<int,int> segment = m_segments[m_segmentRefs.indexOf(SegmentRef)];
     QByteArray result(segment.second, '0');
     int read = qMin(segment.second, m_size - segment.first);
-    memcpy(result.data(), m_data.data() + segment.first, read);
+    memcpy((void*)result.constData(), m_data.constData() + segment.first, read);
     if (read < segment.second)
-        memcpy(result.data() + read, m_data.data(), segment.second - read);
+        memcpy(result.data() + read, m_data.constData(), segment.second - read);
     return result;
 }
 

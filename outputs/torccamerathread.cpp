@@ -143,12 +143,8 @@ bool TorcCameraThread::DownRef(void)
         wait();
         if (!m_eventLoopEnding)
         {
-            QObject* object = dynamic_cast<QObject*>(this);
-            if (object)
-            {
-                object->deleteLater();
-                return true;
-            }
+            deleteLater();
+            return true;
         }
 
         delete this;

@@ -511,7 +511,7 @@ bool TorcWebSocketReader::Read(void)
             if (m_socket.bytesAvailable() < 4)
                 return false;
 
-            if (m_socket.read(m_frameMask.data(), 4) != 4)
+            if (m_socket.read(const_cast<char *>(m_frameMask.constData()), 4) != 4)
             {
                 InitiateClose(CloseUnexpectedError, QString("Read error"));
                 return false;
@@ -534,7 +534,7 @@ bool TorcWebSocketReader::Read(void)
             {
                 qint64 red = qMin(m_socket.bytesAvailable(), needed);
 
-                if (m_socket.read(m_framePayload.data() + m_framePayloadReadPosition, red) != red)
+                if (m_socket.read(const_cast<char*>(m_framePayload.constData() + m_framePayloadReadPosition), red) != red)
                 {
                     InitiateClose(CloseUnexpectedError, QString("Read error"));
                     return false;

@@ -21,7 +21,6 @@
 */
 
 // Qt
-#include <QFile>
 #include <QtGlobal>
 #include <QTextStream>
 
@@ -33,90 +32,92 @@
 
 #define MIN_READ_INTERVAL 10000
 
-Torc1WireReadThread::Torc1WireReadThread(Torc1WireDS18B20 *Parent, const QString &Filename)
+Torc1WireReader::Torc1WireReader(const QString &DeviceName)
+  : m_timer(),
+    m_file(ONE_WIRE_DIRECTORY + DeviceName + "/w1_slave")
+{
+    m_timer.setTimerType(Qt::CoarseTimer);
+    m_timer.setSingleShot(true);
+    connect(&m_timer, &QTimer::timeout, this, &Torc1WireReader::Read);
+    // randomise start time for each input
+    m_timer.start(qrand() % MIN_READ_INTERVAL);
+}
+
+void Torc1WireReader::Read(void)
+{
+    if (!m_file.open(QIODevice::ReadOnly))
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Failed to read device '%1' (Error #%2: '%3')")
+                                 .arg(m_file.fileName()).arg(m_file.error()).arg(m_file.errorString()));
+        emit NewTemperature(0.0, false);
+        m_timer.start(MIN_READ_INTERVAL);
+        return;
+    }
+
+    // read
+    QTextStream text(&m_file);
+
+    // check crc
+    QString line = text.readLine();
+    if (!line.contains("crc") || !line.contains("YES"))
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("CRC check failed for device %1").arg(m_file.fileName()));
+        emit NewTemperature(0.0, false);
+    }
+    else
+    {
+        // read temp
+        line = text.readLine().trimmed();
+        int index = line.lastIndexOf("t=");
+        if (index < 0)
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse temperature for device %1").arg(m_file.fileName()));
+            emit NewTemperature(0.0, false);
+        }
+        else
+        {
+            line = line.mid(index + 2);
+            bool ok = false;
+            double temp = line.toDouble(&ok);
+            if (ok)
+            {
+                emit NewTemperature(temp / 1000.0, true);
+            }
+            else
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("Failed to convert temperature for device %1").arg(m_file.fileName()));
+                emit NewTemperature(0.0, false);
+            }
+        }
+    }
+    m_file.close();
+    m_timer.start(MIN_READ_INTERVAL);
+}
+
+Torc1WireReadThread::Torc1WireReadThread(Torc1WireDS18B20 *Parent, const QString &DeviceName)
   : TorcQThread("1Wire"),
     m_parent(Parent),
-    m_timer(nullptr),
-    m_file(ONE_WIRE_DIRECTORY + Filename + "/w1_slave") 
-{   
-}   
+    m_reader(nullptr),
+    m_deviceName(DeviceName)
+{
+}
 
 void Torc1WireReadThread::Start(void)
 {
-    // create and setup timer in correct thread
-    m_timer = new QTimer();
-    m_timer->setTimerType(Qt::CoarseTimer);
-
-    // restart the timer each time to handle periods of load/delay
-    m_timer->setSingleShot(true);
-
-    // 'this' is in the parent's thread and connect will by default use an indirect connection,
-    // so force a direct connection to ensure Read operates in the 1Wire thread.
-    // This way we don't need an extra object created in the read thread to handle one function...
-    connect(m_timer, &QTimer::timeout, this, &Torc1WireReadThread::Read, Qt::DirectConnection);
-
-    // randomise start time for each input
-    m_timer->start(qrand() % MIN_READ_INTERVAL);
+    if (m_parent)
+    {
+        m_reader = new Torc1WireReader(m_deviceName);
+        connect(m_reader, &Torc1WireReader::NewTemperature, m_parent, &Torc1WireDS18B20::Read);
+    }
 }
 
 void Torc1WireReadThread::Finish(void)
 {
-    delete m_timer;
-    m_timer = nullptr;
-}
-
-void Torc1WireReadThread::Read(void)
-{
-    QFile file(m_file);
-
-    // open
-    if (!file.open(QIODevice::ReadOnly))
-    {   
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to read device '%1' (Error #%2: '%3')")
-                                 .arg(m_file).arg(file.error()).arg(file.errorString()));
-    }
-    else
-    {   
-        // read
-        QTextStream text(&file);
-        
-        // check crc 
-        QString line = text.readLine();
-        if (!line.contains("crc") || !line.contains("YES"))
-        {   
-            LOG(VB_GENERAL, LOG_ERR, QString("CRC check failed for device %1").arg(m_file));
-        }
-        else
-        {   
-            // read temp
-            line = text.readLine().trimmed();
-            int index = line.lastIndexOf("t=");
-            if (index < 0)
-            {   
-                LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse temperature for device %1").arg(m_file));
-            }
-            else
-            {   
-                line = line.mid(index + 2);
-                bool ok = false;
-                double temp = line.toDouble(&ok);
-                if (ok)
-                {
-                    file.close();
-                    m_parent->Read(temp / 1000.0, true);
-                    m_timer->start(MIN_READ_INTERVAL);
-                    return;
-                }   
-                
-                LOG(VB_GENERAL, LOG_ERR, QString("Failed to convert temperature for device %1").arg(m_file));
-            }   
-        }   
-    }   
-    
-    file.close();
-    m_parent->Read(0, false);
-
-    m_timer->start(MIN_READ_INTERVAL);
+    if (m_reader)
+        delete m_reader;
+    m_reader = nullptr;
+    if (m_parent)
+        m_parent->Read(0.0, false);
 }
 
 Torc1WireDS18B20::Torc1WireDS18B20(const QVariantMap &Details)

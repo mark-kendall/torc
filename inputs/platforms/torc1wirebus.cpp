@@ -149,8 +149,8 @@ void Torc1WireBus::Destroy(void)
     QWriteLocker locker(&m_handlerLock);
 
     // delete any extant inputs
-    QHash<QString,TorcInput*>::iterator it = m_inputs.begin();
-    for ( ; it != m_inputs.end(); ++it)
+    QHash<QString,TorcInput*>::const_iterator it = m_inputs.constBegin();
+    for ( ; it != m_inputs.constEnd(); ++it)
     {
         TorcInputs::gInputs->RemoveInput(it.value());
         it.value()->DownRef();

@@ -222,8 +222,8 @@ QLocale::Language TorcLanguage::From3CharCode(const QString &Code)
 
     if (language.size() == 3)
     {
-        QMap<QString,int>::iterator it = gLanguageMap.find(language);
-        if (it != gLanguageMap.end())
+        QMap<QString,int>::const_iterator it = gLanguageMap.constFind(language);
+        if (it != gLanguageMap.constEnd())
             return (QLocale::Language)it.value();
     }
 

@@ -119,7 +119,7 @@ TorcWebSocket::~TorcWebSocket()
         LOG(VB_GENERAL, LOG_WARNING, QString("%1 outstanding RPC requests").arg(m_currentRequests.size()));
 
         while (!m_currentRequests.isEmpty())
-            CancelRequest(m_currentRequests.begin().value());
+            CancelRequest(m_currentRequests.constBegin().value());
     }
 
     if (m_socketState == SocketState::Upgraded)
