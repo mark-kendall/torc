@@ -29,7 +29,7 @@ matrix:
             description: "Torc"
           notification_email: mark.kendall@gmail.com
           build_command_prepend: "qmake torc.pro"
-          build_command: "make"
+          build_command: "make -j4"
           branch_pattern: coverity_scan
 
     - os: osx
@@ -50,7 +50,7 @@ matrix:
         - |
           if [[ $TRAVIS_BRANCH != "coverity_scan" ]]; then
             TORC_FFMPEG=1 qmake torc.pro
-            make
+            make -j4
           else
             echo Ignoring branch
           fi
@@ -71,7 +71,7 @@ matrix:
         - |
           if [[ $TRAVIS_BRANCH != "coverity_scan" ]]; then
             qmake CONFIG+=test torc.pro
-            make
+            make -j4
             ./torc-tests -c test/config -s . -t i18n
             bash <(curl -s https://codecov.io/bash)
           else
@@ -95,7 +95,7 @@ matrix:
         - |
           if [[ $TRAVIS_BRANCH != "coverity_scan" ]]; then
             qmake torc.pro
-            make
+            make j4
           else
             echo Ignoring branch
           fi
@@ -117,7 +117,7 @@ matrix:
         - |
           if [[ $TRAVIS_BRANCH != "coverity_scan" ]]; then
             qmake CONFIG+=test torc.pro
-            make
+            make -j4
             ./torc-tests -c test/config -s . -t i18n
             bash <(curl -s https://codecov.io/bash)
           else
