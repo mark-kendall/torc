@@ -227,7 +227,7 @@ void TorcSSDP::Stop(void)
     for ( ; it2 != m_discoveredDevices.constEnd(); ++it2)
     {
         QVariantMap data;
-        data.insert(QStringLiteral("usn"), it2.value().GetUSN());
+        data.insert(TORC_USN, it2.value().GetUSN());
         TorcEvent event(Torc::ServiceWentAway, data);
         gLocalContext->Notify(event);
     }
@@ -383,11 +383,12 @@ void TorcSSDP::SendSearch(void)
     // we only search for the Torc root device
 
     QString searchdevice = TORC_ROOT_UPNP_DEVICE;//"ssdp:all";
-    static const QString search("M-SEARCH * HTTP/1.1\r\n"
+    static const QString search(QStringLiteral(
+                                "M-SEARCH * HTTP/1.1\r\n"
                                 "HOST: %1\r\n"
                                 "MAN: \"ssdp:discover\"\r\n"
                                 "MX: 3\r\n"
-                                "ST: %2\r\n\r\n");
+                                "ST: %2\r\n\r\n"));
 
     if (!m_ipv4Address.isEmpty() && m_ipv4MulticastSocket && m_ipv4MulticastSocket->isValid() && m_ipv4MulticastSocket->state() == QAbstractSocket::BoundState)
     {
@@ -520,7 +521,8 @@ void TorcSSDP::SendAnnounce(bool IsIPv6, bool Alive)
      * Packet 3 - NT: urn:schemas-torcapp-org:device:TorcClient:1 USN: uuid:device-UUID::urn:schemas-torcapp-org:device:TorcClient:1
     */
 
-    static const QString notify("NOTIFY * HTTP/1.1\r\n"
+    static const QString notify(QStringLiteral(
+                                "NOTIFY * HTTP/1.1\r\n"
                                 "HOST: %1\r\n"
                                 "CACHE-CONTROL: max-age=1800\r\n"
                                 "LOCATION: http%2://%3:%4/upnp/description\r\n"
@@ -531,12 +533,12 @@ void TorcSSDP::SendAnnounce(bool IsIPv6, bool Alive)
                                 "NAME: %9\r\n"
                                 "APIVERSION: %10\r\n"
                                 "STARTTIME: %11\r\n"
-                                "PRIORITY: %12\r\n%13\r\n");
+                                "PRIORITY: %12\r\n%13\r\n"));
 
     QString ip           = IsIPv6 ? TORC_IPV6_UDP_MULTICAST_URL : TORC_IPV4_UDP_MULTICAST_URL;
     QHostAddress address = IsIPv6 ? m_ipv6LinkGroupBaseAddress : m_ipv4GroupAddress;
     QString uuid         = QStringLiteral("uuid:") + gLocalContext->GetUuid();
-    QString alive        = Alive ? QStringLiteral("alive") :QStringLiteral( "byebye");
+    QString alive        = Alive ? QStringLiteral("alive") :QStringLiteral("byebye");
     QString url          = IsIPv6 ? m_ipv6Address : m_ipv4Address;
     QString secure       = m_announceOptions.secure ? QStringLiteral("s") : QStringLiteral("");
     QString secure2      = m_announceOptions.secure ? QStringLiteral("SECURE: yes\r\n") : QStringLiteral("");
@@ -797,7 +799,8 @@ void TorcSSDP::ProcessResponse(const TorcSSDPSearchResponse &Response)
 
     // TODO this duplicates format from TorcHTTPRequest
     static const QString dateformat(QStringLiteral("ddd, dd MMM yyyy HH:mm:ss 'GMT'"));
-    static const QString reply(QStringLiteral("HTTP/1.1 200 OK\r\n"
+    static const QString reply(QStringLiteral(
+                               "HTTP/1.1 200 OK\r\n"
                                "CACHE-CONTROL: max-age=1800\r\n"
                                "DATE: %1\r\n"
                                "EXT:\r\n"
@@ -885,7 +888,7 @@ void TorcSSDP::Refresh(void)
     for ( ; it2 != removed.constEnd(); ++it2)
     {
         QVariantMap data;
-        data.insert(QStringLiteral("usn"), (*it2).GetUSN());
+        data.insert(TORC_USN, (*it2).GetUSN());
         TorcEvent event(Torc::ServiceWentAway, data);
         gLocalContext->Notify(event);
     }
@@ -896,10 +899,10 @@ void TorcSSDP::Refresh(void)
 
 void TorcSSDP::ProcessDevice(const QMap<QString,QString> &Headers, qint64 Expires, bool Add)
 {
-    if (!Headers.contains(QStringLiteral("usn")) || !Headers.contains(QStringLiteral("location")) || Expires < 1)
+    if (!Headers.contains(TORC_USN) || !Headers.contains(QStringLiteral("location")) || Expires < 1)
         return;
 
-    QString USN = Headers.value(QStringLiteral("usn"));
+    QString USN = Headers.value(TORC_USN);
     QString location = Headers.value(QStringLiteral("location"));
 
     if (!USN.contains(TORC_ROOT_UPNP_DEVICE))
@@ -930,14 +933,14 @@ void TorcSSDP::ProcessDevice(const QMap<QString,QString> &Headers, qint64 Expire
     if (notify)
     {
         QVariantMap data;
-        data.insert(QStringLiteral("usn"), USN);
-        data.insert(QStringLiteral("address"), location);
-        data.insert(QStringLiteral("name"), Headers.value(QStringLiteral("name")));
-        data.insert(QStringLiteral("apiversion"), Headers.value(QStringLiteral("apiversion")));
-        data.insert(QStringLiteral("starttime"), Headers.value(QStringLiteral("starttime")));
-        data.insert(QStringLiteral("priority"), Headers.value(QStringLiteral("priority")));
-        if (Headers.contains(QStringLiteral("secure")))
-            data.insert(QStringLiteral("secure"), QStringLiteral("yes"));
+        data.insert(TORC_USN, USN);
+        data.insert(TORC_ADDRESS, location);
+        data.insert(TORC_NAME, Headers.value(TORC_NAME));
+        data.insert(TORC_APIVERSION, Headers.value(TORC_APIVERSION));
+        data.insert(TORC_STARTTIME, Headers.value(TORC_STARTTIME));
+        data.insert(TORC_PRIORITY, Headers.value(TORC_PRIORITY));
+        if (Headers.contains(TORC_SECURE))
+            data.insert(TORC_SECURE, TORC_YES);
         TorcEvent event(Add ? Torc::ServiceDiscovered : Torc::ServiceWentAway, data);
         gLocalContext->Notify(event);
     }

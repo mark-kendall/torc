@@ -10,7 +10,7 @@
 // Torc
 
 #include "torcqthread.h"
-#include "upnp/torcupnp.h"
+#include "torcupnp.h"
 #include "torchttpserver.h"
 
 #define TORC_SSDP_UDP_MULTICAST_PORT  1900

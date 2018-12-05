@@ -35,6 +35,7 @@
 #include "torcrpcrequest.h"
 #include "torchttpserver.h"
 #include "torcwebsocket.h"
+#include "torcupnp.h"
 
 /*! \class TorcWebSocket
  *  \brief Overlays the Websocket protocol over a QTcpSocket
@@ -365,15 +366,15 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest &Request)
         // stop the watchdog timer for peers
         m_watchdogTimer.stop();
         QVariantMap data;
-        data.insert(QStringLiteral("uuid"),       Request.Headers().value(QStringLiteral("Torc-UUID")));
-        data.insert(QStringLiteral("name"),       Request.Headers().value(QStringLiteral("Torc-Name")));
-        data.insert(QStringLiteral("port"),       Request.Headers().value(QStringLiteral("Torc-Port")));
-        data.insert(QStringLiteral("priority"),   Request.Headers().value(QStringLiteral("Torc-Priority")));
-        data.insert(QStringLiteral("starttime"),  Request.Headers().value(QStringLiteral("Torc-Starttime")));
-        data.insert(QStringLiteral("apiversion"), Request.Headers().value(QStringLiteral("Torc-APIVersion")));
-        data.insert(QStringLiteral("address"),    peerAddress().toString());
+        data.insert(TORC_UUID,       Request.Headers().value(QStringLiteral("Torc-UUID")));
+        data.insert(TORC_NAME,       Request.Headers().value(QStringLiteral("Torc-Name")));
+        data.insert(TORC_PORT,       Request.Headers().value(QStringLiteral("Torc-Port")));
+        data.insert(TORC_PRIORITY,   Request.Headers().value(QStringLiteral("Torc-Priority")));
+        data.insert(TORC_STARTTIME,  Request.Headers().value(QStringLiteral("Torc-Starttime")));
+        data.insert(TORC_APIVERSION, Request.Headers().value(QStringLiteral("Torc-APIVersion")));
+        data.insert(TORC_ADDRESS,    peerAddress().toString());
         if (Request.Headers().contains(QStringLiteral("Torc-Secure")))
-            data.insert(QStringLiteral("secure"), QStringLiteral("yes"));
+            data.insert(TORC_SECURE, TORC_YES);
         TorcNetworkedContext::PeerConnected(m_parent, data);
     }
     else
@@ -394,7 +395,7 @@ QVariantList TorcWebSocket::GetSupportedSubProtocols(void)
 {
     QVariantList result;
     QVariantMap proto;
-    proto.insert(QStringLiteral("name"),TORC_JSON_RPC);
+    proto.insert(TORC_NAME, TORC_JSON_RPC);
     proto.insert(QStringLiteral("description"), QStringLiteral("I can't remember how this differs from straight JSON-RPC:) The overall mechanism is very similar to WAMP."));
     result.append(proto);
     return result;
@@ -403,7 +404,7 @@ QVariantList TorcWebSocket::GetSupportedSubProtocols(void)
 void TorcWebSocket::Encrypted(void)
 {
     if (m_debug.isEmpty())
-        m_debug = QStringLiteral(">> %1 %2 -").arg(TorcNetwork::IPAddressToLiteral(peerAddress(), peerPort()), m_secure ? QStringLiteral("secure") : QStringLiteral("insecure"));
+        m_debug = QStringLiteral(">> %1 %2 -").arg(TorcNetwork::IPAddressToLiteral(peerAddress(), peerPort()), m_secure ? TORC_SECURE : QStringLiteral("insecure"));
     connect(this, &TorcWebSocket::readyRead, this, &TorcWebSocket::ReadyRead);
     emit ConnectionEstablished();
     LOG(VB_GENERAL, LOG_INFO, QStringLiteral("%1 encrypted").arg(m_debug));
@@ -449,7 +450,7 @@ void TorcWebSocket::Start(void)
     {
         if (setSocketDescriptor(m_socketDescriptor))
         {
-            m_debug = QStringLiteral("<< %1 %2 -").arg(TorcNetwork::IPAddressToLiteral(peerAddress(), peerPort()), m_secure ? QStringLiteral("secure") : QStringLiteral("insecure"));
+            m_debug = QStringLiteral("<< %1 %2 -").arg(TorcNetwork::IPAddressToLiteral(peerAddress(), peerPort()), m_secure ? TORC_SECURE : QStringLiteral("insecure"));
             LOG(VB_GENERAL, LOG_INFO, QStringLiteral("%1 socket connected (%2)").arg(m_debug, m_authenticated ? QStringLiteral("Authenticated") : QStringLiteral("Unauthenticated")));
             SetState(SocketState::ConnectedTo);
 
@@ -772,7 +773,7 @@ void TorcWebSocket::CloseSocket(void)
 
 void TorcWebSocket::Connected(void)
 {
-    m_debug = QStringLiteral(">> %1 %2 -").arg(TorcNetwork::IPAddressToLiteral(peerAddress(), peerPort()), m_secure ? QStringLiteral("secure") : QStringLiteral("insecure"));
+    m_debug = QStringLiteral(">> %1 %2 -").arg(TorcNetwork::IPAddressToLiteral(peerAddress(), peerPort()), m_secure ? TORC_SECURE : QStringLiteral("insecure"));
     LOG(VB_GENERAL, LOG_INFO, QStringLiteral("%1 connection to remote host").arg(m_debug));
     SetState(SocketState::Upgrading);
     SendHandshake();

@@ -860,10 +860,10 @@ void TorcBonjour::RemoveBrowseResult(DNSServiceRef Reference,
                 it.value().m_interfaceIndex == Service.m_interfaceIndex)
             {
                 QVariantMap data;
-                data.insert(QStringLiteral("name"), it.value().m_name.constData());
-                data.insert(QStringLiteral("type"), it.value().m_type.constData());
-                data.insert(QStringLiteral("txtrecords"), it.value().m_txt);
-                data.insert(QStringLiteral("host"), it.value().m_host);
+                data.insert(TORC_BONJOUR_NAME, it.value().m_name.constData());
+                data.insert(TORC_BONJOUR_TYPE, it.value().m_type.constData());
+                data.insert(TORC_BONJOUR_TXT, it.value().m_txt);
+                data.insert(TORC_BONJOUR_HOST, it.value().m_host);
                 TorcEvent event(Torc::ServiceWentAway, data);
                 gLocalContext->Notify(event);
 
@@ -905,11 +905,11 @@ void TorcBonjour::Resolve(DNSServiceRef Reference, DNSServiceErrorType ErrorType
                 {
                     LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to resolve '%1' (Error %2)").arg(service.m_name.constData()).arg(ErrorType));
                     QVariantMap data;
-                    data.insert(QStringLiteral("name"), service.m_name.constData());
-                    data.insert(QStringLiteral("type"), service.m_type.constData());
-                    data.insert(QStringLiteral("port"), service.m_port);
-                    data.insert(QStringLiteral("txtrecords"), service.m_txt);
-                    data.insert(QStringLiteral("host"), service.m_host.constData());
+                    data.insert(TORC_BONJOUR_NAME, service.m_name.constData());
+                    data.insert(TORC_BONJOUR_TYPE, service.m_type.constData());
+                    data.insert(TORC_BONJOUR_PORT, service.m_port);
+                    data.insert(TORC_BONJOUR_TXT, service.m_txt);
+                    data.insert(TORC_BONJOUR_HOST, service.m_host.constData());
                     // as per HostLookup below - resolve may have failed due to a network disruption and the service is no
                     // longer available. Signal removal - if it wasn't already known it won't matter.
                     TorcEvent event(Torc::ServiceWentAway, data);
@@ -970,12 +970,12 @@ void TorcBonjour::HostLookup(const QHostInfo &HostInfo)
             }
 
             QVariantMap data;
-            data.insert(QStringLiteral("name"), service.m_name.constData());
-            data.insert(QStringLiteral("type"), service.m_type.constData());
-            data.insert(QStringLiteral("port"), service.m_port);
-            data.insert(QStringLiteral("addresses"), addresses);
-            data.insert(QStringLiteral("txtrecords"), service.m_txt);
-            data.insert(QStringLiteral("host"), service.m_host.constData());
+            data.insert(TORC_BONJOUR_NAME, service.m_name.constData());
+            data.insert(TORC_BONJOUR_TYPE, service.m_type.constData());
+            data.insert(TORC_BONJOUR_PORT, service.m_port);
+            data.insert(TORC_BONJOUR_ADDRESSES, addresses);
+            data.insert(TORC_BONJOUR_TXT, service.m_txt);
+            data.insert(TORC_BONJOUR_HOST, service.m_host.constData());
             if (!addresses.isEmpty())
             {
                 TorcEvent event(Torc::ServiceDiscovered, data);

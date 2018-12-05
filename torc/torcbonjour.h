@@ -10,6 +10,13 @@
 // DNS Service Discovery
 #include <dns_sd.h>
 
+#define TORC_BONJOUR_HOST      QStringLiteral("host")
+#define TORC_BONJOUR_ADDRESSES QStringLiteral("addresses")
+#define TORC_BONJOUR_TXT       QStringLiteral("txtrecords")
+#define TORC_BONJOUR_NAME      QStringLiteral("name")
+#define TORC_BONJOUR_TYPE      QStringLiteral("type")
+#define TORC_BONJOUR_PORT      QStringLiteral("port")
+
 class TorcBonjour;
 
 class TorcBonjourService

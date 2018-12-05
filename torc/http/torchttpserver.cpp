@@ -666,12 +666,12 @@ void TorcHTTPServer::StartBonjour(void)
     {
         int port = m_port->GetValue().toInt();
         QMap<QByteArray,QByteArray> map;
-        map.insert(QByteArrayLiteral("uuid"), gLocalContext->GetUuid().toLatin1());
-        map.insert(QByteArrayLiteral("apiversion"), TorcHTTPServices::GetVersion().toLocal8Bit().constData());
-        map.insert(QByteArrayLiteral("priority"),   QByteArray::number(gLocalContext->GetPriority()));
-        map.insert(QByteArrayLiteral("starttime"),  QByteArray::number(gLocalContext->GetStartTime()));
+        map.insert(TORC_UUID_B,       gLocalContext->GetUuid().toLatin1());
+        map.insert(TORC_APIVERSION_B, TorcHTTPServices::GetVersion().toLocal8Bit().constData());
+        map.insert(TORC_PRIORITY_B,   QByteArray::number(gLocalContext->GetPriority()));
+        map.insert(TORC_STARTTIME_B,  QByteArray::number(gLocalContext->GetStartTime()));
         if (m_secure->GetValue().toBool())
-            map.insert(QByteArrayLiteral("secure"), QByteArrayLiteral("yes"));
+            map.insert(TORC_SECURE_B, QByteArrayLiteral("yes"));
 
         QString name = ServerDescription();
 

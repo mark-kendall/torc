@@ -26,7 +26,7 @@
 #include "torcnetwork.h"
 #include "torcbonjour.h"
 #include "torcevent.h"
-#include "upnp/torcupnp.h"
+#include "torcupnp.h"
 #include "torcwebsocket.h"
 #include "torcrpcrequest.h"
 #include "torcnetworkrequest.h"
@@ -299,9 +299,9 @@ void TorcNetworkService::RequestReady(TorcNetworkRequest *Request)
             if (object.contains(QStringLiteral("details")))
             {
                 QJsonObject   details   = object.value(QStringLiteral("details")).toObject();
-                QJsonValueRef jpriority  = details[QStringLiteral("priority")];
-                QJsonValueRef jstarttime = details[QStringLiteral("starttime")];
-                QJsonValueRef jversion   = details[QStringLiteral("version")];
+                QJsonValueRef jpriority  = details[TORC_PRIORITY];
+                QJsonValueRef jstarttime = details[TORC_STARTTIME];
+                QJsonValueRef jversion   = details[TORC_SERVICE_VERSION];
 
                 if (!jpriority.isNull() && !jstarttime.isNull() && !jversion.isNull())
                 {
@@ -373,9 +373,9 @@ void TorcNetworkService::RequestReady(TorcRPCRequest *Request)
             if (m_getPeerDetailsRPC->GetReply().type() == QVariant::Map)
             {
                 QVariantMap map     = m_getPeerDetailsRPC->GetReply().toMap();
-                QVariant vpriority  = map.value(QStringLiteral("priority"));
-                QVariant vstarttime = map.value(QStringLiteral("starttime"));
-                QVariant vversion   = map.value(QStringLiteral("version"));
+                QVariant vpriority  = map.value(TORC_PRIORITY);
+                QVariant vstarttime = map.value(TORC_STARTTIME);
+                QVariant vversion   = map.value(TORC_SERVICE_VERSION);
 
                 if (!vpriority.isNull() && !vstarttime.isNull() && !vversion.isNull())
                 {
@@ -517,14 +517,14 @@ void TorcNetworkService::CancelRequest(TorcRPCRequest *Request)
 QVariant TorcNetworkService::ToMap(void)
 {
     QVariantMap result;
-    result.insert(QStringLiteral("name"),      name);
-    result.insert(QStringLiteral("uuid"),      uuid);
-    result.insert(QStringLiteral("port"),      port);
+    result.insert(TORC_NAME,      name);
+    result.insert(TORC_UUID,      uuid);
+    result.insert(TORC_PORT,      port);
     result.insert(QStringLiteral("uiAddress"), uiAddress);
-    result.insert(QStringLiteral("address"),   m_addresses.isEmpty() ? QStringLiteral("INValid") : TorcNetwork::IPAddressToLiteral(m_addresses[m_preferredAddressIndex], 0));
-    result.insert(QStringLiteral("host"),      host);
+    result.insert(TORC_ADDRESS,   m_addresses.isEmpty() ? QStringLiteral("INValid") : TorcNetwork::IPAddressToLiteral(m_addresses[m_preferredAddressIndex], 0));
+    result.insert(TORC_BONJOUR_HOST, host);
     if (secure)
-        result.insert(QStringLiteral("secure"), QStringLiteral("yes"));
+        result.insert(TORC_SECURE, TORC_YES);
     return result;
 }
 
@@ -665,14 +665,14 @@ bool TorcNetworkedContext::event(QEvent *Event)
         TorcEvent *event = static_cast<TorcEvent*>(Event);
         if (event && (event->GetEvent() == Torc::ServiceDiscovered || event->GetEvent() == Torc::ServiceWentAway))
         {
-            if (event->Data().contains(QStringLiteral("txtrecords")))
+            if (event->Data().contains(TORC_BONJOUR_TXT))
             {
                 // txtrecords is Bonjour specific
-                QMap<QByteArray,QByteArray> records = TorcBonjour::TxtRecordToMap(event->Data().value(QStringLiteral("txtrecords")).toByteArray());
+                QMap<QByteArray,QByteArray> records = TorcBonjour::TxtRecordToMap(event->Data().value(TORC_BONJOUR_TXT).toByteArray());
 
-                if (records.contains(QByteArrayLiteral("uuid")))
+                if (records.contains(TORC_UUID_B))
                 {
-                    QByteArray uuid  = records.value(QByteArrayLiteral("uuid"));
+                    QByteArray uuid = records.value(TORC_UUID_B);
 
                     if (event->GetEvent() == Torc::ServiceDiscovered)
                     {
@@ -691,7 +691,7 @@ bool TorcNetworkedContext::event(QEvent *Event)
                         }
                         else
                         {
-                            QStringList addresses = event->Data().value(QStringLiteral("addresses")).toStringList();
+                            QStringList addresses = event->Data().value(TORC_BONJOUR_ADDRESSES).toStringList();
 
                             QList<QHostAddress> hosts;
                             foreach (const QString &address, addresses)
@@ -709,7 +709,7 @@ bool TorcNetworkedContext::event(QEvent *Event)
                                 }
                             }
 
-                            QString host = event->Data().value(QStringLiteral("host")).toString();
+                            QString host = event->Data().value(TORC_BONJOUR_HOST).toString();
 
                             if (hosts.isEmpty())
                             {
@@ -717,16 +717,16 @@ bool TorcNetworkedContext::event(QEvent *Event)
                             }
                             else
                             {
-                                QString name = event->Data().value(QStringLiteral("name")).toString();
-                                QByteArray txtrecords = event->Data().value(QStringLiteral("txtrecords")).toByteArray();
+                                QString name = event->Data().value(TORC_BONJOUR_NAME).toString();
+                                QByteArray txtrecords = event->Data().value(TORC_BONJOUR_TXT).toByteArray();
                                 QMap<QByteArray,QByteArray> map = TorcBonjour::TxtRecordToMap(txtrecords);
-                                QString version       = QString(map.value(QByteArrayLiteral("apiversion")));
-                                qint64 starttime      = map.value(QByteArrayLiteral("starttime")).toULongLong();
-                                int priority          = map.value(QByteArrayLiteral("priority")).toInt();
-                                bool secure           = map.contains(QByteArrayLiteral("secure"));
+                                QString version       = QString(map.value(TORC_APIVERSION_B));
+                                qint64 starttime      = map.value(TORC_STARTTIME_B).toULongLong();
+                                int priority          = map.value(TORC_PRIORITY_B).toInt();
+                                bool secure           = map.contains(TORC_SECURE_B);
 
                                 // create the new peer
-                                TorcNetworkService *service = new TorcNetworkService(name, uuid, event->Data().value(QStringLiteral("port")).toInt(),
+                                TorcNetworkService *service = new TorcNetworkService(name, uuid, event->Data().value(TORC_BONJOUR_PORT).toInt(),
                                                                                      secure, hosts);
                                 service->SetAPIVersion(version);
                                 service->SetPriority(priority);
@@ -745,17 +745,16 @@ bool TorcNetworkedContext::event(QEvent *Event)
                     else if (event->GetEvent() == Torc::ServiceWentAway)
                     {
                         if (uuid == gLocalContext->GetUuid().toLatin1())
-                            TorcNetwork::RemoveHostName(event->Data().value(QStringLiteral("host")).toString());
+                            TorcNetwork::RemoveHostName(event->Data().value(TORC_BONJOUR_HOST).toString());
                         else
                             Remove(uuid, TorcNetworkService::Bonjour);
                     }
                 }
             }
-            else if (event->Data().contains(QStringLiteral("usn")))
+            else if (event->Data().contains(TORC_USN))
             {
                 // USN == Unique Service Name (UPnP)
-                QString usn      = event->Data().value(QStringLiteral("usn")).toString();
-                QString uuid     = TorcUPNP::UUIDFromUSN(usn);
+                QString uuid     = TorcUPNP::UUIDFromUSN(event->Data().value(TORC_USN).toString());
 
                 if (event->GetEvent() == Torc::ServiceWentAway)
                 {
@@ -778,15 +777,15 @@ bool TorcNetworkedContext::event(QEvent *Event)
                     else
                     {
                         // need name, uuid, port, hosts, apiversion, priority, starttime, host?
-                        QUrl location(event->Data().value(QStringLiteral("address")).toString());
-                        QString name = event->Data().value(QStringLiteral("name")).toString();
-                        bool secure = event->Data().contains(QStringLiteral("secure"));
+                        QUrl location(event->Data().value(TORC_ADDRESS).toString());
+                        QString name = event->Data().value(TORC_NAME).toString();
+                        bool secure = event->Data().contains(TORC_SECURE);
                         QList<QHostAddress> hosts;
                         hosts << QHostAddress(location.host());
                         TorcNetworkService *service = new TorcNetworkService(name, uuid, location.port(), secure, hosts);
-                        service->SetAPIVersion(event->Data().value(QStringLiteral("apiversion")).toString());
-                        service->SetPriority(event->Data().value(QStringLiteral("priority")).toInt());
-                        service->SetStartTime(event->Data().value(QStringLiteral("starttime")).toULongLong());
+                        service->SetAPIVersion(event->Data().value(TORC_APIVERSION).toString());
+                        service->SetPriority(event->Data().value(TORC_PRIORITY).toInt());
+                        service->SetStartTime(event->Data().value(TORC_STARTTIME).toULongLong());
                         service->SetHost(location.host());
                         service->SetSource(TorcNetworkService::UPnP);
                         Add(service);
@@ -915,13 +914,13 @@ void TorcNetworkedContext::HandleNewPeer(TorcWebSocketThread *Thread, const QVar
     if (!Thread)
         return;
 
-    QString UUID       = Data.value(QStringLiteral("uuid")).toString();
-    QString name       = Data.value(QStringLiteral("name")).toString();
-    int     port       = Data.value(QStringLiteral("port")).toInt();
-    QString apiversion = Data.value(QStringLiteral("apiversion")).toString();
-    int     priority   = Data.value(QStringLiteral("priority")).toInt();
-    qint64  starttime  = Data.value(QStringLiteral("starttime")).toULongLong();
-    QHostAddress address(Data.value(QStringLiteral("address")).toString());
+    QString UUID       = Data.value(TORC_UUID).toString();
+    QString name       = Data.value(TORC_NAME).toString();
+    int     port       = Data.value(TORC_PORT).toInt();
+    QString apiversion = Data.value(TORC_APIVERSION).toString();
+    int     priority   = Data.value(TORC_PRIORITY).toInt();
+    qint64  starttime  = Data.value(TORC_STARTTIME).toULongLong();
+    QHostAddress address(Data.value(TORC_ADDRESS).toString());
 
     if (UUID.isEmpty())
     {
@@ -951,7 +950,7 @@ void TorcNetworkedContext::HandleNewPeer(TorcWebSocketThread *Thread, const QVar
         LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Received WebSocket for new peer '%1' (%2)").arg(name, UUID));
         QList<QHostAddress> addresses;
         addresses << address;
-        TorcNetworkService *service = new TorcNetworkService(name, UUID, port, Data.contains(QStringLiteral("secure")), addresses);
+        TorcNetworkService *service = new TorcNetworkService(name, UUID, port, Data.contains(TORC_SECURE), addresses);
         service->SetWebSocketThread(thread);
         service->SetAPIVersion(apiversion);
         service->SetPriority(priority);

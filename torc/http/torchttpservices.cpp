@@ -34,6 +34,7 @@
 #include "torchttpservice.h"
 #include "torchttpservices.h"
 #include "torcwebsockettoken.h"
+#include "torcupnp.h"
 
 /*! \class TorcHTTPServices
  *  \brief Top level interface into services.
@@ -85,7 +86,7 @@ QVariantMap TorcHTTPServices::ProcessRequest(const QString &Method, const QVaria
 
         QVariantMap result;
         QVariantMap secure;
-        secure.insert(QStringLiteral("secure"), sec);
+        secure.insert(TORC_SECURE, sec);
         result.insert(QStringLiteral("result"), secure);
         return result;
     }
@@ -126,7 +127,7 @@ void TorcHTTPServices::ProcessHTTPRequest(const QString &PeerAddress, int PeerPo
                 else if (method == QStringLiteral("IsSecure"))
                 {
                     result = Request.GetSecure();
-                    type   = QStringLiteral("secure");
+                    type   = TORC_SECURE;
                 }
 
                 Request.SetStatus(HTTP_OK);
@@ -171,11 +172,11 @@ QVariantMap TorcHTTPServices::GetDetails(void)
     // NB keys here match those of the relevant stand alone methods. Take care not to break them.
     QVariantMap results;
 
-    results.insert(QStringLiteral("version"),   TorcHTTPServices::GetVersion());
-    results.insert(QStringLiteral("services"),  GetServiceList());
-    results.insert(QStringLiteral("starttime"), GetStartTime());
-    results.insert(QStringLiteral("priority"),  GetPriority());
-    results.insert(QStringLiteral("uuid"),      GetUuid());
+    results.insert(TORC_SERVICE_VERSION, TorcHTTPServices::GetVersion());
+    results.insert(QStringLiteral("services"), GetServiceList());
+    results.insert(TORC_STARTTIME, GetStartTime());
+    results.insert(TORC_PRIORITY,  GetPriority());
+    results.insert(TORC_UUID,      GetUuid());
 
     return results;
 }

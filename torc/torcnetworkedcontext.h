@@ -7,7 +7,7 @@
 #include <QHostAddress>
 
 // Torc
-#include "http/torchttpservice.h"
+#include "torchttpservice.h"
 #include "torclocalcontext.h"
 
 class TorcRPCRequest;

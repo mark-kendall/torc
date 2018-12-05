@@ -12,6 +12,8 @@
 #include "torchttphandler.h"
 #include "torchttprequest.h"
 
+#define TORC_SERVICE_VERSION QStringLiteral("version")
+
 class TorcHTTPServer;
 class MethodParameters;
 

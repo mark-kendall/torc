@@ -471,7 +471,7 @@ void TorcHTTPService::ProcessHTTPRequest(const QString &PeerAddress, int PeerPor
         }
 
         Request.SetStatus(HTTP_OK);
-        Request.Serialise(m_version, QStringLiteral("version"));
+        Request.Serialise(m_version, TORC_SERVICE_VERSION);
         return;
     }
 
@@ -623,7 +623,7 @@ QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVarian
         {
             QVariantMap result;
             QVariantMap version;
-            version.insert(QStringLiteral("version"), m_version);
+            version.insert(TORC_SERVICE_VERSION, m_version);
             result.insert(QStringLiteral("result"), version);
             return result;
         }
