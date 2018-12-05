@@ -119,13 +119,33 @@ Macros</h2></td></tr>
 <tr class="separator:aeeb5ccc7d7c2bdc0591f5cdb1cc360be"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa2c2cf7786c2730b3b739536b797f132"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/df9/torclogging_8h.html#aa2c2cf7786c2730b3b739536b797f132">VERBOSE_LEVEL_CHECK</a>(_MASK_,  _LEVEL_)&#160;&#160;&#160;(((<a class="el" href="../../d7/d24/torcloggingimp_8cpp.html#a5c7909e52832ca565316a47028d9c463">gVerboseMask</a> &amp; (_MASK_)) == (_MASK_)) &amp;&amp; <a class="el" href="../../d7/d24/torcloggingimp_8cpp.html#aca03d08e789474030219b34e9f97e831">gLogLevel</a> &gt;= (_LEVEL_))</td></tr>
 <tr class="separator:aa2c2cf7786c2730b3b739536b797f132"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a73a147108bf0df6442820b82b022ef94"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/df9/torclogging_8h.html#a73a147108bf0df6442820b82b022ef94">LOG</a>(_MASK_,  _LEVEL_,  _FORMAT_, ...)</td></tr>
-<tr class="separator:a73a147108bf0df6442820b82b022ef94"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:accf572ba78ff2517a391a0bd775334b4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/df9/torclogging_8h.html#accf572ba78ff2517a391a0bd775334b4">LOG</a>(_MASK_,  _LEVEL_,  _STRING_)</td></tr>
+<tr class="separator:accf572ba78ff2517a391a0bd775334b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a83a8f42902e42b6560ce128b9645858e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/df9/torclogging_8h.html#a83a8f42902e42b6560ce128b9645858e">ENO</a>&#160;&#160;&#160;(QString(&quot;\n\t\t\teno: &quot;) + LogErrorToString(errno))</td></tr>
+<tr class="separator:a83a8f42902e42b6560ce128b9645858e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2c113f5b34830e8427154bab8458d851"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/df9/torclogging_8h.html#a2c113f5b34830e8427154bab8458d851">ENO_STR</a>&#160;&#160;&#160;ENO.toLocal8Bit().constData()</td></tr>
+<tr class="separator:a2c113f5b34830e8427154bab8458d851"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a7c1ace0063ab77cc0a300302040bcc98"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/df9/torclogging_8h.html#a7c1ace0063ab77cc0a300302040bcc98">PrintLogLine</a> (uint64_t mask, LogLevel level, const char *file, int line, const char *function, int fromQString, const char *format,...)</td></tr>
-<tr class="separator:a7c1ace0063ab77cc0a300302040bcc98"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d20813f0a2a9c4fddeb2d9db5cbcdb0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/df9/torclogging_8h.html#a1d20813f0a2a9c4fddeb2d9db5cbcdb0">PrintLogLine</a> (uint64_t mask, LogLevel level, const char *file, int line, const char *function, const char *format,...)</td></tr>
+<tr class="separator:a1d20813f0a2a9c4fddeb2d9db5cbcdb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8f5feea4a23baf632d4656f09f42d6a6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/df9/torclogging_8h.html#a8f5feea4a23baf632d4656f09f42d6a6">StartLogging</a> (const QString &amp;Logfile, int progress=0, int quiet=0, const QString &amp;level=QStringLiteral(&quot;info&quot;), bool Propagate=false)</td></tr>
+<tr class="separator:a8f5feea4a23baf632d4656f09f42d6a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d3cc91e2c0e999fc6de1c2d2f753a53"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/df9/torclogging_8h.html#a2d3cc91e2c0e999fc6de1c2d2f753a53">StopLogging</a> (void)</td></tr>
+<tr class="separator:a2d3cc91e2c0e999fc6de1c2d2f753a53"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad3cf103b65c0bda3df2244564a1686f3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/df9/torclogging_8h.html#ad3cf103b65c0bda3df2244564a1686f3">CalculateLogPropagation</a> (void)</td></tr>
+<tr class="separator:ad3cf103b65c0bda3df2244564a1686f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a177a5c329f48cbc574b9da7920cad8ff"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/df9/torclogging_8h.html#a177a5c329f48cbc574b9da7920cad8ff">GetQuietLogPropagation</a> (void)</td></tr>
+<tr class="separator:a177a5c329f48cbc574b9da7920cad8ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9bd6e9967bcc6c1814578849940ae45a"><td class="memItemLeft" align="right" valign="top">LogLevel&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/df9/torclogging_8h.html#a9bd6e9967bcc6c1814578849940ae45a">GetLogLevel</a> (const QString &amp;level)</td></tr>
+<tr class="separator:a9bd6e9967bcc6c1814578849940ae45a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae7f4799b832101aaa4b2a6baef616723"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/df9/torclogging_8h.html#ae7f4799b832101aaa4b2a6baef616723">GetLogLevelName</a> (LogLevel level)</td></tr>
+<tr class="separator:ae7f4799b832101aaa4b2a6baef616723"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad28e3aa94ad60a5c32760bd3d7112598"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/df9/torclogging_8h.html#ad28e3aa94ad60a5c32760bd3d7112598">ParseVerboseArgument</a> (const QString &amp;arg)</td></tr>
+<tr class="separator:ad28e3aa94ad60a5c32760bd3d7112598"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a78f45dcc6606633b7a984d62bdd5f810"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/df9/torclogging_8h.html#a78f45dcc6606633b7a984d62bdd5f810">LogErrorToString</a> (int errnum)</td></tr>
+<tr class="separator:a78f45dcc6606633b7a984d62bdd5f810"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -133,9 +153,42 @@ Variables</h2></td></tr>
 <tr class="separator:aca03d08e789474030219b34e9f97e831"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5c7909e52832ca565316a47028d9c463"><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/df9/torclogging_8h.html#a5c7909e52832ca565316a47028d9c463">gVerboseMask</a></td></tr>
 <tr class="separator:a5c7909e52832ca565316a47028d9c463"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab6cabad8bd87cec95db0258be26214f5"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/df9/torclogging_8h.html#ab6cabad8bd87cec95db0258be26214f5">gLogPropagationArgs</a></td></tr>
+<tr class="separator:ab6cabad8bd87cec95db0258be26214f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af0cebcafb3dd2b6bcb19353970f7f73c"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/df9/torclogging_8h.html#af0cebcafb3dd2b6bcb19353970f7f73c">gVerboseString</a></td></tr>
+<tr class="separator:af0cebcafb3dd2b6bcb19353970f7f73c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
-<a class="anchor" id="a73a147108bf0df6442820b82b022ef94"></a>
+<a class="anchor" id="a83a8f42902e42b6560ce128b9645858e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ENO&#160;&#160;&#160;(QString(&quot;\n\t\t\teno: &quot;) + LogErrorToString(errno))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>This can be appended to the LOG args with "+". Please do not use "&lt;&lt;". It uses a thread safe version of strerror to produce the string representation of errno and puts it on the next line in the verbose output. </p>
+
+<p>Definition at line <a class="el" href="../../d4/df9/torclogging_8h_source.html#l00056">56</a> of file <a class="el" href="../../d4/df9/torclogging_8h_source.html">torclogging.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a2c113f5b34830e8427154bab8458d851"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ENO_STR&#160;&#160;&#160;ENO.toLocal8Bit().constData()</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="../../d4/df9/torclogging_8h_source.html#l00057">57</a> of file <a class="el" href="../../d4/df9/torclogging_8h_source.html">torclogging.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="accf572ba78ff2517a391a0bd775334b4"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -155,13 +208,7 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">_FORMAT_, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>...</em>&#160;</td>
+          <td class="paramname">_STRING_&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -170,10 +217,10 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">do</span> {                                                                \</div><div class="line">        if (<a class="code" href="../../d4/df9/torclogging_8h.html#aa2c2cf7786c2730b3b739536b797f132">VERBOSE_LEVEL_CHECK</a>((_MASK_), (_LEVEL_)) &amp;&amp; ((_LEVEL_)&gt;=0)) \</div><div class="line">        {                                                               <a class="code" href="../../d4/df9/torclogging_8h.html#a7c1ace0063ab77cc0a300302040bcc98">\</a></div><div class="line"><a class="code" href="../../d4/df9/torclogging_8h.html#a7c1ace0063ab77cc0a300302040bcc98">            PrintLogLine</a>(_MASK_, (LogLevel)_LEVEL_,                     \</div><div class="line">                         __FILE__, __LINE__, __FUNCTION__, 0,           \</div><div class="line">                         (<span class="keyword">const</span> <span class="keywordtype">char</span> *)_FORMAT_, ##__VA_ARGS__);        \</div><div class="line">        }                                                               \</div><div class="line">    } <span class="keywordflow">while</span> (0)</div><div class="ttc" id="torclogging_8h_html_a7c1ace0063ab77cc0a300302040bcc98"><div class="ttname"><a href="../../d4/df9/torclogging_8h.html#a7c1ace0063ab77cc0a300302040bcc98">PrintLogLine</a></div><div class="ttdeci">void PrintLogLine(uint64_t mask, LogLevel level, const char *file, int line, const char *function, int fromQString, const char *format,...)</div><div class="ttdef"><b>Definition:</b> <a href="../../d7/d24/torcloggingimp_8cpp_source.html#l00620">torcloggingimp.cpp:620</a></div></div>
+<b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">do</span> {                                                                \</div><div class="line">        if (<a class="code" href="../../d4/df9/torclogging_8h.html#aa2c2cf7786c2730b3b739536b797f132">VERBOSE_LEVEL_CHECK</a>((_MASK_), (_LEVEL_)) &amp;&amp; ((_LEVEL_)&gt;=0)) \</div><div class="line">        {                                                               <a class="code" href="../../d4/df9/torclogging_8h.html#a1d20813f0a2a9c4fddeb2d9db5cbcdb0">\</a></div><div class="line"><a class="code" href="../../d4/df9/torclogging_8h.html#a1d20813f0a2a9c4fddeb2d9db5cbcdb0">            PrintLogLine</a>(_MASK_, (LogLevel)_LEVEL_,                     \</div><div class="line">                         __FILE__, __LINE__, __FUNCTION__,              \</div><div class="line">                         _STRING_.toLocal8Bit().constData());  \</div><div class="line">        }                                                               \</div><div class="line">    } <span class="keywordflow">while</span> (<span class="keyword">false</span>)</div><div class="ttc" id="torclogging_8h_html_a1d20813f0a2a9c4fddeb2d9db5cbcdb0"><div class="ttname"><a href="../../d4/df9/torclogging_8h.html#a1d20813f0a2a9c4fddeb2d9db5cbcdb0">PrintLogLine</a></div><div class="ttdeci">void PrintLogLine(uint64_t mask, LogLevel level, const char *file, int line, const char *function, const char *format,...)</div><div class="ttdef"><b>Definition:</b> <a href="../../d7/d24/torcloggingimp_8cpp_source.html#l00588">torcloggingimp.cpp:588</a></div></div>
 <div class="ttc" id="torclogging_8h_html_aa2c2cf7786c2730b3b739536b797f132"><div class="ttname"><a href="../../d4/df9/torclogging_8h.html#aa2c2cf7786c2730b3b739536b797f132">VERBOSE_LEVEL_CHECK</a></div><div class="ttdeci">#define VERBOSE_LEVEL_CHECK(_MASK_, _LEVEL_)</div><div class="ttdef"><b>Definition:</b> <a href="../../d4/df9/torclogging_8h_source.html#l00017">torclogging.h:17</a></div></div>
 </div><!-- fragment -->
-<p>Definition at line <a class="el" href="../../d4/df9/torclogging_8h_source.html#l00031">31</a> of file <a class="el" href="../../d4/df9/torclogging_8h_source.html">torclogging.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d4/df9/torclogging_8h_source.html#l00020">20</a> of file <a class="el" href="../../d4/df9/torclogging_8h_source.html">torclogging.h</a>.</p>
 
 </div>
 </div>
@@ -220,7 +267,115 @@ Variables</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="a7c1ace0063ab77cc0a300302040bcc98"></a>
+<a class="anchor" id="ad3cf103b65c0bda3df2244564a1686f3"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void CalculateLogPropagation </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00624">624</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a9bd6e9967bcc6c1814578849940ae45a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">LogLevel GetLogLevel </td>
+          <td>(</td>
+          <td class="paramtype">const QString &amp;&#160;</td>
+          <td class="paramname"><em>level</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00757">757</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ae7f4799b832101aaa4b2a6baef616723"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QString GetLogLevelName </td>
+          <td>(</td>
+          <td class="paramtype">LogLevel&#160;</td>
+          <td class="paramname"><em>level</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00777">777</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a177a5c329f48cbc574b9da7920cad8ff"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool GetQuietLogPropagation </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00641">641</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a78f45dcc6606633b7a984d62bdd5f810"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QString LogErrorToString </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>errnum</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00978">978</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ad28e3aa94ad60a5c32760bd3d7112598"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int ParseVerboseArgument </td>
+          <td>(</td>
+          <td class="paramtype">const QString &amp;&#160;</td>
+          <td class="paramname"><em>arg</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00873">873</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a1d20813f0a2a9c4fddeb2d9db5cbcdb0"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -257,12 +412,6 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>fromQString</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
           <td class="paramtype">const char *&#160;</td>
           <td class="paramname"><em>format</em>, </td>
         </tr>
@@ -280,7 +429,71 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00620">620</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00588">588</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a8f5feea4a23baf632d4656f09f42d6a6"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void StartLogging </td>
+          <td>(</td>
+          <td class="paramtype">const QString &amp;&#160;</td>
+          <td class="paramname"><em>Logfile</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>progress</em> = <code>0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>quiet</em> = <code>0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const QString &amp;&#160;</td>
+          <td class="paramname"><em>level</em> = <code>QStringLiteral(&quot;info&quot;)</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>Propagate</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00646">646</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a2d3cc91e2c0e999fc6de1c2d2f753a53"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void StopLogging </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00688">688</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -295,7 +508,21 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00307">307</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00281">281</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ab6cabad8bd87cec95db0258be26214f5"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QString gLogPropagationArgs</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00276">276</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -309,14 +536,28 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00334">334</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00308">308</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="af0cebcafb3dd2b6bcb19353970f7f73c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QString gVerboseString</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00309">309</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Dec 4 2018 08:40:48 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Dec 5 2018 10:25:01 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

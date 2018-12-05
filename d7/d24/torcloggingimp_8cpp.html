@@ -188,8 +188,8 @@ Functions</h2></td></tr>
 <tr class="separator:af7907d0a3eaed3942bc99696b1e12ecf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5658a2d3c03671da78b7b52019ff903e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d24/torcloggingimp_8cpp.html#a5658a2d3c03671da78b7b52019ff903e">VerboseHelp</a> (void)</td></tr>
 <tr class="separator:a5658a2d3c03671da78b7b52019ff903e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0b83ad8b625d2f280c92302585f7cebf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d24/torcloggingimp_8cpp.html#a0b83ad8b625d2f280c92302585f7cebf">PrintLogLine</a> (uint64_t Mask, LogLevel Level, const char *File, int Line, const char *Function, int FromQString, const char *Format,...)</td></tr>
-<tr class="separator:a0b83ad8b625d2f280c92302585f7cebf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ccd46b5a4d1b9a645d874ca4aa72a57"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d24/torcloggingimp_8cpp.html#a5ccd46b5a4d1b9a645d874ca4aa72a57">PrintLogLine</a> (uint64_t Mask, LogLevel Level, const char *File, int Line, const char *Function, const char *Format,...)</td></tr>
+<tr class="separator:a5ccd46b5a4d1b9a645d874ca4aa72a57"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad3cf103b65c0bda3df2244564a1686f3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d24/torcloggingimp_8cpp.html#ad3cf103b65c0bda3df2244564a1686f3">CalculateLogPropagation</a> (void)</td></tr>
 <tr class="separator:ad3cf103b65c0bda3df2244564a1686f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a177a5c329f48cbc574b9da7920cad8ff"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d24/torcloggingimp_8cpp.html#a177a5c329f48cbc574b9da7920cad8ff">GetQuietLogPropagation</a> (void)</td></tr>
@@ -233,11 +233,9 @@ Variables</h2></td></tr>
 <tr class="separator:a9b4160977fc96bcedb8419bfd3d1ea32"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9ca8989d9c2f0921fdddfe360fdb9c4d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../da/d38/class_logging_thread.html">LoggingThread</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d24/torcloggingimp_8cpp.html#a9ca8989d9c2f0921fdddfe360fdb9c4d">gLogThread</a> = nullptr</td></tr>
 <tr class="separator:a9ca8989d9c2f0921fdddfe360fdb9c4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a20240adb1deb6c3669f564cb6987d61b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d24/torcloggingimp_8cpp.html#a20240adb1deb6c3669f564cb6987d61b">gLogThreadFinished</a> = <a class="el" href="../../d1/d37/torcloggingdefs_8h.html#a93519f65dd0ef21fc5be0c286a833ae4">false</a></td></tr>
+<tr class="memitem:a20240adb1deb6c3669f564cb6987d61b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d24/torcloggingimp_8cpp.html#a20240adb1deb6c3669f564cb6987d61b">gLogThreadFinished</a> = false</td></tr>
 <tr class="separator:a20240adb1deb6c3669f564cb6987d61b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af36caf425434fd483836a15e18dbb3e8"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d24/torcloggingimp_8cpp.html#af36caf425434fd483836a15e18dbb3e8">gDebugRegistration</a> = <a class="el" href="../../d1/d37/torcloggingdefs_8h.html#a93519f65dd0ef21fc5be0c286a833ae4">false</a></td></tr>
-<tr class="separator:af36caf425434fd483836a15e18dbb3e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5bcd3d3deab71b20e9234fccb0e55dda"><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../d6/d4a/struct_log_propagate_opts.html">LogPropagateOpts</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d24/torcloggingimp_8cpp.html#a5bcd3d3deab71b20e9234fccb0e55dda">gLogPropagationOpts</a> = { <a class="el" href="../../d1/d37/torcloggingdefs_8h.html#a93519f65dd0ef21fc5be0c286a833ae4">false</a>, 0, QString(&quot;&quot;) }</td></tr>
+<tr class="memitem:a5bcd3d3deab71b20e9234fccb0e55dda"><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../d6/d4a/struct_log_propagate_opts.html">LogPropagateOpts</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d24/torcloggingimp_8cpp.html#a5bcd3d3deab71b20e9234fccb0e55dda">gLogPropagationOpts</a> = { false, 0, QStringLiteral(&quot;&quot;) }</td></tr>
 <tr class="separator:a5bcd3d3deab71b20e9234fccb0e55dda"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab6cabad8bd87cec95db0258be26214f5"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d24/torcloggingimp_8cpp.html#ab6cabad8bd87cec95db0258be26214f5">gLogPropagationArgs</a></td></tr>
 <tr class="separator:ab6cabad8bd87cec95db0258be26214f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -251,7 +249,7 @@ Variables</h2></td></tr>
 <tr class="separator:ab526173858208568bb26a6fcf2863cee"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af6f71b753001ed42be9b002dcbeda82c"><td class="memItemLeft" align="right" valign="top">QMutex&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d24/torcloggingimp_8cpp.html#af6f71b753001ed42be9b002dcbeda82c">gLoglevelMapLock</a></td></tr>
 <tr class="separator:af6f71b753001ed42be9b002dcbeda82c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3e8e64ac6f7073431e0b356298199c29"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d24/torcloggingimp_8cpp.html#a3e8e64ac6f7073431e0b356298199c29">gVerboseInitialised</a> = <a class="el" href="../../d1/d37/torcloggingdefs_8h.html#a93519f65dd0ef21fc5be0c286a833ae4">false</a></td></tr>
+<tr class="memitem:a3e8e64ac6f7073431e0b356298199c29"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d24/torcloggingimp_8cpp.html#a3e8e64ac6f7073431e0b356298199c29">gVerboseInitialised</a> = false</td></tr>
 <tr class="separator:a3e8e64ac6f7073431e0b356298199c29"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a71dd883a26ad2d4cc4a6112c4e661956"><td class="memItemLeft" align="right" valign="top">const uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d24/torcloggingimp_8cpp.html#a71dd883a26ad2d4cc4a6112c4e661956">gVerboseDefaultInt</a> = VB_GENERAL</td></tr>
 <tr class="separator:a71dd883a26ad2d4cc4a6112c4e661956"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -265,7 +263,7 @@ Variables</h2></td></tr>
 <tr class="separator:a9e8b0994b68a34c2b63a5c7c37669fe8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ace5b1411cf35dccaa3c9c9a59cbe15fb"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d24/torcloggingimp_8cpp.html#ace5b1411cf35dccaa3c9c9a59cbe15fb">gUserDefaultValueStr</a> = QString(<a class="el" href="../../d7/d24/torcloggingimp_8cpp.html#adb8ae764479db70f32764b2d5a8b8b19">gVerboseDefaultStr</a>)</td></tr>
 <tr class="separator:ace5b1411cf35dccaa3c9c9a59cbe15fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9603f9970282779744c161a77ce890f0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d24/torcloggingimp_8cpp.html#a9603f9970282779744c161a77ce890f0">gHaveUserDefaultValues</a> = <a class="el" href="../../d1/d37/torcloggingdefs_8h.html#a93519f65dd0ef21fc5be0c286a833ae4">false</a></td></tr>
+<tr class="memitem:a9603f9970282779744c161a77ce890f0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d24/torcloggingimp_8cpp.html#a9603f9970282779744c161a77ce890f0">gHaveUserDefaultValues</a> = false</td></tr>
 <tr class="separator:a9603f9970282779744c161a77ce890f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
@@ -291,7 +289,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00305">305</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00279">279</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -305,7 +303,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00304">304</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00278">278</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -320,7 +318,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00324">324</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00298">298</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -334,7 +332,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00316">316</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00290">290</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -361,7 +359,7 @@ Variables</h2></td></tr>
 </td></tr>
 </table>
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00058">58</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00057">57</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -396,7 +394,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00855">855</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00811">811</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -436,7 +434,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00838">838</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00794">794</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -454,7 +452,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00668">668</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00624">624</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -472,7 +470,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00788">788</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00744">744</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -490,7 +488,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00801">801</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00757">757</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -508,7 +506,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00821">821</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00777">777</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -526,7 +524,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00685">685</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00641">641</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -544,7 +542,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00560">560</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00534">534</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -562,7 +560,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00585">585</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00559">559</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -580,7 +578,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00870">870</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00826">826</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -598,7 +596,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l01022">1022</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00978">978</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -616,11 +614,11 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00917">917</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00873">873</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a0b83ad8b625d2f280c92302585f7cebf"></a>
+<a class="anchor" id="a5ccd46b5a4d1b9a645d874ca4aa72a57"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -657,12 +655,6 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>FromQString</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
           <td class="paramtype">const char *&#160;</td>
           <td class="paramname"><em>Format</em>, </td>
         </tr>
@@ -680,7 +672,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00620">620</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00588">588</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -698,7 +690,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00772">772</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00728">728</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -744,7 +736,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00690">690</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00646">646</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -762,7 +754,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00732">732</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00688">688</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -780,36 +772,22 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00884">884</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00840">840</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Variable Documentation</h2>
-<a class="anchor" id="af36caf425434fd483836a15e18dbb3e8"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool gDebugRegistration = <a class="el" href="../../d1/d37/torcloggingdefs_8h.html#a93519f65dd0ef21fc5be0c286a833ae4">false</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00056">56</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
-
-</div>
-</div>
 <a class="anchor" id="a9603f9970282779744c161a77ce890f0"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool gHaveUserDefaultValues = <a class="el" href="../../d1/d37/torcloggingdefs_8h.html#a93519f65dd0ef21fc5be0c286a833ae4">false</a></td>
+          <td class="memname">bool gHaveUserDefaultValues = false</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00338">338</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00312">312</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -851,7 +829,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00307">307</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00281">281</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -865,7 +843,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00328">328</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00302">302</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -879,7 +857,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00329">329</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00303">303</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -893,7 +871,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00302">302</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00276">276</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -902,12 +880,12 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d6/d4a/struct_log_propagate_opts.html">LogPropagateOpts</a> gLogPropagationOpts = { <a class="el" href="../../d1/d37/torcloggingdefs_8h.html#a93519f65dd0ef21fc5be0c286a833ae4">false</a>, 0, QString(&quot;&quot;) }</td>
+          <td class="memname"><a class="el" href="../../d6/d4a/struct_log_propagate_opts.html">LogPropagateOpts</a> gLogPropagationOpts = { false, 0, QStringLiteral(&quot;&quot;) }</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00301">301</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00275">275</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -972,7 +950,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool gLogThreadFinished = <a class="el" href="../../d1/d37/torcloggingdefs_8h.html#a93519f65dd0ef21fc5be0c286a833ae4">false</a></td>
+          <td class="memname">bool gLogThreadFinished = false</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1047,7 +1025,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00336">336</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00310">310</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -1061,7 +1039,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00337">337</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00311">311</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -1075,7 +1053,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00332">332</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00306">306</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -1089,7 +1067,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00333">333</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00307">307</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -1098,12 +1076,12 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool gVerboseInitialised = <a class="el" href="../../d1/d37/torcloggingdefs_8h.html#a93519f65dd0ef21fc5be0c286a833ae4">false</a></td>
+          <td class="memname">bool gVerboseInitialised = false</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00331">331</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00305">305</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -1117,7 +1095,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00326">326</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00300">300</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -1131,7 +1109,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00327">327</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00301">301</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -1145,7 +1123,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00334">334</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00308">308</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
@@ -1159,14 +1137,14 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00335">335</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html#l00309">309</a> of file <a class="el" href="../../d7/d24/torcloggingimp_8cpp_source.html">torcloggingimp.cpp</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Dec 4 2018 08:40:48 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Dec 5 2018 10:25:01 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

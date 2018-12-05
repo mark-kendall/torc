@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['calculatelogpropagation',['CalculateLogPropagation',['../d7/d24/torcloggingimp_8cpp.html#ad3cf103b65c0bda3df2244564a1686f3',1,'torcloggingimp.cpp']]],
+  ['calculatelogpropagation',['CalculateLogPropagation',['../d4/df9/torclogging_8h.html#ad3cf103b65c0bda3df2244564a1686f3',1,'CalculateLogPropagation(void):&#160;torcloggingimp.cpp'],['../d7/d24/torcloggingimp_8cpp.html#ad3cf103b65c0bda3df2244564a1686f3',1,'CalculateLogPropagation(void):&#160;torcloggingimp.cpp']]],
   ['calculateoutput',['CalculateOutput',['../d1/d34/class_torc_control.html#a9b2c81274accc1d779f6917897438e32',1,'TorcControl']]],
   ['callbackobject',['CallbackObject',['../db/dd7/class_callback_object.html#a0ea3d0eef8ebe5521d7ef40501dd81ba',1,'CallbackObject']]],
   ['cameraerrored',['CameraErrored',['../db/dc8/class_torc_camera_output.html#a0b922498c56df3bad72a46bdc54d8225',1,'TorcCameraOutput::CameraErrored()'],['../d4/dbb/class_torc_camera_stills_output.html#a0c7a03e442a04782a9992a510b851992',1,'TorcCameraStillsOutput::CameraErrored()'],['../df/d01/class_torc_camera_video_output.html#a3954669d95818e16d117c73ec4712501',1,'TorcCameraVideoOutput::CameraErrored()'],['../de/dc9/class_torc_camera_thread.html#a939937de8f136ddccec2e6f10181f088',1,'TorcCameraThread::CameraErrored()']]],

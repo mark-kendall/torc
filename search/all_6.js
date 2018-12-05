@@ -2,7 +2,6 @@ var searchData=
 [
   ['fahrenheit',['Fahrenheit',['../d9/d56/class_torc_central.html#af007e56605ccea8cc30e355e9085fae2a5b8bc564838e178d39e266fc92301170',1,'TorcCentral']]],
   ['fahrenheittocelsius',['FahrenheitToCelsius',['../de/d14/class_torc_temperature_input.html#a9368953b98a1e24c3790662bcea15928',1,'TorcTemperatureInput']]],
-  ['false',['false',['../d1/d37/torcloggingdefs_8h.html#a93519f65dd0ef21fc5be0c286a833ae4',1,'torcloggingdefs.h']]],
   ['ffmpeg_5fbuffer_5fsize',['FFMPEG_BUFFER_SIZE',['../d3/d5e/torcmuxer_8cpp.html#a0643743717c68ae8cb01fd198a71d3df',1,'torcmuxer.cpp']]],
   ['file',['file',['../df/dd2/class_log_item.html#aed52f0a4653e4363109c2a8cf27979ec',1,'LogItem']]],
   ['filelogger',['FileLogger',['../de/db9/class_file_logger.html',1,'FileLogger'],['../de/db9/class_file_logger.html#a9f013139eaee5939b6e37944c2cd8fa2',1,'FileLogger::FileLogger()']]],

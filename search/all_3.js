@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['calculatelogpropagation',['CalculateLogPropagation',['../d7/d24/torcloggingimp_8cpp.html#ad3cf103b65c0bda3df2244564a1686f3',1,'torcloggingimp.cpp']]],
+  ['calculatelogpropagation',['CalculateLogPropagation',['../d4/df9/torclogging_8h.html#ad3cf103b65c0bda3df2244564a1686f3',1,'CalculateLogPropagation(void):&#160;torcloggingimp.cpp'],['../d7/d24/torcloggingimp_8cpp.html#ad3cf103b65c0bda3df2244564a1686f3',1,'CalculateLogPropagation(void):&#160;torcloggingimp.cpp']]],
   ['calculateoutput',['CalculateOutput',['../d1/d34/class_torc_control.html#a9b2c81274accc1d779f6917897438e32',1,'TorcControl']]],
   ['callbackobject',['CallbackObject',['../db/dd7/class_callback_object.html',1,'CallbackObject'],['../db/dd7/class_callback_object.html#a0ea3d0eef8ebe5521d7ef40501dd81ba',1,'CallbackObject::CallbackObject()']]],
   ['camera',['Camera',['../d1/dc7/class_torc_output.html#a68bfe71abbe6a4a7634c22458da29391a7b791754260fac3d5ce5fbb006c33d8c',1,'TorcOutput']]],

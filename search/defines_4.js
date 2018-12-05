@@ -13,5 +13,6 @@ var searchData=
   ['default_5fvalue',['DEFAULT_VALUE',['../dd/df5/torcpiswitchinput_8cpp.html#a1683cf20cb6e91b381579ff93b309714',1,'DEFAULT_VALUE():&#160;torcpiswitchinput.cpp'],['../d1/d80/torcpipwmoutput_8cpp.html#a1683cf20cb6e91b381579ff93b309714',1,'DEFAULT_VALUE():&#160;torcpipwmoutput.cpp'],['../d2/de8/torcpiswitchoutput_8cpp.html#a1683cf20cb6e91b381579ff93b309714',1,'DEFAULT_VALUE():&#160;torcpiswitchoutput.cpp']]],
   ['device_5fconstant',['DEVICE_CONSTANT',['../d1/df7/torcdevice_8h.html#a79ea29414e34faf06a746bcd089ba701',1,'torcdevice.h']]],
   ['device_5fline_5fitem',['DEVICE_LINE_ITEM',['../d1/df7/torcdevice_8h.html#aa61b28cbf20b36a4e341bb05a75e2c2a',1,'torcdevice.h']]],
+  ['dis',['dis',['../de/dc5/torchttpserver_8cpp.html#a5e03b096193a161d4b5fca5b7df67030',1,'torchttpserver.cpp']]],
   ['ds18b20name',['DS18B20NAME',['../d0/d86/torc1wireds18b20_8h.html#ae0e3252b7a3561ba80c2bf9e801c3064',1,'torc1wireds18b20.h']]]
 ];

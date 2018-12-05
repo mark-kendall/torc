@@ -7,7 +7,7 @@ var searchData=
   ['listtoxml',['ListToXML',['../de/d44/class_torc_x_m_l_serialiser.html#a33d895d20eed13ca9b2f46de1dc145e9',1,'TorcXMLSerialiser']]],
   ['loadsettings',['LoadSettings',['../d1/d2e/class_torc_d_b.html#afc381ffee8ad754b2fb61edbe121adc7',1,'TorcDB']]],
   ['logchanged',['logChanged',['../d3/d3c/class_web_logger.html#a13559c1e365c59d8e7d1bf16412f4c8d',1,'WebLogger']]],
-  ['logerrortostring',['LogErrorToString',['../d7/d24/torcloggingimp_8cpp.html#a78f45dcc6606633b7a984d62bdd5f810',1,'torcloggingimp.cpp']]],
+  ['logerrortostring',['LogErrorToString',['../d4/df9/torclogging_8h.html#a78f45dcc6606633b7a984d62bdd5f810',1,'LogErrorToString(int errnum):&#160;torcloggingimp.cpp'],['../d7/d24/torcloggingimp_8cpp.html#a78f45dcc6606633b7a984d62bdd5f810',1,'LogErrorToString(int errnum):&#160;torcloggingimp.cpp']]],
   ['loggerbase',['LoggerBase',['../da/de4/class_logger_base.html#afa910d789835322db1c3cd0da17583a8',1,'LoggerBase']]],
   ['loggingthread',['LoggingThread',['../da/d38/class_logging_thread.html#ac89e583f05c24a9bff3b6dca48aebc7b',1,'LoggingThread']]],
   ['logitem',['LogItem',['../df/dd2/class_log_item.html#a61c17dbf04a789d015e92e64a8ab06d2',1,'LogItem']]],

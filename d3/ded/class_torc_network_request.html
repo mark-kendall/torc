@@ -117,7 +117,7 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ae138491e99c454ff954c8f613d38accb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5741cf545e8bd35b729aac5300696c84"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/ded/class_torc_network_request.html#a5741cf545e8bd35b729aac5300696c84">Peek</a> (char *Buffer, qint32 BufferSize, int Timeout)</td></tr>
 <tr class="separator:a5741cf545e8bd35b729aac5300696c84"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aad115f282593645a2ca78494112985b9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/ded/class_torc_network_request.html#aad115f282593645a2ca78494112985b9">Read</a> (char *Buffer, qint32 BufferSize, int Timeout, bool <a class="el" href="../../d3/ded/class_torc_network_request.html#a5741cf545e8bd35b729aac5300696c84">Peek</a>=<a class="el" href="../../d1/d37/torcloggingdefs_8h.html#a93519f65dd0ef21fc5be0c286a833ae4">false</a>)</td></tr>
+<tr class="memitem:aad115f282593645a2ca78494112985b9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/ded/class_torc_network_request.html#aad115f282593645a2ca78494112985b9">Read</a> (char *Buffer, qint32 BufferSize, int Timeout, bool <a class="el" href="../../d3/ded/class_torc_network_request.html#a5741cf545e8bd35b729aac5300696c84">Peek</a>=false)</td></tr>
 <tr class="separator:aad115f282593645a2ca78494112985b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a205e03bce651bd1bb63e57835668c1e8"><td class="memItemLeft" align="right" valign="top">qint64&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/ded/class_torc_network_request.html#a205e03bce651bd1bb63e57835668c1e8">Seek</a> (qint64 Offset)</td></tr>
 <tr class="separator:a205e03bce651bd1bb63e57835668c1e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -248,7 +248,7 @@ Additional Inherited Members</h2></td></tr>
 <tr class="memitem:a351fef355ab2fc1df639f4d40c06786d inherit pub_static_methods_class_torc_reference_counter"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dad/class_torc_reference_counter.html#a351fef355ab2fc1df639f4d40c06786d">EventLoopEnding</a> (bool Ending)</td></tr>
 <tr class="separator:a351fef355ab2fc1df639f4d40c06786d inherit pub_static_methods_class_torc_reference_counter"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_static_attribs_class_torc_reference_counter"><td colspan="2" onclick="javascript:toggleInherit('pro_static_attribs_class_torc_reference_counter')"><img src="../../closed.png" alt="-"/>&#160;Static Protected Attributes inherited from <a class="el" href="../../d6/dad/class_torc_reference_counter.html">TorcReferenceCounter</a></td></tr>
-<tr class="memitem:a0aa85e95f21dd4fb7fc823abf1b9b704 inherit pro_static_attribs_class_torc_reference_counter"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dad/class_torc_reference_counter.html#a0aa85e95f21dd4fb7fc823abf1b9b704">m_eventLoopEnding</a> = <a class="el" href="../../d1/d37/torcloggingdefs_8h.html#a93519f65dd0ef21fc5be0c286a833ae4">false</a></td></tr>
+<tr class="memitem:a0aa85e95f21dd4fb7fc823abf1b9b704 inherit pro_static_attribs_class_torc_reference_counter"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dad/class_torc_reference_counter.html#a0aa85e95f21dd4fb7fc823abf1b9b704">m_eventLoopEnding</a> = false</td></tr>
 <tr class="separator:a0aa85e95f21dd4fb7fc823abf1b9b704 inherit pro_static_attribs_class_torc_reference_counter"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -629,7 +629,7 @@ Additional Inherited Members</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>Peek</em> = <code><a class="el" href="../../d1/d37/torcloggingdefs_8h.html#a93519f65dd0ef21fc5be0c286a833ae4">false</a></code>&#160;</td>
+          <td class="paramname"><em>Peek</em> = <code>false</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1479,7 +1479,7 @@ Additional Inherited Members</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Dec 4 2018 08:40:48 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Dec 5 2018 10:25:01 for Torc by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>
