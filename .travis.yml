@@ -95,7 +95,7 @@ matrix:
         - |
           if [[ $TRAVIS_BRANCH != "coverity_scan" ]]; then
             qmake torc.pro
-            make j4
+            make -j4
           else
             echo Ignoring branch
           fi
