@@ -306,9 +306,9 @@ void TorcCameraVideoOutput::SegmentReady(int Segment)
     QWriteLocker locker(&m_segmentLock);
     if (!m_segments.contains(Segment))
     {
-        if (!m_segments.isEmpty() && m_segments.constFirst() >= Segment)
+        if (!m_segments.isEmpty() && m_segments.first() >= Segment) //clazy:exclude=detaching-member
         {
-            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Segment %1 is not greater than head (%2)").arg(Segment).arg(m_segments.constFirst()));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Segment %1 is not greater than head (%2)").arg(Segment).arg(m_segments.first())); //clazy:exclude=detaching-member
         }
         else
         {
@@ -333,7 +333,7 @@ void TorcCameraVideoOutput::SegmentRemoved(int Segment)
     }
     else
     {
-        if (m_segments.constFirst() != Segment)
+        if (m_segments.first() != Segment) //clazy:exclude=detaching-member
             LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Segment %1 is not at tail of queue").arg(Segment));
         else
             m_segments.dequeue();
@@ -456,12 +456,11 @@ void TorcCameraVideoOutput::ProcessHTTPRequest(const QString &PeerAddress, int P
                     m_threadLock.lockForRead();
                     QDateTime start = m_cameraStartTime;
                     m_threadLock.unlock();
-                    LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Segment %1 not found - we have %2-%3")
-                        .arg(num).arg(m_segments.constFirst()).arg(m_segments.constLast()));
+                    LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Segment %1 not found - we have %2-%3").arg(num).arg(m_segments.first()).arg(m_segments.last())); //clazy:exclude=detaching-member
                     LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Our start time: %1").arg(start.toString(Qt::ISODate)));
                     LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Start+request : %1").arg(start.addSecs(num *2).toString(Qt::ISODate)));
-                    LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Start+first   : %1").arg(start.addSecs(m_segments.constFirst() * 2).toString(Qt::ISODate)));
-                    LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Start+last    : %1").arg(start.addSecs(m_segments.constLast() * 2).toString(Qt::ISODate)));
+                    LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Start+first   : %1").arg(start.addSecs(m_segments.first() * 2).toString(Qt::ISODate))); //clazy:exclude=detaching-member
+                    LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Start+last    : %1").arg(start.addSecs(m_segments.last() * 2).toString(Qt::ISODate))); //clazy:exclude=detaching-member
                     LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("System time   : %1").arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate)));
                     emit CheckTime();
                 }
@@ -543,7 +542,7 @@ QByteArray TorcCameraVideoOutput::GetHLSPlaylist(void)
     QString duration = QString::number(m_params.m_segmentLength / (float) m_params.m_frameRate, 'f', 2);
     m_paramsLock.unlock();
     m_segmentLock.lockForRead();
-    QString result = playlist.arg(duration).arg(m_segments.constFirst());
+    QString result = playlist.arg(duration).arg(m_segments.first()); //clazy:exclude=detaching-member
     foreach (int segment, m_segments)
     {
         result += QStringLiteral("#EXTINF:%1,\r\n").arg(duration);

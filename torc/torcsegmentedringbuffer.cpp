@@ -80,7 +80,7 @@ int TorcSegmentedRingBuffer::GetHead(void)
     int result = -1;
     m_segmentsLock.lockForRead();
     if (!m_segments.isEmpty())
-        result = m_segmentRefs.constLast();
+        result = m_segmentRefs.last(); //clazy:exclude=detaching-member
     m_segmentsLock.unlock();
     return result;
 }
@@ -96,7 +96,7 @@ int TorcSegmentedRingBuffer::GetSegmentsAvail(int &TailRef)
     m_segmentsLock.lockForRead();
     result = m_segments.size();
     if (result > 0)
-        TailRef = m_segmentRefs.constFirst();
+        TailRef = m_segmentRefs.first(); //clazy:exclude=detaching-member
     m_segmentsLock.unlock();
     return result;
 }
