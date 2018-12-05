@@ -20,7 +20,8 @@ class TorcTimerControl : public TorcControl
         Minutely, // yes, small in time...
         Hourly,
         Daily,
-        Weekly
+        Weekly,
+        SingleShot
     };
 
     static QString  TimerTypeToString (TorcTimerControl::TimerType Type);
@@ -62,6 +63,8 @@ class TorcTimerControl : public TorcControl
     bool              m_randomDuration;
     quint64           m_lastElapsed;
     bool              m_newRandom;
+    bool              m_active;
+    quint64           m_singleShotStartTime;
 };
 
 #endif // TORCTIMERCONTROL_H
