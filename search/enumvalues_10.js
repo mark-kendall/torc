@@ -7,6 +7,7 @@ var searchData=
   ['shutdown',['Shutdown',['../d6/db6/class_torc.html#ae24951db8926b98a75762aef8448e473ac33b2acc05c511c309f254218a03f5ee',1,'Torc']]],
   ['shutdownnow',['ShutdownNow',['../d6/db6/class_torc.html#ae24951db8926b98a75762aef8448e473a213642c71c0722246739fc372aa37d9a',1,'Torc']]],
   ['shuttingdown',['ShuttingDown',['../d6/db6/class_torc.html#ae24951db8926b98a75762aef8448e473a5e9ad6a2c31d1e964fdb0fdbb255be87',1,'Torc']]],
+  ['singleshot',['SingleShot',['../d6/d72/class_torc_timer_control.html#a4f8f01816ff0addffb4f269028050371a0f6a1ffe48330f569e93da9def317ef8',1,'TorcTimerControl']]],
   ['spontaneous',['Spontaneous',['../dd/d3a/class_torc_network_service.html#ab5b2ad454d6bac7de21050e2df9d4a27a749aa511d9657a86dcc88e85b9cdebcf',1,'TorcNetworkService']]],
   ['start',['Start',['../d6/db6/class_torc.html#ae24951db8926b98a75762aef8448e473a006fea2768b9d7dc999ee4fed19ca344',1,'Torc']]],
   ['started',['Started',['../d8/d61/class_torc_input.html#afb288ada1ecb4b2593398a9ae8df145aa930a26d68f4fe4e07f187aa9ecbb0a08',1,'TorcInput']]],
