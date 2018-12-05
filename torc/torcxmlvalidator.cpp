@@ -40,7 +40,7 @@ TorcXmlValidator::TorcXmlValidator(const QString &XmlFile, const QString &XSDFil
 
 TorcXmlValidator::TorcXmlValidator(const QString &XmlFile, const QByteArray &XSDData, bool Silent/*=false*/)
   : m_xmlFile(XmlFile),
-    m_xsdFile(QString("")),
+    m_xsdFile(QStringLiteral("")),
     m_xsdData(XSDData),
     m_valid(false),
     m_xsdDone(false),

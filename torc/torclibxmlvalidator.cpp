@@ -42,7 +42,7 @@ TorcXmlValidator::TorcXmlValidator(const QString &XmlFile, const QString &XSDFil
 
 TorcXmlValidator::TorcXmlValidator(const QString &XmlFile, const QByteArray &XSDData, bool Silent /*= false*/)
   : m_xmlFile(XmlFile),
-    m_xsdFile(QString("")),
+    m_xsdFile(QStringLiteral("")),
     m_xsdData(XSDData),
     m_valid(false),
     m_xsdDone(false),
@@ -69,7 +69,7 @@ void TorcXmlValidator::HandleMessage(void *ctx, const char *format, ...)
     va_end(args);
     if (ok)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Libxml error: %1").arg(error));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Libxml error: %1").arg(error));
         free(error);
     }
 }
@@ -95,7 +95,7 @@ void TorcXmlValidator::Validate(void)
 
     if (!parsercontext)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to create parser context for XSD");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to create parser context for XSD"));
         return;
     }
 
@@ -104,7 +104,7 @@ void TorcXmlValidator::Validate(void)
     if (!schema)
     {
         xmlSchemaFreeParserCtxt(parsercontext);
-        LOG(VB_GENERAL, LOG_ERR, "Failed to parse XSD");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to parse XSD"));
         return;
     }
 
@@ -114,12 +114,12 @@ void TorcXmlValidator::Validate(void)
     {
         xmlSchemaFree(schema);
         xmlSchemaFreeParserCtxt(parsercontext);
-        LOG(VB_GENERAL, LOG_ERR, "Could not create XSD schema validation context");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Could not create XSD schema validation context"));
         return;
     }
 
     if (!m_silent)
-        LOG(VB_GENERAL, LOG_INFO, "XSD loaded and validated");
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("XSD loaded and validated"));
 
     m_xsdDone = true;
 

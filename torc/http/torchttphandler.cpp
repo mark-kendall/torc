@@ -48,11 +48,11 @@ TorcHTTPHandler::TorcHTTPHandler(const QString &Signature, const QString &Name)
     m_recursive(false),
     m_name(Name)
 {
-    if (!m_signature.endsWith("/"))
-        m_signature += "/";
+    if (!m_signature.endsWith('/'))
+        m_signature += '/';
 
     if (m_name.isEmpty())
-        LOG(VB_GENERAL, LOG_DEBUG, QString("Not registering '%1' as a handler").arg(m_signature));
+        LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("Not registering '%1' as a handler").arg(m_signature));
     else
         TorcHTTPServer::RegisterHandler(this);
 }
@@ -135,19 +135,19 @@ void TorcHTTPHandler::HandleFile(TorcHTTPRequest &Request, const QString &Filena
             }
             else
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("'%1' is empty - ignoring").arg(Filename));
+                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("'%1' is empty - ignoring").arg(Filename));
                 Request.SetStatus(HTTP_NotFound);
             }
         }
         else
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("'%1' is not readable").arg(Filename));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("'%1' is not readable").arg(Filename));
             Request.SetStatus(HTTP_Forbidden);
         }
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to find '%1'").arg(Filename));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to find '%1'").arg(Filename));
         Request.SetStatus(HTTP_NotFound);
     }
 

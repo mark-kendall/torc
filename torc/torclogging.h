@@ -17,35 +17,21 @@ extern "C" {
 #define VERBOSE_LEVEL_CHECK(_MASK_, _LEVEL_) \
     (((gVerboseMask & (_MASK_)) == (_MASK_)) && gLogLevel >= (_LEVEL_))
 
-#ifdef __cplusplus
 #define LOG(_MASK_, _LEVEL_, _STRING_)                                  \
     do {                                                                \
         if (VERBOSE_LEVEL_CHECK((_MASK_), (_LEVEL_)) && ((_LEVEL_)>=0)) \
         {                                                               \
             PrintLogLine(_MASK_, (LogLevel)_LEVEL_,                     \
-                         __FILE__, __LINE__, __FUNCTION__, 1,           \
-                         QString(_STRING_).toLocal8Bit().constData());  \
+                         __FILE__, __LINE__, __FUNCTION__,              \
+                         _STRING_.toLocal8Bit().constData());  \
         }                                                               \
     } while (false)
-#else
-#define LOG(_MASK_, _LEVEL_, _FORMAT_, ...)                             \
-    do {                                                                \
-        if (VERBOSE_LEVEL_CHECK((_MASK_), (_LEVEL_)) && ((_LEVEL_)>=0)) \
-        {                                                               \
-            PrintLogLine(_MASK_, (LogLevel)_LEVEL_,                     \
-                         __FILE__, __LINE__, __FUNCTION__, 0,           \
-                         (const char *)_FORMAT_, ##__VA_ARGS__);        \
-        }                                                               \
-    } while (0)
-#endif
 
 void PrintLogLine(uint64_t mask, LogLevel level, const char *file, int line,
-                  const char *function, int fromQString, const char *format, ...);
+                  const char *function, const char *format, ...);
 
 extern LogLevel gLogLevel;
 extern uint64_t gVerboseMask;
-
-#ifdef __cplusplus
 }
 
 extern QString    gLogPropagationArgs;
@@ -69,7 +55,6 @@ QString  LogErrorToString(int errnum);
 /// next line in the verbose output.
 #define ENO (QString("\n\t\t\teno: ") + LogErrorToString(errno))
 #define ENO_STR ENO.toLocal8Bit().constData()
-#endif // __cplusplus
 
 #endif
 

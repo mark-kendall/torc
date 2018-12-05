@@ -106,23 +106,23 @@ TorcPiCamera::TorcPiCamera(const TorcCameraParams &Params)
     if (m_params.m_frameRate > 30 && (m_params.m_width > 1280 || m_params.m_height > 720))
     {
         m_params.m_frameRate = 30;
-        LOG(VB_GENERAL, LOG_INFO, "Restricting camera framerate to 30fps for full HD");
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Restricting camera framerate to 30fps for full HD"));
     }
     else if (m_params.m_frameRate > 60 && (m_params.m_width > 720 || m_params.m_height > 576))
     {
         m_params.m_frameRate = 60;
-        LOG(VB_GENERAL, LOG_INFO, "Restricting camera framerate to 60fps for partial HD");
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Restricting camera framerate to 60fps for partial HD"));
     }
     else if (m_params.m_frameRate > 90)
     {
         m_params.m_frameRate = 90;
-        LOG(VB_GENERAL, LOG_INFO, "Resticting camera framerate to 90fps for SD");
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Resticting camera framerate to 90fps for SD"));
     }
 
     // encoder requires stride to be divisible by 32 and slice height by 16
     m_params.m_stride      = (m_params.m_stride + 31) & ~31;
     m_params.m_sliceHeight = (m_params.m_sliceHeight + 15) & ~15;
-    LOG(VB_GENERAL, LOG_INFO, QString("Camera encoder stride: %1 slice height: %2").arg(m_params.m_stride).arg(m_params.m_sliceHeight));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Camera encoder stride: %1 slice height: %2").arg(m_params.m_stride).arg(m_params.m_sliceHeight));
 }
 
 void TorcPiCamera::StreamVideo(bool Video)
@@ -213,11 +213,11 @@ bool TorcPiCamera::Setup(void)
 
     if (TorcCameraDevice::Setup())
     {
-        LOG(VB_GENERAL, LOG_INFO, "Pi camera setup");
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Pi camera setup"));
         return true;
     }
 
-    LOG(VB_GENERAL, LOG_ERR, "Failed to setup Pi camera");
+    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to setup Pi camera"));
     return false;
 }
 
@@ -510,7 +510,7 @@ bool TorcPiCamera::LoadDrivers(void)
     if (m_camera.WaitForResponse(OMX_EventParamOrConfigChanged, 0, 10000))
         return false;
 
-    LOG(VB_GENERAL, LOG_INFO, "Broadcom drivers loaded");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Broadcom drivers loaded"));
 
     OMX_CONFIG_CAMERAINFOTYPE info;
     OMX_INITSTRUCTURE(info);
@@ -520,9 +520,9 @@ bool TorcPiCamera::LoadDrivers(void)
             m_cameraType = V2;
         else if (qstrcmp((const char*)info.cameraname, "ov5647") == 0)
             m_cameraType = V1;
-        LOG(VB_GENERAL, LOG_INFO, QString("Camera: name '%1' (Version %2)")
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Camera: name '%1' (Version %2)")
             .arg((const char*)info.cameraname)
-            .arg(m_cameraType == V2 ? "2" : m_cameraType == V1 ? "1" : "Unknown"));
+            .arg(m_cameraType == V2 ? "2" : m_cameraType == V1 ? QStringLiteral("1") : QStringLiteral("Unknown")));
     }
 
     return true;
@@ -743,7 +743,7 @@ bool TorcPiCamera::ConfigureImageEncoder(void)
     if (m_imageEncoder.SetParameter(OMX_IndexParamPortDefinition, &encoderport))
         return false;
 
-    LOG(VB_GENERAL, LOG_INFO, "Set image encoder output parameters");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Set image encoder output parameters"));
 
     OMX_INITSTRUCTURE(encoderport);
     encoderport.nPortIndex = m_imageEncoder.GetPort(OMX_DirInput, 0, OMX_IndexParamImageInit);
@@ -760,7 +760,7 @@ bool TorcPiCamera::ConfigureImageEncoder(void)
     if (m_imageEncoder.SetParameter(OMX_IndexParamPortDefinition, &encoderport))
         return false;
 
-    LOG(VB_GENERAL, LOG_INFO, "Set image encoder input parameters");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Set image encoder input parameters"));
     return true;
 }
 
@@ -786,7 +786,7 @@ bool TorcPiCamera::ConfigureVideoEncoder(void)
     if (m_videoEncoder.SetParameter(OMX_IndexParamPortDefinition, &encoderport))
         return false;
 
-    LOG(VB_GENERAL, LOG_INFO, "Set video encoder output parameters");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Set video encoder output parameters"));
 
     if (!ENCODER_QP)
     {
@@ -798,7 +798,7 @@ bool TorcPiCamera::ConfigureVideoEncoder(void)
         if (m_videoEncoder.SetParameter(OMX_IndexParamVideoBitrate, &bitrate))
             return false;
 
-        LOG(VB_GENERAL, LOG_INFO, "Set video encoder output bitrate");
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Set video encoder output bitrate"));
     }
     else
     {
@@ -811,7 +811,7 @@ bool TorcPiCamera::ConfigureVideoEncoder(void)
         if (m_videoEncoder.SetParameter(OMX_IndexParamVideoQuantization, &quantization))
             return false;
 
-        LOG(VB_GENERAL, LOG_INFO, "Set video encoder output quantization");
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Set video encoder output quantization"));
     }
 
     // codec
@@ -822,7 +822,7 @@ bool TorcPiCamera::ConfigureVideoEncoder(void)
     if (m_videoEncoder.SetParameter(OMX_IndexParamVideoPortFormat, &format))
         return false;
 
-    LOG(VB_GENERAL, LOG_INFO, "Set video encoder output format");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Set video encoder output format"));
 
     // IDR period
     OMX_VIDEO_CONFIG_AVCINTRAPERIOD idr;
@@ -834,7 +834,7 @@ bool TorcPiCamera::ConfigureVideoEncoder(void)
     if (m_videoEncoder.SetConfig(OMX_IndexConfigVideoAVCIntraPeriod, &idr))
         return false;
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Set video encoder output IDR to %1").arg(m_params.m_frameRate * VIDEO_GOPDURA_TARGET));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Set video encoder output IDR to %1").arg(m_params.m_frameRate * VIDEO_GOPDURA_TARGET));
 
     // SEI
     OMX_PARAM_BRCMVIDEOAVCSEIENABLETYPE sei;
@@ -844,7 +844,7 @@ bool TorcPiCamera::ConfigureVideoEncoder(void)
     if (m_videoEncoder.SetParameter(OMX_IndexParamBrcmVideoAVCSEIEnable, &sei))
         return false;
 
-    LOG(VB_GENERAL, LOG_INFO, "Set video encoder output SEI");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Set video encoder output SEI"));
 
     // EEDE
     OMX_VIDEO_EEDE_ENABLE eede;
@@ -854,7 +854,7 @@ bool TorcPiCamera::ConfigureVideoEncoder(void)
     if (m_videoEncoder.SetParameter(OMX_IndexParamBrcmEEDEEnable, &eede))
         return false;
 
-    LOG(VB_GENERAL, LOG_INFO, "Set video endcoder output EEDE");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Set video endcoder output EEDE"));
 
     OMX_VIDEO_EEDE_LOSSRATE eede_loss_rate;
     OMX_INITSTRUCTURE(eede_loss_rate);
@@ -863,7 +863,7 @@ bool TorcPiCamera::ConfigureVideoEncoder(void)
     if (m_videoEncoder.SetParameter(OMX_IndexParamBrcmEEDELossRate, &eede_loss_rate))
         return false;
 
-    LOG(VB_GENERAL, LOG_INFO, "Set video encoder output EEDE loss rate");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Set video encoder output EEDE loss rate"));
 
     // profile
     OMX_VIDEO_AVCPROFILETYPE profile = OMX_VIDEO_AVCProfileMain;
@@ -877,7 +877,7 @@ bool TorcPiCamera::ConfigureVideoEncoder(void)
         case FF_PROFILE_H264_HIGH_422: profile = OMX_VIDEO_AVCProfileHigh422;  break;
         case FF_PROFILE_H264_HIGH_444: profile = OMX_VIDEO_AVCProfileHigh444;  break;
         default:
-            LOG(VB_GENERAL, LOG_WARNING, "Unknown H264 profile. Defaulting to main");
+            LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Unknown H264 profile. Defaulting to main"));
     }
 
     OMX_VIDEO_PARAM_AVCTYPE avc;
@@ -889,7 +889,7 @@ bool TorcPiCamera::ConfigureVideoEncoder(void)
     if (m_videoEncoder.SetParameter(OMX_IndexParamVideoAvc, &avc))
         return false;
 
-    LOG(VB_GENERAL, LOG_INFO, "Set video encoder output profile");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Set video encoder output profile"));
 
     // Inline SPS/PPS
     OMX_CONFIG_PORTBOOLEANTYPE headers;
@@ -899,7 +899,7 @@ bool TorcPiCamera::ConfigureVideoEncoder(void)
     if (m_videoEncoder.SetParameter(OMX_IndexParamBrcmVideoAVCInlineHeaderEnable, &headers))
         return false;
 
-    LOG(VB_GENERAL, LOG_INFO, "Set video encoder output SPS/PPS");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Set video encoder output SPS/PPS"));
 
     // SPS timing
     OMX_CONFIG_PORTBOOLEANTYPE timing;
@@ -909,7 +909,7 @@ bool TorcPiCamera::ConfigureVideoEncoder(void)
     if (m_videoEncoder.SetParameter(OMX_IndexParamBrcmVideoAVCSPSTimingEnable, &timing))
         return false;
 
-    LOG(VB_GENERAL, LOG_INFO, "Set video encoder SPS timings");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Set video encoder SPS timings"));
     return true;
 }
 
@@ -925,8 +925,8 @@ bool TorcPiCamera::EnableStills(uint Count)
     return TorcCameraDevice::EnableStills(Count);
 }
 
-static const QString piCameraType =
-"    <xs:element name=\"pi\" type=\"cameraType\"/>\r\n";
+static const QString piCameraType = QStringLiteral(
+"    <xs:element name=\"pi\" type=\"cameraType\"/>\r\n");
 
 class TorcPiCameraXSDFactory : public TorcXSDFactory
 {
@@ -964,11 +964,11 @@ class TorcPiCameraFactory final : public TorcCameraFactory
 
             if (gpumem < 128)
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("Insufficent GPU memory for Pi camera - need 128Mb - have %1Mb").arg(gpumem));
+                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Insufficent GPU memory for Pi camera - need 128Mb - have %1Mb").arg(gpumem));
             }
             else
             {
-                LOG(VB_GENERAL, LOG_INFO, QString("%1Mb GPU memory").arg(gpumem));
+                LOG(VB_GENERAL, LOG_INFO, QStringLiteral("%1Mb GPU memory").arg(gpumem));
 
                 int supported = 0;
                 int detected  = 0;
@@ -981,26 +981,26 @@ class TorcPiCameraFactory final : public TorcCameraFactory
 
                 if (!supported)
                 {
-                    LOG(VB_GENERAL, LOG_ERR, "Firmware reports that Pi camera is NOT supported");
+                    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Firmware reports that Pi camera is NOT supported"));
                 }
                 else if (!detected)
                 {
-                    LOG(VB_GENERAL, LOG_ERR, "Firmware reports that Pi camera NOT detected");
+                    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Firmware reports that Pi camera NOT detected"));
                 }
                 else
                 {
-                    LOG(VB_GENERAL, LOG_INFO, "Pi camera supported and detected");
+                    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Pi camera supported and detected"));
                     TorcPiCamera::gPiCameraDetected = true;
                 }
             }
         }
 
-        return TorcPiCamera::gPiCameraDetected ? "pi" == Type : false;
+        return TorcPiCamera::gPiCameraDetected ? QStringLiteral("pi") == Type : false;
     }
 
     TorcCameraDevice* Create(const QString &Type, const TorcCameraParams &Params) override
     {
-        if (("pi" == Type) && TorcPiCamera::gPiCameraDetected)
+        if ((QStringLiteral("pi") == Type) && TorcPiCamera::gPiCameraDetected)
             return new TorcPiCamera(Params);
         return nullptr;
     }

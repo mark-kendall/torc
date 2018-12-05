@@ -26,7 +26,7 @@
 #include "torcnetwork.h"
 #include "torciotplotternotifier.h"
 
-#define IOTPLOTTER_UPDATE_URL QString("http://iotplotter.com/api/v2/feed/") // NB insecure
+#define IOTPLOTTER_UPDATE_URL QStringLiteral("http://iotplotter.com/api/v2/feed/") // NB insecure
 #define IOTPLOTTER_MAX_ERRORS 5
 #define IOTPLOTTER_MAX_FIELDS 8 // I can't actually see a max
 
@@ -39,12 +39,12 @@ TorcIoTPlotterNotifier::TorcIoTPlotterNotifier(const QVariantMap &Details)
     m_maxFields      = IOTPLOTTER_MAX_FIELDS;
 
     // as well as an api key, IoTPlotter needs a feed id
-    if (Details.contains("feedid"))
-        m_feedId = Details.value("feedid").toString().trimmed();
+    if (Details.contains(QStringLiteral("feedid")))
+        m_feedId = Details.value(QStringLiteral("feedid")).toString().trimmed();
 
     if (m_feedId.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("%1 logger has no feed id - disabling").arg(m_description));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("%1 logger has no feed id - disabling").arg(m_description));
         return;
     }
 
@@ -61,7 +61,7 @@ TorcNetworkRequest* TorcIoTPlotterNotifier::CreateRequest(void)
     QJsonObject data;
     QJsonObject raw;
     // NB from Qt 5.8 we can use currentSecsSinceEpoch
-    QString epoch = QString("%1").arg(((quint64)QDateTime::currentMSecsSinceEpoch() / 1000));
+    QString epoch = QStringLiteral("%1").arg(((quint64)QDateTime::currentMSecsSinceEpoch() / 1000));
 
     for (int i = 0; i < m_maxFields; i++)
     {
@@ -70,8 +70,8 @@ TorcNetworkRequest* TorcIoTPlotterNotifier::CreateRequest(void)
             if (m_reverseFields.contains(i))
             {
                 QJsonObject pair;
-                pair.insert("value", m_fieldValues[i].toLongLong());
-                pair.insert("epoch", epoch.toLongLong());
+                pair.insert(QStringLiteral("value"), m_fieldValues[i].toLongLong());
+                pair.insert(QStringLiteral("epoch"), epoch.toLongLong());
                 QJsonArray values;
                 values.append(pair);
                 raw.insert(m_reverseFields.value(i).toLocal8Bit(), values);
@@ -79,10 +79,10 @@ TorcNetworkRequest* TorcIoTPlotterNotifier::CreateRequest(void)
         }
 
         // reset the fields
-        m_fieldValues[i] = QString("");
+        m_fieldValues[i] = QStringLiteral("");
     }
 
-    data.insert("data", raw);
+    data.insert(QStringLiteral("data"), raw);
     QJsonDocument doc(data);
     QByteArray serialiseddata = doc.toJson(QJsonDocument::Indented);
     qrequest.setHeader(QNetworkRequest::ContentLengthHeader, serialiseddata.size());
@@ -99,8 +99,8 @@ class TorcIoTPlotterNotifierFactory final : public TorcNotifierFactory
 {
     TorcNotifier* Create(const QString &Type, const QVariantMap &Details) override
     {
-        if (Type == "iotplotter" && Details.contains("apikey") && Details.contains("fields") &&
-            Details.contains("feedid"))
+        if (Type == QStringLiteral("iotplotter") && Details.contains(QStringLiteral("apikey")) && Details.contains(QStringLiteral("fields")) &&
+            Details.contains(QStringLiteral("feedid")))
         {
             return new TorcIoTPlotterNotifier(Details);
         }

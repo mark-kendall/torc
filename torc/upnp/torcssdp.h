@@ -14,11 +14,11 @@
 #include "torchttpserver.h"
 
 #define TORC_SSDP_UDP_MULTICAST_PORT  1900
-#define TORC_IPV4_UDP_MULTICAST_ADDR  QString("239.255.255.250")
-#define TORC_IPV4_UDP_MULTICAST_URL   QString("%1:%2").arg(TORC_IPV4_UDP_MULTICAST_ADDR).arg(TORC_SSDP_UDP_MULTICAST_PORT)
-#define TORC_IPV6_UDP_MULTICAST_ADDR  QString("[FF05::C]")
-#define TORC_IPV6_UDP_MULTICAST_ADDR2 QString("FF05::C")
-#define TORC_IPV6_UDP_MULTICAST_URL   QString("%1:%2").arg(TORC_IPV6_UDP_MULTICAST_ADDR).arg(TORC_SSDP_UDP_MULTICAST_PORT)
+#define TORC_IPV4_UDP_MULTICAST_ADDR  QStringLiteral("239.255.255.250")
+#define TORC_IPV4_UDP_MULTICAST_URL   QStringLiteral("%1:%2").arg(TORC_IPV4_UDP_MULTICAST_ADDR).arg(TORC_SSDP_UDP_MULTICAST_PORT)
+#define TORC_IPV6_UDP_MULTICAST_ADDR  QStringLiteral("[FF05::C]")
+#define TORC_IPV6_UDP_MULTICAST_ADDR2 QStringLiteral("FF05::C")
+#define TORC_IPV6_UDP_MULTICAST_URL   QStringLiteral("%1:%2").arg(TORC_IPV6_UDP_MULTICAST_ADDR).arg(TORC_SSDP_UDP_MULTICAST_PORT)
 
 class TorcSSDPSearchResponse
 {
@@ -74,7 +74,7 @@ class TorcSSDP final : public QObject
     void             CancelAnnouncePriv (void);
 
     void             SendSearch         (void);
-    void             SendAnnounce       (bool IPv6, bool Alive);
+    void             SendAnnounce       (bool IsIPv6, bool Alive);
 
     bool             event              (QEvent *Event) override;
     void             Read               (void);

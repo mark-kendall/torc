@@ -10,7 +10,7 @@
 // Torc
 #include "torchttprequest.h"
 
-#define QVARIANT_ERROR QString("Error: QVariantList must contain only one variant type")
+#define QVARIANT_ERROR QStringLiteral("Error: QVariantList must contain only one variant type")
 
 class TorcSerialiser
 {

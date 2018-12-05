@@ -74,14 +74,14 @@ class MethodParameters
         // discard slots with an unsupported return type
         if (unsupportedtypes.contains(returntype))
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Method '%1' has unsupported return type '%2'").arg(Method.name().constData(), Method.typeName()));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Method '%1' has unsupported return type '%2'").arg(Method.name().constData(), Method.typeName()));
             return;
         }
 
         // discard overly complicated slots not supported by QMetaMethod
         if (Method.parameterCount() > 10)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Method '%1' takes more than 10 parameters - ignoring").arg(Method.name().constData()));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Method '%1' takes more than 10 parameters - ignoring").arg(Method.name().constData()));
             return;
         }
 
@@ -99,7 +99,7 @@ class MethodParameters
             // discard slots that use unsupported parameter types
             if (unsupportedparameters.contains(type))
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("Method '%1' has unsupported parameter type '%2'")
+                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Method '%1' has unsupported parameter type '%2'")
                     .arg(Method.name().constData(), types[i].constData()));
                 return;
             }
@@ -130,7 +130,7 @@ class MethodParameters
         {
             if (!m_names.isEmpty())
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("Method '%1' expects %2 parameters, sent %3")
+                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Method '%1' expects %2 parameters, sent %3")
                    .arg(m_names.value(0).constData()).arg(size - 1).arg(Queries.size()));
             }
             return QVariant();
@@ -146,7 +146,7 @@ class MethodParameters
                 it = Queries.constFind(m_names.value(i));
                 if (it == Queries.end())
                 {
-                    LOG(VB_GENERAL, LOG_ERR, QString("Parameter '%1' for method '%2' is missing")
+                    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Parameter '%1' for method '%2' is missing")
                         .arg(m_names.value(i).constData(), m_names.value(0).constData()));
                     return QVariant();
                 }
@@ -155,7 +155,7 @@ class MethodParameters
         }
 
         if (Object->qt_metacall(QMetaObject::InvokeMetaMethod, m_index, parameters) > -1)
-            LOG(VB_GENERAL, LOG_ERR, "qt_metacall error");
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("qt_metacall error"));
 
         // handle QVariant return type where we don't want to lose visibility of the underlying type
         int type = m_types.value(0);
@@ -219,13 +219,13 @@ class MethodParameters
 
     static bool ToBool(const QString &Value)
     {
-        if (Value.compare("1", Qt::CaseInsensitive) == 0)
+        if (Value.compare(QStringLiteral("1"), Qt::CaseInsensitive) == 0)
             return true;
-        if (Value.compare("true", Qt::CaseInsensitive) == 0)
+        if (Value.compare(QStringLiteral("true"), Qt::CaseInsensitive) == 0)
             return true;
-        if (Value.compare("y", Qt::CaseInsensitive) == 0)
+        if (Value.compare(QStringLiteral("y"), Qt::CaseInsensitive) == 0)
             return true;
-        if (Value.compare("yes", Qt::CaseInsensitive) == 0)
+        if (Value.compare(QStringLiteral("yes"), Qt::CaseInsensitive) == 0)
             return true;
         return false;
     }
@@ -264,21 +264,21 @@ TorcHTTPService::TorcHTTPService(QObject *Parent, const QString &Signature, cons
   : TorcHTTPHandler(TORC_SERVICES_DIR + Signature, Name),
     m_httpServiceLock(QReadWriteLock::Recursive),
     m_parent(Parent),
-    m_version("Unknown"),
+    m_version(QStringLiteral("Unknown")),
     m_methods(),
     m_properties(),
     m_subscribers(),
     m_subscriberLock(QMutex::Recursive)
 {
-    static const QString defaultblacklisted("deleteLater,SubscriberDeleted,");
-    QStringList blacklist = (defaultblacklisted + Blacklist).split(",");
+    static const QString defaultblacklisted(QStringLiteral("deleteLater,SubscriberDeleted,"));
+    QStringList blacklist = (defaultblacklisted + Blacklist).split(',');
 
     m_parent->setObjectName(Name);
 
     // the parent MUST implement SubscriberDeleted.
     if (MetaObject.indexOfSlot(QMetaObject::normalizedSignature("SubscriberDeleted(QObject*)")) < 0)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Service '%1' has no SubscriberDeleted slot. This is a programmer error - exiting").arg(Name));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Service '%1' has no SubscriberDeleted slot. This is a programmer error - exiting").arg(Name));
         QCoreApplication::exit(TORC_EXIT_UNKOWN_ERROR);
         return;
     }
@@ -288,7 +288,7 @@ TorcHTTPService::TorcHTTPService(QObject *Parent, const QString &Signature, cons
     if (index > -1)
         m_version = MetaObject.classInfo(index).value();
     else
-        LOG(VB_GENERAL, LOG_WARNING, QString("Service '%1' is missing version information").arg(Name));
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Service '%1' is missing version information").arg(Name));
 
     // is this a secure service (all methods require authentication)
     bool secure = MetaObject.indexOfClassInfo("Secure") > -1;
@@ -336,12 +336,12 @@ TorcHTTPService::TorcHTTPService(QObject *Parent, const QString &Signature, cons
                 int index = MetaObject.indexOfClassInfo(name.toLatin1());
                 if (index > -1)
                 {
-                    QStringList infos = QString(MetaObject.classInfo(index).value()).split(",", QString::SkipEmptyParts);
+                    QStringList infos = QString(MetaObject.classInfo(index).value()).split(',', QString::SkipEmptyParts);
                     foreach (const QString &info, infos)
                     {
-                        if (info.startsWith("methods="))
+                        if (info.startsWith(QStringLiteral("methods=")))
                             customallowed = TorcHTTPRequest::StringToAllowed(info.mid(8));
-                        else if (info.startsWith("type="))
+                        else if (info.startsWith(QStringLiteral("type=")))
                             returntype = info.mid(5);
                     }
                 }
@@ -354,23 +354,23 @@ TorcHTTPService::TorcHTTPService(QObject *Parent, const QString &Signature, cons
                 {
                     allowed |= customallowed;
                 }
-                else if (name.startsWith("Get", Qt::CaseInsensitive))
+                else if (name.startsWith(QStringLiteral("Get"), Qt::CaseInsensitive))
                 {
                     allowed |= HTTPGet | HTTPHead;
                 }
-                else if (name.startsWith("Set", Qt::CaseInsensitive))
+                else if (name.startsWith(QStringLiteral("Set"), Qt::CaseInsensitive))
                 {
                     // TODO Put or Post?? How to handle head requests for setters...
                     allowed |= HTTPPut;
                 }
                 else
                 {
-                    LOG(VB_GENERAL, LOG_ERR, QString("Unable to determine request types of method '%1' for '%2' - ignoring").arg(name, m_name));
+                    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Unable to determine request types of method '%1' for '%2' - ignoring").arg(name, m_name));
                     continue;
                 }
 
                 if (allowed & HTTPAuth)
-                    LOG(VB_GENERAL, LOG_DEBUG, QString("%1 requires authentication").arg(Signature + name));
+                    LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("%1 requires authentication").arg(Signature + name));
 
                 MethodParameters *parameters = new MethodParameters(i, method, allowed, returntype);
 
@@ -384,7 +384,7 @@ TorcHTTPService::TorcHTTPService(QObject *Parent, const QString &Signature, cons
                         if (existing->m_method.methodSignature() == method.methodSignature() &&
                             existing->m_method.returnType()      == method.returnType())
                         {
-                            LOG(VB_GENERAL, LOG_DEBUG, QString("Method '%1' in class '%2' already found in superclass - overriding")
+                            LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("Method '%1' in class '%2' already found in superclass - overriding")
                                 .arg(method.methodSignature().constData(), meta->className()));
                             existing = m_methods.take(name);
                             delete existing;
@@ -410,18 +410,18 @@ TorcHTTPService::TorcHTTPService(QObject *Parent, const QString &Signature, cons
             QMetaProperty property = meta->property(i);
             QString   propertyname(property.name());
 
-            if (propertyname != "objectName" && property.isReadable() && ((property.hasNotifySignal() && property.notifySignalIndex() > -1) || property.isConstant()))
+            if (propertyname != QStringLiteral("objectName") && property.isReadable() && ((property.hasNotifySignal() && property.notifySignalIndex() > -1) || property.isConstant()))
             {
                 // constant properties are given a signal index < 0
                 if (property.notifySignalIndex() > -1)
                 {
                     m_properties.insert(property.notifySignalIndex(), property.propertyIndex());
-                    LOG(VB_GENERAL, LOG_DEBUG, QString("Adding property '%1' with signal index %2").arg(property.name()).arg(property.notifySignalIndex()));
+                    LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("Adding property '%1' with signal index %2").arg(property.name()).arg(property.notifySignalIndex()));
                 }
                 else
                 {
                     m_properties.insert(invalidindex--, property.propertyIndex());
-                    LOG(VB_GENERAL, LOG_DEBUG, QString("Adding constant property '%1'").arg(property.name()));
+                    LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("Adding constant property '%1'").arg(property.name()));
                 }
             }
         }
@@ -453,7 +453,7 @@ void TorcHTTPService::ProcessHTTPRequest(const QString &PeerAddress, int PeerPor
     QString method = Request.GetMethod();
     HTTPRequestType type = Request.GetHTTPRequestType();
 
-    if (method.compare("GetServiceVersion") == 0)
+    if (method.compare(QStringLiteral("GetServiceVersion")) == 0)
     {
         if (type == HTTPOptions)
         {
@@ -471,7 +471,7 @@ void TorcHTTPService::ProcessHTTPRequest(const QString &PeerAddress, int PeerPor
         }
 
         Request.SetStatus(HTTP_OK);
-        Request.Serialise(m_version, "version");
+        Request.Serialise(m_version, QStringLiteral("version"));
         return;
     }
 
@@ -529,7 +529,7 @@ void TorcHTTPService::ProcessHTTPRequest(const QString &PeerAddress, int PeerPor
 QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVariant &Parameters, QObject *Connection, bool Authenticated)
 {
     QString method;
-    int index = Method.lastIndexOf("/");
+    int index = Method.lastIndexOf('/');
     if (index > -1)
         method = Method.mid(index + 1).trimmed();
 
@@ -547,14 +547,14 @@ QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVarian
             if (disabled || unauthorised)
             {
                 if (disabled)
-                    LOG(VB_GENERAL, LOG_ERR, QString("'%1' method '%2' is disabled").arg(m_signature, method));
+                    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("'%1' method '%2' is disabled").arg(m_signature, method));
                 else
-                    LOG(VB_GENERAL, LOG_ERR, QString("'%1' method '%2' unauthorised").arg(m_signature, method));
+                    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("'%1' method '%2' unauthorised").arg(m_signature, method));
                 QVariantMap result;
                 QVariantMap error;
-                error.insert("code", -401); // HTTP 401!
-                error.insert("message", "Method not authorised");
-                result.insert("error", error);
+                error.insert(QStringLiteral("code"), -401); // HTTP 401!
+                error.insert(QStringLiteral("message"), QStringLiteral("Method not authorised"));
+                result.insert(QStringLiteral("error"), error);
                 return result;
             }
             else
@@ -580,12 +580,12 @@ QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVarian
                     }
                     else
                     {
-                        LOG(VB_GENERAL, LOG_ERR, "Too many parameters");
+                        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Too many parameters"));
                     }
                 }
                 else if (!Parameters.isNull())
                 {
-                    LOG(VB_GENERAL, LOG_ERR, "Unknown parameter variant");
+                    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Unknown parameter variant"));
                 }
 
                 QString type;
@@ -599,36 +599,36 @@ QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVarian
                     if (results.type() != QVariant::Invalid)
                     {
                         QVariantMap result;
-                        result.insert("result", results);
+                        result.insert(QStringLiteral("result"), results);
                         return result;
                     }
 
                     QVariantMap result;
                     QVariantMap error;
-                    error.insert("code", -32602);
-                    error.insert("message", "Invalid params");
-                    result.insert("error", error);
+                    error.insert(QStringLiteral("code"), -32602);
+                    error.insert(QStringLiteral("message"), QStringLiteral("Invalid params"));
+                    result.insert(QStringLiteral("error"), error);
                     return result;
                 }
 
                 // JSON-RPC 2.0 specification makes no mention of void/null return types
                 QVariantMap result;
-                result.insert("result", "null");
+                result.insert(QStringLiteral("result"), QStringLiteral("null"));
                 return result;
             }
         }
 
         // implicit 'GetServiceVersion' method
-        if (method.compare("GetServiceVersion") == 0)
+        if (method.compare(QStringLiteral("GetServiceVersion")) == 0)
         {
             QVariantMap result;
             QVariantMap version;
-            version.insert("version", m_version);
-            result.insert("result", version);
+            version.insert(QStringLiteral("version"), m_version);
+            result.insert(QStringLiteral("result"), version);
             return result;
         }
         // implicit 'Subscribe' method
-        else if (method.compare("Subscribe") == 0)
+        else if (method.compare(QStringLiteral("Subscribe")) == 0)
         {
             // ensure the 'receiver' has all of the right slots
             int change = Connection->metaObject()->indexOfSlot(QMetaObject::normalizedSignature("PropertyChanged()"));
@@ -639,7 +639,7 @@ QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVarian
 
                 if (!m_subscribers.contains(Connection))
                 {
-                    LOG(VB_GENERAL, LOG_DEBUG, QString("New subscription for '%1'").arg(m_signature));
+                    LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("New subscription for '%1'").arg(m_signature));
                     m_subscribers.append(Connection);
 
                     // notify success and provide appropriate details about properties, notifications, get'ers etc
@@ -656,34 +656,34 @@ QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVarian
                     }
 
                     QVariantMap result;
-                    result.insert("result", GetServiceDetails());
+                    result.insert(QStringLiteral("result"), GetServiceDetails());
                     return result;
                 }
                 else
                 {
-                    LOG(VB_GENERAL, LOG_ERR, QString("Connection is already subscribed to '%1'").arg(m_signature));
+                    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Connection is already subscribed to '%1'").arg(m_signature));
                 }
             }
             else
             {
-                LOG(VB_GENERAL, LOG_ERR, "Subscription request for connection without correct methods");
+                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Subscription request for connection without correct methods"));
             }
 
             QVariantMap result;
             QVariantMap error;
-            error.insert("code", -32603);
-            error.insert("message", "Internal error");
-            result.insert("error", error);
+            error.insert(QStringLiteral("code"), -32603);
+            error.insert(QStringLiteral("message"), "Internal error");
+            result.insert(QStringLiteral("error"), error);
             return result;
         }
         // implicit 'Unsubscribe' method
-        else if (method.compare("Unsubscribe") == 0)
+        else if (method.compare(QStringLiteral("Unsubscribe")) == 0)
         {
             QMutexLocker locker(&m_subscriberLock);
 
             if (m_subscribers.contains(Connection))
             {
-                LOG(VB_GENERAL, LOG_INFO, QString("Removed subscription for '%1'").arg(m_signature));
+                LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Removed subscription for '%1'").arg(m_signature));
 
                 // disconnect all change signals
                 m_parent->disconnect(Connection);
@@ -693,28 +693,28 @@ QVariantMap TorcHTTPService::ProcessRequest(const QString &Method, const QVarian
 
                 // return success
                 QVariantMap result;
-                result.insert("result", 1);
+                result.insert(QStringLiteral("result"), 1);
                 return result;
             }
 
-            LOG(VB_GENERAL, LOG_ERR, QString("Connection is not subscribed to '%1'").arg(m_signature));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Connection is not subscribed to '%1'").arg(m_signature));
 
             QVariantMap result;
             QVariantMap error;
-            error.insert("code", -32603);
-            error.insert("message", "Internal error");
-            result.insert("error", error);
+            error.insert(QStringLiteral("code"), -32603);
+            error.insert(QStringLiteral("message"), "Internal error");
+            result.insert(QStringLiteral("error"), error);
             return result;
         }
     }
 
-    LOG(VB_GENERAL, LOG_ERR, QString("'%1' service has no '%2' method").arg(m_signature, method));
+    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("'%1' service has no '%2' method").arg(m_signature, method));
 
     QVariantMap result;
     QVariantMap error;
-    error.insert("code", -32601);
-    error.insert("message", "Method not found");
-    result.insert("error", error);
+    error.insert(QStringLiteral("code"), -32601);
+    error.insert(QStringLiteral("message"), QStringLiteral("Method not found"));
+    result.insert(QStringLiteral("error"), error);
     return result;
 }
 
@@ -745,29 +745,29 @@ QVariantMap TorcHTTPService::GetServiceDetails(void)
         if (name.isEmpty())
             continue;
 
-        description.insert("notification", QString::fromLatin1(m_parent->metaObject()->method(it.key()).name()));
+        description.insert(QStringLiteral("notification"), QString::fromLatin1(m_parent->metaObject()->method(it.key()).name()));
 
         // a property is always readable
         QString camelname = name.at(0).toUpper() + name.mid(1);
-        QString read = QString("Get") + camelname;
+        QString read = QString(QStringLiteral("Get")) + camelname;
 
         if (m_parent->metaObject()->indexOfSlot(QMetaObject::normalizedSignature(QString(read + "()").toLatin1())) > -1)
-            description.insert("read", read);
+            description.insert(QStringLiteral("read"), read);
         else
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed to deduce 'read' slot for property '%1' in service '%2'").arg(name, m_signature));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to deduce 'read' slot for property '%1' in service '%2'").arg(name, m_signature));
 
         // for writable properties, we need to infer the signature including the type
         if (property.isWritable())
         {
-            QString write = QString("Set") + camelname;
-            if (m_parent->metaObject()->indexOfSlot(QMetaObject::normalizedSignature(QString("%1(%2)").arg(write, property.typeName()).toLatin1())) > -1)
-                description.insert("write", write);
+            QString write = QString(QStringLiteral("Set")) + camelname;
+            if (m_parent->metaObject()->indexOfSlot(QMetaObject::normalizedSignature(QStringLiteral("%1(%2)").arg(write, property.typeName()).toLatin1())) > -1)
+                description.insert(QStringLiteral("write"), write);
             else
-                LOG(VB_GENERAL, LOG_ERR, QString("Failed to deduce 'write' slot for property '%1' in service '%2'").arg(name, m_signature));
+                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to deduce 'write' slot for property '%1' in service '%2'").arg(name, m_signature));
         }
 
         // and add the initial value
-        description.insert("value", property.read(m_parent));
+        description.insert(QStringLiteral("value"), property.read(m_parent));
 
         properties.insert(name, description);
     }
@@ -781,8 +781,8 @@ QVariantMap TorcHTTPService::GetServiceDetails(void)
         MethodParameters *parameters = it2.value();
         for (int i = 1; i < parameters->m_types.size(); ++i)
             params.append(parameters->m_names.value(i).constData());
-        map.insert("params", params);
-        map.insert("returns", TorcJSONRPC::QMetaTypetoJavascriptType(parameters->m_types[0]));
+        map.insert(QStringLiteral("params"), params);
+        map.insert(QStringLiteral("returns"), TorcJSONRPC::QMetaTypetoJavascriptType(parameters->m_types[0]));
         methods.insert(it2.key(), map);
         params.clear();
     }
@@ -795,28 +795,28 @@ QVariantMap TorcHTTPService::GetServiceDetails(void)
     QVariant returns("object");
 
     QVariantMap subscribe;
-    subscribe.insert("params", params);
-    subscribe.insert("returns", returns);
-    methods.insert("Subscribe", subscribe);
+    subscribe.insert(QStringLiteral("params"), params);
+    subscribe.insert(QStringLiteral("returns"), returns);
+    methods.insert(QStringLiteral("Subscribe"), subscribe);
 
     QVariantMap unsubscribe;
-    unsubscribe.insert("params", params);
-    unsubscribe.insert("returns", returns);
-    methods.insert("Unsubscribe", unsubscribe);
+    unsubscribe.insert(QStringLiteral("params"), params);
+    unsubscribe.insert(QStringLiteral("returns"), returns);
+    methods.insert(QStringLiteral("Unsubscribe"), unsubscribe);
 
     QVariantMap serviceversion;
-    serviceversion.insert("params", params);
-    serviceversion.insert("returns", TorcJSONRPC::QMetaTypetoJavascriptType(QMetaType::QString));
-    methods.insert("GetServiceVersion", serviceversion);
+    serviceversion.insert(QStringLiteral("params"), params);
+    serviceversion.insert(QStringLiteral("returns"), TorcJSONRPC::QMetaTypetoJavascriptType(QMetaType::QString));
+    methods.insert(QStringLiteral("GetServiceVersion"), serviceversion);
 
     // and the implicit version property
     QVariantMap description;
-    description.insert("read", "GetServiceVersion");
-    description.insert("value", m_version);
-    properties.insert("serviceVersion", description);
+    description.insert(QStringLiteral("read"), QStringLiteral("GetServiceVersion"));
+    description.insert(QStringLiteral("value"), m_version);
+    properties.insert(QStringLiteral("serviceVersion"), description);
 
-    details.insert("properties", properties);
-    details.insert("methods", methods);
+    details.insert(QStringLiteral("properties"), properties);
+    details.insert(QStringLiteral("methods"), methods);
     return details;
 }
 
@@ -839,7 +839,7 @@ QVariant TorcHTTPService::GetProperty(int Index)
     if (Index > -1 && m_properties.contains(Index))
         result = m_parent->metaObject()->property(m_properties.value(Index)).read(m_parent);
     else
-        LOG(VB_GENERAL, LOG_ERR, "Failed to retrieve property");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to retrieve property"));
 
     return result;
 }
@@ -850,7 +850,7 @@ void TorcHTTPService::HandleSubscriberDeleted(QObject *Subscriber)
 
     if (Subscriber && m_subscribers.contains(Subscriber))
     {
-        LOG(VB_GENERAL, LOG_DEBUG, "Subscriber deleted - cancelling subscription");
+        LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("Subscriber deleted - cancelling subscription"));
         m_subscribers.removeAll(Subscriber);
     }
 }

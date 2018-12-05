@@ -5,10 +5,10 @@
 #include "torcoutput.h"
 #include "torccamera.h"
 
-#define DASH_PLAYLIST        QString("dash.mpd")
-#define HLS_PLAYLIST_MAST    QString("master.m3u8")
-#define HLS_PLAYLIST         QString("playlist.m3u8")
-#define VIDEO_PAGE           QString("video.html")
+#define DASH_PLAYLIST        QStringLiteral("dash.mpd")
+#define HLS_PLAYLIST_MAST    QStringLiteral("master.m3u8")
+#define HLS_PLAYLIST         QStringLiteral("playlist.m3u8")
+#define VIDEO_PAGE           QStringLiteral("video.html")
 
 class TorcCameraThread;
 class TorcNetworkRequest;
@@ -23,7 +23,7 @@ class TorcCameraOutput : public TorcOutput
 
   public:
     TorcCameraOutput(TorcOutput::Type Type, double Value, const QString &ModelId, const QVariantMap &Details,
-                     QObject *Output, const QMetaObject &MetaObject, const QString &Blacklist = QString(""));
+                     QObject *Output, const QMetaObject &MetaObject, const QString &Blacklist = QStringLiteral(""));
     virtual ~TorcCameraOutput() = default;
 
   public slots:

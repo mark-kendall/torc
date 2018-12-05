@@ -45,19 +45,19 @@ bool TorcPowerUnixDBus::Available(void)
     {
         checked = true;
 
-        QDBusInterface upower("org.freedesktop.UPower",
-                              "/org/freedesktop/UPower",
-                              "org.freedesktop.UPower",
+        QDBusInterface upower(QStringLiteral("org.freedesktop.UPower"),
+                              QStringLiteral("/org/freedesktop/UPower"),
+                              QStringLiteral("org.freedesktop.UPower"),
                               QDBusConnection::systemBus());
-        QDBusInterface consolekit("org.freedesktop.ConsoleKit",
-                                  "/org/freedesktop/ConsoleKit/Manager",
-                                  "org.freedesktop.ConsoleKit.Manager",
+        QDBusInterface consolekit(QStringLiteral("org.freedesktop.ConsoleKit"),
+                                  QStringLiteral("/org/freedesktop/ConsoleKit/Manager"),
+                                  QStringLiteral("org.freedesktop.ConsoleKit.Manager"),
                                   QDBusConnection::systemBus());
 
         available = upower.isValid() && consolekit.isValid();
 
         if (!available)
-            LOG(VB_GENERAL, LOG_WARNING, "UPower and ConsoleKit not available");
+            LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("UPower and ConsoleKit not available"));
     }
 
     return available;
@@ -67,28 +67,34 @@ TorcPowerUnixDBus::TorcPowerUnixDBus()
   : TorcPower(),
     m_onBattery(false),
     m_devices(QMap<QString,int>()),
-    m_upowerInterface("org.freedesktop.UPower", "/org/freedesktop/UPower", "org.freedesktop.UPower", QDBusConnection::systemBus()),
-    m_consoleInterface("org.freedesktop.ConsoleKit", "/org/freedesktop/ConsoleKit/Manager", "org.freedesktop.ConsoleKit.Manager", QDBusConnection::systemBus())
+    m_upowerInterface(QStringLiteral("org.freedesktop.UPower"),
+                      QStringLiteral("/org/freedesktop/UPower"),
+                      QStringLiteral("org.freedesktop.UPower"),
+                      QDBusConnection::systemBus()),
+    m_consoleInterface(QStringLiteral("org.freedesktop.ConsoleKit"),
+                       QStringLiteral("/org/freedesktop/ConsoleKit/Manager"),
+                       QStringLiteral("org.freedesktop.ConsoleKit.Manager"),
+                       QDBusConnection::systemBus())
 {
     if (m_consoleInterface.isValid())
     {
-        QDBusReply<bool> shutdown = m_consoleInterface.call(QLatin1String("CanStop"));
+        QDBusReply<bool> shutdown = m_consoleInterface.call(QStringLiteral("CanStop"));
         if (shutdown.isValid() && shutdown.value())
             m_canShutdown->SetValue(QVariant((bool)true));
 
-        QDBusReply<bool> restart = m_consoleInterface.call(QLatin1String("CanRestart"));
+        QDBusReply<bool> restart = m_consoleInterface.call(QStringLiteral("CanRestart"));
         if (restart.isValid() && restart.value())
             m_canRestart->SetValue(QVariant((bool)true));
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to create ConsoleKit interface");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to create ConsoleKit interface"));
     }
 
     // populate devices
     if (m_upowerInterface.isValid())
     {
-        QDBusReply<QList<QDBusObjectPath> > devicecheck = m_upowerInterface.call(QLatin1String("EnumerateDevices"));
+        QDBusReply<QList<QDBusObjectPath> > devicecheck = m_upowerInterface.call(QStringLiteral("EnumerateDevices"));
 
         if (devicecheck.isValid())
             foreach (const QDBusObjectPath &device, devicecheck.value())
@@ -96,56 +102,56 @@ TorcPowerUnixDBus::TorcPowerUnixDBus()
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to create UPower interface");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to create UPower interface"));
     }
 
     // register for events
     if (!QDBusConnection::systemBus().connect(
-         "org.freedesktop.UPower", "/org/freedesktop/UPower",
-         "org.freedesktop.UPower", "Sleeping",
+         QStringLiteral("org.freedesktop.UPower"), QStringLiteral("/org/freedesktop/UPower"),
+         QStringLiteral("org.freedesktop.UPower"), QStringLiteral("Sleeping"),
          this, SLOT(Suspending())))
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to register for sleep events");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to register for sleep events"));
     }
 
     if (!QDBusConnection::systemBus().connect(
-         "org.freedesktop.UPower", "/org/freedesktop/UPower",
-         "org.freedesktop.UPower", "Resuming",
+         QStringLiteral("org.freedesktop.UPower"), QStringLiteral("/org/freedesktop/UPower"),
+         QStringLiteral("org.freedesktop.UPower"), QStringLiteral("Resuming"),
          this, SLOT(WokeUp())))
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to register for resume events");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to register for resume events"));
     }
 
     if (!QDBusConnection::systemBus().connect(
-         "org.freedesktop.UPower", "/org/freedesktop/UPower",
-         "org.freedesktop.UPower", "Changed",
+         QStringLiteral("org.freedesktop.UPower"), QStringLiteral("/org/freedesktop/UPower"),
+         QStringLiteral("org.freedesktop.UPower"), QStringLiteral("Changed"),
          this, SLOT(Changed())))
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to register for Changed");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to register for Changed"));
     }
 
     if (!QDBusConnection::systemBus().connect(
-         "org.freedesktop.UPower", "/org/freedesktop/UPower",
-         "org.freedesktop.UPower", "DeviceChanged", "o",
+         QStringLiteral("org.freedesktop.UPower"), QStringLiteral("/org/freedesktop/UPower"),
+         QStringLiteral("org.freedesktop.UPower"), QStringLiteral("DeviceChanged"), QStringLiteral("o"),
          this, SLOT(DeviceChanged(QDBusObjectPath))))
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to register for DeviceChanged");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to register for DeviceChanged"));
     }
 
     if (!QDBusConnection::systemBus().connect(
-         "org.freedesktop.UPower", "/org/freedesktop/UPower",
-         "org.freedesktop.UPower", "DeviceAdded", "o",
+         QStringLiteral("org.freedesktop.UPower"), QStringLiteral("/org/freedesktop/UPower"),
+         QStringLiteral("org.freedesktop.UPower"), QStringLiteral("DeviceAdded"), QStringLiteral("o"),
          this, SLOT(DeviceAdded(QDBusObjectPath))))
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to register for DeviceAdded");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to register for DeviceAdded"));
     }
 
     if (!QDBusConnection::systemBus().connect(
-         "org.freedesktop.UPower", "/org/freedesktop/UPower",
-         "org.freedesktop.UPower", "DeviceRemoved", "o",
+         QStringLiteral("org.freedesktop.UPower"), QStringLiteral("/org/freedesktop/UPower"),
+         QStringLiteral("org.freedesktop.UPower"), QStringLiteral("DeviceRemoved"), QStringLiteral("o"),
          this, SLOT(DeviceRemoved(QDBusObjectPath))))
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to register for DeviceRemoved");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to register for DeviceRemoved"));
     }
 
     // set battery state
@@ -160,14 +166,14 @@ bool TorcPowerUnixDBus::DoShutdown(void)
     if (m_consoleInterface.isValid() && m_canShutdown->GetValue().toBool())
     {
         QList<QVariant> dummy;
-        if (m_consoleInterface.callWithCallback(QLatin1String("Stop"), dummy, (QObject*)this, SLOT(DBusCallback()), SLOT(DBusError(QDBusError))))
+        if (m_consoleInterface.callWithCallback(QStringLiteral("Stop"), dummy, (QObject*)this, SLOT(DBusCallback()), SLOT(DBusError(QDBusError))))
         {
             m_httpServiceLock.unlock();
             ShuttingDown();
             return true;
         }
 
-        LOG(VB_GENERAL, LOG_ERR, "Shutdown call failed");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Shutdown call failed"));
     }
     m_httpServiceLock.unlock();
     return false;
@@ -179,9 +185,9 @@ bool TorcPowerUnixDBus::DoSuspend(void)
     if (m_upowerInterface.isValid() && m_canSuspend->GetValue().toBool())
     {
         QList<QVariant> dummy;
-        if (m_upowerInterface.callWithCallback(QLatin1String("AboutToSleep"), dummy, (QObject*)this, SLOT(DBusCallback()), SLOT(DBusError(QDBusError))))
+        if (m_upowerInterface.callWithCallback(QStringLiteral("AboutToSleep"), dummy, (QObject*)this, SLOT(DBusCallback()), SLOT(DBusError(QDBusError))))
         {
-            if (m_upowerInterface.callWithCallback(QLatin1String("Suspend"), dummy, (QObject*)this, SLOT(DBusCallback()), SLOT(DBusError(QDBusError))))
+            if (m_upowerInterface.callWithCallback(QStringLiteral("Suspend"), dummy, (QObject*)this, SLOT(DBusCallback()), SLOT(DBusError(QDBusError))))
             {
                 m_httpServiceLock.unlock();
                 Suspending();
@@ -189,7 +195,7 @@ bool TorcPowerUnixDBus::DoSuspend(void)
             }
         }
 
-        LOG(VB_GENERAL, LOG_ERR, "Suspend call failed");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Suspend call failed"));
     }
     m_httpServiceLock.unlock();
     return false;
@@ -201,9 +207,9 @@ bool TorcPowerUnixDBus::DoHibernate(void)
     if (m_upowerInterface.isValid() && m_canHibernate->GetValue().toBool())
     {
         QList<QVariant> dummy;
-        if (m_upowerInterface.callWithCallback(QLatin1String("AboutToSleep"), dummy, (QObject*)this, SLOT(DBusCallback()), SLOT(DBusError(QDBusError))))
+        if (m_upowerInterface.callWithCallback(QStringLiteral("AboutToSleep"), dummy, (QObject*)this, SLOT(DBusCallback()), SLOT(DBusError(QDBusError))))
         {
-            if (m_upowerInterface.callWithCallback(QLatin1String("Hibernate"), dummy, (QObject*)this, SLOT(DBusCallback()), SLOT(DBusError(QDBusError))))
+            if (m_upowerInterface.callWithCallback(QStringLiteral("Hibernate"), dummy, (QObject*)this, SLOT(DBusCallback()), SLOT(DBusError(QDBusError))))
             {
                 m_httpServiceLock.unlock();
                 Hibernating();
@@ -211,7 +217,7 @@ bool TorcPowerUnixDBus::DoHibernate(void)
             }
         }
 
-        LOG(VB_GENERAL, LOG_ERR, "Hibernate call failed");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Hibernate call failed"));
     }
     m_httpServiceLock.unlock();
     return false;
@@ -223,14 +229,14 @@ bool TorcPowerUnixDBus::DoRestart(void)
     if (m_consoleInterface.isValid() && m_canRestart->GetValue().toBool())
     {
         QList<QVariant> dummy;
-        if (m_consoleInterface.callWithCallback(QLatin1String("Restart"), dummy, (QObject*)this, SLOT(DBusCallback()), SLOT(DBusError(QDBusError))))
+        if (m_consoleInterface.callWithCallback(QStringLiteral("Restart"), dummy, (QObject*)this, SLOT(DBusCallback()), SLOT(DBusError(QDBusError))))
         {
             m_httpServiceLock.unlock();
             Restarting();
             return true;
         }
 
-        LOG(VB_GENERAL, LOG_ERR, "Restart call failed");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Restart call failed"));
     }
     m_httpServiceLock.unlock();
     return false;
@@ -247,9 +253,7 @@ void TorcPowerUnixDBus::DeviceAdded(QDBusObjectPath Device)
         m_devices.insert(Device.path(), GetBatteryLevel(Device.path()));
     }
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Added UPower.Device '%1'")
-        .arg(Device.path()));
-
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Added UPower.Device '%1'").arg(Device.path()));
     UpdateBattery();
 }
 
@@ -264,9 +268,7 @@ void TorcPowerUnixDBus::DeviceRemoved(QDBusObjectPath Device)
         m_devices.remove(Device.path());
     }
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Removed UPower.Device '%1'")
-        .arg(Device.path()));
-
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Removed UPower.Device '%1'").arg(Device.path()));
     UpdateBattery();
 }
 
@@ -286,7 +288,7 @@ void TorcPowerUnixDBus::DeviceChanged(QDBusObjectPath Device)
 
 void TorcPowerUnixDBus::DBusError(QDBusError Error)
 {
-    LOG(VB_GENERAL, LOG_ERR, QString("DBus callback error: %1, %2")
+    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("DBus callback error: %1, %2")
         .arg(Error.name(), Error.message().trimmed()));
 }
 
@@ -339,7 +341,7 @@ void TorcPowerUnixDBus::UpdateBattery(void)
 int TorcPowerUnixDBus::GetBatteryLevel(const QString &Path)
 {
     QWriteLocker locker(&m_httpServiceLock);
-    QDBusInterface interface("org.freedesktop.UPower", Path, "org.freedesktop.UPower.Device",
+    QDBusInterface interface(QStringLiteral("org.freedesktop.UPower"), Path, QStringLiteral("org.freedesktop.UPower.Device"),
                              QDBusConnection::systemBus());
 
     if (interface.isValid())

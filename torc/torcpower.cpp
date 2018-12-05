@@ -88,7 +88,7 @@ TorcPower* TorcPowerFactory::CreatePower()
     }
 
     if (!power)
-        LOG(VB_GENERAL, LOG_ERR, "Failed to create power implementation");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to create power implementation"));
 
     return power;
 }
@@ -117,26 +117,26 @@ TorcPower* TorcPowerFactory::CreatePower()
 
 TorcPower::TorcPower()
   : QObject(),
-    TorcHTTPService(this, "power", "power", TorcPower::staticMetaObject, "ShuttingDown,Suspending,Hibernating,Restarting,WokeUp,LowBattery,Refresh"),
-    m_canShutdown(new TorcSetting(nullptr,  QString("CanShutdown"),  QString(), TorcSetting::Bool, TorcSetting::None, QVariant((bool)false))),
-    m_canSuspend(new TorcSetting(nullptr,   QString("CanSuspend"),   QString(), TorcSetting::Bool, TorcSetting::None, QVariant((bool)false))),
-    m_canHibernate(new TorcSetting(nullptr, QString("CanHibernate"), QString(), TorcSetting::Bool, TorcSetting::None, QVariant((bool)false))),
-    m_canRestart(new TorcSetting(nullptr,   QString("CanRestart"),   QString(), TorcSetting::Bool, TorcSetting::None, QVariant((bool)false))),
+    TorcHTTPService(this, QStringLiteral("power"), QStringLiteral("power"), TorcPower::staticMetaObject, QStringLiteral("ShuttingDown,Suspending,Hibernating,Restarting,WokeUp,LowBattery,Refresh")),
+    m_canShutdown(new TorcSetting(nullptr,  QStringLiteral("CanShutdown"),  QStringLiteral(), TorcSetting::Bool, TorcSetting::None, QVariant((bool)false))),
+    m_canSuspend(new TorcSetting(nullptr,   QStringLiteral("CanSuspend"),   QStringLiteral(), TorcSetting::Bool, TorcSetting::None, QVariant((bool)false))),
+    m_canHibernate(new TorcSetting(nullptr, QStringLiteral("CanHibernate"), QStringLiteral(), TorcSetting::Bool, TorcSetting::None, QVariant((bool)false))),
+    m_canRestart(new TorcSetting(nullptr,   QStringLiteral("CanRestart"),   QStringLiteral(), TorcSetting::Bool, TorcSetting::None, QVariant((bool)false))),
     m_batteryLevel(TorcPower::UnknownPower),
     m_powerGroupItem(new TorcSettingGroup(gRootSetting, tr("Power"))),
-    m_powerEnabled(new TorcSetting(m_powerGroupItem, QString("EnablePower"),
+    m_powerEnabled(new TorcSetting(m_powerGroupItem, QStringLiteral("EnablePower"),
                                    tr("Enable power management"),
                                    TorcSetting::Bool, TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true))),
-    m_allowShutdown(new TorcSetting(m_powerEnabled, QString("AllowShutdown"),
+    m_allowShutdown(new TorcSetting(m_powerEnabled, QStringLiteral("AllowShutdown"),
                                    tr("Allow Torc to shutdown the system"),
                                    TorcSetting::Bool, TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true))),
-    m_allowSuspend(new TorcSetting(m_powerEnabled, QString("AllowSuspend"),
+    m_allowSuspend(new TorcSetting(m_powerEnabled, QStringLiteral("AllowSuspend"),
                                    tr("Allow Torc to suspend the system"),
                                    TorcSetting::Bool, TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true))),
-    m_allowHibernate(new TorcSetting(m_powerEnabled, QString("AllowHibernate"),
+    m_allowHibernate(new TorcSetting(m_powerEnabled, QStringLiteral("AllowHibernate"),
                                    tr("Allow Torc to hibernate the system"),
                                    TorcSetting::Bool, TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true))),
-    m_allowRestart(new TorcSetting(m_powerEnabled, QString("AllowRestart"),
+    m_allowRestart(new TorcSetting(m_powerEnabled, QStringLiteral("AllowRestart"),
                                    tr("Allow Torc to restart the system"),
                                    TorcSetting::Bool, TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true))),
     m_lastBatteryLevel(UnknownPower),
@@ -253,18 +253,18 @@ void TorcPower::Debug(void)
     QString caps;
 
     if (m_canShutdown->GetValue().toBool())
-        caps += "Shutdown ";
+        caps += QStringLiteral("Shutdown ");
     if (m_canSuspend->GetValue().toBool())
-        caps += "Suspend ";
+        caps += QStringLiteral("Suspend ");
     if (m_canHibernate->GetValue().toBool())
-        caps += "Hibernate ";
+        caps += QStringLiteral("Hibernate ");
     if (m_canRestart->GetValue().toBool())
-        caps += "Restart ";
+        caps += QStringLiteral("Restart ");
 
     if (caps.isEmpty())
-        caps = "None";
+        caps = QStringLiteral("None");
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Power support: %1").arg(caps));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Power support: %1").arg(caps));
 }
 
 QString TorcPower::GetUIName(void)
@@ -286,11 +286,11 @@ void TorcPower::BatteryUpdated(int Level)
     m_lastBatteryLevel = Level;
 
     if (m_lastBatteryLevel == ACPower)
-        LOG(VB_GENERAL, LOG_INFO, "On AC power");
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("On AC power"));
     else if (m_lastBatteryLevel == UnknownPower)
-        LOG(VB_GENERAL, LOG_INFO, "Unknown power status");
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Unknown power status"));
     else
-        LOG(VB_GENERAL, LOG_INFO, QString("Battery level %1%").arg(m_lastBatteryLevel));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Battery level %1%").arg(m_lastBatteryLevel));
 
 
     bool lowbattery = !wasalreadylow && (m_lastBatteryLevel >= 0 && m_lastBatteryLevel <= BatteryLow);
@@ -482,47 +482,47 @@ void TorcPower::CanRestartValueChanged(bool Value)
 QVariantMap TorcPower::GetPowerStatus(void)
 {
     QVariantMap result;
-    result.insert("canShutdown",  GetCanShutdown());
-    result.insert("canSuspend",   GetCanSuspend());
-    result.insert("canHibernate", GetCanHibernate());
-    result.insert("canRestart",   GetCanRestart());
-    result.insert("batteryLevel", GetBatteryLevel());
+    result.insert(QStringLiteral("canShutdown"),  GetCanShutdown());
+    result.insert(QStringLiteral("canSuspend"),   GetCanSuspend());
+    result.insert(QStringLiteral("canHibernate"), GetCanHibernate());
+    result.insert(QStringLiteral("canRestart"),   GetCanRestart());
+    result.insert(QStringLiteral("batteryLevel"), GetBatteryLevel());
     return result;
 }
 
 void TorcPower::ShuttingDown(void)
 {
-    LOG(VB_GENERAL, LOG_INFO, "System will shut down");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("System will shut down"));
     TorcLocalContext::NotifyEvent(Torc::ShuttingDown);
 }
 
 void TorcPower::Suspending(void)
 {
-    LOG(VB_GENERAL, LOG_INFO, "System will go to sleep");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("System will go to sleep"));
     TorcLocalContext::NotifyEvent(Torc::Suspending);
 }
 
 void TorcPower::Hibernating(void)
 {
-    LOG(VB_GENERAL, LOG_INFO, "System will hibernate");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("System will hibernate"));
     TorcLocalContext::NotifyEvent(Torc::Hibernating);
 }
 
 void TorcPower::Restarting(void)
 {
-    LOG(VB_GENERAL, LOG_INFO, "System restarting");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("System restarting"));
     TorcLocalContext::NotifyEvent(Torc::Restarting);
 }
 
 void TorcPower::WokeUp(void)
 {
-    LOG(VB_GENERAL, LOG_INFO, "System woke up");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("System woke up"));
     TorcLocalContext::NotifyEvent(Torc::WokeUp);
 }
 
 void TorcPower::LowBattery(void)
 {
-    LOG(VB_GENERAL, LOG_INFO, "Sending low battery warning");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Sending low battery warning"));
     TorcLocalContext::NotifyEvent(Torc::LowBattery);
 }
 
@@ -547,20 +547,20 @@ static class TorcPowerObject : public TorcAdminObject, public TorcStringFactory
 
     void GetStrings(QVariantMap &Strings)
     {
-        Strings.insert("Suspend",          QCoreApplication::translate("TorcPower", "Suspend"));
-        Strings.insert("Shutdown",         QCoreApplication::translate("TorcPower", "Shutdown"));
-        Strings.insert("Hibernate",        QCoreApplication::translate("TorcPower", "Hibernate"));
-        Strings.insert("Restart",          QCoreApplication::translate("TorcPower", "Restart"));
-        Strings.insert("ConfirmSuspend",   QCoreApplication::translate("TorcPower", "Are you sure you want to suspend the device?"));
-        Strings.insert("ConfirmShutdown",  QCoreApplication::translate("TorcPower", "Are you sure you want to shutdown the device?"));
-        Strings.insert("ConfirmHibernate", QCoreApplication::translate("TorcPower", "Are you sure you want to hibernate the device?"));
-        Strings.insert("ConfirmRestart",   QCoreApplication::translate("TorcPower", "Are you sure you want to restart the device?"));
-        Strings.insert("ACPowerTr",        QCoreApplication::translate("TorcPower", "On AC Power"));
-        Strings.insert("UnknownPowerTr",   QCoreApplication::translate("TorcPower", "Unknown power status"));
+        Strings.insert(QStringLiteral("Suspend"),          QCoreApplication::translate("TorcPower", "Suspend"));
+        Strings.insert(QStringLiteral("Shutdown"),         QCoreApplication::translate("TorcPower", "Shutdown"));
+        Strings.insert(QStringLiteral("Hibernate"),        QCoreApplication::translate("TorcPower", "Hibernate"));
+        Strings.insert(QStringLiteral("Restart"),          QCoreApplication::translate("TorcPower", "Restart"));
+        Strings.insert(QStringLiteral("ConfirmSuspend"),   QCoreApplication::translate("TorcPower", "Are you sure you want to suspend the device?"));
+        Strings.insert(QStringLiteral("ConfirmShutdown"),  QCoreApplication::translate("TorcPower", "Are you sure you want to shutdown the device?"));
+        Strings.insert(QStringLiteral("ConfirmHibernate"), QCoreApplication::translate("TorcPower", "Are you sure you want to hibernate the device?"));
+        Strings.insert(QStringLiteral("ConfirmRestart"),   QCoreApplication::translate("TorcPower", "Are you sure you want to restart the device?"));
+        Strings.insert(QStringLiteral("ACPowerTr"),        QCoreApplication::translate("TorcPower", "On AC Power"));
+        Strings.insert(QStringLiteral("UnknownPowerTr"),   QCoreApplication::translate("TorcPower", "Unknown power status"));
 
         // string constants
-        Strings.insert("ACPower",          TorcPower::ACPower);
-        Strings.insert("UnknownPower",     TorcPower::UnknownPower);
+        Strings.insert(QStringLiteral("ACPower"),          TorcPower::ACPower);
+        Strings.insert(QStringLiteral("UnknownPower"),     TorcPower::UnknownPower);
     }
 
     void Create(void)

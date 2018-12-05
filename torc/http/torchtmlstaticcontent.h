@@ -4,7 +4,7 @@
 // Torc
 #include "torchttphandler.h"
 
-#define STATIC_DIRECTORY QString("/css,/img,/webfonts,/js")
+#define STATIC_DIRECTORY QStringLiteral("/css,/img,/webfonts,/js")
 
 class TorcHTMLStaticContent : public TorcHTTPHandler
 {

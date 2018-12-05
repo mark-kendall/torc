@@ -46,7 +46,7 @@ TorcSegmentedRingBuffer::TorcSegmentedRingBuffer(int Size, int MaxSegments)
     m_maxSegments(MaxSegments),
     m_initSegment()
 {
-    LOG(VB_GENERAL, LOG_INFO, QString("Allocated segmented ring buffer of size %1bytes").arg(m_size));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Allocated segmented ring buffer of size %1bytes").arg(m_size));
 }
 
 TorcSegmentedRingBuffer::~TorcSegmentedRingBuffer()
@@ -113,11 +113,11 @@ int TorcSegmentedRingBuffer::FinishSegment(bool Init)
     int result = -1;
     if (m_writePosition == m_currentStartPosition || m_currentSize < 1)
     {
-        LOG(VB_GENERAL, LOG_WARNING, "Cannot finish segment - nothing written");
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Cannot finish segment - nothing written"));
         return result;
     }
 
-    //LOG(VB_GENERAL, LOG_INFO, QString("Finished segmentref %1 start %2 size %3 (segments %4)")
+    //LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Finished segmentref %1 start %2 size %3 (segments %4)")
     //    .arg(m_segmentCounter).arg(m_currentStartPosition).arg(m_currentSize).arg(m_segments.size() + 1));
 
     result = m_segmentCounter;
@@ -145,7 +145,7 @@ int TorcSegmentedRingBuffer::Write(const uint8_t *Data, int Size)
     {
         if (GetSegmentsAvail(dummyref) < 1)
         {
-            LOG(VB_GENERAL, LOG_WARNING, "Segmented buffer underrun - no space for write");
+            LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Segmented buffer underrun - no space for write"));
             return -1;
         }
 
@@ -235,13 +235,13 @@ void TorcSegmentedRingBuffer::SaveInitSegment(void)
     QWriteLocker locker(&m_segmentsLock);
     if (m_segments.size() != 1)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Cannot retrieve init segment - zero or >1 segments");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Cannot retrieve init segment - zero or >1 segments"));
         return;
     }
 
     // sanity check
     if (!m_initSegment.isEmpty())
-        LOG(VB_GENERAL, LOG_WARNING, "Already have init segment - overwriting");
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Already have init segment - overwriting"));
 
     // copy the segment
     QPair<int,int> segment = m_segments.dequeue();
@@ -252,7 +252,7 @@ void TorcSegmentedRingBuffer::SaveInitSegment(void)
         memcpy((void*)(m_initSegment.constData() + read), m_data.constData(), segment.second - read);
 
     // reset the ringbuffer
-    LOG(VB_GENERAL, LOG_INFO, QString("Init segment saved (%1 bytes) - resetting ringbuffer").arg(m_initSegment.size()));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Init segment saved (%1 bytes) - resetting ringbuffer").arg(m_initSegment.size()));
     m_segments.clear();
     m_segmentRefs.clear();
     m_readPosition   = 0;

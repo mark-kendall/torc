@@ -31,9 +31,9 @@ QString TorcJSONRPC::QMetaTypetoJavascriptType(int MetaType)
     switch (MetaType)
     {
         case QMetaType::Void:
-            return QString("undefined");
+            return QStringLiteral("undefined");
         case QMetaType::Bool:
-            return QString("boolean");
+            return QStringLiteral("boolean");
         case QMetaType::Short:
         case QMetaType::UShort:
         case QMetaType::Int:
@@ -44,7 +44,7 @@ QString TorcJSONRPC::QMetaTypetoJavascriptType(int MetaType)
         case QMetaType::ULongLong:
         case QMetaType::Double:
         case QMetaType::Float:
-            return QString("number");
+            return QStringLiteral("number");
         case QMetaType::Char:
         case QMetaType::UChar:
         case QMetaType::QChar:
@@ -55,10 +55,10 @@ QString TorcJSONRPC::QMetaTypetoJavascriptType(int MetaType)
         case QMetaType::QDateTime:
         case QMetaType::QUuid:
         case QMetaType::QUrl:
-            return QString("string");
+            return QStringLiteral("string");
         default:
             break;
     }
 
-    return QString("object");
+    return QStringLiteral("object");
 }

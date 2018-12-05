@@ -52,7 +52,7 @@ void TorcPlainTextSerialiser::AddProperty(QByteArray &Dest, const QString &Name,
 class TorcPlainTextSerialiserFactory : public TorcSerialiserFactory
 {
   public:
-    TorcPlainTextSerialiserFactory() : TorcSerialiserFactory("text", "plain", "Text")
+    TorcPlainTextSerialiserFactory() : TorcSerialiserFactory(QStringLiteral("text"), QStringLiteral("plain"), QStringLiteral("Text"))
     {
     }
 

@@ -116,14 +116,14 @@ TorcWebSocket::~TorcWebSocket()
     {
         // clients should be cancelling requests before closing the connection, so this
         // may represent a leak
-        LOG(VB_GENERAL, LOG_WARNING, QString("%1 outstanding RPC requests").arg(m_currentRequests.size()));
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("%1 outstanding RPC requests").arg(m_currentRequests.size()));
 
         while (!m_currentRequests.isEmpty())
             CancelRequest(m_currentRequests.constBegin().value());
     }
 
     if (m_socketState == SocketState::Upgraded)
-        m_wsReader.InitiateClose(TorcWebSocketReader::CloseGoingAway, QString("WebSocket exiting normally"));
+        m_wsReader.InitiateClose(TorcWebSocketReader::CloseGoingAway, QStringLiteral("WebSocket exiting normally"));
 
     CloseSocket();
 }
@@ -132,14 +132,14 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest &Request)
 {
     if (!m_serverSide)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Trying to send response to upgrade request but not server side");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Trying to send response to upgrade request but not server side"));
         SetState(SocketState::ErroredSt);
         return;
     }
 
     if (m_socketState != SocketState::ConnectedTo)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Trying to send response to upgrade request but not in connected state (HTTP)");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Trying to send response to upgrade request but not in connected state (HTTP)"));
         SetState(SocketState::ErroredSt);
         return;
     }
@@ -165,7 +165,7 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest &Request)
 
     if (valid && (Request.GetHTTPRequestType() != HTTPGet || Request.GetHTTPProtocol() != HTTPOneDotOne))
     {
-        error = "Must be GET and HTTP/1.1";
+        error = QStringLiteral("Must be GET and HTTP/1.1");
         valid = false;
     }
 
@@ -178,7 +178,7 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest &Request)
 
     if (valid && Request.GetPath().isEmpty())
     {
-        error = "invalid Request-URI";
+        error = QStringLiteral("invalid Request-URI");
         valid = false;
     }
 
@@ -188,19 +188,20 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest &Request)
             using the default port).
     */
 
-    if (valid && !Request.Headers().contains("Host"))
+    if (valid && !Request.Headers().contains(QStringLiteral("Host")))
     {
-        error = "No Host header";
+        error = QStringLiteral("No Host header");
         valid = false;
     }
 
     // default ports (e.g. 80) are not listed in host, so don't check in this case
-    QUrl host("http://" + Request.Headers().value("Host"));
+    // FIXME - should this be https as well? is this is the ios issue?(but check not used below)
+    QUrl host(QStringLiteral("http://%1").arg(Request.Headers().value(QStringLiteral("Host"))));
     int localport = localPort();
 
     if (valid && localport != 80 && localport != 443 && host.port() != localport)
     {
-        error = "Invalid Host port";
+        error = QStringLiteral("Invalid Host port");
         valid = false;
     }
 
@@ -209,7 +210,7 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest &Request)
 #if 0
     if (valid && host.host() != localAddress().toString())
     {
-        error = "Invalid Host";
+        error = QStringLiteral("Invalid Host");
         valid = false;
     }
 #endif
@@ -218,15 +219,15 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest &Request)
             MUST include the "websocket" keyword.
     */
 
-    if (valid && !Request.Headers().contains("Upgrade"))
+    if (valid && !Request.Headers().contains(QStringLiteral("Upgrade")))
     {
-        error = "No Upgrade header";
+        error = QStringLiteral("No Upgrade header");
         valid = false;
     }
 
-    if (valid && !Request.Headers().value("Upgrade").contains("websocket", Qt::CaseInsensitive))
+    if (valid && !Request.Headers().value(QStringLiteral("Upgrade")).contains(QStringLiteral("websocket"), Qt::CaseInsensitive))
     {
-        error = "No 'websocket request";
+        error = QStringLiteral("No 'websocket request");
         valid = false;
     }
 
@@ -235,15 +236,15 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest &Request)
             MUST include the "Upgrade" token.
     */
 
-    if (valid && !Request.Headers().contains("Connection"))
+    if (valid && !Request.Headers().contains(QStringLiteral("Connection")))
     {
-        error = "No Connection header";
+        error = QStringLiteral("No Connection header");
         valid = false;
     }
 
-    if (valid && !Request.Headers().value("Connection").contains("Upgrade", Qt::CaseInsensitive))
+    if (valid && !Request.Headers().value(QStringLiteral("Connection")).contains(QStringLiteral("Upgrade"), Qt::CaseInsensitive))
     {
-        error = "No Upgrade request";
+        error = QStringLiteral("No Upgrade request");
         valid = false;
     }
 
@@ -260,15 +261,15 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest &Request)
             field would be "AQIDBAUGBwgJCgsMDQ4PEC=="
     */
 
-    if (valid && !Request.Headers().contains("Sec-WebSocket-Key"))
+    if (valid && !Request.Headers().contains(QStringLiteral("Sec-WebSocket-Key")))
     {
-        error = "No Sec-WebSocket-Key header";
+        error = QStringLiteral("No Sec-WebSocket-Key header");
         valid = false;
     }
 
-    if (valid && Request.Headers().value("Sec-WebSocket-Key").isEmpty())
+    if (valid && Request.Headers().value(QStringLiteral("Sec-WebSocket-Key")).isEmpty())
     {
-        error = "Invalid Sec-WebSocket-Key";
+        error = QStringLiteral("Invalid Sec-WebSocket-Key");
         valid = false;
     }
 
@@ -292,17 +293,17 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest &Request)
             13.
     */
 
-    if (valid && !Request.Headers().contains("Sec-WebSocket-Version"))
+    if (valid && !Request.Headers().contains(QStringLiteral("Sec-WebSocket-Version")))
     {
-        error = "No Sec-WebSocket-Version header";
+        error = QStringLiteral("No Sec-WebSocket-Version header");
         valid = false;
     }
 
-    int version = Request.Headers().value("Sec-WebSocket-Version").toInt();
+    int version = Request.Headers().value(QStringLiteral("Sec-WebSocket-Version")).toInt();
 
     if (valid && version != TorcWebSocketReader::Version13 && version != TorcWebSocketReader::Version8)
     {
-        error = "Unsupported WebSocket version";
+        error = QStringLiteral("Unsupported WebSocket version");
         versionerror = true;
         valid = false;
     }
@@ -319,9 +320,9 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest &Request)
         constructs and rules are as given in [RFC2616].
     */
 
-    if (Request.Headers().contains("Sec-WebSocket-Protocol"))
+    if (Request.Headers().contains(QStringLiteral("Sec-WebSocket-Protocol")))
     {
-        QList<TorcWebSocketReader::WSSubProtocol> protocols = TorcWebSocketReader::SubProtocolsFromPrioritisedString(Request.Headers().value("Sec-WebSocket-Protocol"));
+        QList<TorcWebSocketReader::WSSubProtocol> protocols = TorcWebSocketReader::SubProtocolsFromPrioritisedString(Request.Headers().value(QStringLiteral("Sec-WebSocket-Protocol")));
         if (!protocols.isEmpty())
             protocol = protocols.first();
     }
@@ -331,24 +332,24 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest &Request)
         LOG(VB_GENERAL, LOG_ERR, error);
         Request.SetStatus(HTTP_BadRequest);
         if (versionerror)
-            Request.SetResponseHeader("Sec-WebSocket-Version", "8,13");
+            Request.SetResponseHeader(QStringLiteral("Sec-WebSocket-Version"), QStringLiteral("8,13"));
         return;
     }
 
     // valid handshake so set response headers and transfer socket
-    LOG(VB_GENERAL, LOG_DEBUG, "Received valid websocket Upgrade request");
+    LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("Received valid websocket Upgrade request"));
 
-    QString key = Request.Headers().value("Sec-WebSocket-Key") + QLatin1String("258EAFA5-E914-47DA-95CA-C5AB0DC85B11");
+    QString key = QStringLiteral("%1%2").arg(Request.Headers().value(QStringLiteral("Sec-WebSocket-Key")), QStringLiteral("258EAFA5-E914-47DA-95CA-C5AB0DC85B11"));
     QString nonce = QCryptographicHash::hash(key.toUtf8(), QCryptographicHash::Sha1).toBase64();
 
     Request.SetResponseType(HTTPResponseNone);
     Request.SetStatus(HTTP_SwitchingProtocols);
     Request.SetConnection(HTTPConnectionUpgrade);
-    Request.SetResponseHeader("Upgrade", "websocket");
-    Request.SetResponseHeader("Sec-WebSocket-Accept", nonce);
+    Request.SetResponseHeader(QStringLiteral("Upgrade"), QStringLiteral("websocket"));
+    Request.SetResponseHeader(QStringLiteral("Sec-WebSocket-Accept"), nonce);
     if (protocol != TorcWebSocketReader::SubProtocolNone)
     {
-        Request.SetResponseHeader("Sec-WebSocket-Protocol", TorcWebSocketReader::SubProtocolsToString(protocol));
+        Request.SetResponseHeader(QStringLiteral("Sec-WebSocket-Protocol"), TorcWebSocketReader::SubProtocolsToString(protocol));
         m_subProtocol = protocol;
         m_subProtocolFrameFormat = TorcWebSocketReader::FormatForSubProtocol(protocol);
         m_wsReader.SetSubProtocol(protocol);
@@ -357,22 +358,22 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest &Request)
     SetState(SocketState::Upgraded);
     m_authenticated = Request.IsAuthorised();
 
-    LOG(VB_GENERAL, LOG_INFO, QString("%1 socket upgraded  (%2)").arg(m_debug, m_authenticated ? "Authenticated" : "Unauthenticated"));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("%1 socket upgraded  (%2)").arg(m_debug, m_authenticated ? QStringLiteral("Authenticated") : QStringLiteral("Unauthenticated")));
 
-    if (Request.Headers().contains("Torc-UUID"))
+    if (Request.Headers().contains(QStringLiteral("Torc-UUID")))
     {
         // stop the watchdog timer for peers
         m_watchdogTimer.stop();
         QVariantMap data;
-        data.insert("uuid",       Request.Headers().value("Torc-UUID"));
-        data.insert("name",       Request.Headers().value("Torc-Name"));
-        data.insert("port",       Request.Headers().value("Torc-Port"));
-        data.insert("priority",   Request.Headers().value("Torc-Priority"));
-        data.insert("starttime",  Request.Headers().value("Torc-Starttime"));
-        data.insert("apiversion", Request.Headers().value("Torc-APIVersion"));
-        data.insert("address",    peerAddress().toString());
-        if (Request.Headers().contains("Torc-Secure"))
-            data.insert("secure", "yes");
+        data.insert(QStringLiteral("uuid"),       Request.Headers().value(QStringLiteral("Torc-UUID")));
+        data.insert(QStringLiteral("name"),       Request.Headers().value(QStringLiteral("Torc-Name")));
+        data.insert(QStringLiteral("port"),       Request.Headers().value(QStringLiteral("Torc-Port")));
+        data.insert(QStringLiteral("priority"),   Request.Headers().value(QStringLiteral("Torc-Priority")));
+        data.insert(QStringLiteral("starttime"),  Request.Headers().value(QStringLiteral("Torc-Starttime")));
+        data.insert(QStringLiteral("apiversion"), Request.Headers().value(QStringLiteral("Torc-APIVersion")));
+        data.insert(QStringLiteral("address"),    peerAddress().toString());
+        if (Request.Headers().contains(QStringLiteral("Torc-Secure")))
+            data.insert(QStringLiteral("secure"), QStringLiteral("yes"));
         TorcNetworkedContext::PeerConnected(m_parent, data);
     }
     else
@@ -384,7 +385,7 @@ void TorcWebSocket::HandleUpgradeRequest(TorcHTTPRequest &Request)
     if (Request.GetMethod().startsWith(QStringLiteral("echo"), Qt::CaseInsensitive))
     {
         m_wsReader.EnableEcho();
-        LOG(VB_GENERAL, LOG_INFO, "Enabling WebSocket echo for testing");
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Enabling WebSocket echo for testing"));
     }
 }
 
@@ -393,8 +394,8 @@ QVariantList TorcWebSocket::GetSupportedSubProtocols(void)
 {
     QVariantList result;
     QVariantMap proto;
-    proto.insert("name",TORC_JSON_RPC);
-    proto.insert("description", "I can't remember how this differs from straight JSON-RPC:) The overall mechanism is very similar to WAMP.");
+    proto.insert(QStringLiteral("name"),TORC_JSON_RPC);
+    proto.insert(QStringLiteral("description"), QStringLiteral("I can't remember how this differs from straight JSON-RPC:) The overall mechanism is very similar to WAMP."));
     result.append(proto);
     return result;
 }
@@ -402,10 +403,10 @@ QVariantList TorcWebSocket::GetSupportedSubProtocols(void)
 void TorcWebSocket::Encrypted(void)
 {
     if (m_debug.isEmpty())
-        m_debug = QString(">> %1 %2 -").arg(TorcNetwork::IPAddressToLiteral(peerAddress(), peerPort()), m_secure ? "secure" : "insecure");
+        m_debug = QStringLiteral(">> %1 %2 -").arg(TorcNetwork::IPAddressToLiteral(peerAddress(), peerPort()), m_secure ? QStringLiteral("secure") : QStringLiteral("insecure"));
     connect(this, &TorcWebSocket::readyRead, this, &TorcWebSocket::ReadyRead);
     emit ConnectionEstablished();
-    LOG(VB_GENERAL, LOG_INFO, QString("%1 encrypted").arg(m_debug));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("%1 encrypted").arg(m_debug));
 
     if (!m_serverSide)
         Connected();
@@ -448,8 +449,8 @@ void TorcWebSocket::Start(void)
     {
         if (setSocketDescriptor(m_socketDescriptor))
         {
-            m_debug = QString("<< %1 %2 -").arg(TorcNetwork::IPAddressToLiteral(peerAddress(), peerPort()), m_secure ? "secure" : "insecure");
-            LOG(VB_GENERAL, LOG_INFO, QString("%1 socket connected (%2)").arg(m_debug, m_authenticated ? "Authenticated" : "Unauthenticated"));
+            m_debug = QStringLiteral("<< %1 %2 -").arg(TorcNetwork::IPAddressToLiteral(peerAddress(), peerPort()), m_secure ? QStringLiteral("secure") : QStringLiteral("insecure"));
+            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("%1 socket connected (%2)").arg(m_debug, m_authenticated ? QStringLiteral("Authenticated") : QStringLiteral("Unauthenticated")));
             SetState(SocketState::ConnectedTo);
 
             if (m_secure)
@@ -465,7 +466,7 @@ void TorcWebSocket::Start(void)
         }
         else
         {
-            LOG(VB_GENERAL, LOG_INFO, "Failed to set socket descriptor");
+            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Failed to set socket descriptor"));
         }
     }
     else if (!m_serverSide)
@@ -486,7 +487,7 @@ void TorcWebSocket::Start(void)
     }
 
     // failed
-    LOG(VB_GENERAL, LOG_ERR, "Failed to start Websocket");
+    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to start Websocket"));
     SetState(SocketState::ErroredSt);
 }
 
@@ -497,7 +498,7 @@ void TorcWebSocket::PropertyChanged(void)
     if (service && senderSignalIndex() > -1)
     {
         TorcRPCRequest *request = new TorcRPCRequest(service->Signature() + service->GetMethod(senderSignalIndex()));
-        request->AddParameter("value", service->GetProperty(senderSignalIndex()));
+        request->AddParameter(QStringLiteral("value"), service->GetProperty(senderSignalIndex()));
         m_wsReader.SendFrame(m_subProtocolFrameFormat, request->SerialiseRequest(m_subProtocol));
         request->DownRef();
     }
@@ -556,7 +557,7 @@ void TorcWebSocket::RemoteRequest(TorcRPCRequest *Request)
     if (m_subProtocol != TorcWebSocketReader::SubProtocolNone)
         m_wsReader.SendFrame(m_subProtocolFrameFormat, Request->SerialiseRequest(m_subProtocol));
     else
-        LOG(VB_GENERAL, LOG_ERR, "No protocol specified for remote procedure call");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("No protocol specified for remote procedure call"));
 
     // notifications are fire and forget, so downref immediately
     if (notification)
@@ -586,11 +587,11 @@ void TorcWebSocket::CancelRequest(TorcRPCRequest *Request)
         }
         else
         {
-            LOG(VB_GENERAL, LOG_ERR, "Cannot cancel unknown RPC request");
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Cannot cancel unknown RPC request"));
         }
 
         if (Request->IsShared())
-            LOG(VB_GENERAL, LOG_ERR, "RPC request is still referenced after cancellation - potential leak");
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("RPC request is still referenced after cancellation - potential leak"));
     }
 }
 
@@ -598,14 +599,14 @@ void TorcWebSocket::ReadHTTP(void)
 {
     if (!m_serverSide)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Trying to read HTTP but not server side");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Trying to read HTTP but not server side"));
         SetState(SocketState::ErroredSt);
         return;
     }
 
     if (m_socketState != SocketState::ConnectedTo)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Trying to read HTTP but not in connected state (raw HTTP)");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Trying to read HTTP but not in connected state (raw HTTP)"));
         SetState(SocketState::ErroredSt);
         return;
     }
@@ -624,7 +625,7 @@ void TorcWebSocket::ReadHTTP(void)
 
         // sanity check
         if (bytesAvailable() > 0)
-            LOG(VB_GENERAL, LOG_WARNING, QString("%1 unread bytes from %2").arg(bytesAvailable()).arg(peerAddress().toString()));
+            LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("%1 unread bytes from %2").arg(bytesAvailable()).arg(peerAddress().toString()));
 
         // have headers and content - process request
         TorcHTTPRequest request(&m_reader);
@@ -632,12 +633,12 @@ void TorcWebSocket::ReadHTTP(void)
 
         if (request.GetHTTPType() == HTTPResponse)
         {
-            LOG(VB_GENERAL, LOG_ERR, "Received unexpected HTTP response");
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Received unexpected HTTP response"));
             SetState(SocketState::ErroredSt);
             return;
         }
 
-        bool upgrade = request.Headers().contains("Upgrade");
+        bool upgrade = request.Headers().contains(QStringLiteral("Upgrade"));
         TorcHTTPServer::Authorise(peerAddress().toString(), request, upgrade);
 
         if (upgrade)
@@ -694,7 +695,7 @@ void TorcWebSocket::ReadyRead(void)
             {
                 // the upgrade request is handled in ReadHTTP and if successfully processed we
                 // move directly into the Upgraded state
-                LOG(VB_GENERAL, LOG_ERR, "Upgrading state on server side");
+                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Upgrading state on server side"));
                 SetState(SocketState::ErroredSt);
                 return;
             }
@@ -726,7 +727,7 @@ void TorcWebSocket::ReadyRead(void)
             unchangedCount++;
             if (unchangedCount > maxUnchanged)
             {
-                LOG(VB_GENERAL, LOG_WARNING, QString("Socket time out waiting for valid data - closing"));
+                LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Socket time out waiting for valid data - closing"));
                 SetState(SocketState::Disconnecting);
                 break;
             }
@@ -752,27 +753,27 @@ void TorcWebSocket::SubscriberDeleted(QObject *Object)
     foreach (const QString &service, remove)
     {
         m_subscribers.remove(service, Object);
-        LOG(VB_GENERAL, LOG_WARNING, QString("Removed stale subscription to '%1'").arg(service));
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Removed stale subscription to '%1'").arg(service));
     }
 }
 
 void TorcWebSocket::CloseSocket(void)
 {
     if(state() == QAbstractSocket::ConnectedState)
-        LOG(VB_GENERAL, LOG_INFO, QString("%1 disconnecting").arg(m_debug));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("%1 disconnecting").arg(m_debug));
 
     disconnectFromHost();
     // we only check for connected state - we don't care if it is any in any prior or subsequent state (hostlookup, connecting) and
     // the wait is only a 'courtesy' anyway.
     if (state() == QAbstractSocket::ConnectedState && !waitForDisconnected(1000))
-        LOG(VB_GENERAL, LOG_WARNING, "WebSocket not successfully disconnected before closing");
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("WebSocket not successfully disconnected before closing"));
     close();
 }
 
 void TorcWebSocket::Connected(void)
 {
-    m_debug = QString(">> %1 %2 -").arg(TorcNetwork::IPAddressToLiteral(peerAddress(), peerPort()), m_secure ? "secure" : "insecure");
-    LOG(VB_GENERAL, LOG_INFO, QString("%1 connection to remote host").arg(m_debug));
+    m_debug = QStringLiteral(">> %1 %2 -").arg(TorcNetwork::IPAddressToLiteral(peerAddress(), peerPort()), m_secure ? QStringLiteral("secure") : QStringLiteral("insecure"));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("%1 connection to remote host").arg(m_debug));
     SetState(SocketState::Upgrading);
     SendHandshake();
 }
@@ -781,14 +782,14 @@ void TorcWebSocket::SendHandshake(void)
 {
     if (m_serverSide)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Trying to send handshake from server side");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Trying to send handshake from server side"));
         SetState(SocketState::ErroredSt);
         return;
     }
 
     if (m_socketState != SocketState::Upgrading)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Trying to upgrade from incorrect state (client side)");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Trying to upgrade from incorrect state (client side)"));
         SetState(SocketState::ErroredSt);
         return;
     }
@@ -802,7 +803,7 @@ void TorcWebSocket::SendHandshake(void)
     nonce = nonce.toBase64();
 
     // store the expected response for later comparison
-    QString key = QString(nonce.data()) + QLatin1String("258EAFA5-E914-47DA-95CA-C5AB0DC85B11");
+    QString key = QStringLiteral("%1%2").arg(nonce.data(), QStringLiteral("258EAFA5-E914-47DA-95CA-C5AB0DC85B11"));
     m_challengeResponse = QCryptographicHash::hash(key.toUtf8(), QCryptographicHash::Sha1).toBase64();
 
     QHostAddress host(m_address);
@@ -830,29 +831,29 @@ void TorcWebSocket::SendHandshake(void)
 
     if (write(upgrade->data(), upgrade->size()) != upgrade->size())
     {
-        LOG(VB_GENERAL, LOG_ERR, "Unexpected write error");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Unexpected write error"));
         SetState(SocketState::ErroredSt);
         return;
     }
 
-    LOG(VB_GENERAL, LOG_DEBUG, QString("%1 client WebSocket connected (SubProtocol: %2)")
+    LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("%1 client WebSocket connected (SubProtocol: %2)")
         .arg(m_debug, TorcWebSocketReader::SubProtocolsToString(m_subProtocol)));
 
-    LOG(VB_NETWORK, LOG_DEBUG, QString("Data...\r\n%1").arg(upgrade->data()));
+    LOG(VB_NETWORK, LOG_DEBUG, QStringLiteral("Data...\r\n%1").arg(upgrade->data()));
 }
 
 void TorcWebSocket::ReadHandshake(void)
 {
     if (m_serverSide)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Trying to read handshake server side");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Trying to read handshake server side"));
         SetState(SocketState::ErroredSt);
         return;
     }
 
     if (m_socketState != SocketState::Upgrading)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Trying to read handshake but not upgrading");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Trying to read handshake but not upgrading"));
         SetState(SocketState::ErroredSt);
         return;
     }
@@ -860,7 +861,7 @@ void TorcWebSocket::ReadHandshake(void)
     // read response (which is the only raw HTTP we should see)
     if (!m_reader.Read(this))
     {
-        LOG(VB_GENERAL, LOG_ERR, "Error reading upgrade response");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Error reading upgrade response"));
         SetState(SocketState::ErroredSt);
         return;
     }
@@ -879,44 +880,44 @@ void TorcWebSocket::ReadHandshake(void)
     if (valid && request.GetHTTPType() != HTTPResponse)
     {
         valid = false;
-        error = QString("Response is not an HTTP response");
+        error = QStringLiteral("Response is not an HTTP response");
     }
 
     // is it switching protocols
     if (valid && request.GetHTTPStatus() != HTTP_SwitchingProtocols)
     {
         valid = false;
-        error = QString("Expected '%1' - got '%2'").arg(TorcHTTPRequest::StatusToString(HTTP_SwitchingProtocols),
+        error = QStringLiteral("Expected '%1' - got '%2'").arg(TorcHTTPRequest::StatusToString(HTTP_SwitchingProtocols),
                                                         TorcHTTPRequest::StatusToString(request.GetHTTPStatus()));
     }
 
     // does it contain the correct headers
-    if (valid && !(request.Headers().contains("Upgrade") && request.Headers().contains("Connection") &&
-                   request.Headers().contains("Sec-WebSocket-Accept")))
+    if (valid && !(request.Headers().contains(QStringLiteral("Upgrade")) && request.Headers().contains(QStringLiteral("Connection")) &&
+                   request.Headers().contains(QStringLiteral("Sec-WebSocket-Accept"))))
     {
         valid = false;
-        error = QString("Response is missing required headers");
+        error = QStringLiteral("Response is missing required headers");
     }
 
     // correct header contents
     if (valid)
     {
-        QString upgrade    = request.Headers().value("Upgrade").trimmed();
-        QString connection = request.Headers().value("Connection").trimmed();
-        QString accept     = request.Headers().value("Sec-WebSocket-Accept").trimmed();
-        QString protocols  = request.Headers().value("Sec-WebSocket-Protocol").trimmed();
+        QString upgrade    = request.Headers().value(QStringLiteral("Upgrade")).trimmed();
+        QString connection = request.Headers().value(QStringLiteral("Connection")).trimmed();
+        QString accept     = request.Headers().value(QStringLiteral("Sec-WebSocket-Accept")).trimmed();
+        QString protocols  = request.Headers().value(QStringLiteral("Sec-WebSocket-Protocol")).trimmed();
 
-        if (!upgrade.contains("websocket", Qt::CaseInsensitive) || !connection.contains("upgrade", Qt::CaseInsensitive))
+        if (!upgrade.contains(QStringLiteral("websocket"), Qt::CaseInsensitive) || !connection.contains(QStringLiteral("upgrade"), Qt::CaseInsensitive))
         {
             valid = false;
-            error = QString("Unexpected header content");
+            error = QStringLiteral("Unexpected header content");
         }
         else
         {
             if (!accept.contains(m_challengeResponse, Qt::CaseSensitive))
             {
                 valid = false;
-                error = QString("Incorrect Sec-WebSocket-Accept response");
+                error = QStringLiteral("Incorrect Sec-WebSocket-Accept response");
             }
         }
 
@@ -928,7 +929,7 @@ void TorcWebSocket::ReadHandshake(void)
                 if (!protocols.isEmpty())
                 {
                     valid = false;
-                    error = QString("Unexpected subprotocol");
+                    error = QStringLiteral("Unexpected subprotocol");
                 }
             }
             else
@@ -937,7 +938,7 @@ void TorcWebSocket::ReadHandshake(void)
                 if ((subprotocols | m_subProtocol) != m_subProtocol)
                 {
                     valid = false;
-                    error = QString("Unexpected subprotocol");
+                    error = QStringLiteral("Unexpected subprotocol");
                 }
             }
         }
@@ -950,25 +951,25 @@ void TorcWebSocket::ReadHandshake(void)
         return;
     }
 
-    LOG(VB_GENERAL, LOG_DEBUG, "Received valid upgrade response - switching to frame protocol");
+    LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("Received valid upgrade response - switching to frame protocol"));
     SetState(SocketState::Upgraded);
 }
 
 void TorcWebSocket::Error(QAbstractSocket::SocketError SocketError)
 {
     if (QAbstractSocket::RemoteHostClosedError == SocketError)
-        LOG(VB_GENERAL, LOG_INFO, QString("%1 remote host disconnected socket").arg(m_debug));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("%1 remote host disconnected socket").arg(m_debug));
     else
-        LOG(VB_GENERAL, LOG_ERR, QString("%1 socket error %2 '%3'").arg(m_debug).arg(SocketError).arg(errorString()));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("%1 socket error %2 '%3'").arg(m_debug).arg(SocketError).arg(errorString()));
     SetState(SocketState::ErroredSt);
 }
 
 void TorcWebSocket::TimedOut(void)
 {
     if(m_socketState == SocketState::Upgraded)
-        LOG(VB_GENERAL, LOG_WARNING, QString("%1 no websocket traffic for %2seconds").arg(m_debug).arg(m_watchdogTimer.interval() / 1000));
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("%1 no websocket traffic for %2seconds").arg(m_debug).arg(m_watchdogTimer.interval() / 1000));
     else
-        LOG(VB_GENERAL, LOG_INFO, QString("%1 no HTTP traffic for %2seconds").arg(m_debug).arg(m_watchdogTimer.interval() / 1000));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("%1 no HTTP traffic for %2seconds").arg(m_debug).arg(m_watchdogTimer.interval() / 1000));
     SetState(SocketState::DisconnectedSt);
 }
 
@@ -999,7 +1000,7 @@ bool TorcWebSocket::event(QEvent *Event)
                 if (m_currentRequests.contains(requestid) && (request = m_currentRequests.value(requestid)))
                 {
                     request->AddState(TorcRPCRequest::TimedOut);
-                    LOG(VB_GENERAL, LOG_WARNING, QString("'%1' request timed out").arg(request->GetMethod()));
+                    LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("'%1' request timed out").arg(request->GetMethod()));
 
                     request->NotifyParent();
 
@@ -1063,14 +1064,14 @@ void TorcWebSocket::ProcessPayload(const QByteArray &Payload)
                 {
                     QString method = requestor->GetMethod();
                     // is this a successful response to a subscription request?
-                    if (method.endsWith("/Subscribe"))
+                    if (method.endsWith(QStringLiteral("/Subscribe")))
                     {
                         method.chop(9);
                         QObject *parent = requestor->GetParent();
 
                         if (parent->metaObject()->indexOfSlot(QMetaObject::normalizedSignature("ServiceNotification(QString)")) < 0)
                         {
-                            LOG(VB_GENERAL, LOG_ERR, QString("Cannot monitor subscription to '%1' for object '%2' - no notification slot").arg(method, parent->objectName()));
+                            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Cannot monitor subscription to '%1' for object '%2' - no notification slot").arg(method, parent->objectName()));
                         }
                         else if (request->GetReply().type() == QVariant::Map)
                         {
@@ -1078,9 +1079,9 @@ void TorcWebSocket::ProcessPayload(const QByteArray &Payload)
                             connect(parent, &QObject::destroyed, this, &TorcWebSocket::SubscriberDeleted);
 
                             QVariantMap map = request->GetReply().toMap();
-                            if (map.contains("properties") && map.value("properties").type() == QVariant::List)
+                            if (map.contains(QStringLiteral("properties")) && map.value(QStringLiteral("properties")).type() == QVariant::List)
                             {
-                                QVariantList properties = map.value("properties").toList();
+                                QVariantList properties = map.value(QStringLiteral("properties")).toList();
 
                                 // add each notification/parent pair to the subscriber list
                                 QVariantList::const_iterator it = properties.constBegin();
@@ -1089,17 +1090,17 @@ void TorcWebSocket::ProcessPayload(const QByteArray &Payload)
                                     if (it->type() == QVariant::Map)
                                     {
                                         QVariantMap property = it->toMap();
-                                        if (property.contains("notification"))
+                                        if (property.contains(QStringLiteral("notification")))
                                         {
-                                            QString service = method + property.value("notification").toString();
+                                            QString service = method + property.value(QStringLiteral("notification")).toString();
                                             if (m_subscribers.contains(service, parent))
                                             {
-                                                LOG(VB_GENERAL, LOG_WARNING, QString("Object '%1' already has subscription to '%2'").arg(parent->objectName(), service));
+                                                LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Object '%1' already has subscription to '%2'").arg(parent->objectName(), service));
                                             }
                                             else
                                             {
                                                 m_subscribers.insertMulti(service, parent);
-                                                LOG(VB_GENERAL, LOG_INFO, QString("Object '%1' subscribed to '%2'").arg(parent->objectName(), service));
+                                                LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Object '%1' subscribed to '%2'").arg(parent->objectName(), service));
                                             }
                                         }
                                     }
@@ -1108,7 +1109,7 @@ void TorcWebSocket::ProcessPayload(const QByteArray &Payload)
                         }
                     }
                     // or a successful unsubscribe?
-                    else if (method.endsWith("/Unsubscribe"))
+                    else if (method.endsWith(QStringLiteral("/Unsubscribe")))
                     {
                         method.chop(11);
                         QObject *parent = requestor->GetParent();
@@ -1123,7 +1124,7 @@ void TorcWebSocket::ProcessPayload(const QByteArray &Payload)
 
                         foreach (const QString &signature, remove)
                         {
-                            LOG(VB_GENERAL, LOG_INFO, QString("Object '%1' unsubscribed from '%2'").arg(parent->objectName(), signature));
+                            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Object '%1' unsubscribed from '%2'").arg(parent->objectName(), signature));
                             m_subscribers.remove(signature, parent);
                         }
 
@@ -1131,7 +1132,7 @@ void TorcWebSocket::ProcessPayload(const QByteArray &Payload)
                         if (std::find(m_subscribers.cbegin(), m_subscribers.cend(), parent) == m_subscribers.cend())
                         {
                             // temporary logging to ensure clazy optimisation is working correctly
-                            LOG(VB_GENERAL, LOG_INFO, QString("'%1' disconnect - no more subscriptions").arg(parent->objectName()));
+                            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("'%1' disconnect - no more subscriptions").arg(parent->objectName()));
                             (void)disconnect(parent, nullptr, this, nullptr);
                         }
                     }

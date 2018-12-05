@@ -52,12 +52,12 @@ static void ExitHandler(int Sig)
 {
     if (SIGPIPE == Sig)
     {
-        LOG(VB_GENERAL, LOG_WARNING, "Received SIGPIPE interrupt - ignoring");
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Received SIGPIPE interrupt - ignoring"));
         return;
     }
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Received %1")
-        .arg(Sig == SIGINT ? "SIGINT" : "SIGTERM"));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Received %1")
+        .arg(Sig == SIGINT ? QStringLiteral("SIGINT") : QStringLiteral("SIGTERM")));
 
     signal(SIGINT, SIG_DFL);
     TorcLocalContext::NotifyEvent(Torc::Stop);
@@ -96,7 +96,7 @@ void TorcLocalContext::NotifyEvent(int Event)
 TorcLocalContext::TorcLocalContext(TorcCommandLine* CommandLine)
   : QObject(),
     m_sqliteDB(nullptr),
-    m_dbName(QString("")),
+    m_dbName(QStringLiteral("")),
     m_localSettings(),
     m_localSettingsLock(QReadWriteLock::Recursive),
     m_adminThread(nullptr),
@@ -109,7 +109,7 @@ TorcLocalContext::TorcLocalContext(TorcCommandLine* CommandLine)
     AddObserver(this);
 
     // set any custom database location
-    m_dbName = CommandLine->GetValue("db").toString();
+    m_dbName = CommandLine->GetValue(QStringLiteral("db")).toString();
 
     // Initialise TorcQThread FIRST
     TorcQThread::SetMainThread();
@@ -117,7 +117,7 @@ TorcLocalContext::TorcLocalContext(TorcCommandLine* CommandLine)
     // install our message handler
     qInstallMessageHandler(&TorcCoreUtils::QtMessage);
 
-    setObjectName("LocalContext");
+    setObjectName(QStringLiteral("LocalContext"));
 
     // Handle signals gracefully
     signal(SIGINT,  ExitHandler);
@@ -128,24 +128,24 @@ TorcLocalContext::TorcLocalContext(TorcCommandLine* CommandLine)
     InitialiseTorcDirectories(CommandLine);
 
     // Start logging at the first opportunity
-    QString logfile = CommandLine->GetValue("logfile").toString();
+    QString logfile = CommandLine->GetValue(QStringLiteral("logfile")).toString();
     if (logfile.isEmpty())
-        logfile = QString(GetTorcConfigDir() + "/" + TORC_TORC + ".log");
+        logfile = QStringLiteral("%1/%2.log").arg(GetTorcConfigDir(), TORC_TORC);
 
-    ParseVerboseArgument(CommandLine->GetValue("l").toString());
+    ParseVerboseArgument(CommandLine->GetValue(QStringLiteral("l")).toString());
 
     gVerboseMask |= VB_STDIO | VB_FLUSH;
 
-    StartLogging(logfile, 0, 0, CommandLine->GetValue("v").toString(), false);
+    StartLogging(logfile, 0, 0, CommandLine->GetValue(QStringLiteral("v")).toString(), false);
 
     // Debug the config directory
-    LOG(VB_GENERAL, LOG_INFO, QString("Dir: Using '%1'")
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Dir: Using '%1'")
         .arg(GetTorcConfigDir()));
 
     // Version info
-    LOG(VB_GENERAL, LOG_INFO, QString("Version: %1").arg(GIT_VERSION));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Version: %1").arg(QStringLiteral(GIT_VERSION)));
     LOG(VB_GENERAL, LOG_NOTICE,
-        QString("Enabled verbose msgs: %1").arg(gVerboseString));
+        QStringLiteral("Enabled verbose msgs: %1").arg(gVerboseString));
 }
 
 TorcLocalContext::~TorcLocalContext()
@@ -200,7 +200,7 @@ bool TorcLocalContext::Init(void)
     {
         if (!dir.mkpath(configdir))
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed to create config directory ('%1')")
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to create config directory ('%1')")
                 .arg(configdir));
             return false;
         }
@@ -231,13 +231,13 @@ bool TorcLocalContext::Init(void)
         uuid = uuid.mid(1);
     if (uuid.endsWith('}'))
         uuid.chop(1);
-    TorcSetting* uuidsaved = new TorcSetting(nullptr, QString("uuid"),QString("UUID"), TorcSetting::String, TorcSetting::Persistent, QVariant(uuid));
+    TorcSetting* uuidsaved = new TorcSetting(nullptr, QStringLiteral("uuid"),QStringLiteral("UUID"), TorcSetting::String, TorcSetting::Persistent, QVariant(uuid));
     m_uuid = uuidsaved->GetValue().toString();
     uuidsaved->Remove();
     uuidsaved->DownRef();
     uuidsaved = nullptr;
 
-    LOG(VB_GENERAL, LOG_INFO, QString("UUID: %1").arg(m_uuid));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("UUID: %1").arg(m_uuid));
 
     // Load language and translation preferences
     m_language = new TorcLanguage(gRootSetting);
@@ -249,7 +249,7 @@ bool TorcLocalContext::Init(void)
     // Increase the thread count
     int ideal = QThreadPool::globalInstance()->maxThreadCount();
     int want  = ideal * 8;
-    LOG(VB_GENERAL, LOG_INFO, QString("Setting thread pool size to %1 (was %2)").arg(want).arg(ideal));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Setting thread pool size to %1 (was %2)").arg(want).arg(ideal));
     QThreadPool::globalInstance()->setMaxThreadCount(want);
     */
 
@@ -257,8 +257,8 @@ bool TorcLocalContext::Init(void)
     QThread::currentThread()->setPriority(QThread::TimeCriticalPriority);
 
     // Qt version?
-    LOG(VB_GENERAL, LOG_INFO, QString("Qt runtime version '%1' (compiled with '%2')")
-        .arg(qVersion(), QT_VERSION_STR));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Qt runtime version '%1' (compiled with '%2')")
+        .arg(qVersion(), QStringLiteral(QT_VERSION_STR)));
 
     // we don't use an admin thread as purely a server (i.e. no gui) - may need to revisit
 #ifdef TORC_TEST
@@ -278,8 +278,8 @@ QString TorcLocalContext::GetSetting(const QString &Name, const QString &Default
 
 bool TorcLocalContext::GetSetting(const QString &Name, bool DefaultValue)
 {
-    QString value = GetDBSetting(Name, DefaultValue ? QString("1") : QString("0"));
-    return value.trimmed() == "1";
+    QString value = GetDBSetting(Name, DefaultValue ? QStringLiteral("1") : QStringLiteral("0"));
+    return value.trimmed() == QStringLiteral("1");
 }
 
 int TorcLocalContext::GetSetting(const QString &Name, int DefaultValue)
@@ -295,7 +295,7 @@ void TorcLocalContext::SetSetting(const QString &Name, const QString &Value)
 
 void TorcLocalContext::SetSetting(const QString &Name, bool Value)
 {
-    SetDBSetting(Name, Value ? QString("1") : QString("0"));
+    SetDBSetting(Name, Value ? QStringLiteral("1") : QStringLiteral("0"));
 }
 
 void TorcLocalContext::SetSetting(const QString &Name, int Value)
@@ -327,12 +327,12 @@ void TorcLocalContext::SetShutdownDelay(uint Delay)
     QWriteLocker locker(&m_localSettingsLock);
     if (Delay < 1 || Delay > 300) // set in XSD
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Not setting shutdown delay to %1: must be 1<->300 seconds").arg(Delay));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Not setting shutdown delay to %1: must be 1<->300 seconds").arg(Delay));
     }
     else if (Delay > m_shutdownDelay)
     {
         m_shutdownDelay = Delay;
-        LOG(VB_GENERAL, LOG_INFO, QString("Set shutdown delay to %1 seconds").arg(m_shutdownDelay));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Set shutdown delay to %1 seconds").arg(m_shutdownDelay));
     }
 }
 
@@ -389,12 +389,12 @@ bool TorcLocalContext::QueueShutdownEvent(int Event)
 
     if (m_shutdownEvent != Torc::None)
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Shutdown already queued - ignoring '%1' event").arg(TorcCoreUtils::EnumToString<Torc::Actions>((Torc::Actions)newevent)));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Shutdown already queued - ignoring '%1' event").arg(TorcCoreUtils::EnumToString<Torc::Actions>((Torc::Actions)newevent)));
         return true;
     }
 
     m_shutdownEvent = newevent;
-    LOG(VB_GENERAL, LOG_INFO, QString("Queued '%1' event for %2 seconds").arg(TorcCoreUtils::EnumToString<Torc::Actions>((Torc::Actions)m_shutdownEvent)).arg(m_shutdownDelay));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Queued '%1' event for %2 seconds").arg(TorcCoreUtils::EnumToString<Torc::Actions>((Torc::Actions)m_shutdownEvent)).arg(m_shutdownDelay));
     TorcEvent torcevent(Torc::TorcWillStop);
     Notify(torcevent);
     QTimer::singleShot(m_shutdownDelay * 1000, this, &TorcLocalContext::ShutdownTimeout);
@@ -407,12 +407,12 @@ bool TorcLocalContext::HandleShutdown(int Event)
     switch (event)
     {
         case Torc::RestartTorc:
-            LOG(VB_GENERAL, LOG_INFO, "Restarting application");
+            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Restarting application"));
             TorcReferenceCounter::EventLoopEnding(true);
             QCoreApplication::exit(TORC_EXIT_RESTART);
             return true;
         case Torc::Stop:
-            LOG(VB_GENERAL, LOG_INFO, "Stopping application");
+            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Stopping application"));
             TorcReferenceCounter::EventLoopEnding(true);
             QCoreApplication::quit();
             return true;

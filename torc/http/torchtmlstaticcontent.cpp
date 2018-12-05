@@ -36,13 +36,13 @@
 */
 
 TorcHTMLStaticContent::TorcHTMLStaticContent()
-  : TorcHTTPHandler(STATIC_DIRECTORY, "static"),
-    m_pathToContent("")
+  : TorcHTTPHandler(STATIC_DIRECTORY, QStringLiteral("static")),
+    m_pathToContent(QStringLiteral(""))
 {
     m_pathToContent = GetTorcShareDir();
-    if (m_pathToContent.endsWith("/"))
+    if (m_pathToContent.endsWith('/'))
         m_pathToContent.chop(1);
-    m_pathToContent += "/html";
+    m_pathToContent += QStringLiteral("/html");
 
     m_recursive = true;
 }
@@ -67,7 +67,7 @@ void TorcHTMLStaticContent::ProcessHTTPRequest(const QString &PeerAddress, int P
     // request for Torc configuration. This is used to add some appropriate Javascript globals
     // and translated strings
 
-    if (subpath == "/js/torcconfiguration.js")
+    if (subpath == QStringLiteral("/js/torcconfiguration.js"))
     {
         GetJavascriptConfiguration(Request);
         Request.SetAllowGZip(true);
@@ -88,14 +88,14 @@ void TorcHTMLStaticContent::GetJavascriptConfiguration(TorcHTTPRequest &Request)
     QVariantMap strings = TorcStringFactory::GetTorcStrings();
 
     // generate dynamic variables
-    strings.insert("ServicesPath", TORC_SERVICES_DIR);
-    strings.insert("UserService",  TORC_USER_SERVICE);
-    strings.insert("SettingsPath", TORC_SETTINGS_DIR);
-    strings.insert("RootSetting",  TORC_ROOT_SETTING);
-    strings.insert("TorcRealm",    TORC_REALM);
-    strings.insert("PortSetting",  TORC_PORT_SERVICE);
-    strings.insert("SecureSetting",TORC_SSL_SERVICE);
-    strings.insert("TorcConfFile", TORC_CONTENT_DIR + TORC_CONFIG_FILE);
+    strings.insert(QStringLiteral("ServicesPath"), TORC_SERVICES_DIR);
+    strings.insert(QStringLiteral("UserService"),  TORC_USER_SERVICE);
+    strings.insert(QStringLiteral("SettingsPath"), TORC_SETTINGS_DIR);
+    strings.insert(QStringLiteral("RootSetting"),  TORC_ROOT_SETTING);
+    strings.insert(QStringLiteral("TorcRealm"),    TORC_REALM);
+    strings.insert(QStringLiteral("PortSetting"),  TORC_PORT_SERVICE);
+    strings.insert(QStringLiteral("SecureSetting"),TORC_SSL_SERVICE);
+    strings.insert(QStringLiteral("TorcConfFile"), TORC_CONTENT_DIR + TORC_CONFIG_FILE);
 
     // and generate javascript
     QJsonObject json = QJsonObject::fromVariantMap(strings);

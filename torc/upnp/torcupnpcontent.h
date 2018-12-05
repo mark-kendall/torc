@@ -4,7 +4,7 @@
 // Torc
 #include "torchttphandler.h"
 
-#define UPNP_DIRECTORY QString("/upnp/")
+#define UPNP_DIRECTORY QStringLiteral("/upnp/")
 
 class TorcUPnPContent final: public TorcHTTPHandler
 {

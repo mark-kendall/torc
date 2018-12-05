@@ -64,13 +64,13 @@ TorcSystemNotification::TorcSystemNotification(const QVariantMap &Details)
         return;
 
     // NB event names are also validated in the xsd
-    if (Details.contains("inputs"))
+    if (Details.contains(QStringLiteral("inputs")))
     {
-        QVariantMap inputs = Details.value("inputs").toMap();
+        QVariantMap inputs = Details.value(QStringLiteral("inputs")).toMap();
         QVariantMap::const_iterator it = inputs.constBegin();
         for ( ; it != inputs.constEnd(); ++it)
         {
-            if (it.key() == "event")
+            if (it.key() == QStringLiteral("event"))
             {
                 int event = TorcCoreUtils::StringToEnum<Torc::Actions>(it.value().toString().trimmed());
                 if (event != -1)
@@ -81,7 +81,7 @@ TorcSystemNotification::TorcSystemNotification(const QVariantMap &Details)
 
     if (m_events.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("System notification '%1' has no events to listen for").arg(uniqueId));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("System notification '%1' has no events to listen for").arg(uniqueId));
     }
     else
     {
@@ -110,7 +110,7 @@ void TorcSystemNotification::Graph(QByteArray *Data)
         return;
 
     foreach (TorcNotifier* notifier, m_notifiers)
-        Data->append(QString("    \"%1\"->\"%2\"\r\n").arg(uniqueId, notifier->GetUniqueId()));
+        Data->append(QStringLiteral("    \"%1\"->\"%2\"\r\n").arg(uniqueId, notifier->GetUniqueId()));
 }
 
 /// Listen for system events (TorcEvent).
@@ -126,7 +126,7 @@ bool TorcSystemNotification::event(QEvent *Event)
             if (m_events.contains(event))
             {
                 QMap<QString,QString> custom;
-                custom.insert("event", TorcCoreUtils::EnumToString<Torc::Actions>(event));
+                custom.insert(QStringLiteral("event"), TorcCoreUtils::EnumToString<Torc::Actions>(event));
                 QVariantMap message = TorcNotify::gNotify->SetNotificationText(m_title, m_body, custom);
                 emit Notify(message);
             }
@@ -141,7 +141,7 @@ class TorcSystemNotificationFactory final : public TorcNotificationFactory
 {
     TorcNotification* Create(const QString &Type, const QVariantMap &Details) override
     {
-        if (Type == "system" && Details.contains("inputs"))
+        if (Type == QStringLiteral("system") && Details.contains(QStringLiteral("inputs")))
             return new TorcSystemNotification(Details);
         return nullptr;
     }

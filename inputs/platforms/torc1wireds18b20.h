@@ -10,7 +10,7 @@
 #include "torctemperatureinput.h"
 #include "torc1wirebus.h"
 
-#define DS18B20NAME QString("ds18b20")
+#define DS18B20NAME QStringLiteral("ds18b20")
 
 class Torc1WireDS18B20;
 

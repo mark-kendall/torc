@@ -46,20 +46,20 @@ void TorcCameraThread::CreateOrDestroy(TorcCameraThread *&Thread, const QString 
         {
             TorcCameraThread* thread = threads.value(Type);
             if (thread != Thread)
-                LOG(VB_GENERAL, LOG_ERR, QString("Mismatch between thread and type for '%1'").arg(Type));
+                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Mismatch between thread and type for '%1'").arg(Type));
 
             thread->DownRef();
             // release our own ref
             if (!thread->IsShared())
             {
-                LOG(VB_GENERAL, LOG_INFO, QString("Removing camera thread - no longer in use '%1'").arg(Type));
+                LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Removing camera thread - no longer in use '%1'").arg(Type));
                 thread->DownRef();
                 threads.remove(Type);
             }
         }
         else
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Unknown camera thread type '%1'").arg(Type));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Unknown camera thread type '%1'").arg(Type));
         }
     }
     else
@@ -67,12 +67,12 @@ void TorcCameraThread::CreateOrDestroy(TorcCameraThread *&Thread, const QString 
         TorcCameraThread* thread = nullptr;
         if (threads.contains(Type))
         {
-            LOG(VB_GENERAL, LOG_INFO, QString("Sharing existing camera thread '%1'").arg(Type));
+            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Sharing existing camera thread '%1'").arg(Type));
             thread = threads.value(Type);
         }
         else
         {
-            LOG(VB_GENERAL, LOG_INFO, QString("Creating shared camera thread '%1'").arg(Type));
+            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Creating shared camera thread '%1'").arg(Type));
             thread = new TorcCameraThread(Type, Params);
             threads.insert(Type, thread);
         }
@@ -85,7 +85,7 @@ void TorcCameraThread::CreateOrDestroy(TorcCameraThread *&Thread, const QString 
 /*! \brief A custom thread to run TorcCameraDevice's
  */
 TorcCameraThread::TorcCameraThread( const QString &Type, const TorcCameraParams &Params)
-  : TorcQThread("Camera"),
+  : TorcQThread(QStringLiteral("Camera")),
     m_type(Type),
     m_params(Params),
     m_camera(nullptr),
@@ -156,7 +156,7 @@ bool TorcCameraThread::DownRef(void)
 
 void TorcCameraThread::Start(void)
 {
-    LOG(VB_GENERAL, LOG_INFO, "Camera thread starting");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Camera thread starting"));
 
     QWriteLocker locker(&m_cameraLock);
     m_camera = TorcCameraFactory::GetCamera(m_type, m_params);
@@ -194,7 +194,7 @@ void TorcCameraThread::Finish(void)
         m_camera = nullptr;
     }
 
-    LOG(VB_GENERAL, LOG_INFO, "Camera thread stopping");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Camera thread stopping"));
 }
 
 QByteArray TorcCameraThread::GetSegment(int Segment)

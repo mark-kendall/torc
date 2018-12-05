@@ -9,7 +9,7 @@
 
 class TorcNetworkRequest;
 
-#define PUSHBULLET_PUSH_URL QString("https://api.pushbullet.com/v2/pushes")
+#define PUSHBULLET_PUSH_URL QStringLiteral("https://api.pushbullet.com/v2/pushes")
 
 class TorcPushbulletNotifier final : public TorcNotifier
 {

@@ -84,7 +84,7 @@ TorcLogicControl::TorcLogicControl(const QString &Type, const QVariantMap &Detai
 {
     if (m_operation == TorcLogicControl::UnknownLogicType)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Unrecognised control operation '%1' for device '%2'").arg(Type, uniqueId));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Unrecognised control operation '%1' for device '%2'").arg(Type, uniqueId));
         return;
     }
 
@@ -92,12 +92,12 @@ TorcLogicControl::TorcLogicControl(const QString &Type, const QVariantMap &Detai
     if (IsComplexType(m_operation))
     {
         bool found = false;
-        if (Details.contains("references"))
+        if (Details.contains(QStringLiteral("references")))
         {
-            QVariantMap reference = Details.value("references").toMap();
-            if (reference.contains("device"))
+            QVariantMap reference = Details.value(QStringLiteral("references")).toMap();
+            if (reference.contains(QStringLiteral("device")))
             {
-                m_referenceDeviceId = reference.value("device").toString().trimmed();
+                m_referenceDeviceId = reference.value(QStringLiteral("device")).toString().trimmed();
                 // and treat it as a normal input - this ensures TorcControl takes care of all of the input value and
                 // valid logic. We just ensure we know which is the reference device/value.
                 m_inputList.append(m_referenceDeviceId);
@@ -106,7 +106,7 @@ TorcLogicControl::TorcLogicControl(const QString &Type, const QVariantMap &Detai
         }
         if (!found)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Control '%1' has no reference device for operation").arg(uniqueId));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Control '%1' has no reference device for operation").arg(uniqueId));
             return;
         }
 
@@ -114,12 +114,12 @@ TorcLogicControl::TorcLogicControl(const QString &Type, const QVariantMap &Detai
         {
             // trigger device is used to update the average
             found = false;
-            if (Details.contains("triggers"))
+            if (Details.contains(QStringLiteral("triggers")))
             {
-                QVariantMap triggers = Details.value("triggers").toMap();
-                if (triggers.contains("device"))
+                QVariantMap triggers = Details.value(QStringLiteral("triggers")).toMap();
+                if (triggers.contains(QStringLiteral("device")))
                 {
-                    m_triggerDeviceId = triggers.value("device").toString().trimmed();
+                    m_triggerDeviceId = triggers.value(QStringLiteral("device")).toString().trimmed();
                     m_inputList.append(m_triggerDeviceId);
                     found = true;
                 }
@@ -127,7 +127,7 @@ TorcLogicControl::TorcLogicControl(const QString &Type, const QVariantMap &Detai
 
             if (!found)
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("Control '%1' has no trigger device for updating").arg(uniqueId));
+                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Control '%1' has no trigger device for updating").arg(uniqueId));
                 return;
             }
         }
@@ -154,7 +154,7 @@ TorcControl::Type TorcLogicControl::GetType(void) const
 QStringList TorcLogicControl::GetDescription(void)
 {
     QStringList result;
-    QString reference("Unknown");
+    QString reference(QStringLiteral("Unknown"));
     TorcDevice *device = qobject_cast<TorcDevice*>(m_referenceDevice);
     if (device)
     {
@@ -263,7 +263,7 @@ bool TorcLogicControl::Validate(void)
     // we always need one or more outputs
     if (m_outputs.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Device '%1' needs at least one output").arg(uniqueId));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Device '%1' needs at least one output").arg(uniqueId));
         return false;
     }
 
@@ -279,8 +279,8 @@ bool TorcLogicControl::Validate(void)
             {
                 if (m_inputs.size() < 2)
                 {
-                    LOG(VB_GENERAL, LOG_ERR, QString("%1 has %2 inputs for operation '%3' (needs at least 2) - ignoring.")
-                        .arg(uniqueId).arg(m_inputs.size()).arg(GetDescription().join(",")));
+                    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("%1 has %2 inputs for operation '%3' (needs at least 2) - ignoring.")
+                        .arg(uniqueId).arg(m_inputs.size()).arg(GetDescription().join(',')));
                     return false;
                 }
             }
@@ -291,8 +291,8 @@ bool TorcLogicControl::Validate(void)
             {
                 if (m_inputs.size() != 1)
                 {
-                    LOG(VB_GENERAL, LOG_ERR, QString("%1 has %2 inputs for operation '%3' (must have 1) - ignoring.")
-                        .arg(uniqueId).arg(m_inputs.size()).arg(GetDescription().join(",")));
+                    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("%1 has %2 inputs for operation '%3' (must have 1) - ignoring.")
+                        .arg(uniqueId).arg(m_inputs.size()).arg(GetDescription().join(',')));
                     return false;
                 }
             }
@@ -308,8 +308,8 @@ bool TorcLogicControl::Validate(void)
             {
                 if (m_inputs.size() != 2)
                 {
-                    LOG(VB_GENERAL, LOG_ERR, QString("%1 has %2 inputs for operation '%3' (must have 1 input and 1 reference) - ignoring.")
-                        .arg(uniqueId).arg(m_inputs.size()).arg(GetDescription().join(",")));
+                    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("%1 has %2 inputs for operation '%3' (must have 1 input and 1 reference) - ignoring.")
+                        .arg(uniqueId).arg(m_inputs.size()).arg(GetDescription().join(',')));
                     return false;
                 }
             }
@@ -319,8 +319,8 @@ bool TorcLogicControl::Validate(void)
             {
                 if (m_inputs.size() != 3)
                 {
-                    LOG(VB_GENERAL, LOG_ERR, QString("%1 has %2 inputs for operation '%3' (must have 1 input, 1 reference and 1 trigger) - ignoring.")
-                        .arg(uniqueId).arg(m_inputs.size()).arg(GetDescription().join(",")));
+                    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("%1 has %2 inputs for operation '%3' (must have 1 input, 1 reference and 1 trigger) - ignoring.")
+                        .arg(uniqueId).arg(m_inputs.size()).arg(GetDescription().join(',')));
                     return false;
                 }
             }

@@ -27,7 +27,7 @@
 #include "torccentral.h"
 #include "torcinputs.h"
 
-#define BLACKLIST QString("")
+#define BLACKLIST QStringLiteral("")
 
 TorcInputs* TorcInputs::gInputs = new TorcInputs();
 
@@ -43,7 +43,7 @@ TorcInputs* TorcInputs::gInputs = new TorcInputs();
 */
 TorcInputs::TorcInputs()
   : QObject(),
-    TorcHTTPService(this, INPUTS_DIRECTORY, "inputs", TorcInputs::staticMetaObject, BLACKLIST),
+    TorcHTTPService(this, INPUTS_DIRECTORY, QStringLiteral("inputs"), TorcInputs::staticMetaObject, BLACKLIST),
     inputList(),
     inputTypes()
 {
@@ -60,10 +60,10 @@ void TorcInputs::Graph(QByteArray *Data)
         return;
 
     QString start =
-          QString("    subgraph cluster_0 {\r\n"
-                  "        label = \"%1\";\r\n"
-                  "        style=filled;\r\n"
-                  "        fillcolor = \"grey95\";\r\n").arg(tr("Inputs"));
+          QStringLiteral("    subgraph cluster_0 {\r\n"
+                         "        label = \"%1\";\r\n"
+                         "        style=filled;\r\n"
+                         "        fillcolor = \"grey95\";\r\n").arg(tr("Inputs"));
     Data->append(start);
 
     foreach(TorcInput *input, inputList)
@@ -81,7 +81,7 @@ void TorcInputs::Graph(QByteArray *Data)
 
         if (label.isEmpty())
             label = id;
-        Data->append(QString("        \"%1\" [shape=record id=\"%1\" label=<<B>%2</B>%3>];\r\n").arg(id, label, desc));
+        Data->append(QStringLiteral("        \"%1\" [shape=record id=\"%1\" label=<<B>%2</B>%3>];\r\n").arg(id, label, desc));
     }
 
     Data->append("    }\r\n\r\n");
@@ -130,13 +130,13 @@ void TorcInputs::AddInput(TorcInput *Input)
 
     if (inputList.contains(Input))
     {
-        LOG(VB_GENERAL, LOG_WARNING, QString("Already have an input named %1 - ignoring").arg(Input->GetUniqueId()));
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Already have an input named %1 - ignoring").arg(Input->GetUniqueId()));
         return;
     }
 
     Input->UpRef();
     inputList.append(Input);
-    LOG(VB_GENERAL, LOG_INFO, QString("Registered input '%1'").arg(Input->GetUniqueId()));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Registered input '%1'").arg(Input->GetUniqueId()));
     emit InputsChanged();
 }
 
@@ -148,11 +148,11 @@ void TorcInputs::RemoveInput(TorcInput *Input)
 
     if (!inputList.contains(Input))
     {
-        LOG(VB_GENERAL, LOG_WARNING, QString("Input %1 not recognised - cannot remove").arg(Input->GetUniqueId()));
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Input %1 not recognised - cannot remove").arg(Input->GetUniqueId()));
         return;
     }
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Input %1 de-registered").arg(Input->GetUniqueId()));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Input %1 de-registered").arg(Input->GetUniqueId()));
     Input->DownRef();
     inputList.removeOne(Input);
     emit InputsChanged();

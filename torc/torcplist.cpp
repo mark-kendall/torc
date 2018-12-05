@@ -100,7 +100,7 @@ QString TorcPList::ToString(void)
     QBuffer buf(&res);
     buf.open(QBuffer::WriteOnly);
     if (!this->ToXML(&buf))
-        return QString("");
+        return QStringLiteral("");
     return QString::fromUtf8(res.data());
 }
 
@@ -111,14 +111,14 @@ bool TorcPList::ToXML(QIODevice *Device)
     XML.setAutoFormatting(true);
     XML.setAutoFormattingIndent(4);
     XML.writeStartDocument();
-    XML.writeDTD("<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">");
-    XML.writeStartElement("plist");
-    XML.writeAttribute("version", "1.0");
+    XML.writeDTD(QStringLiteral("<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">"));
+    XML.writeStartElement(QStringLiteral("plist"));
+    XML.writeAttribute(QStringLiteral("version"), QStringLiteral("1.0"));
     bool success = ToXML(m_result, XML);
     XML.writeEndElement();
     XML.writeEndDocument();
     if (!success)
-        LOG(VB_GENERAL, LOG_WARNING, "Invalid result.");
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Invalid result."));
     return success;
 }
 
@@ -139,36 +139,36 @@ bool TorcPList::ToXML(const QVariant &Data, QXmlStreamWriter &XML)
         case QMetaType::LongLong:
         case QMetaType::Float:
         case QMetaType::Double:
-            XML.writeTextElement("real", QString("%1").arg(Data.toDouble(), 0, 'f', 6));
+            XML.writeTextElement(QStringLiteral("real"), QStringLiteral("%1").arg(Data.toDouble(), 0, 'f', 6));
             break;
         case QMetaType::QUuid:
-            XML.writeTextElement("uid", Data.toByteArray().toHex().data());
+            XML.writeTextElement(QStringLiteral("uid"), Data.toByteArray().toHex().data());
             break;
         case QMetaType::QByteArray:
-            XML.writeTextElement("data", Data.toByteArray().toBase64().data());
+            XML.writeTextElement(QStringLiteral("data"), Data.toByteArray().toBase64().data());
             break;
         case QMetaType::UInt:
         case QMetaType::UShort:
         case QMetaType::ULong:
         case QMetaType::ULongLong:
-            XML.writeTextElement("integer", QString("%1").arg(Data.toULongLong()));
+            XML.writeTextElement(QStringLiteral("integer"), QStringLiteral("%1").arg(Data.toULongLong()));
             break;
-        case QMetaType::QString: XML.writeTextElement("string", Data.toString());
+        case QMetaType::QString: XML.writeTextElement(QStringLiteral("string"), Data.toString());
             break;
         case QMetaType::QDateTime:
-            XML.writeTextElement("date", Data.toDateTime().toString(Qt::ISODate));
+            XML.writeTextElement(QStringLiteral("date"), Data.toDateTime().toString(Qt::ISODate));
             break;
         case QMetaType::Bool:
             {
                 bool val = Data.toBool();
-                XML.writeEmptyElement(val ? "true" : "false");
+                XML.writeEmptyElement(val ? QStringLiteral("true") : QStringLiteral("false"));
             }
             break;
         case QMetaType::Char:
-            XML.writeEmptyElement("fill");
+            XML.writeEmptyElement(QStringLiteral("fill"));
             break;
         default:
-            LOG(VB_GENERAL, LOG_WARNING, "Unknown type.");
+            LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Unknown type."));
             return false;
     }
     return true;
@@ -177,14 +177,14 @@ bool TorcPList::ToXML(const QVariant &Data, QXmlStreamWriter &XML)
 ///brief Convert the given dictionary data element to valid XML.
 void TorcPList::DictToXML(const QVariant &Data, QXmlStreamWriter &XML)
 {
-    XML.writeStartElement("dict");
+    XML.writeStartElement(QStringLiteral("dict"));
 
     QVariantMap map = Data.toMap();
     QMapIterator<QString,QVariant> it(map);
     while (it.hasNext())
     {
         it.next();
-        XML.writeTextElement("key", it.key());
+        XML.writeTextElement(QStringLiteral("key"), it.key());
         ToXML(it.value(), XML);
     }
 
@@ -194,7 +194,7 @@ void TorcPList::DictToXML(const QVariant &Data, QXmlStreamWriter &XML)
 ///brief Convert the given array data element to valid XML.
 void TorcPList::ArrayToXML(const QVariant &Data, QXmlStreamWriter &XML)
 {
-    XML.writeStartElement("array");
+    XML.writeStartElement(QStringLiteral("array"));
 
     QList<QVariant> list = Data.toList();
     foreach (const QVariant &item, list)
@@ -214,18 +214,18 @@ void TorcPList::ParseBinaryPList(const QByteArray &Data)
     if (size < MIN_SIZE)
         return;
 
-    LOG(VB_GENERAL, LOG_DEBUG, QString("Binary: size %1, startswith '%2'")
+    LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("Binary: size %1, startswith '%2'")
         .arg(size).arg(Data.left(8).data()));
 
     // check plist type & version
     if ((Data.left(6) != MAGIC) ||
         (Data.mid(MAGIC_SIZE, VERSION_SIZE) != VERSION))
     {
-        LOG(VB_GENERAL, LOG_ERR, "Unrecognised start sequence. Corrupt?");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Unrecognised start sequence. Corrupt?"));
         return;
     }
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Parsing binary plist (%1 bytes)")
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Parsing binary plist (%1 bytes)")
         .arg(size));
 
     m_data = (quint8*)Data.data();
@@ -238,20 +238,20 @@ void TorcPList::ParseBinaryPList(const QByteArray &Data)
     m_offsetTable = m_data + offset_tindex;
 
     LOG(VB_GENERAL, LOG_DEBUG,
-        QString("numObjs: %1 parmSize: %2 offsetSize: %3 rootObj: %4 offsetindex: %5")
+        QStringLiteral("numObjs: %1 parmSize: %2 offsetSize: %3 rootObj: %4 offsetindex: %5")
             .arg(m_numObjs).arg(m_parmSize).arg(m_offsetSize).arg(m_rootObj).arg(offset_tindex));
 
     // something wrong?
     if (!m_numObjs || !m_parmSize || !m_offsetSize)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Error parsing binary plist. Corrupt?");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Error parsing binary plist. Corrupt?"));
         return;
     }
 
     // parse
     m_result = ParseBinaryNode(m_rootObj);
 
-    LOG(VB_GENERAL, LOG_INFO, "Parse complete.");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Parse complete."));
 }
 
 QVariant TorcPList::ParseBinaryNode(quint64 Num)
@@ -316,7 +316,7 @@ quint8* TorcPList::GetBinaryObject(quint64 Num)
 
     quint8* p = m_offsetTable + (Num * m_offsetSize);
     quint64 offset = GetBinaryUInt(p, m_offsetSize);
-    LOG(VB_GENERAL, LOG_DEBUG, QString("GetBinaryObject Num %1, offsize %2 offset %3")
+    LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("GetBinaryObject Num %1, offsize %2 offset %3")
         .arg(Num).arg(m_offsetSize).arg(offset));
 
     return m_data + offset;
@@ -330,7 +330,7 @@ QVariantMap TorcPList::ParseBinaryDict(quint8 *Data)
 
     quint64 count = GetBinaryCount(&Data);
 
-    LOG(VB_GENERAL, LOG_DEBUG, QString("Dict: Size %1").arg(count));
+    LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("Dict: Size %1").arg(count));
 
     if (!count)
         return result;
@@ -344,7 +344,7 @@ QVariantMap TorcPList::ParseBinaryDict(quint8 *Data)
         QVariant val = ParseBinaryNode(valobj);
         if (!key.canConvert<QString>())
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Invalid dictionary key type '%1' (key %2)")
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Invalid dictionary key type '%1' (key %2)")
                 .arg(key.type()).arg(keyobj));
             return result;
         }
@@ -363,7 +363,7 @@ QList<QVariant> TorcPList::ParseBinaryArray(quint8 *Data)
 
     quint64 count = GetBinaryCount(&Data);
 
-    LOG(VB_GENERAL, LOG_DEBUG, QString("Array: Size %1").arg(count));
+    LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("Array: Size %1").arg(count));
 
     if (!count)
         return result;
@@ -389,7 +389,7 @@ QVariant TorcPList::ParseBinaryUInt(quint8 **Data)
     result = GetBinaryUInt(*Data, size);
     (*Data) += size;
 
-    LOG(VB_GENERAL, LOG_DEBUG, QString("UInt: %1").arg(result));
+    LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("UInt: %1").arg(result));
     return QVariant(result);
 }
 
@@ -426,7 +426,7 @@ QVariant TorcPList::ParseBinaryString(quint8 *Data)
         return result;
 
     result = QString::fromLatin1((const char*)Data, count);
-    LOG(VB_GENERAL, LOG_DEBUG, QString("ASCII String: %1").arg(result));
+    LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("ASCII String: %1").arg(result));
     return QVariant(result);
 }
 
@@ -452,7 +452,7 @@ QVariant TorcPList::ParseBinaryReal(quint8 *Data)
         result = *((double*)Data);
     }
 
-    LOG(VB_GENERAL, LOG_DEBUG, QString("Real: %1").arg(result, 0, 'f', 6));
+    LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("Real: %1").arg(result, 0, 'f', 6));
     return QVariant(result);
 }
 
@@ -468,7 +468,7 @@ QVariant TorcPList::ParseBinaryDate(quint8 *Data)
 
     convert_float(Data, 8);
     result = QDateTime::fromTime_t((quint64)(*((double*)Data)));
-    LOG(VB_GENERAL, LOG_DEBUG, QString("Date: %1").arg(result.toString(Qt::ISODate)));
+    LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("Date: %1").arg(result.toString(Qt::ISODate)));
     return QVariant(result);
 }
 
@@ -483,7 +483,7 @@ QVariant TorcPList::ParseBinaryData(quint8 *Data)
         return result;
 
     result = QByteArray((const char*)Data, count);
-    LOG(VB_GENERAL, LOG_DEBUG, QString("Data: Size %1 (count %2)")
+    LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("Data: Size %1 (count %2)")
         .arg(result.size()).arg(count));
     return QVariant(result);
 }

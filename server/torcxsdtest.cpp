@@ -96,10 +96,10 @@ int TorcXSDTest::RunXSDTestSuite(TorcCommandLine *CommandLine)
     if (int error = TorcLocalContext::Create(CommandLine, false))
         return error;
 
-    QString directory = CommandLine->GetValue("xsdtest").toString();
-    LOG(VB_GENERAL, LOG_INFO, QString("Starting XSD test from %1").arg(directory));
+    QString directory = CommandLine->GetValue(QStringLiteral("xsdtest")).toString();
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Starting XSD test from %1").arg(directory));
 
-    QString basexsd    = GetTorcShareDir() + "/html/torc.xsd";
+    QString basexsd    = QStringLiteral("%1/html/torc.xsd").arg(GetTorcShareDir());
     QByteArray fullxsd = TorcCentral::GetCustomisedXSD(basexsd);
     if (fullxsd.isEmpty())
     {
@@ -109,18 +109,18 @@ int TorcXSDTest::RunXSDTestSuite(TorcCommandLine *CommandLine)
 
     QDir dir(directory);
     QStringList filters;
-    filters << "*.xml";
+    filters << QStringLiteral("*.xml");
 
     QStringList testfiles = dir.entryList(filters, QDir::Files | QDir::NoDotAndDotDot | QDir::Readable | QDir::CaseSensitive, QDir::Name);
 
     if (testfiles.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Failed to find any xml files in %1").arg(dir.path()));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Failed to find any xml files in %1").arg(dir.path()));
         TorcLocalContext::TearDown();
         return TORC_EXIT_UNKOWN_ERROR;
     }
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Found %1 files.").arg(testfiles.size()));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Found %1 files.").arg(testfiles.size()));
     int passcount = 0;
     foreach (const QString &file, testfiles)
     {
@@ -130,21 +130,21 @@ int TorcXSDTest::RunXSDTestSuite(TorcCommandLine *CommandLine)
         TorcXmlValidator validator(path, fullxsd, true);
         if (validator.Validated())
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Unexpected pass: %1").arg(path));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Unexpected pass: %1").arg(path));
             passcount++;
         }
     }
 
     if (!passcount)
-        LOG(VB_GENERAL, LOG_INFO, "All test files failed as expected");
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("All test files failed as expected"));
     else
-        LOG(VB_GENERAL, LOG_ERR, QString("%1 unexpected passes.").arg(passcount));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("%1 unexpected passes.").arg(passcount));
 
     TorcLocalContext::TearDown();
 
 #else
     (void) CommandLine;
-    LOG(VB_GENERAL, LOG_INFO, "XML validation not available.");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("XML validation not available."));
 #endif
 
     return TORC_EXIT_OK;

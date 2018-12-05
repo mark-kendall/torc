@@ -11,7 +11,7 @@
 #include "torcpipwmoutput.h"
 #include "torcpiswitchinput.h"
 
-#define PI_GPIO QString("gpio")
+#define PI_GPIO QStringLiteral("gpio")
 
 class TorcPiGPIO : public TorcDeviceHandler
 {

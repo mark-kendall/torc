@@ -53,7 +53,7 @@ QAtomicInt   gAdminRunLoopRunning(0);
 */
 
 TorcOSXCallbackThread::TorcOSXCallbackThread()
-  : TorcQThread("OSXRunLoop"),
+  : TorcQThread(QStringLiteral("OSXRunLoop")),
     m_object(nullptr)
 {
 }
@@ -65,7 +65,7 @@ TorcOSXCallbackThread::~TorcOSXCallbackThread()
 
 void TorcOSXCallbackThread::Start(void)
 {
-    LOG(VB_GENERAL, LOG_INFO, "OSX callback thread starting");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("OSX callback thread starting"));
     gAdminRunLoop = CFRunLoopGetCurrent();
     m_object = new CallbackObject();
 }
@@ -77,7 +77,7 @@ void TorcOSXCallbackThread::Finish(void)
     delete m_object;
     m_object = nullptr;
     gAdminRunLoop = 0;
-    LOG(VB_GENERAL, LOG_INFO, "OSX callback thread stopping");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("OSX callback thread stopping"));
 }
 
 /*! \class CallbackObject
@@ -141,7 +141,7 @@ static class TorcRunLoopOSX : public TorcAdminObject
             QThread::msleep(count < 2 ? 10 : 100);
 
         if (!m_thread->isRunning())
-            LOG(VB_GENERAL, LOG_WARNING, "OS X callback thread not started yet!");
+            LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("OS X callback thread not started yet!"));
     }
 
     void Destroy(void)

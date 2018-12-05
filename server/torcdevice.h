@@ -11,8 +11,8 @@
 #include "torcreferencecounted.h"
 #include "torcdevicehandler.h"
 
-#define DEVICE_LINE_ITEM "|<FONT POINT-SIZE=\"10\">%1</FONT>"
-#define DEVICE_CONSTANT "Constant"
+#define DEVICE_LINE_ITEM QStringLiteral("|<FONT POINT-SIZE=\"10\">%1</FONT>")
+#define DEVICE_CONSTANT QStringLiteral("Constant")
 
 class TorcDevice : public QObject, public TorcReferenceCounter
 {

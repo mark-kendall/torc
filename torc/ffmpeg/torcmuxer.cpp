@@ -40,7 +40,7 @@ static void TorcAVLog(void *Ptr, int Level, const char *Fmt, va_list VAL)
     if (VERBOSE_LEVEL_NONE)
         return;
 
-    static QString   line("");
+    static QString   line(QStringLiteral(""));
     static const int length = 255;
     static QMutex    lock;
     uint64_t         verboseMask  = VB_GENERAL;
@@ -86,14 +86,12 @@ static void TorcAVLog(void *Ptr, int Level, const char *Fmt, va_list VAL)
     // check for truncated messages and fix them
     if (bytes > length)
     {
-        LOG(VB_GENERAL, LOG_WARNING,
-            QString("Libav log output truncated %1 of %2 bytes written")
-                .arg(length).arg(bytes));
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Libav log output truncated %1 of %2 bytes written").arg(length).arg(bytes));
         str[length - 1] = '\n';
     }
 
     line += QString(str);
-    if (line.endsWith("\n"))
+    if (line.endsWith(QStringLiteral("\n")))
     {
         LOG(verboseMask, verboseLevel, line.trimmed());
         line.truncate(0);
@@ -186,7 +184,7 @@ void TorcMuxer::SetupContext(void)
     AVOutputFormat *format = av_guess_format("mp4", nullptr, nullptr);
     if (!format)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to find MPEGTS muxer");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to find MPEGTS muxer"));
         return;
     }
 
@@ -194,7 +192,7 @@ void TorcMuxer::SetupContext(void)
     m_formatCtx = avformat_alloc_context();
     if (!m_formatCtx)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to create AVFormatContext");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to create AVFormatContext"));
         return;
     }
     m_formatCtx->oformat = format;
@@ -210,7 +208,7 @@ void TorcMuxer::SetupIO(void)
         // create output file
         if (avio_open(&m_formatCtx->pb, m_outputFile.toLocal8Bit().constData(), AVIO_FLAG_WRITE) < 0)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed to open '%1' for output").arg(m_outputFile));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to open '%1' for output").arg(m_outputFile));
             return;
         }
         m_created = true;
@@ -247,7 +245,7 @@ QString TorcMuxer::GetAVCCodec(const QByteArray &Packet)
     int size = Packet.size();
     if (size < 7) // 3 (or 4) byte start code, 1 byte NALU, 1 byte IDC, 1 byte constraints and 1 byte level
     {
-        LOG(VB_GENERAL, LOG_WARNING, "Cannot retrieve AVC1 codec data from packet - too short");
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Cannot retrieve AVC1 codec data from packet - too short"));
         return QString();
     }
 
@@ -264,15 +262,15 @@ QString TorcMuxer::GetAVCCodec(const QByteArray &Packet)
 
     if (!found)
     {
-        LOG(VB_GENERAL, LOG_WARNING, "Failed to find start code");
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Failed to find start code"));
         return QString();
     }
 
     index += 3;
     if ((Packet[index] & 0x1f) == 7) // SPS NAL UNIT
-        return QString("avc1.%1%2%3").arg(Packet[index + 1], 2, 16, QChar('0')).arg(Packet[index + 2], 2, 16, QChar('0')).arg(Packet[index + 3], 2, 16, QChar('0'));
+        return QStringLiteral("avc1.%1%2%3").arg(Packet[index + 1], 2, 16, QChar('0')).arg(Packet[index + 2], 2, 16, QChar('0')).arg(Packet[index + 3], 2, 16, QChar('0'));
 
-    LOG(VB_GENERAL, LOG_WARNING, "Failed to find SPS");
+    LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Failed to find SPS"));
     return QString();
 }
 
@@ -311,22 +309,22 @@ int TorcMuxer::AddDummyAudioStream(void)
     audiostream->codecpar->channels       = 2;
     audiostream->codecpar->channel_layout = AV_CH_LAYOUT_STEREO;
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Audio stream id %1").arg(audiostream->id));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Audio stream id %1").arg(audiostream->id));
     AVCodec* codec = avcodec_find_encoder(audiostream->codecpar->codec_id);
     if (!codec)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to find dummy audio codec");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to find dummy audio codec"));
         return -1;
     }
-    LOG(VB_GENERAL, LOG_INFO, QString("Found audio codec '%1'").arg(codec->name));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Found audio codec '%1'").arg(codec->name));
 
     m_audioContext = avcodec_alloc_context3(codec);
     if (!m_audioContext)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to create audio context");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to create audio context"));
         return -1;
     }
-    LOG(VB_GENERAL, LOG_INFO, "Created audio context");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Created audio context"));
 
     avcodec_parameters_to_context(m_audioContext, audiostream->codecpar);
     m_audioContext->sample_fmt = AV_SAMPLE_FMT_FLTP;
@@ -334,11 +332,11 @@ int TorcMuxer::AddDummyAudioStream(void)
         m_audioContext->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
     if (avcodec_open2(m_audioContext, codec, nullptr) < 0)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to open codec '%1'").arg(codec->name));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to open codec '%1'").arg(codec->name));
         return -1;
     }
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Dummy audio: frame size %1 sample_fmt %2 sample_rate %3 bitrate %4 channels %5")
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Dummy audio: frame size %1 sample_fmt %2 sample_rate %3 bitrate %4 channels %5")
         .arg(m_audioContext->frame_size).arg(m_audioContext->sample_fmt).arg(m_audioContext->sample_rate)
         .arg(m_audioContext->bit_rate).arg(m_audioContext->channels));
 
@@ -350,7 +348,7 @@ int TorcMuxer::AddDummyAudioStream(void)
     CopyExtraData(m_audioContext->extradata_size, m_audioContext->extradata, m_audioStream);
     if (av_frame_get_buffer(m_audioFrame, 0) < 0)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to create audio frame buffers");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to create audio frame buffers"));
         return -1;
     }
     return audiostream->id;
@@ -365,7 +363,7 @@ void TorcMuxer::WriteDummyAudio(void)
     {
         if (avcodec_send_frame(m_audioContext, m_audioFrame) < 0)
         {
-            LOG(VB_GENERAL, LOG_ERR, "Error sending frame to audio encoder");
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Error sending frame to audio encoder"));
             break;
         }
         else
@@ -375,7 +373,7 @@ void TorcMuxer::WriteDummyAudio(void)
                 continue;
             if (rec < 0)
             {
-                LOG(VB_GENERAL, LOG_ERR, "Error receiving packet from audio encoder");
+                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Error receiving packet from audio encoder"));
                 break;
             }
             while ((m_lastVideoPts > m_lastAudioPts) || m_lastAudioPts == AV_NOPTS_VALUE)
@@ -386,7 +384,7 @@ void TorcMuxer::WriteDummyAudio(void)
                 m_audioPacket->dts = m_lastAudioPts;
                 m_audioPacket->stream_index = m_audioStream;
                 if (av_write_frame(m_formatCtx, m_audioPacket) < 0)
-                    LOG(VB_GENERAL, LOG_ERR, "Failed to write audio frame to muxer");
+                    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to write audio frame to muxer"));
             }
             av_packet_unref(m_audioPacket);
             break;
@@ -423,7 +421,7 @@ void TorcMuxer::CopyExtraData(int Size, void* Source, int Stream)
 
     if (m_formatCtx->nb_streams <= 0 || (uint)Stream >= m_formatCtx->nb_streams || Stream < 0)
     {
-        LOG(VB_GENERAL, LOG_INFO, "Cannot copy extradata - invalid stream");
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Cannot copy extradata - invalid stream"));
         return;
     }
 
@@ -452,13 +450,13 @@ bool TorcMuxer::AddPacket(AVPacket *Packet, bool CodecConfig)
 
     if (!m_started)
     {
-        LOG(VB_GENERAL, LOG_WARNING, "Ignoring packet - stream not started (waiting for config?)");
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Ignoring packet - stream not started (waiting for config?)"));
         return true;
     }
 
     int result = av_write_frame(m_formatCtx, Packet);
     if (result < 0)
-        LOG(VB_GENERAL, LOG_ERR, "Failed to write video frame");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to write video frame"));
     else
         m_lastVideoPts = Packet->pts;
 
@@ -484,7 +482,7 @@ void TorcMuxer::Start(void)
         AVDictionary *opts = nullptr;
         av_dict_set(&opts, "movflags", "frag_custom+dash+delay_moov", 0);
         if (avformat_write_header(m_formatCtx, &opts))
-            LOG(VB_GENERAL, LOG_ERR, "Failed to set demuxer options");
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to set demuxer options"));
         av_dict_free(&opts);
     }
 }
@@ -502,7 +500,7 @@ void TorcMuxer::Finish(void)
     if (m_formatCtx)
     {
         if (av_write_trailer(m_formatCtx))
-            LOG(VB_GENERAL, LOG_ERR, "Failed to write stream trailer");
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to write stream trailer"));
         //avio_close(m_formatCtx->pb);
     }
 }

@@ -7,10 +7,10 @@
 // Torc
 #include "torcdevice.h"
 
-#define NOTIFICATION_TITLE   QString("title")
-#define NOTIFICATION_BODY    QString("body")
-#define UNKNOWN_TITLE        QString("Torc")
-#define UNKNOWN_BODY         QString("Unknown")
+#define NOTIFICATION_TITLE   QStringLiteral("title")
+#define NOTIFICATION_BODY    QStringLiteral("body")
+#define UNKNOWN_TITLE        QStringLiteral("Torc")
+#define UNKNOWN_BODY         QStringLiteral("Unknown")
 
 class TorcNotifier : public TorcDevice
 {

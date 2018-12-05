@@ -47,7 +47,7 @@ TorcAdminThread::TorcAdminThread()
 
 void TorcAdminThread::Start(void)
 {
-    LOG(VB_GENERAL, LOG_INFO, "Admin thread starting");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Admin thread starting"));
 
     // create objects that will run in the admin thread
     TorcAdminObject::CreateObjects();
@@ -56,7 +56,7 @@ void TorcAdminThread::Start(void)
 void TorcAdminThread::Finish(void)
 {
     TorcAdminObject::DestroyObjects();
-    LOG(VB_GENERAL, LOG_INFO, "Admin thread stopping");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Admin thread stopping"));
 }
 
 /*! \class TorcAdminObject
@@ -138,7 +138,7 @@ void TorcAdminObject::CreateObjects(void)
     // guard against multiple concurrent use
     if (!gTorcAdminObjects.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_CRIT, "Trying to create admin objects but they already exist!");
+        LOG(VB_GENERAL, LOG_CRIT, QStringLiteral("Trying to create admin objects but they already exist!"));
         return;
     }
 

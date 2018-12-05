@@ -28,113 +28,113 @@ QString EventToString(OMX_EVENTTYPE Event)
 {
     switch (Event)
     {
-        case OMX_EventCmdComplete:               return QString("CmdComplete");
-        case OMX_EventError:                     return QString("Error");
-        case OMX_EventMark:                      return QString("Mark");
-        case OMX_EventPortSettingsChanged:       return QString("PortSettingsChanged");
-        case OMX_EventBufferFlag:                return QString("BufferFlag");
-        case OMX_EventResourcesAcquired:         return QString("ResourcesAcquired");
-        case OMX_EventComponentResumed:          return QString("ComponentResumed");
-        case OMX_EventDynamicResourcesAvailable: return QString("DynamicResourcesAvailable");
-        case OMX_EventPortFormatDetected:        return QString("PortFormatDetected");
+        case OMX_EventCmdComplete:               return QStringLiteral("CmdComplete");
+        case OMX_EventError:                     return QStringLiteral("Error");
+        case OMX_EventMark:                      return QStringLiteral("Mark");
+        case OMX_EventPortSettingsChanged:       return QStringLiteral("PortSettingsChanged");
+        case OMX_EventBufferFlag:                return QStringLiteral("BufferFlag");
+        case OMX_EventResourcesAcquired:         return QStringLiteral("ResourcesAcquired");
+        case OMX_EventComponentResumed:          return QStringLiteral("ComponentResumed");
+        case OMX_EventDynamicResourcesAvailable: return QStringLiteral("DynamicResourcesAvailable");
+        case OMX_EventPortFormatDetected:        return QStringLiteral("PortFormatDetected");
         default: break;
     }
 
-    return QString("Unknown %1").arg(Event);
+    return QStringLiteral("Unknown %1").arg(Event);
 }
 
 QString StateToString(OMX_STATETYPE State)
 {
     switch (State)
     {
-        case OMX_StateInvalid:          return QString("Invalid");
-        case OMX_StateLoaded:           return QString("Loaded");
-        case OMX_StateIdle:             return QString("Idle");
-        case OMX_StateExecuting:        return QString("Executing");
-        case OMX_StatePause:            return QString("Pause");
-        case OMX_StateWaitForResources: return QString("WaitForResources");
+        case OMX_StateInvalid:          return QStringLiteral("Invalid");
+        case OMX_StateLoaded:           return QStringLiteral("Loaded");
+        case OMX_StateIdle:             return QStringLiteral("Idle");
+        case OMX_StateExecuting:        return QStringLiteral("Executing");
+        case OMX_StatePause:            return QStringLiteral("Pause");
+        case OMX_StateWaitForResources: return QStringLiteral("WaitForResources");
         default: break;
     }
-    return QString("Unknown %1").arg(State);
+    return QStringLiteral("Unknown %1").arg(State);
 }
 
 QString ErrorToString(OMX_ERRORTYPE Error)
 {
     switch (Error)
     {
-        case OMX_ErrorNone:                               return QString("None");
-        case OMX_ErrorInsufficientResources:              return QString("InsufficientResources");
-        case OMX_ErrorUndefined:                          return QString("Undefined");
-        case OMX_ErrorInvalidComponentName:               return QString("InvalidComponentName");
-        case OMX_ErrorComponentNotFound:                  return QString("ComponentNotFound");
-        case OMX_ErrorInvalidComponent:                   return QString("InvalidComponent");
-        case OMX_ErrorBadParameter:                       return QString("BadParameter");
-        case OMX_ErrorNotImplemented:                     return QString("NotImplemented");
-        case OMX_ErrorUnderflow:                          return QString("Underflow");
-        case OMX_ErrorOverflow:                           return QString("Overflow");
-        case OMX_ErrorHardware:                           return QString("Hardware");
-        case OMX_ErrorInvalidState:                       return QString("InvalidState");
-        case OMX_ErrorStreamCorrupt:                      return QString("StreamCorrupt");
-        case OMX_ErrorPortsNotCompatible:                 return QString("PortsNotCompatible");
-        case OMX_ErrorResourcesLost:                      return QString("ResourcesLost");
-        case OMX_ErrorNoMore:                             return QString("NoMore");
-        case OMX_ErrorVersionMismatch:                    return QString("VersionMismatch");
-        case OMX_ErrorNotReady:                           return QString("NotReady");
-        case OMX_ErrorTimeout:                            return QString("Timeout");
-        case OMX_ErrorSameState:                          return QString("SameState");
-        case OMX_ErrorResourcesPreempted:                 return QString("ResourcesPreempted");
-        case OMX_ErrorPortUnresponsiveDuringAllocation:   return QString("PortUnresponsiveDuringAllocation");
-        case OMX_ErrorPortUnresponsiveDuringDeallocation: return QString("PortUnresponsiveDuringDeallocation");
-        case OMX_ErrorPortUnresponsiveDuringStop:         return QString("PortUnresponsiveDuringStop");
-        case OMX_ErrorIncorrectStateTransition:           return QString("IncorrectStateTransition");
-        case OMX_ErrorIncorrectStateOperation:            return QString("IncorrectStateOperation");
-        case OMX_ErrorUnsupportedSetting:                 return QString("UnsupportedSetting");
-        case OMX_ErrorUnsupportedIndex:                   return QString("UnsupportedIndex");
-        case OMX_ErrorBadPortIndex:                       return QString("BadPortIndex");
-        case OMX_ErrorPortUnpopulated:                    return QString("PortUnpopulated");
-        case OMX_ErrorComponentSuspended:                 return QString("ComponentSuspended");
-        case OMX_ErrorDynamicResourcesUnavailable:        return QString("DynamicResourcesUnavailable");
-        case OMX_ErrorMbErrorsInFrame:                    return QString("MbErrorsInFrame");
-        case OMX_ErrorFormatNotDetected:                  return QString("FormatNotDetected");
-        case OMX_ErrorContentPipeOpenFailed:              return QString("ContentPipeOpenFailed");
-        case OMX_ErrorContentPipeCreationFailed:          return QString("ContentPipeCreationFailed");
-        case OMX_ErrorSeperateTablesUsed:                 return QString("SeperateTablesUsed");
-        case OMX_ErrorTunnelingUnsupported:               return QString("TunnelingUnsupported");
-        case OMX_ErrorMax:                                return QString("Max");
+        case OMX_ErrorNone:                               return QStringLiteral("None");
+        case OMX_ErrorInsufficientResources:              return QStringLiteral("InsufficientResources");
+        case OMX_ErrorUndefined:                          return QStringLiteral("Undefined");
+        case OMX_ErrorInvalidComponentName:               return QStringLiteral("InvalidComponentName");
+        case OMX_ErrorComponentNotFound:                  return QStringLiteral("ComponentNotFound");
+        case OMX_ErrorInvalidComponent:                   return QStringLiteral("InvalidComponent");
+        case OMX_ErrorBadParameter:                       return QStringLiteral("BadParameter");
+        case OMX_ErrorNotImplemented:                     return QStringLiteral("NotImplemented");
+        case OMX_ErrorUnderflow:                          return QStringLiteral("Underflow");
+        case OMX_ErrorOverflow:                           return QStringLiteral("Overflow");
+        case OMX_ErrorHardware:                           return QStringLiteral("Hardware");
+        case OMX_ErrorInvalidState:                       return QStringLiteral("InvalidState");
+        case OMX_ErrorStreamCorrupt:                      return QStringLiteral("StreamCorrupt");
+        case OMX_ErrorPortsNotCompatible:                 return QStringLiteral("PortsNotCompatible");
+        case OMX_ErrorResourcesLost:                      return QStringLiteral("ResourcesLost");
+        case OMX_ErrorNoMore:                             return QStringLiteral("NoMore");
+        case OMX_ErrorVersionMismatch:                    return QStringLiteral("VersionMismatch");
+        case OMX_ErrorNotReady:                           return QStringLiteral("NotReady");
+        case OMX_ErrorTimeout:                            return QStringLiteral("Timeout");
+        case OMX_ErrorSameState:                          return QStringLiteral("SameState");
+        case OMX_ErrorResourcesPreempted:                 return QStringLiteral("ResourcesPreempted");
+        case OMX_ErrorPortUnresponsiveDuringAllocation:   return QStringLiteral("PortUnresponsiveDuringAllocation");
+        case OMX_ErrorPortUnresponsiveDuringDeallocation: return QStringLiteral("PortUnresponsiveDuringDeallocation");
+        case OMX_ErrorPortUnresponsiveDuringStop:         return QStringLiteral("PortUnresponsiveDuringStop");
+        case OMX_ErrorIncorrectStateTransition:           return QStringLiteral("IncorrectStateTransition");
+        case OMX_ErrorIncorrectStateOperation:            return QStringLiteral("IncorrectStateOperation");
+        case OMX_ErrorUnsupportedSetting:                 return QStringLiteral("UnsupportedSetting");
+        case OMX_ErrorUnsupportedIndex:                   return QStringLiteral("UnsupportedIndex");
+        case OMX_ErrorBadPortIndex:                       return QStringLiteral("BadPortIndex");
+        case OMX_ErrorPortUnpopulated:                    return QStringLiteral("PortUnpopulated");
+        case OMX_ErrorComponentSuspended:                 return QStringLiteral("ComponentSuspended");
+        case OMX_ErrorDynamicResourcesUnavailable:        return QStringLiteral("DynamicResourcesUnavailable");
+        case OMX_ErrorMbErrorsInFrame:                    return QStringLiteral("MbErrorsInFrame");
+        case OMX_ErrorFormatNotDetected:                  return QStringLiteral("FormatNotDetected");
+        case OMX_ErrorContentPipeOpenFailed:              return QStringLiteral("ContentPipeOpenFailed");
+        case OMX_ErrorContentPipeCreationFailed:          return QStringLiteral("ContentPipeCreationFailed");
+        case OMX_ErrorSeperateTablesUsed:                 return QStringLiteral("SeperateTablesUsed");
+        case OMX_ErrorTunnelingUnsupported:               return QStringLiteral("TunnelingUnsupported");
+        case OMX_ErrorMax:                                return QStringLiteral("Max");
         default: break;
     }
 
-    return QString("Unknown error 0x%1").arg(Error, 0, 16);
+    return QStringLiteral("Unknown error 0x%1").arg(Error, 0, 16);
 }
 
 QString CommandToString(OMX_COMMANDTYPE Command)
 {
     switch (Command)
     {
-        case OMX_CommandStateSet:    return QString("StateSet");
-        case OMX_CommandFlush:       return QString("Flush");
-        case OMX_CommandPortDisable: return QString("PortDisable");
-        case OMX_CommandPortEnable:  return QString("PortEnable");
-        case OMX_CommandMarkBuffer:  return QString("MarkBuffer");
-        case OMX_CommandMax:         return QString("Max");
+        case OMX_CommandStateSet:    return QStringLiteral("StateSet");
+        case OMX_CommandFlush:       return QStringLiteral("Flush");
+        case OMX_CommandPortDisable: return QStringLiteral("PortDisable");
+        case OMX_CommandPortEnable:  return QStringLiteral("PortEnable");
+        case OMX_CommandMarkBuffer:  return QStringLiteral("MarkBuffer");
+        case OMX_CommandMax:         return QStringLiteral("Max");
         default: break;
     }
 
-    return QString("Unknown %1").arg(Command);
+    return QStringLiteral("Unknown %1").arg(Command);
 }
 
 QString DomainToString(OMX_INDEXTYPE Domain)
 {
     switch (Domain)
     {
-        case OMX_IndexParamAudioInit: return QString("Audio");
-        case OMX_IndexParamImageInit: return QString("Image");
-        case OMX_IndexParamVideoInit: return QString("Video");
-        case OMX_IndexParamOtherInit: return QString("Other");
+        case OMX_IndexParamAudioInit: return QStringLiteral("Audio");
+        case OMX_IndexParamImageInit: return QStringLiteral("Image");
+        case OMX_IndexParamVideoInit: return QStringLiteral("Video");
+        case OMX_IndexParamOtherInit: return QStringLiteral("Other");
         default: break;
     }
 
-    return QString("Unknown");
+    return QStringLiteral("Unknown");
 }
 
 TorcOMXCore::TorcOMXCore()
@@ -142,19 +142,19 @@ TorcOMXCore::TorcOMXCore()
     OMX_ERRORTYPE error = OMX_Init();
     if (OMX_ErrorNone != error)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to initialise OMXCore (Error '%1')").arg(ErrorToString(error)));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to initialise OMXCore (Error '%1')").arg(ErrorToString(error)));
         return;
     }
 
-    LOG(VB_GENERAL, LOG_INFO, "Available OMX components:");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Available OMX components:"));
     OMX_U32 index = 0;
     char componentname[128];
     while (OMX_ComponentNameEnum(&componentname[0], 128, index++) == OMX_ErrorNone)
-        LOG(VB_GENERAL, LOG_INFO, componentname);
+        LOG(VB_GENERAL, LOG_INFO, QString(componentname));
 }
 
 TorcOMXCore::~TorcOMXCore()
 {
-    LOG(VB_GENERAL, LOG_INFO, "Closing OpenMax Core");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Closing OpenMax Core"));
     OMX_Deinit();
 }

@@ -95,35 +95,35 @@ TorcTriggerNotification::TorcTriggerNotification(const QVariantMap &Details)
     if (uniqueId.isEmpty() || m_notifierNames.isEmpty() || m_body.isEmpty())
         return;
 
-    if (Details.contains("inputs"))
+    if (Details.contains(QStringLiteral("inputs")))
     {
-        QVariantMap inputs = Details.value("inputs").toMap();
+        QVariantMap inputs = Details.value(QStringLiteral("inputs")).toMap();
         QVariantMap::const_iterator it = inputs.constBegin();
         for ( ; it != inputs.constEnd(); ++it)
         {
-            if (it.key() == "device")
+            if (it.key() == QStringLiteral("device"))
             {
                 m_inputName = it.value().toString().trimmed();
-                m_customData.insert("inputname", m_inputName);
-                m_customData.insert("name", userName);
+                m_customData.insert(QStringLiteral("inputname"), m_inputName);
+                m_customData.insert(QStringLiteral("name"), userName);
                 break;
             }
         }
     }
 
-    if (Details.contains("triggerlow"))
+    if (Details.contains(QStringLiteral("triggerlow")))
     {
         m_triggerHigh = false;
         m_lastValue = 1.0;
     }
 
-    if (Details.contains("references"))
+    if (Details.contains(QStringLiteral("references")))
     {
-        QVariantMap references = Details.value("references").toMap();
+        QVariantMap references = Details.value(QStringLiteral("references")).toMap();
         QVariantMap::const_iterator it = references.constBegin();
         for ( ; it != references.constEnd(); ++it)
         {
-            if (it.key() == "device")
+            if (it.key() == QStringLiteral("device"))
                 m_references.append(it.value().toString().trimmed());
         }
     }
@@ -148,13 +148,13 @@ void TorcTriggerNotification::Graph(QByteArray *Data)
         return;
 
     if (m_input)
-        Data->append(QString("    \"%2\"->\"%1\"\r\n").arg(uniqueId, m_input->GetUniqueId()));
+        Data->append(QStringLiteral("    \"%2\"->\"%1\"\r\n").arg(uniqueId, m_input->GetUniqueId()));
 
     foreach (TorcDevice *device, m_referenceDevices)
-        Data->append(QString("    \"%1\"->\"%2\" [style=dashed]\r\n").arg(device->GetUniqueId(), uniqueId));
+        Data->append(QStringLiteral("    \"%1\"->\"%2\" [style=dashed]\r\n").arg(device->GetUniqueId(), uniqueId));
 
     foreach (TorcNotifier* notifier, m_notifiers)
-        Data->append(QString("    \"%1\"->\"%2\"\r\n").arg(uniqueId, notifier->GetUniqueId()));
+        Data->append(QStringLiteral("    \"%1\"->\"%2\"\r\n").arg(uniqueId, notifier->GetUniqueId()));
 }
 
 void TorcTriggerNotification::InputValueChanged(double Value)
@@ -178,7 +178,7 @@ void TorcTriggerNotification::InputValueChanged(double Value)
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("TriggerNotifiction '%1' signalled from unknown input").arg(uniqueId));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("TriggerNotifiction '%1' signalled from unknown input").arg(uniqueId));
     }
 }
 
@@ -201,7 +201,7 @@ bool TorcTriggerNotification::Setup(void)
 
     if (!input)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to find input '%1' for trigger notification '%2'").arg(m_inputName, uniqueId));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to find input '%1' for trigger notification '%2'").arg(m_inputName, uniqueId));
         return false;
     }
 
@@ -223,7 +223,7 @@ class TorcTriggerNotificationFactory final : public TorcNotificationFactory
 {
     TorcNotification* Create(const QString &Type, const QVariantMap &Details) override
     {
-        if (Type == "trigger" && Details.contains("inputs"))
+        if (Type == QStringLiteral("trigger") && Details.contains(QStringLiteral("inputs")))
             return new TorcTriggerNotification(Details);
         return nullptr;
     }

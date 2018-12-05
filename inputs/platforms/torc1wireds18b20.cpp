@@ -34,7 +34,7 @@
 
 Torc1WireReader::Torc1WireReader(const QString &DeviceName)
   : m_timer(),
-    m_file(ONE_WIRE_DIRECTORY + DeviceName + "/w1_slave")
+    m_file(QStringLiteral("%1%2/w1_slave").arg(ONE_WIRE_DIRECTORY, DeviceName))
 {
     m_timer.setTimerType(Qt::CoarseTimer);
     m_timer.setSingleShot(true);
@@ -47,7 +47,7 @@ void Torc1WireReader::Read(void)
 {
     if (!m_file.open(QIODevice::ReadOnly))
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to read device '%1' (Error #%2: '%3')")
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to read device '%1' (Error #%2: '%3')")
                                  .arg(m_file.fileName()).arg(m_file.error()).arg(m_file.errorString()));
         emit NewTemperature(0.0, false);
         m_timer.start(MIN_READ_INTERVAL);
@@ -59,19 +59,19 @@ void Torc1WireReader::Read(void)
 
     // check crc
     QString line = text.readLine();
-    if (!line.contains("crc") || !line.contains("YES"))
+    if (!line.contains(QStringLiteral("crc")) || !line.contains(QStringLiteral("YES")))
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("CRC check failed for device %1").arg(m_file.fileName()));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("CRC check failed for device %1").arg(m_file.fileName()));
         emit NewTemperature(0.0, false);
     }
     else
     {
         // read temp
         line = text.readLine().trimmed();
-        int index = line.lastIndexOf("t=");
+        int index = line.lastIndexOf(QStringLiteral("t="));
         if (index < 0)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse temperature for device %1").arg(m_file.fileName()));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to parse temperature for device %1").arg(m_file.fileName()));
             emit NewTemperature(0.0, false);
         }
         else
@@ -85,7 +85,7 @@ void Torc1WireReader::Read(void)
             }
             else
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("Failed to convert temperature for device %1").arg(m_file.fileName()));
+                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to convert temperature for device %1").arg(m_file.fileName()));
                 emit NewTemperature(0.0, false);
             }
         }
@@ -95,7 +95,7 @@ void Torc1WireReader::Read(void)
 }
 
 Torc1WireReadThread::Torc1WireReadThread(Torc1WireDS18B20 *Parent, const QString &DeviceName)
-  : TorcQThread("1Wire"),
+  : TorcQThread(QStringLiteral("1Wire")),
     m_parent(Parent),
     m_reader(nullptr),
     m_deviceName(DeviceName)
@@ -125,8 +125,8 @@ Torc1WireDS18B20::Torc1WireDS18B20(const QVariantMap &Details)
                          TorcCentral::GetGlobalTemperatureUnits() == TorcCentral::Celsius ? -55.0 : -67.0,
                          TorcCentral::GetGlobalTemperatureUnits() == TorcCentral::Celsius ? 125.0 : 257.0,
                          DS18B20NAME, Details),
-    m_deviceId(Details.value("wire1serial").toString()),
-    m_readThread(this, Details.value("wire1serial").toString())
+    m_deviceId(Details.value(QStringLiteral("wire1serial")).toString()),
+    m_readThread(this, Details.value(QStringLiteral("wire1serial")).toString())
 {
     m_readThread.start();
 }

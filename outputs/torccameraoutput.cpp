@@ -20,7 +20,7 @@
 * USA.
 */
 
-#define AKAMAI_TIME_ISO QString("http://time.akamai.com/?iso")
+#define AKAMAI_TIME_ISO QStringLiteral("http://time.akamai.com/?iso")
 
 // Qt
 #include <QDir>
@@ -64,13 +64,13 @@ void TorcCameraOutput::ParamsChanged(TorcCameraParams &Params)
 {
     m_paramsLock.lockForWrite();
     m_params = Params;
-    LOG(VB_GENERAL, LOG_INFO, QString("Camera parameters changed - video codec '%1'").arg(m_params.m_videoCodec));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Camera parameters changed - video codec '%1'").arg(m_params.m_videoCodec));
     m_paramsLock.unlock();
 }
 
 TorcCameraStillsOutput::TorcCameraStillsOutput(const QString &ModelId, const QVariantMap &Details)
   : TorcCameraOutput(TorcOutput::Camera, 0.0, ModelId, Details, this, TorcCameraStillsOutput::staticMetaObject,
-               "StillReady"),
+                     QStringLiteral("StillReady")),
     stillsList(),
     m_stillsList(),
     m_stillsDirectory()
@@ -83,9 +83,9 @@ TorcCameraStillsOutput::TorcCameraStillsOutput(const QString &ModelId, const QVa
     if (!stillsdir.exists())
         stillsdir.mkpath(m_stillsDirectory);
     QStringList namefilters;
-    QStringList imagefilters = TorcMime::ExtensionsForType("image");
+    QStringList imagefilters = TorcMime::ExtensionsForType(QStringLiteral("image"));
     foreach (const QString &image, imagefilters)
-        { namefilters << QString("*." + image); }
+        { namefilters << QStringLiteral("*.%1").arg(image); }
     QFileInfoList stills = stillsdir.entryInfoList(namefilters, QDir::NoDotAndDotDot | QDir::Files | QDir::Readable, QDir::Name);
     foreach (const QFileInfo &file, stills)
         m_stillsList.append(file.fileName());
@@ -141,7 +141,7 @@ void TorcCameraStillsOutput::CameraErrored(bool Errored)
     SetValid(!Errored);
     if (Errored)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Camera reported error");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Camera reported error"));
         Stop();
     }
 }
@@ -151,7 +151,7 @@ void TorcCameraStillsOutput::StillReady(const QString &File)
     QWriteLocker locker(&m_threadLock);
     if (m_stillsList.contains(File))
     {
-        LOG(VB_GENERAL, LOG_WARNING, QString("Still '%1' is duplicate - ignoring").arg(File));
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Still '%1' is duplicate - ignoring").arg(File));
     }
     else
     {
@@ -162,7 +162,7 @@ void TorcCameraStillsOutput::StillReady(const QString &File)
 
 TorcCameraVideoOutput::TorcCameraVideoOutput(const QString &ModelId, const QVariantMap &Details)
   : TorcCameraOutput(TorcOutput::Camera, 0.0, ModelId, Details, this, TorcCameraVideoOutput::staticMetaObject,
-               "WritingStarted,WritingStopped,SegmentRemoved,InitSegmentReady,SegmentReady,TimeCheck,RequestReady"),
+                     QStringLiteral("WritingStarted,WritingStopped,SegmentRemoved,InitSegmentReady,SegmentReady,TimeCheck,RequestReady")),
     m_segments(),
     m_segmentLock(QReadWriteLock::Recursive),
     m_cameraStartTime(),
@@ -188,7 +188,7 @@ void TorcCameraVideoOutput::TimeCheck(void)
 {
     if (m_networkTimeRequest)
     {
-        LOG(VB_GENERAL, LOG_INFO, "Time check in progress - not resending");
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Time check in progress - not resending"));
         return;
     }
 
@@ -202,7 +202,7 @@ void TorcCameraVideoOutput::RequestReady(TorcNetworkRequest *Request)
 {
     if (Request && m_networkTimeRequest && (Request == m_networkTimeRequest))
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Network time (%1) : %2").arg(AKAMAI_TIME_ISO, Request->GetBuffer().constData()));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Network time (%1) : %2").arg(AKAMAI_TIME_ISO, Request->GetBuffer().constData()));
         m_networkTimeRequest->DownRef();
         m_networkTimeRequest = nullptr;
     }
@@ -215,7 +215,7 @@ TorcOutput::Type TorcCameraVideoOutput::GetType(void)
 
 QString TorcCameraVideoOutput::GetPresentationURL(void)
 {
-    return QString("%1%2").arg(m_signature, VIDEO_PAGE);
+    return QStringLiteral("%1%2").arg(m_signature, VIDEO_PAGE);
 }
 
 void TorcCameraVideoOutput::Start(void)
@@ -241,7 +241,7 @@ void TorcCameraVideoOutput::Start(void)
 /// The 'init' segment is ready and available.
 void TorcCameraVideoOutput::InitSegmentReady(void)
 {
-    LOG(VB_GENERAL, LOG_INFO, "Initial segment ready");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Initial segment ready"));
 }
 
 /// The camera has started to record video.
@@ -249,7 +249,7 @@ void TorcCameraVideoOutput::WritingStarted(void)
 {
     // we actually deem video output to be valid once the init segment has been received
     // (which is signalled separately)
-    LOG(VB_GENERAL, LOG_INFO, "Camera started");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Camera started"));
 }
 
 void TorcCameraVideoOutput::Stop(void)
@@ -270,7 +270,7 @@ void TorcCameraVideoOutput::Stop(void)
 /// The camera is no longer recording any video.
 void TorcCameraVideoOutput::WritingStopped(void)
 {
-    LOG(VB_GENERAL, LOG_INFO, "Camera stopped");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Camera stopped"));
     m_threadLock.lockForWrite();
     m_cameraStartTime = QDateTime();
     m_threadLock.unlock();
@@ -281,14 +281,14 @@ void TorcCameraVideoOutput::CameraErrored(bool Errored)
     SetValid(!Errored);
     if (Errored)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Camera reported error");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Camera reported error"));
         Stop();
     }
 }
 
 void TorcCameraVideoOutput::SegmentReady(int Segment)
 {
-    LOG(VB_GENERAL, LOG_DEBUG, QString("Segment %1 ready").arg(Segment));
+    LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("Segment %1 ready").arg(Segment));
 
     // allow remote clients to start reading once the first segment is saved
     m_threadLock.lockForRead();
@@ -299,7 +299,7 @@ void TorcCameraVideoOutput::SegmentReady(int Segment)
         // set start time now and 'backdate' as the init segment is usually sent once processing has started, so the rest
         // of the segment arrives quicker than 'expected'
         m_cameraStartTime = QDateTime::currentDateTimeUtc().addMSecs(VIDEO_SEGMENT_TARGET * -1000);
-        LOG(VB_GENERAL, LOG_INFO, "First segment ready - start time set");
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("First segment ready - start time set"));
     }
     m_threadLock.unlock();
 
@@ -308,7 +308,7 @@ void TorcCameraVideoOutput::SegmentReady(int Segment)
     {
         if (!m_segments.isEmpty() && m_segments.constFirst() >= Segment)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Segment %1 is not greater than head (%2)").arg(Segment).arg(m_segments.constFirst()));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Segment %1 is not greater than head (%2)").arg(Segment).arg(m_segments.constFirst()));
         }
         else
         {
@@ -317,24 +317,24 @@ void TorcCameraVideoOutput::SegmentReady(int Segment)
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Already have a segment #%1").arg(Segment));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Already have a segment #%1").arg(Segment));
     }
 }
 
 void TorcCameraVideoOutput::SegmentRemoved(int Segment)
 {
-    LOG(VB_GENERAL, LOG_DEBUG, QString("Segment %1 removed").arg(Segment));
+    LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("Segment %1 removed").arg(Segment));
 
     QWriteLocker locker(&m_segmentLock);
 
     if (m_segments.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, "Cannot remove segment - segments list is empty");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Cannot remove segment - segments list is empty"));
     }
     else
     {
         if (m_segments.constFirst() != Segment)
-            LOG(VB_GENERAL, LOG_ERR, QString("Segment %1 is not at tail of queue").arg(Segment));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Segment %1 is not at tail of queue").arg(Segment));
         else
             m_segments.dequeue();
     }
@@ -367,8 +367,8 @@ void TorcCameraVideoOutput::ProcessHTTPRequest(const QString &PeerAddress, int P
     bool hlsplaylist = method.compare(HLS_PLAYLIST) == 0;
     bool player      = method.compare(VIDEO_PAGE) == 0;
     bool dash        = method.compare(DASH_PLAYLIST) == 0;
-    bool segment     = method.startsWith("segment") && method.endsWith(".m4s");
-    bool init        = method.startsWith("init") && method.endsWith(".mp4");
+    bool segment     = method.startsWith(QStringLiteral("segment")) && method.endsWith(QStringLiteral(".m4s"));
+    bool init        = method.startsWith(QStringLiteral("init")) && method.endsWith(QStringLiteral(".mp4"));
 
     if (!(hlsplaylist || player || hlsmaster || dash || segment || init))
     {
@@ -402,28 +402,28 @@ void TorcCameraVideoOutput::ProcessHTTPRequest(const QString &PeerAddress, int P
 
     if (hlsmaster)
     {
-        LOG(VB_GENERAL, LOG_DEBUG, "Sending master HLS playlist");
+        LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("Sending master HLS playlist"));
         result = GetMasterPlaylist();
         Request.SetAllowGZip(true);
         Request.SetResponseType(HTTPResponseM3U8Apple);
     }
     else if (hlsplaylist)
     {
-        LOG(VB_GENERAL, LOG_DEBUG, "Sending HLS playlist");
+        LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("Sending HLS playlist"));
         result = GetHLSPlaylist();
         Request.SetAllowGZip(true);
         Request.SetResponseType(HTTPResponseM3U8Apple);
     }
     else if (player)
     {
-        LOG(VB_GENERAL, LOG_DEBUG, "Sending video page");
+        LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("Sending video page"));
         result = GetPlayerPage();
         Request.SetAllowGZip(true);
         Request.SetResponseType(HTTPResponseHTML);
     }
     else if (dash)
     {
-        LOG(VB_GENERAL, LOG_DEBUG, "Sending DASH playlist");
+        LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("Sending DASH playlist"));
         result = GetDashPlaylist();
         Request.SetAllowGZip(true);
         Request.SetResponseType(HTTPResponseMPD);
@@ -437,7 +437,7 @@ void TorcCameraVideoOutput::ProcessHTTPRequest(const QString &PeerAddress, int P
         if (ok)
         {
             QReadLocker locker(&m_threadLock);
-            LOG(VB_GENERAL, LOG_DEBUG, QString("Segment %1 requested").arg(num));
+            LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("Segment %1 requested").arg(num));
             result = m_thread->GetSegment(num);
             if (!result.isEmpty())
             {
@@ -449,20 +449,20 @@ void TorcCameraVideoOutput::ProcessHTTPRequest(const QString &PeerAddress, int P
                 QReadLocker locker(&m_segmentLock);
                 if (m_segments.isEmpty())
                 {
-                    LOG(VB_GENERAL, LOG_WARNING, QString("No segments - %1 requested").arg(num));
+                    LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("No segments - %1 requested").arg(num));
                 }
                 else
                 {
                     m_threadLock.lockForRead();
                     QDateTime start = m_cameraStartTime;
                     m_threadLock.unlock();
-                    LOG(VB_GENERAL, LOG_WARNING, QString("Segment %1 not found - we have %2-%3")
+                    LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Segment %1 not found - we have %2-%3")
                         .arg(num).arg(m_segments.constFirst()).arg(m_segments.constLast()));
-                    LOG(VB_GENERAL, LOG_WARNING, QString("Our start time: %1").arg(start.toString(Qt::ISODate)));
-                    LOG(VB_GENERAL, LOG_WARNING, QString("Start+request : %1").arg(start.addSecs(num *2).toString(Qt::ISODate)));
-                    LOG(VB_GENERAL, LOG_WARNING, QString("Start+first   : %1").arg(start.addSecs(m_segments.constFirst() * 2).toString(Qt::ISODate)));
-                    LOG(VB_GENERAL, LOG_WARNING, QString("Start+last    : %1").arg(start.addSecs(m_segments.constLast() * 2).toString(Qt::ISODate)));
-                    LOG(VB_GENERAL, LOG_WARNING, QString("System time   : %1").arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate)));
+                    LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Our start time: %1").arg(start.toString(Qt::ISODate)));
+                    LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Start+request : %1").arg(start.addSecs(num *2).toString(Qt::ISODate)));
+                    LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Start+first   : %1").arg(start.addSecs(m_segments.constFirst() * 2).toString(Qt::ISODate)));
+                    LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Start+last    : %1").arg(start.addSecs(m_segments.constLast() * 2).toString(Qt::ISODate)));
+                    LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("System time   : %1").arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate)));
                     emit CheckTime();
                 }
 
@@ -478,7 +478,7 @@ void TorcCameraVideoOutput::ProcessHTTPRequest(const QString &PeerAddress, int P
     else if (init)
     {
         QReadLocker locker(&m_threadLock);
-        LOG(VB_GENERAL, LOG_DEBUG, "Init segment requested");
+        LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("Init segment requested"));
         result = m_thread->GetInitSegment();
         if (!result.isEmpty())
         {
@@ -487,7 +487,7 @@ void TorcCameraVideoOutput::ProcessHTTPRequest(const QString &PeerAddress, int P
         }
         else
         {
-            LOG(VB_GENERAL, LOG_WARNING, "Init segment not found");
+            LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Init segment not found"));
         }
     }
 
@@ -546,8 +546,8 @@ QByteArray TorcCameraVideoOutput::GetHLSPlaylist(void)
     QString result = playlist.arg(duration).arg(m_segments.constFirst());
     foreach (int segment, m_segments)
     {
-        result += QString("#EXTINF:%1,\r\n").arg(duration);
-        result += QString("segment%1.m4s\r\n").arg(segment);
+        result += QStringLiteral("#EXTINF:%1,\r\n").arg(duration);
+        result += QStringLiteral("segment%1.m4s\r\n").arg(segment);
     }
     m_segmentLock.unlock();
     return QByteArray(result.toLocal8Bit());
@@ -606,14 +606,14 @@ void TorcCameraOutputs::Create(const QVariantMap &Details)
     QVariantMap::const_iterator ii = Details.constBegin();
     for ( ; ii != Details.constEnd(); ++ii)
     {
-        if (ii.key() != "outputs")
+        if (ii.key() != QStringLiteral("outputs"))
             continue;
 
         QVariantMap outputs = ii.value().toMap();
         QVariantMap::const_iterator i = outputs.constBegin();
         for ( ; i != outputs.constEnd(); ++i)
         {
-            if (i.key() != "cameras")
+            if (i.key() != QStringLiteral("cameras"))
                 continue;
 
             QVariantMap cameras = i.value().toMap();
@@ -627,49 +627,49 @@ void TorcCameraOutputs::Create(const QVariantMap &Details)
                     bool video  = false;
                     bool stills = false;
                     QVariantMap camera;
-                    if (it2.key() == "video")
+                    if (it2.key() == QStringLiteral("video"))
                     {
                         video = true;
                         camera = it2.value().toMap();
                     }
-                    else if (it2.key() == "stills")
+                    else if (it2.key() == QStringLiteral("stills"))
                     {
                         stills = true;
                         camera = it2.value().toMap();
                     }
                     else
                     {
-                        LOG(VB_GENERAL, LOG_ERR, QString("Unknown camera interface '%1'").arg(it2.key()));
+                        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Unknown camera interface '%1'").arg(it2.key()));
                         continue;
                     }
 
-                    if (!camera.contains("name"))
+                    if (!camera.contains(QStringLiteral("name")))
                     {
-                        LOG(VB_GENERAL, LOG_ERR, QString("Camera '%1' has no name").arg(it.key()));
+                        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Camera '%1' has no name").arg(it.key()));
                         continue;
                     }
-                    if (!camera.contains("width"))
+                    if (!camera.contains(QStringLiteral("width")))
                     {
-                        LOG(VB_GENERAL, LOG_ERR, QString("Camera '%1' does not specify width").arg(camera.value("name").toString()));
+                        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Camera '%1' does not specify width").arg(camera.value(QStringLiteral("name")).toString()));
                         continue;
                     }
-                    if (!camera.contains("height"))
+                    if (!camera.contains(QStringLiteral("height")))
                     {
-                        LOG(VB_GENERAL, LOG_ERR, QString("Camera '%1' does not specify height").arg(camera.value("name").toString()));
+                        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Camera '%1' does not specify height").arg(camera.value(QStringLiteral("name")).toString()));
                         continue;
                     }
-                    bool bitrate   = camera.contains("bitrate");
-                    bool framerate = camera.contains("framerate");
+                    bool bitrate   = camera.contains(QStringLiteral("bitrate"));
+                    bool framerate = camera.contains(QStringLiteral("framerate"));
 
                     if (video && !bitrate)
                     {
-                        LOG(VB_GENERAL, LOG_ERR, QString("Camera video interface '%1' does not specify bitrate").arg(camera.value("name").toString()));
+                        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Camera video interface '%1' does not specify bitrate").arg(camera.value(QStringLiteral("name")).toString()));
                         continue;
                     }
 
                     if (video && !framerate)
                     {
-                        LOG(VB_GENERAL, LOG_ERR, QString("Camera video interface '%1' does not specify framerate").arg(camera.value("name").toString()));
+                        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Camera video interface '%1' does not specify framerate").arg(camera.value(QStringLiteral("name")).toString()));
                         continue;
                     }
 
@@ -690,13 +690,13 @@ void TorcCameraOutputs::Create(const QVariantMap &Details)
                             if (newcamera)
                             {
                                 m_cameras.insertMulti(it.key(), newcamera);
-                                LOG(VB_GENERAL, LOG_INFO, QString("New '%1' camera '%2'").arg(it.key(), newcamera->GetUniqueId()));
+                                LOG(VB_GENERAL, LOG_INFO, QStringLiteral("New '%1' camera '%2'").arg(it.key(), newcamera->GetUniqueId()));
                                 break;
                             }
                         }
                     }
                     if (nullptr == newcamera)
-                        LOG(VB_GENERAL, LOG_WARNING, QString("Failed to find handler for camera '%1'").arg(it.key()));
+                        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Failed to find handler for camera '%1'").arg(it.key()));
                 }
             }
         }

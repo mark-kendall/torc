@@ -32,7 +32,7 @@
 
 QMap<QString,int> TorcLanguage::gLanguageMap;
 
-#define BLACKLIST QString("SetLanguageCode,LanguageSettingChanged")
+#define BLACKLIST QStringLiteral("SetLanguageCode,LanguageSettingChanged")
 
 /*! \class TorcLanguage
  *  \brief A class to track and manage language and locale settings and available translations.
@@ -56,7 +56,7 @@ QMap<QString,int> TorcLanguage::gLanguageMap;
 */
 TorcLanguage::TorcLanguage(TorcSetting *SettingParent)
   : QObject(),
-    TorcHTTPService(this, "languages", "languages", TorcLanguage::staticMetaObject, BLACKLIST),
+    TorcHTTPService(this, QStringLiteral("languages"), QStringLiteral("languages"), TorcLanguage::staticMetaObject, BLACKLIST),
     m_languageSetting(nullptr), // Don't initialise setting until we have a local default
     languageCode(),
     languageString(),
@@ -66,17 +66,17 @@ TorcLanguage::TorcLanguage(TorcSetting *SettingParent)
 {
     QCoreApplication::installTranslator(&m_translator);
 
-    LOG(VB_GENERAL, LOG_INFO, QString("System language: %1 (%2) (%3)(env - %4)")
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("System language: %1 (%2) (%3)(env - %4)")
         .arg(QLocale::languageToString(m_locale.language()), QLocale::countryToString(m_locale.country()),
-             m_locale.name(), qgetenv("LANG").constData()));
+             m_locale.name(), QString(qgetenv(QByteArrayLiteral("LANG").constData()))));
 
     Initialise();
 
     InitialiseTranslations();
     QString language = m_locale.name(); // somewhat circular
     if (language.isEmpty())
-        language = "en_GB";
-    m_languageSetting = new TorcSetting(SettingParent, "Language", tr("Language"), TorcSetting::String,
+        language = QStringLiteral("en_GB");
+    m_languageSetting = new TorcSetting(SettingParent, QStringLiteral("Language"), tr("Language"), TorcSetting::String,
                                         TorcSetting::Persistent | TorcSetting::Public, QVariant(language));
     m_languageSetting->SetActive(true);
     QVariantMap selections;
@@ -96,7 +96,7 @@ TorcLanguage::~TorcLanguage()
 
 void TorcLanguage::LanguageSettingChanged(QString &Language)
 {
-    LOG(VB_GENERAL, LOG_ALERT, QString("Language setting changed to '%1' - restarting").arg(Language));
+    LOG(VB_GENERAL, LOG_ALERT, QStringLiteral("Language setting changed to '%1' - restarting").arg(Language));
     TorcLocalContext::NotifyEvent(Torc::RestartTorc);
 }
 
@@ -116,14 +116,14 @@ void TorcLanguage::SetLanguageCode(const QString &Language)
     QLocale locale(Language);
     if (m_locale == locale)
     {
-        LOG(VB_GENERAL, LOG_INFO, "Requested language already set - ignoring");
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Requested language already set - ignoring"));
         return;
     }
 
     // ignore unknown
     if (!m_languages.contains(locale))
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Requested language (%1) not available - ignoring").arg(Language));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Requested language (%1) not available - ignoring").arg(Language));
         return;
     }
 
@@ -132,18 +132,18 @@ void TorcLanguage::SetLanguageCode(const QString &Language)
     languageCode   = m_locale.name();
     languageString = m_locale.nativeLanguageName();
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Language changed: %1 (%2) (%3)(env - %4)")
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Language changed: %1 (%2) (%3)(env - %4)")
         .arg(QLocale::languageToString(m_locale.language()), QLocale::countryToString(m_locale.country()),
-             m_locale.name(), qgetenv("LANG").constData()));
+             m_locale.name(), QString(qgetenv(QByteArrayLiteral("LANG").constData()))));
 
     // load the new translation. This will replace the existing translation.
     // NB it's not clear from the docs whether this is thread safe.
     // NB this only supports installing a single translation file. So other 'modules' cannot
     // currently be loaded.
 
-    QString filename = QString("torc_%1.qm").arg(m_locale.name());
+    QString filename = QStringLiteral("torc_%1.qm").arg(m_locale.name());
     if (!m_translator.load(filename, GetTorcTransDir()))
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to load translation file '%1' from '%2'").arg(filename, GetTorcTransDir()));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to load translation file '%1' from '%2'").arg(filename, GetTorcTransDir()));
 
     // notify change
     emit LanguageCodeChanged(languageCode);
@@ -184,7 +184,7 @@ void TorcLanguage::SubscriberDeleted(QObject *Subscriber)
 QString TorcLanguage::ToString(QLocale::Language Language, bool Empty)
 {
     if (Language == DEFAULT_QT_LANGUAGE)
-        return Empty ? QString("") : QString("Unknown");
+        return Empty ? QStringLiteral("") : QStringLiteral("Unknown");
 
     return QLocale::languageToString(Language);
 }
@@ -237,12 +237,12 @@ void TorcLanguage::InitialiseTranslations(void)
 
     // retrieve list of installed translation files
     QDir directory(GetTorcTransDir());
-    QStringList files = directory.entryList(QStringList("torc_*.qm"),
+    QStringList files = directory.entryList(QStringList(QStringLiteral("torc_*.qm")),
                                             QDir::Files | QDir::Readable | QDir::NoSymLinks | QDir::NoDotAndDotDot,
                                             QDir::Name);
 
     // create a reference list
-    LOG(VB_GENERAL, LOG_INFO, QString("Found %1 translations").arg(files.size()));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Found %1 translations").arg(files.size()));
     foreach (QString file, files)
     {
         file.chop(3);
@@ -265,245 +265,245 @@ void TorcLanguage::Initialise(void)
 
     initialised = true;
 
-    gLanguageMap.insert("aar", QLocale::Afar);
-    gLanguageMap.insert("abk", QLocale::Abkhazian);
-    gLanguageMap.insert("afr", QLocale::Afrikaans);
-    gLanguageMap.insert("aka", QLocale::Akan);
-    gLanguageMap.insert("alb", QLocale::Albanian);
-    gLanguageMap.insert("amh", QLocale::Amharic);
-    gLanguageMap.insert("ara", QLocale::Arabic);
-    gLanguageMap.insert("arm", QLocale::Armenian);
-    gLanguageMap.insert("asm", QLocale::Assamese);
-    gLanguageMap.insert("aym", QLocale::Aymara);
-    gLanguageMap.insert("aze", QLocale::Azerbaijani);
-    gLanguageMap.insert("bak", QLocale::Bashkir);
-    gLanguageMap.insert("bam", QLocale::Bambara);
-    gLanguageMap.insert("baq", QLocale::Basque);
-    gLanguageMap.insert("bel", QLocale::Byelorussian);
-    gLanguageMap.insert("ben", QLocale::Bengali);
-    gLanguageMap.insert("bih", QLocale::Bihari);
-    gLanguageMap.insert("bis", QLocale::Bislama);
-    gLanguageMap.insert("bos", QLocale::Bosnian);
-    gLanguageMap.insert("bre", QLocale::Breton);
-    gLanguageMap.insert("bul", QLocale::Bulgarian);
-    gLanguageMap.insert("bur", QLocale::Burmese);
-    gLanguageMap.insert("byn", QLocale::Blin);
-    gLanguageMap.insert("cat", QLocale::Catalan);
-    gLanguageMap.insert("cch", QLocale::Atsam);
-    gLanguageMap.insert("chi", QLocale::Chinese);
-    gLanguageMap.insert("cor", QLocale::Cornish);
-    gLanguageMap.insert("cos", QLocale::Corsican);
-    gLanguageMap.insert("cze", QLocale::Czech);
-    gLanguageMap.insert("dan", QLocale::Danish);
-    gLanguageMap.insert("div", QLocale::Divehi);
-    gLanguageMap.insert("dut", QLocale::Dutch);
-    gLanguageMap.insert("dzo", QLocale::Bhutani);
-    gLanguageMap.insert("eng", QLocale::English);
-    gLanguageMap.insert("epo", QLocale::Esperanto);
-    gLanguageMap.insert("est", QLocale::Estonian);
-    gLanguageMap.insert("ewe", QLocale::Ewe);
-    gLanguageMap.insert("fao", QLocale::Faroese);
-    gLanguageMap.insert("fil", QLocale::Filipino);
-    gLanguageMap.insert("fin", QLocale::Finnish);
-    gLanguageMap.insert("fre", QLocale::French);
-    gLanguageMap.insert("fry", QLocale::Frisian);
-    gLanguageMap.insert("ful", QLocale::Fulah);
-    gLanguageMap.insert("fur", QLocale::Friulian);
-    gLanguageMap.insert("gaa", QLocale::Ga);
-    gLanguageMap.insert("geo", QLocale::Georgian);
-    gLanguageMap.insert("ger", QLocale::German);
-    gLanguageMap.insert("gez", QLocale::Geez);
-    gLanguageMap.insert("gla", QLocale::Gaelic);
-    gLanguageMap.insert("gle", QLocale::Irish);
-    gLanguageMap.insert("glg", QLocale::Galician);
-    gLanguageMap.insert("glv", QLocale::Manx);
-    gLanguageMap.insert("gre", QLocale::Greek);
-    gLanguageMap.insert("grn", QLocale::Guarani);
-    gLanguageMap.insert("guj", QLocale::Gujarati);
-    gLanguageMap.insert("hau", QLocale::Hausa);
-    gLanguageMap.insert("haw", QLocale::Hawaiian);
-    gLanguageMap.insert("hbs", QLocale::SerboCroatian);
-    gLanguageMap.insert("heb", QLocale::Hebrew);
-    gLanguageMap.insert("hin", QLocale::Hindi);
-    gLanguageMap.insert("hun", QLocale::Hungarian);
-    gLanguageMap.insert("ibo", QLocale::Igbo);
-    gLanguageMap.insert("ice", QLocale::Icelandic);
-    gLanguageMap.insert("iii", QLocale::SichuanYi);
-    gLanguageMap.insert("iku", QLocale::Inuktitut);
-    gLanguageMap.insert("ile", QLocale::Interlingue);
-    gLanguageMap.insert("ina", QLocale::Interlingua);
-    gLanguageMap.insert("ind", QLocale::Indonesian);
-    gLanguageMap.insert("ipk", QLocale::Inupiak);
-    gLanguageMap.insert("ita", QLocale::Italian);
-    gLanguageMap.insert("jav", QLocale::Javanese);
-    gLanguageMap.insert("jpn", QLocale::Japanese);
-    gLanguageMap.insert("kaj", QLocale::Jju);
-    gLanguageMap.insert("kal", QLocale::Greenlandic);
-    gLanguageMap.insert("kan", QLocale::Kannada);
-    gLanguageMap.insert("kam", QLocale::Kamba);
-    gLanguageMap.insert("kas", QLocale::Kashmiri);
-    gLanguageMap.insert("kaz", QLocale::Kazakh);
-    gLanguageMap.insert("kcg", QLocale::Tyap);
-    gLanguageMap.insert("kfo", QLocale::Koro);
-    gLanguageMap.insert("khm", QLocale::Cambodian);
-    gLanguageMap.insert("kik", QLocale::Kikuyu);
-    gLanguageMap.insert("kin", QLocale::Kinyarwanda);
-    gLanguageMap.insert("kir", QLocale::Kirghiz);
-    gLanguageMap.insert("kok", QLocale::Konkani);
-    gLanguageMap.insert("kor", QLocale::Korean);
-    gLanguageMap.insert("kpe", QLocale::Kpelle);
-    gLanguageMap.insert("kur", QLocale::Kurdish);
-    gLanguageMap.insert("lat", QLocale::Latin);
-    gLanguageMap.insert("lav", QLocale::Latvian);
-    gLanguageMap.insert("lin", QLocale::Lingala);
-    gLanguageMap.insert("lit", QLocale::Lithuanian);
-    gLanguageMap.insert("lug", QLocale::Ganda);
-    gLanguageMap.insert("mac", QLocale::Macedonian);
-    gLanguageMap.insert("mal", QLocale::Malayalam);
-    gLanguageMap.insert("mao", QLocale::Maori);
-    gLanguageMap.insert("mar", QLocale::Marathi);
-    gLanguageMap.insert("may", QLocale::Malay);
-    gLanguageMap.insert("mlg", QLocale::Malagasy);
-    gLanguageMap.insert("mlt", QLocale::Maltese);
-    gLanguageMap.insert("mol", QLocale::Moldavian);
-    gLanguageMap.insert("mon", QLocale::Mongolian);
-    gLanguageMap.insert("nau", QLocale::NauruLanguage);
-    gLanguageMap.insert("nbl", QLocale::SouthNdebele);
-    gLanguageMap.insert("nde", QLocale::NorthNdebele);
-    gLanguageMap.insert("nds", QLocale::LowGerman);
-    gLanguageMap.insert("nep", QLocale::Nepali);
-    gLanguageMap.insert("nno", QLocale::NorwegianNynorsk);
-    gLanguageMap.insert("nob", QLocale::NorwegianBokmal);
-    gLanguageMap.insert("nor", QLocale::Norwegian);
-    gLanguageMap.insert("nya", QLocale::Chewa);
-    gLanguageMap.insert("oci", QLocale::Occitan);
-    gLanguageMap.insert("ori", QLocale::Oriya);
-    gLanguageMap.insert("orm", QLocale::Afan);
-    gLanguageMap.insert("pan", QLocale::Punjabi);
-    gLanguageMap.insert("per", QLocale::Persian);
-    gLanguageMap.insert("pol", QLocale::Polish);
-    gLanguageMap.insert("por", QLocale::Portuguese);
-    gLanguageMap.insert("pus", QLocale::Pashto);
-    gLanguageMap.insert("que", QLocale::Quechua);
-    gLanguageMap.insert("roh", QLocale::RhaetoRomance);
-    gLanguageMap.insert("rum", QLocale::Romanian);
-    gLanguageMap.insert("run", QLocale::Kurundi);
-    gLanguageMap.insert("rus", QLocale::Russian);
-    gLanguageMap.insert("san", QLocale::Sanskrit);
-    gLanguageMap.insert("scc", QLocale::Serbian);
-    gLanguageMap.insert("scr", QLocale::Croatian);
-    gLanguageMap.insert("sid", QLocale::Sidamo);
-    gLanguageMap.insert("slo", QLocale::Slovak);
-    gLanguageMap.insert("slv", QLocale::Slovenian);
-    gLanguageMap.insert("syr", QLocale::Syriac);
-    gLanguageMap.insert("sme", QLocale::NorthernSami);
-    gLanguageMap.insert("smo", QLocale::Samoan);
-    gLanguageMap.insert("sna", QLocale::Shona);
-    gLanguageMap.insert("snd", QLocale::Sindhi);
-    gLanguageMap.insert("som", QLocale::Somali);
-    gLanguageMap.insert("spa", QLocale::Spanish);
-    gLanguageMap.insert("sun", QLocale::Sundanese);
-    gLanguageMap.insert("swa", QLocale::Swahili);
-    gLanguageMap.insert("swe", QLocale::Swedish);
-    gLanguageMap.insert("tam", QLocale::Tamil);
-    gLanguageMap.insert("tat", QLocale::Tatar);
-    gLanguageMap.insert("tel", QLocale::Telugu);
-    gLanguageMap.insert("tgk", QLocale::Tajik);
-    gLanguageMap.insert("tgl", QLocale::Tagalog);
-    gLanguageMap.insert("tha", QLocale::Thai);
-    gLanguageMap.insert("tib", QLocale::Tibetan);
-    gLanguageMap.insert("tig", QLocale::Tigre);
-    gLanguageMap.insert("tir", QLocale::Tigrinya);
-    gLanguageMap.insert("tso", QLocale::Tsonga);
-    gLanguageMap.insert("tuk", QLocale::Turkmen);
-    gLanguageMap.insert("tur", QLocale::Turkish);
-    gLanguageMap.insert("twi", QLocale::Twi);
-    gLanguageMap.insert("uig", QLocale::Uigur);
-    gLanguageMap.insert("ukr", QLocale::Ukrainian);
-    gLanguageMap.insert("urd", QLocale::Urdu);
-    gLanguageMap.insert("uzb", QLocale::Uzbek);
-    gLanguageMap.insert("ven", QLocale::Venda);
-    gLanguageMap.insert("vie", QLocale::Vietnamese);
-    gLanguageMap.insert("vol", QLocale::Volapuk);
-    gLanguageMap.insert("wal", QLocale::Walamo);
-    gLanguageMap.insert("wel", QLocale::Welsh);
-    gLanguageMap.insert("wol", QLocale::Wolof);
-    gLanguageMap.insert("xho", QLocale::Xhosa);
-    gLanguageMap.insert("yid", QLocale::Yiddish);
-    gLanguageMap.insert("yor", QLocale::Yoruba);
-    gLanguageMap.insert("zha", QLocale::Zhuang);
-    gLanguageMap.insert("zul", QLocale::Zulu);
+    gLanguageMap.insert(QStringLiteral("aar"), QLocale::Afar);
+    gLanguageMap.insert(QStringLiteral("abk"), QLocale::Abkhazian);
+    gLanguageMap.insert(QStringLiteral("afr"), QLocale::Afrikaans);
+    gLanguageMap.insert(QStringLiteral("aka"), QLocale::Akan);
+    gLanguageMap.insert(QStringLiteral("alb"), QLocale::Albanian);
+    gLanguageMap.insert(QStringLiteral("amh"), QLocale::Amharic);
+    gLanguageMap.insert(QStringLiteral("ara"), QLocale::Arabic);
+    gLanguageMap.insert(QStringLiteral("arm"), QLocale::Armenian);
+    gLanguageMap.insert(QStringLiteral("asm"), QLocale::Assamese);
+    gLanguageMap.insert(QStringLiteral("aym"), QLocale::Aymara);
+    gLanguageMap.insert(QStringLiteral("aze"), QLocale::Azerbaijani);
+    gLanguageMap.insert(QStringLiteral("bak"), QLocale::Bashkir);
+    gLanguageMap.insert(QStringLiteral("bam"), QLocale::Bambara);
+    gLanguageMap.insert(QStringLiteral("baq"), QLocale::Basque);
+    gLanguageMap.insert(QStringLiteral("bel"), QLocale::Byelorussian);
+    gLanguageMap.insert(QStringLiteral("ben"), QLocale::Bengali);
+    gLanguageMap.insert(QStringLiteral("bih"), QLocale::Bihari);
+    gLanguageMap.insert(QStringLiteral("bis"), QLocale::Bislama);
+    gLanguageMap.insert(QStringLiteral("bos"), QLocale::Bosnian);
+    gLanguageMap.insert(QStringLiteral("bre"), QLocale::Breton);
+    gLanguageMap.insert(QStringLiteral("bul"), QLocale::Bulgarian);
+    gLanguageMap.insert(QStringLiteral("bur"), QLocale::Burmese);
+    gLanguageMap.insert(QStringLiteral("byn"), QLocale::Blin);
+    gLanguageMap.insert(QStringLiteral("cat"), QLocale::Catalan);
+    gLanguageMap.insert(QStringLiteral("cch"), QLocale::Atsam);
+    gLanguageMap.insert(QStringLiteral("chi"), QLocale::Chinese);
+    gLanguageMap.insert(QStringLiteral("cor"), QLocale::Cornish);
+    gLanguageMap.insert(QStringLiteral("cos"), QLocale::Corsican);
+    gLanguageMap.insert(QStringLiteral("cze"), QLocale::Czech);
+    gLanguageMap.insert(QStringLiteral("dan"), QLocale::Danish);
+    gLanguageMap.insert(QStringLiteral("div"), QLocale::Divehi);
+    gLanguageMap.insert(QStringLiteral("dut"), QLocale::Dutch);
+    gLanguageMap.insert(QStringLiteral("dzo"), QLocale::Bhutani);
+    gLanguageMap.insert(QStringLiteral("eng"), QLocale::English);
+    gLanguageMap.insert(QStringLiteral("epo"), QLocale::Esperanto);
+    gLanguageMap.insert(QStringLiteral("est"), QLocale::Estonian);
+    gLanguageMap.insert(QStringLiteral("ewe"), QLocale::Ewe);
+    gLanguageMap.insert(QStringLiteral("fao"), QLocale::Faroese);
+    gLanguageMap.insert(QStringLiteral("fil"), QLocale::Filipino);
+    gLanguageMap.insert(QStringLiteral("fin"), QLocale::Finnish);
+    gLanguageMap.insert(QStringLiteral("fre"), QLocale::French);
+    gLanguageMap.insert(QStringLiteral("fry"), QLocale::Frisian);
+    gLanguageMap.insert(QStringLiteral("ful"), QLocale::Fulah);
+    gLanguageMap.insert(QStringLiteral("fur"), QLocale::Friulian);
+    gLanguageMap.insert(QStringLiteral("gaa"), QLocale::Ga);
+    gLanguageMap.insert(QStringLiteral("geo"), QLocale::Georgian);
+    gLanguageMap.insert(QStringLiteral("ger"), QLocale::German);
+    gLanguageMap.insert(QStringLiteral("gez"), QLocale::Geez);
+    gLanguageMap.insert(QStringLiteral("gla"), QLocale::Gaelic);
+    gLanguageMap.insert(QStringLiteral("gle"), QLocale::Irish);
+    gLanguageMap.insert(QStringLiteral("glg"), QLocale::Galician);
+    gLanguageMap.insert(QStringLiteral("glv"), QLocale::Manx);
+    gLanguageMap.insert(QStringLiteral("gre"), QLocale::Greek);
+    gLanguageMap.insert(QStringLiteral("grn"), QLocale::Guarani);
+    gLanguageMap.insert(QStringLiteral("guj"), QLocale::Gujarati);
+    gLanguageMap.insert(QStringLiteral("hau"), QLocale::Hausa);
+    gLanguageMap.insert(QStringLiteral("haw"), QLocale::Hawaiian);
+    gLanguageMap.insert(QStringLiteral("hbs"), QLocale::SerboCroatian);
+    gLanguageMap.insert(QStringLiteral("heb"), QLocale::Hebrew);
+    gLanguageMap.insert(QStringLiteral("hin"), QLocale::Hindi);
+    gLanguageMap.insert(QStringLiteral("hun"), QLocale::Hungarian);
+    gLanguageMap.insert(QStringLiteral("ibo"), QLocale::Igbo);
+    gLanguageMap.insert(QStringLiteral("ice"), QLocale::Icelandic);
+    gLanguageMap.insert(QStringLiteral("iii"), QLocale::SichuanYi);
+    gLanguageMap.insert(QStringLiteral("iku"), QLocale::Inuktitut);
+    gLanguageMap.insert(QStringLiteral("ile"), QLocale::Interlingue);
+    gLanguageMap.insert(QStringLiteral("ina"), QLocale::Interlingua);
+    gLanguageMap.insert(QStringLiteral("ind"), QLocale::Indonesian);
+    gLanguageMap.insert(QStringLiteral("ipk"), QLocale::Inupiak);
+    gLanguageMap.insert(QStringLiteral("ita"), QLocale::Italian);
+    gLanguageMap.insert(QStringLiteral("jav"), QLocale::Javanese);
+    gLanguageMap.insert(QStringLiteral("jpn"), QLocale::Japanese);
+    gLanguageMap.insert(QStringLiteral("kaj"), QLocale::Jju);
+    gLanguageMap.insert(QStringLiteral("kal"), QLocale::Greenlandic);
+    gLanguageMap.insert(QStringLiteral("kan"), QLocale::Kannada);
+    gLanguageMap.insert(QStringLiteral("kam"), QLocale::Kamba);
+    gLanguageMap.insert(QStringLiteral("kas"), QLocale::Kashmiri);
+    gLanguageMap.insert(QStringLiteral("kaz"), QLocale::Kazakh);
+    gLanguageMap.insert(QStringLiteral("kcg"), QLocale::Tyap);
+    gLanguageMap.insert(QStringLiteral("kfo"), QLocale::Koro);
+    gLanguageMap.insert(QStringLiteral("khm"), QLocale::Cambodian);
+    gLanguageMap.insert(QStringLiteral("kik"), QLocale::Kikuyu);
+    gLanguageMap.insert(QStringLiteral("kin"), QLocale::Kinyarwanda);
+    gLanguageMap.insert(QStringLiteral("kir"), QLocale::Kirghiz);
+    gLanguageMap.insert(QStringLiteral("kok"), QLocale::Konkani);
+    gLanguageMap.insert(QStringLiteral("kor"), QLocale::Korean);
+    gLanguageMap.insert(QStringLiteral("kpe"), QLocale::Kpelle);
+    gLanguageMap.insert(QStringLiteral("kur"), QLocale::Kurdish);
+    gLanguageMap.insert(QStringLiteral("lat"), QLocale::Latin);
+    gLanguageMap.insert(QStringLiteral("lav"), QLocale::Latvian);
+    gLanguageMap.insert(QStringLiteral("lin"), QLocale::Lingala);
+    gLanguageMap.insert(QStringLiteral("lit"), QLocale::Lithuanian);
+    gLanguageMap.insert(QStringLiteral("lug"), QLocale::Ganda);
+    gLanguageMap.insert(QStringLiteral("mac"), QLocale::Macedonian);
+    gLanguageMap.insert(QStringLiteral("mal"), QLocale::Malayalam);
+    gLanguageMap.insert(QStringLiteral("mao"), QLocale::Maori);
+    gLanguageMap.insert(QStringLiteral("mar"), QLocale::Marathi);
+    gLanguageMap.insert(QStringLiteral("may"), QLocale::Malay);
+    gLanguageMap.insert(QStringLiteral("mlg"), QLocale::Malagasy);
+    gLanguageMap.insert(QStringLiteral("mlt"), QLocale::Maltese);
+    gLanguageMap.insert(QStringLiteral("mol"), QLocale::Moldavian);
+    gLanguageMap.insert(QStringLiteral("mon"), QLocale::Mongolian);
+    gLanguageMap.insert(QStringLiteral("nau"), QLocale::NauruLanguage);
+    gLanguageMap.insert(QStringLiteral("nbl"), QLocale::SouthNdebele);
+    gLanguageMap.insert(QStringLiteral("nde"), QLocale::NorthNdebele);
+    gLanguageMap.insert(QStringLiteral("nds"), QLocale::LowGerman);
+    gLanguageMap.insert(QStringLiteral("nep"), QLocale::Nepali);
+    gLanguageMap.insert(QStringLiteral("nno"), QLocale::NorwegianNynorsk);
+    gLanguageMap.insert(QStringLiteral("nob"), QLocale::NorwegianBokmal);
+    gLanguageMap.insert(QStringLiteral("nor"), QLocale::Norwegian);
+    gLanguageMap.insert(QStringLiteral("nya"), QLocale::Chewa);
+    gLanguageMap.insert(QStringLiteral("oci"), QLocale::Occitan);
+    gLanguageMap.insert(QStringLiteral("ori"), QLocale::Oriya);
+    gLanguageMap.insert(QStringLiteral("orm"), QLocale::Afan);
+    gLanguageMap.insert(QStringLiteral("pan"), QLocale::Punjabi);
+    gLanguageMap.insert(QStringLiteral("per"), QLocale::Persian);
+    gLanguageMap.insert(QStringLiteral("pol"), QLocale::Polish);
+    gLanguageMap.insert(QStringLiteral("por"), QLocale::Portuguese);
+    gLanguageMap.insert(QStringLiteral("pus"), QLocale::Pashto);
+    gLanguageMap.insert(QStringLiteral("que"), QLocale::Quechua);
+    gLanguageMap.insert(QStringLiteral("roh"), QLocale::RhaetoRomance);
+    gLanguageMap.insert(QStringLiteral("rum"), QLocale::Romanian);
+    gLanguageMap.insert(QStringLiteral("run"), QLocale::Kurundi);
+    gLanguageMap.insert(QStringLiteral("rus"), QLocale::Russian);
+    gLanguageMap.insert(QStringLiteral("san"), QLocale::Sanskrit);
+    gLanguageMap.insert(QStringLiteral("scc"), QLocale::Serbian);
+    gLanguageMap.insert(QStringLiteral("scr"), QLocale::Croatian);
+    gLanguageMap.insert(QStringLiteral("sid"), QLocale::Sidamo);
+    gLanguageMap.insert(QStringLiteral("slo"), QLocale::Slovak);
+    gLanguageMap.insert(QStringLiteral("slv"), QLocale::Slovenian);
+    gLanguageMap.insert(QStringLiteral("syr"), QLocale::Syriac);
+    gLanguageMap.insert(QStringLiteral("sme"), QLocale::NorthernSami);
+    gLanguageMap.insert(QStringLiteral("smo"), QLocale::Samoan);
+    gLanguageMap.insert(QStringLiteral("sna"), QLocale::Shona);
+    gLanguageMap.insert(QStringLiteral("snd"), QLocale::Sindhi);
+    gLanguageMap.insert(QStringLiteral("som"), QLocale::Somali);
+    gLanguageMap.insert(QStringLiteral("spa"), QLocale::Spanish);
+    gLanguageMap.insert(QStringLiteral("sun"), QLocale::Sundanese);
+    gLanguageMap.insert(QStringLiteral("swa"), QLocale::Swahili);
+    gLanguageMap.insert(QStringLiteral("swe"), QLocale::Swedish);
+    gLanguageMap.insert(QStringLiteral("tam"), QLocale::Tamil);
+    gLanguageMap.insert(QStringLiteral("tat"), QLocale::Tatar);
+    gLanguageMap.insert(QStringLiteral("tel"), QLocale::Telugu);
+    gLanguageMap.insert(QStringLiteral("tgk"), QLocale::Tajik);
+    gLanguageMap.insert(QStringLiteral("tgl"), QLocale::Tagalog);
+    gLanguageMap.insert(QStringLiteral("tha"), QLocale::Thai);
+    gLanguageMap.insert(QStringLiteral("tib"), QLocale::Tibetan);
+    gLanguageMap.insert(QStringLiteral("tig"), QLocale::Tigre);
+    gLanguageMap.insert(QStringLiteral("tir"), QLocale::Tigrinya);
+    gLanguageMap.insert(QStringLiteral("tso"), QLocale::Tsonga);
+    gLanguageMap.insert(QStringLiteral("tuk"), QLocale::Turkmen);
+    gLanguageMap.insert(QStringLiteral("tur"), QLocale::Turkish);
+    gLanguageMap.insert(QStringLiteral("twi"), QLocale::Twi);
+    gLanguageMap.insert(QStringLiteral("uig"), QLocale::Uigur);
+    gLanguageMap.insert(QStringLiteral("ukr"), QLocale::Ukrainian);
+    gLanguageMap.insert(QStringLiteral("urd"), QLocale::Urdu);
+    gLanguageMap.insert(QStringLiteral("uzb"), QLocale::Uzbek);
+    gLanguageMap.insert(QStringLiteral("ven"), QLocale::Venda);
+    gLanguageMap.insert(QStringLiteral("vie"), QLocale::Vietnamese);
+    gLanguageMap.insert(QStringLiteral("vol"), QLocale::Volapuk);
+    gLanguageMap.insert(QStringLiteral("wal"), QLocale::Walamo);
+    gLanguageMap.insert(QStringLiteral("wel"), QLocale::Welsh);
+    gLanguageMap.insert(QStringLiteral("wol"), QLocale::Wolof);
+    gLanguageMap.insert(QStringLiteral("xho"), QLocale::Xhosa);
+    gLanguageMap.insert(QStringLiteral("yid"), QLocale::Yiddish);
+    gLanguageMap.insert(QStringLiteral("yor"), QLocale::Yoruba);
+    gLanguageMap.insert(QStringLiteral("zha"), QLocale::Zhuang);
+    gLanguageMap.insert(QStringLiteral("zul"), QLocale::Zulu);
 
-    gLanguageMap.insert("sqi", QLocale::Albanian);
-    gLanguageMap.insert("hye", QLocale::Armenian);
-    gLanguageMap.insert("eus", QLocale::Basque);
-    gLanguageMap.insert("mya", QLocale::Burmese);
-    gLanguageMap.insert("zho", QLocale::Chinese);
-    gLanguageMap.insert("ces", QLocale::Czech);
-    gLanguageMap.insert("nld", QLocale::Dutch);
-    gLanguageMap.insert("fra", QLocale::French);
-    gLanguageMap.insert("kat", QLocale::Georgian);
-    gLanguageMap.insert("deu", QLocale::German);
-    gLanguageMap.insert("ell", QLocale::Greek);
-    gLanguageMap.insert("isl", QLocale::Icelandic);
-    gLanguageMap.insert("mkd", QLocale::Macedonian);
-    gLanguageMap.insert("mri", QLocale::Maori);
-    gLanguageMap.insert("msa", QLocale::Malay);
-    gLanguageMap.insert("fas", QLocale::Persian);
-    gLanguageMap.insert("ron", QLocale::Romanian);
-    gLanguageMap.insert("srp", QLocale::Serbian);
-    gLanguageMap.insert("hrv", QLocale::Croatian);
-    gLanguageMap.insert("slk", QLocale::Slovak);
-    gLanguageMap.insert("bod", QLocale::Tibetan);
-    gLanguageMap.insert("cym", QLocale::Welsh);
-    gLanguageMap.insert("chs", QLocale::Chinese);
+    gLanguageMap.insert(QStringLiteral("sqi"), QLocale::Albanian);
+    gLanguageMap.insert(QStringLiteral("hye"), QLocale::Armenian);
+    gLanguageMap.insert(QStringLiteral("eus"), QLocale::Basque);
+    gLanguageMap.insert(QStringLiteral("mya"), QLocale::Burmese);
+    gLanguageMap.insert(QStringLiteral("zho"), QLocale::Chinese);
+    gLanguageMap.insert(QStringLiteral("ces"), QLocale::Czech);
+    gLanguageMap.insert(QStringLiteral("nld"), QLocale::Dutch);
+    gLanguageMap.insert(QStringLiteral("fra"), QLocale::French);
+    gLanguageMap.insert(QStringLiteral("kat"), QLocale::Georgian);
+    gLanguageMap.insert(QStringLiteral("deu"), QLocale::German);
+    gLanguageMap.insert(QStringLiteral("ell"), QLocale::Greek);
+    gLanguageMap.insert(QStringLiteral("isl"), QLocale::Icelandic);
+    gLanguageMap.insert(QStringLiteral("mkd"), QLocale::Macedonian);
+    gLanguageMap.insert(QStringLiteral("mri"), QLocale::Maori);
+    gLanguageMap.insert(QStringLiteral("msa"), QLocale::Malay);
+    gLanguageMap.insert(QStringLiteral("fas"), QLocale::Persian);
+    gLanguageMap.insert(QStringLiteral("ron"), QLocale::Romanian);
+    gLanguageMap.insert(QStringLiteral("srp"), QLocale::Serbian);
+    gLanguageMap.insert(QStringLiteral("hrv"), QLocale::Croatian);
+    gLanguageMap.insert(QStringLiteral("slk"), QLocale::Slovak);
+    gLanguageMap.insert(QStringLiteral("bod"), QLocale::Tibetan);
+    gLanguageMap.insert(QStringLiteral("cym"), QLocale::Welsh);
+    gLanguageMap.insert(QStringLiteral("chs"), QLocale::Chinese);
 
-    gLanguageMap.insert("nso", QLocale::NorthernSotho);
-    gLanguageMap.insert("trv", QLocale::Taroko);
-    gLanguageMap.insert("guz", QLocale::Gusii);
-    gLanguageMap.insert("dav", QLocale::Taita);
-    gLanguageMap.insert("saq", QLocale::Samburu);
-    gLanguageMap.insert("seh", QLocale::Sena);
-    gLanguageMap.insert("rof", QLocale::Rombo);
-    gLanguageMap.insert("shi", QLocale::Tachelhit);
-    gLanguageMap.insert("kab", QLocale::Kabyle);
-    gLanguageMap.insert("nyn", QLocale::Nyankole);
-    gLanguageMap.insert("bez", QLocale::Bena);
-    gLanguageMap.insert("vun", QLocale::Vunjo);
-    gLanguageMap.insert("ebu", QLocale::Embu);
-    gLanguageMap.insert("chr", QLocale::Cherokee);
-    gLanguageMap.insert("mfe", QLocale::Morisyen);
-    gLanguageMap.insert("kde", QLocale::Makonde);
-    gLanguageMap.insert("lag", QLocale::Langi);
-    gLanguageMap.insert("bem", QLocale::Bemba);
-    gLanguageMap.insert("kea", QLocale::Kabuverdianu);
-    gLanguageMap.insert("mer", QLocale::Meru);
-    gLanguageMap.insert("kln", QLocale::Kalenjin);
-    gLanguageMap.insert("naq", QLocale::Nama);
-    gLanguageMap.insert("jmc", QLocale::Machame);
-    gLanguageMap.insert("ksh", QLocale::Colognian);
-    gLanguageMap.insert("mas", QLocale::Masai);
-    gLanguageMap.insert("xog", QLocale::Soga);
-    gLanguageMap.insert("luy", QLocale::Luyia);
-    gLanguageMap.insert("asa", QLocale::Asu);
-    gLanguageMap.insert("teo", QLocale::Teso);
-    gLanguageMap.insert("ssy", QLocale::Saho);
-    gLanguageMap.insert("khq", QLocale::KoyraChiini);
-    gLanguageMap.insert("rwk", QLocale::Rwa);
-    gLanguageMap.insert("luo", QLocale::Luo);
-    gLanguageMap.insert("cgg", QLocale::Chiga);
-    gLanguageMap.insert("tzm", QLocale::CentralMoroccoTamazight);
-    gLanguageMap.insert("ses", QLocale::KoyraboroSenni);
-    gLanguageMap.insert("ksb", QLocale::Shambala);
-    gLanguageMap.insert("gsw", QLocale::SwissGerman);
-    gLanguageMap.insert("fij", QLocale::Fijian);
-    gLanguageMap.insert("lao", QLocale::Lao);
-    gLanguageMap.insert("sag", QLocale::Sango);
-    gLanguageMap.insert("sin", QLocale::Sinhala);
-    gLanguageMap.insert("sot", QLocale::SouthernSotho);
-    gLanguageMap.insert("ssw", QLocale::Swati);
-    gLanguageMap.insert("ton", QLocale::Tongan);
-    gLanguageMap.insert("tsn", QLocale::Tswana);
+    gLanguageMap.insert(QStringLiteral("nso"), QLocale::NorthernSotho);
+    gLanguageMap.insert(QStringLiteral("trv"), QLocale::Taroko);
+    gLanguageMap.insert(QStringLiteral("guz"), QLocale::Gusii);
+    gLanguageMap.insert(QStringLiteral("dav"), QLocale::Taita);
+    gLanguageMap.insert(QStringLiteral("saq"), QLocale::Samburu);
+    gLanguageMap.insert(QStringLiteral("seh"), QLocale::Sena);
+    gLanguageMap.insert(QStringLiteral("rof"), QLocale::Rombo);
+    gLanguageMap.insert(QStringLiteral("shi"), QLocale::Tachelhit);
+    gLanguageMap.insert(QStringLiteral("kab"), QLocale::Kabyle);
+    gLanguageMap.insert(QStringLiteral("nyn"), QLocale::Nyankole);
+    gLanguageMap.insert(QStringLiteral("bez"), QLocale::Bena);
+    gLanguageMap.insert(QStringLiteral("vun"), QLocale::Vunjo);
+    gLanguageMap.insert(QStringLiteral("ebu"), QLocale::Embu);
+    gLanguageMap.insert(QStringLiteral("chr"), QLocale::Cherokee);
+    gLanguageMap.insert(QStringLiteral("mfe"), QLocale::Morisyen);
+    gLanguageMap.insert(QStringLiteral("kde"), QLocale::Makonde);
+    gLanguageMap.insert(QStringLiteral("lag"), QLocale::Langi);
+    gLanguageMap.insert(QStringLiteral("bem"), QLocale::Bemba);
+    gLanguageMap.insert(QStringLiteral("kea"), QLocale::Kabuverdianu);
+    gLanguageMap.insert(QStringLiteral("mer"), QLocale::Meru);
+    gLanguageMap.insert(QStringLiteral("kln"), QLocale::Kalenjin);
+    gLanguageMap.insert(QStringLiteral("naq"), QLocale::Nama);
+    gLanguageMap.insert(QStringLiteral("jmc"), QLocale::Machame);
+    gLanguageMap.insert(QStringLiteral("ksh"), QLocale::Colognian);
+    gLanguageMap.insert(QStringLiteral("mas"), QLocale::Masai);
+    gLanguageMap.insert(QStringLiteral("xog"), QLocale::Soga);
+    gLanguageMap.insert(QStringLiteral("luy"), QLocale::Luyia);
+    gLanguageMap.insert(QStringLiteral("asa"), QLocale::Asu);
+    gLanguageMap.insert(QStringLiteral("teo"), QLocale::Teso);
+    gLanguageMap.insert(QStringLiteral("ssy"), QLocale::Saho);
+    gLanguageMap.insert(QStringLiteral("khq"), QLocale::KoyraChiini);
+    gLanguageMap.insert(QStringLiteral("rwk"), QLocale::Rwa);
+    gLanguageMap.insert(QStringLiteral("luo"), QLocale::Luo);
+    gLanguageMap.insert(QStringLiteral("cgg"), QLocale::Chiga);
+    gLanguageMap.insert(QStringLiteral("tzm"), QLocale::CentralMoroccoTamazight);
+    gLanguageMap.insert(QStringLiteral("ses"), QLocale::KoyraboroSenni);
+    gLanguageMap.insert(QStringLiteral("ksb"), QLocale::Shambala);
+    gLanguageMap.insert(QStringLiteral("gsw"), QLocale::SwissGerman);
+    gLanguageMap.insert(QStringLiteral("fij"), QLocale::Fijian);
+    gLanguageMap.insert(QStringLiteral("lao"), QLocale::Lao);
+    gLanguageMap.insert(QStringLiteral("sag"), QLocale::Sango);
+    gLanguageMap.insert(QStringLiteral("sin"), QLocale::Sinhala);
+    gLanguageMap.insert(QStringLiteral("sot"), QLocale::SouthernSotho);
+    gLanguageMap.insert(QStringLiteral("ssw"), QLocale::Swati);
+    gLanguageMap.insert(QStringLiteral("ton"), QLocale::Tongan);
+    gLanguageMap.insert(QStringLiteral("tsn"), QLocale::Tswana);
 }
 
 /*! \class TorcStringFactory

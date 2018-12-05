@@ -44,7 +44,7 @@
 */
 TorcHTTPServices::TorcHTTPServices(TorcHTTPServer *Server)
   : QObject(),
-    TorcHTTPService(this, "", "services", TorcHTTPServices::staticMetaObject, QString("HandlersChanged")),
+    TorcHTTPService(this, QStringLiteral(""), QStringLiteral("services"), TorcHTTPServices::staticMetaObject, QStringLiteral("HandlersChanged")),
     serviceList(),
     returnFormats(),
     webSocketProtocols()
@@ -55,8 +55,8 @@ TorcHTTPServices::TorcHTTPServices(TorcHTTPServer *Server)
     for ( int i = 0; factory; factory = factory->NextTorcSerialiserFactory(), i++)
     {
         QVariantMap item;
-        item.insert("name", factory->Description());
-        item.insert("type", factory->MimeType());
+        item.insert(QStringLiteral("name"), factory->Description());
+        item.insert(QStringLiteral("type"), factory->MimeType());
         returnFormats.append(item);
     }
 }
@@ -64,7 +64,7 @@ TorcHTTPServices::TorcHTTPServices(TorcHTTPServer *Server)
 QString TorcHTTPServices::GetVersion(void)
 {
     int index = TorcHTTPServices::staticMetaObject.indexOfClassInfo("Version");
-    return (index > -1) ? TorcHTTPServices::staticMetaObject.classInfo(index).value() : "unknown";
+    return (index > -1) ? TorcHTTPServices::staticMetaObject.classInfo(index).value() : QStringLiteral("unknown");
 }
 
 QString TorcHTTPServices::GetUIName(void)
@@ -76,7 +76,7 @@ QVariantMap TorcHTTPServices::ProcessRequest(const QString &Method, const QVaria
 {
     // N.B. this returns a result associated with the actual state of the underlying websocket and
     // not what the browser etc think is the correct state.
-    if (Method.endsWith("IsSecure"))
+    if (Method.endsWith(QStringLiteral("IsSecure")))
     {
         QVariant sec((bool)false);
         TorcWebSocket *connection = qobject_cast<TorcWebSocket*>(Connection);
@@ -85,8 +85,8 @@ QVariantMap TorcHTTPServices::ProcessRequest(const QString &Method, const QVaria
 
         QVariantMap result;
         QVariantMap secure;
-        secure.insert("secure", sec);
-        result.insert("result", secure);
+        secure.insert(QStringLiteral("secure"), sec);
+        result.insert(QStringLiteral("result"), secure);
         return result;
     }
 
@@ -102,7 +102,7 @@ void TorcHTTPServices::ProcessHTTPRequest(const QString &PeerAddress, int PeerPo
         // we handle GetWebSocketToken/IsSecure manually as they need access to the authentication headers.
         // and they have no value internally (hence dummy implementations)
         QString method = Request.GetMethod();
-        if (method == "GetWebSocketToken" || method == "IsSecure")
+        if (method == QStringLiteral("GetWebSocketToken") || method == QStringLiteral("IsSecure"))
         {
             HTTPRequestType type = Request.GetHTTPRequestType();
             if (type == HTTPOptions)
@@ -115,18 +115,18 @@ void TorcHTTPServices::ProcessHTTPRequest(const QString &PeerAddress, int PeerPo
             {
                 QVariant result;
                 QString type;
-                if (method == "GetWebSocketToken")
+                if (method == QStringLiteral("GetWebSocketToken"))
                 {
                     // force authentication
                     if (!TorcHTTPHandler::MethodIsAuthorised(Request, HTTPAuth))
                         return;
                     result = TorcWebSocketToken::GetWebSocketToken(PeerAddress);
-                    type   = "accesstoken";
+                    type   = QStringLiteral("accesstoken");
                 }
-                else if (method == "IsSecure")
+                else if (method == QStringLiteral("IsSecure"))
                 {
                     result = Request.GetSecure();
-                    type   = "secure";
+                    type   = QStringLiteral("secure");
                 }
 
                 Request.SetStatus(HTTP_OK);
@@ -171,11 +171,11 @@ QVariantMap TorcHTTPServices::GetDetails(void)
     // NB keys here match those of the relevant stand alone methods. Take care not to break them.
     QVariantMap results;
 
-    results.insert("version",   TorcHTTPServices::GetVersion());
-    results.insert("services",  GetServiceList());
-    results.insert("starttime", GetStartTime());
-    results.insert("priority",  GetPriority());
-    results.insert("uuid",      GetUuid());
+    results.insert(QStringLiteral("version"),   TorcHTTPServices::GetVersion());
+    results.insert(QStringLiteral("services"),  GetServiceList());
+    results.insert(QStringLiteral("starttime"), GetStartTime());
+    results.insert(QStringLiteral("priority"),  GetPriority());
+    results.insert(QStringLiteral("uuid"),      GetUuid());
 
     return results;
 }
@@ -223,7 +223,7 @@ QString TorcHTTPServices::GetUuid(void)
 */
 QString TorcHTTPServices::GetWebSocketToken(void)
 {
-    return QString("");
+    return QStringLiteral("");
 }
 
 bool TorcHTTPServices::IsSecure(void)

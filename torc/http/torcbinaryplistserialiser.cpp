@@ -100,7 +100,7 @@ void TorcBinaryPListSerialiser::AddProperty(QByteArray &Dest, const QString &Nam
     quint64 count = 2;
     CountObjects(count, Value);
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Max object count %1").arg(count));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Max object count %1").arg(count));
 
     m_referenceSize = count < 0x000000ff ? 1 :
                       count < 0x0000ffff ? 2 :
@@ -200,12 +200,12 @@ void TorcBinaryPListSerialiser::End(QByteArray &Dest)
 
     Dest.append(trailer);
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Actual object count %1").arg(m_objectOffsets.count()));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Actual object count %1").arg(m_objectOffsets.count()));
 
 #if 1
     QByteArray testdata(Dest.data(), Dest.size());
     TorcPList test(testdata);
-    LOG(VB_GENERAL, LOG_INFO, "\n" + test.ToString());
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("\n%1").arg(test.ToString()));
 #endif
 }
 
@@ -344,7 +344,7 @@ quint64 TorcBinaryPListSerialiser::BinaryFromArray(QByteArray &Dest, const QStri
         QVariantList::const_iterator it = Value.constBegin();
         for ( ; it != Value.constEnd(); ++it)
             if ((int)(*it).type() != type)
-                return BinaryFromQString(Dest, "Error: QVariantList is not valid service return type");
+                return BinaryFromQString(Dest, QStringLiteral("Error: QVariantList is not valid service return type"));
     }
 
     quint64 result = m_objectOffsets.size();
@@ -457,7 +457,7 @@ void TorcBinaryPListSerialiser::BinaryFromData(QByteArray &Dest, const QVariant 
     QByteArray data = Value.toByteArray();
     if (data.isNull())
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to retrieve binary data");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to retrieve binary data"));
         Dest.append((quint8)(TorcPList::BPLIST_NULL | TorcPList::BPLIST_FALSE));
         return;
     }
@@ -483,7 +483,7 @@ void TorcBinaryPListSerialiser::BinaryFromUuid(QByteArray &Dest, const QVariant 
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Unknown UUID binary with size %1 bytes").arg(value.size()));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Unknown UUID binary with size %1 bytes").arg(value.size()));
         Dest.append((quint8)(TorcPList::BPLIST_NULL | TorcPList::BPLIST_FALSE));
     }
 }
@@ -542,7 +542,7 @@ void TorcBinaryPListSerialiser::CountObjects(quint64 &Count, const QVariant &Val
 class TorcBinaryPListSerialiserFactory : public TorcSerialiserFactory
 {
   public:
-    TorcBinaryPListSerialiserFactory() : TorcSerialiserFactory("application", "x-plist", "Binary PList")
+    TorcBinaryPListSerialiserFactory() : TorcSerialiserFactory(QStringLiteral("application"), QStringLiteral("x-plist"), QStringLiteral("Binary PList"))
     {
     }
 
@@ -555,7 +555,7 @@ class TorcBinaryPListSerialiserFactory : public TorcSerialiserFactory
 class TorcAppleBinaryPListSerialiserFactory : public TorcSerialiserFactory
 {
   public:
-    TorcAppleBinaryPListSerialiserFactory() : TorcSerialiserFactory("application", "x-apple-binary-plist", "Binary PList")
+    TorcAppleBinaryPListSerialiserFactory() : TorcSerialiserFactory(QStringLiteral("application"), QStringLiteral("x-apple-binary-plist"), QStringLiteral("Binary PList"))
     {
     }
 

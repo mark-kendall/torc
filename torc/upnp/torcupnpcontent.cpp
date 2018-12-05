@@ -32,7 +32,7 @@
 #include "torcnetwork.h"
 
 TorcUPnPContent::TorcUPnPContent()
-  : TorcHTTPHandler(UPNP_DIRECTORY, "upnp")
+  : TorcHTTPHandler(UPNP_DIRECTORY, QStringLiteral("upnp"))
 {
 }
 
@@ -50,37 +50,37 @@ void TorcUPnPContent::ProcessHTTPRequest(const QString &PeerAddress, int PeerPor
 
     // handle device description
     // N.B. this does not check whether the device is actually published on this interface
-    if (Request.GetMethod().toLower() == "description")
+    if (Request.GetMethod().toLower() == QStringLiteral("description"))
     {
         QHostAddress base(LocalAddress);
-        QString url = QString("http%1://%2").arg(Request.GetSecure() ? "s" : "", TorcNetwork::IPAddressToLiteral(base, LocalPort, false));
+        QString url = QStringLiteral("http%1://%2").arg(Request.GetSecure() ? QStringLiteral("s") : QStringLiteral(""), TorcNetwork::IPAddressToLiteral(base, LocalPort, false));
         QByteArray result;
         QXmlStreamWriter xml(&result);
-        xml.writeStartDocument("1.0");
-        xml.writeStartElement("root");
-        xml.writeAttribute("xmlns", "urn:schemas-upnp-org:device-1-0");
+        xml.writeStartDocument(QStringLiteral("1.0"));
+        xml.writeStartElement(QStringLiteral("root"));
+        xml.writeAttribute(QStringLiteral("xmlns"), QStringLiteral("urn:schemas-upnp-org:device-1-0"));
 
-        xml.writeTextElement("URLBase", url);
-        xml.writeStartElement("specVersion");
-        xml.writeTextElement("major", "1");
-        xml.writeTextElement("minor", "0");
+        xml.writeTextElement(QStringLiteral("URLBase"), url);
+        xml.writeStartElement(QStringLiteral("specVersion"));
+        xml.writeTextElement(QStringLiteral("major"), QStringLiteral("1"));
+        xml.writeTextElement(QStringLiteral("minor"), QStringLiteral("0"));
         xml.writeEndElement(); // specversion
 
-        xml.writeStartElement("device");
+        xml.writeStartElement(QStringLiteral("device"));
 
-        xml.writeTextElement("deviceType", TORC_ROOT_UPNP_DEVICE);
-        xml.writeTextElement("friendlyName", "Torc");
-        xml.writeTextElement("manufacturer", "Torc");
-        xml.writeTextElement("modelName", "Torc v1.0");
-        xml.writeTextElement("UDN", QString("uuid:%1").arg(gLocalContext->GetUuid()));
+        xml.writeTextElement(QStringLiteral("deviceType"), TORC_ROOT_UPNP_DEVICE);
+        xml.writeTextElement(QStringLiteral("friendlyName"), QStringLiteral("Torc"));
+        xml.writeTextElement(QStringLiteral("manufacturer"), QStringLiteral("Torc"));
+        xml.writeTextElement(QStringLiteral("modelName"), QStringLiteral("Torc v1.0"));
+        xml.writeTextElement(QStringLiteral("UDN"), QStringLiteral("uuid:%1").arg(gLocalContext->GetUuid()));
 
-        xml.writeStartElement("iconList");
-        xml.writeStartElement("icon");
-        xml.writeTextElement("mimetype", "image/png");
-        xml.writeTextElement("width", "36");
-        xml.writeTextElement("height", "36");
-        xml.writeTextElement("depth", "32");
-        xml.writeTextElement("url", "img/android-icon-36x36.png");
+        xml.writeStartElement(QStringLiteral("iconList"));
+        xml.writeStartElement(QStringLiteral("icon"));
+        xml.writeTextElement(QStringLiteral("mimetype"), QStringLiteral("image/png"));
+        xml.writeTextElement(QStringLiteral("width"), QStringLiteral("36"));
+        xml.writeTextElement(QStringLiteral("height"), QStringLiteral("36"));
+        xml.writeTextElement(QStringLiteral("depth"), QStringLiteral("32"));
+        xml.writeTextElement(QStringLiteral("url"), QStringLiteral("img/android-icon-36x36.png"));
         xml.writeEndElement(); // icon
         xml.writeEndElement(); // iconlist
 

@@ -28,11 +28,11 @@
 #include "torclocaldefs.h"
 #include "torcdirectories.h"
 
-static QString gInstallDir = QString("");
-static QString gShareDir   = QString("");
-static QString gConfDir    = QString("");
-static QString gTransDir   = QString("");
-static QString gContentDir = QString("");
+static QString gInstallDir = QStringLiteral("");
+static QString gShareDir   = QStringLiteral("");
+static QString gConfDir    = QStringLiteral("");
+static QString gTransDir   = QStringLiteral("");
+static QString gContentDir = QStringLiteral("");
 
 /*! \brief Statically initialise the various directories that Torc uses.
  *
@@ -55,22 +55,22 @@ void InitialiseTorcDirectories(TorcCommandLine* CommandLine)
 
     initialised = true;
 
-    gInstallDir = QString(PREFIX) + "/";
-    gShareDir   = QString(RUNPREFIX) + "/share/" + TORC_TORC;
+    gInstallDir = QStringLiteral("%1/").arg(QStringLiteral(PREFIX));
+    gShareDir   = QStringLiteral("%1/share/%2").arg(QStringLiteral(RUNPREFIX), TORC_TORC);
     // override shared directory
-    QString sharedir = CommandLine ? CommandLine->GetValue("share").toString() : QString();
+    QString sharedir = CommandLine ? CommandLine->GetValue(QStringLiteral("share")).toString() : QStringLiteral();
     if (!sharedir.isEmpty())
         gShareDir = sharedir;
 
-    gTransDir   = gShareDir + "/i18n/";
+    gTransDir   = gShareDir + QStringLiteral("/i18n/");
     // override translation directory - which may be done independantly of shared directory
-    QString transdir = CommandLine ? CommandLine->GetValue("trans").toString() : QString();
+    QString transdir = CommandLine ? CommandLine->GetValue(QStringLiteral("trans")).toString() : QStringLiteral();
     if (!transdir.isEmpty())
         gTransDir = transdir;
 
     gConfDir    = QDir::homePath() + "/." + TORC_TORC;
     // override config directory - and by implication the content directory
-    QString confdir = CommandLine ? CommandLine->GetValue("config").toString() : QString();
+    QString confdir = CommandLine ? CommandLine->GetValue(QStringLiteral("config")).toString() : QStringLiteral();
     if (!confdir.isEmpty())
         gConfDir = confdir;
     gContentDir = gConfDir + TORC_CONTENT_DIR;

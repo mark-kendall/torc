@@ -62,7 +62,7 @@ void TorcSystemInputs::Create(const QVariantMap &Details)
                 if (it.key() == TorcCoreUtils::EnumToLowerString<TorcInput::Type>(TorcInput::Started))
                 {
                     QVariantMap system   = it.value().toMap();
-                    QString uniqueid     = system.value("name").toString();
+                    QString uniqueid     = system.value(QStringLiteral("name")).toString();
                     TorcSystemInput *input = new TorcSystemInput(0, system);
                     m_inputs.insert(uniqueid, input);
                 }

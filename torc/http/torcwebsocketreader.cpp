@@ -37,16 +37,16 @@ QString TorcWebSocketReader::OpCodeToString(OpCode Code)
 {
     switch (Code)
     {
-        case OpContinuation: return QString("Continuation");
-        case OpText:         return QString("Text");
-        case OpBinary:       return QString("Binary");
-        case OpClose:        return QString("Close");
-        case OpPing:         return QString("Ping");
-        case OpPong:         return QString("Pong");
+        case OpContinuation: return QStringLiteral("Continuation");
+        case OpText:         return QStringLiteral("Text");
+        case OpBinary:       return QStringLiteral("Binary");
+        case OpClose:        return QStringLiteral("Close");
+        case OpPing:         return QStringLiteral("Ping");
+        case OpPong:         return QStringLiteral("Pong");
         default: break;
     }
 
-    return QString("Reserved");
+    return QStringLiteral("Reserved");
 }
 
 ///\brief Convert CloseCode to human readable string
@@ -54,23 +54,23 @@ QString TorcWebSocketReader::CloseCodeToString(CloseCode Code)
 {
     switch (Code)
     {
-        case CloseNormal:              return QString("Normal");
-        case CloseGoingAway:           return QString("GoingAway");
-        case CloseProtocolError:       return QString("ProtocolError");
-        case CloseUnsupportedDataType: return QString("UnsupportedDataType");
-        case CloseReserved1004:        return QString("Reserved");
-        case CloseStatusCodeMissing:   return QString("StatusCodeMissing");
-        case CloseAbnormal:            return QString("Abnormal");
-        case CloseInconsistentData:    return QString("InconsistentData");
-        case ClosePolicyViolation:     return QString("PolicyViolation");
-        case CloseMessageTooBig:       return QString("MessageTooBig");
-        case CloseMissingExtension:    return QString("MissingExtension");
-        case CloseUnexpectedError:     return QString("UnexpectedError");
-        case CloseTLSHandshakeError:   return QString("TLSHandshakeError");
+        case CloseNormal:              return QStringLiteral("Normal");
+        case CloseGoingAway:           return QStringLiteral("GoingAway");
+        case CloseProtocolError:       return QStringLiteral("ProtocolError");
+        case CloseUnsupportedDataType: return QStringLiteral("UnsupportedDataType");
+        case CloseReserved1004:        return QStringLiteral("Reserved");
+        case CloseStatusCodeMissing:   return QStringLiteral("StatusCodeMissing");
+        case CloseAbnormal:            return QStringLiteral("Abnormal");
+        case CloseInconsistentData:    return QStringLiteral("InconsistentData");
+        case ClosePolicyViolation:     return QStringLiteral("PolicyViolation");
+        case CloseMessageTooBig:       return QStringLiteral("MessageTooBig");
+        case CloseMissingExtension:    return QStringLiteral("MissingExtension");
+        case CloseUnexpectedError:     return QStringLiteral("UnexpectedError");
+        case CloseTLSHandshakeError:   return QStringLiteral("TLSHandshakeError");
         default: break;
     }
 
-    return QString("Unknown");
+    return QStringLiteral("Unknown");
 }
 
 TorcWebSocketReader::OpCode TorcWebSocketReader::FormatForSubProtocol(WSSubProtocol Protocol)
@@ -94,7 +94,7 @@ QString TorcWebSocketReader::SubProtocolsToString(WSSubProtocols Protocols)
 
     if (Protocols.testFlag(SubProtocolJSONRPC)) list.append(TORC_JSON_RPC.toLatin1());
 
-    return list.join(",");
+    return list.join(',');
 }
 
 ///\brief Parse supported WSSubProtocols from Protocols.
@@ -112,7 +112,7 @@ QList<TorcWebSocketReader::WSSubProtocol> TorcWebSocketReader::SubProtocolsFromP
 {
     QList<WSSubProtocol> results;
     results.reserve(1);
-    QStringList protocols = Protocols.split(",");
+    QStringList protocols = Protocols.split(',');
     for (int i = 0; i < protocols.size(); ++i)
         if (!QString::compare(protocols[i].trimmed(), TORC_JSON_RPC.toLatin1(), Qt::CaseInsensitive))
             results.append(SubProtocolJSONRPC);
@@ -236,7 +236,7 @@ void TorcWebSocketReader::SendFrame(OpCode Code, QByteArray &Payload)
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, "Infeasibly large payload!");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Infeasibly large payload!"));
         return;
     }
 
@@ -255,14 +255,14 @@ void TorcWebSocketReader::SendFrame(OpCode Code, QByteArray &Payload)
     {
         if ((!Payload.isEmpty() && m_socket.write(Payload) == Payload.size()) || Payload.isEmpty())
         {
-            LOG(VB_NETWORK, LOG_DEBUG, QString("Sent frame (Final), OpCode: '%1' Masked: %2 Length: %3")
+            LOG(VB_NETWORK, LOG_DEBUG, QStringLiteral("Sent frame (Final), OpCode: '%1' Masked: %2 Length: %3")
                 .arg(OpCodeToString(Code)).arg(!m_serverSide).arg(Payload.size()));
             return;
         }
     }
 
     if (Code != OpClose)
-        InitiateClose(CloseUnexpectedError, QString("Send error"));
+        InitiateClose(CloseUnexpectedError, QStringLiteral("Send error"));
 }
 
 void TorcWebSocketReader::HandlePing(QByteArray &Payload)
@@ -300,7 +300,7 @@ void TorcWebSocketReader::HandleCloseRequest(QByteArray &Close)
     // payload size 1 is invalid
     else if (Close.size() == 1)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Invalid close payload size (<2)");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Invalid close payload size (<2)"));
         newclosecode = CloseProtocolError;
     }
     // check close code if present
@@ -311,7 +311,7 @@ void TorcWebSocketReader::HandleCloseRequest(QByteArray &Close)
         if (closecode < CloseNormal || closecode > 4999 || closecode == CloseReserved1004 ||
             closecode == CloseStatusCodeMissing || closecode == CloseAbnormal || closecode == CloseTLSHandshakeError)
         {
-            LOG(VB_GENERAL, LOG_ERR, "Invalid close code");
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Invalid close code"));
             newclosecode = CloseProtocolError;
         }
     }
@@ -321,7 +321,7 @@ void TorcWebSocketReader::HandleCloseRequest(QByteArray &Close)
     {
         if (!utf8::is_valid(Close.data() + 2, Close.data() + Close.size()))
         {
-            LOG(VB_GENERAL, LOG_ERR, "Invalid UTF8 in close payload");
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Invalid UTF8 in close payload"));
             newclosecode = CloseInconsistentData;
         }
         else
@@ -339,7 +339,7 @@ void TorcWebSocketReader::HandleCloseRequest(QByteArray &Close)
     }
     else
     {
-        LOG(VB_NETWORK, LOG_INFO, QString("Received Close: %1 ('%2')").arg(CloseCodeToString((CloseCode)closecode), reason));
+        LOG(VB_NETWORK, LOG_INFO, QStringLiteral("Received Close: %1 ('%2')").arg(CloseCodeToString((CloseCode)closecode), reason));
     }
 
     m_closeReceived = true;
@@ -370,7 +370,7 @@ bool TorcWebSocketReader::Read(void)
             char header[2];
             if (m_socket.read(header, 2) != 2)
             {
-                InitiateClose(CloseUnexpectedError, QString("Read error"));
+                InitiateClose(CloseUnexpectedError, QStringLiteral("Read error"));
                 return false;
             }
 
@@ -387,14 +387,14 @@ bool TorcWebSocketReader::Read(void)
             // invalid use of reserved bits
             if (reservedbits)
             {
-                reason = QString("Invalid use of reserved bits");
+                reason = QStringLiteral("Invalid use of reserved bits");
                 error = CloseProtocolError;
             }
 
             // control frames can only have payloads of up to 125 bytes
             else if ((m_frameOpCode & 0x8) && length > 125)
             {
-                reason = QString("Control frame payload too large");
+                reason = QStringLiteral("Control frame payload too large");
                 error = CloseProtocolError;
 
                 // need to acknowledge when an OpClose is received
@@ -405,7 +405,7 @@ bool TorcWebSocketReader::Read(void)
             // if this is a server, clients must be sending masked frames and vice versa
             else if (m_serverSide != m_frameMasked)
             {
-                reason = QString("Masking error");
+                reason = QStringLiteral("Masking error");
                 error = CloseProtocolError;
             }
 
@@ -413,28 +413,28 @@ bool TorcWebSocketReader::Read(void)
             else if (m_frameOpCode != OpText && m_frameOpCode != OpBinary && m_frameOpCode != OpContinuation &&
                 m_frameOpCode != OpPing && m_frameOpCode != OpPong   && m_frameOpCode != OpClose)
             {
-                reason = QString("Invalid use of reserved opcode");
+                reason = QStringLiteral("Invalid use of reserved opcode");
                 error = CloseProtocolError;
             }
 
             // control frames cannot be fragmented
             else if (!m_frameFinalFragment && (m_frameOpCode == OpPing || m_frameOpCode == OpPong || m_frameOpCode == OpClose))
             {
-                reason = QString("Fragmented control frame");
+                reason = QStringLiteral("Fragmented control frame");
                 error = CloseProtocolError;
             }
 
             // a continuation frame must have an opening frame
             else if (!m_haveBufferedPayload && m_frameOpCode == OpContinuation)
             {
-                reason = QString("Fragmentation error");
+                reason = QStringLiteral("Fragmentation error");
                 error = CloseProtocolError;
             }
 
             // only continuation frames or control frames are expected once in the middle of a frame
             else if (m_haveBufferedPayload && !(m_frameOpCode == OpContinuation || m_frameOpCode == OpPing || m_frameOpCode == OpPong || m_frameOpCode == OpClose))
             {
-                reason = QString("Fragmentation error");
+                reason = QStringLiteral("Fragmentation error");
                 error = CloseProtocolError;
             }
 
@@ -443,13 +443,13 @@ bool TorcWebSocketReader::Read(void)
                      (m_frameOpCode == OpText || m_frameOpCode == OpBinary) &&
                       m_frameOpCode != m_subProtocolFrameFormat)
             {
-                reason = QString("Received incorrect frame type for subprotocol");
+                reason = QStringLiteral("Received incorrect frame type for subprotocol");
                 error  = CloseUnsupportedDataType;
             }
 
             if (error != CloseNormal)
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("Read error: %1 (%2)").arg(CloseCodeToString(error), reason));
+                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Read error: %1 (%2)").arg(CloseCodeToString(error), reason));
                 InitiateClose(error, reason);
                 return false;
             }
@@ -480,7 +480,7 @@ bool TorcWebSocketReader::Read(void)
 
             if (m_socket.read(reinterpret_cast<char *>(length), 2) != 2)
             {
-                InitiateClose(CloseUnexpectedError, QString("Read error"));
+                InitiateClose(CloseUnexpectedError, QStringLiteral("Read error"));
                 return false;
             }
 
@@ -497,7 +497,7 @@ bool TorcWebSocketReader::Read(void)
             uchar length[8];
             if (m_socket.read(reinterpret_cast<char *>(length), 8) != 8)
             {
-                InitiateClose(CloseUnexpectedError, QString("Read error"));
+                InitiateClose(CloseUnexpectedError, QStringLiteral("Read error"));
                 return false;
             }
 
@@ -513,7 +513,7 @@ bool TorcWebSocketReader::Read(void)
 
             if (m_socket.read(const_cast<char *>(m_frameMask.constData()), 4) != 4)
             {
-                InitiateClose(CloseUnexpectedError, QString("Read error"));
+                InitiateClose(CloseUnexpectedError, QStringLiteral("Read error"));
                 return false;
             }
 
@@ -536,7 +536,7 @@ bool TorcWebSocketReader::Read(void)
 
                 if (m_socket.read(const_cast<char*>(m_framePayload.constData() + m_framePayloadReadPosition), red) != red)
                 {
-                    InitiateClose(CloseUnexpectedError, QString("Read error"));
+                    InitiateClose(CloseUnexpectedError, QStringLiteral("Read error"));
                     return false;
                 }
 
@@ -546,7 +546,7 @@ bool TorcWebSocketReader::Read(void)
             // finished
             if (m_framePayloadReadPosition == m_framePayloadLength)
             {
-                LOG(VB_NETWORK, LOG_DEBUG, QString("Frame, Final: %1 OpCode: '%2' Masked: %3 Length: %4")
+                LOG(VB_NETWORK, LOG_DEBUG, QStringLiteral("Frame, Final: %1 OpCode: '%2' Masked: %3 Length: %4")
                     .arg(m_frameFinalFragment).arg(OpCodeToString(m_frameOpCode)).arg(m_frameMasked).arg(m_framePayloadLength));
 
                 // unmask payload
@@ -561,7 +561,7 @@ bool TorcWebSocketReader::Read(void)
                     if (m_haveBufferedPayload)
                     {
                         m_bufferedPayload = QByteArray();
-                        LOG(VB_GENERAL, LOG_WARNING, "Already have payload buffer - clearing");
+                        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Already have payload buffer - clearing"));
                     }
 
                     m_haveBufferedPayload = true;
@@ -573,7 +573,7 @@ bool TorcWebSocketReader::Read(void)
                     if (m_haveBufferedPayload)
                         m_bufferedPayload.append(m_framePayload);
                     else
-                        LOG(VB_GENERAL, LOG_ERR, "Continuation frame but no buffered payload");
+                        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Continuation frame but no buffered payload"));
                 }
 
                 // finished
@@ -600,30 +600,30 @@ bool TorcWebSocketReader::Read(void)
                         {
                             if (!utf8::is_valid(m_framePayload.data(), m_framePayload.data() + m_framePayload.size()))
                             {
-                                LOG(VB_GENERAL, LOG_ERR, "Invalid UTF8");
+                                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Invalid UTF8"));
                                 invalidtext = true;
                             }
                             else
                             {
-                                LOG(VB_NETWORK, LOG_DEBUG, QString("'%1'").arg(QString::fromUtf8(m_framePayload)));
+                                LOG(VB_NETWORK, LOG_DEBUG, QStringLiteral("'%1'").arg(QString::fromUtf8(m_framePayload)));
                             }
                         }
                         else if (m_haveBufferedPayload && m_bufferedPayloadOpCode == OpText)
                         {
                             if (!utf8::is_valid(m_bufferedPayload.data(), m_bufferedPayload.data() + m_bufferedPayload.size()))
                             {
-                                LOG(VB_GENERAL, LOG_ERR, "Invalid UTF8");
+                                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Invalid UTF8"));
                                 invalidtext = true;
                             }
                             else
                             {
-                                LOG(VB_NETWORK, LOG_DEBUG, QString("'%1'").arg(QString::fromUtf8(m_bufferedPayload)));
+                                LOG(VB_NETWORK, LOG_DEBUG, QStringLiteral("'%1'").arg(QString::fromUtf8(m_bufferedPayload)));
                             }
                         }
 
                         if (invalidtext)
                         {
-                            InitiateClose(CloseInconsistentData, "Invalid UTF-8 text");
+                            InitiateClose(CloseInconsistentData, QStringLiteral("Invalid UTF-8 text"));
                             return false;
                         }
                         else
@@ -655,7 +655,7 @@ bool TorcWebSocketReader::Read(void)
             else if (m_framePayload.size() > (qint64)m_framePayloadLength)
             {
                 // this shouldn't happen
-                InitiateClose(CloseUnexpectedError, QString("Read error"));
+                InitiateClose(CloseUnexpectedError, QStringLiteral("Read error"));
                 return false;
             }
         }

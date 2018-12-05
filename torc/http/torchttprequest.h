@@ -141,7 +141,7 @@ class TorcHTTPRequest
     void                   SetAllowed               (int Allowed);
     void                   SetAllowGZip             (bool Allowed);
     void                   SetAllowCORS             (bool Allowed);
-    void                   SetCache                 (int Cache, const QString &Tag = QString(""));
+    void                   SetCache                 (int Cache, const QString &Tag = QStringLiteral(""));
     void                   SetSecure                (bool Secure);
     bool                   GetSecure                (void);
     HTTPStatus             GetHTTPStatus            (void) const;

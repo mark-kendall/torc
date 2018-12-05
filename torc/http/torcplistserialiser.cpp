@@ -34,11 +34,11 @@ void TorcPListSerialiser::Begin(QByteArray &)
 {
     m_xmlStream.setAutoFormatting(true);
     m_xmlStream.setAutoFormattingIndent(4);
-    m_xmlStream.writeStartDocument("1.0");
-    m_xmlStream.writeDTD("<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">");
-    m_xmlStream.writeStartElement("plist");
-    m_xmlStream.writeAttribute("version", "1.0");
-    m_xmlStream.writeStartElement("dict");
+    m_xmlStream.writeStartDocument(QStringLiteral("1.0"));
+    m_xmlStream.writeDTD(QStringLiteral("<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">"));
+    m_xmlStream.writeStartElement(QStringLiteral("plist"));
+    m_xmlStream.writeAttribute(QStringLiteral("version"), QStringLiteral("1.0"));
+    m_xmlStream.writeStartElement(QStringLiteral("dict"));
 }
 
 void TorcPListSerialiser::AddProperty(QByteArray &, const QString &Name, const QVariant &Value)
@@ -58,8 +58,8 @@ void TorcPListSerialiser::PListFromVariant(const QString &Name, const QVariant &
     if (Value.isNull())
     {
         if (NeedKey)
-            m_xmlStream.writeTextElement("key", Name);
-        m_xmlStream.writeEmptyElement("null");
+            m_xmlStream.writeTextElement(QStringLiteral("key"), Name);
+        m_xmlStream.writeEmptyElement(QStringLiteral("null"));
         return;
     }
 
@@ -73,8 +73,8 @@ void TorcPListSerialiser::PListFromVariant(const QString &Name, const QVariant &
             if (Value.toDateTime().isValid())
             {
                 if (NeedKey)
-                    m_xmlStream.writeTextElement("key", Name);
-                m_xmlStream.writeTextElement("date", Value.toDateTime().toUTC().toString("yyyy-MM-ddThh:mm:ssZ"));
+                    m_xmlStream.writeTextElement(QStringLiteral("key"), Name);
+                m_xmlStream.writeTextElement(QStringLiteral("date"), Value.toDateTime().toUTC().toString(QStringLiteral("yyyy-MM-ddThh:mm:ssZ")));
             }
             break;
         }
@@ -83,23 +83,23 @@ void TorcPListSerialiser::PListFromVariant(const QString &Name, const QVariant &
             if (!Value.toByteArray().isNull())
             {
                 if (NeedKey)
-                    m_xmlStream.writeTextElement("key", Name);
-                m_xmlStream.writeTextElement("data", Value.toByteArray().toBase64().data());
+                    m_xmlStream.writeTextElement(QStringLiteral("key"), Name);
+                m_xmlStream.writeTextElement(QStringLiteral("data"), Value.toByteArray().toBase64().data());
             }
             break;
         }
         case QMetaType::Bool:
         {
             if (NeedKey)
-                m_xmlStream.writeTextElement("key", Name);
-            m_xmlStream.writeEmptyElement(Value.toBool() ? "true" : "false");
+                m_xmlStream.writeTextElement(QStringLiteral("key"), Name);
+            m_xmlStream.writeEmptyElement(Value.toBool() ? QStringLiteral("true") : QStringLiteral("false"));
             break;
         }
         case QMetaType::Char:
         {
             if (NeedKey)
-                m_xmlStream.writeTextElement("key", Name);
-            m_xmlStream.writeEmptyElement("fill");
+                m_xmlStream.writeTextElement(QStringLiteral("key"), Name);
+            m_xmlStream.writeEmptyElement(QStringLiteral("fill"));
             break;
         }
         break;
@@ -109,8 +109,8 @@ void TorcPListSerialiser::PListFromVariant(const QString &Name, const QVariant &
         case QMetaType::ULongLong:
         {
             if (NeedKey)
-                m_xmlStream.writeTextElement("key", Name);
-            m_xmlStream.writeTextElement("integer", QString::number(Value.toULongLong()));
+                m_xmlStream.writeTextElement(QStringLiteral("key"), Name);
+            m_xmlStream.writeTextElement(QStringLiteral("integer"), QString::number(Value.toULongLong()));
             break;
         }
 
@@ -122,8 +122,8 @@ void TorcPListSerialiser::PListFromVariant(const QString &Name, const QVariant &
         case QMetaType::Double:
         {
             if (NeedKey)
-                m_xmlStream.writeTextElement("key", Name);
-            m_xmlStream.writeTextElement("real", QString("%1").arg(Value.toDouble(), 0, 'f', 6));
+                m_xmlStream.writeTextElement(QStringLiteral("key"), Name);
+            m_xmlStream.writeTextElement(QStringLiteral("real"), QStringLiteral("%1").arg(Value.toDouble(), 0, 'f', 6));
             break;
         }
 
@@ -131,8 +131,8 @@ void TorcPListSerialiser::PListFromVariant(const QString &Name, const QVariant &
         default:
         {
             if (NeedKey)
-                m_xmlStream.writeTextElement("key", Name);
-            m_xmlStream.writeTextElement("string", Value.toString());
+                m_xmlStream.writeTextElement(QStringLiteral("key"), Name);
+            m_xmlStream.writeTextElement(QStringLiteral("string"), Value.toString());
             break;
         }
     }
@@ -149,14 +149,14 @@ void TorcPListSerialiser::PListFromList(const QString &Name, const QVariantList 
         {
             if ((int)(*it).type() != type)
             {
-                PListFromVariant("Error", QVARIANT_ERROR);
+                PListFromVariant(QStringLiteral("Error"), QVARIANT_ERROR);
                 return;
             }
         }
     }
 
-    m_xmlStream.writeTextElement("key", Name);
-    m_xmlStream.writeStartElement("array");
+    m_xmlStream.writeTextElement(QStringLiteral("key"), Name);
+    m_xmlStream.writeStartElement(QStringLiteral("array"));
 
     QVariantList::const_iterator it = Value.begin();
     for ( ; it != Value.end(); ++it)
@@ -167,20 +167,20 @@ void TorcPListSerialiser::PListFromList(const QString &Name, const QVariantList 
 
 void TorcPListSerialiser::PListFromStringList(const QString &Name, const QStringList &Value)
 {
-    m_xmlStream.writeTextElement("key", Name);
-    m_xmlStream.writeStartElement("array");
+    m_xmlStream.writeTextElement(QStringLiteral("key"), Name);
+    m_xmlStream.writeStartElement(QStringLiteral("array"));
 
     QStringList::const_iterator it = Value.begin();
     for ( ; it != Value.end(); ++it)
-        m_xmlStream.writeTextElement("string", (*it));
+        m_xmlStream.writeTextElement(QStringLiteral("string"), (*it));
 
     m_xmlStream.writeEndElement();
 }
 
 void TorcPListSerialiser::PListFromMap(const QString &Name, const QVariantMap &Value)
 {
-    m_xmlStream.writeTextElement("key", Name);
-    m_xmlStream.writeStartElement("dict");
+    m_xmlStream.writeTextElement(QStringLiteral("key"), Name);
+    m_xmlStream.writeStartElement(QStringLiteral("dict"));
 
     QVariantMap::const_iterator it = Value.begin();
     for ( ; it != Value.end(); ++it)
@@ -192,7 +192,7 @@ void TorcPListSerialiser::PListFromMap(const QString &Name, const QVariantMap &V
 class TorcApplePListSerialiserFactory : public TorcSerialiserFactory
 {
   public:
-    TorcApplePListSerialiserFactory() : TorcSerialiserFactory("text", "x-apple-plist+xml", "PList")
+    TorcApplePListSerialiserFactory() : TorcSerialiserFactory(QStringLiteral("text"), QStringLiteral("x-apple-plist+xml"), QStringLiteral("PList"))
     {
     }
 
@@ -205,7 +205,7 @@ class TorcApplePListSerialiserFactory : public TorcSerialiserFactory
 class TorcPListSerialiserFactory : public TorcSerialiserFactory
 {
   public:
-    TorcPListSerialiserFactory() : TorcSerialiserFactory("application", "plist", "PList")
+    TorcPListSerialiserFactory() : TorcSerialiserFactory(QStringLiteral("application"), QStringLiteral("plist"), QStringLiteral("PList"))
     {
     }
 

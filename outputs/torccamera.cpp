@@ -58,26 +58,26 @@ TorcCameraParams::TorcCameraParams(const QVariantMap &Details)
     m_videoCodec(),
     m_contentDir()
 {
-    if (!Details.contains("width") || !Details.contains("height"))
+    if (!Details.contains(QStringLiteral("width")) || !Details.contains(QStringLiteral("height")))
         return;
 
-    bool bitrate   = Details.contains("bitrate");
-    bool framerate = Details.contains("framerate");
+    bool bitrate   = Details.contains(QStringLiteral("bitrate"));
+    bool framerate = Details.contains(QStringLiteral("framerate"));
     bool video     = bitrate && framerate;
     bool stills    = !bitrate && !framerate;
 
     if (!video && !stills)
         return;
 
-    m_width     = Details.value("width").toInt();
-    m_height    = Details.value("height").toInt();
+    m_width     = Details.value(QStringLiteral("width")).toInt();
+    m_height    = Details.value(QStringLiteral("height")).toInt();
 
     // N.B. pitch and slice height may be further constrained in certain encoders and may be further adjusted
     // most h264 streams will expect 16 pixel aligned video so round up
     int pitch = (m_width + 15) & ~15;
     if (pitch != m_width)
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Rounding video width up to %1 from %2").arg(pitch).arg(m_width));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Rounding video width up to %1 from %2").arg(pitch).arg(m_width));
         m_width = pitch;
     }
 
@@ -85,7 +85,7 @@ TorcCameraParams::TorcCameraParams(const QVariantMap &Details)
     int height = (m_height + 7) & ~7;
     if (height != m_height)
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Rounding video height up to %1 from %2").arg(height).arg(m_height));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Rounding video height up to %1 from %2").arg(height).arg(m_height));
         m_height = height;
     }
 
@@ -98,52 +98,52 @@ TorcCameraParams::TorcCameraParams(const QVariantMap &Details)
     {
         m_width  = VIDEO_WIDTH_MIN;
         m_height = VIDEO_HEIGHT_MIN;
-        LOG(VB_GENERAL, LOG_WARNING, QString("Video too small - forcing output to %1x%2").arg(m_width).arg(m_height));
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Video too small - forcing output to %1x%2").arg(m_width).arg(m_height));
     }
     else if (forcemax)
     {
         m_width  = VIDEO_WIDTH_MAX;
         m_height = VIDEO_HEIGHT_MAX;
-        LOG(VB_GENERAL, LOG_WARNING, QString("Video too large - forcing output to %1x%2").arg(m_width).arg(m_height));
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Video too large - forcing output to %1x%2").arg(m_width).arg(m_height));
     }
 
     if (video)
     {
-        m_frameRate = Details.value("framerate").toInt();
-        m_bitrate   = Details.value("bitrate").toInt();
+        m_frameRate = Details.value(QStringLiteral("framerate")).toInt();
+        m_bitrate   = Details.value(QStringLiteral("bitrate")).toInt();
 
         if (m_frameRate < VIDEO_FRAMERATE_MIN)
         {
             m_frameRate = VIDEO_FRAMERATE_MIN;
-            LOG(VB_GENERAL, LOG_WARNING, QString("Video framerate too low - forcing to %1").arg(m_frameRate));
+            LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Video framerate too low - forcing to %1").arg(m_frameRate));
         }
         else if (m_frameRate > VIDEO_FRAMERATE_MAX)
         {
             m_frameRate = VIDEO_FRAMERATE_MAX;
-            LOG(VB_GENERAL, LOG_WARNING, QString("Video framerate too high - forcing to %1").arg(m_frameRate));
+            LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Video framerate too high - forcing to %1").arg(m_frameRate));
         }
 
         if (m_bitrate < VIDEO_BITRATE_MIN)
         {
             m_bitrate = VIDEO_BITRATE_MIN;
-            LOG(VB_GENERAL, LOG_WARNING, QString("Video bitrate too low - forcing to %1").arg(m_bitrate));
+            LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Video bitrate too low - forcing to %1").arg(m_bitrate));
         }
         else if (m_bitrate > VIDEO_BITRATE_MAX)
         {
             m_bitrate = VIDEO_BITRATE_MAX;
-            LOG(VB_GENERAL, LOG_WARNING, QString("Video bitrate too high - forcing to %1").arg(m_bitrate));
+            LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Video bitrate too high - forcing to %1").arg(m_bitrate));
         }
 
         m_segmentLength = m_frameRate * VIDEO_SEGMENT_TARGET;
         m_gopSize       = m_frameRate * VIDEO_GOPDURA_TARGET;
 
-        LOG(VB_GENERAL, LOG_INFO, QString("Segment length: %1frames %2seconds").arg(m_segmentLength).arg(m_segmentLength / m_frameRate));
-        LOG(VB_GENERAL, LOG_INFO, QString("GOP     length: %1frames %2seconds").arg(m_gopSize).arg(m_gopSize / m_frameRate));
-        LOG(VB_GENERAL, LOG_INFO, QString("Camera video  : %1x%2@%3fps bitrate %4").arg(m_width).arg(m_height).arg(m_frameRate).arg(m_bitrate));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Segment length: %1frames %2seconds").arg(m_segmentLength).arg(m_segmentLength / m_frameRate));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("GOP     length: %1frames %2seconds").arg(m_gopSize).arg(m_gopSize / m_frameRate));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Camera video  : %1x%2@%3fps bitrate %4").arg(m_width).arg(m_height).arg(m_frameRate).arg(m_bitrate));
     }
     else
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Camera stills: %1x%2").arg(m_width).arg(m_height));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Camera stills: %1x%2").arg(m_width).arg(m_height));
     }
 
     m_valid = true;
@@ -197,7 +197,7 @@ TorcCameraParams TorcCameraParams::Combine(const TorcCameraParams &Add)
 
     if (!IsCompatible(Add))
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Error combining camera parameters - %1x%2 != %3x%4")
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Error combining camera parameters - %1x%2 != %3x%4")
                                     .arg(m_width).arg(m_height).arg(Add.m_width).arg(Add.m_height));
         // this should cover most cases
         if ((m_width > Add.m_width) || (m_height > Add.m_height))
@@ -205,7 +205,7 @@ TorcCameraParams TorcCameraParams::Combine(const TorcCameraParams &Add)
             m_width  = Add.m_width;
             m_height = Add.m_height;
         }
-        LOG(VB_GENERAL, LOG_WARNING, QString("Using smaller image size %1x%2").arg(m_width).arg(m_height));
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Using smaller image size %1x%2").arg(m_width).arg(m_height));
     }
 
     // add video data
@@ -219,12 +219,13 @@ TorcCameraParams TorcCameraParams::Combine(const TorcCameraParams &Add)
         m_segmentLength = Add.m_segmentLength;
         m_videoCodec    = Add.m_videoCodec;
         m_timebase      = Add.m_timebase;
-        LOG(VB_GENERAL, LOG_INFO, "Added video to camera parameters");
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Added video to camera parameters"));
     }
     // add stills
     else if (IsVideo() && Add.IsStill())
     {
         m_contentDir    = Add.m_contentDir;
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Added stills to camera parameters"));
     }
 
     return *this;
@@ -352,19 +353,19 @@ void TorcCameraDevice::SaveStill(void)
         {
             if (!m_params.m_contentDir.isEmpty())
             {
-                QFile file(m_params.m_contentDir + QDateTime::currentDateTime().toString("yyyy_MM_dd_hh_mm_ss_zzz") + ".jpg");
+                QFile file(m_params.m_contentDir + QDateTime::currentDateTime().toString(QStringLiteral("yyyy_MM_dd_hh_mm_ss_zzz")) + ".jpg");
                 if (file.open(QIODevice::ReadWrite | QIODevice::Truncate))
                 {
                     QPair<quint32, uint8_t*> pair;
                     foreach(pair, m_stillsBuffers)
                         file.write((const char*)pair.second, pair.first);
                     file.close();
-                    LOG(VB_GENERAL, LOG_INFO, QString("Saved snapshot as '%1'").arg(file.fileName()));
+                    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Saved snapshot as '%1'").arg(file.fileName()));
                     emit StillReady(file.fileName());
                 }
                 else
                 {
-                    LOG(VB_GENERAL, LOG_ERR, QString("Failed to open %1 for writing").arg(file.fileName()));
+                    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to open %1 for writing").arg(file.fileName()));
                 }
             }
             m_stillsRequired--;
@@ -420,7 +421,7 @@ void TorcCameraDevice::TrackDrift(void)
     double gradient   = driftdelta / timedelta;
     double timetozero = qAbs(driftdelta) < 1 ? qInf() : drift / gradient;
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Drift: %1secs 1min %2 5min %3 timetozero %4")
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Drift: %1secs 1min %2 5min %3 timetozero %4")
         .arg((double)drift/1000, 0, 'f', 3).arg(shortaverage/1000, 0, 'f', 3).arg(longaverage/1000, 0, 'f', 3).arg(timetozero/1000, 0, 'f', 3));
 }
 

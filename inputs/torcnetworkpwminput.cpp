@@ -24,7 +24,7 @@
 #include "torcnetworkpwminput.h"
 
 TorcNetworkPWMInput::TorcNetworkPWMInput(double Default, const QVariantMap &Details)
-  : TorcPWMInput(Default, "NetworkPWM", Details)
+  : TorcPWMInput(Default, QStringLiteral("NetworkPWM"), Details)
 {
 }
 

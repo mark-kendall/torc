@@ -31,7 +31,7 @@
 #define DEFAULT_VALUE 0
 
 TorcPiSwitchOutput::TorcPiSwitchOutput(int Pin, const QVariantMap &Details)
-  : TorcSwitchOutput(DEFAULT_VALUE, "PiGPIOSwitchOutput", Details),
+  : TorcSwitchOutput(DEFAULT_VALUE, QStringLiteral("PiGPIOSwitchOutput"), Details),
     m_pin(Pin)
 {
     // setup and initialise pin for output

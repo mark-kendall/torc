@@ -45,18 +45,18 @@ bool TorcHTTPServerListener::Listen(const QHostAddress &Address, int Port)
 {
     if (!listen(Address, Port))
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to listen on %1").arg(TorcNetwork::IPAddressToLiteral(Address, Port)));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to listen on %1").arg(TorcNetwork::IPAddressToLiteral(Address, Port)));
         return false;
     }
 
     if (QHostAddress::AnyIPv4 == Address)
-        LOG(VB_GENERAL, LOG_INFO, QString("Listening on port %1 (IPv4 addresses only)").arg(Port));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Listening on port %1 (IPv4 addresses only)").arg(Port));
     else if (QHostAddress::AnyIPv6 == Address)
-        LOG(VB_GENERAL, LOG_INFO, QString("Listening on port %1 (IPv6 addresses only)").arg(Port));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Listening on port %1 (IPv6 addresses only)").arg(Port));
     else if (QHostAddress::Any == Address)
-        LOG(VB_GENERAL, LOG_INFO, QString("Listening on port %1 (IPv4 and IPv6 addresses)").arg(Port));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Listening on port %1 (IPv4 and IPv6 addresses)").arg(Port));
     else
-        LOG(VB_GENERAL, LOG_INFO, QString("Listening on %1").arg(TorcNetwork::IPAddressToLiteral(Address, Port)));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Listening on %1").arg(TorcNetwork::IPAddressToLiteral(Address, Port)));
     return true;
 }
 

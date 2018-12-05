@@ -35,7 +35,7 @@
  *  \todo Allow customisation of the time format.
 */
 TorcTime::TorcTime()
-  : QObject(), TorcHTTPService(this, "time", "time", TorcTime::staticMetaObject, "Tick"),
+  : QObject(), TorcHTTPService(this, QStringLiteral("time"), QStringLiteral("time"), TorcTime::staticMetaObject, QStringLiteral("Tick")),
     currentTime(),
     m_lastTime(QDateTime::currentDateTime()),
     m_timer(),
@@ -71,7 +71,7 @@ void TorcTime::Tick(void)
     // so compromise between seconds and a full hour.
     if (qAbs(difference) > (30 * 60))
     {
-        LOG(VB_GENERAL, LOG_WARNING, "Detected change in system time");
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Detected change in system time"));
         gLocalContext->NotifyEvent(Torc::SystemTimeChanged);
     }
 

@@ -62,17 +62,17 @@ TorcCentral::TemperatureUnits TorcCentral::GetGlobalTemperatureUnits(void)
 
 TorcCentral::TorcCentral()
   : QObject(),
-    TorcHTTPService(this, "central", "central", TorcCentral::staticMetaObject, ""),
+    TorcHTTPService(this, QStringLiteral("central"), QStringLiteral("central"), TorcCentral::staticMetaObject, QStringLiteral("")),
     m_config(QVariantMap()),
     m_graph(),
-    temperatureUnits("celsius")
+    temperatureUnits(QStringLiteral("celsius"))
 {
     // reset state graph and clear out old files
     // content directory should already have been created by TorcHTMLDynamicContent
-    QString graphdot = GetTorcContentDir() + "stategraph.dot";
-    QString graphsvg = GetTorcContentDir() + "stategraph.svg";
-    QString config   = GetTorcContentDir() + TORC_CONFIG_FILE;
-    QString current  = GetTorcConfigDir() + "/" + TORC_CONFIG_FILE;
+    QString graphdot = QStringLiteral("%1stategraph.dot").arg(GetTorcContentDir());
+    QString graphsvg = QStringLiteral("%1stategraph.svg").arg(GetTorcContentDir());
+    QString config   = QStringLiteral("%1%2").arg(GetTorcContentDir(), TORC_CONFIG_FILE);
+    QString current  = QStringLiteral("%1/%2").arg(GetTorcConfigDir(), TORC_CONFIG_FILE);
 
     if (QFile::exists(graphdot))
         QFile::remove(graphdot);
@@ -83,7 +83,7 @@ TorcCentral::TorcCentral()
 
     QFile currentconfig(current);
     if (!currentconfig.copy(config))
-        LOG(VB_GENERAL, LOG_WARNING, "Failed to copy current config file to content directory");
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Failed to copy current config file to content directory"));
 
     // listen for interesting events
     gLocalContext->AddObserver(this);
@@ -93,37 +93,37 @@ TorcCentral::TorcCentral()
         TemperatureUnits temperatureunits = Celsius; // default to metric
 
         // handle settings now
-        if (m_config.contains("settings"))
+        if (m_config.contains(QStringLiteral("settings")))
         {
-            QVariantMap settings = m_config.value("settings").toMap();
+            QVariantMap settings = m_config.value(QStringLiteral("settings")).toMap();
 
             // applicationname
-            if (settings.contains("applicationname"))
+            if (settings.contains(QStringLiteral("applicationname")))
             {
-                QString name = settings.value("applicationname").toString().trimmed();
+                QString name = settings.value(QStringLiteral("applicationname")).toString().trimmed();
                 if (!name.isEmpty())
                 {
                     QCoreApplication::setApplicationName(name);
-                    LOG(VB_GENERAL, LOG_INFO, QString("Changed application name to '%1'").arg(name));
+                    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Changed application name to '%1'").arg(name));
                 }
             }
 
             // temperature units - metric or imperial...
-            if (settings.contains("temperatureunits"))
+            if (settings.contains(QStringLiteral("temperatureunits")))
             {
-                QString units = settings.value("temperatureunits").toString().trimmed().toLower();
-                if (units == "metric" || units == "celsius")
+                QString units = settings.value(QStringLiteral("temperatureunits")).toString().trimmed().toLower();
+                if (units == QStringLiteral("metric") || units == QStringLiteral("celsius"))
                     temperatureunits = Celsius;
-                else if (units == "imperial" || units == "fahrenheit")
+                else if (units == QStringLiteral("imperial") || units == QStringLiteral("fahrenheit"))
                     temperatureunits = Fahrenheit;
                 else
-                    LOG(VB_GENERAL, LOG_WARNING, "Unknown temperature units - defaulting to metric (Celsius)");
+                    LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Unknown temperature units - defaulting to metric (Celsius)"));
             }
         }
 
         TorcCentral::gTemperatureUnits = temperatureunits;
         temperatureUnits               = TorcCoreUtils::EnumToLowerString<TorcCentral::TemperatureUnits>(temperatureunits);
-        LOG(VB_GENERAL, LOG_INFO, QString("Using '%1' temperature units").arg(temperatureUnits));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Using '%1' temperature units").arg(temperatureUnits));
 
         // create the devices
         TorcDeviceHandler::Start(m_config);
@@ -134,7 +134,7 @@ TorcCentral::TorcCentral()
         // setup notifications/notifiers
         (void)TorcNotify::gNotify->Validate();
 
-        LOG(VB_GENERAL, LOG_INFO, "Initialising state machine");
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Initialising state machine"));
         // initialise the state machine
         {
             QMutexLocker lock(TorcDevice::gDeviceListLock);
@@ -144,13 +144,13 @@ TorcCentral::TorcCentral()
                 it.value()->Start();
         }
 
-        LOG(VB_GENERAL, LOG_INFO, "Notifying start");
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Notifying start"));
         TorcLocalContext::NotifyEvent(Torc::Start);
 
         // iff we have got this far, then create the graph
         // start the graph
         m_graph.clear();
-        m_graph.append(QString("strict digraph \"%1\" {\r\n"
+        m_graph.append(QStringLiteral("strict digraph \"%1\" {\r\n"
                                     "    rankdir=\"LR\";\r\n"
                                     "    node [shape=rect];\r\n")
                             .arg(TORC_TORC));
@@ -170,11 +170,11 @@ TorcCentral::TorcCentral()
             file.write(m_graph);
             file.flush();
             file.close();
-            LOG(VB_GENERAL, LOG_INFO, QString("Saved state graph as %1").arg(graphdot));
+            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Saved state graph as %1").arg(graphdot));
         }
         else
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed to open '%1' to write state graph").arg(graphdot));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to open '%1' to write state graph").arg(graphdot));
         }
 
         // create a representation of the state graph
@@ -196,24 +196,24 @@ TorcCentral::TorcCentral()
         }
         else
         {
-            LOG(VB_GENERAL, LOG_WARNING, QString("Failed to open '%1' for writing (err: %2)").arg(graphsvg, strerror(errno)));
+            LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Failed to open '%1' for writing (err: %2)").arg(graphsvg, strerror(errno)));
         }
 
         if (!created)
         {
 #endif
             // NB QProcess appears to be fatally broken. Just use system instead
-            QString command = QString("dot -Tsvg -o %1 %2").arg(graphsvg, graphdot);
+            QString command = QStringLiteral("dot -Tsvg -o %1 %2").arg(graphsvg, graphdot);
             int err = system(command.toLocal8Bit());
             if (err < 0)
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("Failed to create stategraph representation (err: %1)").arg(strerror(errno)));
+                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to create stategraph representation (err: %1)").arg(strerror(errno)));
             }
             else
             {
-                LOG(VB_GENERAL, LOG_INFO, QString("Saved state graph representation as %1").arg(graphsvg));
+                LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Saved state graph representation as %1").arg(graphsvg));
                 if (err > 0)
-                    LOG(VB_GENERAL, LOG_ERR, "dot returned an unexpected result - stategraph may be incomplete or absent");
+                    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("dot returned an unexpected result - stategraph may be incomplete or absent"));
             }
         }
 #ifdef USING_GRAPHVIZ_LIBS
@@ -253,7 +253,7 @@ bool TorcCentral::LoadConfig(void)
 
     if (!qEnvironmentVariableIsEmpty("TORC_NO_VALIDATION"))
     {
-        LOG(VB_GENERAL, LOG_INFO, "Skipping configuration file validation (command line).");
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Skipping configuration file validation (command line)."));
         skipvalidation = true;
     }
 
@@ -261,7 +261,7 @@ bool TorcCentral::LoadConfig(void)
     QFileInfo config(xml);
     if (!skipvalidation && !config.exists())
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to find configuration file '%1'").arg(xml));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to find configuration file '%1'").arg(xml));
         return false;
     }
 
@@ -284,7 +284,7 @@ bool TorcCentral::LoadConfig(void)
     QString basexsd = GetTorcShareDir() + "/html/torc.xsd";
     if (!QFile::exists(basexsd))
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to find base XSD file '%1'").arg(basexsd));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to find base XSD file '%1'").arg(basexsd));
         return false;
     }
 
@@ -303,62 +303,62 @@ bool TorcCentral::LoadConfig(void)
                 customxsdfile.write(newxsd);
                 customxsdfile.flush();
                 customxsdfile.close();
-                LOG(VB_GENERAL, LOG_INFO, QString("Saved current XSD as '%1'").arg(customxsd));
+                LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Saved current XSD as '%1'").arg(customxsd));
             }
             else
             {
-                LOG(VB_GENERAL, LOG_WARNING, QString("Failed to open '%1' for writing").arg(customxsd));
+                LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Failed to open '%1' for writing").arg(customxsd));
             }
         }
         else
         {
-            LOG(VB_GENERAL, LOG_ERR, "Strange - empty xsd...");
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Strange - empty xsd..."));
             return false;
         }
     }
 
     // validation can take a while on slower machines (e.g. single core raspberry pi).
     // try and skip if the config has not been modified
-    QString lastvalidated = gLocalContext->GetSetting("configLastValidated", QString("never"));
-    if (!skipvalidation && lastvalidated != "never")
+    QString lastvalidated = gLocalContext->GetSetting(QStringLiteral("configLastValidated"), QStringLiteral("never"));
+    if (!skipvalidation && lastvalidated != QStringLiteral("never"))
     {
         bool xsdmodified    = qstrcmp(oldxsd.constData(), newxsd.constData()) != 0;
         bool configmodified = config.lastModified() >= QDateTime::fromString(lastvalidated);
 
         if (xsdmodified)
-            LOG(VB_GENERAL, LOG_INFO, QString("XSD file changed since last validation"));
+            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("XSD file changed since last validation"));
         else
-            LOG(VB_GENERAL, LOG_INFO, QString("XSD unchanged since last validation"));
+            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("XSD unchanged since last validation"));
 
         if (configmodified)
-            LOG(VB_GENERAL, LOG_INFO, QString("Configuration file changed since last validation"));
+            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Configuration file changed since last validation"));
         else
-            LOG(VB_GENERAL, LOG_INFO, QString("Configuration file unchanged since last validation:"));
+            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Configuration file unchanged since last validation:"));
 
         skipvalidation = !xsdmodified && !configmodified;
     }
 
     if (!skipvalidation)
     {
-        LOG(VB_GENERAL, LOG_INFO, "Starting validation of configuration file");
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Starting validation of configuration file"));
         TorcXmlValidator validator(xml, newxsd);
         if (!validator.Validated())
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Configuration file '%1' failed validation").arg(xml));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Configuration file '%1' failed validation").arg(xml));
             // make sure we re-validate
-            gLocalContext->SetSetting("configLastValidated", QString("never"));
+            gLocalContext->SetSetting(QStringLiteral("configLastValidated"), QStringLiteral("never"));
             return false;
         }
 
-        LOG(VB_GENERAL, LOG_INFO, "Configuration successfully validated");
-        gLocalContext->SetSetting("configLastValidated", QDateTime::currentDateTime().toString());
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Configuration successfully validated"));
+        gLocalContext->SetSetting(QStringLiteral("configLastValidated"), QDateTime::currentDateTime().toString());
     }
     else
     {
-        LOG(VB_GENERAL, LOG_INFO, "Skipping validation of configuration file");
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Skipping validation of configuration file"));
     }
 #else
-    LOG(VB_GENERAL, LOG_INFO, "Xml validation unavailable - not validating configuration file.");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Xml validation unavailable - not validating configuration file."));
 #endif
 
     TorcXMLReader reader(xml);
@@ -373,15 +373,15 @@ bool TorcCentral::LoadConfig(void)
     QVariantMap result = reader.GetResult();
 
     // root object should be 'torc'
-    if (!result.contains("torc"))
+    if (!result.contains(QStringLiteral("torc")))
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to find 'torc' root element in '%1'").arg(xml));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to find 'torc' root element in '%1'").arg(xml));
         return false;
     }
 
-    m_config = result.value("torc").toMap();
+    m_config = result.value(QStringLiteral("torc")).toMap();
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Loaded config from %1").arg(xml));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Loaded config from %1").arg(xml));
     return true;
 }
 
@@ -390,14 +390,14 @@ QByteArray TorcCentral::GetCustomisedXSD(const QString &BaseXSDFile)
     QByteArray result;
     if (!QFile::exists(BaseXSDFile))
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Base XSD file '%1' does not exist").arg(BaseXSDFile));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Base XSD file '%1' does not exist").arg(BaseXSDFile));
         return result;
     }
 
     QFile xsd(BaseXSDFile);
     if (!xsd.open(QIODevice::ReadOnly))
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to open base XSD file '%1'").arg(BaseXSDFile));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to open base XSD file '%1'").arg(BaseXSDFile));
         return result;
     }
 
@@ -423,7 +423,7 @@ bool TorcCentral::event(QEvent *Event)
                 // NB this just ensures outputs (e.g. PWM drivers) are set to sensible
                 // defaults if we shut down. There is currently no handling of waking, which
                 // would need more thought about resetting state etc.
-                LOG(VB_GENERAL, LOG_INFO, "Resetting devices to defaults.");
+                LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Resetting devices to defaults."));
                 {
                     QMutexLocker lock(TorcDevice::gDeviceListLock);
 
@@ -450,7 +450,7 @@ class TorcCentralObject : public TorcAdminObject, public TorcStringFactory
       : TorcAdminObject(TORC_ADMIN_LOW_PRIORITY - 5), // start last
         m_object(nullptr)
     {
-        TorcCommandLine::RegisterEnvironmentVariable("TORC_NO_VALIDATION", "Disable validation of configuration file. This may speed up start times.");
+        TorcCommandLine::RegisterEnvironmentVariable(QStringLiteral("TORC_NO_VALIDATION"), QStringLiteral("Disable validation of configuration file. This may speed up start times."));
     }
 
     ~TorcCentralObject()
@@ -460,10 +460,10 @@ class TorcCentralObject : public TorcAdminObject, public TorcStringFactory
 
     void GetStrings(QVariantMap &Strings)
     {
-        Strings.insert("CelsiusTr",          QCoreApplication::translate("TorcCentral", "Celsius"));
-        Strings.insert("CelsiusUnitsTr",     QCoreApplication::translate("TorcCentral", "°C"));
-        Strings.insert("FahrenheitTr",       QCoreApplication::translate("TorcCentral", "Fahrenheit"));
-        Strings.insert("FahrenheitUnitsTr",  QCoreApplication::translate("TorcCentral", "°F"));
+        Strings.insert(QStringLiteral("CelsiusTr"),          QCoreApplication::translate("TorcCentral", "Celsius"));
+        Strings.insert(QStringLiteral("CelsiusUnitsTr"),     QCoreApplication::translate("TorcCentral", "°C"));
+        Strings.insert(QStringLiteral("FahrenheitTr"),       QCoreApplication::translate("TorcCentral", "Fahrenheit"));
+        Strings.insert(QStringLiteral("FahrenheitUnitsTr"),  QCoreApplication::translate("TorcCentral", "°F"));
     }
 
     void Create(void)

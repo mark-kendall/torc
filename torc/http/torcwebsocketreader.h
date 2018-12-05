@@ -5,7 +5,7 @@
 #include <QTcpSocket>
 
 // Torc
-#define TORC_JSON_RPC QString("torc.json-rpc")
+#define TORC_JSON_RPC QStringLiteral("torc.json-rpc")
 
 class TorcWebSocketReader
 {

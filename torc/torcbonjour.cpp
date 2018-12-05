@@ -87,7 +87,7 @@ TorcBonjourService::TorcBonjourService()
     m_socketNotifier(nullptr)
 {
     // the default constructor only exists to keep QMap happy - it should never be used
-    LOG(VB_GENERAL, LOG_WARNING, "Invalid TorcBonjourService object");
+    LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Invalid TorcBonjourService object"));
 }
 
 TorcBonjourService::TorcBonjourService(const TorcBonjourService &Other)
@@ -193,7 +193,7 @@ void TorcBonjourService::Deregister(void)
 
     if (m_lookupID != -1)
     {
-        LOG(VB_NETWORK, LOG_WARNING, QString("Host lookup for '%1' is not finished - cancelling").arg(m_host.constData()));
+        LOG(VB_NETWORK, LOG_WARNING, QStringLiteral("Host lookup for '%1' is not finished - cancelling").arg(m_host.constData()));
         QHostInfo::abortHostLookup(m_lookupID);
         m_lookupID = -1;
     }
@@ -203,18 +203,18 @@ void TorcBonjourService::Deregister(void)
         // Unregister
         if (m_serviceType == Browse)
         {
-            LOG(VB_GENERAL, LOG_INFO, QString("Cancelling browse for '%1'")
+            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Cancelling browse for '%1'")
                 .arg(m_type.constData()));
         }
         else if (m_serviceType == Service)
         {
             LOG(VB_GENERAL, LOG_INFO,
-                QString("De-registering service '%1' on '%2'")
+                QStringLiteral("De-registering service '%1' on '%2'")
                 .arg(m_type.constData(), m_name.constData()));
         }
         else if (m_serviceType == Resolve)
         {
-            LOG(VB_NETWORK, LOG_INFO, QString("Cancelling resolve for '%1'")
+            LOG(VB_NETWORK, LOG_INFO, QStringLiteral("Cancelling resolve for '%1'")
                 .arg(m_type.constData()));
         }
 
@@ -242,17 +242,17 @@ void BonjourRegisterCallback(DNSServiceRef Ref, DNSServiceFlags Flags,
     TorcBonjour *bonjour = static_cast<TorcBonjour*>(Object);
     if (kDNSServiceErr_NoError != Errorcode)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Callback Error: %1").arg(Errorcode));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Callback Error: %1").arg(Errorcode));
     }
     else if (bonjour)
     {
         LOG(VB_GENERAL, LOG_INFO,
-            QString("Service registration complete: name '%1' type '%2'")
+            QStringLiteral("Service registration complete: name '%1' type '%2'")
             .arg(QString::fromUtf8(Name), QString::fromUtf8(Type)));
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("BonjourRegisterCallback for unknown object."));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("BonjourRegisterCallback for unknown object."));
     }
 }
 
@@ -267,13 +267,13 @@ void BonjourBrowseCallback(DNSServiceRef Ref, DNSServiceFlags Flags,
     TorcBonjour *bonjour = static_cast<TorcBonjour*>(Object);
     if (!bonjour)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Received browse callback for unknown object");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Received browse callback for unknown object"));
         return;
     }
 
     if (ErrorCode != kDNSServiceErr_NoError)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Browse callback error");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Browse callback error"));
         return;
     }
 
@@ -304,7 +304,7 @@ void BonjourResolveCallback(DNSServiceRef Ref, DNSServiceFlags Flags,
     TorcBonjour *bonjour = static_cast<TorcBonjour*>(Object);
     if (!bonjour)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Received resolve callback for unknown object");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Received resolve callback for unknown object"));
         return;
     }
 
@@ -420,7 +420,7 @@ TorcBonjour::~TorcBonjour()
     // stop listening for network events
     gLocalContext->RemoveObserver(this);
 
-    LOG(VB_GENERAL, LOG_INFO, "Closing Bonjour");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Closing Bonjour"));
 
     // deregister any outstanding services (should be empty)
     {
@@ -482,7 +482,7 @@ quint32 TorcBonjour::Register(quint16 Port, const QByteArray &Type, const QByteA
             reference++;
         m_services.insert(reference, service);
 
-        LOG(VB_GENERAL, LOG_ERR, "Bonjour service registration deferred until Bonjour resumed");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Bonjour service registration deferred until Bonjour resumed"));
         return reference;
     }
 
@@ -495,7 +495,7 @@ quint32 TorcBonjour::Register(quint16 Port, const QByteArray &Type, const QByteA
     {
         QByteArray name(Name);
         if (tries > 0)
-            name.append(QString(" [%1]").arg(tries + 1));
+            name.append(QStringLiteral(" [%1]").arg(tries + 1));
         result = DNSServiceRegister(&dnssref, 0,
                                     0, (const char*)name.constData(),
                                     (const char*)Type.constData(),
@@ -506,7 +506,7 @@ quint32 TorcBonjour::Register(quint16 Port, const QByteArray &Type, const QByteA
 
     if (kDNSServiceErr_NoError != result)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Register error: %1").arg(result));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Register error: %1").arg(result));
         if (dnssref)
             DNSServiceRefDeallocate(dnssref);
     }
@@ -524,7 +524,7 @@ quint32 TorcBonjour::Register(quint16 Port, const QByteArray &Type, const QByteA
         return reference;
     }
 
-    LOG(VB_GENERAL, LOG_ERR, "Failed to register service.");
+    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to register service."));
     return 0;
 }
 
@@ -554,7 +554,7 @@ quint32 TorcBonjour::Browse(const QByteArray &Type, quint32 Reference /*=0*/)
             reference++;
         m_services.insert(reference, service);
 
-        LOG(VB_GENERAL, LOG_ERR, "Bonjour browse request deferred until Bonjour resumed");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Bonjour browse request deferred until Bonjour resumed"));
         return reference;
     }
 
@@ -564,7 +564,7 @@ quint32 TorcBonjour::Browse(const QByteArray &Type, quint32 Reference /*=0*/)
                                                   Type, nullptr, BonjourBrowseCallback, this);
     if (kDNSServiceErr_NoError != result)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Browse error: %1").arg(result));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Browse error: %1").arg(result));
         if (dnssref)
             DNSServiceRefDeallocate(dnssref);
     }
@@ -577,11 +577,11 @@ quint32 TorcBonjour::Browse(const QByteArray &Type, quint32 Reference /*=0*/)
         TorcBonjourService service(TorcBonjourService::Browse, dnssref, dummy, Type);
         m_services.insert(reference, service);
         m_services[reference].SetFileDescriptor(DNSServiceRefSockFD(dnssref), this);
-        LOG(VB_GENERAL, LOG_INFO, QString("Browsing for '%1'").arg(Type.constData()));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Browsing for '%1'").arg(Type.constData()));
         return reference;
     }
 
-    LOG(VB_GENERAL, LOG_ERR, QString("Failed to browse for '%1'").arg(Type.constData()));
+    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to browse for '%1'").arg(Type.constData()));
     return 0;
 }
 
@@ -611,7 +611,7 @@ void TorcBonjour::Deregister(quint32 Reference)
 
     if (type.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_WARNING, "Trying to de-register an unknown service.");
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Trying to de-register an unknown service."));
         return;
     }
 
@@ -649,7 +649,7 @@ void TorcBonjour::socketReadyRead(int Socket)
             {
                 DNSServiceErrorType res = DNSServiceProcessResult((*it).m_dnssRef);
                 if (kDNSServiceErr_NoError != res)
-                    LOG(VB_GENERAL, LOG_ERR, QString("Read Error: %1").arg(res));
+                    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Read Error: %1").arg(res));
                 return;
             }
         }
@@ -665,13 +665,13 @@ void TorcBonjour::socketReadyRead(int Socket)
             {
                 DNSServiceErrorType res = DNSServiceProcessResult((*it).m_dnssRef);
                 if (kDNSServiceErr_NoError != res)
-                    LOG(VB_GENERAL, LOG_ERR, QString("Read Error: %1").arg(res));
+                    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Read Error: %1").arg(res));
                 return;
             }
         }
     }
 
-    LOG(VB_GENERAL, LOG_WARNING, "Read request on unknown socket");
+    LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Read request on unknown socket"));
 }
 
 /*! \fn    TorcBonjour::SuspendPriv
@@ -689,11 +689,11 @@ void TorcBonjour::SuspendPriv(bool Suspend)
     {
         if (m_suspended)
         {
-            LOG(VB_GENERAL, LOG_INFO, "Bonjour already suspended");
+            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Bonjour already suspended"));
             return;
         }
 
-        LOG(VB_GENERAL, LOG_INFO, "Suspending bonjour activities");
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Suspending bonjour activities"));
 
         m_suspended = true;
 
@@ -720,11 +720,11 @@ void TorcBonjour::SuspendPriv(bool Suspend)
     {
         if (!m_suspended)
         {
-            LOG(VB_GENERAL, LOG_ERR, "Cannot resume - not suspended");
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Cannot resume - not suspended"));
             return;
         }
 
-        LOG(VB_GENERAL, LOG_INFO, "Resuming bonjour activities");
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Resuming bonjour activities"));
 
         {
             QMutexLocker locker(&m_serviceLock);
@@ -770,7 +770,7 @@ void TorcBonjour::AddBrowseResult(DNSServiceRef Reference, const TorcBonjourServ
 
         if (!found)
         {
-            LOG(VB_GENERAL, LOG_INFO, "Browser result for unknown browser");
+            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Browser result for unknown browser"));
             return;
         }
     }
@@ -786,7 +786,7 @@ void TorcBonjour::AddBrowseResult(DNSServiceRef Reference, const TorcBonjourServ
                 (*it).m_domain == Service.m_domain &&
                 (*it).m_interfaceIndex == Service.m_interfaceIndex)
             {
-                LOG(VB_NETWORK, LOG_INFO, QString("Service '%1' already discovered - ignoring")
+                LOG(VB_NETWORK, LOG_INFO, QStringLiteral("Service '%1' already discovered - ignoring")
                     .arg(Service.m_name.constData()));
                 return;
             }
@@ -801,7 +801,7 @@ void TorcBonjour::AddBrowseResult(DNSServiceRef Reference, const TorcBonjourServ
                               this);
         if (error != kDNSServiceErr_NoError)
         {
-            LOG(VB_GENERAL, LOG_ERR, "Service resolution call failed");
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Service resolution call failed"));
             if (reference)
                 DNSServiceRefDeallocate(reference);
         }
@@ -815,7 +815,7 @@ void TorcBonjour::AddBrowseResult(DNSServiceRef Reference, const TorcBonjourServ
             service.m_dnssRef = reference;
             m_discoveredServices.insert(ref, service);
             m_discoveredServices[ref].SetFileDescriptor(DNSServiceRefSockFD(reference), this);
-            LOG(VB_NETWORK, LOG_INFO, QString("Resolving '%1'").arg(service.m_name.constData()));
+            LOG(VB_NETWORK, LOG_INFO, QStringLiteral("Resolving '%1'").arg(service.m_name.constData()));
         }
     }
 }
@@ -842,7 +842,7 @@ void TorcBonjour::RemoveBrowseResult(DNSServiceRef Reference,
 
         if (!found)
         {
-            LOG(VB_GENERAL, LOG_INFO, "Browser result for unknown browser");
+            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Browser result for unknown browser"));
             return;
         }
     }
@@ -860,14 +860,14 @@ void TorcBonjour::RemoveBrowseResult(DNSServiceRef Reference,
                 it.value().m_interfaceIndex == Service.m_interfaceIndex)
             {
                 QVariantMap data;
-                data.insert("name", it.value().m_name.constData());
-                data.insert("type", it.value().m_type.constData());
-                data.insert("txtrecords", it.value().m_txt);
-                data.insert("host", it.value().m_host);
+                data.insert(QStringLiteral("name"), it.value().m_name.constData());
+                data.insert(QStringLiteral("type"), it.value().m_type.constData());
+                data.insert(QStringLiteral("txtrecords"), it.value().m_txt);
+                data.insert(QStringLiteral("host"), it.value().m_host);
                 TorcEvent event(Torc::ServiceWentAway, data);
                 gLocalContext->Notify(event);
 
-                LOG(VB_GENERAL, LOG_INFO, QString("Service '%1' on '%2' went away")
+                LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Service '%1' on '%2' went away")
                     .arg(it.value().m_type.constData(),
                          it.value().m_host.isEmpty() ? it.value().m_name.constData() : it.value().m_host.constData()));
                 it.value().Deregister();
@@ -903,13 +903,13 @@ void TorcBonjour::Resolve(DNSServiceRef Reference, DNSServiceErrorType ErrorType
             {
                 if (ErrorType != kDNSServiceErr_NoError)
                 {
-                    LOG(VB_GENERAL, LOG_ERR, QString("Failed to resolve '%1' (Error %2)").arg(service.m_name.constData()).arg(ErrorType));
+                    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to resolve '%1' (Error %2)").arg(service.m_name.constData()).arg(ErrorType));
                     QVariantMap data;
-                    data.insert("name", service.m_name.constData());
-                    data.insert("type", service.m_type.constData());
-                    data.insert("port", service.m_port);
-                    data.insert("txtrecords", service.m_txt);
-                    data.insert("host", service.m_host.constData());
+                    data.insert(QStringLiteral("name"), service.m_name.constData());
+                    data.insert(QStringLiteral("type"), service.m_type.constData());
+                    data.insert(QStringLiteral("port"), service.m_port);
+                    data.insert(QStringLiteral("txtrecords"), service.m_txt);
+                    data.insert(QStringLiteral("host"), service.m_host.constData());
                     // as per HostLookup below - resolve may have failed due to a network disruption and the service is no
                     // longer available. Signal removal - if it wasn't already known it won't matter.
                     TorcEvent event(Torc::ServiceWentAway, data);
@@ -920,7 +920,7 @@ void TorcBonjour::Resolve(DNSServiceRef Reference, DNSServiceErrorType ErrorType
                 uint16_t port = ntohs(Port);
                 service.m_host = HostTarget;
                 service.m_port = port;
-                LOG(VB_NETWORK, LOG_INFO, QString("%1 (%2) resolved to %3:%4")
+                LOG(VB_NETWORK, LOG_INFO, QStringLiteral("%1 (%2) resolved to %3:%4")
                     .arg(service.m_name.constData(), service.m_type.constData(), HostTarget).arg(port));
                 QString name(HostTarget);
                 service.m_lookupID = QHostInfo::lookupHost(name, this, SLOT(HostLookup(QHostInfo)));
@@ -950,12 +950,12 @@ void TorcBonjour::HostLookup(const QHostInfo &HostInfo)
             // igore if errored
             if (HostInfo.error() != QHostInfo::NoError)
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("Lookup failed for '%1' with error '%2'").arg(HostInfo.hostName(), HostInfo.errorString()));
+                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Lookup failed for '%1' with error '%2'").arg(HostInfo.hostName(), HostInfo.errorString()));
                 return;
             }
 
             service.m_ipAddresses = HostInfo.addresses();
-            LOG(VB_GENERAL, LOG_INFO, QString("Service '%1' on '%2:%3' resolved to %4 address(es) on interface %5")
+            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Service '%1' on '%2:%3' resolved to %4 address(es) on interface %5")
                 .arg(service.m_type.constData(), service.m_host.constData())
                 .arg(service.m_port)
                 .arg(service.m_ipAddresses.size())
@@ -965,17 +965,17 @@ void TorcBonjour::HostLookup(const QHostInfo &HostInfo)
 
             foreach (const QHostAddress &address, service.m_ipAddresses)
             {
-                LOG(VB_NETWORK, LOG_INFO, QString("Address: %1").arg(address.toString()));
+                LOG(VB_NETWORK, LOG_INFO, QStringLiteral("Address: %1").arg(address.toString()));
                 addresses << address.toString();
             }
 
             QVariantMap data;
-            data.insert("name", service.m_name.constData());
-            data.insert("type", service.m_type.constData());
-            data.insert("port", service.m_port);
-            data.insert("addresses", addresses);
-            data.insert("txtrecords", service.m_txt);
-            data.insert("host", service.m_host.constData());
+            data.insert(QStringLiteral("name"), service.m_name.constData());
+            data.insert(QStringLiteral("type"), service.m_type.constData());
+            data.insert(QStringLiteral("port"), service.m_port);
+            data.insert(QStringLiteral("addresses"), addresses);
+            data.insert(QStringLiteral("txtrecords"), service.m_txt);
+            data.insert(QStringLiteral("host"), service.m_host.constData());
             if (!addresses.isEmpty())
             {
                 TorcEvent event(Torc::ServiceDiscovered, data);
@@ -983,7 +983,7 @@ void TorcBonjour::HostLookup(const QHostInfo &HostInfo)
             }
             else
             {
-                LOG(VB_GENERAL, LOG_WARNING, QString("No valid addresses resolved for Service '%1' on '%2:%3'")
+                LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("No valid addresses resolved for Service '%1' on '%2:%3'")
                     .arg(service.m_type.constData(), service.m_host.constData())
                     .arg(service.m_port));
                 // NB this is experimental!!!

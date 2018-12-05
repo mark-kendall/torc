@@ -43,9 +43,9 @@ bool TorcControl::ParseTimeString(const QString &Time, int &Days, int &Hours,
     int  days    = 0;
 
     // take seconds off the end if present
-    QStringList initialsplit = Time.split(".");
+    QStringList initialsplit = Time.split('.');
     QString dayshoursminutes = initialsplit[0];
-    QString secondss = initialsplit.size() > 1 ? initialsplit[1] : QString("");
+    QString secondss = initialsplit.size() > 1 ? initialsplit[1] : QStringLiteral("");
 
     // parse seconds (seconds are optional)
     if (!secondss.isEmpty())
@@ -53,13 +53,13 @@ bool TorcControl::ParseTimeString(const QString &Time, int &Days, int &Hours,
         int newseconds = secondss.toInt(&ok);
         if (!ok)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse seconds from '%1'").arg(secondss));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to parse seconds from '%1'").arg(secondss));
             return false;
         }
 
         if (newseconds < 0 || newseconds > 59)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Invalid seconds value '%1'").arg(newseconds));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Invalid seconds value '%1'").arg(newseconds));
             return false;
         }
 
@@ -67,11 +67,11 @@ bool TorcControl::ParseTimeString(const QString &Time, int &Days, int &Hours,
     }
 
     // parse the remainder
-    QStringList secondsplit = dayshoursminutes.split(":");
+    QStringList secondsplit = dayshoursminutes.split(':');
     int count = secondsplit.size();
     if (count > 3)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Cannot parse time from '%1'").arg(dayshoursminutes));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Cannot parse time from '%1'").arg(dayshoursminutes));
         return false;
     }
 
@@ -84,14 +84,14 @@ bool TorcControl::ParseTimeString(const QString &Time, int &Days, int &Hours,
             int newdays = dayss.toInt(&ok);
             if (!ok)
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse days from '%1'").arg(secondsplit[2]));
+                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to parse days from '%1'").arg(secondsplit[2]));
                 return false;
             }
 
             // allow 1-365 and zero
             if (newdays < 0 || newdays > 365)
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("Invalid day value '%1'").arg(newdays));
+                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Invalid day value '%1'").arg(newdays));
                 return false;
             }
 
@@ -108,13 +108,13 @@ bool TorcControl::ParseTimeString(const QString &Time, int &Days, int &Hours,
             int newhours = hourss.toInt(&ok);
             if (!ok)
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse hours from '%1'").arg(secondsplit[1]));
+                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to parse hours from '%1'").arg(secondsplit[1]));
                 return false;
             }
 
             if (newhours < 0 || newhours > 23)
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("Invalid hour value '%1'").arg(newhours));
+                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Invalid hour value '%1'").arg(newhours));
                 return false;
             }
 
@@ -129,13 +129,13 @@ bool TorcControl::ParseTimeString(const QString &Time, int &Days, int &Hours,
         int newminutes = minutess.toInt(&ok);
         if (!ok)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse minutes from '%1'").arg(secondsplit[0]));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to parse minutes from '%1'").arg(secondsplit[0]));
             return false;
         }
 
         if (newminutes < 0 || newminutes > 59)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Invalid minute values '%1'").arg(newminutes));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Invalid minute values '%1'").arg(newminutes));
             return false;
         }
 
@@ -155,11 +155,11 @@ bool TorcControl::ParseTimeString(const QString &Time, int &Days, int &Hours,
 
 QString TorcControl::DurationToString(int Days, quint64 Duration)
 {
-    return Days > 0 ? QString("%1days %2").arg(Days).arg(QTime(0, 0).addSecs(Duration).toString(QString("hh:mm.ss"))) :
-                      QString("%1").arg(QTime(0, 0).addSecs(Duration).toString(QString("hh:mm.ss")));
+    return Days > 0 ? QStringLiteral("%1days %2").arg(Days).arg(QTime(0, 0).addSecs(Duration).toString(QStringLiteral("hh:mm.ss"))) :
+                      QStringLiteral("%1").arg(QTime(0, 0).addSecs(Duration).toString(QStringLiteral("hh:mm.ss")));
 }
 
-#define BLACKLIST QString("SetValue,SetValid,InputValueChanged,InputValidChanged")
+#define BLACKLIST QStringLiteral("SetValue,SetValid,InputValueChanged,InputValidChanged")
 
 /*! \class TorcControl
  *
@@ -168,9 +168,9 @@ QString TorcControl::DurationToString(int Days, quint64 Duration)
  * If 'invalid' the output will be set to the default.
 */
 TorcControl::TorcControl(TorcControl::Type Type, const QVariantMap &Details)
-  : TorcDevice(false, 0, 0, QString("Control"), Details),
-    TorcHTTPService(this, CONTROLS_DIRECTORY + "/" + TorcCoreUtils::EnumToLowerString<TorcControl::Type>(Type) + "/" + Details.value("name").toString(),
-                    Details.value("name").toString(), TorcControl::staticMetaObject, BLACKLIST),
+  : TorcDevice(false, 0, 0, QStringLiteral("Control"), Details),
+    TorcHTTPService(this, QStringLiteral("%1/%2/%3").arg(CONTROLS_DIRECTORY, TorcCoreUtils::EnumToLowerString<TorcControl::Type>(Type), Details.value(QStringLiteral("name")).toString()),
+                    Details.value(QStringLiteral("name")).toString(), TorcControl::staticMetaObject, BLACKLIST),
     m_parsed(false),
     m_validated(false),
     m_inputList(),
@@ -183,18 +183,18 @@ TorcControl::TorcControl(TorcControl::Type Type, const QVariantMap &Details)
     m_allInputsValid(false)
 {
     // parse inputs
-    QVariantMap inputs = Details.value("inputs").toMap();
+    QVariantMap inputs = Details.value(QStringLiteral("inputs")).toMap();
     QVariantMap::const_iterator it = inputs.constBegin();
     for ( ; it != inputs.constEnd(); ++it)
-        if (it.key() == "device")
+        if (it.key() == QStringLiteral("device"))
             m_inputList.append(it.value().toString().trimmed());
     m_inputList.removeDuplicates();
 
     // parse outputs
-    QVariantMap outputs = Details.value("outputs").toMap();
+    QVariantMap outputs = Details.value(QStringLiteral("outputs")).toMap();
     it = outputs.constBegin();
     for (; it != outputs.constEnd(); ++it)
-        if (it.key() == "device")
+        if (it.key() == QStringLiteral("device"))
             m_outputList.append(it.value().toString().trimmed());
     m_outputList.removeDuplicates();
 }
@@ -213,14 +213,14 @@ bool TorcControl::Validate(void)
     {
         if (input == uniqueId)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Control '%1' cannot have itself as input").arg(input));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Control '%1' cannot have itself as input").arg(input));
             return false;
         }
 
         // valid object
         if (!gDeviceList->contains(input))
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed to find input '%1' for '%2'").arg(input, uniqueId));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to find input '%1' for '%2'").arg(input, uniqueId));
             return false;
         }
 
@@ -230,7 +230,7 @@ bool TorcControl::Validate(void)
         TorcControl *control = qobject_cast<TorcControl*>(object);
         if (control && !control->IsKnownOutput(uniqueId))
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Device '%1' does not recognise '%2' as an output")
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Device '%1' does not recognise '%2' as an output")
                 .arg(input, uniqueId));
             return false;
         }
@@ -243,14 +243,14 @@ bool TorcControl::Validate(void)
     {
         if (output == uniqueId)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Control '%1' cannot have itself as output").arg(output));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Control '%1' cannot have itself as output").arg(output));
             return false;
         }
 
         // valid object?
         if (!gDeviceList->contains(output))
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed to find output '%1' for device %2").arg(output, uniqueId));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to find output '%1' for device %2").arg(output, uniqueId));
             return false;
         }
 
@@ -260,7 +260,7 @@ bool TorcControl::Validate(void)
         TorcOutput* out = qobject_cast<TorcOutput*>(object);
         if (out && out->HasOwner())
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Output '%1' (for control '%2') already has an owner")
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Output '%1' (for control '%2') already has an owner")
                 .arg(out->GetUniqueId(), uniqueId));
             return false;
         }
@@ -269,7 +269,7 @@ bool TorcControl::Validate(void)
         TorcControl* control = qobject_cast<TorcControl*>(object);
         if (control && !control->IsKnownInput(uniqueId))
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Device '%1' does not recognise '%2' as an input")
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Device '%1' does not recognise '%2' as an input")
                 .arg(output, uniqueId));
             return false;
         }
@@ -343,7 +343,7 @@ void TorcControl::Graph(QByteArray* Data)
         desc.append(QString(DEVICE_LINE_ITEM).arg(tr("Valid %1").arg(GetValid())));
         desc.append(QString(DEVICE_LINE_ITEM).arg(tr("Value %1").arg(GetValue())));
 
-        Data->append(QString("    \"%1\" [shape=record id=\"%1\" label=<<B>%2</B>%3>];\r\n").arg(uniqueId, userName.isEmpty() ? uniqueId : userName, desc));
+        Data->append(QStringLiteral("    \"%1\" [shape=record id=\"%1\" label=<<B>%2</B>%3>];\r\n").arg(uniqueId, userName.isEmpty() ? uniqueId : userName, desc));
     }
 
     QMap<QObject*,QString>::const_iterator it = m_outputs.constBegin();
@@ -353,12 +353,12 @@ void TorcControl::Graph(QByteArray* Data)
         {
             TorcOutput* output = qobject_cast<TorcOutput*>(it.key());
             QString source = passthrough ? qobject_cast<TorcInput*>(m_inputs.firstKey())->GetUniqueId() : uniqueId;
-            Data->append(QString("    \"%1\"->\"%2\"\r\n").arg(source, output->GetUniqueId()));
+            Data->append(QStringLiteral("    \"%1\"->\"%2\"\r\n").arg(source, output->GetUniqueId()));
         }
         else if (qobject_cast<TorcControl*>(it.key()))
         {
             TorcControl* control = qobject_cast<TorcControl*>(it.key());
-            Data->append(QString("    \"%1\"->\"%2\"\r\n").arg(uniqueId, control->GetUniqueId()));
+            Data->append(QStringLiteral("    \"%1\"->\"%2\"\r\n").arg(uniqueId, control->GetUniqueId()));
         }
         else if (qobject_cast<TorcNotification*>(it.key()))
         {
@@ -366,7 +366,7 @@ void TorcControl::Graph(QByteArray* Data)
         }
         else
         {
-            LOG(VB_GENERAL, LOG_ERR, "Unknown output type");
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Unknown output type"));
         }
     }
 
@@ -382,9 +382,9 @@ void TorcControl::Graph(QByteArray* Data)
         else if (qobject_cast<TorcInput*>(it.key()))
             inputid = qobject_cast<TorcInput*>(it.key())->GetUniqueId();
         else
-            LOG(VB_GENERAL, LOG_ERR, "Unknown input type");
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Unknown input type"));
 
-        Data->append(QString("    \"%1\"->\"%2\"\r\n").arg(inputid, uniqueId));
+        Data->append(QStringLiteral("    \"%1\"->\"%2\"\r\n").arg(inputid, uniqueId));
     }
 }
 
@@ -418,7 +418,7 @@ bool TorcControl::Finish(void)
             // there can be only one owner... though this is already checked in Validate
             if (!output->SetOwner(this))
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("Cannot set control '%1' as owner of output '%2'")
+                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Cannot set control '%1' as owner of output '%2'")
                     .arg(uniqueId, output->GetUniqueId()));
                 return false;
             }
@@ -433,7 +433,7 @@ bool TorcControl::Finish(void)
             // this will also check whether the control allows inputs
             if (!control->IsKnownInput(uniqueId))
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("Control '%1' does not recognise '%2' as an input")
+                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Control '%1' does not recognise '%2' as an input")
                     .arg(control->GetUniqueId(), uniqueId));
                 return false;
             }
@@ -449,14 +449,14 @@ bool TorcControl::Finish(void)
             TorcNotification* notification = qobject_cast<TorcNotification*>(it.key());
             if (!notification->IsKnownInput(uniqueId))
             {
-                LOG(VB_GENERAL, LOG_INFO, QString("Notification '%1' does not recognise '%2' as an input")
+                LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Notification '%1' does not recognise '%2' as an input")
                     .arg(notification->GetUniqueId(), uniqueId));
                 return false;
             }
         }
         else
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Unknown output type for '%1'").arg(uniqueId));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Unknown output type for '%1'").arg(uniqueId));
             return false;
         }
     }
@@ -470,14 +470,14 @@ bool TorcControl::Finish(void)
         // an input must be a sensor or control
         if (!control && !input)
         {
-            LOG(VB_GENERAL, LOG_ERR, "Unknown input type");
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Unknown input type"));
             return false;
         }
 
         // if input is a control, it must recognise this control as an output
         if (control && !control->IsKnownOutput(uniqueId))
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Control '%1' does not recognise control '%2' as an output")
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Control '%1' does not recognise control '%2' as an output")
                 .arg(control->GetUniqueId(), uniqueId));
             return false;
         }
@@ -495,7 +495,7 @@ bool TorcControl::Finish(void)
         m_inputValids.insert(it.key(), false);
     }
 
-    LOG(VB_GENERAL, LOG_DEBUG, QString("%1: Ready").arg(uniqueId));
+    LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("%1: Ready").arg(uniqueId));
     m_validated = true;
     return true;
 }
@@ -631,13 +631,13 @@ bool TorcControl::CheckForCircularReferences(const QString &UniqueId, const QStr
 {
     if (UniqueId.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, "Invalid UniqueId");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Invalid UniqueId"));
         return false;
     }
 
     QString path = Path;
     if (!path.isEmpty())
-        path += "->";
+        path += QStringLiteral("->");
     path += uniqueId;
 
     // iterate over the outputs list
@@ -647,7 +647,7 @@ bool TorcControl::CheckForCircularReferences(const QString &UniqueId, const QStr
         // check first for a direct match with the output
         if (it.value() == UniqueId)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Circular reference found: %1->%2").arg(path, UniqueId));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Circular reference found: %1->%2").arg(path, UniqueId));
             return false;
         }
 

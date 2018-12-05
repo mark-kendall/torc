@@ -66,7 +66,7 @@ void TorcJSONSerialiser::End(QByteArray &)
 class TorcJSONSerialiserFactory : public TorcSerialiserFactory
 {
   public:
-    TorcJSONSerialiserFactory() : TorcSerialiserFactory("application", "json", "JSON")
+    TorcJSONSerialiserFactory() : TorcSerialiserFactory(QStringLiteral("application"), QStringLiteral("json"), QStringLiteral("JSON"))
     {
     }
 
@@ -79,7 +79,7 @@ class TorcJSONSerialiserFactory : public TorcSerialiserFactory
 class TorcJavascriptSerialiserFactory : public TorcSerialiserFactory
 {
   public:
-    TorcJavascriptSerialiserFactory() : TorcSerialiserFactory("text", "javascript", "JSON")
+    TorcJavascriptSerialiserFactory() : TorcSerialiserFactory(QStringLiteral("text"), QStringLiteral("javascript"), QStringLiteral("JSON"))
     {
     }
 

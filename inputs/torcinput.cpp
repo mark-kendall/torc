@@ -27,7 +27,7 @@
 #include "torcnetworkinputs.h"
 #include "torcinput.h"
 
-#define BLACKLIST QString("SetValue,SetValid")
+#define BLACKLIST QStringLiteral("SetValue,SetValid")
 
 /*! \class Torcinput
  *  \brief An abstract class representing an external input.
@@ -41,9 +41,10 @@
 TorcInput::TorcInput(TorcInput::Type Type, double Value, double RangeMinimum, double RangeMaximum,
                      const QString &ModelId, const QVariantMap &Details)
   : TorcDevice(false, Value, Value, ModelId, Details),
-    TorcHTTPService(this, INPUTS_DIRECTORY + "/" + TorcCoreUtils::EnumToLowerString<TorcInput::Type>(Type) + "/" + Details.value("name").toString(),
-                    Details.value("name").toString(), TorcInput::staticMetaObject,
-                    ModelId.startsWith("Network") ? QString("") : BLACKLIST),
+    TorcHTTPService(this,
+                    QStringLiteral("%1/%2/%3").arg(INPUTS_DIRECTORY, TorcCoreUtils::EnumToLowerString<TorcInput::Type>(Type), Details.value(QStringLiteral("name")).toString()),
+                    Details.value(QStringLiteral("name")).toString(), TorcInput::staticMetaObject,
+                    ModelId.startsWith(QStringLiteral("Network")) ? QStringLiteral("") : BLACKLIST),
     operatingRangeMin(RangeMinimum),
     operatingRangeMax(RangeMaximum),
     outOfRangeLow(true),
@@ -52,7 +53,7 @@ TorcInput::TorcInput(TorcInput::Type Type, double Value, double RangeMinimum, do
     // guard against stupidity
     if (operatingRangeMax <= operatingRangeMin)
     {
-        LOG(VB_GENERAL, LOG_WARNING, "Input has invalid operating ranges - adjusting");
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Input has invalid operating ranges - adjusting"));
         operatingRangeMax = operatingRangeMin + 1.0;
     }
 

@@ -24,7 +24,7 @@
 #include "torcnetworkphinput.h"
 
 TorcNetworkpHInput::TorcNetworkpHInput(double Default, const QVariantMap &Details)
-  : TorcpHInput(Default, "TorcNetworkpHInput", Details)
+  : TorcpHInput(Default, QStringLiteral("TorcNetworkpHInput"), Details)
 {
 }
 

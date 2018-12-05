@@ -24,7 +24,7 @@
 #include "torcnetworkswitchinput.h"
 
 TorcNetworkSwitchInput::TorcNetworkSwitchInput(double Default, const QVariantMap &Details)
-  : TorcSwitchInput(Default, "NetworkSwitch", Details)
+  : TorcSwitchInput(Default, QStringLiteral("NetworkSwitch"), Details)
 {
 }
 

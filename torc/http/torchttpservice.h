@@ -21,7 +21,7 @@ class TorcHTTPService : public TorcHTTPHandler
 
   public:
     TorcHTTPService(QObject *Parent, const QString &Signature, const QString &Name,
-                    const QMetaObject &MetaObject, const QString &Blacklist = QString(""));
+                    const QMetaObject &MetaObject, const QString &Blacklist = QStringLiteral(""));
     virtual ~TorcHTTPService();
 
     void         ProcessHTTPRequest       (const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest &Request) override;

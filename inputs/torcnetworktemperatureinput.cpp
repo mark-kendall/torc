@@ -25,7 +25,7 @@
 
 // TODO these defaults may not be the best
 TorcNetworkTemperatureInput::TorcNetworkTemperatureInput(double Default, const QVariantMap &Details)
-  : TorcTemperatureInput(Default, -1000, 1000, "NetworkTemperatureInput", Details)
+  : TorcTemperatureInput(Default, -1000, 1000, QStringLiteral("NetworkTemperatureInput"), Details)
 {
 }
 

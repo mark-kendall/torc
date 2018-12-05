@@ -88,7 +88,7 @@ TorcHTTPRequest::TorcHTTPRequest(TorcHTTPReader *Reader)
     m_authorised(HTTPNotAuthorised),
     m_responseType(HTTPResponseUnknown),
     m_cache(HTTPCacheNone),
-    m_cacheTag(QString("")),
+    m_cacheTag(QStringLiteral("")),
     m_responseStatus(HTTP_NotFound),
     m_responseContent(),
     m_responseFile(),
@@ -101,7 +101,7 @@ TorcHTTPRequest::TorcHTTPRequest(TorcHTTPReader *Reader)
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, "NULL Reader");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("NULL Reader"));
     }
 }
 
@@ -115,7 +115,7 @@ void TorcHTTPRequest::Initialise(const QString &Method)
         item = items.takeFirst();
 
         // response of type 'HTTP/1.1 200 OK'
-        if (item.startsWith("HTTP"))
+        if (item.startsWith(QStringLiteral("HTTP")))
         {
             m_type = HTTPResponse;
 
@@ -141,7 +141,7 @@ void TorcHTTPRequest::Initialise(const QString &Method)
                 m_path    = url.path();
                 m_fullUrl = url.toString();
 
-                int index = m_path.lastIndexOf("/");
+                int index = m_path.lastIndexOf('/');
                 if (index > -1)
                 {
                     m_method = m_path.mid(index + 1).trimmed();
@@ -170,14 +170,14 @@ void TorcHTTPRequest::Initialise(const QString &Method)
     if (m_protocol > HTTPOneDotZero)
         m_connection = HTTPConnectionKeepAlive;
 
-    QString connection = m_headers.value("Connection").toLower();
+    QString connection = m_headers.value(QStringLiteral("Connection")).toLower();
 
-    if (connection == "keep-alive")
+    if (connection == QStringLiteral("keep-alive"))
         m_connection = HTTPConnectionKeepAlive;
-    else if (connection == "close")
+    else if (connection == QStringLiteral("close"))
         m_connection = HTTPConnectionClose;
 
-    LOG(VB_GENERAL, LOG_DEBUG, QString("HTTP request: path '%1' method '%2'").arg(m_path, m_method));
+    LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("HTTP request: path '%1' method '%2'").arg(m_path, m_method));
 }
 
 void TorcHTTPRequest::SetConnection(HTTPConnection Connection)
@@ -197,7 +197,7 @@ void TorcHTTPRequest::SetResponseType(HTTPResponseType Type)
 
 void TorcHTTPRequest::SetResponseContent(const QByteArray &Content)
 {
-    m_responseFile    = QString();
+    m_responseFile    = QStringLiteral();
     m_responseContent = Content;
 }
 
@@ -320,7 +320,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
     // this is not the file you are looking for...
     if ((m_responseType == HTTPResponseUnknown && m_responseFile.isEmpty()) || m_responseStatus == HTTP_NotFound)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("'%1' not found").arg(m_fullUrl));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("'%1' not found").arg(m_fullUrl));
         m_responseStatus  = HTTP_NotFound;
 
         QByteArray result;
@@ -347,7 +347,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
         m_responseType = HTTPResponseDefault;
     }
 
-    QByteArray contentheader = QString("Content-Type: %1\r\n").arg(contenttype).toLatin1();
+    QByteArray contentheader = QStringLiteral("Content-Type: %1\r\n").arg(contenttype).toLatin1();
 
     // process byte range requests
     qint64 totalsize  = !m_responseContent.isEmpty() ? m_responseContent.size() : !m_responseFile.isEmpty() ? file.size() : 0;
@@ -356,9 +356,9 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
     static QByteArray seperator("\r\n--STaRT\r\n");
     QList<QByteArray> partheaders;
 
-    if (m_headers.contains("Range") && m_responseStatus == HTTP_OK)
+    if (m_headers.contains(QStringLiteral("Range")) && m_responseStatus == HTTP_OK)
     {
-        m_ranges = StringToRanges(m_headers.value("Range"), totalsize, sendsize);
+        m_ranges = StringToRanges(m_headers.value(QStringLiteral("Range")), totalsize, sendsize);
 
         if (m_ranges.isEmpty())
         {
@@ -376,7 +376,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
                 QVector<QPair<quint64,quint64> >::const_iterator it = m_ranges.constBegin();
                 for ( ; it != m_ranges.constEnd(); ++it)
                 {
-                    QByteArray header = seperator + contentheader + QString("Content-Range: bytes %1\r\n\r\n").arg(RangeToString((*it), totalsize)).toLatin1();
+                    QByteArray header = seperator + contentheader + QStringLiteral("Content-Range: bytes %1\r\n\r\n").arg(RangeToString((*it), totalsize)).toLatin1();
                     partheaders << header;
                     sendsize += header.size();
                 }
@@ -410,9 +410,9 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
         if (!m_cacheTag.isEmpty())
         {
             if (m_cache & HTTPCacheETag)
-                response << QString("ETag: \"%1\"\r\n").arg(m_cacheTag);
+                response << QStringLiteral("ETag: \"%1\"\r\n").arg(m_cacheTag);
             else if (m_cache & HTTPCacheLastModified)
-                response << QString("Last-Modified: %1\r\n").arg(m_cacheTag);
+                response << QStringLiteral("Last-Modified: %1\r\n").arg(m_cacheTag);
         }
     }
 
@@ -423,7 +423,8 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
     //  - there is some content and it is smaller than 1Mb in size (arbitrary limit)
     //  - the response is not a range request with single or multipart response
     if (m_allowGZip && totalsize > 0 && totalsize < 0x100000 && TorcCoreUtils::HasZlib() && m_responseStatus == HTTP_OK &&
-        m_headers.contains("Accept-Encoding") && m_headers.value("Accept-Encoding").contains("gzip", Qt::CaseInsensitive))
+        m_headers.contains(QStringLiteral("Accept-Encoding")) &&
+            m_headers.value(QStringLiteral("Accept-Encoding")).contains(QStringLiteral("gzip"), Qt::CaseInsensitive))
     {
         if (!m_responseContent.isEmpty())
         {
@@ -468,11 +469,11 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
     qint64 headersize = headers.data()->size();
     qint64 sent = Socket->write(headers.data()->constData(), headersize);
     if (headersize != sent)
-        LOG(VB_GENERAL, LOG_WARNING, QString("Buffer size %1 - but sent %2").arg(headersize).arg(sent));
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Buffer size %1 - but sent %2").arg(headersize).arg(sent));
     else
-        LOG(VB_NETWORK, LOG_DEBUG, QString("Sent %1 header bytes").arg(sent));
+        LOG(VB_NETWORK, LOG_DEBUG, QStringLiteral("Sent %1 header bytes").arg(sent));
 
-    LOG(VB_NETWORK, LOG_DEBUG, headers->data());
+    LOG(VB_NETWORK, LOG_DEBUG, QString(headers->data()));
 
     // send content
     if (!m_responseContent.isEmpty() && m_requestType != HTTPHead)
@@ -485,17 +486,17 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
             {
                 qint64 sent = Socket->write((*bit).data(), (*bit).size());
                 if ((*bit).size() != sent)
-                    LOG(VB_GENERAL, LOG_WARNING, QString("Buffer size %1 - but sent %2").arg((*bit).size()).arg(sent));
+                    LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Buffer size %1 - but sent %2").arg((*bit).size()).arg(sent));
                 else
-                    LOG(VB_NETWORK, LOG_DEBUG, QString("Sent %1 multipart header bytes").arg(sent));
+                    LOG(VB_NETWORK, LOG_DEBUG, QStringLiteral("Sent %1 multipart header bytes").arg(sent));
 
                 quint64 start      = (*it).first;
                 qint64 chunksize  = (*it).second - start + 1;
                 sent  = Socket->write(m_responseContent.constData() + start, chunksize);
                 if (chunksize != sent)
-                    LOG(VB_GENERAL, LOG_WARNING, QString("Buffer size %1 - but sent %2").arg(chunksize).arg(sent));
+                    LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Buffer size %1 - but sent %2").arg(chunksize).arg(sent));
                 else
-                    LOG(VB_NETWORK, LOG_DEBUG, QString("Sent %1 content bytes").arg(sent));
+                    LOG(VB_NETWORK, LOG_DEBUG, QStringLiteral("Sent %1 content bytes").arg(sent));
             }
         }
         else
@@ -504,9 +505,9 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
             qint64 offset = m_ranges.isEmpty() ? 0 : m_ranges.value(0).first;
             qint64 sent = Socket->write(m_responseContent.constData() + offset, size);
             if (size != sent)
-                LOG(VB_GENERAL, LOG_WARNING, QString("Buffer size %1 - but sent %2").arg(size).arg(sent));
+                LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Buffer size %1 - but sent %2").arg(size).arg(sent));
             else
-                LOG(VB_NETWORK, LOG_DEBUG, QString("Sent %1 content bytes").arg(sent));
+                LOG(VB_NETWORK, LOG_DEBUG, QStringLiteral("Sent %1 content bytes").arg(sent));
         }
     }
     else if (!m_responseFile.isEmpty() && m_requestType != HTTPHead)
@@ -524,9 +525,9 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
             {
                 off64_t sent = Socket->write((*bit).data(), (*bit).size());
                 if ((*bit).size() != sent)
-                    LOG(VB_GENERAL, LOG_WARNING, QString("Buffer size %1 - but sent %2").arg((*bit).size()).arg(sent));
+                    LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Buffer size %1 - but sent %2").arg((*bit).size()).arg(sent));
                 else
-                    LOG(VB_NETWORK, LOG_DEBUG, QString("Sent %1 multipart header bytes").arg(sent));
+                    LOG(VB_NETWORK, LOG_DEBUG, QStringLiteral("Sent %1 multipart header bytes").arg(sent));
 
                 sent   = 0;
                 off64_t offset = (*it).first;
@@ -551,12 +552,12 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
                                 continue;
                             }
 
-                            LOG(VB_GENERAL, LOG_ERR, QString("Error sending data (%1) %2").arg(errno).arg(strerror(errno)));
+                            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Error sending data (%1) %2").arg(errno).arg(strerror(errno)));
                             break;
                         }
                         else
                         {
-                            LOG(VB_NETWORK, LOG_DEBUG, QString("Sent %1 for %2").arg(send).arg(file.handle()));
+                            LOG(VB_NETWORK, LOG_DEBUG, QStringLiteral("Sent %1 for %2").arg(send).arg(file.handle()));
                         }
 
                         sent += send;
@@ -579,7 +580,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
                         {
                             if (errno != EAGAIN)
                             {
-                                LOG(VB_GENERAL, LOG_ERR, QString("Error sending data (%1) %2").arg(errno).arg(strerror(errno)));
+                                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Error sending data (%1) %2").arg(errno).arg(strerror(errno)));
                                 break;
                             }
 
@@ -587,7 +588,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
                         }
                         else
                         {
-                            LOG(VB_GENERAL, LOG_DEBUG, QString("Sent %1 for %2").arg(bytessent).arg(file.handle()));
+                            LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("Sent %1 for %2").arg(bytessent).arg(file.handle()));
                         }
 
                         sent += bytessent;
@@ -606,7 +607,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
                         qint64 read = file.read(buffer.data()->data(), remaining);
                         if (read < 0)
                         {
-                            LOG(VB_GENERAL, LOG_ERR, QString("Error reading from '%1' (%2)").arg(file.fileName()).arg(file.errorString()));
+                            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Error reading from '%1' (%2)").arg(file.fileName()).arg(file.errorString()));
                             break;
                         }
 
@@ -614,7 +615,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
 
                         if (send != read)
                         {
-                            LOG(VB_GENERAL, LOG_ERR, QString("Error sending data (%1)").arg(Socket->errorString()));
+                            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Error sending data (%1)").arg(Socket->errorString()));
                             break;
                         }
 
@@ -623,7 +624,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
                     while (sent < size);
 
                     if (sent < size)
-                        LOG(VB_GENERAL, LOG_ERR, QString("Failed to send all data for '%1'").arg(file.fileName()));
+                        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to send all data for '%1'").arg(file.fileName()));
                 }
 #endif
             }
@@ -653,12 +654,12 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
                             continue;
                         }
 
-                        LOG(VB_GENERAL, LOG_ERR, QString("Error sending data (%1 - '%2')").arg(errno).arg(strerror(errno)));
+                        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Error sending data (%1 - '%2')").arg(errno).arg(strerror(errno)));
                         break;
                     }
                     else
                     {
-                        LOG(VB_NETWORK, LOG_DEBUG, QString("Sent %1 for %2").arg(send).arg(file.handle()));
+                        LOG(VB_NETWORK, LOG_DEBUG, QStringLiteral("Sent %1 for %2").arg(send).arg(file.handle()));
                     }
 
                     sent += send;
@@ -682,7 +683,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
                     {
                         if (errno != EAGAIN)
                         {
-                            LOG(VB_GENERAL, LOG_ERR, QString("Error sending data (%1) %2").arg(errno).arg(strerror(errno)));
+                            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Error sending data (%1) %2").arg(errno).arg(strerror(errno)));
                             break;
                         }
 
@@ -690,7 +691,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
                     }
                     else
                     {
-                        LOG(VB_GENERAL, LOG_DEBUG, QString("Sent %1 for %2").arg(bytessent).arg(file.handle()));
+                        LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("Sent %1 for %2").arg(bytessent).arg(file.handle()));
                     }
 
                     sent += bytessent;
@@ -710,7 +711,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
                     qint64 read = file.read(buffer.data()->data(), remaining);
                     if (read < 0)
                     {
-                        LOG(VB_GENERAL, LOG_ERR, QString("Error reading from '%1' (%2)").arg(file.fileName()).arg(file.errorString()));
+                        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Error reading from '%1' (%2)").arg(file.fileName()).arg(file.errorString()));
                         break;
                     }
 
@@ -718,7 +719,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
 
                     if (send != read)
                     {
-                        LOG(VB_GENERAL, LOG_ERR, QString("Error sending data (%1)").arg(Socket->errorString()));
+                        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Error sending data (%1)").arg(Socket->errorString()));
                         break;
                     }
 
@@ -727,7 +728,7 @@ void TorcHTTPRequest::Respond(QTcpSocket *Socket)
                 while (sent < size);
 
                 if (sent < size)
-                    LOG(VB_GENERAL, LOG_ERR, QString("Failed to send all data for '%1'").arg(file.fileName()));
+                    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to send all data for '%1'").arg(file.fileName()));
             }
 #endif
         }
@@ -748,12 +749,12 @@ void TorcHTTPRequest::Redirected(const QString &Redirected)
 
 HTTPRequestType TorcHTTPRequest::RequestTypeFromString(const QString &Type)
 {
-    if (Type == "GET")     return HTTPGet;
-    if (Type == "HEAD")    return HTTPHead;
-    if (Type == "POST")    return HTTPPost;
-    if (Type == "PUT")     return HTTPPut;
-    if (Type == "OPTIONS") return HTTPOptions;
-    if (Type == "DELETE")  return HTTPDelete;
+    if (Type == QStringLiteral("GET"))     return HTTPGet;
+    if (Type == QStringLiteral("HEAD"))    return HTTPHead;
+    if (Type == QStringLiteral("POST"))    return HTTPPost;
+    if (Type == QStringLiteral("PUT"))     return HTTPPut;
+    if (Type == QStringLiteral("OPTIONS")) return HTTPOptions;
+    if (Type == QStringLiteral("DELETE"))  return HTTPDelete;
 
     return HTTPUnknownType;
 }
@@ -762,27 +763,27 @@ QString TorcHTTPRequest::RequestTypeToString(HTTPRequestType Type)
 {
     switch (Type)
     {
-        case HTTPHead:     return QString("HEAD");
-        case HTTPGet:      return QString("GET");
-        case HTTPPost:     return QString("POST");
-        case HTTPPut:      return QString("PUT");
-        case HTTPDelete:   return QString("DELETE");
-        case HTTPOptions:  return QString("OPTIONS");
-        case HTTPDisabled: return QString("DISABLED"); // for completeness
+        case HTTPHead:     return QStringLiteral("HEAD");
+        case HTTPGet:      return QStringLiteral("GET");
+        case HTTPPost:     return QStringLiteral("POST");
+        case HTTPPut:      return QStringLiteral("PUT");
+        case HTTPDelete:   return QStringLiteral("DELETE");
+        case HTTPOptions:  return QStringLiteral("OPTIONS");
+        case HTTPDisabled: return QStringLiteral("DISABLED"); // for completeness
         default:
             break;
     }
 
-    return QString("UNKNOWN");
+    return QStringLiteral("UNKNOWN");
 }
 
 HTTPProtocol TorcHTTPRequest::ProtocolFromString(const QString &Protocol)
 {
-    if (Protocol.startsWith("HTTP"))
+    if (Protocol.startsWith(QStringLiteral("HTTP")))
     {
-        if (Protocol.endsWith("1.1")) return HTTPOneDotOne;
-        if (Protocol.endsWith("1.0")) return HTTPOneDotZero;
-        if (Protocol.endsWith("0.9")) return HTTPZeroDotNine;
+        if (Protocol.endsWith(QStringLiteral("1.1"))) return HTTPOneDotOne;
+        if (Protocol.endsWith(QStringLiteral("1.0"))) return HTTPOneDotZero;
+        if (Protocol.endsWith(QStringLiteral("0.9"))) return HTTPZeroDotNine;
     }
 
     return HTTPUnknownProtocol;
@@ -790,19 +791,19 @@ HTTPProtocol TorcHTTPRequest::ProtocolFromString(const QString &Protocol)
 
 HTTPStatus TorcHTTPRequest::StatusFromString(const QString &Status)
 {
-    if (Status.startsWith("200")) return HTTP_OK;
-    if (Status.startsWith("101")) return HTTP_SwitchingProtocols;
-    if (Status.startsWith("206")) return HTTP_PartialContent;
-    if (Status.startsWith("301")) return HTTP_MovedPermanently;
-    if (Status.startsWith("304")) return HTTP_NotModified;
-    //if (Status.startsWith("400")) return HTTP_BadRequest;
-    if (Status.startsWith("401")) return HTTP_Unauthorized;
-    if (Status.startsWith("402")) return HTTP_Forbidden;
-    if (Status.startsWith("404")) return HTTP_NotFound;
-    if (Status.startsWith("405")) return HTTP_MethodNotAllowed;
-    if (Status.startsWith("416")) return HTTP_RequestedRangeNotSatisfiable;
-    if (Status.startsWith("429")) return HTTP_TooManyRequests;
-    if (Status.startsWith("500")) return HTTP_InternalServerError;
+    if (Status.startsWith(QStringLiteral("200"))) return HTTP_OK;
+    if (Status.startsWith(QStringLiteral("101"))) return HTTP_SwitchingProtocols;
+    if (Status.startsWith(QStringLiteral("206"))) return HTTP_PartialContent;
+    if (Status.startsWith(QStringLiteral("301"))) return HTTP_MovedPermanently;
+    if (Status.startsWith(QStringLiteral("304"))) return HTTP_NotModified;
+    //if (Status.startsWith(QStringLiteral("400"))) return HTTP_BadRequest;
+    if (Status.startsWith(QStringLiteral("401"))) return HTTP_Unauthorized;
+    if (Status.startsWith(QStringLiteral("402"))) return HTTP_Forbidden;
+    if (Status.startsWith(QStringLiteral("404"))) return HTTP_NotFound;
+    if (Status.startsWith(QStringLiteral("405"))) return HTTP_MethodNotAllowed;
+    if (Status.startsWith(QStringLiteral("416"))) return HTTP_RequestedRangeNotSatisfiable;
+    if (Status.startsWith(QStringLiteral("429"))) return HTTP_TooManyRequests;
+    if (Status.startsWith(QStringLiteral("500"))) return HTTP_InternalServerError;
 
     return HTTP_BadRequest;
 }
@@ -811,103 +812,103 @@ QString TorcHTTPRequest::ProtocolToString(HTTPProtocol Protocol)
 {
     switch (Protocol)
     {
-        case HTTPOneDotOne:       return QString("HTTP/1.1");
-        case HTTPOneDotZero:      return QString("HTTP/1.0");
-        case HTTPZeroDotNine:     return QString("HTTP/0.9");
-        case HTTPUnknownProtocol: return QString("Error");
+        case HTTPOneDotOne:       return QStringLiteral("HTTP/1.1");
+        case HTTPOneDotZero:      return QStringLiteral("HTTP/1.0");
+        case HTTPZeroDotNine:     return QStringLiteral("HTTP/0.9");
+        case HTTPUnknownProtocol: return QStringLiteral("Error");
     }
 
-    return QString("Error");
+    return QStringLiteral("Error");
 }
 
 QString TorcHTTPRequest::StatusToString(HTTPStatus Status)
 {
     switch (Status)
     {
-        case HTTP_SwitchingProtocols:  return QString("101 Switching Protocols");
-        case HTTP_OK:                  return QString("200 OK");
-        case HTTP_PartialContent:      return QString("206 Partial Content");
-        case HTTP_MovedPermanently:    return QString("301 Moved Permanently");
-        case HTTP_NotModified:         return QString("304 Not Modified");
-        case HTTP_BadRequest:          return QString("400 Bad Request");
-        case HTTP_Unauthorized:        return QString("401 Unauthorized");
-        case HTTP_Forbidden:           return QString("403 Forbidden");
-        case HTTP_NotFound:            return QString("404 Not Found");
-        case HTTP_MethodNotAllowed:    return QString("405 Method Not Allowed");
-        case HTTP_RequestedRangeNotSatisfiable: return QString("416 Requested Range Not Satisfiable");
-        case HTTP_TooManyRequests:     return QString("429 Too Many Requests");
-        case HTTP_InternalServerError: return QString("500 Internal Server Error");
-        case HTTP_NotImplemented:      return QString("501 Not Implemented");
-        case HTTP_BadGateway:          return QString("502 Bad Gateway");
-        case HTTP_ServiceUnavailable:  return QString("503 Service Unavailable");
-        case HTTP_NetworkAuthenticationRequired: return QString("511 Network Authentication Required");
+        case HTTP_SwitchingProtocols:  return QStringLiteral("101 Switching Protocols");
+        case HTTP_OK:                  return QStringLiteral("200 OK");
+        case HTTP_PartialContent:      return QStringLiteral("206 Partial Content");
+        case HTTP_MovedPermanently:    return QStringLiteral("301 Moved Permanently");
+        case HTTP_NotModified:         return QStringLiteral("304 Not Modified");
+        case HTTP_BadRequest:          return QStringLiteral("400 Bad Request");
+        case HTTP_Unauthorized:        return QStringLiteral("401 Unauthorized");
+        case HTTP_Forbidden:           return QStringLiteral("403 Forbidden");
+        case HTTP_NotFound:            return QStringLiteral("404 Not Found");
+        case HTTP_MethodNotAllowed:    return QStringLiteral("405 Method Not Allowed");
+        case HTTP_RequestedRangeNotSatisfiable: return QStringLiteral("416 Requested Range Not Satisfiable");
+        case HTTP_TooManyRequests:     return QStringLiteral("429 Too Many Requests");
+        case HTTP_InternalServerError: return QStringLiteral("500 Internal Server Error");
+        case HTTP_NotImplemented:      return QStringLiteral("501 Not Implemented");
+        case HTTP_BadGateway:          return QStringLiteral("502 Bad Gateway");
+        case HTTP_ServiceUnavailable:  return QStringLiteral("503 Service Unavailable");
+        case HTTP_NetworkAuthenticationRequired: return QStringLiteral("511 Network Authentication Required");
     }
 
-    return QString("Error");
+    return QStringLiteral("Error");
 }
 
 QString TorcHTTPRequest::ResponseTypeToString(HTTPResponseType Response)
 {
     switch (Response)
     {
-        case HTTPResponseNone:             return QString("");
-        case HTTPResponseXML:              return QString("text/xml; charset=\"UTF-8\"");
-        case HTTPResponseHTML:             return QString("text/html; charset=\"UTF-8\"");
-        case HTTPResponseJSON:             return QString("application/json");
-        case HTTPResponseJSONJavascript:   return QString("text/javascript");
-        case HTTPResponsePList:            return QString("application/plist");
-        case HTTPResponseBinaryPList:      return QString("application/x-plist");
-        case HTTPResponsePListApple:       return QString("text/x-apple-plist+xml");
-        case HTTPResponseBinaryPListApple: return QString("application/x-apple-binary-plist");
-        case HTTPResponsePlainText:        return QString("text/plain");
-        case HTTPResponseM3U8:             return QString("application/x-mpegurl");
-        case HTTPResponseM3U8Apple:        return QString("application/vnd.apple.mpegurl");
-        case HTTPResponseMPD:              return QString("application/dash+xml");
-        case HTTPResponseMPEGTS:           return QString("video/mp2t");
-        case HTTPResponseMP4:              return QString("video/mp4");
+        case HTTPResponseNone:             return QStringLiteral("");
+        case HTTPResponseXML:              return QStringLiteral("text/xml; charset=\"UTF-8\"");
+        case HTTPResponseHTML:             return QStringLiteral("text/html; charset=\"UTF-8\"");
+        case HTTPResponseJSON:             return QStringLiteral("application/json");
+        case HTTPResponseJSONJavascript:   return QStringLiteral("text/javascript");
+        case HTTPResponsePList:            return QStringLiteral("application/plist");
+        case HTTPResponseBinaryPList:      return QStringLiteral("application/x-plist");
+        case HTTPResponsePListApple:       return QStringLiteral("text/x-apple-plist+xml");
+        case HTTPResponseBinaryPListApple: return QStringLiteral("application/x-apple-binary-plist");
+        case HTTPResponsePlainText:        return QStringLiteral("text/plain");
+        case HTTPResponseM3U8:             return QStringLiteral("application/x-mpegurl");
+        case HTTPResponseM3U8Apple:        return QStringLiteral("application/vnd.apple.mpegurl");
+        case HTTPResponseMPD:              return QStringLiteral("application/dash+xml");
+        case HTTPResponseMPEGTS:           return QStringLiteral("video/mp2t");
+        case HTTPResponseMP4:              return QStringLiteral("video/mp4");
         default: break;
     }
 
-    return QString("text/plain");
+    return QStringLiteral("text/plain");
 }
 
 QString TorcHTTPRequest::AllowedToString(int Allowed)
 {
     QStringList result;
 
-    if (Allowed & HTTPHead)    result << "HEAD";
-    if (Allowed & HTTPGet)     result << "GET";
-    if (Allowed & HTTPPost)    result << "POST";
-    if (Allowed & HTTPPut)     result << "PUT";
-    if (Allowed & HTTPDelete)  result << "DELETE";
-    if (Allowed & HTTPOptions) result << "OPTIONS";
+    if (Allowed & HTTPHead)    result << QStringLiteral("HEAD");
+    if (Allowed & HTTPGet)     result << QStringLiteral("GET");
+    if (Allowed & HTTPPost)    result << QStringLiteral("POST");
+    if (Allowed & HTTPPut)     result << QStringLiteral("PUT");
+    if (Allowed & HTTPDelete)  result << QStringLiteral("DELETE");
+    if (Allowed & HTTPOptions) result << QStringLiteral("OPTIONS");
 
-    return result.join(", ");
+    return result.join(QStringLiteral(", "));
 }
 
 QString TorcHTTPRequest::ConnectionToString(HTTPConnection Connection)
 {
     switch (Connection)
     {
-        case HTTPConnectionClose:     return QString("close");
-        case HTTPConnectionKeepAlive: return QString("keep-alive");
-        case HTTPConnectionUpgrade:   return QString("Upgrade");
+        case HTTPConnectionClose:     return QStringLiteral("close");
+        case HTTPConnectionKeepAlive: return QStringLiteral("keep-alive");
+        case HTTPConnectionUpgrade:   return QStringLiteral("Upgrade");
     }
 
-    return QString();
+    return QStringLiteral();
 }
 
 int TorcHTTPRequest::StringToAllowed(const QString &Allowed)
 {
     int allowed = 0;
 
-    if (Allowed.contains("HEAD",    Qt::CaseInsensitive)) allowed += HTTPHead;
-    if (Allowed.contains("GET",     Qt::CaseInsensitive)) allowed += HTTPGet;
-    if (Allowed.contains("POST",    Qt::CaseInsensitive)) allowed += HTTPPost;
-    if (Allowed.contains("PUT",     Qt::CaseInsensitive)) allowed += HTTPPut;
-    if (Allowed.contains("DELETE",  Qt::CaseInsensitive)) allowed += HTTPDelete;
-    if (Allowed.contains("OPTIONS", Qt::CaseInsensitive)) allowed += HTTPOptions;
-    if (Allowed.contains("AUTH",    Qt::CaseInsensitive)) allowed += HTTPAuth;
+    if (Allowed.contains(QStringLiteral("HEAD"),    Qt::CaseInsensitive)) allowed += HTTPHead;
+    if (Allowed.contains(QStringLiteral("GET"),     Qt::CaseInsensitive)) allowed += HTTPGet;
+    if (Allowed.contains(QStringLiteral("POST"),    Qt::CaseInsensitive)) allowed += HTTPPost;
+    if (Allowed.contains(QStringLiteral("PUT"),     Qt::CaseInsensitive)) allowed += HTTPPut;
+    if (Allowed.contains(QStringLiteral("DELETE"),  Qt::CaseInsensitive)) allowed += HTTPDelete;
+    if (Allowed.contains(QStringLiteral("OPTIONS"), Qt::CaseInsensitive)) allowed += HTTPOptions;
+    if (Allowed.contains(QStringLiteral("AUTH"),    Qt::CaseInsensitive)) allowed += HTTPAuth;
 
     return allowed;
 }
@@ -919,16 +920,16 @@ QVector<QPair<quint64,quint64> > TorcHTTPRequest::StringToRanges(const QString &
     if (Size < 1)
         return results;
 
-    if (Ranges.contains("bytes", Qt::CaseInsensitive))
+    if (Ranges.contains(QStringLiteral("bytes"), Qt::CaseInsensitive))
     {
-        QStringList newranges = Ranges.split("=");
+        QStringList newranges = Ranges.split('=');
         if (newranges.size() == 2)
         {
-            QStringList rangelist = newranges[1].split(",", QString::SkipEmptyParts);
+            QStringList rangelist = newranges[1].split(',', QString::SkipEmptyParts);
 
             foreach (const QString &range, rangelist)
             {
-                QStringList parts = range.split("-");
+                QStringList parts = range.split('-');
 
                 if (parts.size() != 2)
                     continue;
@@ -991,7 +992,7 @@ QVector<QPair<quint64,quint64> > TorcHTTPRequest::StringToRanges(const QString &
     if (results.isEmpty())
     {
         SizeToSend = 0;
-        LOG(VB_GENERAL, LOG_ERR, QString("Error parsing byte ranges ('%1')").arg(Ranges));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Error parsing byte ranges ('%1')").arg(Ranges));
     }
     else
     {
@@ -1036,12 +1037,12 @@ QVector<QPair<quint64,quint64> > TorcHTTPRequest::StringToRanges(const QString &
 
 QString TorcHTTPRequest::RangeToString(QPair<quint64, quint64> Range, qint64 Size)
 {
-    return QString("%1-%2/%3").arg(Range.first).arg(Range.second).arg(Size);
+    return QStringLiteral("%1-%2/%3").arg(Range.first).arg(Range.second).arg(Size);
 }
 
 void TorcHTTPRequest::Serialise(const QVariant &Data, const QString &Type)
 {
-    TorcSerialiser *serialiser = TorcSerialiser::GetSerialiser(m_headers.value("Accept"));
+    TorcSerialiser *serialiser = TorcSerialiser::GetSerialiser(m_headers.value(QStringLiteral("Accept")));
     SetResponseType(serialiser->ResponseType());
     serialiser->Serialise(m_responseContent, Data, Type);
     SetResponseContent(m_responseContent);
@@ -1055,9 +1056,9 @@ void TorcHTTPRequest::Serialise(const QVariant &Data, const QString &Type)
 */
 bool TorcHTTPRequest::Unmodified(const QDateTime &LastModified)
 {
-    if ((m_cache & HTTPCacheLastModified) && m_headers.contains("If-Modified-Since"))
+    if ((m_cache & HTTPCacheLastModified) && m_headers.contains(QStringLiteral("If-Modified-Since")))
     {
-        QDateTime since = QDateTime::fromString(m_headers.value("If-Modified-Since"), DateFormat);
+        QDateTime since = QDateTime::fromString(m_headers.value(QStringLiteral("If-Modified-Since")), DateFormat);
 
         if (LastModified <= since)
         {
@@ -1080,9 +1081,9 @@ bool TorcHTTPRequest::Unmodified(const QDateTime &LastModified)
 */
 bool TorcHTTPRequest::Unmodified(void)
 {
-    if ((m_cache & HTTPCacheETag) && !m_cacheTag.isEmpty() && m_headers.contains("If-None-Match"))
+    if ((m_cache & HTTPCacheETag) && !m_cacheTag.isEmpty() && m_headers.contains(QStringLiteral("If-None-Match")))
     {
-        if (m_cacheTag == m_headers.value("If-None-Match"))
+        if (m_cacheTag == m_headers.value(QStringLiteral("If-None-Match")))
         {
             SetStatus(HTTP_NotModified);
             SetResponseType(HTTPResponseNone);

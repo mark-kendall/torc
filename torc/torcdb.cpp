@@ -85,14 +85,14 @@ void TorcDB::CloseConnections(void)
     if (m_connectionMap.isEmpty())
         return;
 
-    LOG(VB_GENERAL, LOG_WARNING, QString("%1 open connections.").arg(m_connectionMap.size()));
+    LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("%1 open connections.").arg(m_connectionMap.size()));
 
     QHashIterator<QThread*,QString> it(m_connectionMap);
     while (it.hasNext())
     {
         it.next();
         QString name = it.value();
-        LOG(VB_GENERAL, LOG_INFO, QString("Removing connection '%1'").arg(name));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Removing connection '%1'").arg(name));
         QSqlDatabase::removeDatabase(name);
     }
     m_connectionMap.clear();
@@ -108,7 +108,7 @@ void TorcDB::CloseThreadConnection(void)
     if (m_connectionMap.contains(thread))
     {
         QString name = m_connectionMap.value(thread);
-        LOG(VB_GENERAL, LOG_INFO, QString("Removing connection '%1'").arg(name));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Removing connection '%1'").arg(name));
         QSqlDatabase::removeDatabase(name);
         m_connectionMap.remove(thread);
     }
@@ -134,21 +134,21 @@ QString TorcDB::GetThreadConnection(void)
 
     if (thread->objectName().isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, "Database access is only available from TorcQThread");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Database access is only available from TorcQThread"));
         return QString();
     }
 
-    QString name = QString("%1-%2").arg(thread->objectName(), QString::number((unsigned long long)thread));
+    QString name = QStringLiteral("%1-%2").arg(thread->objectName(), QString::number((unsigned long long)thread));
     QSqlDatabase newdb = QSqlDatabase::addDatabase(m_databaseType, name);
 
-    if (m_databaseType == "QSQLITE")
-        newdb.setConnectOptions("QSQLITE_BUSY_TIMEOUT=1");
+    if (m_databaseType == QStringLiteral("QSQLITE"))
+        newdb.setConnectOptions(QStringLiteral("QSQLITE_BUSY_TIMEOUT=1"));
     newdb.setDatabaseName(m_databaseName);
 
     {
         QMutexLocker locker(&m_lock);
         m_connectionMap.insert(thread, name);
-        LOG(VB_GENERAL, LOG_INFO, QString("New connection '%1'").arg(name));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("New connection '%1'").arg(name));
     }
 
     return name;
@@ -171,14 +171,14 @@ bool TorcDB::DebugError(QSqlQuery *Query)
 
     if (!error.databaseText().isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Database Error: %1")
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Database Error: %1")
             .arg(error.databaseText()));
         return true;
     }
 
     if (!error.driverText().isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Driver Error: %1")
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Driver Error: %1")
             .arg(error.driverText()));
     }
 
@@ -202,14 +202,14 @@ bool TorcDB::DebugError(QSqlDatabase *Database)
 
     if (!error.databaseText().isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Database Error: %1")
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Database Error: %1")
             .arg(error.databaseText()));
         return true;
     }
 
     if (!error.driverText().isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Driver Error: %1")
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Driver Error: %1")
             .arg(error.driverText()));
     }
 
@@ -234,12 +234,12 @@ void TorcDB::LoadSettings(QMap<QString, QString> &Settings)
     if (!db.isValid() || !db.isOpen())
         return;
 
-    QSqlQuery query("SELECT name, value from settings;", db);
+    QSqlQuery query(QStringLiteral("SELECT name, value from settings;"), db);
     DebugError(&query);
 
     while (query.next())
     {
-        LOG(VB_GENERAL, LOG_DEBUG, QString("'%1' : '%2'").arg(query.value(0).toString(), query.value(1).toString()));
+        LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("'%1' : '%2'").arg(query.value(0).toString(), query.value(1).toString()));
         Settings.insert(query.value(0).toString(), query.value(1).toString());
     }
 }
@@ -257,20 +257,19 @@ void TorcDB::SetSetting(const QString &Name, const QString &Value)
     DebugError(&db);
     if (!db.isValid() || !db.isOpen())
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to open database connection.");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to open database connection."));
         return;
     }
 
     QSqlQuery query(db);
-    query.prepare("DELETE FROM settings where name=:NAME;");
-    query.bindValue(":NAME", Name);
+    query.prepare(QStringLiteral("DELETE FROM settings where name=:NAME;"));
+    query.bindValue(QStringLiteral(":NAME"), Name);
     query.exec();
     DebugError(&query);
 
-    query.prepare("INSERT INTO settings (name, value) "
-                  "VALUES (:NAME, :VALUE);");
-    query.bindValue(":NAME", Name);
-    query.bindValue(":VALUE", Value);
+    query.prepare(QStringLiteral("INSERT INTO settings (name, value) VALUES (:NAME, :VALUE);"));
+    query.bindValue(QStringLiteral(":NAME"), Name);
+    query.bindValue(QStringLiteral(":VALUE"), Value);
     query.exec();
     DebugError(&query);
 }

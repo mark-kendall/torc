@@ -30,32 +30,32 @@
  * TorcNotification is the base notification class.
 */
 TorcNotification::TorcNotification(const QVariantMap &Details)
-  : TorcDevice(false, 0, 0, "Notification", Details),
+  : TorcDevice(false, 0, 0, QStringLiteral("Notification"), Details),
     m_notifierNames(),
     m_notifiers(),
     m_title(),
     m_body()
 {
-    if (Details.contains("outputs") && Details.contains("message"))
+    if (Details.contains(QStringLiteral("outputs")) && Details.contains(QStringLiteral("message")))
     {
-        QVariantMap message = Details.value("message").toMap();
-        if (message.contains("body"))
+        QVariantMap message = Details.value(QStringLiteral("message")).toMap();
+        if (message.contains(QStringLiteral("body")))
         {
-            m_body = message.value("body").toString();
+            m_body = message.value(QStringLiteral("body")).toString();
             // title is optional
-            if (message.contains("title"))
-                m_title = message.value("title").toString();
+            if (message.contains(QStringLiteral("title")))
+                m_title = message.value(QStringLiteral("title")).toString();
 
-            QVariantMap outputs = Details.value("outputs").toMap();
+            QVariantMap outputs = Details.value(QStringLiteral("outputs")).toMap();
             QVariantMap::const_iterator it = outputs.constBegin();
             for (; it != outputs.constEnd(); ++it)
-                if (it.key() == "notifier")
+                if (it.key() == QStringLiteral("notifier"))
                     m_notifierNames.append(it.value().toString().trimmed());
         }
     }
 
     if (m_notifierNames.isEmpty())
-        LOG(VB_GENERAL, LOG_ERR, "Notifier is incomplete");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Notifier is incomplete"));
 }
 
 bool TorcNotification::Setup(void)
@@ -75,7 +75,7 @@ bool TorcNotification::Setup(void)
         }
         else
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Notification '%1' failed to find notifier '%2'").arg(uniqueId, notifiername));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Notification '%1' failed to find notifier '%2'").arg(uniqueId, notifiername));
         }
     }
 

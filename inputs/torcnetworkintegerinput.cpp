@@ -24,7 +24,7 @@
 #include "torcnetworkintegerinput.h"
 
 TorcNetworkIntegerInput::TorcNetworkIntegerInput(double Default, const QVariantMap &Details)
-  : TorcIntegerInput(qRound(Default), "TorcNetworkIntegerInput", Details)
+  : TorcIntegerInput(qRound(Default), QStringLiteral("TorcNetworkIntegerInput"), Details)
 {
 }
 

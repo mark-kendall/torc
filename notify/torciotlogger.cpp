@@ -28,10 +28,10 @@
 
 TorcIOTLogger::TorcIOTLogger(const QVariantMap &Details)
   : TorcNotifier(Details),
-    m_description("IOTLogger"),
+    m_description(QStringLiteral("IOTLogger")),
     m_timer(),
     m_networkAbort(0),
-    m_apiKey(""),
+    m_apiKey(QStringLiteral("")),
     m_badRequestCount(0),
     m_maxBadRequests(5),
     m_maxUpdateInterval(15),
@@ -44,7 +44,7 @@ TorcIOTLogger::TorcIOTLogger(const QVariantMap &Details)
 {
     // clear fields
     for (int i = 0; i < 32; i++)
-        m_fieldValues[i] = "";
+        m_fieldValues[i] = QStringLiteral("");
 }
 
 TorcIOTLogger::~TorcIOTLogger()
@@ -63,21 +63,21 @@ TorcIOTLogger::~TorcIOTLogger()
 
 bool TorcIOTLogger::Initialise(const QVariantMap &Details)
 {
-    if (Details.contains("apikey"))
-        m_apiKey = Details.value("apikey").toString().trimmed();
+    if (Details.contains(QStringLiteral("apikey")))
+        m_apiKey = Details.value(QStringLiteral("apikey")).toString().trimmed();
 
     if (m_apiKey.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("%1 logger has no api key - disabling").arg(m_description));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("%1 logger has no api key - disabling").arg(m_description));
         return false;
     }
 
-    if (Details.contains("fields"))
+    if (Details.contains(QStringLiteral("fields")))
     {
-        QVariantMap fields = Details.value("fields").toMap();
+        QVariantMap fields = Details.value(QStringLiteral("fields")).toMap();
         for (int i = 0; i < m_maxFields; i++)
         {
-            QString field = "field" + QString::number(i +1);
+            QString field = QStringLiteral("field%1").arg(i +1);
             if (fields.contains(field))
             {
                 QString value = fields.value(field).toString().trimmed();
@@ -92,7 +92,7 @@ bool TorcIOTLogger::Initialise(const QVariantMap &Details)
 
     if (m_fields.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("%1 logger has no valid fields - disabling").arg(m_description));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("%1 logger has no valid fields - disabling").arg(m_description));
         return false;
     }
 
@@ -111,7 +111,7 @@ QStringList TorcIOTLogger::GetDescription(void)
     result << m_description;
     QMap<QString,int>::const_iterator it = m_fields.constBegin();
     for ( ; it != m_fields.constEnd(); ++it)
-        result << QString("field%1: %2").arg(it.value() + 1).arg(it.key());
+        result << QStringLiteral("field%1: %2").arg(it.value() + 1).arg(it.key());
     return result;
 }
 
@@ -147,7 +147,7 @@ void TorcIOTLogger::DoNotify(void)
 
     if (!TorcNetwork::IsAvailable())
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Not sending %1 update. Network is not available").arg(m_description));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Not sending %1 update. Network is not available").arg(m_description));
         return;
     }
 
@@ -187,7 +187,7 @@ void TorcIOTLogger::RequestReady(TorcNetworkRequest *Request)
     QMutexLocker locker(&lock);
     if (!m_requests.contains(Request))
     {
-        LOG(VB_GENERAL, LOG_WARNING, QString("Response to unknown %1 request").arg(m_description));
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Response to unknown %1 request").arg(m_description));
         return;
     }
 
@@ -196,13 +196,13 @@ void TorcIOTLogger::RequestReady(TorcNetworkRequest *Request)
     {
         // not sure whether it is my network or the thingspeak server - but I get intermittent Host Not Found errors
         // which end up disabling ThingSpeak. So check for HostNotFound...
-        LOG(VB_GENERAL, LOG_ERR, QString("%2 update error '%1'").arg(TorcHTTPRequest::StatusToString((HTTPStatus)status), m_description));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("%2 update error '%1'").arg(TorcHTTPRequest::StatusToString((HTTPStatus)status), m_description));
 
         if (Request->GetReplyError() != QNetworkReply::HostNotFoundError)
         {
             if (++m_badRequestCount > m_maxBadRequests)
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("%1 %2 update errors. Disabling logger - Check your config.")
+                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("%1 %2 update errors. Disabling logger - Check your config.")
                     .arg(m_badRequestCount)
                     .arg(m_description));
                 SetValid(false);

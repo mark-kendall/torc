@@ -9,7 +9,7 @@
 // Torc
 #include "torccentral.h"
 
-#define I2C QString("i2c")
+#define I2C QStringLiteral("i2c")
 
 class TorcI2CDevice
 {

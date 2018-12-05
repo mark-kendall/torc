@@ -58,10 +58,10 @@ OMX_ERRORTYPE TorcOMXTunnel::Flush(void)
 
     QMutexLocker locker(&m_lock);
 
-    OMX_CHECK(m_source->FlushBuffer(OMX_DirOutput, m_sourceIndex, m_sourceDomain), m_source->GetName(), "Tunnel failed to flush source");
-    OMX_CHECK(m_destination->FlushBuffer(OMX_DirInput, m_destinationIndex, m_destinationDomain), m_destination->GetName(), "Tunnel failed to flush destination");
-    OMX_CHECK(m_source->WaitForResponse(OMX_CommandFlush, m_sourcePort, 200), m_source->GetName(), "Tunnel failed to flush source");
-    OMX_CHECK(m_destination->WaitForResponse(OMX_CommandFlush, m_destinationPort, 200), m_destination->GetName(), "Tunnel failed to flush destination");
+    OMX_CHECK(m_source->FlushBuffer(OMX_DirOutput, m_sourceIndex, m_sourceDomain), m_source->GetName(), QStringLiteral("Tunnel failed to flush source"));
+    OMX_CHECK(m_destination->FlushBuffer(OMX_DirInput, m_destinationIndex, m_destinationDomain), m_destination->GetName(), QStringLiteral("Tunnel failed to flush destination"));
+    OMX_CHECK(m_source->WaitForResponse(OMX_CommandFlush, m_sourcePort, 200), m_source->GetName(), QStringLiteral("Tunnel failed to flush source"));
+    OMX_CHECK(m_destination->WaitForResponse(OMX_CommandFlush, m_destinationPort, 200), m_destination->GetName(), QStringLiteral("Tunnel failed to flush destination"));
 
     return OMX_ErrorNone;
 }
@@ -78,11 +78,11 @@ OMX_ERRORTYPE TorcOMXTunnel::Create(void)
 
     QMutexLocker locker(&m_lock);
     m_connected = false;
-    QString description = QString("%1:%2->%3:%4").arg(m_source->GetName()).arg(m_sourcePort).arg(m_destination->GetName()).arg(m_destinationPort);
+    QString description = QStringLiteral("%1:%2->%3:%4").arg(m_source->GetName()).arg(m_sourcePort).arg(m_destination->GetName()).arg(m_destinationPort);
 
-    OMX_CHECK(OMX_SetupTunnel(m_source->GetHandle(), m_sourcePort, m_destination->GetHandle(), m_destinationPort), "", QString("Failed to create tunnel: " + description));
+    OMX_CHECK(OMX_SetupTunnel(m_source->GetHandle(), m_sourcePort, m_destination->GetHandle(), m_destinationPort), QStringLiteral(""), QStringLiteral("Failed to create tunnel: %1").arg(description));
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Created tunnel: %1").arg(description));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Created tunnel: %1").arg(description));
 
     m_connected = true;
     return OMX_ErrorNone;
@@ -105,11 +105,11 @@ OMX_ERRORTYPE TorcOMXTunnel::Destroy(void)
 
     OMX_ERRORTYPE error = OMX_SetupTunnel(m_source->GetHandle(), m_sourcePort, nullptr, 0);
     if (OMX_ErrorNone != error)
-        OMX_ERROR(error, m_source->GetName(), "Failed to destroy tunnel input");
+        OMX_ERROR(error, m_source->GetName(), QStringLiteral("Failed to destroy tunnel input"));
 
     error = OMX_SetupTunnel(m_destination->GetHandle(), m_destinationPort, nullptr, 0);
     if (OMX_ErrorNone != error)
-        OMX_ERROR(error, m_destination->GetName(), "Failed to destroy tunnel output");
+        OMX_ERROR(error, m_destination->GetName(), QStringLiteral("Failed to destroy tunnel output"));
 
     m_connected = false;
     return OMX_ErrorNone;

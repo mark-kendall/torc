@@ -41,14 +41,14 @@
  * subject to jitter under load - and nobody wants flickering LEDs!).
  */
 TorcPiPWMOutput::TorcPiPWMOutput(int Pin, const QVariantMap &Details)
-  : TorcPWMOutput(DEFAULT_VALUE, "PiGPIOPWMOutput", Details, PI_PWM_RESOLUTION),
+  : TorcPWMOutput(DEFAULT_VALUE, QStringLiteral("PiGPIOPWMOutput"), Details, PI_PWM_RESOLUTION),
     m_pin(Pin)
 {
     // hardware PWM only operates at default 10bit accuracy
     if ((m_resolution != m_maxResolution) && (m_pin == TORC_HWPWM_PIN))
     {
         m_resolution = m_maxResolution;
-        LOG(VB_GENERAL, LOG_WARNING, QString("Ignoring user defined resolution for hardware PWM - defaulting to %1").arg(m_maxResolution));
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Ignoring user defined resolution for hardware PWM - defaulting to %1").arg(m_maxResolution));
     }
 
     int value = (int)((DEFAULT_VALUE * (double)m_resolution) + 0.5);
@@ -62,11 +62,11 @@ TorcPiPWMOutput::TorcPiPWMOutput(int Pin, const QVariantMap &Details)
     {
         if (softPwmCreate(m_pin, value, m_resolution) == 0)
         {
-            LOG(VB_GENERAL, LOG_WARNING, QString("Using software PWM on pin %1: It MIGHT flicker...").arg(m_pin));
+            LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Using software PWM on pin %1: It MIGHT flicker...").arg(m_pin));
         }
         else
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed to setup software PWM on pin %1").arg(m_pin));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to setup software PWM on pin %1").arg(m_pin));
         }
     }
 }

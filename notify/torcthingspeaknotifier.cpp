@@ -26,7 +26,7 @@
 #include "torcnetwork.h"
 #include "torcthingspeaknotifier.h"
 
-#define THINGSPEAK_UPDATE_URL QString("https://api.thingspeak.com/update")
+#define THINGSPEAK_UPDATE_URL QStringLiteral("https://api.thingspeak.com/update")
 #define THINGSPEAK_MAX_ERRORS 5
 #define THINGSPEAK_MAX_FIELDS 8
 
@@ -52,11 +52,11 @@ void TorcThingSpeakNotifier::ProcessRequest(TorcNetworkRequest *Request)
     if (ok)
     {
         if (id == 0)
-            LOG(VB_GENERAL, LOG_ERR, QString("%1 update failed for '%2'").arg(m_description, uniqueId));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("%1 update failed for '%2'").arg(m_description, uniqueId));
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse update id from %1 response (%2)").arg(m_description, uniqueId));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to parse update id from %1 response (%2)").arg(m_description, uniqueId));
     }
 }
 
@@ -64,13 +64,13 @@ TorcNetworkRequest* TorcThingSpeakNotifier::CreateRequest(void)
 {
     QUrl url(THINGSPEAK_UPDATE_URL);
     QUrlQuery query;
-    query.addQueryItem("api_key", m_apiKey);
+    query.addQueryItem(QStringLiteral("api_key"), m_apiKey);
     for (int i = 0; i < m_maxFields; i++)
     {
         if (!m_fieldValues[i].isEmpty())
-            query.addQueryItem(QString("field%1").arg(i+1), m_fieldValues[i]);
+            query.addQueryItem(QStringLiteral("field%1").arg(i+1), m_fieldValues[i]);
         // reset the fields
-        m_fieldValues[i] = QString("");
+        m_fieldValues[i] = QStringLiteral("");
     }
     url.setQuery(query);
     QNetworkRequest qrequest(url);
@@ -82,7 +82,7 @@ class TorcThingSpeakNotifierFactory final : public TorcNotifierFactory
 {
     TorcNotifier* Create(const QString &Type, const QVariantMap &Details) override
     {
-        if (Type == "thingspeak" && Details.contains("apikey") && Details.contains("fields"))
+        if (Type == QStringLiteral("thingspeak") && Details.contains(QStringLiteral("apikey")) && Details.contains(QStringLiteral("fields")))
             return new TorcThingSpeakNotifier(Details);
         return nullptr;
     }

@@ -163,17 +163,17 @@ void TorcPiGPIO::Create(const QVariantMap &GPIO)
         if (!m_setup)
         {
             // NB wiringPi will have terminated the program already!
-            LOG(VB_GENERAL, LOG_ERR, "wiringPi is not initialised");
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("wiringPi is not initialised"));
         }
         else
         {
             int revision = piBoardRev();
             if (revision == 1)
-                LOG(VB_GENERAL, LOG_INFO, "Revision 1 board - 7 pins available (0-6)");
+                LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Revision 1 board - 7 pins available (0-6)"));
             else if (revision == 2)
-                LOG(VB_GENERAL, LOG_INFO, "Revision 2 board - 22 pins available (0-6 and 17-31)");
+                LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Revision 2 board - 22 pins available (0-6 and 17-31)"));
             else
-                LOG(VB_GENERAL, LOG_INFO, "Unknown board revision...");
+                LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Unknown board revision..."));
         }
     }
 
@@ -201,33 +201,33 @@ void TorcPiGPIO::Create(const QVariantMap &GPIO)
                     QString    type = it2.key();
                     QVariantMap pin = it2.value().toMap();
 
-                    if (!pin.contains("gpiopinnumber"))
+                    if (!pin.contains(QStringLiteral("gpiopinnumber")))
                     {
-                        LOG(VB_GENERAL, LOG_ERR, QString("GPIO device '%1' does not specify pin <number>").arg(pin.value("name").toString()));
+                        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("GPIO device '%1' does not specify pin <number>").arg(pin.value(QStringLiteral("name")).toString()));
                         continue;
                     }
 
-                    if (!pin.contains("default") && output)
+                    if (!pin.contains(QStringLiteral("default")) && output)
                     {
-                        LOG(VB_GENERAL, LOG_ERR, QString("GPIO device '%1' does not specify <default> value").arg(pin.value("name").toString()));
+                        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("GPIO device '%1' does not specify <default> value").arg(pin.value(QStringLiteral("name")).toString()));
                         continue;
                     }
 
                     bool ok = false;
-                    int number = pin.value("gpiopinnumber").toInt(&ok);
+                    int number = pin.value(QStringLiteral("gpiopinnumber")).toInt(&ok);
                     if (!ok || (wpiPinToGpio(number) < 0))
                     {
-                        LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse valid pin from '%1'").arg(pin.value("pin").toString()));
+                        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to parse valid pin from '%1'").arg(pin.value("pin").toString()));
                         continue;
                     }
 
                     if (m_inputs.contains(number) || m_outputs.contains(number) || m_pwmOutputs.contains(number))
                     {
-                        LOG(VB_GENERAL, LOG_ERR, QString("GPIO Pin #%1 is already in use").arg(number));
+                        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("GPIO Pin #%1 is already in use").arg(number));
                         continue;
                     }
 
-                    if (type == "switch")
+                    if (type == QStringLiteral("switch"))
                     {
                         if (output)
                         {
@@ -240,14 +240,14 @@ void TorcPiGPIO::Create(const QVariantMap &GPIO)
                             m_inputs.insert(number, in);
                         }
                     }
-                    else if (type == "pwm" && output)
+                    else if (type == QStringLiteral("pwm") && output)
                     {
                         TorcPiPWMOutput* out = new TorcPiPWMOutput(number, pin);
                         m_pwmOutputs.insert(number, out);
                     }
                     else
                     {
-                        LOG(VB_GENERAL, LOG_ERR, "Unknown GPIO device type");
+                        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Unknown GPIO device type"));
                     }
                 }
             }
@@ -290,18 +290,18 @@ void TorcPiGPIO::Destroy(void)
  * Pins 10-14 are for SPI.
  * Pins 15 and 16 are for UART by default.
 */
-static const QString gpioPinNumberTypeRev1 =
+static const QString gpioPinNumberTypeRev1 = QStringLiteral(
 "<xs:simpleType name='gpioPinNumberType'>\r\n"
 "  <xs:restriction base='xs:integer'>\r\n"
 "    <xs:minInclusive value='0'/>\r\n"
 "    <xs:maxInclusive value='6'/>\r\n"
 "  </xs:restriction>\r\n"
-"</xs:simpleType>\r\n";
+"</xs:simpleType>\r\n");
 
 /* For revision 2 boards and beyond, we have the Rev 1 pins as above, plus
  * pins 17-20 on Model B Rev 2 boards only and 21-31 for B+...
 */
-static const QString gpioPinNumberTypeRev2 =
+static const QString gpioPinNumberTypeRev2 = QStringLiteral(
 "<xs:simpleType name='gpioPinNumberType'>\r\n"
 "  <xs:restriction base='xs:integer'>\r\n"
 "    <xs:enumeration value='0'/>\r\n"
@@ -327,9 +327,9 @@ static const QString gpioPinNumberTypeRev2 =
 "    <xs:enumeration value='30'/>\r\n"
 "    <xs:enumeration value='31'/>\r\n"
 "  </xs:restriction>\r\n"
-"</xs:simpleType>\r\n";
+"</xs:simpleType>\r\n");
 
-static const QString pigpioInputTypes =
+static const QString pigpioInputTypes = QStringLiteral(
 "\r\n"
 "<xs:complexType name='gpioInputSwitchType'>\r\n"
 "  <xs:all>\r\n"
@@ -344,12 +344,12 @@ static const QString pigpioInputTypes =
 "  <xs:sequence>\r\n"
 "    <xs:element minOccurs='1' maxOccurs='unbounded' name='switch' type='gpioInputSwitchType'/>\r\n"
 "  </xs:sequence>\r\n"
-"</xs:complexType>\r\n";
+"</xs:complexType>\r\n");
 
-static const QString pigpioInputs =
-"    <xs:element minOccurs='0' maxOccurs='1' name='gpio'    type='gpioInputType'/>\r\n";
+static const QString pigpioInputs = QStringLiteral(
+"    <xs:element minOccurs='0' maxOccurs='1' name='gpio'    type='gpioInputType'/>\r\n");
 
-static const QString pigpioOutputTypes =
+static const QString pigpioOutputTypes = QStringLiteral(
 "<xs:complexType name='gpioOutputSwitchType'>\r\n"
 "  <xs:all>\r\n"
 "    <xs:element name='name'     type='deviceNameType'/>\r\n"
@@ -375,17 +375,17 @@ static const QString pigpioOutputTypes =
 "    <xs:element name='switch' type='gpioOutputSwitchType'/>\r\n"
 "    <xs:element name='pwm'    type='gpioOutputPWMType'/>\r\n"
 "  </xs:choice>\r\n"
-"</xs:complexType>\r\n";
+"</xs:complexType>\r\n");
 
-static const QString pigpioOutputs =
-"    <xs:element minOccurs='0' maxOccurs='1' name='gpio'    type='gpioOutputType'/>\r\n";
+static const QString pigpioOutputs = QStringLiteral(
+"    <xs:element minOccurs='0' maxOccurs='1' name='gpio'    type='gpioOutputType'/>\r\n");
 
-static const QString pigpioUnique =
+static const QString pigpioUnique = QStringLiteral(
 "  <!-- enforce unique GPIO pin numbers -->\r\n"
 "  <xs:unique name='uniqueGPIOPinNumber'>\r\n"
 "    <xs:selector xpath='.//gpiopinnumber' />\r\n"
 "    <xs:field xpath='.' />\r\n"
-"  </xs:unique>\r\n";
+"  </xs:unique>\r\n");
 
 class TorcPiGPIOXSDFactory : public TorcXSDFactory
 {

@@ -33,15 +33,15 @@ QMutex*         gNetworkLock = new QMutex(QMutex::Recursive);
 QStringList     gNetworkHostNames;
 QReadWriteLock* gNetworkHostNamesLock = new QReadWriteLock();
 
-QPair<QHostAddress,int> gIPv4LinkLocal   = QHostAddress::parseSubnet("169.254.0.0/16");
-QPair<QHostAddress,int> gIPv4PrivateA    = QHostAddress::parseSubnet("10.0.0.0/8");
-QPair<QHostAddress,int> gIPv4PrivateB    = QHostAddress::parseSubnet("172.16.0.0/12");
-QPair<QHostAddress,int> gIPv4PrivateC    = QHostAddress::parseSubnet("192.168.0.0/16");
+QPair<QHostAddress,int> gIPv4LinkLocal   = QHostAddress::parseSubnet(QStringLiteral("169.254.0.0/16"));
+QPair<QHostAddress,int> gIPv4PrivateA    = QHostAddress::parseSubnet(QStringLiteral("10.0.0.0/8"));
+QPair<QHostAddress,int> gIPv4PrivateB    = QHostAddress::parseSubnet(QStringLiteral("172.16.0.0/12"));
+QPair<QHostAddress,int> gIPv4PrivateC    = QHostAddress::parseSubnet(QStringLiteral("192.168.0.0/16"));
 
-QPair<QHostAddress,int> gIPv6LinkLocal   = QHostAddress::parseSubnet("fe80::/10");
-QPair<QHostAddress,int> gIPv6SiteLocal   = QHostAddress::parseSubnet("fec0::/10"); // deprecated
-QPair<QHostAddress,int> gIPv6UniqueLocal = QHostAddress::parseSubnet("fc00::/7");
-QPair<QHostAddress,int> gIPv6Global      = QHostAddress::parseSubnet("2000::/3");
+QPair<QHostAddress,int> gIPv6LinkLocal   = QHostAddress::parseSubnet(QStringLiteral("fe80::/10"));
+QPair<QHostAddress,int> gIPv6SiteLocal   = QHostAddress::parseSubnet(QStringLiteral("fec0::/10")); // deprecated
+QPair<QHostAddress,int> gIPv6UniqueLocal = QHostAddress::parseSubnet(QStringLiteral("fc00::/7"));
+QPair<QHostAddress,int> gIPv6Global      = QHostAddress::parseSubnet(QStringLiteral("2000::/3"));
 
 bool TorcNetwork::IsAvailable(void)
 {
@@ -98,13 +98,13 @@ bool TorcNetwork::GetAsynchronous(TorcNetworkRequest *Request, QObject *Parent)
 
     if (Request->m_bufferSize)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Cannot queue asynchronous request for streamed buffer");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Cannot queue asynchronous request for streamed buffer"));
         return false;
     }
 
     if (Parent->metaObject()->indexOfMethod(QMetaObject::normalizedSignature("RequestReady(TorcNetworkRequest*)")) < 0)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Request's parent does not have RequestReady method");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Request's parent does not have RequestReady method"));
         return false;
     }
 
@@ -137,11 +137,11 @@ void TorcNetwork::AddHostName(const QString &Host)
 
         if (gNetworkHostNames.size() > 10)
         {
-            LOG(VB_GENERAL, LOG_WARNING, QString("Number of host names > 10 - ignoring new name '%1' (%2)").arg(Host, gNetworkHostNames.join(",")));
+            LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Number of host names > 10 - ignoring new name '%1' (%2)").arg(Host, gNetworkHostNames.join(',')));
         }
         else if (!gNetworkHostNames.contains(Host))
         {
-            LOG(VB_GENERAL, LOG_INFO, QString("New host name '%1'").arg(Host));
+            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("New host name '%1'").arg(Host));
             gNetworkHostNames.append(Host);
             changed = true;
         }
@@ -165,7 +165,7 @@ void TorcNetwork::RemoveHostName(const QString &Host)
 
         if (gNetworkHostNames.contains(Host))
         {
-            LOG(VB_GENERAL, LOG_INFO, QString("Removed host name '%1'").arg(Host));
+            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Removed host name '%1'").arg(Host));
             gNetworkHostNames.removeAll(Host);
             changed = true;
         }
@@ -199,7 +199,7 @@ QString TorcNetwork::IPAddressToLiteral(const QHostAddress &Address, int Port, b
 
     if (UseLocalhost && Address.isLoopback())
     {
-        result = QString("localhost");
+        result = QStringLiteral("localhost");
     }
     else if (Address.protocol() == QAbstractSocket::IPv4Protocol)
     {
@@ -208,7 +208,7 @@ QString TorcNetwork::IPAddressToLiteral(const QHostAddress &Address, int Port, b
     else
     {
         QHostAddress address(Address);
-        address.setScopeId("");
+        address.setScopeId(QStringLiteral(""));
         result = "[" + address.toString() +"]";
     }
 
@@ -296,13 +296,13 @@ QString ConfigurationTypeToString(QNetworkConfiguration::Type Type)
 {
     switch (Type)
     {
-        case QNetworkConfiguration::InternetAccessPoint: return QString("InternetAccessPoint");
-        case QNetworkConfiguration::ServiceNetwork:      return QString("ServiceNetwork");
-        case QNetworkConfiguration::UserChoice:          return QString("UserDefined");
-        case QNetworkConfiguration::Invalid:             return QString("Invalid");
+        case QNetworkConfiguration::InternetAccessPoint: return QStringLiteral("InternetAccessPoint");
+        case QNetworkConfiguration::ServiceNetwork:      return QStringLiteral("ServiceNetwork");
+        case QNetworkConfiguration::UserChoice:          return QStringLiteral("UserDefined");
+        case QNetworkConfiguration::Invalid:             return QStringLiteral("Invalid");
     }
 
-    return QString();
+    return QStringLiteral();
 }
 
 /*! \class TorcNetwork
@@ -320,8 +320,8 @@ TorcNetwork::TorcNetwork()
     m_reverseRequests(),
     m_asynchronousRequests()
 {
-    LOG(VB_GENERAL, LOG_INFO, "Opening network access manager");
-    LOG(VB_GENERAL, LOG_INFO, QString("SSL support is %1available").arg(QSslSocket::supportsSsl() ? "" : "not "));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Opening network access manager"));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("SSL support is %1available").arg(QSslSocket::supportsSsl() ? QStringLiteral("") : QStringLiteral("not ")));
 
     connect(&m_manager, &QNetworkConfigurationManager::configurationAdded,   this, &TorcNetwork::ConfigurationAdded);
     connect(&m_manager, &QNetworkConfigurationManager::configurationChanged, this, &TorcNetwork::ConfigurationChanged);
@@ -346,7 +346,7 @@ TorcNetwork::~TorcNetwork()
     // release any outstanding requests
     CloseConnections();
 
-    LOG(VB_GENERAL, LOG_INFO, "Closing network access manager");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Closing network access manager"));
 }
 
 bool TorcNetwork::IsOnline(void)
@@ -380,7 +380,7 @@ void TorcNetwork::GetSafe(TorcNetworkRequest* Request)
         if (!reply)
         {
             Request->DownRef();
-            LOG(VB_GENERAL, LOG_ERR, "Unknown request type");
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Unknown request type"));
             return;
         }
 
@@ -404,9 +404,9 @@ void TorcNetwork::CancelSafe(TorcNetworkRequest *Request)
         Request->m_rawHeaders = reply->rawHeaderPairs();
         m_requests.remove(reply);
         if (reply->isFinished())
-            LOG(VB_NETWORK, LOG_DEBUG, QString("Deleting finished request '%1'").arg(reply->request().url().toString()));
+            LOG(VB_NETWORK, LOG_DEBUG, QStringLiteral("Deleting finished request '%1'").arg(reply->request().url().toString()));
         else
-            LOG(VB_GENERAL, LOG_INFO, QString("Cancelling '%1'").arg(reply->request().url().toString()));
+            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Cancelling '%1'").arg(reply->request().url().toString()));
         reply->abort();
         reply->deleteLater();
         Request->DownRef();
@@ -415,12 +415,12 @@ void TorcNetwork::CancelSafe(TorcNetworkRequest *Request)
         {
             QObject *parent = m_asynchronousRequests.take(Request);
             if (!QMetaObject::invokeMethod(parent, "RequestReady", Qt::AutoConnection, Q_ARG(TorcNetworkRequest*, Request)))
-                LOG(VB_GENERAL, LOG_ERR, "Error sending RequestReady");
+                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Error sending RequestReady"));
         }
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, "Trying to cancel unknown network request");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Trying to cancel unknown network request"));
     }
 }
 
@@ -437,7 +437,7 @@ void TorcNetwork::GetAsynchronousSafe(TorcNetworkRequest *Request, QObject *Pare
 
     if (m_asynchronousRequests.contains(Request))
     {
-        LOG(VB_GENERAL, LOG_ERR, "Asynchronous request is already queued - ignoring");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Asynchronous request is already queued - ignoring"));
         return;
     }
 
@@ -528,7 +528,7 @@ bool TorcNetwork::CheckHeaders(TorcNetworkRequest *Request, QNetworkReply *Reply
 
     Request->m_httpStatus = httpstatus;
     Request->m_contentLength = contentlength;
-    Request->m_contentType = contenttype.isValid() ? contenttype.toString().toLower() : QString();
+    Request->m_contentType = contenttype.isValid() ? contenttype.toString().toLower() : QStringLiteral();
     Request->m_byteServingAvailable = Reply->rawHeader("Accept-Ranges").toLower().contains("bytes") && contentlength > 0;
     return true;
 }
@@ -547,7 +547,7 @@ bool TorcNetwork::Redirected(TorcNetworkRequest *Request, QNetworkReply *Reply)
         if (newurl.isRelative())
             newurl = oldurl.resolved(newurl);
 
-        LOG(VB_GENERAL, LOG_INFO, QString("Redirected from '%1' to '%2'").arg(oldurl.toString(), newurl.toString()));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Redirected from '%1' to '%2'").arg(oldurl.toString(), newurl.toString()));
         if (Request->m_redirectionCount++ < DEFAULT_MAX_REDIRECTIONS)
         {
             // delete the reply and create a new one
@@ -562,7 +562,7 @@ bool TorcNetwork::Redirected(TorcNetworkRequest *Request, QNetworkReply *Reply)
         }
         else
         {
-            LOG(VB_GENERAL, LOG_WARNING, "Max redirections exceeded");
+            LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Max redirections exceeded"));
         }
     }
 
@@ -590,7 +590,7 @@ void TorcNetwork::ReadyRead(void)
             if (request->m_bufferSize)
                 reply->setReadBufferSize(request->m_bufferSize);
 
-            LOG(VB_GENERAL, LOG_INFO, "Download started");
+            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Download started"));
             request->m_started = true;
         }
 
@@ -638,7 +638,7 @@ void TorcNetwork::Error(QNetworkReply::NetworkError Code)
     if (reply && m_requests.contains(reply) && (request = m_requests.value(reply)) && (Code != QNetworkReply::OperationCanceledError))
     {
         request->SetReplyError(Code);
-        LOG(VB_GENERAL, LOG_ERR, QString("Network error '%1'").arg(reply->errorString()));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Network error '%1'").arg(reply->errorString()));
     }
 }
 
@@ -653,7 +653,7 @@ QList<QSslError> TorcNetwork::AllowableSslErrors(const QList<QSslError> &Errors)
     {
         if (error.error() == QSslError::SelfSignedCertificate)
         {
-            LOG(VB_GENERAL, LOG_INFO, "Allowing self signed certificate");
+            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Allowing self signed certificate"));
             allowed << error;
             selfsigned = true;
         }
@@ -664,7 +664,7 @@ QList<QSslError> TorcNetwork::AllowableSslErrors(const QList<QSslError> &Errors)
         }
         else
         {
-            LOG(VB_GENERAL, LOG_INFO, QString("Ssl Error: %1").arg(error.errorString()));
+            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Ssl Error: %1").arg(error.errorString()));
         }
     }
 
@@ -672,12 +672,12 @@ QList<QSslError> TorcNetwork::AllowableSslErrors(const QList<QSslError> &Errors)
     {
         if (selfsigned)
         {
-            LOG(VB_GENERAL, LOG_INFO, "Allowing host name mismatch for self signed certfificate");
+            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Allowing host name mismatch for self signed certfificate"));
             allowed << mismatch;
         }
         else
         {
-            LOG(VB_GENERAL, LOG_INFO, QString("Ssl Error: %1").arg(mismatch.errorString()));
+            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Ssl Error: %1").arg(mismatch.errorString()));
         }
     }
 
@@ -708,7 +708,7 @@ void TorcNetwork::Authenticate(QNetworkReply *Reply, QAuthenticator *Authenticat
 {
     (void)Reply;
     (void)Authenticator;
-    LOG(VB_GENERAL, LOG_INFO, "Authentication required");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Authentication required"));
 }
 
 ///\brief Receives host name updates from QHostInfo
@@ -735,7 +735,7 @@ void TorcNetwork::NewHostName(const QHostInfo &Info)
 void TorcNetwork::CloseConnections(void)
 {
     if (!m_requests.isEmpty())
-        LOG(VB_GENERAL, LOG_WARNING, QString("%1 outstanding network requests").arg(m_requests.size()));
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("%1 outstanding network requests").arg(m_requests.size()));
 
     while (!m_requests.isEmpty())
         CancelSafe(*m_requests.begin());
@@ -758,12 +758,12 @@ void TorcNetwork::UpdateConfiguration(bool Creating)
 
         if (m_configuration.isValid())
         {
-            LOG(VB_GENERAL, LOG_INFO, QString("Network interface: %1 Bearer: %2").arg(configuration.name(), configuration.bearerTypeName()));
+            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Network interface: %1 Bearer: %2").arg(configuration.name(), configuration.bearerTypeName()));
             m_online = true;
         }
         else
         {
-            LOG(VB_GENERAL, LOG_INFO, "No valid network connection");
+            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("No valid network connection"));
             m_online = false;
         }
     }
@@ -781,11 +781,11 @@ void TorcNetwork::UpdateConfiguration(bool Creating)
             QHostInfo::lookupHost(address, this, SLOT(NewHostName(QHostInfo)));
         }
 
-        LOG(VB_GENERAL, LOG_INFO, QString("Network up (%1)").arg(addresses.join(", ")));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Network up (%1)").arg(addresses.join(QStringLiteral(", "))));
     }
     else if (wasonline && !m_online)
     {
-        LOG(VB_GENERAL, LOG_INFO, "Network down");
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Network down"));
         CloseConnections();
         TorcLocalContext::NotifyEvent(Torc::NetworkUnavailable);
 
@@ -795,7 +795,7 @@ void TorcNetwork::UpdateConfiguration(bool Creating)
     }
     else if (changed)
     {
-        LOG(VB_GENERAL, LOG_INFO, "Network configuration changed");
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Network configuration changed"));
         TorcLocalContext::NotifyEvent(Torc::NetworkChanged);
     }
 }

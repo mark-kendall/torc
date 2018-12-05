@@ -98,7 +98,7 @@ void Torc1WireBus::Create(const QVariantMap &Details)
                 // we have found a 1wire device config - make sure 1wire is available
                 if (!wire1found)
                 {
-                    LOG(VB_GENERAL, LOG_ERR, QString("1Wire device configured but cannot find 1Wire directory (%1)").arg(ONE_WIRE_DIRECTORY));
+                    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("1Wire device configured but cannot find 1Wire directory (%1)").arg(ONE_WIRE_DIRECTORY));
                     return;
                 }
 
@@ -110,10 +110,10 @@ void Torc1WireBus::Create(const QVariantMap &Details)
                     QVariantMap details = it2.value().toMap();
 
                     // a 1Wire device must have the <id> field
-                    if (!details.contains("wire1serial"))
+                    if (!details.contains(QStringLiteral("wire1serial")))
                     {
-                        LOG(VB_GENERAL, LOG_ERR, QString("Cannot create 1Wire device without unique 1Wire ID ('%1' '%2')")
-                            .arg(devicetype, details.value("name").toString()));
+                        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Cannot create 1Wire device without unique 1Wire ID ('%1' '%2')")
+                            .arg(devicetype, details.value(QStringLiteral("name")).toString()));
                     }
                     else
                     {
@@ -128,13 +128,13 @@ void Torc1WireBus::Create(const QVariantMap &Details)
 
                         if (device)
                         {
-                            QString deviceid = details.value("wire1serial").toString();
-                            LOG(VB_GENERAL, LOG_INFO, QString("New 1Wire device: %1").arg(deviceid));
+                            QString deviceid = details.value(QStringLiteral("wire1serial")).toString();
+                            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("New 1Wire device: %1").arg(deviceid));
                             m_inputs.insert(deviceid, device);
                         }
                         else
                         {
-                            LOG(VB_GENERAL, LOG_WARNING, QString("Unable to find handler for 1Wire device type '%1'").arg(devicetype));
+                            LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Unable to find handler for 1Wire device type '%1'").arg(devicetype));
                         }
                     }
 
@@ -177,7 +177,7 @@ Torc1WireDeviceFactory* Torc1WireDeviceFactory::NextFactory(void) const
 }
 
 static const QString wire1InputTypes =
-"<xs:simpleType name='ds18b20SerialType'>\r\n"
+QStringLiteral("<xs:simpleType name='ds18b20SerialType'>\r\n"
 "  <xs:restriction base='xs:string'>\r\n"
 "    <xs:pattern value='28-[0-9a-fA-F]{12}'/>\r\n"
 "  </xs:restriction>\r\n"
@@ -194,17 +194,17 @@ static const QString wire1InputTypes =
 "  <xs:choice minOccurs='1' maxOccurs='unbounded'>\r\n"
 "    <xs:element name='ds18b20' type='ds18b20Type'/>\r\n"
 "  </xs:choice>\r\n"
-"</xs:complexType>\r\n";
+"</xs:complexType>\r\n");
 
 static const QString wire1Inputs =
-"    <xs:element minOccurs='0' maxOccurs='1' name='wire1'   type='wire1Type'/>\r\n";
+QStringLiteral("    <xs:element minOccurs='0' maxOccurs='1' name='wire1'   type='wire1Type'/>\r\n");
 
 static const QString wire1Unique =
-"<!-- enforce unique 1Wire serial numbers -->\r\n"
+QStringLiteral("<!-- enforce unique 1Wire serial numbers -->\r\n"
 "<xs:unique name='uniqueWire1Serial'>\r\n"
 "<xs:selector xpath='.//wire1serial' />\r\n"
 "  <xs:field xpath='.' />\r\n"
-"</xs:unique>\r\n";
+"</xs:unique>\r\n");
 
 class Torc1WireXSDFactory : public TorcXSDFactory
 {

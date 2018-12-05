@@ -62,10 +62,10 @@ QString TorcUPNP::UUIDFromUSN(const QString &USN)
     QString result;
     QString usn = USN.trimmed();
 
-    if (usn.startsWith("uuid:"))
+    if (usn.startsWith(QStringLiteral("uuid:")))
     {
         usn = usn.mid(5);
-        int index = usn.indexOf("::");
+        int index = usn.indexOf(QStringLiteral("::"));
 
         if (index > -1)
             result = usn.left(index);

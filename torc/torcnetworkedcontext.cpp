@@ -50,10 +50,10 @@ TorcNetworkService::TorcNetworkService(const QString &Name, const QString &UUID,
     port(Port),
     host(),
     secure(Secure),
-    uiAddress(QString()),
+    uiAddress(QStringLiteral()),
     startTime(0),
     priority(-1),
-    apiVersion(QString()),
+    apiVersion(QStringLiteral()),
     connected(false),
     m_sources(Spontaneous),
     m_debugString(),
@@ -75,7 +75,7 @@ TorcNetworkService::TorcNetworkService(const QString &Name, const QString &UUID,
     }
 
     if (m_addresses.isEmpty())
-        m_debugString = "No address found";
+        m_debugString = QStringLiteral("No address found");
     else
         m_debugString = TorcNetwork::IPAddressToLiteral(m_addresses[m_preferredAddressIndex], port);
 
@@ -155,7 +155,7 @@ void TorcNetworkService::Connect(void)
     // sanity check
     if (m_addresses.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, "No valid peer addresses");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("No valid peer addresses"));
         return;
     }
 
@@ -182,11 +182,11 @@ void TorcNetworkService::Connect(void)
 
     if (WeActAsServer(priority, startTime, uuid))
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Not connecting to %1 - we have priority").arg(m_debugString));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Not connecting to %1 - we have priority").arg(m_debugString));
         return;
     }
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Trying to connect to %1").arg(m_debugString));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Trying to connect to %1").arg(m_debugString));
 
     m_webSocketThread = new TorcWebSocketThread(m_addresses.at(m_preferredAddressIndex), port, secure);
     connect(m_webSocketThread, &TorcWebSocketThread::Finished,           this, &TorcNetworkService::Disconnected);
@@ -245,12 +245,12 @@ void TorcNetworkService::Connected(void)
     TorcWebSocketThread *thread = static_cast<TorcWebSocketThread*>(sender());
     if (m_webSocketThread && m_webSocketThread == thread)
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Connection established with %1").arg(m_debugString));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Connection established with %1").arg(m_debugString));
         emit TryConnect();
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, "Unknown WebSocket connected...");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Unknown WebSocket connected..."));
     }
 }
 
@@ -259,7 +259,7 @@ void TorcNetworkService::Disconnected(void)
     TorcWebSocketThread *thread = static_cast<TorcWebSocketThread*>(sender());
     if (m_webSocketThread && m_webSocketThread == thread)
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Connection with %1 closed").arg(m_debugString));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Connection with %1 closed").arg(m_debugString));
         m_webSocketThread->quit();
         m_webSocketThread->wait();
         delete m_webSocketThread;
@@ -280,7 +280,7 @@ void TorcNetworkService::Disconnected(void)
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, "Unknown WebSocket disconnected...");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Unknown WebSocket disconnected..."));
     }
 }
 
@@ -296,12 +296,12 @@ void TorcNetworkService::RequestReady(TorcNetworkRequest *Request)
         {
             QJsonObject object = jsonresult.object();
 
-            if (object.contains("details"))
+            if (object.contains(QStringLiteral("details")))
             {
-                QJsonObject   details   = object["details"].toObject();
-                QJsonValueRef jpriority  = details["priority"];
-                QJsonValueRef jstarttime = details["starttime"];
-                QJsonValueRef jversion   = details["version"];
+                QJsonObject   details   = object.value(QStringLiteral("details")).toObject();
+                QJsonValueRef jpriority  = details[QStringLiteral("priority")];
+                QJsonValueRef jstarttime = details[QStringLiteral("starttime")];
+                QJsonValueRef jversion   = details[QStringLiteral("version")];
 
                 if (!jpriority.isNull() && !jstarttime.isNull() && !jversion.isNull())
                 {
@@ -318,20 +318,20 @@ void TorcNetworkService::RequestReady(TorcNetworkRequest *Request)
                 }
                 else
                 {
-                    LOG(VB_GENERAL, LOG_ERR, "Failed to retrieve peer information");
+                    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to retrieve peer information"));
                 }
             }
             else
             {
-                LOG(VB_GENERAL, LOG_ERR, "Failed to find 'details' in peer response");
+                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to find 'details' in peer response"));
             }
         }
         else
         {
-            LOG(VB_GENERAL, LOG_ERR, "Error parsing API return - expecting JSON object");
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Error parsing API return - expecting JSON object"));
         }
 
-        LOG(VB_GENERAL, LOG_ERR, QString("Response:\r\n%1").arg(jsonresult.toJson().constData()));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Response:\r\n%1").arg(jsonresult.toJson().constData()));
 
         // try again...
         ScheduleRetry();
@@ -351,20 +351,21 @@ void TorcNetworkService::RequestReady(TorcRPCRequest *Request)
 
         if (state & TorcRPCRequest::TimedOut)
         {
-            message = "Timed out";
+            message = QStringLiteral("Timed out");
         }
         else if (state & TorcRPCRequest::Cancelled)
         {
-            message = "Cancelled";
+            message = QStringLiteral("Cancelled");
         }
         else if (state & TorcRPCRequest::Errored)
         {
             QVariantMap map  = m_getPeerDetailsRPC->GetReply().toMap();
-            QVariant error = map["error"];
+            QVariant error = map.value(QStringLiteral("error"));
             if (error.type() == QVariant::Map)
             {
                 QVariantMap errors = error.toMap();
-                message = QString("'%1' (%2)").arg(errors.value("message").toString()).arg(errors.value("code").toInt());
+                message = QStringLiteral("'%1' (%2)").arg(errors.value(QStringLiteral("message")).toString())
+                                                     .arg(errors.value(QStringLiteral("code")).toInt());
             }
         }
         else if (state & TorcRPCRequest::ReplyReceived)
@@ -372,9 +373,9 @@ void TorcNetworkService::RequestReady(TorcRPCRequest *Request)
             if (m_getPeerDetailsRPC->GetReply().type() == QVariant::Map)
             {
                 QVariantMap map     = m_getPeerDetailsRPC->GetReply().toMap();
-                QVariant vpriority  = map["priority"];
-                QVariant vstarttime = map["starttime"];
-                QVariant vversion   = map["version"];
+                QVariant vpriority  = map.value(QStringLiteral("priority"));
+                QVariant vstarttime = map.value(QStringLiteral("starttime"));
+                QVariant vversion   = map.value(QStringLiteral("version"));
 
                 if (!vpriority.isNull() && !vstarttime.isNull() && !vversion.isNull())
                 {
@@ -390,18 +391,18 @@ void TorcNetworkService::RequestReady(TorcRPCRequest *Request)
                 }
                 else
                 {
-                    message = "Incomplete details";
+                    message = QStringLiteral("Incomplete details");
                 }
             }
             else
             {
-                message = QString("Unexpected variant type %1").arg(m_getPeerDetailsRPC->GetReply().type());
+                message = QStringLiteral("Unexpected variant type %1").arg(m_getPeerDetailsRPC->GetReply().type());
             }
         }
 
         if (!success)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Call to '%1' failed (%2)").arg(m_getPeerDetailsRPC->GetMethod(), message));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Call to '%1' failed (%2)").arg(m_getPeerDetailsRPC->GetMethod(), message));
             ScheduleRetry();
         }
 
@@ -410,13 +411,13 @@ void TorcNetworkService::RequestReady(TorcRPCRequest *Request)
 
         if (success)
         {
-            LOG(VB_GENERAL, LOG_INFO, "Reply received");
+            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Reply received"));
             emit TryConnect();
         }
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, "Unknown request ready");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Unknown request ready"));
     }
 }
 
@@ -437,19 +438,19 @@ void TorcNetworkService::QueryPeerDetails(void)
     {
         if (m_getPeerDetails)
         {
-            LOG(VB_GENERAL, LOG_ERR, "Already running GetDetails HTTP request");
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Already running GetDetails HTTP request"));
             return;
         }
 
-        LOG(VB_GENERAL, LOG_INFO, "Querying peer details over HTTP");
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Querying peer details over HTTP"));
 
         QUrl url;
-        url.setScheme(secure ? "https" : "http");
+        url.setScheme(secure ? QStringLiteral("https") : QStringLiteral("http"));
         url.setPort(port);
         url.setHost(m_addresses.value(m_preferredAddressIndex).toString());
-        url.setPath("/services/GetDetails");
+        url.setPath(QStringLiteral("/services/GetDetails"));
         QNetworkRequest networkrequest(url);
-        networkrequest.setRawHeader("Accept", "application/json");
+        networkrequest.setRawHeader(QByteArrayLiteral("Accept"), QByteArrayLiteral("application/json"));
 
         m_getPeerDetails = new TorcNetworkRequest(networkrequest, QNetworkAccessManager::GetOperation, 0, &m_abort);
         TorcNetwork::GetAsynchronous(m_getPeerDetails, this);
@@ -460,11 +461,11 @@ void TorcNetworkService::QueryPeerDetails(void)
     // perform JSON-RPC call over socket
     if (m_getPeerDetailsRPC)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Already running GetDetails RPC");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Already running GetDetails RPC"));
         return;
     }
 
-    m_getPeerDetailsRPC = new TorcRPCRequest("/services/GetDetails", this);
+    m_getPeerDetailsRPC = new TorcRPCRequest(QStringLiteral("/services/GetDetails"), this);
     RemoteRequest(m_getPeerDetailsRPC);
 }
 
@@ -476,7 +477,7 @@ void TorcNetworkService::SetWebSocketThread(TorcWebSocketThread *Thread)
     // guard against incorrect use
     if (m_webSocketThread)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Already have websocket - closing new socket");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Already have websocket - closing new socket"));
         Thread->quit();
         return;
     }
@@ -497,7 +498,7 @@ void TorcNetworkService::RemoteRequest(TorcRPCRequest *Request)
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, "Cannot fulfill remote request - not connected");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Cannot fulfill remote request - not connected"));
         Request->DownRef();
     }
 }
@@ -510,20 +511,20 @@ void TorcNetworkService::CancelRequest(TorcRPCRequest *Request)
     if (m_webSocketThread)
         m_webSocketThread->CancelRequest(Request);
     else
-        LOG(VB_GENERAL, LOG_ERR, "Cannot cancel request - not connected");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Cannot cancel request - not connected"));
 }
 
 QVariant TorcNetworkService::ToMap(void)
 {
     QVariantMap result;
-    result.insert("name",      name);
-    result.insert("uuid",      uuid);
-    result.insert("port",      port);
-    result.insert("uiAddress", uiAddress);
-    result.insert("address",   m_addresses.isEmpty() ? "INValid" : TorcNetwork::IPAddressToLiteral(m_addresses[m_preferredAddressIndex], 0));
-    result.insert("host",      host);
+    result.insert(QStringLiteral("name"),      name);
+    result.insert(QStringLiteral("uuid"),      uuid);
+    result.insert(QStringLiteral("port"),      port);
+    result.insert(QStringLiteral("uiAddress"), uiAddress);
+    result.insert(QStringLiteral("address"),   m_addresses.isEmpty() ? QStringLiteral("INValid") : TorcNetwork::IPAddressToLiteral(m_addresses[m_preferredAddressIndex], 0));
+    result.insert(QStringLiteral("host"),      host);
     if (secure)
-        result.insert("secure", "yes");
+        result.insert(QStringLiteral("secure"), QStringLiteral("yes"));
     return result;
 }
 
@@ -568,7 +569,7 @@ void TorcNetworkService::RemoveSource(ServiceSource Source)
     m_sources &= !Source;
 }
 
-#define BLACKLIST QString("submit,revert")
+#define BLACKLIST QStringLiteral("submit,revert")
 
 /*! \class TorcNetworkedContext
  *  \brief A class to discover and connect to other Torc applications.
@@ -587,7 +588,7 @@ void TorcNetworkService::RemoveSource(ServiceSource Source)
  */
 TorcNetworkedContext::TorcNetworkedContext()
   : QObject(),
-    TorcHTTPService(this, "peers", "peers", TorcNetworkedContext::staticMetaObject, BLACKLIST),
+    TorcHTTPService(this, QStringLiteral("peers"), QStringLiteral("peers"), TorcNetworkedContext::staticMetaObject, BLACKLIST),
     m_discoveredServices(),
     m_serviceList(),
     peers()
@@ -612,7 +613,7 @@ TorcNetworkedContext::~TorcNetworkedContext()
     gLocalContext->RemoveObserver(this);
 
     if (!m_discoveredServices.isEmpty())
-        LOG(VB_GENERAL, LOG_INFO, QString("Removing %1 discovered peers").arg(m_discoveredServices.size()));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Removing %1 discovered peers").arg(m_discoveredServices.size()));
     while (!m_discoveredServices.isEmpty())
         delete m_discoveredServices.takeLast();
 }
@@ -664,21 +665,21 @@ bool TorcNetworkedContext::event(QEvent *Event)
         TorcEvent *event = static_cast<TorcEvent*>(Event);
         if (event && (event->GetEvent() == Torc::ServiceDiscovered || event->GetEvent() == Torc::ServiceWentAway))
         {
-            if (event->Data().contains("txtrecords"))
+            if (event->Data().contains(QStringLiteral("txtrecords")))
             {
                 // txtrecords is Bonjour specific
-                QMap<QByteArray,QByteArray> records = TorcBonjour::TxtRecordToMap(event->Data().value("txtrecords").toByteArray());
+                QMap<QByteArray,QByteArray> records = TorcBonjour::TxtRecordToMap(event->Data().value(QStringLiteral("txtrecords")).toByteArray());
 
-                if (records.contains("uuid"))
+                if (records.contains(QByteArrayLiteral("uuid")))
                 {
-                    QByteArray uuid  = records.value("uuid");
+                    QByteArray uuid  = records.value(QByteArrayLiteral("uuid"));
 
                     if (event->GetEvent() == Torc::ServiceDiscovered)
                     {
                         if (uuid == gLocalContext->GetUuid().toLatin1())
                         {
                             // this is our own external Bonjour host name
-                            TorcNetwork::AddHostName(event->Data().value("host").toString());
+                            TorcNetwork::AddHostName(event->Data().value(QByteArrayLiteral("host")).toString());
                         }
                         else if (m_serviceList.contains(uuid))
                         {
@@ -690,7 +691,7 @@ bool TorcNetworkedContext::event(QEvent *Event)
                         }
                         else
                         {
-                            QStringList addresses = event->Data().value("addresses").toStringList();
+                            QStringList addresses = event->Data().value(QStringLiteral("addresses")).toStringList();
 
                             QList<QHostAddress> hosts;
                             foreach (const QString &address, addresses)
@@ -700,7 +701,7 @@ bool TorcNetworkedContext::event(QEvent *Event)
                                 QHostAddress hostaddress(address);
                                 if (!TorcNetwork::IsExternal(hostaddress) && !hostaddress.isLoopback())
                                 {
-                                    LOG(VB_GENERAL, LOG_INFO, QString("Ignoring peer address '%1' - address is unreachable").arg(address));
+                                    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Ignoring peer address '%1' - address is unreachable").arg(address));
                                 }
                                 else
                                 {
@@ -708,24 +709,24 @@ bool TorcNetworkedContext::event(QEvent *Event)
                                 }
                             }
 
-                            QString host = event->Data().value("host").toString();
+                            QString host = event->Data().value(QStringLiteral("host")).toString();
 
                             if (hosts.isEmpty())
                             {
-                                LOG(VB_GENERAL, LOG_WARNING, QString("Ignoring peer '%1' - no useable network addresses.").arg(host));
+                                LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Ignoring peer '%1' - no useable network addresses.").arg(host));
                             }
                             else
                             {
-                                QString name = event->Data().value("name").toString();
-                                QByteArray txtrecords = event->Data().value("txtrecords").toByteArray();
+                                QString name = event->Data().value(QStringLiteral("name")).toString();
+                                QByteArray txtrecords = event->Data().value(QStringLiteral("txtrecords")).toByteArray();
                                 QMap<QByteArray,QByteArray> map = TorcBonjour::TxtRecordToMap(txtrecords);
-                                QString version       = QString(map.value("apiversion"));
-                                qint64 starttime      = map.value("starttime").toULongLong();
-                                int priority          = map.value("priority").toInt();
-                                bool secure           = map.contains("secure");
+                                QString version       = QString(map.value(QByteArrayLiteral("apiversion")));
+                                qint64 starttime      = map.value(QByteArrayLiteral("starttime")).toULongLong();
+                                int priority          = map.value(QByteArrayLiteral("priority")).toInt();
+                                bool secure           = map.contains(QByteArrayLiteral("secure"));
 
                                 // create the new peer
-                                TorcNetworkService *service = new TorcNetworkService(name, uuid, event->Data().value("port").toInt(),
+                                TorcNetworkService *service = new TorcNetworkService(name, uuid, event->Data().value(QStringLiteral("port")).toInt(),
                                                                                      secure, hosts);
                                 service->SetAPIVersion(version);
                                 service->SetPriority(priority);
@@ -744,16 +745,16 @@ bool TorcNetworkedContext::event(QEvent *Event)
                     else if (event->GetEvent() == Torc::ServiceWentAway)
                     {
                         if (uuid == gLocalContext->GetUuid().toLatin1())
-                            TorcNetwork::RemoveHostName(event->Data().value("host").toString());
+                            TorcNetwork::RemoveHostName(event->Data().value(QStringLiteral("host")).toString());
                         else
                             Remove(uuid, TorcNetworkService::Bonjour);
                     }
                 }
             }
-            else if (event->Data().contains("usn"))
+            else if (event->Data().contains(QStringLiteral("usn")))
             {
                 // USN == Unique Service Name (UPnP)
-                QString usn      = event->Data().value("usn").toString();
+                QString usn      = event->Data().value(QStringLiteral("usn")).toString();
                 QString uuid     = TorcUPNP::UUIDFromUSN(usn);
 
                 if (event->GetEvent() == Torc::ServiceWentAway)
@@ -777,15 +778,15 @@ bool TorcNetworkedContext::event(QEvent *Event)
                     else
                     {
                         // need name, uuid, port, hosts, apiversion, priority, starttime, host?
-                        QUrl location(event->Data().value("address").toString());
-                        QString name = event->Data().value("name").toString();
-                        bool secure = event->Data().contains("secure");
+                        QUrl location(event->Data().value(QStringLiteral("address")).toString());
+                        QString name = event->Data().value(QStringLiteral("name")).toString();
+                        bool secure = event->Data().contains(QStringLiteral("secure"));
                         QList<QHostAddress> hosts;
                         hosts << QHostAddress(location.host());
                         TorcNetworkService *service = new TorcNetworkService(name, uuid, location.port(), secure, hosts);
-                        service->SetAPIVersion(event->Data().value("apiversion").toString());
-                        service->SetPriority(event->Data().value("priority").toInt());
-                        service->SetStartTime(event->Data().value("starttime").toULongLong());
+                        service->SetAPIVersion(event->Data().value(QStringLiteral("apiversion")).toString());
+                        service->SetPriority(event->Data().value(QStringLiteral("priority")).toInt());
+                        service->SetStartTime(event->Data().value(QStringLiteral("starttime")).toULongLong());
                         service->SetHost(location.host());
                         service->SetSource(TorcNetworkService::UPnP);
                         Add(service);
@@ -811,7 +812,7 @@ void TorcNetworkedContext::PeerConnected(TorcWebSocketThread* Thread, const QVar
 
     if (!gNetworkedContext)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Upgrade request but no TorcNetworkedContext singleton");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Upgrade request but no TorcNetworkedContext singleton"));
         return;
     }
 
@@ -827,7 +828,7 @@ void TorcNetworkedContext::RemoteRequest(const QString &UUID, TorcRPCRequest *Re
 
     if (!gNetworkedContext)
     {
-        LOG(VB_GENERAL, LOG_ERR, "RemoteRequest but no TorcNetworkedContext singleton");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("RemoteRequest but no TorcNetworkedContext singleton"));
         return;
     }
 
@@ -847,7 +848,7 @@ void TorcNetworkedContext::CancelRequest(const QString &UUID, TorcRPCRequest *Re
 
     if (!gNetworkedContext)
     {
-        LOG(VB_GENERAL, LOG_ERR, "CancelRequest but no TorcNetworkedContext singleton");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("CancelRequest but no TorcNetworkedContext singleton"));
         return;
     }
 
@@ -863,7 +864,7 @@ void TorcNetworkedContext::CancelRequest(const QString &UUID, TorcRPCRequest *Re
                 QThread::msleep(1);
 
             if (Request->IsShared())
-                LOG(VB_GENERAL, LOG_ERR, "Request is still shared after cancellation");
+                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Request is still shared after cancellation"));
         }
     }
 }
@@ -883,7 +884,7 @@ void TorcNetworkedContext::HandleNewRequest(const QString &UUID, TorcRPCRequest 
         }
     }
 
-    LOG(VB_GENERAL, LOG_WARNING, QString("Connection identified by '%1' unknown").arg(UUID));
+    LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Connection identified by '%1' unknown").arg(UUID));
 }
 
 void TorcNetworkedContext::HandleCancelRequest(const QString &UUID, TorcRPCRequest *Request)
@@ -901,7 +902,7 @@ void TorcNetworkedContext::HandleCancelRequest(const QString &UUID, TorcRPCReque
         }
     }
 
-    LOG(VB_GENERAL, LOG_WARNING, QString("Connection identified by '%1' unknown").arg(UUID));
+    LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Connection identified by '%1' unknown").arg(UUID));
 }
 
 void TorcNetworkedContext::SubscriberDeleted(QObject *Subscriber)
@@ -914,17 +915,17 @@ void TorcNetworkedContext::HandleNewPeer(TorcWebSocketThread *Thread, const QVar
     if (!Thread)
         return;
 
-    QString UUID       = Data.value("uuid").toString();
-    QString name       = Data.value("name").toString();
-    int     port       = Data.value("port").toInt();
-    QString apiversion = Data.value("apiversion").toString();
-    int     priority   = Data.value("priority").toInt();
-    qint64  starttime  = Data.value("starttime").toULongLong();
-    QHostAddress address(Data.value("address").toString());
+    QString UUID       = Data.value(QStringLiteral("uuid")).toString();
+    QString name       = Data.value(QStringLiteral("name")).toString();
+    int     port       = Data.value(QStringLiteral("port")).toInt();
+    QString apiversion = Data.value(QStringLiteral("apiversion")).toString();
+    int     priority   = Data.value(QStringLiteral("priority")).toInt();
+    qint64  starttime  = Data.value(QStringLiteral("starttime")).toULongLong();
+    QHostAddress address(Data.value(QStringLiteral("address")).toString());
 
     if (UUID.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Received WebSocket for peer without UUID (%1) - closing").arg(name));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Received WebSocket for peer without UUID (%1) - closing").arg(name));
         Thread->quit();
         return;
     }
@@ -936,7 +937,7 @@ void TorcNetworkedContext::HandleNewPeer(TorcWebSocketThread *Thread, const QVar
         {
             if (m_discoveredServices[i]->GetUuid() == UUID && !TorcNetworkService::WeActAsServer(priority, starttime, UUID))
             {
-                LOG(VB_GENERAL, LOG_INFO, QString("Received unexpected WebSocket from peer '%1' (%2) - closing")
+                LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Received unexpected WebSocket from peer '%1' (%2) - closing")
                     .arg(m_discoveredServices.value(i)->GetName(), UUID));
                 Thread->quit();
                 return;
@@ -947,10 +948,10 @@ void TorcNetworkedContext::HandleNewPeer(TorcWebSocketThread *Thread, const QVar
     TorcWebSocketThread* thread = TorcHTTPServer::TakeSocket(Thread);
     if (Thread == thread)
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Received WebSocket for new peer '%1' (%2)").arg(name, UUID));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Received WebSocket for new peer '%1' (%2)").arg(name, UUID));
         QList<QHostAddress> addresses;
         addresses << address;
-        TorcNetworkService *service = new TorcNetworkService(name, UUID, port, Data.contains("secure"), addresses);
+        TorcNetworkService *service = new TorcNetworkService(name, UUID, port, Data.contains(QStringLiteral("secure")), addresses);
         service->SetWebSocketThread(thread);
         service->SetAPIVersion(apiversion);
         service->SetPriority(priority);
@@ -959,7 +960,7 @@ void TorcNetworkedContext::HandleNewPeer(TorcWebSocketThread *Thread, const QVar
         return;
     }
 
-    LOG(VB_GENERAL, LOG_ERR, QString("Failed to take ownership of WebSocket from %1").arg(TorcNetwork::IPAddressToLiteral(address, port)));
+    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to take ownership of WebSocket from %1").arg(TorcNetwork::IPAddressToLiteral(address, port)));
 }
 
 void TorcNetworkedContext::Add(TorcNetworkService *Peer)
@@ -973,7 +974,7 @@ void TorcNetworkedContext::Add(TorcNetworkService *Peer)
 
         m_serviceList.append(Peer->GetUuid());
         emit PeersChanged();
-        LOG(VB_GENERAL, LOG_INFO, QString("New Torc peer '%1' %2").arg(Peer->GetName(), Peer->GetUuid()));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("New Torc peer '%1' %2").arg(Peer->GetName(), Peer->GetUuid()));
     }
 }
 
@@ -1003,7 +1004,7 @@ void TorcNetworkedContext::Remove(const QString &UUID, TorcNetworkService::Servi
 
         (void)m_serviceList.removeAll(UUID);
         emit PeersChanged();
-        LOG(VB_GENERAL, LOG_INFO, QString("Torc peer %1 went away").arg(UUID));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Torc peer %1 went away").arg(UUID));
     }
 }
 
@@ -1023,7 +1024,7 @@ static class TorcNetworkedContextObject : public TorcAdminObject, public TorcStr
 
     void GetStrings(QVariantMap &Strings)
     {
-        Strings.insert("NoPeers", QCoreApplication::translate("TorcNetworkedContext", "No other Torc devices detected"));
+        Strings.insert(QStringLiteral("NoPeers"), QCoreApplication::translate("TorcNetworkedContext", "No other Torc devices detected"));
         // this is here to capture the plural translation
         (void)QCoreApplication::translate("TorcNetworkedContext", "%n other Torc device(s) discovered", nullptr, 2);
     }

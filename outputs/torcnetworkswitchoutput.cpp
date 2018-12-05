@@ -24,7 +24,7 @@
 #include "torcnetworkswitchoutput.h"
 
 TorcNetworkSwitchOutput::TorcNetworkSwitchOutput(double Default, const QVariantMap &Details)
-  : TorcSwitchOutput(Default, "NetworkSwitchOutput", Details)
+  : TorcSwitchOutput(Default, QStringLiteral("NetworkSwitchOutput"), Details)
 {
 }
 

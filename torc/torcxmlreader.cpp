@@ -48,14 +48,14 @@ TorcXMLReader::TorcXMLReader(const QString &File)
 {
     if (!QFile::exists(File))
     {
-        m_message = QString("File '%1' does not exist").arg(File);
+        m_message = QStringLiteral("File '%1' does not exist").arg(File);
         return;
     }
 
     QFile file(File);
     if (!file.open(QIODevice::ReadOnly))
     {
-        m_message = QString("Cannot open file '%1' for reading").arg(File);
+        m_message = QStringLiteral("Cannot open file '%1' for reading").arg(File);
         return;
     }
 
@@ -116,7 +116,7 @@ bool TorcXMLReader::ReadElement(QVariantMap &Map)
         switch (m_reader.readNext())
         {
             case QXmlStreamReader::Invalid:
-                m_message = QString("XML error: '%1' at line %2:%3").arg(m_reader.errorString()).arg(m_reader.lineNumber()).arg(m_reader.columnNumber());
+                m_message = QStringLiteral("XML error: '%1' at line %2:%3").arg(m_reader.errorString()).arg(m_reader.lineNumber()).arg(m_reader.columnNumber());
                 return false;
             case QXmlStreamReader::EntityReference:
             case QXmlStreamReader::Characters:

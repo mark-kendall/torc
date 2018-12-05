@@ -80,9 +80,9 @@ QString TorcWebSocketToken::GetWebSocketToken(const QString &Host, const QString
                 return Current;
             }
             tokens.remove(Current);
-            LOG(VB_GENERAL, LOG_ERR, "Host mismatch for websocket authentication");
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Host mismatch for websocket authentication"));
         }
-        return QString("ErroR");
+        return QStringLiteral("ErroR");
     }
 
     // create new

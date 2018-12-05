@@ -26,13 +26,13 @@
 #include "torccentral.h"
 #include "torcoutputs.h"
 
-#define BLACKLIST QString("")
+#define BLACKLIST QStringLiteral("")
 
 TorcOutputs* TorcOutputs::gOutputs = new TorcOutputs();
 
 TorcOutputs::TorcOutputs()
   : QObject(),
-    TorcHTTPService(this, OUTPUTS_DIRECTORY, "outputs", TorcOutputs::staticMetaObject, BLACKLIST),
+    TorcHTTPService(this, OUTPUTS_DIRECTORY, QStringLiteral("outputs"), TorcOutputs::staticMetaObject, BLACKLIST),
     outputList(),
     outputTypes()
 {
@@ -49,10 +49,10 @@ void TorcOutputs::Graph(QByteArray* Data)
         return;
 
     QString start =
-         QString("    subgraph cluster_2 {\r\n"
-                 "        label = \"%1\";\r\n"
-                 "        style=filled;\r\n"
-                 "        fillcolor=\"grey95\";\r\n").arg(tr("Outputs"));
+         QStringLiteral("    subgraph cluster_2 {\r\n"
+                        "        label = \"%1\";\r\n"
+                        "        style=filled;\r\n"
+                        "        fillcolor=\"grey95\";\r\n").arg(tr("Outputs"));
     Data->append(start);
 
     foreach(TorcOutput* output, outputList)
@@ -71,8 +71,8 @@ void TorcOutputs::Graph(QByteArray* Data)
 
         if (label.isEmpty())
             label = id;
-        QString link = url.isEmpty() ? QString() : QString(" href=\"%1\"").arg(url);
-        Data->append(QString("        \"%1\" [shape=record id=\"%1\" label=<<B>%2</B>%3>%4];\r\n").arg(id, label, desc, link));
+        QString link = url.isEmpty() ? QString() : QStringLiteral(" href=\"%1\"").arg(url);
+        Data->append(QStringLiteral("        \"%1\" [shape=record id=\"%1\" label=<<B>%2</B>%3>%4];\r\n").arg(id, label, desc, link));
     }
 
     Data->append("    }\r\n\r\n");
@@ -120,13 +120,13 @@ void TorcOutputs::AddOutput(TorcOutput *Output)
 
     if (outputList.contains(Output))
     {
-        LOG(VB_GENERAL, LOG_WARNING, QString("Already have output named %1 - ignoring").arg(Output->GetUniqueId()));
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Already have output named %1 - ignoring").arg(Output->GetUniqueId()));
         return;
     }
 
     Output->UpRef();
     outputList.append(Output);
-    LOG(VB_GENERAL, LOG_INFO, QString("Registered output %1").arg(Output->GetUniqueId()));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Registered output %1").arg(Output->GetUniqueId()));
     emit OutputsChanged();
 }
 
@@ -141,11 +141,11 @@ void TorcOutputs::RemoveOutput(TorcOutput *Output)
 
     if (!outputList.contains(Output))
     {
-        LOG(VB_GENERAL, LOG_WARNING, QString("Output %1 not recognised - cannot remove").arg(Output->GetUniqueId()));
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Output %1 not recognised - cannot remove").arg(Output->GetUniqueId()));
         return;
     }
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Output %1 deregistered").arg(Output->GetUniqueId()));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Output %1 deregistered").arg(Output->GetUniqueId()));
     Output->DownRef();
     outputList.removeOne(Output);
     emit OutputsChanged();

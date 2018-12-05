@@ -10,7 +10,7 @@
 #include "torchttpservice.h"
 #include "torcdevice.h"
 
-#define OUTPUTS_DIRECTORY QString("outputs")
+#define OUTPUTS_DIRECTORY QStringLiteral("outputs")
 
 class TorcOutput : public TorcDevice, public TorcHTTPService
 {
@@ -34,7 +34,7 @@ class TorcOutput : public TorcDevice, public TorcHTTPService
   public:
     TorcOutput(TorcOutput::Type Type, double Value, const QString &ModelId, const QVariantMap &Details);
     TorcOutput(TorcOutput::Type Type, double Value, const QString &ModelId, const QVariantMap &Details,
-               QObject *Output, const QMetaObject &MetaObject, const QString &Blacklist = QString(""));
+               QObject *Output, const QMetaObject &MetaObject, const QString &Blacklist = QStringLiteral(""));
 
     virtual ~TorcOutput() = default;
 

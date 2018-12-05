@@ -43,14 +43,14 @@ QStringList TorcLogNotifier::GetDescription(void)
 void TorcLogNotifier::Notify(const QVariantMap &Notification)
 {
     QString message = Notification.contains(NOTIFICATION_BODY) ? Notification.value(NOTIFICATION_BODY).toString() : UNKNOWN_BODY;
-    LOG(VB_GENERAL, LOG_INFO, QString("Notify: %1").arg(message));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Notify: %1").arg(message));
 }
 
 class TorcLogNotifierFactory final : public TorcNotifierFactory
 {
     TorcNotifier* Create(const QString &Type, const QVariantMap &Details) override
     {
-        if (Type == "log")
+        if (Type == QStringLiteral("log"))
             return new TorcLogNotifier(Details);
         return nullptr;
     }

@@ -52,7 +52,7 @@ void TorcXMLSerialiser::Prepare(QByteArray &Dest)
 void TorcXMLSerialiser::Begin(QByteArray &Dest)
 {
     (void)Dest;
-    m_xmlStream.writeStartDocument("1.0");
+    m_xmlStream.writeStartDocument(QStringLiteral("1.0"));
 }
 
 void TorcXMLSerialiser::End(QByteArray &Dest)
@@ -82,7 +82,7 @@ void TorcXMLSerialiser::VariantToXML(const QString &Name, const QVariant &Value)
         {
             QDateTime datetime(Value.toDateTime());
             if (datetime.isNull())
-                m_xmlStream.writeAttribute("xsi:nil", "true");
+                m_xmlStream.writeAttribute(QStringLiteral("xsi:nil"), QStringLiteral("true"));
             m_xmlStream.writeCharacters(datetime.toString(Qt::ISODate));
             return;
         }
@@ -100,7 +100,7 @@ void TorcXMLSerialiser::ListToXML(const QString &Name, const QVariantList &Value
         {
             if ((int)(*it).type() != type)
             {
-                VariantToXML("Error", QVARIANT_ERROR);
+                VariantToXML(QStringLiteral("Error"), QVARIANT_ERROR);
                 return;
             }
         }
@@ -122,7 +122,7 @@ void TorcXMLSerialiser::StringListToXML(const QString &Name, const QStringList &
     QStringList::const_iterator it = Value.begin();
     for ( ; it != Value.end(); ++it)
     {
-        m_xmlStream.writeStartElement("String");
+        m_xmlStream.writeStartElement(QStringLiteral("String"));
         m_xmlStream.writeCharacters((*it));
         m_xmlStream.writeEndElement();
     }
@@ -142,7 +142,7 @@ void TorcXMLSerialiser::MapToXML(const QString &Name, const QVariantMap &Value)
 class TorcXMLSerialiserFactory : public TorcSerialiserFactory
 {
   public:
-    TorcXMLSerialiserFactory() : TorcSerialiserFactory("application", "xml", "XML")
+    TorcXMLSerialiserFactory() : TorcSerialiserFactory(QStringLiteral("application"), QStringLiteral("xml"), QStringLiteral("XML"))
     {
     }
 

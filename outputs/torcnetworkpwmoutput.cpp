@@ -24,7 +24,7 @@
 #include "torcnetworkpwmoutput.h"
 
 TorcNetworkPWMOutput::TorcNetworkPWMOutput(double Default, const QVariantMap &Details)
-  : TorcPWMOutput(Default, "NetworkPWMOutput", Details)
+  : TorcPWMOutput(Default, QStringLiteral("NetworkPWMOutput"), Details)
 {
 }
 

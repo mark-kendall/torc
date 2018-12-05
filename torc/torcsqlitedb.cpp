@@ -40,7 +40,7 @@
  * \sa TorcDB
 */
 TorcSQLiteDB::TorcSQLiteDB(const QString &DatabaseName)
-  : TorcDB(DatabaseName, "QSQLITE")
+  : TorcDB(DatabaseName, QStringLiteral("QSQLITE"))
 {
     InitDatabase();
 }
@@ -51,26 +51,26 @@ TorcSQLiteDB::TorcSQLiteDB(const QString &DatabaseName)
 bool TorcSQLiteDB::InitDatabase(void)
 {
     QMutexLocker locker(&m_lock);
-    LOG(VB_GENERAL, LOG_INFO, QString("Attempting to open '%1'")
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Attempting to open '%1'")
         .arg(m_databaseName));
 
     QSqlDatabase db = QSqlDatabase::database(GetThreadConnection());
     DebugError(&db);
     if (!db.isValid())
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to get valid database connection.");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to get valid database connection."));
         return false;
     }
 
     if (!db.open())
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to open database.");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to open database."));
         return false;
     }
 
     QSqlQuery query(db);
 
-    query.exec("PRAGMA locking_mode = NORMAL");
+    query.exec(QStringLiteral("PRAGMA locking_mode = NORMAL"));
     if (DebugError(&query))
         return false;
 
@@ -81,35 +81,35 @@ bool TorcSQLiteDB::InitDatabase(void)
     DebugError(&query);
 
     // Check the creation date for existing installations
-    query.exec("SELECT value FROM settings where name='DB_DateCreated'");
+    query.exec(QStringLiteral("SELECT value FROM settings where name='DB_DateCreated'"));
     DebugError(&query);
 
     query.first();
     if (query.isValid())
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Settings table was created on %1")
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Settings table was created on %1")
             .arg(query.value(0).toString()));
     }
     else
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Initialising settings table."));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Initialising settings table."));
         QString createdon = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
         query.exec(
-            QString("INSERT INTO settings (name, value) VALUES ('DB_DateCreated', '%1');")
+            QStringLiteral("INSERT INTO settings (name, value) VALUES ('DB_DateCreated', '%1');")
                 .arg(createdon));
         DebugError(&query);
     }
 
     // optimise the database
-    query.exec("PRAGMA page_size = 4096");
+    query.exec(QStringLiteral("PRAGMA page_size = 4096"));
     DebugError(&query);
-    query.exec("PRAGMA cache_size = 16384");
+    query.exec(QStringLiteral("PRAGMA cache_size = 16384"));
     DebugError(&query);
-    query.exec("PRAGMA temp_store = MEMORY");
+    query.exec(QStringLiteral("PRAGMA temp_store = MEMORY"));
     DebugError(&query);
-    query.exec("PRAGMA journal_mode = OFF");
+    query.exec(QStringLiteral("PRAGMA journal_mode = OFF"));
     DebugError(&query);
-    query.exec("PRAGMA synchronous = OFF");
+    query.exec(QStringLiteral("PRAGMA synchronous = OFF"));
     DebugError(&query);
 
     m_databaseValid = true;

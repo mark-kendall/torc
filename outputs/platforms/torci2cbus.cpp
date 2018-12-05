@@ -82,26 +82,26 @@ void TorcI2CBus::Create(const QVariantMap &Details)
                 QVariantMap details = it2.value().toMap();
 
                 // device needs an address
-                if (!details.contains("i2caddress"))
+                if (!details.contains(QStringLiteral("i2caddress")))
                 {
-                    LOG(VB_GENERAL, LOG_ERR, QString("I2C device '%1' needs <i2caddress>").arg(it2.key()));
+                    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("I2C device '%1' needs <i2caddress>").arg(it2.key()));
                     continue;
                 }
 
                 bool ok = false;
                 // N.B. assumes hexadecimal 0xXX
-                int address = details.value("i2caddress").toString().toInt(&ok, 16);
+                int address = details.value(QStringLiteral("i2caddress")).toString().toInt(&ok, 16);
                 if (!ok)
                 {
-                    LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse I2C address from '%1' for device '%2'")
-                        .arg(details.value("address").toString(), it2.key()));
+                    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to parse I2C address from '%1' for device '%2'")
+                        .arg(details.value(QStringLiteral("address")).toString(), it2.key()));
                     continue;
                 }
 
                 // TODO - handle defining the same device in sensors and outputs
                 if (m_devices.contains(address))
                 {
-                    LOG(VB_GENERAL, LOG_ERR, QString("I2C bus already contains device at 0x%1 - ignoring").arg(address, 0, 16));
+                    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("I2C bus already contains device at 0x%1 - ignoring").arg(address, 0, 16));
                     continue;
                 }
 
@@ -117,7 +117,7 @@ void TorcI2CBus::Create(const QVariantMap &Details)
                 if (device)
                     m_devices.insert(address, device);
                 else
-                    LOG(VB_GENERAL, LOG_ERR, QString("Unable to find handler for I2C device '%1'").arg(it2.key()));
+                    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Unable to find handler for I2C device '%1'").arg(it2.key()));
             }
         }
     }
@@ -130,7 +130,7 @@ void TorcI2CBus::Destroy(void)
     qDeleteAll(m_devices);
     m_devices.clear();
 }
-static const QString i2cOutputTypes =
+static const QString i2cOutputTypes = QStringLiteral(
 "<xs:simpleType name='pca9685ChannelNumberType'>\r\n"
 "  <xs:restriction base='xs:integer'>\r\n"
 "    <xs:minInclusive value='0'/>\r\n"
@@ -159,17 +159,17 @@ static const QString i2cOutputTypes =
 "  <xs:choice minOccurs='1' maxOccurs='unbounded'>\r\n"
 "    <xs:element name='pca9685' type='pca9685Type'/>\r\n"
 "  </xs:choice>\r\n"
-"</xs:complexType>\r\n";
+"</xs:complexType>\r\n");
 
-static const QString i2cOutputs =
-"    <xs:element minOccurs='0' maxOccurs='1' name='i2c'     type='i2cType'/>\r\n";
+static const QString i2cOutputs = QStringLiteral(
+"    <xs:element minOccurs='0' maxOccurs='1' name='i2c'     type='i2cType'/>\r\n");
 
-static const QString i2cUnique =
+static const QString i2cUnique = QStringLiteral(
 "    <!-- enforce unique i2c addresses -->\r\n"
 "    <xs:unique name='uniqueI2CAddress'>\r\n"
 "      <xs:selector xpath='.//i2caddress' />\r\n"
 "      <xs:field xpath='.' />\r\n"
-"    </xs:unique>\r\n";
+"    </xs:unique>\r\n");
 
 
 class TorcI2CXSDFactory : public TorcXSDFactory

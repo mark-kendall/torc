@@ -36,16 +36,16 @@
  * allow for dimming etc.
 */
 TorcSystemInput::TorcSystemInput(double Value, const QVariantMap &Details)
-  : TorcInput(TorcInput::Started, Value, 0, 1, "SystemStarted", Details),
+  : TorcInput(TorcInput::Started, Value, 0, 1, QStringLiteral("SystemStarted"), Details),
     m_shutdownDelay(0)
 {
     gLocalContext->AddObserver(this);
     SetValid(true);
 
-    if (Details.contains("delay"))
+    if (Details.contains(QStringLiteral("delay")))
     {
         bool ok = false;
-        uint delay = Details.value("delay").toInt(&ok);
+        uint delay = Details.value(QStringLiteral("delay")).toInt(&ok);
         if (ok && (delay > 0))
         {
             gLocalContext->SetShutdownDelay(delay);
@@ -53,7 +53,7 @@ TorcSystemInput::TorcSystemInput(double Value, const QVariantMap &Details)
         }
         else
         {
-            LOG(VB_GENERAL, LOG_WARNING, "Failed to parse meaningful value for delay (>0)");
+            LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Failed to parse meaningful value for delay (>0)"));
         }
     }
 }

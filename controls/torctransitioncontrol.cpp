@@ -74,7 +74,7 @@ QEasingCurve::Type TorcTransitionControl::EasingCurveFromString(const QString &C
     if ("OUTINBOUNCE"  == curve) return QEasingCurve::OutInBounce;
     if ("LINEARLED"    == curve) return QEasingCurve::Custom;
 
-    LOG(VB_GENERAL, LOG_WARNING, QString("Failed to parse transition type from '%1'").arg(Curve));
+    LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Failed to parse transition type from '%1'").arg(Curve));
     return QEasingCurve::TCBSpline; // invalid
 }
 
@@ -154,44 +154,44 @@ TorcTransitionControl::TorcTransitionControl(const QString &Type, const QVariant
     m_type = EasingCurveFromString(Type);
     if (m_type == QEasingCurve::TCBSpline /*invalid*/)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Unknown transition type '%1' for device '%2'").arg(Type, uniqueId));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Unknown transition type '%1' for device '%2'").arg(Type, uniqueId));
         return;
     }
 
     // check duration
-    if (!Details.contains("duration"))
+    if (!Details.contains(QStringLiteral("duration")))
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Transition '%1' does not specify duration").arg(uniqueId));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Transition '%1' does not specify duration").arg(uniqueId));
         return;
     }
 
     int days, hours, minutes, seconds;
-    QString durations = Details.value("duration").toString();
+    QString durations = Details.value(QStringLiteral("duration")).toString();
     quint64 duration;
     if (!TorcControl::ParseTimeString(durations, days, hours, minutes, seconds, duration))
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse transition duration from '%1'").arg(durations));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to parse transition duration from '%1'").arg(durations));
         return;
     }
 
     // no point in having a zero length transition
     if (duration < 1)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Transition duration is invalid ('%1')").arg(duration));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Transition duration is invalid ('%1')").arg(duration));
         return;
     }
     m_duration = duration;
 
     // a transition can have a default value (0 or 1) to force the start state properly
-    if (Details.contains("default"))
+    if (Details.contains(QStringLiteral("default")))
     {
         bool ok = false;
-        int defaultvalue = Details.value("default").toInt(&ok);
+        int defaultvalue = Details.value(QStringLiteral("default")).toInt(&ok);
         if (ok)
         {
             if (defaultvalue == 0 || defaultvalue == 1)
             {
-                LOG(VB_GENERAL, LOG_INFO, QString("Setting default for '%1' to '%2'").arg(uniqueId).arg(defaultvalue));
+                LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Setting default for '%1' to '%2'").arg(uniqueId).arg(defaultvalue));
                 defaultValue = defaultvalue;
                 value        = defaultvalue; // NB safe to set during constructor
             }
@@ -203,7 +203,7 @@ TorcTransitionControl::TorcTransitionControl(const QString &Type, const QVariant
 
         if (!ok)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse default for transition '%1'").arg(uniqueId));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to parse default for transition '%1'").arg(uniqueId));
             return;
         }
     }
@@ -255,7 +255,7 @@ bool TorcTransitionControl::event(QEvent *Event)
 
 void TorcTransitionControl::Restart(void)
 {
-    LOG(VB_GENERAL, LOG_INFO, QString("Transition %1 restarting").arg(uniqueId));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Transition %1 restarting").arg(uniqueId));
     m_firstTrigger = true;
     CalculateOutput();
 }
@@ -275,14 +275,14 @@ bool TorcTransitionControl::Validate(void)
     // need one input and one input only
     if (m_inputs.size() != 1)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Transition device '%1' needs exactly one input").arg(uniqueId));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Transition device '%1' needs exactly one input").arg(uniqueId));
         return false;
     }
 
     // need at least one output
     if (m_outputs.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Transition device '%1' needs at least one output").arg(uniqueId));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Transition device '%1' needs at least one output").arg(uniqueId));
         return false;
     }
 
@@ -302,7 +302,7 @@ bool TorcTransitionControl::Validate(void)
     m_animation.setDuration(m_duration * 1000);
 
     // debug
-    LOG(VB_GENERAL, LOG_DEBUG, QString("%1: %2").arg(uniqueId, GetDescription().join(",")));
+    LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("%1: %2").arg(uniqueId, GetDescription().join(',')));
 
     return true;
 }
@@ -353,7 +353,7 @@ void TorcTransitionControl::CalculateOutput(void)
     // could also be 'smoothed' with a seperate transition.
 
     double newvalue = m_inputValues.constBegin().value();
-    LOG(VB_GENERAL, LOG_DEBUG, QString("Transition value: %1").arg(newvalue));
+    LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("Transition value: %1").arg(newvalue));
 
     if (m_firstTrigger)
     {
@@ -367,7 +367,7 @@ void TorcTransitionControl::CalculateOutput(void)
 
             if (timesincelasttransition > m_duration)
             {
-                LOG(VB_GENERAL, LOG_INFO, QString("Transition '%1' is initially inactive (value '%2')").arg(uniqueId).arg(newvalue));
+                LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Transition '%1' is initially inactive (value '%2')").arg(uniqueId).arg(newvalue));
                 SetValue(newvalue);
                 return;
             }
@@ -375,8 +375,8 @@ void TorcTransitionControl::CalculateOutput(void)
             // if we are part way through the transition, the animation will expect the value to have started
             // from the previous transition value !:)
             SetValue(newvalue > 0 ? 0 : 1);
-            LOG(VB_GENERAL, LOG_INFO, QString("Forcing transition '%1' to %2% complete (%3)").arg(uniqueId)
-                .arg(((double)timesincelasttransition / (double)m_duration) * 100.0).arg(newvalue ? "rising" : "falling"));
+            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Forcing transition '%1' to %2% complete (%3)").arg(uniqueId)
+                .arg(((double)timesincelasttransition / (double)m_duration) * 100.0).arg(newvalue ? QStringLiteral("rising") : QStringLiteral("falling")));
 
             if (newvalue < 1) // time can run backwards :)
                 timesincelasttransition = m_duration - timesincelasttransition;
@@ -385,7 +385,7 @@ void TorcTransitionControl::CalculateOutput(void)
         {
             if (qFuzzyCompare(GetValue() + 1.0, m_transitionValue + 1.0))
             {
-                LOG(VB_GENERAL, LOG_INFO, QString("Transition '%1' is initially inactive (value '%2')").arg(uniqueId).arg(newvalue));
+                LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Transition '%1' is initially inactive (value '%2')").arg(uniqueId).arg(newvalue));
                 return;
             }
         }

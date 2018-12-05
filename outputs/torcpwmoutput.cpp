@@ -38,7 +38,7 @@ TorcPWMOutput::TorcPWMOutput(double Value, const QString &ModelId, const QVarian
     QVariantMap::const_iterator it = Details.begin();
     for ( ; it != Details.constEnd(); ++it)
     {
-        if (it.key() == "resolution")
+        if (it.key() == QStringLiteral("resolution"))
         {
             bool ok = false;
             uint resolution = it.value().toUInt(&ok);
@@ -48,24 +48,24 @@ TorcPWMOutput::TorcPWMOutput(double Value, const QString &ModelId, const QVarian
                 {
                     if (resolution > m_maxResolution)
                     {
-                        LOG(VB_GENERAL, LOG_ERR, QString("Requested resolution of %1 for '%2' exceeds maximum - defaulting to %3")
+                        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Requested resolution of %1 for '%2' exceeds maximum - defaulting to %3")
                             .arg(resolution).arg(uniqueId).arg(m_maxResolution));
                     }
                     else
                     {
                         m_resolution = resolution;
-                        LOG(VB_GENERAL, LOG_INFO, QString("Set resolution to %1 for '%2'").arg(m_resolution).arg(uniqueId));
+                        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Set resolution to %1 for '%2'").arg(m_resolution).arg(uniqueId));
                     }
                 }
                 else
                 {
-                    LOG(VB_GENERAL, LOG_ERR, QString("Requested resolution of %1 for '%2' is out of range - defaulting to %3")
+                    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Requested resolution of %1 for '%2' is out of range - defaulting to %3")
                         .arg(resolution).arg(uniqueId).arg(m_maxResolution));
                 }
             }
             else
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse resolution for '%1'").arg(uniqueId));
+                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to parse resolution for '%1'").arg(uniqueId));
             }
         }
     }

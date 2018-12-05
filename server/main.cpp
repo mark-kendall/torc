@@ -50,7 +50,7 @@ int main(int argc, char **argv)
             if (justexit)
                 return ret;
 
-            if (!(cmdline.data()->GetValue("xsdtest").toString().isEmpty()))
+            if (!(cmdline.data()->GetValue(QStringLiteral("xsdtest")).toString().isEmpty()))
                 return TorcXSDTest::RunXSDTestSuite(cmdline.data());
 
             if (int error = TorcLocalContext::Create(cmdline.data()))

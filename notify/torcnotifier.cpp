@@ -34,7 +34,7 @@
  *  need to run in a full QThread (and not a QRunnable).
 */
 TorcNotifier::TorcNotifier(const QVariantMap &Details)
-  : TorcDevice(false, 0, 0, "Notifier", Details)
+  : TorcDevice(false, 0, 0, QStringLiteral("Notifier"), Details)
 {
 }
 

@@ -60,7 +60,7 @@
 */
 
 TorcWebSocketThread::TorcWebSocketThread(qintptr SocketDescriptor, bool Secure)
-  : TorcQThread("SocketIn"),
+  : TorcQThread(QStringLiteral("SocketIn")),
     m_webSocket(nullptr),
     m_secure(Secure),
     m_socketDescriptor(SocketDescriptor),
@@ -71,7 +71,7 @@ TorcWebSocketThread::TorcWebSocketThread(qintptr SocketDescriptor, bool Secure)
 }
 
 TorcWebSocketThread::TorcWebSocketThread(const QHostAddress &Address, quint16 Port, bool Secure, TorcWebSocketReader::WSSubProtocol Protocol)
-  : TorcQThread("SocketOut"),
+  : TorcQThread(QStringLiteral("SocketOut")),
     m_webSocket(nullptr),
     m_secure(Secure),
     m_socketDescriptor(0),
@@ -85,13 +85,13 @@ int SSLCallback(int, int, BN_GENCB*)
 {
     static int count = 0;
     if (!(++count % 20))
-        LOG(VB_GENERAL, LOG_INFO, "Key generation...");
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Key generation..."));
     return 1;
 }
 
 bool TorcWebSocketThread::CreateCerts(const QString &CertFile, const QString &KeyFile)
 {
-    LOG(VB_GENERAL, LOG_INFO, "Generating RSA key");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Generating RSA key"));
 
     RSA *rsa = RSA_new();
 
@@ -116,7 +116,7 @@ bool TorcWebSocketThread::CreateCerts(const QString &CertFile, const QString &Ke
 #endif
     if (nullptr == rsa)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to generate RSA key");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to generate RSA key"));
         return false;
     }
 
@@ -124,18 +124,18 @@ bool TorcWebSocketThread::CreateCerts(const QString &CertFile, const QString &Ke
     if(!EVP_PKEY_assign_RSA(privatekey, rsa))
     {
         EVP_PKEY_free(privatekey);
-        LOG(VB_GENERAL, LOG_ERR, "Failed to create RSA key");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to create RSA key"));
         return false;
     }
 
-    LOG(VB_GENERAL, LOG_INFO, "Generating X509 certificate");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Generating X509 certificate"));
     X509 *x509 = X509_new();
     // we need a unique serial number (or more strictly a unique combination of CA and serial number)
     QString timenow = QString::number(QDateTime::currentMSecsSinceEpoch());
-    LOG(VB_GENERAL, LOG_INFO, QString("New cert serial number: %1").arg(timenow));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("New cert serial number: %1").arg(timenow));
     BIGNUM *bn = BN_new();
     if (BN_dec2bn(&bn, timenow.toLatin1().constData()) != timenow.size())
-        LOG(VB_GENERAL, LOG_WARNING, "Conversion error");
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Conversion error"));
     ASN1_INTEGER *sno = ASN1_INTEGER_new();
     sno = BN_to_ASN1_INTEGER(bn, sno);
     X509_set_serialNumber(x509, sno);
@@ -154,7 +154,7 @@ bool TorcWebSocketThread::CreateCerts(const QString &CertFile, const QString &Ke
     {
         X509_free(x509);
         EVP_PKEY_free(privatekey);
-        LOG(VB_GENERAL, LOG_ERR, "Failed to sign certificate");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to sign certificate"));
         return false;
     }
 
@@ -163,7 +163,7 @@ bool TorcWebSocketThread::CreateCerts(const QString &CertFile, const QString &Ke
     {
         X509_free(x509);
         EVP_PKEY_free(privatekey);
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to open '%1' for writing").arg(CertFile));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to open '%1' for writing").arg(CertFile));
         return false;
     }
     bool success = PEM_write_X509(certfile, x509);
@@ -172,7 +172,7 @@ bool TorcWebSocketThread::CreateCerts(const QString &CertFile, const QString &Ke
     {
         X509_free(x509);
         EVP_PKEY_free(privatekey);
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to write to '%1'").arg(CertFile));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to write to '%1'").arg(CertFile));
         return false;
     }
 
@@ -181,7 +181,7 @@ bool TorcWebSocketThread::CreateCerts(const QString &CertFile, const QString &Ke
     {
         X509_free(x509);
         EVP_PKEY_free(privatekey);
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to open '%1' for writing").arg(KeyFile));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to open '%1' for writing").arg(KeyFile));
         return false;
     }
 
@@ -192,17 +192,17 @@ bool TorcWebSocketThread::CreateCerts(const QString &CertFile, const QString &Ke
 
     if (!success)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to write to '%1'").arg(KeyFile));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to write to '%1'").arg(KeyFile));
         return false;
     }
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Cert file saved as '%1'").arg(CertFile));
-    LOG(VB_GENERAL, LOG_INFO, QString("Key file saved as '%1'").arg(KeyFile));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Cert file saved as '%1'").arg(CertFile));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Key file saved as '%1'").arg(KeyFile));
 
     if (chmod(CertFile.toLocal8Bit().constData(), S_IRUSR | S_IWUSR) != 0)
-        LOG(VB_GENERAL, LOG_WARNING, QString("Failed to set permissions for '%1' - this is not fatal but may present a security risk").arg(CertFile));
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Failed to set permissions for '%1' - this is not fatal but may present a security risk").arg(CertFile));
     if (chmod(KeyFile.toLocal8Bit().constData(),  S_IRUSR | S_IWUSR) != 0)
-        LOG(VB_GENERAL, LOG_WARNING, QString("Failed to set permissions for '%1' - this is not fatal but may present a security risk").arg(KeyFile));
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Failed to set permissions for '%1' - this is not fatal but may present a security risk").arg(KeyFile));
     return true;
 }
 
@@ -228,25 +228,25 @@ void TorcWebSocketThread::SetupSSL(void)
 #endif
 
     QString certlocation = GetTorcConfigDir() + "/" + TORC_TORC + ".cert";
-    LOG(VB_GENERAL, LOG_INFO, QString("SSL: looking for cert in '%1'").arg(certlocation));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("SSL: looking for cert in '%1'").arg(certlocation));
     QString keylocation  = GetTorcConfigDir() + "/" + TORC_TORC + ".key";
-    LOG(VB_GENERAL, LOG_INFO, QString("SSL: looking for key in '%1'").arg(keylocation));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("SSL: looking for key in '%1'").arg(keylocation));
 
     bool create = false;
     if (!QFile::exists(certlocation))
     {
         create = true;
-        LOG(VB_GENERAL, LOG_WARNING, "Failed to find cert");
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Failed to find cert"));
     }
     if (!QFile::exists(keylocation))
     {
         create = true;
-        LOG(VB_GENERAL, LOG_WARNING, "Failed to find key");
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Failed to find key"));
     }
 
     if (create && !CreateCerts(certlocation, keylocation))
     {
-        LOG(VB_GENERAL, LOG_ERR, "SSL key/cert creation failed - server connections will fail");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("SSL key/cert creation failed - server connections will fail"));
         return;
     }
 
@@ -258,17 +258,17 @@ void TorcWebSocketThread::SetupSSL(void)
         if (!certificate.isNull())
         {
             config.setLocalCertificate(certificate);
-            LOG(VB_GENERAL, LOG_INFO, "SSL: cert loaded");
+            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("SSL: cert loaded"));
         }
         else
         {
-            LOG(VB_GENERAL, LOG_ERR, "SSL: error loading/reading cert file");
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("SSL: error loading/reading cert file"));
         }
         certFile.close();
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, "SSL: failed to open cert file for reading");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("SSL: failed to open cert file for reading"));
     }
 
     QFile keyFile(keylocation);
@@ -279,17 +279,17 @@ void TorcWebSocketThread::SetupSSL(void)
         if (!key.isNull())
         {
             config.setPrivateKey(key);
-            LOG(VB_GENERAL, LOG_INFO, "SSL: key loaded");
+            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("SSL: key loaded"));
         }
         else
         {
-            LOG(VB_GENERAL, LOG_ERR, "SSL: error loading/reading key file");
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("SSL: error loading/reading key file"));
         }
         keyFile.close();
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, "SSL: failed to open key file for reading");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("SSL: failed to open key file for reading"));
     }
     QSslConfiguration::setDefaultConfiguration(config);
 }

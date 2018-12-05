@@ -46,7 +46,7 @@ void TorcQThread::SetMainThread(void)
 {
     gMainThread = QThread::currentThread();
     InitRand();
-    QThread::currentThread()->setObjectName("MainLoop");
+    QThread::currentThread()->setObjectName(QStringLiteral("MainLoop"));
 }
 
 bool TorcQThread::IsMainThread(void)

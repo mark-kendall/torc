@@ -31,19 +31,19 @@
 #include "torclanguage.h"
 #include "torcuser.h"
 
-#define TORC_DEFAULT_USERNAME    QString("admin")
-#define TORC_DEFAULT_CREDENTIALS QString("f0f825afb7ee5ca70ba178463f360d4b")
+#define TORC_DEFAULT_USERNAME    QStringLiteral("admin")
+#define TORC_DEFAULT_CREDENTIALS QStringLiteral("f0f825afb7ee5ca70ba178463f360d4b")
 
-QString    TorcUser::gUserName = QString();
+QString    TorcUser::gUserName = QStringLiteral();
 QByteArray TorcUser::gUserCredentials = QByteArray();
 QMutex     TorcUser::gUserCredentialsLock(QMutex::Recursive);
 
 TorcUser::TorcUser()
  : QObject(),
-   TorcHTTPService(this, TORC_USER_SERVICE, "user", TorcUser::staticMetaObject, ""),
+   TorcHTTPService(this, TORC_USER_SERVICE, QStringLiteral("user"), TorcUser::staticMetaObject, QStringLiteral("")),
    m_userName(),
-   m_userNameSetting(new TorcSetting(nullptr, "UserName", "User name", TorcSetting::String, TorcSetting::Persistent, QVariant(TORC_DEFAULT_USERNAME))),
-   m_userCredentials(new TorcSetting(nullptr, "UserCredentials", "Authentication string", TorcSetting::String, TorcSetting::Persistent, QVariant(TORC_DEFAULT_CREDENTIALS))),
+   m_userNameSetting(new TorcSetting(nullptr, QStringLiteral("UserName"), QStringLiteral("User name"), TorcSetting::String, TorcSetting::Persistent, QVariant(TORC_DEFAULT_USERNAME))),
+   m_userCredentials(new TorcSetting(nullptr, QStringLiteral("UserCredentials"), QStringLiteral("Authentication string"), TorcSetting::String, TorcSetting::Persistent, QVariant(TORC_DEFAULT_CREDENTIALS))),
    m_canRestartTorc(true),
    m_canStopTorc(true)
 {
@@ -103,7 +103,7 @@ bool TorcUser::SetUserCredentials(const QString &Name, const QString &Credential
 
     if (Name == gUserName && Credentials.toLower() == GetCredentials())
     {
-        LOG(VB_GENERAL, LOG_WARNING, "New credentials match old - not changing");
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("New credentials match old - not changing"));
         return false;
     }
 
@@ -111,7 +111,7 @@ bool TorcUser::SetUserCredentials(const QString &Name, const QString &Credential
     static QRegExp gReg1("[\\w]{4,}");
     if (!gReg1.exactMatch(Name))
     {
-        LOG(VB_GENERAL, LOG_WARNING, "Password unacceptable");
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Password unacceptable"));
         return false;
     }
 
@@ -120,7 +120,7 @@ bool TorcUser::SetUserCredentials(const QString &Name, const QString &Credential
     static QRegExp gReg2("[0-9a-fA-F]{32}");
     if (!gReg2.exactMatch(Credentials))
     {
-        LOG(VB_GENERAL, LOG_WARNING, "User credentials hash unacceptable");
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("User credentials hash unacceptable"));
         return false;
     }
 
@@ -174,54 +174,54 @@ class TorcUserObject : public TorcAdminObject, public TorcStringFactory
 
     void GetStrings(QVariantMap &Strings)
     {
-        Strings.insert("LoggedInUserTr",     QCoreApplication::translate("TorcUser", "Logged in as %1"));
-        Strings.insert("RestartTorcTr",      QCoreApplication::translate("TorcUser", "Restart Torc"));
-        Strings.insert("ConfirmRestartTorc", QCoreApplication::translate("TorcUser", "Are you sure you want to restart Torc?"));
-        Strings.insert("StopTorcTr",         QCoreApplication::translate("TorcUser", "Stop Torc"));
-        Strings.insert("ConfirmStopTorc",    QCoreApplication::translate("TorcUser", "Are you sure you want to stop Torc?"));
-        Strings.insert("ViewConfigTr",       QCoreApplication::translate("TorcUser", "View configuration"));
-        Strings.insert("ViewConfigTitleTr",  QCoreApplication::translate("TorcUser", "Current configuration"));
-        Strings.insert("ViewDOTTr",          QCoreApplication::translate("TorcUser", "View DOT"));
-        Strings.insert("ViewDOTTitleTr",     QCoreApplication::translate("TorcUser", "Stategraph Description"));
-        Strings.insert("ViewXSDTr",          QCoreApplication::translate("TorcUser", "View XSD"));
-        Strings.insert("ViewXSDTitleTr",     QCoreApplication::translate("TorcUser", "Configuration schema"));
-        Strings.insert("ViewAPITr",          QCoreApplication::translate("TorcUser", "View API"));
-        Strings.insert("ViewAPITitleTr",     QCoreApplication::translate("TorcUser", "API reference"));
-        Strings.insert("ViewLogTr",          QCoreApplication::translate("TorcUser", "View Log"));
-        Strings.insert("RefreshTr",          QCoreApplication::translate("TorcUser", "Refresh"));
-        Strings.insert("FollowLogTr",        QCoreApplication::translate("TorcUser", "Follow Log"));
-        Strings.insert("FollowTr",           QCoreApplication::translate("TorcUser", "Follow"));
-        Strings.insert("UnfollowTr",         QCoreApplication::translate("TorcUser", "Unfollow"));
-        Strings.insert("Value",              QCoreApplication::translate("TorcUser", "Value"));
-        Strings.insert("Valid",              QCoreApplication::translate("TorcUser", "Valid"));
-        Strings.insert("CloseTr",            QCoreApplication::translate("TorcUser", "Close"));
-        Strings.insert("SettingsTr",         QCoreApplication::translate("TorcUser", "Settings"));
-        Strings.insert("ConfirmTr",          QCoreApplication::translate("TorcUser", "Confirm"));
-        Strings.insert("CancelTr",           QCoreApplication::translate("TorcUser", "Cancel"));
-        Strings.insert("ChangeCredsTr",      QCoreApplication::translate("TorcUser", "Change username and password"));
-        Strings.insert("UsernameTr",         QCoreApplication::translate("TorcUser", "Username"));
-        Strings.insert("PasswordTr",         QCoreApplication::translate("TorcUser", "Password"));
-        Strings.insert("Username2Tr",        QCoreApplication::translate("TorcUser", "Confirm username"));
-        Strings.insert("Password2Tr",        QCoreApplication::translate("TorcUser", "Confirm password"));
-        Strings.insert("CredentialsHelpTr",  QCoreApplication::translate("TorcUser", "Usernames and passwords are case sensitive, must be at least 4 characters long and can only contain letters, numbers and \'_\' (underscore)."));
-        Strings.insert("ServicesTr",         QCoreApplication::translate("TorcUser", "Services"));
-        Strings.insert("ReturnformatsTr",    QCoreApplication::translate("TorcUser", "Return formats"));
-        Strings.insert("WebSocketsTr",       QCoreApplication::translate("TorcUser", "WebSockets"));
-        Strings.insert("AvailableservicesTr",QCoreApplication::translate("TorcUser", "Available services"));
-        Strings.insert("IDTr",               QCoreApplication::translate("TorcUser", "ID"));
-        Strings.insert("NameTr",             QCoreApplication::translate("TorcUser", "Name"));
-        Strings.insert("PathTr",             QCoreApplication::translate("TorcUser", "Path"));
-        Strings.insert("DetailsTr",          QCoreApplication::translate("TorcUser", "Details"));
-        Strings.insert("HTTPreturnformatsTr",QCoreApplication::translate("TorcUser", "Supported HTTP return formats"));
-        Strings.insert("ContenttypeTr",      QCoreApplication::translate("TorcUser", "Content type"));
-        Strings.insert("WSsubprotocolsTr",   QCoreApplication::translate("TorcUser", "Supported WebSocket subprotocols"));
-        Strings.insert("DescriptionTr",      QCoreApplication::translate("TorcUser", "Description"));
-        Strings.insert("ParametersTr",       QCoreApplication::translate("TorcUser", "Parameters"));
-        Strings.insert("JSreturntypeTr",     QCoreApplication::translate("TorcUser", "Javascript return type"));
-        Strings.insert("MethodlistTr",       QCoreApplication::translate("TorcUser", "Method list"));
-        Strings.insert("GetterTr",           QCoreApplication::translate("TorcUser", "Getter"));
-        Strings.insert("NotificationTr",     QCoreApplication::translate("TorcUser", "Notification"));
-        Strings.insert("UpdateTr",           QCoreApplication::translate("TorcUser", "Update"));
+        Strings.insert(QStringLiteral("LoggedInUserTr"),     QCoreApplication::translate("TorcUser", "Logged in as %1"));
+        Strings.insert(QStringLiteral("RestartTorcTr"),      QCoreApplication::translate("TorcUser", "Restart Torc"));
+        Strings.insert(QStringLiteral("ConfirmRestartTorc"), QCoreApplication::translate("TorcUser", "Are you sure you want to restart Torc?"));
+        Strings.insert(QStringLiteral("StopTorcTr"),         QCoreApplication::translate("TorcUser", "Stop Torc"));
+        Strings.insert(QStringLiteral("ConfirmStopTorc"),    QCoreApplication::translate("TorcUser", "Are you sure you want to stop Torc?"));
+        Strings.insert(QStringLiteral("ViewConfigTr"),       QCoreApplication::translate("TorcUser", "View configuration"));
+        Strings.insert(QStringLiteral("ViewConfigTitleTr"),  QCoreApplication::translate("TorcUser", "Current configuration"));
+        Strings.insert(QStringLiteral("ViewDOTTr"),          QCoreApplication::translate("TorcUser", "View DOT"));
+        Strings.insert(QStringLiteral("ViewDOTTitleTr"),     QCoreApplication::translate("TorcUser", "Stategraph Description"));
+        Strings.insert(QStringLiteral("ViewXSDTr"),          QCoreApplication::translate("TorcUser", "View XSD"));
+        Strings.insert(QStringLiteral("ViewXSDTitleTr"),     QCoreApplication::translate("TorcUser", "Configuration schema"));
+        Strings.insert(QStringLiteral("ViewAPITr"),          QCoreApplication::translate("TorcUser", "View API"));
+        Strings.insert(QStringLiteral("ViewAPITitleTr"),     QCoreApplication::translate("TorcUser", "API reference"));
+        Strings.insert(QStringLiteral("ViewLogTr"),          QCoreApplication::translate("TorcUser", "View Log"));
+        Strings.insert(QStringLiteral("RefreshTr"),          QCoreApplication::translate("TorcUser", "Refresh"));
+        Strings.insert(QStringLiteral("FollowLogTr"),        QCoreApplication::translate("TorcUser", "Follow Log"));
+        Strings.insert(QStringLiteral("FollowTr"),           QCoreApplication::translate("TorcUser", "Follow"));
+        Strings.insert(QStringLiteral("UnfollowTr"),         QCoreApplication::translate("TorcUser", "Unfollow"));
+        Strings.insert(QStringLiteral("Value"),              QCoreApplication::translate("TorcUser", "Value"));
+        Strings.insert(QStringLiteral("Valid"),              QCoreApplication::translate("TorcUser", "Valid"));
+        Strings.insert(QStringLiteral("CloseTr"),            QCoreApplication::translate("TorcUser", "Close"));
+        Strings.insert(QStringLiteral("SettingsTr"),         QCoreApplication::translate("TorcUser", "Settings"));
+        Strings.insert(QStringLiteral("ConfirmTr"),          QCoreApplication::translate("TorcUser", "Confirm"));
+        Strings.insert(QStringLiteral("CancelTr"),           QCoreApplication::translate("TorcUser", "Cancel"));
+        Strings.insert(QStringLiteral("ChangeCredsTr"),      QCoreApplication::translate("TorcUser", "Change username and password"));
+        Strings.insert(QStringLiteral("UsernameTr"),         QCoreApplication::translate("TorcUser", "Username"));
+        Strings.insert(QStringLiteral("PasswordTr"),         QCoreApplication::translate("TorcUser", "Password"));
+        Strings.insert(QStringLiteral("Username2Tr"),        QCoreApplication::translate("TorcUser", "Confirm username"));
+        Strings.insert(QStringLiteral("Password2Tr"),        QCoreApplication::translate("TorcUser", "Confirm password"));
+        Strings.insert(QStringLiteral("CredentialsHelpTr"),  QCoreApplication::translate("TorcUser", "Usernames and passwords are case sensitive, must be at least 4 characters long and can only contain letters, numbers and \'_\' (underscore)."));
+        Strings.insert(QStringLiteral("ServicesTr"),         QCoreApplication::translate("TorcUser", "Services"));
+        Strings.insert(QStringLiteral("ReturnformatsTr"),    QCoreApplication::translate("TorcUser", "Return formats"));
+        Strings.insert(QStringLiteral("WebSocketsTr"),       QCoreApplication::translate("TorcUser", "WebSockets"));
+        Strings.insert(QStringLiteral("AvailableservicesTr"),QCoreApplication::translate("TorcUser", "Available services"));
+        Strings.insert(QStringLiteral("IDTr"),               QCoreApplication::translate("TorcUser", "ID"));
+        Strings.insert(QStringLiteral("NameTr"),             QCoreApplication::translate("TorcUser", "Name"));
+        Strings.insert(QStringLiteral("PathTr"),             QCoreApplication::translate("TorcUser", "Path"));
+        Strings.insert(QStringLiteral("DetailsTr"),          QCoreApplication::translate("TorcUser", "Details"));
+        Strings.insert(QStringLiteral("HTTPreturnformatsTr"),QCoreApplication::translate("TorcUser", "Supported HTTP return formats"));
+        Strings.insert(QStringLiteral("ContenttypeTr"),      QCoreApplication::translate("TorcUser", "Content type"));
+        Strings.insert(QStringLiteral("WSsubprotocolsTr"),   QCoreApplication::translate("TorcUser", "Supported WebSocket subprotocols"));
+        Strings.insert(QStringLiteral("DescriptionTr"),      QCoreApplication::translate("TorcUser", "Description"));
+        Strings.insert(QStringLiteral("ParametersTr"),       QCoreApplication::translate("TorcUser", "Parameters"));
+        Strings.insert(QStringLiteral("JSreturntypeTr"),     QCoreApplication::translate("TorcUser", "Javascript return type"));
+        Strings.insert(QStringLiteral("MethodlistTr"),       QCoreApplication::translate("TorcUser", "Method list"));
+        Strings.insert(QStringLiteral("GetterTr"),           QCoreApplication::translate("TorcUser", "Getter"));
+        Strings.insert(QStringLiteral("NotificationTr"),     QCoreApplication::translate("TorcUser", "Notification"));
+        Strings.insert(QStringLiteral("UpdateTr"),           QCoreApplication::translate("TorcUser", "Update"));
     }
 
     void Create(void)

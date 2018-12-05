@@ -37,7 +37,7 @@ TorcHTTPReader::TorcHTTPReader()
     m_headersRead(0),
     m_contentLength(0),
     m_contentReceived(0),
-    m_method(QString()),
+    m_method(QStringLiteral()),
     m_content(),
     m_headers()
 {
@@ -76,7 +76,7 @@ void TorcHTTPReader::Reset(void)
     m_headersRead     = 0;
     m_contentLength   = 0;
     m_contentReceived = 0;
-    m_method          = QString();
+    m_method          = QStringLiteral();
     m_content         = QByteArray();
     m_headers         = QMap<QString,QString>();
 }
@@ -97,7 +97,7 @@ bool TorcHTTPReader::Read(QTcpSocket *Socket)
     // sanity check
     if (m_headersRead >= 200)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Read 200 lines of headers - aborting");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Read 200 lines of headers - aborting"));
         return false;
     }
 
@@ -117,7 +117,7 @@ bool TorcHTTPReader::Read(QTcpSocket *Socket)
                                 if (!buf.startsWith("HEAD"))
                                     if (!buf.startsWith("DELETE"))
                                     {
-                                        LOG(VB_GENERAL, LOG_ERR, QString("Invalid HTTP start ('%1')- aborting").arg(buf.constData()));
+                                        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Invalid HTTP start ('%1')- aborting").arg(buf.constData()));
                                         return false;
                                     }
         }
@@ -129,7 +129,7 @@ bool TorcHTTPReader::Read(QTcpSocket *Socket)
             // an unusually long header is likely to mean this is not a valid HTTP message
             if (line.size() > 1000)
             {
-                LOG(VB_GENERAL, LOG_ERR, "Header is too long - aborting");
+                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Header is too long - aborting"));
                 return false;
             }
 
@@ -142,7 +142,7 @@ bool TorcHTTPReader::Read(QTcpSocket *Socket)
 
             if (!m_requestStarted)
             {
-                LOG(VB_NETWORK, LOG_DEBUG, line);
+                LOG(VB_NETWORK, LOG_DEBUG, QString(line));
                 m_method = line;
             }
             else
@@ -158,7 +158,7 @@ bool TorcHTTPReader::Read(QTcpSocket *Socket)
                     if (key == "Content-Length")
                         m_contentLength = value.toULongLong();
 
-                    LOG(VB_NETWORK, LOG_DEBUG, QString("%1: %2").arg(key.data(), value.data()));
+                    LOG(VB_NETWORK, LOG_DEBUG, QStringLiteral("%1: %2").arg(key.data(), value.data()));
 
                     m_headers.insert(key, value);
                 }

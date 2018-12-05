@@ -53,7 +53,6 @@ QMutex                   gLogThreadTidLock;
 QHash<uint64_t, int64_t> gLogThreadtidHash;
 LoggingThread           *gLogThread = nullptr;
 bool                     gLogThreadFinished = false;
-bool                     gDebugRegistration = false;
 
 typedef enum {
     kMessage       = 0x01,
@@ -235,48 +234,23 @@ void LoggingThread::HandleItem(LogItem *Item)
 {
     if (Item->type & kRegistering)
     {
-        int64_t tid = GetThreadTid(Item);
-
         QMutexLocker locker(&gLogThreadLock);
         if (gLogThreadHash.contains(Item->threadId))
             free(gLogThreadHash.take(Item->threadId));
 
         gLogThreadHash[Item->threadId] = strdup(Item->threadName);
-
-        if (gDebugRegistration)
-        {
-            snprintf(Item->message, LOGLINE_MAX,
-                     "Thread 0x%" PREFIX64 "X (%" PREFIX64
-                     "d) registered as \'%s\'",
-                     (long long unsigned int)Item->threadId,
-                     (long long int)tid,
-                     gLogThreadHash[Item->threadId]);
-        }
     }
     else if (Item->type & kDeregistering)
     {
-        int64_t tid = 0;
         {
             QMutexLocker locker(&gLogThreadTidLock);
             if (gLogThreadtidHash.contains(Item->threadId))
-            {
-                tid = gLogThreadtidHash[Item->threadId];
                 gLogThreadtidHash.remove(Item->threadId);
-            }
         }
 
         QMutexLocker locker(&gLogThreadLock);
         if (gLogThreadHash.contains(Item->threadId))
         {
-            if (gDebugRegistration)
-            {
-                snprintf(Item->message, LOGLINE_MAX,
-                         "Thread 0x%" PREFIX64 "X (%" PREFIX64
-                         "d) deregistered as \'%s\'",
-                         (long long unsigned int)Item->threadId,
-                         (long long int)tid,
-                         gLogThreadHash[Item->threadId]);
-            }
             char* threadname = gLogThreadHash.take(Item->threadId);
             free(threadname);
         }
@@ -298,7 +272,7 @@ typedef struct {
     QString path;
 } LogPropagateOpts;
 
-LogPropagateOpts gLogPropagationOpts = { false, 0, QString("") };
+LogPropagateOpts gLogPropagationOpts = { false, 0, QStringLiteral("") };
 QString          gLogPropagationArgs;
 
 #define TIMESTAMP_MAX 30
@@ -308,16 +282,16 @@ LogLevel gLogLevel = (LogLevel)LOG_INFO;
 
 typedef struct {
     uint64_t mask      { 0 };
-    QString  name      { QString("") };
+    QString  name      { QStringLiteral("") };
     bool     additive  { false };
-    QString  helpText  { QString("") };
+    QString  helpText  { QStringLiteral("") };
 } VerboseDef;
 
 typedef QMap<QString, VerboseDef> VerboseMap;
 
 typedef struct {
     int         value     { 0 };
-    QString     name      { QString("") };
+    QString     name      { QStringLiteral("") };
     char        shortname { '?' };
 } LoglevelDef;
 
@@ -404,7 +378,7 @@ FileLogger::FileLogger(const QString &Filename, bool ErrorsOnly, int Quiet)
     if (m_fileName.isEmpty())
     {
         m_opened = true;
-        LOG(VB_GENERAL, LOG_INFO, "Logging to the console");
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Logging to the console"));
     }
     else
     {
@@ -412,7 +386,7 @@ FileLogger::FileLogger(const QString &Filename, bool ErrorsOnly, int Quiet)
         {
             QString old = m_fileName + ".old";
 
-            LOG(VB_GENERAL, LOG_INFO, QString("Moving '%1' to '%2'").arg(m_fileName, old));
+            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Moving '%1' to '%2'").arg(m_fileName, old));
 
             QFile::remove(old);
             QFile::rename(m_fileName, old);
@@ -423,11 +397,11 @@ FileLogger::FileLogger(const QString &Filename, bool ErrorsOnly, int Quiet)
         m_file.setFileName(m_fileName);
         if (!m_file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Truncate | QIODevice::Text | QIODevice::Unbuffered))
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed to open %1 for logging").arg(m_fileName));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to open %1 for logging").arg(m_fileName));
             return;
         }
 
-        LOG(VB_GENERAL, LOG_INFO, QString("Logging to '%1'").arg(m_fileName));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Logging to '%1'").arg(m_fileName));
         m_opened = true;
     }
 }
@@ -465,7 +439,7 @@ bool FileLogger::PrintLine(QByteArray &Line)
     if (error == -1)
     {
         LOG(VB_GENERAL, LOG_ERR,
-             QString("Closed Log output due to errors"));
+             QStringLiteral("Closed Log output due to errors"));
         m_opened = false;
         return false;
     }
@@ -484,7 +458,7 @@ bool FileLogger::PrintLine(QByteArray &Line)
 */
 WebLogger::WebLogger(const QString &Filename)
   : QObject(),
-    TorcHTTPService(this, "log", "log", WebLogger::staticMetaObject, "event"),
+    TorcHTTPService(this, QStringLiteral("log"), QStringLiteral("log"), WebLogger::staticMetaObject, QStringLiteral("event")),
     FileLogger(Filename, false, false),
     log(),
     tail(),
@@ -597,17 +571,11 @@ int64_t GetThreadTid(LogItem *Item)
 }
 
 LoggingThread::LoggingThread()
-  : TorcQThread("Logger"),
+  : TorcQThread(QStringLiteral("Logger")),
     m_waitNotEmpty(),
     m_waitEmpty(),
     m_aborted(false)
 {
-    if (!qEnvironmentVariableIsEmpty("VERBOSE_THREADS"))
-    {
-        LOG(VB_GENERAL, LOG_NOTICE,
-            "Logging thread registration/deregistration enabled!");
-        gDebugRegistration = true;
-    }
 }
 
 LoggingThread::~LoggingThread()
@@ -618,8 +586,7 @@ LoggingThread::~LoggingThread()
 }
 
 void PrintLogLine(uint64_t Mask, LogLevel Level, const char *File, int Line,
-                  const char *Function, int FromQString,
-                  const char *Format, ... )
+                  const char *Function, const char *Format, ... )
 {
     int type = kMessage;
     type |= (Mask & VB_FLUSH) ? kFlush : 0;
@@ -628,21 +595,10 @@ void PrintLogLine(uint64_t Mask, LogLevel Level, const char *File, int Line,
     if (!item)
         return;
 
-    char* copy = nullptr;
-    if (FromQString && strchr(Format, '%'))
-    {
-        QString string(Format);
-        Format = strdup(string.replace(gLogRexExp, "%%").toLocal8Bit().constData());
-        copy = (char*)Format;
-    }
-
     va_list arguments;
     va_start(arguments, Format);
     vsnprintf(item->message, LOGLINE_MAX, Format, arguments);
     va_end(arguments);
-
-    if (copy)
-        free(copy);
 
     QMutexLocker lock(&gLogQueueLock);
 
@@ -668,18 +624,18 @@ void PrintLogLine(uint64_t Mask, LogLevel Level, const char *File, int Line,
 void CalculateLogPropagation(void)
 {
     QString mask = gVerboseString.trimmed();
-    mask.replace(QRegExp(" "), ",");
+    mask.replace(QRegExp(" "), QStringLiteral(","));
     mask.remove(QRegExp("^,"));
-    gLogPropagationArgs = " --verbose " + mask;
+    gLogPropagationArgs = QStringLiteral(" --verbose ") + mask;
 
     if (gLogPropagationOpts.propagate)
-        gLogPropagationArgs += " --logpath " + gLogPropagationOpts.path;
+        gLogPropagationArgs += QStringLiteral(" --logpath ") + gLogPropagationOpts.path;
 
     QString name = GetLogLevelName(gLogLevel);
-    gLogPropagationArgs += " --loglevel " + name;
+    gLogPropagationArgs += QStringLiteral(" --loglevel ") + name;
 
     for (int i = 0; i < gLogPropagationOpts.quiet; i++)
-        gLogPropagationArgs += " --quiet";
+        gLogPropagationArgs += QStringLiteral(" --quiet");
 }
 
 bool GetQuietLogPropagation(void)
@@ -706,7 +662,7 @@ void StartLogging(const QString &Logfile, int progress, int quiet,
         return;
 
     gLogLevel = level;
-    LOG(VB_GENERAL, LOG_NOTICE, QString("Setting level to LOG_%1")
+    LOG(VB_GENERAL, LOG_NOTICE, QStringLiteral("Setting level to LOG_%1")
              .arg(GetLogLevelName(gLogLevel).toUpper()));
 
     gLogPropagationOpts.propagate = Propagate;
@@ -721,7 +677,7 @@ void StartLogging(const QString &Logfile, int progress, int quiet,
 
     CalculateLogPropagation();
 
-    new FileLogger(QString(""), progress, quiet);
+    new FileLogger(QStringLiteral(""), progress, quiet);
 
     if (!Logfile.isEmpty())
         new WebLogger(Logfile);
@@ -830,7 +786,7 @@ QString GetLogLevelName(LogLevel level)
     LoglevelMap::iterator it = gLoglevelMap.find((int)level);
 
     if ( it == gLoglevelMap.end() )
-        return QString("unknown");
+        return QStringLiteral("unknown");
 
     return (*it).name;
 }
@@ -884,7 +840,7 @@ void InitVerbose(void)
 void VerboseHelp(void)
 {
     QString m_verbose = gVerboseString.trimmed();
-    m_verbose.replace(QRegExp(" "), ",");
+    m_verbose.replace(QRegExp(" "), QStringLiteral(","));
     m_verbose.remove(QRegExp("^,"));
 
     cerr << "Verbose debug levels.\n"
@@ -893,7 +849,7 @@ void VerboseHelp(void)
     for (VerboseMap::Iterator vit = gVerboseMap.begin();
          vit != gVerboseMap.end(); ++vit )
     {
-        QString name = QString("  %1").arg(vit.value().name, -15, ' ');
+        QString name = QStringLiteral("  %1").arg(vit.value().name, -15, ' ');
         if (vit.value().helpText.isEmpty())
             continue;
         cerr << name.toLocal8Bit().constData() << " - " <<
@@ -939,27 +895,27 @@ int ParseVerboseArgument(const QString &arg)
         option = (*it).toLower();
         bool reverseOption = false;
 
-        if (option != "none" && option.left(2) == "no")
+        if (option != QStringLiteral("none") && option.left(2) == QStringLiteral("no"))
         {
             reverseOption = true;
             option = option.right(option.length() - 2);
         }
 
-        if (option == "help")
+        if (option == QStringLiteral("help"))
         {
             VerboseHelp();
             return TORC_EXIT_INVALID_CMDLINE;
         }
-        else if (option == "important")
+        else if (option == QStringLiteral("important"))
         {
             cerr << "The \"important\" log mask is no longer valid.\n";
         }
-        else if (option == "extra")
+        else if (option == QStringLiteral("extra"))
         {
             cerr << "The \"extra\" log mask is no longer valid.  Please try "
                     "--loglevel debug instead.\n";
         }
-        else if (option == "default")
+        else if (option == QStringLiteral("default"))
         {
             if (gHaveUserDefaultValues)
             {
@@ -1021,7 +977,7 @@ int ParseVerboseArgument(const QString &arg)
 
 QString LogErrorToString(int errnum)
 {
-    return QString("%1 (%2)").arg(strerror(errnum)).arg(errnum);
+    return QStringLiteral("%1 (%2)").arg(strerror(errnum)).arg(errnum);
 }
 
 // vim:ts=4:sw=4:ai:et:si:sts=4

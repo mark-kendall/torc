@@ -28,7 +28,7 @@
 TorcSerialiser* TorcSerialiser::GetSerialiser(const QString &MimeType)
 {
     // first create a prioritised list from MimeType
-    QStringList rawtypes = MimeType.split(",", QString::SkipEmptyParts);
+    QStringList rawtypes = MimeType.split(',', QString::SkipEmptyParts);
     QMap<float, QPair<QString,QString>> types;
     foreach (QString rawtype, rawtypes)
     {
@@ -51,7 +51,7 @@ TorcSerialiser* TorcSerialiser::GetSerialiser(const QString &MimeType)
                 priority   = ok ? priority : 0.0;
                 // N.B. a fully specified mime type (e.g. text/plain) should have higher priority than partially
                 // specified (e.g. text/*)
-                if (subtype == "*")
+                if (subtype == QStringLiteral("*"))
                     priority -= 0.0001; // fudged - this COULD make it lower priority than intended
             }
 
@@ -71,7 +71,7 @@ TorcSerialiser* TorcSerialiser::GetSerialiser(const QString &MimeType)
     }
 
     // We don't check for */* - just default to XML as there is no serialiser priority.
-    LOG(VB_GENERAL, LOG_WARNING, QString("Failed to find serialiser for '%1' - defaulting to XML").arg(MimeType));
+    LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Failed to find serialiser for '%1' - defaulting to XML").arg(MimeType));
     return new TorcXMLSerialiser();
 }
 

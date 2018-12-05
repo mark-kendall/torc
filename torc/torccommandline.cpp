@@ -67,12 +67,10 @@ TorcEnvironmentVariable* TorcEnvironmentVariable::gEnvironmentVariable = nullptr
 */
 TorcArgument::TorcArgument()
   : m_value(QVariant()),
-    m_helpText(""),
+    m_helpText(),
     m_exitImmediately(true),
     m_flags(TorcCommandLine::None)
 {
-    // default constructor is provided for QHash support only
-    LOG(VB_GENERAL, LOG_ERR, "Invalid TorcArgument usage");
 }
 
 TorcArgument::TorcArgument(const QVariant &Default, const QString &HelpText, TorcCommandLine::Options Flags, bool Exit)
@@ -105,25 +103,25 @@ TorcCommandLine::TorcCommandLine(Options Flags)
                                                TorcCommandLine::TransDir;
 
     if (options.testFlag(TorcCommandLine::Help))
-        AddPriv(QString("h,help"), QVariant(), QString("Display full usage information."), TorcCommandLine::Help, true);
+        AddPriv(QStringLiteral("h,help"), QVariant(), QStringLiteral("Display full usage information."), TorcCommandLine::Help, true);
     if (options.testFlag(TorcCommandLine::LogLevel))
-        AddPriv(QString("l,log"), QStringList("general"), QString("Set the logging level."), TorcCommandLine::None);
+        AddPriv(QStringLiteral("l,log"), QStringList(QStringLiteral("general")), QStringLiteral("Set the logging level."), TorcCommandLine::None);
     if (options.testFlag(TorcCommandLine::LogType))
-        AddPriv(QString("v,verbose,verbosity"), QString("info"), QString("Set the logging type."), TorcCommandLine::None);
+        AddPriv(QStringLiteral("v,verbose,verbosity"), QStringLiteral("info"), QStringLiteral("Set the logging type."), TorcCommandLine::None);
     if (options.testFlag(TorcCommandLine::Version))
-        AddPriv(QString("version"), QVariant(), QString("Display version information."), TorcCommandLine::Version, true);
+        AddPriv(QStringLiteral("version"), QVariant(), QStringLiteral("Display version information."), TorcCommandLine::Version, true);
     if (options.testFlag(TorcCommandLine::Database))
-        AddPriv(QString("db,database"), QString(""), QString("Use a custom database location. If the file does not exist, it will be created."));
+        AddPriv(QStringLiteral("db,database"), QStringLiteral(""), QStringLiteral("Use a custom database location. If the file does not exist, it will be created."));
     if (options.testFlag(TorcCommandLine::LogFile))
-        AddPriv(QString("logfile"), QString(""), QString("Override the logfile location."));
+        AddPriv(QStringLiteral("logfile"), QStringLiteral(""), QStringLiteral("Override the logfile location."));
     if (options.testFlag(TorcCommandLine::XSDTest))
-        AddPriv(QString("xsdtest"), QString(""), QString("Run validation of test configuration XML files found in the given directory."), TorcCommandLine::XSDTest);
+        AddPriv(QStringLiteral("xsdtest"), QStringLiteral(""), QStringLiteral("Run validation of test configuration XML files found in the given directory."), TorcCommandLine::XSDTest);
     if (options.testFlag(TorcCommandLine::ConfDir))
-        AddPriv(QString("c,config"), QString(""), QString("Override the configuration directory for XML config file, database etc."));
+        AddPriv(QStringLiteral("c,config"), QStringLiteral(""), QStringLiteral("Override the configuration directory for XML config file, database etc."));
     if (options.testFlag(TorcCommandLine::ShareDir))
-        AddPriv(QString("s,share"), QString(""), QString("Overrride the shared directory for HTML files etc"));
+        AddPriv(QStringLiteral("s,share"), QStringLiteral(""), QStringLiteral("Overrride the shared directory for HTML files etc"));
     if (options.testFlag(TorcCommandLine::TransDir))
-        AddPriv(QString("t,trans"), QString(""), QString("Override the translations directory"));
+        AddPriv(QStringLiteral("t,trans"), QStringLiteral(""), QStringLiteral("Override the translations directory"));
 }
 
 /*! \brief Implement custom command line options.
@@ -140,7 +138,7 @@ void TorcCommandLine::Add(const QString &Keys, const QVariant &Default, const QS
 
 void TorcCommandLine::AddPriv(const QString &Keys, const QVariant &Default, const QString &HelpText, TorcCommandLine::Options Flags /*= TorcCommandLine::None*/, bool ExitImmediately /*=false*/)
 {
-    QStringList keys = Keys.split(",");
+    QStringList keys = Keys.split(',');
 
     QStringList valid;
 
@@ -148,9 +146,9 @@ void TorcCommandLine::AddPriv(const QString &Keys, const QVariant &Default, cons
     QString master;
     foreach (const QString &key, keys)
     {
-        if (key.contains("="))
+        if (key.contains('='))
         {
-            std::cout << QString("Invalid option '%1'").arg(key).toLocal8Bit().constData() << std::endl;
+            std::cout << QStringLiteral("Invalid option '%1'").arg(key).toLocal8Bit().constData() << std::endl;
         }
         else if (first && !m_options.contains(key))
         {
@@ -166,13 +164,13 @@ void TorcCommandLine::AddPriv(const QString &Keys, const QVariant &Default, cons
         }
         else
         {
-            std::cout << QString("Command line option '%1' already in use - ignoring").arg(key).toLocal8Bit().constData() << std::endl;
+            std::cout << QStringLiteral("Command line option '%1' already in use - ignoring").arg(key).toLocal8Bit().constData() << std::endl;
         }
     }
 
     if (!valid.isEmpty())
     {
-        QString options = valid.join(" OR ");
+        QString options = valid.join(QStringLiteral(" OR "));
         m_help.insert(options, HelpText);
         if (options.size() > (int)m_maxLength)
             m_maxLength = options.size() + 2;
@@ -199,16 +197,16 @@ int TorcCommandLine::Evaluate(int argc, const char * const *argv, bool &Exit)
         QString key = QString::fromLocal8Bit(argv[i]);
 
         // remove trailing '-'s
-        while (key.startsWith("-"))
+        while (key.startsWith('-'))
             key = key.mid(1);
 
-        QString value("");
+        QString value(QStringLiteral(""));
 
-        bool simpleformat = key.contains("=");
+        bool simpleformat = key.contains('=');
         if (simpleformat)
         {
             // option is --key=value format
-            QStringList keyval = key.split("=");
+            QStringList keyval = key.split('=');
             key = keyval.at(0).trimmed();
             value = keyval.at(1).trimmed();
         }
@@ -220,7 +218,7 @@ int TorcCommandLine::Evaluate(int argc, const char * const *argv, bool &Exit)
             if (!m_aliases.contains(key))
             {
                 parserror = true;
-                error = QString("Unknown command line option '%1'").arg(key);
+                error = QStringLiteral("Unknown command line option '%1'").arg(key);
                 break;
             }
             else
@@ -237,16 +235,16 @@ int TorcCommandLine::Evaluate(int argc, const char * const *argv, bool &Exit)
             if (i >= argc - 1)
             {
                 parserror = true;
-                error = QString("Insufficient arguments - option '%1' requires a value").arg(key);
+                error = QStringLiteral("Insufficient arguments - option '%1' requires a value").arg(key);
                 break;
             }
 
             value = QString::fromLocal8Bit(argv[++i]).trimmed();
 
-            if (value.startsWith("-"))
+            if (value.startsWith('='))
             {
                 parserror = true;
-                error = QString("Option '%1' expects a value").arg(key);
+                error = QStringLiteral("Option '%1' expects a value").arg(key);
                 break;
             }
         }
@@ -257,7 +255,7 @@ int TorcCommandLine::Evaluate(int argc, const char * const *argv, bool &Exit)
             {
                 // unexpected value
                 parserror = true;
-                error = QString("Option '%1' does not expect a value ('%2')").arg(key, value);
+                error = QStringLiteral("Option '%1' does not expect a value ('%2')").arg(key, value);
                 break;
             }
             else
@@ -269,7 +267,7 @@ int TorcCommandLine::Evaluate(int argc, const char * const *argv, bool &Exit)
         else if (argument.m_value.isValid() && value.isEmpty())
         {
             parserror = true;
-            error = QString("Option '%1' expects a value").arg(key).toLocal8Bit().constData();
+            error = QStringLiteral("Option '%1' expects a value").arg(key).toLocal8Bit();
             break;
         }
 

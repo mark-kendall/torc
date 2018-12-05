@@ -24,7 +24,7 @@
 #include "torcnetworktemperatureoutput.h"
 
 TorcNetworkTemperatureOutput::TorcNetworkTemperatureOutput(double Default, const QVariantMap &Details)
-  : TorcTemperatureOutput(Default, "NetworkTemperatureOutput", Details)
+  : TorcTemperatureOutput(Default, QStringLiteral("NetworkTemperatureOutput"), Details)
 {
 }
 

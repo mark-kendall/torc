@@ -73,11 +73,11 @@ void TorcHTTPServerNonce::ProcessDigestAuth(TorcHTTPRequest &Request, bool Check
         nonces.insert(nonce, nonceobj);
         // NB SHA-256 doesn't seem to be implemented anywhere yet - so just offer MD5
         // should probably use insertMulti for SetResponseHeader
-          QString auth = QString("Digest realm=\"%1\", qop=\"auth\", algorithm=MD5, nonce=\"%2\", opaque=\"%3\"%4")
+          QString auth = QStringLiteral("Digest realm=\"%1\", qop=\"auth\", algorithm=MD5, nonce=\"%2\", opaque=\"%3\"%4")
                 .arg(TORC_REALM, nonce, nonceobj.GetOpaque(),
-                 Request.IsAuthorised() == HTTPAuthorisedStale ? QString(", stale=\"true\"") : QString(""));
+                 Request.IsAuthorised() == HTTPAuthorisedStale ? QStringLiteral(", stale=\"true\"") : QStringLiteral(""));
         lock.unlock();
-        Request.SetResponseHeader("WWW-Authenticate", auth);
+        Request.SetResponseHeader(QStringLiteral("WWW-Authenticate"), auth);
     }
     // Check digest authentication
     else
@@ -95,7 +95,7 @@ void TorcHTTPServerNonce::ProcessDigestAuth(TorcHTTPRequest &Request, bool Check
         }
 
         // remove leading 'Digest' and split out parameters
-        QStringList authentication = Request.Headers().value("Authorization").mid(6).trimmed().split(",", QString::SkipEmptyParts);
+        QStringList authentication = Request.Headers().value(QStringLiteral("Authorization")).mid(6).trimmed().split(',', QString::SkipEmptyParts);
 
         // create a filtered hash of the parameters
         QHash<QString,QString> params;
@@ -104,31 +104,31 @@ void TorcHTTPServerNonce::ProcessDigestAuth(TorcHTTPRequest &Request, bool Check
             // various parameters can contain an '=' in the body, so only search for the first '='
             QString key   = auth.section('=', 0, 0).trimmed().toLower();
             QString value = auth.section('=', 1).trimmed();
-            value.remove("\"");
+            value.remove(QStringLiteral("\""));
             params.insert(key, value);
         }
 
         // we need username, realm, nonce, uri, qop, algorithm, nc, cnonce, response and opaque...
         if (params.size() < 10)
         {
-            LOG(VB_NETWORK, LOG_DEBUG, "Digest response received too few parameters");
+            LOG(VB_NETWORK, LOG_DEBUG, QStringLiteral("Digest response received too few parameters"));
             return;
         }
 
         // check for presence of each
-        if (!params.contains("username") || !params.contains("realm") || !params.contains("nonce") ||
-            !params.contains("uri") || !params.contains("qop") || !params.contains("algorithm") ||
-            !params.contains("nc") || !params.contains("cnonce") || !params.contains("response") ||
-            !params.contains("opaque"))
+        if (!params.contains(QStringLiteral("username")) || !params.contains(QStringLiteral("realm")) || !params.contains(QStringLiteral("nonce")) ||
+            !params.contains(QStringLiteral("uri")) || !params.contains(QStringLiteral("qop")) || !params.contains(QStringLiteral("algorithm")) ||
+            !params.contains(QStringLiteral("nc")) || !params.contains(QStringLiteral("cnonce")) || !params.contains(QStringLiteral("response")) ||
+            !params.contains(QStringLiteral("opaque")))
         {
-            LOG(VB_NETWORK, LOG_DEBUG, "Did not receive expected paramaters");
+            LOG(VB_NETWORK, LOG_DEBUG, QStringLiteral("Did not receive expected paramaters"));
             return;
         }
 
         // username must match
-        if (TorcUser::GetName() != params.value("username"))
+        if (TorcUser::GetName() != params.value(QStringLiteral("username")))
         {
-            LOG(VB_GENERAL, LOG_WARNING, QString("Expected '%1' username, got '%2'").arg(TorcUser::GetName(), params.value("username")));
+            LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Expected '%1' username, got '%2'").arg(TorcUser::GetName(), params.value(QStringLiteral("username"))));
             return;
         }
 
@@ -138,25 +138,25 @@ void TorcHTTPServerNonce::ProcessDigestAuth(TorcHTTPRequest &Request, bool Check
         // can resubmit without prompting the user for credentials (i.e. the client has proved it knows the correct
         // credentials but the nonce is out of date)
         QString       URI = Request.GetUrl();
-        QString  noncestr = params.value("nonce");
-        QString    ncstr  = params.value("nc");
-        QString    second = QString("%1:%2").arg(TorcHTTPRequest::RequestTypeToString(Request.GetHTTPRequestType()), URI);
+        QString  noncestr = params.value(QStringLiteral("nonce"));
+        QString    ncstr  = params.value(QStringLiteral("nc"));
+        QString    second = QStringLiteral("%1:%2").arg(TorcHTTPRequest::RequestTypeToString(Request.GetHTTPRequestType()), URI);
         QByteArray hash1  = TorcUser::GetCredentials();
         QByteArray hash2  = QCryptographicHash::hash(second.toLatin1(), QCryptographicHash::Md5).toHex();
-        QString    third  = QString("%1:%2:%3:%4:%5:%6").arg(QString(hash1), noncestr, ncstr, params.value("cnonce"), "auth", QString(hash2));
+        QString    third  = QStringLiteral("%1:%2:%3:%4:%5:%6").arg(QString(hash1), noncestr, ncstr, params.value(QStringLiteral("cnonce")), QStringLiteral("auth"), QString(hash2));
         QByteArray hash3  = QCryptographicHash::hash(third.toLatin1(), QCryptographicHash::Md5).toHex();
 
-        if (hash3 != params.value("response"))
+        if (hash3 != params.value(QStringLiteral("response")))
         {
-            LOG(VB_GENERAL, LOG_WARNING, "Digest hash failed");
+            LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Digest hash failed"));
             return;
         }
 
         // the uri MUST match the uri provided in the standard HTTP header, otherwise we could be authorise
         // access to the wrong resource
-        if (URI != params.value("uri"))
+        if (URI != params.value(QStringLiteral("uri")))
         {
-            LOG(VB_GENERAL, LOG_WARNING, "URI mismatch between HTTP request and WWW-Authenticate header");
+            LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("URI mismatch between HTTP request and WWW-Authenticate header"));
             return;
         }
 
@@ -171,7 +171,7 @@ void TorcHTTPServerNonce::ProcessDigestAuth(TorcHTTPRequest &Request, bool Check
             QHash<QString,TorcHTTPServerNonce>::const_iterator it = nonces.constFind(noncestr);
             if (it == nonces.constEnd())
             {
-                LOG(VB_NETWORK, LOG_DEBUG, QString("Failed to find nonce '%1'").arg(noncestr));
+                LOG(VB_NETWORK, LOG_DEBUG, QStringLiteral("Failed to find nonce '%1'").arg(noncestr));
                 // if we got this far the nonce was valid but old, so set Stale and ask for re-auth
                 Request.Authorise(HTTPAuthorisedStale);
                 return;
@@ -180,10 +180,10 @@ void TorcHTTPServerNonce::ProcessDigestAuth(TorcHTTPRequest &Request, bool Check
             TorcHTTPServerNonce nonce = it.value();
 
             // match opaque
-            if (it.value().GetOpaque() != params.value("opaque"))
+            if (it.value().GetOpaque() != params.value(QStringLiteral("opaque")))
             {
                 // this is an error
-                LOG(VB_NETWORK, LOG_DEBUG, "Failed to match opaque");
+                LOG(VB_NETWORK, LOG_DEBUG, QStringLiteral("Failed to match opaque"));
                 return;
             }
 
@@ -192,7 +192,7 @@ void TorcHTTPServerNonce::ProcessDigestAuth(TorcHTTPRequest &Request, bool Check
             quint64 nc = ncstr.toInt(&ok, 16);
             if (!ok)
             {
-                LOG(VB_NETWORK, LOG_DEBUG, "Failed to parse nonce count");
+                LOG(VB_NETWORK, LOG_DEBUG, QStringLiteral("Failed to parse nonce count"));
                 return;
             }
 
@@ -200,7 +200,7 @@ void TorcHTTPServerNonce::ProcessDigestAuth(TorcHTTPRequest &Request, bool Check
             if (!nonce.UseOnce(nc, current))
             {
                 Request.Authorise(HTTPAuthorisedStale);
-                LOG(VB_NETWORK, LOG_DEBUG, "Nonce count use failed");
+                LOG(VB_NETWORK, LOG_DEBUG, QStringLiteral("Nonce count use failed"));
                 return;
             }
         }
@@ -218,7 +218,7 @@ TorcHTTPServerNonce::TorcHTTPServerNonce()
     m_lifetimeInSeconds(0),
     m_lifetimeInRequests(0)
 {
-    LOG(VB_GENERAL, LOG_ERR, "Invalid TorcHTTPServerNonce");
+    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Invalid TorcHTTPServerNonce"));
 }
 
 TorcHTTPServerNonce::TorcHTTPServerNonce(const QDateTime &Time)

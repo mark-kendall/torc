@@ -30,11 +30,11 @@
 
 TorcControls* TorcControls::gControls = new TorcControls();
 
-#define BLACKLIST QString("")
+#define BLACKLIST QStringLiteral("")
 
 TorcControls::TorcControls()
   : QObject(),
-    TorcHTTPService(this, CONTROLS_DIRECTORY, "controls", TorcControls::staticMetaObject, BLACKLIST),
+    TorcHTTPService(this, CONTROLS_DIRECTORY, QStringLiteral("controls"), TorcControls::staticMetaObject, BLACKLIST),
     TorcDeviceHandler(),
     controlList(),
     controlTypes()
@@ -45,7 +45,7 @@ void TorcControls::Create(const QVariantMap &Details)
 {
     QWriteLocker locker(&m_handlerLock);
 
-    QVariantMap::const_iterator it = Details.constFind("controls");
+    QVariantMap::const_iterator it = Details.constFind(QStringLiteral("controls"));
     if (Details.constEnd() == it)
         return;
 
@@ -56,7 +56,7 @@ void TorcControls::Create(const QVariantMap &Details)
         int type = TorcCoreUtils::StringToEnum<TorcControl::Type>(it.key());
         if (type == -1)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Unknown control type '%1'").arg(it.key()));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Unknown control type '%1'").arg(it.key()));
             continue;
         }
 
@@ -65,9 +65,9 @@ void TorcControls::Create(const QVariantMap &Details)
         for ( ; it2 != controls.constEnd(); ++it2)
         {
             QVariantMap details = it2.value().toMap();
-            if (!details.contains("name"))
+            if (!details.contains(QStringLiteral("name")))
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("Ignoring control type '%1' with no <name>").arg(TorcCoreUtils::EnumToLowerString<TorcControl::Type>((TorcControl::Type)type)));
+                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Ignoring control type '%1' with no <name>").arg(TorcCoreUtils::EnumToLowerString<TorcControl::Type>((TorcControl::Type)type)));
                 continue;
             }
 
@@ -108,17 +108,17 @@ void TorcControls::Validate(void)
         TorcControl* control = it.next();
         if (!control->Validate())
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed to complete device '%1' - deleting").arg(control->GetUniqueId()));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to complete device '%1' - deleting").arg(control->GetUniqueId()));
             control->DownRef();
             it.remove();
         }
         else
         {
-            LOG(VB_GENERAL, LOG_INFO, QString("Registered control '%1'").arg(control->Name()));
+            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Registered control '%1'").arg(control->Name()));
         }
     }
 
-    LOG(VB_GENERAL, LOG_DEBUG, "Controls validated");
+    LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("Controls validated"));
 
     // Each control now has a complete list of inputs and outputs so we can now check for circular references.
     // N.B. Only controls are aware of other devices (i.e. they are created with the expectation that they are
@@ -128,7 +128,7 @@ void TorcControls::Validate(void)
     foreach (TorcControl* control, controlList)
     {
         QString id = control->GetUniqueId();
-        QString path("");
+        QString path(QStringLiteral(""));
         (void)control->CheckForCircularReferences(id, path);
     }
 }

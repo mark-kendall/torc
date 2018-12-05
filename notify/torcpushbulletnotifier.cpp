@@ -37,7 +37,7 @@ TorcPushbulletNotifier::TorcPushbulletNotifier(const QVariantMap &Details)
   : TorcNotifier(Details),
     m_resetTimer(),
     m_networkAbort(0),
-    m_accessToken(QString("")),
+    m_accessToken(QStringLiteral("")),
     m_requests(),
     m_badRequestCount(0)
 {
@@ -46,14 +46,14 @@ TorcPushbulletNotifier::TorcPushbulletNotifier(const QVariantMap &Details)
     connect(this, &TorcPushbulletNotifier::StartResetTimer, &m_resetTimer, static_cast<void (QTimer::*)(int)>(&QTimer::start));
     connect(&m_resetTimer, &QTimer::timeout, this, &TorcPushbulletNotifier::ResetTimerTimeout);
 
-    if (Details.contains("accesstoken"))
+    if (Details.contains(QStringLiteral("accesstoken")))
     {
-        m_accessToken = Details.value("accesstoken").toString();
+        m_accessToken = Details.value(QStringLiteral("accesstoken")).toString();
         SetValid(true);
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, "No Pushbullet access token specified - disabling");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("No Pushbullet access token specified - disabling"));
         m_badRequestCount = MAX_BAD_REQUESTS;
     }
 }
@@ -81,13 +81,13 @@ void TorcPushbulletNotifier::Notify(const QVariantMap &Notification)
 {
     if (m_accessToken.isEmpty() || m_badRequestCount >= MAX_BAD_REQUESTS || m_resetTimer.isActive())
     {
-        LOG(VB_GENERAL, LOG_WARNING, "Ignoring Pushbullet notify request");
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Ignoring Pushbullet notify request"));
         return;
     }
 
     if (!TorcNetwork::IsAvailable())
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Not sending Pushbullet notification. Network is not available"));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Not sending Pushbullet notification. Network is not available"));
         return;
     }
 
@@ -95,9 +95,9 @@ void TorcPushbulletNotifier::Notify(const QVariantMap &Notification)
     QString body  = Notification.contains(NOTIFICATION_BODY)  ? Notification.value(NOTIFICATION_BODY).toString()  : UNKNOWN_BODY;
 
     QJsonObject object;
-    object.insert("title", title);
-    object.insert("body",  body);
-    object.insert("type",  "note");
+    object.insert(QStringLiteral("title"), title);
+    object.insert(QStringLiteral("body"),  body);
+    object.insert(QStringLiteral("type"),  "note");
     QJsonDocument doc(object);
     QByteArray content = doc.toJson(QJsonDocument::Compact);
 
@@ -123,7 +123,7 @@ void TorcPushbulletNotifier::RequestReady(TorcNetworkRequest *Request)
     QMutexLocker locker(&lock);
     if (!m_requests.contains(Request))
     {
-        LOG(VB_GENERAL, LOG_ERR, "Response to unknown Pushbullet request");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Response to unknown Pushbullet request"));
         return;
     }
 
@@ -148,17 +148,17 @@ void TorcPushbulletNotifier::RequestReady(TorcNetworkRequest *Request)
                 }
             }
 
-            LOG(VB_GENERAL, LOG_WARNING, QString("Pushbullet rate limit exceeded. Restarting in %1 seconds").arg(resetin));
+            LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Pushbullet rate limit exceeded. Restarting in %1 seconds").arg(resetin));
         }
         else
         {
             QJsonDocument result = QJsonDocument::fromJson(Request->GetBuffer());
-            LOG(VB_GENERAL, LOG_ERR, QString("Pushbullet notifier '%1' - bad request ('%2')").arg(uniqueId, TorcHTTPRequest::StatusToString((HTTPStatus)status)));
-            LOG(VB_GENERAL, LOG_ERR, QString("Pushbullet replied with:\r\n%1").arg(result.toJson().constData()));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Pushbullet notifier '%1' - bad request ('%2')").arg(uniqueId, TorcHTTPRequest::StatusToString((HTTPStatus)status)));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Pushbullet replied with:\r\n%1").arg(result.toJson().constData()));
             if (++m_badRequestCount >= MAX_BAD_REQUESTS)
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("Disabling Pushbullet notifier '%1' - too many bad requests. Check your access token.").arg(uniqueId));
-                LOG(VB_GENERAL, LOG_ERR, QString("Will try again in %1 seconds").arg(resetin));
+                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Disabling Pushbullet notifier '%1' - too many bad requests. Check your access token.").arg(uniqueId));
+                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Will try again in %1 seconds").arg(resetin));
             }
             else
             {
@@ -180,7 +180,7 @@ void TorcPushbulletNotifier::RequestReady(TorcNetworkRequest *Request)
 
 void TorcPushbulletNotifier::ResetTimerTimeout(void)
 {
-    LOG(VB_GENERAL, LOG_INFO, QString("Re-enabling Pushbullet notifier '%1'").arg(uniqueId));
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Re-enabling Pushbullet notifier '%1'").arg(uniqueId));
     m_badRequestCount = 0;
     SetValid(!m_accessToken.isEmpty());
 }
@@ -189,7 +189,7 @@ class TorcPushbulletNotifierFactory final : public TorcNotifierFactory
 {
     TorcNotifier* Create(const QString &Type, const QVariantMap &Details) override
     {
-        if (Type == "pushbullet" && Details.contains("accesstoken"))
+        if (Type == QStringLiteral("pushbullet") && Details.contains(QStringLiteral("accesstoken")))
             return new TorcPushbulletNotifier(Details);
         return nullptr;
     }

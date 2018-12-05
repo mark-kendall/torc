@@ -40,7 +40,7 @@ void TorcWebSocketPool::CloseSockets(void)
 {
     QMutexLocker locker(&m_webSocketsLock);
     if (!m_webSockets.isEmpty())
-        LOG(VB_GENERAL, LOG_INFO, "Closing outstanding websockets");
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Closing outstanding websockets"));
     while (!m_webSockets.isEmpty())
     {
         TorcWebSocketThread* thread = m_webSockets.takeLast();
@@ -65,7 +65,7 @@ void TorcWebSocketPool::WebSocketClosed(void)
             socket->quit();
             socket->wait();
             delete socket;
-            LOG(VB_NETWORK, LOG_INFO, "WebSocket thread deleted");
+            LOG(VB_NETWORK, LOG_INFO, QStringLiteral("WebSocket thread deleted"));
             break;
         }
     }
@@ -88,7 +88,7 @@ void TorcWebSocketPool::IncomingConnection(qintptr SocketDescriptor, bool Secure
         socket->setSocketDescriptor(SocketDescriptor);
         socket->close();
         delete socket;
-        LOG(VB_GENERAL, LOG_WARNING, "Ignoring incoming connection - too many connections");
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Ignoring incoming connection - too many connections"));
     }
 }
 

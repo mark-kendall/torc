@@ -119,7 +119,7 @@ TorcRPCRequest::TorcRPCRequest(TorcWebSocketReader::WSSubProtocol Protocol, cons
 {
     if (Protocol != TorcWebSocketReader::SubProtocolJSONRPC)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Unknown websocket subprotocol");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Unknown websocket subprotocol"));
         return;
     }
 
@@ -132,7 +132,7 @@ TorcRPCRequest::TorcRPCRequest(TorcWebSocketReader::WSSubProtocol Protocol, cons
         return;
     }
 
-    LOG(VB_GENERAL, LOG_DEBUG, Data);
+    LOG(VB_GENERAL, LOG_DEBUG, QString(Data));
 
     // single request, one JSON object
     if (doc.isObject())
@@ -157,17 +157,17 @@ void TorcRPCRequest::ProcessBatchCall(const QJsonArray &Array)
 {
     QJsonObject error;
     QJsonObject object;
-    object.insert("code",    -32600);
-    object.insert("message", QString("Invalid request"));
-    error.insert("error",    object);
-    error.insert("jsonrpc",  QString("2.0"));
-    error.insert("id",       QJsonValue());
+    object.insert(QStringLiteral("code"),    -32600);
+    object.insert(QStringLiteral("message"), QStringLiteral("Invalid request"));
+    error.insert(QStringLiteral("error"),    object);
+    error.insert(QStringLiteral("jsonrpc"),  QStringLiteral("2.0"));
+    error.insert(QStringLiteral("id"),       QJsonValue());
 
     // an empty array is an error
     if (Array.isEmpty())
     {
         m_serialisedData = QJsonDocument(error).toJson();
-        LOG(VB_GENERAL, LOG_ERR, "Invalid request - empty array");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Invalid request - empty array"));
         return;
     }
 
@@ -182,7 +182,7 @@ void TorcRPCRequest::ProcessBatchCall(const QJsonArray &Array)
         // must be an object
         if (!(*it).isObject())
         {
-            LOG(VB_GENERAL, LOG_ERR, "Invalid request - not an object");
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Invalid request - not an object"));
             result.append(QJsonDocument(error).toJson());
             continue;
         }
@@ -218,37 +218,37 @@ void TorcRPCRequest::ProcessNullContent(bool HasMethod)
     {
         QJsonObject object;
         QJsonObject error;
-        error.insert("code", -32700);
-        error.insert("message", QString("Parse error"));
-        object.insert("error",   error);
-        object.insert("jsonrpc", QString("2.0"));
-        object.insert("id",      QJsonValue());
+        error.insert(QStringLiteral("code"), -32700);
+        error.insert(QStringLiteral("message"), QStringLiteral("Parse error"));
+        object.insert(QStringLiteral("error"),   error);
+        object.insert(QStringLiteral("jsonrpc"), QStringLiteral("2.0"));
+        object.insert(QStringLiteral("id"),      QJsonValue());
         m_serialisedData = QJsonDocument(object).toJson();
-        LOG(VB_GENERAL, LOG_INFO, m_serialisedData);
+        LOG(VB_GENERAL, LOG_INFO, QString(m_serialisedData));
     }
 
-    LOG(VB_GENERAL, LOG_ERR, "Error parsing JSON-RPC data");
+    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Error parsing JSON-RPC data"));
     AddState(Errored);
 }
 
 void TorcRPCRequest::ParseJSONObject(const QJsonObject &Object)
 {
     // determine whether this is a request or response
-    int  id        = (Object.contains("id") && !Object["id"].isNull()) ? (int)Object["id"].toDouble() : -1;
-    bool isrequest = Object.contains("method");
-    bool isresult  = Object.contains("result");
-    bool iserror   = Object.contains("error");
+    int  id        = (Object.contains(QStringLiteral("id")) && !Object[QStringLiteral("id")].isNull()) ? (int)Object[QStringLiteral("id")].toDouble() : -1;
+    bool isrequest = Object.contains(QStringLiteral("method"));
+    bool isresult  = Object.contains(QStringLiteral("result"));
+    bool iserror   = Object.contains(QStringLiteral("error"));
 
     if ((int)isrequest + (int)isresult + (int)iserror != 1)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Ambiguous RPC request/response");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Ambiguous RPC request/response"));
         AddState(Errored);
         return;
     }
 
     if (isrequest)
     {
-        QString method = Object["method"].toString();
+        QString method = Object[QStringLiteral("method")].toString();
         // if this is a notification, check first whether it is a subscription 'event' that the parent is monitoring
         bool handled = false;
         if (id < 0)
@@ -256,37 +256,37 @@ void TorcRPCRequest::ParseJSONObject(const QJsonObject &Object)
             if (!QMetaObject::invokeMethod(m_parent, "HandleNotification", Qt::DirectConnection,
                                            Q_RETURN_ARG(bool, handled), Q_ARG(QString, method)))
             {
-                LOG(VB_GENERAL, LOG_ERR, "Failed to invoke 'HandleNotification' in request parent");
+                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to invoke 'HandleNotification' in request parent"));
             }
         }
 
         if (!handled)
         {
-            QVariantMap result = TorcHTTPServer::HandleRequest(method, Object.value("params").toVariant(), m_parent, m_authenticated);
+            QVariantMap result = TorcHTTPServer::HandleRequest(method, Object.value(QStringLiteral("params")).toVariant(), m_parent, m_authenticated);
 
             // not a notification, response expected
             if (id > -1)
             {
                 // result should contain either 'result' or 'error', we need to insert id and protocol identifier
-                result.insert("jsonrpc", QString("2.0"));
-                result.insert("id", id);
+                result.insert(QStringLiteral("jsonrpc"), QStringLiteral("2.0"));
+                result.insert(QStringLiteral("id"), id);
                 m_serialisedData = QJsonDocument::fromVariant(result).toJson();
             }
-            else if (Object.contains("id"))
+            else if (Object.contains(QStringLiteral("id")))
             {
-                LOG(VB_GENERAL, LOG_ERR, "Request contains invalid id");
+                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Request contains invalid id"));
             }
         }
     }
     else if (isresult)
     {
-        m_reply = Object.value("result").toVariant();
+        m_reply = Object.value(QStringLiteral("result")).toVariant();
         AddState(Result);
         m_id = id;
 
         if (m_id < 0)
         {
-            LOG(VB_GENERAL, LOG_ERR, "Received result with no id");
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Received result with no id"));
             AddState(Errored);
         }
     }
@@ -297,9 +297,9 @@ void TorcRPCRequest::ParseJSONObject(const QJsonObject &Object)
         m_id = id;
 
         if (m_id < 0)
-            LOG(VB_GENERAL, LOG_ERR, "Received error with no id");
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Received error with no id"));
         else
-            LOG(VB_GENERAL, LOG_ERR, "JSON-RPC error");
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("JSON-RPC error"));
     }
 }
 
@@ -333,7 +333,7 @@ void TorcRPCRequest::SetParent(QObject *Parent)
 
     if (m_parent && m_parent->metaObject()->indexOfMethod(QMetaObject::normalizedSignature("RequestReady(TorcRPCRequest*)")) < 0)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Request's parent does not have RequestReady method - request WILL fail");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Request's parent does not have RequestReady method - request WILL fail"));
         m_validParent = false;
     }
 }
@@ -347,8 +347,8 @@ QByteArray& TorcRPCRequest::SerialiseRequest(TorcWebSocketReader::WSSubProtocol 
     if (Protocol == TorcWebSocketReader::SubProtocolJSONRPC)
     {
         QJsonObject object;
-        object.insert("jsonrpc", QString("2.0"));
-        object.insert("method",  m_method);
+        object.insert(QStringLiteral("jsonrpc"), QStringLiteral("2.0"));
+        object.insert(QStringLiteral("method"),  m_method);
 
         // named paramaters are preferred over positional
         if (!m_parameters.isEmpty())
@@ -356,7 +356,7 @@ QByteArray& TorcRPCRequest::SerialiseRequest(TorcWebSocketReader::WSSubProtocol 
             QJsonObject params;
             for (int i = 0; i < m_parameters.size(); ++i)
                 params.insert(m_parameters[i].first, QJsonValue::fromVariant(m_parameters[i].second));
-            object.insert("params", params);
+            object.insert(QStringLiteral("params"), params);
         }
         else if (!m_positionalParameters.isEmpty())
         {
@@ -364,17 +364,17 @@ QByteArray& TorcRPCRequest::SerialiseRequest(TorcWebSocketReader::WSSubProtocol 
             QJsonArray params;
             for (int i = 0; i < m_positionalParameters.size(); ++i)
                 params.append(QJsonValue::fromVariant(m_positionalParameters[i]));
-            object.insert("params", params);
+            object.insert(QStringLiteral("params"), params);
         }
 
         if (m_id > -1)
-            object.insert("id", m_id);
+            object.insert(QStringLiteral("id"), m_id);
 
         QJsonDocument doc(object);
         m_serialisedData = doc.toJson();
     }
 
-    LOG(VB_NETWORK, LOG_DEBUG, m_serialisedData);
+    LOG(VB_NETWORK, LOG_DEBUG, QString(m_serialisedData));
 
     return m_serialisedData;
 }

@@ -9,8 +9,8 @@
 #include "torcinput.h"
 #include "torccentral.h"
 
-#define ONE_WIRE_DIRECTORY QString("/sys/bus/w1/devices/")
-#define ONE_WIRE_NAME      QString("wire1")
+#define ONE_WIRE_DIRECTORY QStringLiteral("/sys/bus/w1/devices/")
+#define ONE_WIRE_NAME      QStringLiteral("wire1")
 
 class Torc1WireBus : public TorcDeviceHandler
 {

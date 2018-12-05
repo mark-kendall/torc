@@ -46,10 +46,10 @@ QDateTime TorcCoreUtils::DateTimeFromString(const QString &String)
     if (String.isEmpty())
         return QDateTime();
 
-    if (!String.contains("-") && String.length() == 14)
+    if (!String.contains('-') && String.length() == 14)
     {
         // must be in yyyyMMddhhmmss format
-        return QDateTime::fromString(String, "yyyyMMddhhmmss");
+        return QDateTime::fromString(String, QStringLiteral("yyyyMMddhhmmss"));
     }
 
     return QDateTime::fromString(String, Qt::ISODate);
@@ -103,7 +103,7 @@ void TorcCoreUtils::QtMessage(QtMsgType Type, const QMessageLogContext &Context,
     if (VERBOSE_LEVEL_CHECK(VB_GENERAL, level))
     {
         PrintLogLine(VB_GENERAL, (LogLevel)level,
-                     file, line, function, 1,
+                     file, line, function,
                      Message.toLocal8Bit().constData());
     }
 
@@ -154,7 +154,7 @@ QByteArray TorcCoreUtils::GZipCompress(QByteArray &Source)
 
     if (Z_OK != deflateInit2(&stream, Z_DEFAULT_COMPRESSION, Z_DEFLATED, 15 + 16, 8, Z_DEFAULT_STRATEGY))
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to setup zlip decompression");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to setup zlip decompression"));
         return result;
     }
 
@@ -167,7 +167,7 @@ QByteArray TorcCoreUtils::GZipCompress(QByteArray &Source)
 
         if (Z_NEED_DICT == error || error < Z_OK)
         {
-            LOG(VB_GENERAL, LOG_ERR, "Failed to compress data");
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to compress data"));
             deflateEnd(&stream);
             return result;
         }
@@ -209,7 +209,7 @@ QByteArray TorcCoreUtils::GZipCompressFile(QFile &Source)
 
     if (Z_OK != deflateInit2(&stream, Z_DEFAULT_COMPRESSION, Z_DEFLATED, 15 + 16, 8, Z_DEFAULT_STRATEGY))
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to setup zlip decompression");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to setup zlip decompression"));
         return result;
     }
 
@@ -239,7 +239,7 @@ QByteArray TorcCoreUtils::GZipCompressFile(QFile &Source)
             }
         }
 
-        LOG(VB_GENERAL, LOG_ERR, "Failed to compress file");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to compress file"));
         deflateEnd(&stream);
         return result;
     }

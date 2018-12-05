@@ -24,7 +24,7 @@
 #include "torcnetworkphoutput.h"
 
 TorcNetworkpHOutput::TorcNetworkpHOutput(double Default, const QVariantMap &Details)
-  : TorcpHOutput(Default, "NetworkpHOutput", Details)
+  : TorcpHOutput(Default, QStringLiteral("NetworkpHOutput"), Details)
 {
 }
 

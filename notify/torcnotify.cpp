@@ -78,7 +78,7 @@ void TorcNotify::Graph(QByteArray *Data)
 
         if (label.isEmpty())
             label = id;
-        Data->append(QString("        \"%1\" [shape=record style=rounded id=\"%1\" label=<<B>%2</B>%3>];\r\n").arg(id, label, desc));
+        Data->append(QStringLiteral("        \"%1\" [shape=record style=rounded id=\"%1\" label=<<B>%2</B>%3>];\r\n").arg(id, label, desc));
 
         // and add links
         notification->Graph(Data);
@@ -95,7 +95,7 @@ void TorcNotify::Graph(QByteArray *Data)
 
         if (label.isEmpty())
             label = id;
-        Data->append(QString("        \"%1\" [shape=record style=rounded id=\"%1\" label=<<B>%2</B>%3>];\r\n").arg(id, label, desc));
+        Data->append(QStringLiteral("        \"%1\" [shape=record style=rounded id=\"%1\" label=<<B>%2</B>%3>];\r\n").arg(id, label, desc));
     }
 }
 
@@ -109,7 +109,7 @@ QVariantMap TorcNotify::SetNotificationText(const QString &Title, const QString 
     {
         {
             QWriteLocker locker(lock);
-            data.insert("applicationname", QCoreApplication::applicationName());
+            data.insert(QStringLiteral("applicationname"), QCoreApplication::applicationName());
             initialised = true;
         }
         {
@@ -124,15 +124,15 @@ QVariantMap TorcNotify::SetNotificationText(const QString &Title, const QString 
 
     {
         QWriteLocker locker(lock);
-        data.insert("datetime",      datetime.toString(Qt::TextDate));
-        data.insert("shortdatetime", datetime.toString(Qt::SystemLocaleShortDate));
-        data.insert("longdatetime",  datetime.toString(Qt::SystemLocaleLongDate));
-        data.insert("time",          time.toString(Qt::TextDate));
-        data.insert("shorttime",     time.toString(Qt::SystemLocaleShortDate));
-        data.insert("longtime",      time.toString(Qt::SystemLocaleLongDate));
-        data.insert("date",          date.toString(Qt::TextDate));
-        data.insert("shortdate",     date.toString(Qt::SystemLocaleShortDate));
-        data.insert("longdate",      date.toString(Qt::SystemLocaleLongDate));
+        data.insert(QStringLiteral("datetime"),      datetime.toString(Qt::TextDate));
+        data.insert(QStringLiteral("shortdatetime"), datetime.toString(Qt::SystemLocaleShortDate));
+        data.insert(QStringLiteral("longdatetime"),  datetime.toString(Qt::SystemLocaleLongDate));
+        data.insert(QStringLiteral("time"),          time.toString(Qt::TextDate));
+        data.insert(QStringLiteral("shorttime"),     time.toString(Qt::SystemLocaleShortDate));
+        data.insert(QStringLiteral("longtime"),      time.toString(Qt::SystemLocaleLongDate));
+        data.insert(QStringLiteral("date"),          date.toString(Qt::TextDate));
+        data.insert(QStringLiteral("shortdate"),     date.toString(Qt::SystemLocaleShortDate));
+        data.insert(QStringLiteral("longdate"),      date.toString(Qt::SystemLocaleLongDate));
     }
 
     QRegExp regexp("%(([^\\|%]+)?\\||\\|(.))?([\\w#]+)(\\|(.+))?%");
@@ -149,7 +149,7 @@ QVariantMap TorcNotify::SetNotificationText(const QString &Title, const QString 
         {
             QString key = regexp.cap(4).toLower().trimmed();
             if (data.contains(key))
-                title.replace(regexp.cap(0), QString("%1%2%3%4").arg(regexp.cap(2), regexp.cap(3), data.value(key), regexp.cap(6)));
+                title.replace(regexp.cap(0), QStringLiteral("%1%2%3%4").arg(regexp.cap(2), regexp.cap(3), data.value(key), regexp.cap(6)));
             pos += regexp.matchedLength();
         }
         pos = 0;
@@ -157,7 +157,7 @@ QVariantMap TorcNotify::SetNotificationText(const QString &Title, const QString 
         {
             QString key = regexp.cap(4).toLower().trimmed();
             if (data.contains(key))
-                body.replace(regexp.cap(0), QString("%1%2%3%4").arg(regexp.cap(2), regexp.cap(3), data.value(key), regexp.cap(6)));
+                body.replace(regexp.cap(0), QStringLiteral("%1%2%3%4").arg(regexp.cap(2), regexp.cap(3), data.value(key), regexp.cap(6)));
             pos += regexp.matchedLength();
         }
     }
@@ -167,7 +167,7 @@ QVariantMap TorcNotify::SetNotificationText(const QString &Title, const QString 
     {
         QString key = regexp.cap(4).toLower().trimmed();
         if (Custom.contains(key))
-            title.replace(regexp.cap(0), QString("%1%2%3%4").arg(regexp.cap(2), regexp.cap(3), Custom.value(key), regexp.cap(6)));
+            title.replace(regexp.cap(0), QStringLiteral("%1%2%3%4").arg(regexp.cap(2), regexp.cap(3), Custom.value(key), regexp.cap(6)));
         pos += regexp.matchedLength();
     }
     pos = 0;
@@ -175,7 +175,7 @@ QVariantMap TorcNotify::SetNotificationText(const QString &Title, const QString 
     {
         QString key = regexp.cap(4).toLower().trimmed();
         if (Custom.contains(key))
-            body.replace(regexp.cap(0), QString("%1%2%3%4").arg(regexp.cap(2), regexp.cap(3), Custom.value(key), regexp.cap(6)));
+            body.replace(regexp.cap(0), QStringLiteral("%1%2%3%4").arg(regexp.cap(2), regexp.cap(3), Custom.value(key), regexp.cap(6)));
         pos += regexp.matchedLength();
     }
 
@@ -203,22 +203,22 @@ void TorcNotify::Create(const QVariantMap &Details)
     QVariantMap::const_iterator ii = Details.constBegin();
     for ( ; ii != Details.constEnd(); ++ii)
     {
-        if (ii.key() == "notify")
+        if (ii.key() == QStringLiteral("notify"))
         {
             QVariantMap notify = ii.value().toMap();
             QVariantMap::const_iterator i = notify.constBegin();
             for ( ; i != notify.constEnd(); ++i)
             {
-                if (i.key() == "notifiers")
+                if (i.key() == QStringLiteral("notifiers"))
                 {
                     QVariantMap notifiers = i.value().toMap();
                     QVariantMap::iterator it = notifiers.begin();
                     for ( ; it != notifiers.end(); ++it)
                     {
                         QVariantMap details = it.value().toMap();
-                        if (!details.contains("name"))
+                        if (!details.contains(QStringLiteral("name")))
                         {
-                            LOG(VB_GENERAL, LOG_ERR, QString("Notifier '%1' has no name").arg(it.key()));
+                            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Notifier '%1' has no name").arg(it.key()));
                             continue;
                         }
 
@@ -229,34 +229,34 @@ void TorcNotify::Create(const QVariantMap &Details)
                             if (notifier)
                             {
                                 m_notifiers.append(notifier);
-                                LOG(VB_GENERAL, LOG_INFO, QString("New notifier '%1'").arg(notifier->GetUniqueId()));
+                                LOG(VB_GENERAL, LOG_INFO, QStringLiteral("New notifier '%1'").arg(notifier->GetUniqueId()));
                                 break;
                             }
                         }
                     }
                 }
-                else if (i.key() == "notifications")
+                else if (i.key() == QStringLiteral("notifications"))
                 {
                     QVariantMap notifications = i.value().toMap();
                     QVariantMap::iterator it = notifications.begin();
                     for ( ; it != notifications.end(); ++it)
                     {
                         QVariantMap details = it.value().toMap();
-                        if (!details.contains("name"))
+                        if (!details.contains(QStringLiteral("name")))
                         {
-                            LOG(VB_GENERAL, LOG_ERR, QString("Notification '%1' has no name").arg(it.key()));
+                            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Notification '%1' has no name").arg(it.key()));
                             continue;
                         }
 
-                        if (!details.contains("outputs"))
+                        if (!details.contains(QStringLiteral("outputs")))
                         {
-                            LOG(VB_GENERAL, LOG_ERR, QString("Notification '%1' does not specify 'outputs' (notififiers)").arg(it.key()));
+                            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Notification '%1' does not specify 'outputs' (notififiers)").arg(it.key()));
                             continue;
                         }
 
-                        if (!details.contains("message"))
+                        if (!details.contains(QStringLiteral("message")))
                         {
-                            LOG(VB_GENERAL, LOG_ERR, QString("Notificaiton '%1' does not specify 'message'").arg(it.key()));
+                            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Notificaiton '%1' does not specify 'message'").arg(it.key()));
                             continue;
                         }
 
@@ -267,7 +267,7 @@ void TorcNotify::Create(const QVariantMap &Details)
                             if (notification)
                             {
                                 m_notifications.append(notification);
-                                LOG(VB_GENERAL, LOG_INFO, QString("New notification '%1'").arg(notification->GetUniqueId()));
+                                LOG(VB_GENERAL, LOG_INFO, QStringLiteral("New notification '%1'").arg(notification->GetUniqueId()));
                                 break;
                             }
                         }

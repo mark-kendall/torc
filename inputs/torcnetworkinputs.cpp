@@ -113,8 +113,8 @@ void TorcNetworkInputs::Create(const QVariantMap &Details)
                     if (it.key() == TorcCoreUtils::EnumToLowerString<TorcInput::Type>(static_cast<TorcInput::Type>(type)))
                     {
                         QVariantMap input    = it.value().toMap();
-                        QString defaultvalue = network ? input.value("default").toString() : input.value("value").toString();
-                        QString uniqueid     = input.value("name").toString(); // ugly... assumes it is present
+                        QString defaultvalue = network ? input.value(QStringLiteral("default")).toString() : input.value(QStringLiteral("value")).toString();
+                        QString uniqueid     = input.value(QStringLiteral("name")).toString(); // ugly... assumes it is present
 
                         bool ok = false;
                         double defaultdouble = defaultvalue.toDouble(&ok);
@@ -170,7 +170,7 @@ void TorcNetworkInputs::Create(const QVariantMap &Details)
                                     if (constant)
                                     {
                                         // this should be flagged by the XSD
-                                        LOG(VB_GENERAL, LOG_ERR, "Cannot create constant button input");
+                                        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Cannot create constant button input"));
                                     }
                                     else
                                     {

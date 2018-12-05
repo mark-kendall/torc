@@ -50,8 +50,8 @@
 TorcSetting::TorcSetting(TorcSetting *Parent, const QString &DBName, const QString &UIName,
                          Type SettingType, Roles SettingRoles, const QVariant &Default)
   : QObject(),
-    TorcHTTPService(this, TORC_SETTINGS_DIR + DBName, (SettingRoles & Public) ? DBName : "",
-                    TorcSetting::staticMetaObject, "SetActive,SetTrue,SetFalse"),
+    TorcHTTPService(this, TORC_SETTINGS_DIR + DBName, (SettingRoles & Public) ? DBName : QStringLiteral(""),
+                    TorcSetting::staticMetaObject, QStringLiteral("SetActive,SetTrue,SetFalse")),
     m_parent(Parent),
     type(SettingType),
     settingType(TorcCoreUtils::EnumToLowerString<TorcSetting::Type>(SettingType)),
@@ -96,7 +96,7 @@ TorcSetting::TorcSetting(TorcSetting *Parent, const QString &DBName, const QStri
         if (roles & Persistent)
         {
             QString svalue = gLocalContext->GetSetting(m_dbName, (QString)defaultValue.toString());
-            value = QVariant(svalue.split(","));
+            value = QVariant(svalue.split(','));
         }
         else
         {
@@ -106,7 +106,7 @@ TorcSetting::TorcSetting(TorcSetting *Parent, const QString &DBName, const QStri
     else
     {
         if (vtype != QVariant::Invalid)
-            LOG(VB_GENERAL, LOG_ERR, QString("Unsupported setting data type for %1 (%2)").arg(m_dbName).arg(vtype));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Unsupported setting data type for %1 (%2)").arg(m_dbName).arg(vtype));
         value = QVariant();
     }
 }
@@ -129,9 +129,9 @@ QString TorcSetting::GetChildList(QVariantMap &Children)
 {
     QReadLocker locker(&m_httpServiceLock);
 
-    Children.insert("name", m_dbName);
-    Children.insert("uiname", uiName);
-    Children.insert("type", TorcCoreUtils::EnumToLowerString<TorcSetting::Type>(type));
+    Children.insert(QStringLiteral("name"), m_dbName);
+    Children.insert(QStringLiteral("uiname"), uiName);
+    Children.insert(QStringLiteral("type"), TorcCoreUtils::EnumToLowerString<TorcSetting::Type>(type));
     QVariantMap children;
     foreach (TorcSetting* child, m_children)
     {
@@ -139,7 +139,7 @@ QString TorcSetting::GetChildList(QVariantMap &Children)
         QString name = child->GetChildList(childd);
         children.insert(name, childd);
     }
-    Children.insert("children", children);
+    Children.insert(QStringLiteral("children"), children);
     return m_dbName;
 }
 
@@ -362,7 +362,7 @@ bool TorcSetting::SetValue(const QVariant &Value)
     {
         QStringList svalue = Value.toStringList();
         if (roles & Persistent)
-            gLocalContext->SetSetting(m_dbName, svalue.join(","));
+            gLocalContext->SetSetting(m_dbName, svalue.join(','));
         value = Value;
         locker.unlock();
         emit ValueChanged(svalue);
@@ -379,7 +379,7 @@ void TorcSetting::SetRange(int Begin, int End, int Step)
 
     if (Begin >= End || Step < 1)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Invalid setting range: begin %1 end %2 step %3")
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Invalid setting range: begin %1 end %2 step %3")
             .arg(Begin).arg(End).arg(Step));
         return;
     }

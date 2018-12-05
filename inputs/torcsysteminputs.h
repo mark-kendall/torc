@@ -5,7 +5,7 @@
 #include "torccentral.h"
 #include "torcinput.h"
 
-#define SYSTEM_INPUTS_STRING QString("system")
+#define SYSTEM_INPUTS_STRING QStringLiteral("system")
 
 class TorcSystemInputs final : public TorcDeviceHandler
 {

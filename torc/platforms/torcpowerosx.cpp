@@ -51,7 +51,7 @@ TorcPowerOSX::TorcPowerOSX()
 
     if (!gAdminRunLoop)
     {
-        LOG(VB_GENERAL, LOG_ERR, "OS X callback run loop not present - aborting");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("OS X callback run loop not present - aborting"));
         return;
     }
 
@@ -65,7 +65,7 @@ TorcPowerOSX::TorcPowerOSX()
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to setup power status callback");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to setup power status callback"));
     }
 
     // Is there a battery?
@@ -85,7 +85,7 @@ TorcPowerOSX::TorcPowerOSX()
     }
 
     if (!m_powerRef)
-        LOG(VB_GENERAL, LOG_ERR, "Failed to setup power source callback");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to setup power source callback"));
 
     // Set capabilities
     m_canShutdown->SetValue(QVariant((bool)true));
@@ -128,12 +128,12 @@ bool TorcPowerOSX::DoShutdown(void)
 
     if (noErr == error)
     {
-        LOG(VB_GENERAL, LOG_INFO, "Sent shutdown command.");
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Sent shutdown command."));
         TorcLocalContext::NotifyEvent(Torc::ShuttingDown);
         return true;
     }
 
-    LOG(VB_GENERAL, LOG_ERR, "Failed to send shutdown command.");
+    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to send shutdown command."));
     return false;
 }
 
@@ -146,11 +146,11 @@ bool TorcPowerOSX::DoSuspend(void)
 
     if (noErr == error)
     {
-        LOG(VB_GENERAL, LOG_INFO, "Sent sleep command.");
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Sent sleep command."));
         return true;
     }
 
-    LOG(VB_GENERAL, LOG_ERR, "Failed to send sleep command.");
+    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to send sleep command."));
     return false;
 }
 
@@ -169,11 +169,11 @@ bool TorcPowerOSX::DoRestart(void)
 
     if (noErr == error)
     {
-        LOG(VB_GENERAL, LOG_INFO, "Sent restart command.");
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Sent restart command."));
         return true;
     }
 
-    LOG(VB_GENERAL, LOG_ERR, "Failed to send restart command.");
+    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to send restart command."));
     return false;
 }
 

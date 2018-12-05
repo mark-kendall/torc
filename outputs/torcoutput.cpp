@@ -26,14 +26,14 @@
 #include "torcoutputs.h"
 #include "torcoutput.h"
 
-#define BLACKLIST QString("SetValue,SetValid")
+#define BLACKLIST QStringLiteral("SetValue,SetValid")
 
 // N.B. We need to pass the staticMetaObject to TorcHTTPService as the object is not yet complete.
 //      If we pass 'this' during construction, this->metaObject() only contains details of the super class.
 TorcOutput::TorcOutput(TorcOutput::Type Type, double Value, const QString &ModelId, const QVariantMap &Details)
   : TorcDevice(true, Value, Value, ModelId, Details),
-    TorcHTTPService(this, OUTPUTS_DIRECTORY + "/" + TorcCoreUtils::EnumToLowerString<TorcOutput::Type>(Type) + "/" + Details.value("name").toString(),
-                    Details.value("name").toString(), TorcOutput::staticMetaObject, BLACKLIST),
+    TorcHTTPService(this, QStringLiteral("%1/%2%3").arg(OUTPUTS_DIRECTORY, TorcCoreUtils::EnumToLowerString<TorcOutput::Type>(Type), Details.value(QStringLiteral("name")).toString()),
+                    Details.value(QStringLiteral("name")).toString(), TorcOutput::staticMetaObject, BLACKLIST),
     m_owner(nullptr)
 {
     TorcOutputs::gOutputs->AddOutput(this);
@@ -42,8 +42,8 @@ TorcOutput::TorcOutput(TorcOutput::Type Type, double Value, const QString &Model
 TorcOutput::TorcOutput(TorcOutput::Type Type, double Value, const QString &ModelId, const QVariantMap &Details,
                        QObject *Output, const QMetaObject &MetaObject, const QString &Blacklist)
   : TorcDevice(true, Value, Value, ModelId, Details),
-    TorcHTTPService(Output, OUTPUTS_DIRECTORY + "/" + TorcCoreUtils::EnumToLowerString<TorcOutput::Type>(Type) + "/" + Details.value("name").toString(),
-                    Details.value("name").toString(), MetaObject, BLACKLIST + "," + Blacklist),
+    TorcHTTPService(Output, QStringLiteral("%1/%2/%3").arg(OUTPUTS_DIRECTORY, TorcCoreUtils::EnumToLowerString<TorcOutput::Type>(Type), Details.value(QStringLiteral("name")).toString()),
+                    Details.value(QStringLiteral("name")).toString(), MetaObject, BLACKLIST + "," + Blacklist),
     m_owner(nullptr)
 {
     TorcOutputs::gOutputs->AddOutput(this);
@@ -69,13 +69,13 @@ bool TorcOutput::SetOwner(QObject *Owner)
 
     if (!Owner)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Cannot set NULL output owner for %1").arg(uniqueId));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Cannot set NULL output owner for %1").arg(uniqueId));
         return false;
     }
 
     if (m_owner && m_owner != Owner)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Cannot set different output owner for %1").arg(uniqueId));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Cannot set different output owner for %1").arg(uniqueId));
         return false;
     }
 

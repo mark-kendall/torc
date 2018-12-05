@@ -82,7 +82,7 @@ TorcNetworkRequest::TorcNetworkRequest(const QNetworkRequest &Request, QNetworkA
 {
     // reserve some space for seeking backwards in the stream
     if (m_bufferSize)
-        LOG(VB_GENERAL, LOG_INFO, QString("Request buffer size %1bytes (%2 reserved)").arg(m_bufferSize).arg(m_bufferSize - m_writeBufferSize));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Request buffer size %1bytes (%2 reserved)").arg(m_bufferSize).arg(m_bufferSize - m_writeBufferSize));
 }
 
 TorcNetworkRequest::TorcNetworkRequest(const QNetworkRequest &Request, const QByteArray &PostData, int *Abort)
@@ -211,11 +211,11 @@ int TorcNetworkRequest::Read(char *Buffer, qint32 BufferSize, int Timeout, bool 
     {
         if (m_replyFinished && m_replyBytesAvailable == 0 && available == 0)
         {
-            LOG(VB_GENERAL, LOG_INFO, "Download complete");
+            LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Download complete"));
             return 0;
         }
 
-        LOG(VB_GENERAL, LOG_ERR, QString("Waited %1ms for data. Aborting").arg(Timeout));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Waited %1ms for data. Aborting").arg(Timeout));
         return -ECONNABORTED;
     }
 
@@ -261,7 +261,7 @@ bool TorcNetworkRequest::WritePriv(QNetworkReply *Reply, const char *Buffer, int
 
         if (read < 0)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Error reading '%1'").arg(Reply->errorString()));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Error reading '%1'").arg(Reply->errorString()));
             return false;
         }
 
@@ -275,7 +275,7 @@ bool TorcNetworkRequest::WritePriv(QNetworkReply *Reply, const char *Buffer, int
         if (read == Size)
             return true;
 
-        LOG(VB_GENERAL, LOG_ERR, QString("Expected %1 bytes, got %2").arg(Size).arg(read));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Expected %1 bytes, got %2").arg(Size).arg(read));
     }
 
     return false;
@@ -320,13 +320,13 @@ void TorcNetworkRequest::SetRange(int Start, int End)
 {
     if (m_rangeStart != 0 || m_rangeEnd != 0)
     {
-        LOG(VB_GENERAL, LOG_WARNING, "Byte ranges already set - ignoring");
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Byte ranges already set - ignoring"));
         return;
     }
 
     if (Start < 0)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Invalid range start");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Invalid range start"));
         return;
     }
 
@@ -340,7 +340,7 @@ void TorcNetworkRequest::SetRange(int Start, int End)
     m_rewindPositionInFile += m_rangeStart;
 
     // and update the request
-    m_request.setRawHeader("Range", QString("bytes=%1-%2").arg(m_rangeStart).arg(m_rangeEnd != -1 ? QString::number(m_rangeEnd) : "").toLatin1());
+    m_request.setRawHeader("Range", QStringLiteral("bytes=%1-%2").arg(m_rangeStart).arg(m_rangeEnd != -1 ? QString::number(m_rangeEnd) : QStringLiteral("")).toLatin1());
 }
 
 void TorcNetworkRequest::DownloadProgress(qint64 Received, qint64 Total)
@@ -399,7 +399,7 @@ QByteArray& TorcNetworkRequest::GetBuffer(void)
 QByteArray TorcNetworkRequest::ReadAll(int Timeout)
 {
     if (m_bufferSize)
-        LOG(VB_GENERAL, LOG_WARNING, "ReadAll called for a streamed buffer");
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("ReadAll called for a streamed buffer"));
 
     m_readTimer.Restart();
 
@@ -410,7 +410,7 @@ QByteArray TorcNetworkRequest::ReadAll(int Timeout)
         return QByteArray();
 
     if (!m_replyFinished)
-        LOG(VB_GENERAL, LOG_ERR, "Download timed out - probably incomplete");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Download timed out - probably incomplete"));
 
     return m_buffer;
 }

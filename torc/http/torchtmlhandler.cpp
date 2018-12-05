@@ -54,11 +54,12 @@ TorcHTMLHandler::TorcHTMLHandler(const QString &Path, const QString &Name)
     m_pathToContent(GetTorcShareDir()),
     m_allowedFiles()
 {
-    if (m_pathToContent.endsWith("/"))
+    if (m_pathToContent.endsWith('/'))
         m_pathToContent.chop(1);
-    m_pathToContent += "/html";
+    m_pathToContent += QStringLiteral("/html");
 
-    m_allowedFiles << "/" << "/index.html" << "/torc.xsd" << "/browserconfig.xml" << "/manifest.json";
+    m_allowedFiles << QStringLiteral("/") << QStringLiteral("/index.html") << QStringLiteral("/torc.xsd") <<
+                      QStringLiteral("/browserconfig.xml") << QStringLiteral("/manifest.json");
 }
 
 void TorcHTMLHandler::ProcessHTTPRequest(const QString &PeerAddress, int PeerPort, const QString &LocalAddress, int LocalPort, TorcHTTPRequest &Request)
@@ -72,7 +73,7 @@ void TorcHTMLHandler::ProcessHTTPRequest(const QString &PeerAddress, int PeerPor
     if (Request.GetHTTPRequestType() == HTTPOptions)
     {
         // this is the 'global' options - return everything possible
-        if (Request.GetUrl() == "/*")
+        if (Request.GetUrl() == QStringLiteral("/*"))
             HandleOptions(Request, HTTPHead | HTTPGet | HTTPPost | HTTPPut | HTTPDelete | HTTPOptions);
         else
             HandleOptions(Request, HTTPHead | HTTPGet | HTTPOptions);
@@ -83,13 +84,13 @@ void TorcHTMLHandler::ProcessHTTPRequest(const QString &PeerAddress, int PeerPor
     QString url = Request.GetUrl();
     if (m_allowedFiles.contains(url))
     {
-        if (url == "/")
-            url = "/index.html";
+        if (url == QStringLiteral("/"))
+            url = QStringLiteral("/index.html");
 
         HandleFile(Request, m_pathToContent + url, HTTPCacheNone);
     }
     // I think this is unused/unreachable. img directory is served by TorcHTMLStaticContent
-    else if (url.endsWith(".png", Qt::CaseInsensitive) || url.endsWith(".ico", Qt::CaseInsensitive))
+    else if (url.endsWith(QStringLiteral(".png"), Qt::CaseInsensitive) || url.endsWith(QStringLiteral(".ico"), Qt::CaseInsensitive))
     {
         HandleFile(Request, m_pathToContent + "/img" + url, HTTPCacheLongLife | HTTPCacheLastModified);
     }

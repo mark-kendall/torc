@@ -10,7 +10,7 @@
 #include "torchttpservice.h"
 #include "torcdevice.h"
 
-#define CONTROLS_DIRECTORY QString("controls")
+#define CONTROLS_DIRECTORY QStringLiteral("controls")
 
 class TorcControl : public TorcDevice, public TorcHTTPService
 {

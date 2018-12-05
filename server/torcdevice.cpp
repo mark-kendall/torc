@@ -33,37 +33,37 @@ TorcDevice::TorcDevice(bool Valid, double Value, double Default,
     value(Value),
     defaultValue(Default),
     modelId(ModelId),
-    uniqueId(QString("")),
-    userName(QString("")),
-    userDescription(QString("")),
+    uniqueId(QStringLiteral("")),
+    userName(QStringLiteral("")),
+    userDescription(QStringLiteral("")),
     lock(QMutex::Recursive),
     wasInvalid(true)
 {
-    if (!Details.contains("name"))
+    if (!Details.contains(QStringLiteral("name")))
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Device has no <name> - THIS WILL NOT WORK"));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Device has no <name> - THIS WILL NOT WORK"));
     }
     else
     {
         QMutexLocker locker(gDeviceListLock);
-        uniqueId = Details.value("name").toString();
+        uniqueId = Details.value(QStringLiteral("name")).toString();
         setObjectName(uniqueId);
 
         if (!uniqueId.isEmpty() && !gDeviceList->contains(uniqueId))
         {
             gDeviceList->insert(uniqueId, this);
-            LOG(VB_GENERAL, LOG_DEBUG, QString("New device id: %1").arg(uniqueId));
+            LOG(VB_GENERAL, LOG_DEBUG, QStringLiteral("New device id: %1").arg(uniqueId));
         }
         else
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("Device id '%1' already in use - THIS WILL NOT WORK").arg(uniqueId));
+            LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Device id '%1' already in use - THIS WILL NOT WORK").arg(uniqueId));
         }
     }
 
-    if (Details.contains("username"))
-        userName = Details.value("username").toString();
-    if (Details.contains("userdescription"))
-        userDescription = Details.value("userdescription").toString();
+    if (Details.contains(QStringLiteral("username")))
+        userName = Details.value(QStringLiteral("username")).toString();
+    if (Details.contains(QStringLiteral("userdescription")))
+        userDescription = Details.value(QStringLiteral("userdescription")).toString();
 }
 
 TorcDevice::~TorcDevice()
@@ -71,7 +71,7 @@ TorcDevice::~TorcDevice()
     {
         QMutexLocker locker(gDeviceListLock);
 
-        LOG(VB_GENERAL, LOG_INFO, QString("Device id: %1 removed").arg(uniqueId));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Device id: %1 removed").arg(uniqueId));
         gDeviceList->remove(uniqueId);
     }
 }
