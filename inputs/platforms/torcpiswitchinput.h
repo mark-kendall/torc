@@ -10,24 +10,22 @@
 
 class TorcPiSwitchInput;
 
-// this has to be declared here as we cannot have a Q_OBJECT class declared privately
-class TorcPiSwitchInputThread : public TorcQThread
+class TorcPiSwitchInputThread final : public TorcQThread
 {
     Q_OBJECT
-
   public:
     TorcPiSwitchInputThread(TorcPiSwitchInput* Parent, int Pin);
     virtual ~TorcPiSwitchInputThread() = default;
 
-    void         Start    (void);
-    void         Finish   (void);
+    void         Start    (void) override;
+    void         Finish   (void) override;
     void         Stop     (void);
 
   signals:
     void         Changed  (double Value);
 
   protected:
-    void         run      (void);
+    void         run      (void) override;
     void         Update   (void);
  
   private:
@@ -38,7 +36,7 @@ class TorcPiSwitchInputThread : public TorcQThread
     QFile              m_file;
 };
 
-class TorcPiSwitchInput : public TorcSwitchInput
+class TorcPiSwitchInput final : public TorcSwitchInput
 {
     Q_OBJECT
 
@@ -46,8 +44,8 @@ class TorcPiSwitchInput : public TorcSwitchInput
     TorcPiSwitchInput(int Pin, const QVariantMap &Details);
     virtual ~TorcPiSwitchInput();
 
-    void               Start          (void);
-    QStringList        GetDescription (void);
+    void               Start          (void) override;
+    QStringList        GetDescription (void) override;
 
   private:
     Q_DISABLE_COPY(TorcPiSwitchInput)

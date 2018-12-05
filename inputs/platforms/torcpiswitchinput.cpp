@@ -42,7 +42,7 @@ TorcPiSwitchInputThread::TorcPiSwitchInputThread(TorcPiSwitchInput *Parent, int 
     m_aborted(false),
     m_file(QStringLiteral("/sys/class/gpio/gpio%1/value").arg(wpiPinToGpio(Pin)))
 {
-   connect(this, SIGNAL(Changed(double)), m_parent, SLOT(SetValue(double)));
+    connect(this, &TorcPiSwitchInputThread::Changed, m_parent, &TorcPiSwitchInput::SetValue);
 }
 
 void TorcPiSwitchInputThread::Finish(void)
