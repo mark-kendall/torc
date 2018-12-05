@@ -52,7 +52,7 @@ TorcI2CPCA9685Channel::TorcI2CPCA9685Channel(int Number, TorcI2CPCA9685 *Parent,
     if (m_resolution != m_maxResolution)
     {
         m_resolution = m_maxResolution;
-        LOG(VB_GENERAL, LOG_WARNING, QString("Ignoring user defined resolution for PCA9685 channel - defaulting to %1").arg(m_maxResolution));
+        LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Ignoring user defined resolution for PCA9685 channel - defaulting to %1").arg(m_maxResolution));
     }
 
     m_parent->SetPWM(m_channelNumber, m_channelValue);
@@ -66,7 +66,7 @@ TorcI2CPCA9685Channel::~TorcI2CPCA9685Channel()
 
 QStringList TorcI2CPCA9685Channel::GetDescription(void)
 {
-    return QStringList() << tr("I2C") << tr("PCA9685 16 Channel PWM") << QString("%1 %2").arg(tr("Channel")).arg(m_channelNumber) << tr("Resolution %1").arg(m_resolution);
+    return QStringList() << tr("I2C") << tr("PCA9685 16 Channel PWM") << QStringLiteral("%1 %2").arg(tr("Channel")).arg(m_channelNumber) << tr("Resolution %1").arg(m_resolution);
 }
 
 void TorcI2CPCA9685Channel::SetValue(double Value)
@@ -99,17 +99,17 @@ TorcI2CPCA9685::TorcI2CPCA9685(int Address, const QVariantMap &Details)
     m_fd = wiringPiI2CSetup(m_address);
     if (m_fd < 0)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to open I2C device at address 0x%1").arg(m_address, 0, 16));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to open I2C device at address 0x%1").arg(m_address, 0, 16));
         return;
     }
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Opened %1 I2C device at address 0x%2")
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Opened %1 I2C device at address 0x%2")
         .arg(PCA9685).arg(m_address, 0, 16));
 
     // reset
     if (wiringPiI2CWriteReg8(m_fd, MODE1, 0x00) < 0 || wiringPiI2CWriteReg8(m_fd, MODE2, 0x04) < 0)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to reset PCA9685 device");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to reset PCA9685 device"));
         return;
     }
 
@@ -121,35 +121,35 @@ TorcI2CPCA9685::TorcI2CPCA9685(int Address, const QVariantMap &Details)
     success &= wiringPiI2CWriteReg8(m_fd, MODE2, 0x04) > -1;
 
     if (!success)
-        LOG(VB_GENERAL, LOG_ERR, "Failed to set up PCA9685 device");
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to set up PCA9685 device"));
 
     // create individual channel services
     // this will also reset each channel to the default value (0)
     QVariantMap::const_iterator it = Details.begin();
     for ( ; it != Details.constEnd(); ++it)
     {
-        if (it.key() == "channel")
+        if (it.key() == QStringLiteral("channel"))
         {
             // channel needs a <number>
             QVariantMap channel = it.value().toMap();
-            if (!channel.contains("number"))
+            if (!channel.contains(QStringLiteral("number")))
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("PCA9685 channel has no number"));
+                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("PCA9685 channel has no number"));
                 continue;
             }
 
             bool ok = false;
-            int channelnum = channel.value("number").toInt(&ok);
+            int channelnum = channel.value(QStringLiteral("number")).toInt(&ok);
 
             if (!ok || channelnum < 0 || channelnum >= 16)
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("Failed to parse valid PCA9685 channel number from '%1'").arg(channel.value("number").toString()));
+                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Failed to parse valid PCA9685 channel number from '%1'").arg(channel.value(QStringLiteral("number")).toString()));
                 continue;
             }
 
             if (m_outputs[channelnum])
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("PCA9685 channel '%1' is already in use").arg(channelnum));
+                LOG(VB_GENERAL, LOG_ERR, QStringLiteral("PCA9685 channel '%1' is already in use").arg(channelnum));
                 continue;
             }
 
@@ -190,12 +190,12 @@ bool TorcI2CPCA9685::SetPWM(int Channel, int Value)
     // 'off' supercedes 'on' per spec
     if (offtime < 1)
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Channel %1 turned completely OFF").arg(Channel));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Channel %1 turned completely OFF").arg(Channel));
         offtime |= 0x1000;
     }
     else if (offtime >= PCA9685_RESOLUTION)
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Channel %1 turned completely ON").arg(Channel));
+        LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Channel %1 turned completely ON").arg(Channel));
         ontime |= 0x1000;
     }
 
@@ -206,7 +206,7 @@ bool TorcI2CPCA9685::SetPWM(int Channel, int Value)
     success &= wiringPiI2CWriteReg8(m_fd, LED0_OFF_HIGH + (4 * Channel), offtime >> 8) > -1;
     
     if (!success)
-        LOG(VB_GENERAL, LOG_ERR, QString("Error writing to channel %1").arg(Channel));
+        LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Error writing to channel %1").arg(Channel));
     return success;
 }
 

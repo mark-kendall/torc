@@ -9,7 +9,7 @@
 #include "../torcoutputs.h"
 #include "torci2cbus.h"
 
-#define PCA9685 QString("pca9685")
+#define PCA9685 QStringLiteral("pca9685")
 
 class TorcI2CPCA9685;
 

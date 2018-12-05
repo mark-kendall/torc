@@ -488,7 +488,7 @@ bool TorcPiCamera::Stop(void)
 
 bool TorcPiCamera::LoadDrivers(void)
 {
-    LOG(VB_GENERAL, LOG_INFO, "Trying to load Broadcom drivers");
+    LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Trying to load Broadcom drivers"));
 
     // request a callback
     OMX_CONFIG_REQUESTCALLBACKTYPE callback;
