@@ -359,7 +359,7 @@ var searchData=
   ['torcoutput',['TorcOutput',['../d1/dc7/class_torc_output.html',1,'TorcOutput'],['../d1/dc7/class_torc_output.html#ac61d340d6e42ff8894d445fc1cc1bd1e',1,'TorcOutput::TorcOutput(TorcOutput::Type Type, double Value, const QString &amp;ModelId, const QVariantMap &amp;Details)'],['../d1/dc7/class_torc_output.html#ac1d1de7561cdccfa948ba7e882768ade',1,'TorcOutput::TorcOutput(TorcOutput::Type Type, double Value, const QString &amp;ModelId, const QVariantMap &amp;Details, QObject *Output, const QMetaObject &amp;MetaObject, const QString &amp;Blacklist=QStringLiteral(&quot;&quot;))']]],
   ['torcoutput_2ecpp',['torcoutput.cpp',['../d5/d6d/torcoutput_8cpp.html',1,'']]],
   ['torcoutput_2eh',['torcoutput.h',['../dc/d01/torcoutput_8h.html',1,'']]],
-  ['torcoutputs',['TorcOutputs',['../df/da4/class_torc_outputs.html',1,'TorcOutputs'],['../df/da4/class_torc_outputs.html#a5983537cf404c5b06dcd4f58122cd551',1,'TorcOutputs::TorcOutputs()']]],
+  ['torcoutputs',['TorcOutputs',['../df/da4/class_torc_outputs.html',1,'TorcOutputs'],['../d1/dc7/class_torc_output.html#af49b015c6144dab1d83daf968ae53183',1,'TorcOutput::TorcOutputs()'],['../df/da4/class_torc_outputs.html#a5983537cf404c5b06dcd4f58122cd551',1,'TorcOutputs::TorcOutputs()']]],
   ['torcoutputs_2ecpp',['torcoutputs.cpp',['../d5/da7/torcoutputs_8cpp.html',1,'']]],
   ['torcoutputs_2eh',['torcoutputs.h',['../da/d80/torcoutputs_8h.html',1,'']]],
   ['torcphinput',['TorcpHInput',['../db/d20/class_torcp_h_input.html',1,'TorcpHInput'],['../db/d20/class_torcp_h_input.html#a5f3aca3fb907c91ee072d5dfd40779fd',1,'TorcpHInput::TorcpHInput()']]],
@@ -556,5 +556,5 @@ var searchData=
   ['tryconnect',['TryConnect',['../dd/d3a/class_torc_network_service.html#a25801b8d95abe55ae17fc1fe38c71b97',1,'TorcNetworkService']]],
   ['trynotify',['TryNotify',['../d0/db9/class_torc_i_o_t_logger.html#a47917ff5decf4a7f9710f0128bbbc210',1,'TorcIOTLogger']]],
   ['txtrecordtomap',['TxtRecordToMap',['../d0/d9f/class_torc_bonjour.html#a6d602ba5fb9021f2cb7be12ecc90e70a',1,'TorcBonjour']]],
-  ['type',['Type',['../d1/d34/class_torc_control.html#a9674689dc841799e823c26856123a8b0',1,'TorcControl::Type()'],['../d8/d61/class_torc_input.html#afb288ada1ecb4b2593398a9ae8df145a',1,'TorcInput::Type()'],['../d1/dc7/class_torc_output.html#a68bfe71abbe6a4a7634c22458da29391',1,'TorcOutput::Type()'],['../dd/d69/class_torc_setting.html#a8fde92f4624b2ba1c9ec6a2bc910ecb5',1,'TorcSetting::Type()'],['../df/dd2/class_log_item.html#af55b2ff94a7fbf8d818dcda9e768fa05',1,'LogItem::type()']]]
+  ['type',['type',['../df/dd2/class_log_item.html#af55b2ff94a7fbf8d818dcda9e768fa05',1,'LogItem::type()'],['../d1/d34/class_torc_control.html#a9674689dc841799e823c26856123a8b0',1,'TorcControl::Type()'],['../d8/d61/class_torc_input.html#afb288ada1ecb4b2593398a9ae8df145a',1,'TorcInput::Type()'],['../d1/dc7/class_torc_output.html#a68bfe71abbe6a4a7634c22458da29391',1,'TorcOutput::Type()'],['../dd/d69/class_torc_setting.html#a8fde92f4624b2ba1c9ec6a2bc910ecb5',1,'TorcSetting::Type()']]]
 ];
