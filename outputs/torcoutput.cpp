@@ -88,3 +88,26 @@ void TorcOutput::SubscriberDeleted(QObject *Subscriber)
 {
     TorcHTTPService::HandleSubscriberDeleted(Subscriber);
 }
+
+void TorcOutput::Graph(QByteArray *Data)
+{
+    if (!Data)
+        return;
+
+    QString id    = GetUniqueId();
+    QString label = GetUserName();
+    QString url   = GetPresentationURL();
+    QString desc;
+    QStringList source = GetDescription();
+    foreach (const QString &item, source)
+        if (!item.isEmpty())
+            desc.append(QString(DEVICE_LINE_ITEM).arg(item));
+    desc.append(QString(DEVICE_LINE_ITEM).arg(tr("Default %1").arg(GetDefaultValue())));
+    desc.append(QString(DEVICE_LINE_ITEM).arg(tr("Valid %1").arg(GetValid())));
+    desc.append(QString(DEVICE_LINE_ITEM).arg(tr("Value %1").arg(GetValue())));
+
+    if (label.isEmpty())
+        label = id;
+    QString link = url.isEmpty() ? QString() : QStringLiteral(" href=\"%1\"").arg(url);
+    Data->append(QStringLiteral("        \"%1\" [shape=record id=\"%1\" label=<<B>%2</B>%3>%4];\r\n").arg(id, label, desc, link));
+}

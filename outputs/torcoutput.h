@@ -17,6 +17,8 @@ class TorcOutput : public TorcDevice, public TorcHTTPService
     Q_OBJECT
     Q_CLASSINFO("Version",        "1.0.0")
 
+    friend class TorcOutputs;
+
   public:
     enum Type
     {
@@ -46,7 +48,10 @@ class TorcOutput : public TorcDevice, public TorcHTTPService
 
   public slots:
     // TorcHTTPService
-    void             SubscriberDeleted         (QObject *Subscriber);
+    void             SubscriberDeleted      (QObject *Subscriber);
+
+  protected:
+    virtual void     Graph                  (QByteArray* Data);
 
   private:
     QObject         *m_owner;

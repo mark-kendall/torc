@@ -54,27 +54,8 @@ void TorcOutputs::Graph(QByteArray* Data)
                         "        style=filled;\r\n"
                         "        fillcolor=\"grey95\";\r\n").arg(tr("Outputs"));
     Data->append(start);
-
     foreach(TorcOutput* output, outputList)
-    {
-        QString id    = output->GetUniqueId();
-        QString label = output->GetUserName();
-        QString url   = output->GetPresentationURL();
-        QString desc;
-        QStringList source = output->GetDescription();
-        foreach (const QString &item, source)
-            if (!item.isEmpty())
-                desc.append(QString(DEVICE_LINE_ITEM).arg(item));
-        desc.append(QString(DEVICE_LINE_ITEM).arg(tr("Default %1").arg(output->GetDefaultValue())));
-        desc.append(QString(DEVICE_LINE_ITEM).arg(tr("Valid %1").arg(output->GetValid())));
-        desc.append(QString(DEVICE_LINE_ITEM).arg(tr("Value %1").arg(output->GetValue())));
-
-        if (label.isEmpty())
-            label = id;
-        QString link = url.isEmpty() ? QString() : QStringLiteral(" href=\"%1\"").arg(url);
-        Data->append(QStringLiteral("        \"%1\" [shape=record id=\"%1\" label=<<B>%2</B>%3>%4];\r\n").arg(id, label, desc, link));
-    }
-
+        output->Graph(Data);
     Data->append("    }\r\n\r\n");
 }
 
