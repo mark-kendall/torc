@@ -10,7 +10,7 @@
 #include "torcinput.h"
 #include "torccentral.h"
 
-class TorcInputs final : public QObject, public TorcHTTPService
+class TorcInputs final : public QObject, public TorcHTTPService, public TorcDeviceHandler
 {
     Q_OBJECT
     Q_CLASSINFO("Version",        "1.0.0")
@@ -23,13 +23,18 @@ class TorcInputs final : public QObject, public TorcHTTPService
 
   public:
     TorcInputs();
+    ~TorcInputs() = default;
 
-    void                Graph                     (QByteArray* Data);
-    QString             GetUIName                 (void) override;
+    void                Graph                    (QByteArray* Data);
+    QString             GetUIName                (void) override;
+
+    // TorcDeviceHandler
+    void                Create                   (const QVariantMap &Details) override;
+    void                Destroy                  (void) override;
 
   public slots:
     // TorcHTTPService
-    void                SubscriberDeleted         (QObject *Subscriber);
+    void                SubscriberDeleted        (QObject *Subscriber);
 
     QVariantMap         GetInputList             (void);
     QStringList         GetInputTypes            (void);
@@ -44,6 +49,7 @@ class TorcInputs final : public QObject, public TorcHTTPService
   private:
     QList<TorcInput*>   inputList;
     QStringList         inputTypes;
+    QMap<QString,TorcInput*> m_createdInputs;
 };
 
 #endif // TORCINPUTS_H

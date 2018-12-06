@@ -10,7 +10,7 @@
 #include "torcoutput.h"
 #include "torccentral.h"
 
-class TorcOutputs final : public QObject, public TorcHTTPService
+class TorcOutputs final : public QObject, public TorcHTTPService, public TorcDeviceHandler
 {
     Q_OBJECT
     Q_CLASSINFO("Version",        "1.0.0")
@@ -26,6 +26,10 @@ class TorcOutputs final : public QObject, public TorcHTTPService
 
     void                Graph                     (QByteArray* Data);
     QString             GetUIName                 (void) override;
+
+    // TorcDeviceHandler
+    void                Create                    (const QVariantMap &Details) override;
+    void                Destroy                   (void) override;
 
   public slots:
     // TorcHTTPService
@@ -44,6 +48,7 @@ class TorcOutputs final : public QObject, public TorcHTTPService
   private:
     QList<TorcOutput*>  outputList;
     QStringList         outputTypes;
+    QMap<QString,TorcOutput*>   m_createdOutputs;
 
   private:
     Q_DISABLE_COPY(TorcOutputs)

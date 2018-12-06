@@ -25,6 +25,12 @@
 #include "torccoreutils.h"
 #include "torcadminthread.h"
 #include "torccentral.h"
+#include "torcnetworkpwminput.h"
+#include "torcnetworkswitchinput.h"
+#include "torcnetworktemperatureinput.h"
+#include "torcnetworkphinput.h"
+#include "torcnetworkbuttoninput.h"
+#include "torcnetworkintegerinput.h"
 #include "torcinputs.h"
 
 #define BLACKLIST QStringLiteral("")
@@ -39,13 +45,42 @@ TorcInputs* TorcInputs::gInputs = new TorcInputs();
  * Any subclass of TorcInput will automatically register itself on creation. Any class
  * creating inputs must DownRef AND call RemoveInput when deleting them.
  *
+ * It also creates and manages known network (i.e. user set) and constant inputs.
+ *
+ * \code
+ *
+ * <torc>
+ *   <inputs>
+ *     <network>
+ *       <switch/pwm/temperature/ph/button>
+ *         <name></name>
+ *         <default></default>
+ *         <username></username>
+ *         <userdescription></userdescription>
+ *       </switch etc>
+ *     </network>
+ *     <constant>
+ *       <switch/pwm/temperature/ph> -- NO BUTTON
+ *         <name></name>
+ *         <default></default>
+ *         <username></username>
+ *         <userdescription></userdescription>
+ *       </switch etc>
+ *     </constant>
+ *   </inputs>
+ * </torc>
+ *
+ * \endcode
+ *
  * \note This class is thread safe.
 */
 TorcInputs::TorcInputs()
   : QObject(),
     TorcHTTPService(this, INPUTS_DIRECTORY, QStringLiteral("inputs"), TorcInputs::staticMetaObject, BLACKLIST),
+    TorcDeviceHandler(),
     inputList(),
-    inputTypes()
+    inputTypes(),
+    m_createdInputs()
 {
 }
 
@@ -156,4 +191,92 @@ void TorcInputs::RemoveInput(TorcInput *Input)
     Input->DownRef();
     inputList.removeOne(Input);
     emit InputsChanged();
+}
+
+void TorcInputs::Create(const QVariantMap &Details)
+{
+    QWriteLocker locker(&m_handlerLock);
+
+    QVariantMap::const_iterator i = Details.constBegin();
+    for ( ; i != Details.constEnd(); ++i)
+    {
+        if (i.key() != INPUTS_DIRECTORY)
+            continue;
+
+        QVariantMap devices = i.value().toMap();
+        QVariantMap::const_iterator j = devices.constBegin();
+        for ( ; j != devices.constEnd(); ++j)
+        {
+            // look for <network> or <constant>
+            QString group = j.key();
+            bool network  = group == NETWORK_DEVICE_STRING;
+            bool constant = group == CONSTANT_DEVICE_STRING;
+
+            if (!network && !constant)
+                continue;
+
+            QVariantMap details = j.value().toMap();
+            QVariantMap::const_iterator it = details.constBegin();
+            for ( ; it != details.constEnd(); ++it)
+            {
+                // iterate over known types <pwm>, <switch> etc
+                for (int type = TorcInput::Unknown; type != TorcInput::MaxType; type++)
+                {
+                    if (it.key() == TorcCoreUtils::EnumToLowerString<TorcInput::Type>(static_cast<TorcInput::Type>(type)))
+                    {
+                        QVariantMap input    = it.value().toMap();
+                        QString defaultvalue = network ? input.value(QStringLiteral("default")).toString() : input.value(QStringLiteral("value")).toString();
+                        QString uniqueid     = input.value(QStringLiteral("name"), QStringLiteral("Error")).toString();
+
+                        bool ok = false;
+                        double defaultdouble = defaultvalue.toDouble(&ok);
+                        if (!ok)
+                            defaultdouble = 0.0;
+
+                        TorcInput*  newinput  = nullptr;
+                        switch (type)
+                        {
+                            case TorcInput::PWM:
+                                newinput = network ? new TorcNetworkPWMInput(defaultdouble, input) : new TorcPWMInput(defaultdouble, DEVICE_CONSTANT + TorcCoreUtils::EnumToLowerString<TorcInput::Type>(TorcInput::PWM), input);
+                                break;
+                            case TorcInput::Switch:
+                                newinput = network ? new TorcNetworkSwitchInput(defaultdouble, input) : new TorcSwitchInput(defaultdouble, DEVICE_CONSTANT + TorcCoreUtils::EnumToLowerString<TorcInput::Type>(TorcInput::Switch), input);
+                                break;
+                            case TorcInput::Temperature:
+                                newinput = network ? new TorcNetworkTemperatureInput(defaultdouble, input) : new TorcTemperatureInput(defaultdouble, -1000, 1000, DEVICE_CONSTANT + TorcCoreUtils::EnumToLowerString<TorcInput::Type>(TorcInput::Temperature), input);
+                                break;
+                            case TorcInput::pH:
+                                newinput = network ? new TorcNetworkpHInput(defaultdouble, input) : new TorcpHInput(defaultdouble, DEVICE_CONSTANT + TorcCoreUtils::EnumToLowerString<TorcInput::Type>(TorcInput::pH), input);
+                                break;
+                            case TorcInput::Integer:
+                                newinput = network ? new TorcNetworkIntegerInput(defaultdouble, input) : new TorcIntegerInput(defaultdouble, DEVICE_CONSTANT + TorcCoreUtils::EnumToLowerString<TorcInput::Type>(TorcInput::Integer), input);
+                                break;
+                            case TorcInput::Button:
+                                if (constant)
+                                    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Cannot create constant button input"));
+                                else
+                                    newinput = new TorcNetworkButtonInput(defaultdouble, input);
+                            default: break;
+                        }
+
+                        if (newinput)
+                            m_createdInputs.insert(uniqueid, newinput);
+                    }
+                }
+            }
+        }
+    }
+}
+
+void TorcInputs::Destroy()
+{
+    QWriteLocker locker(&m_handlerLock);
+
+    QMap<QString,TorcInput*>::const_iterator it = m_createdInputs.constBegin();
+    for ( ; it != m_createdInputs.constEnd(); ++it)
+    {
+        it.value()->DownRef();
+        RemoveInput(it.value());
+    }
+    m_createdInputs.clear();
 }

@@ -62,6 +62,11 @@ void TorcNetworkButtonInput::Start(void)
     TorcNetworkSwitchInput::Start();
 }
 
+TorcInput::Type TorcNetworkButtonInput::GetType()
+{
+    return TorcInput::Button;
+}
+
 /*! \brief Toggle the value of the button.
  *
  * The input value is ignored, the current value is toggled and the timer started to

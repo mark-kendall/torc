@@ -16,6 +16,7 @@ class TorcNetworkButtonOutput final : public TorcNetworkSwitchOutput
    ~TorcNetworkButtonOutput() = default;
 
     QStringList GetDescription(void) override;
+    TorcOutput::Type GetType (void) override;
 
   signals:
     void Pushed     (void);

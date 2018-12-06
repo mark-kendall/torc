@@ -27,7 +27,9 @@ class TorcOutput : public TorcDevice, public TorcHTTPService
         pH,
         Switch,
         PWM,
+        Button,
         Camera,
+        Integer,
         MaxType
      };
 

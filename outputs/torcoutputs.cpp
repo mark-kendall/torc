@@ -24,17 +24,61 @@
 #include "torclogging.h"
 #include "torccoreutils.h"
 #include "torccentral.h"
+#include "torcnetworkpwmoutput.h"
+#include "torcnetworkswitchoutput.h"
+#include "torcnetworktemperatureoutput.h"
+#include "torcnetworkphoutput.h"
+#include "torcnetworkbuttonoutput.h"
 #include "torcoutputs.h"
 
 #define BLACKLIST QStringLiteral("")
 
 TorcOutputs* TorcOutputs::gOutputs = new TorcOutputs();
 
+/*! \brief TorcOutputs contains the master record of known outputs.
+ *
+ * A static global TorcOutputs object is created (this could alternatively be created
+ * as a TorcAdminObject). This object will list these outputs as an HTTP service.
+ *
+ * Any subclass of TorcOutput will automatically register itself on creation. Any class
+ * creating outputs must DownRef AND call RemoveOutput when deleting them.
+ *
+ * It also creates and manages known network (i.e. user set) and constant outputs.
+ *
+ * \code
+ *
+ * <torc>
+ *   <outputs>
+ *     <network>
+ *       <switch/pwm/temperature/ph/button>
+ *         <name></name>
+ *         <default></default>
+ *         <username></username>
+ *         <userdescription></userdescription>
+ *       </switch etc>
+ *     </network>
+ *     <constant>
+ *       <switch/pwm/temperature/ph> -- NO BUTTON
+ *         <name></name>
+ *         <default></default>
+ *         <username></username>
+ *         <userdescription></userdescription>
+ *       </switch etc>
+ *     </constant>
+ *   </outputs>
+ * </torc>
+ *
+ * \endcode
+ *
+ * \note This class is thread safe.
+*/
 TorcOutputs::TorcOutputs()
   : QObject(),
     TorcHTTPService(this, OUTPUTS_DIRECTORY, QStringLiteral("outputs"), TorcOutputs::staticMetaObject, BLACKLIST),
+    TorcDeviceHandler(),
     outputList(),
-    outputTypes()
+    outputTypes(),
+    m_createdOutputs()
 {
 }
 
@@ -130,4 +174,93 @@ void TorcOutputs::RemoveOutput(TorcOutput *Output)
     Output->DownRef();
     outputList.removeOne(Output);
     emit OutputsChanged();
+}
+
+void TorcOutputs::Create(const QVariantMap &Details)
+{
+    QWriteLocker locker(&m_handlerLock);
+
+    QVariantMap::const_iterator i = Details.constBegin();
+    for ( ; i != Details.constEnd(); ++i)
+    {
+        // network devices can be <inputs> or <outputs>
+        if (i.key() != OUTPUTS_DIRECTORY)
+            continue;
+
+        QVariantMap devices = i.value().toMap();
+        QVariantMap::const_iterator j = devices.constBegin();
+        for ( ; j != devices.constEnd(); ++j)
+        {
+            // look for <network> or <constant>
+            QString group = j.key();
+            bool network  = group == NETWORK_DEVICE_STRING;
+            bool constant = group == CONSTANT_DEVICE_STRING;
+
+            if (!network && !constant)
+                continue;
+
+            QVariantMap details = j.value().toMap();
+            QVariantMap::const_iterator it = details.constBegin();
+            for ( ; it != details.constEnd(); ++it)
+            {
+                for (int type = TorcOutput::Unknown; type != TorcOutput::MaxType; type++)
+                {
+                    if (it.key() == TorcCoreUtils::EnumToLowerString<TorcOutput::Type>(static_cast<TorcOutput::Type>(type)))
+                    {
+                        QVariantMap input    = it.value().toMap();
+                        QString defaultvalue = network ? input.value(QStringLiteral("default")).toString() : input.value(QStringLiteral("value")).toString();
+                        QString uniqueid     = input.value(QStringLiteral("name"), QStringLiteral("Error")).toString();
+
+                        bool ok = false;
+                        double defaultdouble = defaultvalue.toDouble(&ok);
+                        if (!ok)
+                            defaultdouble = 0.0;
+
+                        TorcOutput* newoutput = nullptr;
+                        switch (type)
+                        {
+                            case TorcOutput::PWM:
+                                newoutput = network ? new TorcNetworkPWMOutput(defaultdouble, input) : new TorcPWMOutput(defaultdouble, DEVICE_CONSTANT + TorcCoreUtils::EnumToLowerString<TorcOutput::Type>(TorcOutput::PWM), input);
+                                break;
+                            case TorcOutput::Switch:
+                                newoutput = network ? new TorcNetworkSwitchOutput(defaultdouble, input) : new TorcSwitchOutput(defaultdouble, DEVICE_CONSTANT + TorcCoreUtils::EnumToLowerString<TorcOutput::Type>(TorcOutput::Switch), input);
+                                break;
+                            case TorcOutput::Temperature:
+                                newoutput = network ? new TorcNetworkTemperatureOutput(defaultdouble, input) : new TorcTemperatureOutput(defaultdouble, DEVICE_CONSTANT + TorcCoreUtils::EnumToLowerString<TorcOutput::Type>(TorcOutput::Temperature), input);
+                                break;
+                            case TorcOutput::pH:
+                                newoutput = network ? new TorcNetworkpHOutput(defaultdouble, input) : new TorcpHOutput(defaultdouble, DEVICE_CONSTANT + TorcCoreUtils::EnumToLowerString<TorcOutput::Type>(TorcOutput::pH), input);
+                                break;
+                            /*
+                            case TorcOutput::Integer:
+                                newoutput = network ? new TorcNetworkIntegerOutput(defaultdouble, input) : new TorcIntegerOutput(defaultdouble, DEVICE_CONSTANT + TorcCoreUtils::EnumToLowerString<TorcOutput::Type>(TorcOutput::Integer), input);
+                                break;
+                            */
+                            case TorcOutput::Button:
+                                if (constant)
+                                    LOG(VB_GENERAL, LOG_ERR, QStringLiteral("Cannot create constant button input"));
+                                else
+                                    newoutput = new TorcNetworkButtonOutput(defaultdouble, input);
+                            default: break;
+                        }
+
+                        if (newoutput)
+                            m_createdOutputs.insert(uniqueid, newoutput);
+                    }
+                }
+            }
+        }
+    }
+}
+
+void TorcOutputs::Destroy(void)
+{
+    QWriteLocker locker(&m_handlerLock);
+    QMap<QString,TorcOutput*>::const_iterator it2 = m_createdOutputs.constBegin();
+    for ( ; it2 != m_createdOutputs.constEnd(); ++it2)
+    {
+        it2.value()->DownRef();
+        TorcOutputs::gOutputs->RemoveOutput(it2.value());
+    }
+    m_createdOutputs.clear();
 }

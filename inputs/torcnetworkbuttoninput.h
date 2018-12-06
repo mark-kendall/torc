@@ -17,6 +17,7 @@ class TorcNetworkButtonInput final : public TorcNetworkSwitchInput
 
     QStringList GetDescription (void) override;
     void        Start          (void) override;
+    TorcInput::Type GetType    (void) override;
 
   signals:
     void Pushed     (void);
