@@ -101,6 +101,7 @@ var searchData=
   ['torcnotifierfactory',['TorcNotifierFactory',['../d0/d97/class_torc_notifier_factory.html',1,'']]],
   ['torcnotify',['TorcNotify',['../df/d23/class_torc_notify.html',1,'']]],
   ['torcobservable',['TorcObservable',['../d8/d49/class_torc_observable.html',1,'']]],
+  ['torcomxbufferowner',['TorcOMXBufferOwner',['../d6/dac/class_torc_o_m_x_buffer_owner.html',1,'']]],
   ['torcomxcomponent',['TorcOMXComponent',['../de/d1d/class_torc_o_m_x_component.html',1,'']]],
   ['torcomxcore',['TorcOMXCore',['../df/d7a/class_torc_o_m_x_core.html',1,'']]],
   ['torcomxevent',['TorcOMXEvent',['../dc/d30/class_torc_o_m_x_event.html',1,'']]],

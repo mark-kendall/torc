@@ -333,6 +333,7 @@ var searchData=
   ['torcobservable',['TorcObservable',['../d8/d49/class_torc_observable.html',1,'TorcObservable'],['../d8/d49/class_torc_observable.html#a1f3a84a242d565628e073c4f18217975',1,'TorcObservable::TorcObservable()']]],
   ['torcobservable_2ecpp',['torcobservable.cpp',['../d4/d74/torcobservable_8cpp.html',1,'']]],
   ['torcobservable_2eh',['torcobservable.h',['../d6/d94/torcobservable_8h.html',1,'']]],
+  ['torcomxbufferowner',['TorcOMXBufferOwner',['../d6/dac/class_torc_o_m_x_buffer_owner.html',1,'']]],
   ['torcomxcomponent',['TorcOMXComponent',['../de/d1d/class_torc_o_m_x_component.html',1,'TorcOMXComponent'],['../de/d1d/class_torc_o_m_x_component.html#a4838eb26a4dd15895ef6358dfaf596a5',1,'TorcOMXComponent::TorcOMXComponent()']]],
   ['torcomxcomponent_2ecpp',['torcomxcomponent.cpp',['../da/dc0/torcomxcomponent_8cpp.html',1,'']]],
   ['torcomxcomponent_2eh',['torcomxcomponent.h',['../d3/de4/torcomxcomponent_8h.html',1,'']]],
@@ -553,5 +554,5 @@ var searchData=
   ['tryconnect',['TryConnect',['../dd/d3a/class_torc_network_service.html#a25801b8d95abe55ae17fc1fe38c71b97',1,'TorcNetworkService']]],
   ['trynotify',['TryNotify',['../d0/db9/class_torc_i_o_t_logger.html#a47917ff5decf4a7f9710f0128bbbc210',1,'TorcIOTLogger']]],
   ['txtrecordtomap',['TxtRecordToMap',['../d0/d9f/class_torc_bonjour.html#a6d602ba5fb9021f2cb7be12ecc90e70a',1,'TorcBonjour']]],
-  ['type',['Type',['../d1/d34/class_torc_control.html#a9674689dc841799e823c26856123a8b0',1,'TorcControl::Type()'],['../d8/d61/class_torc_input.html#afb288ada1ecb4b2593398a9ae8df145a',1,'TorcInput::Type()'],['../d1/dc7/class_torc_output.html#a68bfe71abbe6a4a7634c22458da29391',1,'TorcOutput::Type()'],['../dd/d69/class_torc_setting.html#a8fde92f4624b2ba1c9ec6a2bc910ecb5',1,'TorcSetting::Type()'],['../df/dd2/class_log_item.html#af55b2ff94a7fbf8d818dcda9e768fa05',1,'LogItem::type()']]]
+  ['type',['type',['../df/dd2/class_log_item.html#af55b2ff94a7fbf8d818dcda9e768fa05',1,'LogItem::type()'],['../d1/d34/class_torc_control.html#a9674689dc841799e823c26856123a8b0',1,'TorcControl::Type()'],['../d8/d61/class_torc_input.html#afb288ada1ecb4b2593398a9ae8df145a',1,'TorcInput::Type()'],['../d1/dc7/class_torc_output.html#a68bfe71abbe6a4a7634c22458da29391',1,'TorcOutput::Type()'],['../dd/d69/class_torc_setting.html#a8fde92f4624b2ba1c9ec6a2bc910ecb5',1,'TorcSetting::Type()']]]
 ];

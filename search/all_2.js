@@ -40,7 +40,7 @@ var searchData=
   ['broadcom_5fnullsink',['BROADCOM_NULLSINK',['../d7/de1/torcpicamera_8cpp.html#a9433bfd324f3e45bcc9b055c6a3f1524',1,'torcpicamera.cpp']]],
   ['broadcom_5fvideosplitter',['BROADCOM_VIDEOSPLITTER',['../d7/de1/torcpicamera_8cpp.html#a4f1bc79b124abc2a44f6a42c104a44c9',1,'torcpicamera.cpp']]],
   ['browse',['Browse',['../db/dff/class_torc_bonjour_service.html#aee3dcf4814b16c416242490cf343a72ba0c10514974537e9889a8f5d736bb8ebd',1,'TorcBonjourService::Browse()'],['../d0/d9f/class_torc_bonjour.html#a5db7f9dff8a4e28b42b18330a859d9a5',1,'TorcBonjour::Browse()']]],
-  ['bufferready',['BufferReady',['../da/da1/class_torc_pi_camera.html#aa5556d4abb1cf5584c0a1894f996fe63',1,'TorcPiCamera::BufferReady()'],['../d7/d61/class_torc_o_m_x_port.html#adf7a8c2e929a1d0032b3770eceb95713',1,'TorcOMXPort::BufferReady()']]],
+  ['bufferready',['BufferReady',['../da/da1/class_torc_pi_camera.html#a39ca266e2bc1bc9b1b73a99de84d7ef7',1,'TorcPiCamera::BufferReady()'],['../d6/dac/class_torc_o_m_x_buffer_owner.html#a07c4a80d33ffae227189ec71c0e2351b',1,'TorcOMXBufferOwner::BufferReady()'],['../d7/d61/class_torc_o_m_x_port.html#adf7a8c2e929a1d0032b3770eceb95713',1,'TorcOMXPort::BufferReady()']]],
   ['button',['Button',['../d8/d61/class_torc_input.html#afb288ada1ecb4b2593398a9ae8df145aad97180f145d18f1ec315d953b1d8b0f4',1,'TorcInput::Button()'],['../d1/dc7/class_torc_output.html#a68bfe71abbe6a4a7634c22458da29391a2eeba0b3420aed14a790b92a31ffbab9',1,'TorcOutput::Button()']]],
   ['bytesavailable',['BytesAvailable',['../d3/ded/class_torc_network_request.html#aa6a6b09693cc7dcdaf4f82e94bd7a8a6',1,'TorcNetworkRequest']]],
   ['byteswritten',['BytesWritten',['../d9/d0a/class_torc_web_socket.html#a0a704407554b058ff903fc8047397963',1,'TorcWebSocket']]]

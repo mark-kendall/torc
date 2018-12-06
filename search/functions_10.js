@@ -28,6 +28,7 @@ var searchData=
   ['setanimationvalue',['SetAnimationValue',['../df/d11/class_torc_transition_control.html#a74e5f5ccea421131fee6870c130caa7e',1,'TorcTransitionControl']]],
   ['setapiversion',['SetAPIVersion',['../dd/d3a/class_torc_network_service.html#a1d7ab38727b3faea64b96e538458fbd9',1,'TorcNetworkService']]],
   ['setcache',['SetCache',['../da/dfc/class_torc_h_t_t_p_request.html#a20ef207b64e2ae122c4c23c613e524e7',1,'TorcHTTPRequest']]],
+  ['setcameraname',['SetCameraName',['../db/dc8/class_torc_camera_output.html#a498f451c80d4099ce38cbe19960140d1',1,'TorcCameraOutput']]],
   ['setconfig',['SetConfig',['../de/d1d/class_torc_o_m_x_component.html#a047665c434af39f9597e3d95990431a5',1,'TorcOMXComponent']]],
   ['setconnection',['SetConnection',['../da/dfc/class_torc_h_t_t_p_request.html#a77eb83175f0e3855273d2458420db823',1,'TorcHTTPRequest']]],
   ['seterrored',['SetErrored',['../d3/dfd/class_torc_camera_device.html#afd00e5ad5c3fc76ace3ea318152de285',1,'TorcCameraDevice']]],
