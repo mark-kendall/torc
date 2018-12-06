@@ -24,7 +24,6 @@
 #include "torclogging.h"
 #include "torccoreutils.h"
 #include "torcinputs.h"
-#include "torcnetworkinputs.h"
 #include "torcinput.h"
 
 #define BLACKLIST QStringLiteral("SetValue,SetValid")
