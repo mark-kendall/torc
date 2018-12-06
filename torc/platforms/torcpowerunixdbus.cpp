@@ -322,7 +322,7 @@ void TorcPowerUnixDBus::UpdateBattery(void)
 
         if (count > 0)
         {
-            m_batteryLevel = (int)((total / count) + 0.5);
+            m_batteryLevel = lround(total / count);
         }
         else
         {
@@ -352,9 +352,8 @@ int TorcPowerUnixDBus::GetBatteryLevel(const QString &Path)
             QVariant percent = interface.property("Percentage");
             if (percent.isValid())
             {
-                int result = percent.toFloat() * 100.0;
-                if (result >= 0.0 && result <= 100.0)
-                    return (int)(result + 0.5);
+                int result = lround(percent.toFloat() * 100.0);
+                return qBound(0, result, 100);
             }
         }
         else

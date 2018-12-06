@@ -80,7 +80,7 @@ void TorcI2CPCA9685Channel::SetValue(double Value)
         return;
 
     // convert 0.0 to 1.0 to 0 to 4095
-    int channelvalue = (int)((newvalue * (float)PCA9685_RESOLUTION) + 0.5);
+    int channelvalue = lround(newvalue * (float)PCA9685_RESOLUTION);
     if (channelvalue == m_channelValue)
         return;
 

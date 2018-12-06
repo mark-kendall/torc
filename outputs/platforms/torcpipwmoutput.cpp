@@ -51,7 +51,7 @@ TorcPiPWMOutput::TorcPiPWMOutput(int Pin, const QVariantMap &Details)
         LOG(VB_GENERAL, LOG_WARNING, QStringLiteral("Ignoring user defined resolution for hardware PWM - defaulting to %1").arg(m_maxResolution));
     }
 
-    int value = (int)((DEFAULT_VALUE * (double)m_resolution) + 0.5);
+    int value = lround(DEFAULT_VALUE * (double)m_resolution);
 
     if (m_pin == TORC_HWPWM_PIN)
     {
@@ -96,7 +96,7 @@ void TorcPiPWMOutput::SetValue(double Value)
     if (!ValueIsDifferent(newdouble))
         return;
 
-    int newvalue = (int)((newdouble * (double)m_resolution) + 0.5);
+    int newvalue = lround(newdouble * (double)m_resolution);
 
     if (m_pin == TORC_HWPWM_PIN)
         pwmWrite(m_pin, newvalue);
