@@ -19,7 +19,7 @@ var searchData=
   ['inputvalidchangedpriv',['InputValidChangedPriv',['../d1/d34/class_torc_control.html#a71ac0066655457de885a202843234bff',1,'TorcControl']]],
   ['inputvaluechanged',['InputValueChanged',['../d1/d34/class_torc_control.html#a344961f726d065613cbd235dbe787f5e',1,'TorcControl::InputValueChanged()'],['../dd/d6d/class_torc_trigger_notification.html#a2f54bba096510dac1c43b5dc16292a0d',1,'TorcTriggerNotification::InputValueChanged()']]],
   ['instance',['Instance',['../d0/d9f/class_torc_bonjour.html#ac6bee62b6cc7e5552c6c84270077c2a2',1,'TorcBonjour']]],
-  ['integer',['Integer',['../d8/d61/class_torc_input.html#afb288ada1ecb4b2593398a9ae8df145aa2b20d15bb494798f5ac4f9cbcd1a33c1',1,'TorcInput::Integer()'],['../dd/d69/class_torc_setting.html#a8fde92f4624b2ba1c9ec6a2bc910ecb5a613e9c76f06c57e4a35e7014399273e9',1,'TorcSetting::Integer()']]],
+  ['integer',['Integer',['../d8/d61/class_torc_input.html#afb288ada1ecb4b2593398a9ae8df145aa2b20d15bb494798f5ac4f9cbcd1a33c1',1,'TorcInput::Integer()'],['../d1/dc7/class_torc_output.html#a68bfe71abbe6a4a7634c22458da29391a09a6b2fc048b41ef9b34906dec851a2f',1,'TorcOutput::Integer()'],['../dd/d69/class_torc_setting.html#a8fde92f4624b2ba1c9ec6a2bc910ecb5a613e9c76f06c57e4a35e7014399273e9',1,'TorcSetting::Integer()']]],
   ['invert',['Invert',['../d5/d8f/class_torc_logic_control.html#a9a534064891b32f43f8210c3ff211b38a5d261e276c0f8bb1321ac90454c2f687',1,'TorcLogicControl']]],
   ['invoke',['Invoke',['../de/db3/class_method_parameters.html#af4b498dd485b5ba32706c9aa9b03e230',1,'MethodParameters']]],
   ['iotplotter_5fmax_5ferrors',['IOTPLOTTER_MAX_ERRORS',['../d6/da0/torciotplotternotifier_8cpp.html#a2d140a4aa6cd2090a2167bf1b11bf786',1,'torciotplotternotifier.cpp']]],

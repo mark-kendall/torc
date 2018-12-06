@@ -46,7 +46,7 @@ if (edges && edges.length) {
         </defs>
 
 <script type="text/javascript">
-var viewWidth = 945;
+var viewWidth = 805;
 var viewHeight = 84;
 var sectionId = 'dynsection-1';
 </script>
@@ -54,11 +54,11 @@ var sectionId = 'dynsection-1';
 <svg id="graph" class="graph">
 <g id="viewport">
 <title>torcinputs.h</title>
-<polygon fill="white" stroke="none" points="-4,4 -4,-80 941,-80 941,4 -4,4"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-80 801,-80 801,4 -4,4"/>
 <!-- Node1 -->
 <g id="node1" class="node"><title>Node1</title>
-<polygon fill="#bfbfbf" stroke="black" points="411,-56.5 411,-75.5 485,-75.5 485,-56.5 411,-56.5"/>
-<text text-anchor="middle" x="448" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">torcinputs.h</text>
+<polygon fill="#bfbfbf" stroke="black" points="341,-56.5 341,-75.5 415,-75.5 415,-56.5 341,-56.5"/>
+<text text-anchor="middle" x="378" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">torcinputs.h</text>
 </g>
 <!-- Node2 -->
 <g id="node2" class="node"><title>Node2</title>
@@ -70,8 +70,8 @@ var sectionId = 'dynsection-1';
 </g>
 <!-- Node1&#45;&gt;Node2 -->
 <g id="edge1" class="edge"><title>Node1&#45;&gt;Node2</title>
-<path fill="none" stroke="midnightblue" d="M400.809,-59.1169C334.955,-50.8286 211.78,-35.0411 107,-20 104.075,-19.5801 101.068,-19.1398 98.036,-18.6892"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="400.516,-62.6075 410.874,-60.3815 401.389,-55.6621 400.516,-62.6075"/>
+<path fill="none" stroke="midnightblue" d="M331.026,-57.2899C269.234,-47.1478 161.141,-29.4061 98.2407,-19.0821"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="330.464,-60.7445 340.899,-58.9105 331.598,-53.8369 330.464,-60.7445"/>
 </g>
 <!-- Node3 -->
 <g id="node3" class="node"><title>Node3</title>
@@ -83,8 +83,8 @@ var sectionId = 'dynsection-1';
 </g>
 <!-- Node1&#45;&gt;Node3 -->
 <g id="edge2" class="edge"><title>Node1&#45;&gt;Node3</title>
-<path fill="none" stroke="midnightblue" d="M400.575,-56.2296C343.813,-45.7325 249.75,-28.3374 196.332,-18.4586"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="400.252,-59.7291 410.721,-58.106 401.525,-52.8458 400.252,-59.7291"/>
+<path fill="none" stroke="midnightblue" d="M332.875,-54.0237C290.94,-43.8232 229.348,-28.8414 191.012,-19.5164"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="332.28,-57.4808 342.823,-56.4435 333.934,-50.6791 332.28,-57.4808"/>
 </g>
 <!-- Node4 -->
 <g id="node4" class="node"><title>Node4</title>
@@ -96,73 +96,60 @@ var sectionId = 'dynsection-1';
 </g>
 <!-- Node1&#45;&gt;Node4 -->
 <g id="edge3" class="edge"><title>Node1&#45;&gt;Node4</title>
-<path fill="none" stroke="midnightblue" d="M408.027,-53.6986C371.979,-43.507 319.757,-28.7429 287.123,-19.5164"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="407.16,-57.0909 417.735,-56.4435 409.065,-50.3549 407.16,-57.0909"/>
+<path fill="none" stroke="midnightblue" d="M349.694,-52.3678C327.035,-42.2553 295.874,-28.3486 276.083,-19.5164"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="348.269,-55.5643 358.827,-56.4435 351.122,-49.1719 348.269,-55.5643"/>
 </g>
 <!-- Node5 -->
 <g id="node5" class="node"><title>Node5</title>
-<g id="a_node5"><a xlink:href="../../df/dc7/torcnetworkinputs_8cpp.html" target="_top" xlink:title="torcnetworkinputs.cpp">
-<polygon fill="white" stroke="black" points="318,-0.5 318,-19.5 440,-19.5 440,-0.5 318,-0.5"/>
-<text text-anchor="middle" x="379" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">torcnetworkinputs.cpp</text>
+<g id="a_node5"><a xlink:href="../../dd/d56/torcsysteminputs_8cpp.html" target="_top" xlink:title="torcsysteminputs.cpp">
+<polygon fill="white" stroke="black" points="318,-0.5 318,-19.5 438,-19.5 438,-0.5 318,-0.5"/>
+<text text-anchor="middle" x="378" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">torcsysteminputs.cpp</text>
 </a>
 </g>
 </g>
 <!-- Node1&#45;&gt;Node5 -->
 <g id="edge4" class="edge"><title>Node1&#45;&gt;Node5</title>
-<path fill="none" stroke="midnightblue" d="M428.962,-50.1008C416.544,-40.3824 400.757,-28.0269 390.288,-19.8339"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="426.882,-52.9171 436.914,-56.324 431.196,-47.4046 426.882,-52.9171"/>
+<path fill="none" stroke="midnightblue" d="M378,-45.8045C378,-36.9102 378,-26.7798 378,-19.7511"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="374.5,-46.083 378,-56.083 381.5,-46.083 374.5,-46.083"/>
 </g>
 <!-- Node6 -->
 <g id="node6" class="node"><title>Node6</title>
-<g id="a_node6"><a xlink:href="../../dd/d56/torcsysteminputs_8cpp.html" target="_top" xlink:title="torcsysteminputs.cpp">
-<polygon fill="white" stroke="black" points="458,-0.5 458,-19.5 578,-19.5 578,-0.5 458,-0.5"/>
-<text text-anchor="middle" x="518" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">torcsysteminputs.cpp</text>
+<g id="a_node6"><a xlink:href="../../da/d84/torcpigpio_8cpp.html" target="_top" xlink:title="torcpigpio.cpp">
+<polygon fill="white" stroke="black" points="456,-0.5 456,-19.5 540,-19.5 540,-0.5 456,-0.5"/>
+<text text-anchor="middle" x="498" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">torcpigpio.cpp</text>
 </a>
 </g>
 </g>
 <!-- Node1&#45;&gt;Node6 -->
 <g id="edge5" class="edge"><title>Node1&#45;&gt;Node6</title>
-<path fill="none" stroke="midnightblue" d="M467.314,-50.1008C479.912,-40.3824 495.928,-28.0269 506.549,-19.8339"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="465.027,-47.4446 459.247,-56.324 469.302,-52.9871 465.027,-47.4446"/>
+<path fill="none" stroke="midnightblue" d="M406.373,-52.2321C428.82,-42.1312 459.535,-28.3091 479.075,-19.5164"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="404.697,-49.1481 397.014,-56.4435 407.57,-55.5316 404.697,-49.1481"/>
 </g>
 <!-- Node7 -->
 <g id="node7" class="node"><title>Node7</title>
-<g id="a_node7"><a xlink:href="../../da/d84/torcpigpio_8cpp.html" target="_top" xlink:title="torcpigpio.cpp">
-<polygon fill="white" stroke="black" points="596,-0.5 596,-19.5 680,-19.5 680,-0.5 596,-0.5"/>
-<text text-anchor="middle" x="638" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">torcpigpio.cpp</text>
+<g id="a_node7"><a xlink:href="../../d1/d81/torccentral_8cpp.html" target="_top" xlink:title="torccentral.cpp">
+<polygon fill="white" stroke="black" points="557.5,-0.5 557.5,-19.5 646.5,-19.5 646.5,-0.5 557.5,-0.5"/>
+<text text-anchor="middle" x="602" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">torccentral.cpp</text>
 </a>
 </g>
 </g>
 <!-- Node1&#45;&gt;Node7 -->
 <g id="edge6" class="edge"><title>Node1&#45;&gt;Node7</title>
-<path fill="none" stroke="midnightblue" d="M487.764,-53.6986C523.623,-43.507 575.571,-28.7429 608.035,-19.5164"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="486.768,-50.343 478.106,-56.4435 488.682,-57.0763 486.768,-50.343"/>
+<path fill="none" stroke="midnightblue" d="M423.263,-54.0884C465.582,-43.8865 527.909,-28.8612 566.673,-19.5164"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="422.395,-50.6974 413.493,-56.4435 424.035,-57.5024 422.395,-50.6974"/>
 </g>
 <!-- Node8 -->
 <g id="node8" class="node"><title>Node8</title>
-<g id="a_node8"><a xlink:href="../../d1/d81/torccentral_8cpp.html" target="_top" xlink:title="torccentral.cpp">
-<polygon fill="white" stroke="black" points="697.5,-0.5 697.5,-19.5 786.5,-19.5 786.5,-0.5 697.5,-0.5"/>
-<text text-anchor="middle" x="742" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">torccentral.cpp</text>
+<g id="a_node8"><a xlink:href="../../dd/dbf/testtorclocalcontext_8cpp.html" target="_top" xlink:title="testtorclocalcontext.cpp">
+<polygon fill="white" stroke="black" points="665,-0.5 665,-19.5 797,-19.5 797,-0.5 665,-0.5"/>
+<text text-anchor="middle" x="731" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">testtorclocalcontext.cpp</text>
 </a>
 </g>
 </g>
 <!-- Node1&#45;&gt;Node8 -->
 <g id="edge7" class="edge"><title>Node1&#45;&gt;Node8</title>
-<path fill="none" stroke="midnightblue" d="M495.198,-56.331C550.904,-46.0992 642.839,-29.2132 697.393,-19.1932"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="494.438,-52.9119 485.235,-58.1609 495.703,-59.7967 494.438,-52.9119"/>
-</g>
-<!-- Node9 -->
-<g id="node9" class="node"><title>Node9</title>
-<g id="a_node9"><a xlink:href="../../dd/dbf/testtorclocalcontext_8cpp.html" target="_top" xlink:title="testtorclocalcontext.cpp">
-<polygon fill="white" stroke="black" points="805,-0.5 805,-19.5 937,-19.5 937,-0.5 805,-0.5"/>
-<text text-anchor="middle" x="871" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">testtorclocalcontext.cpp</text>
-</a>
-</g>
-</g>
-<!-- Node1&#45;&gt;Node9 -->
-<g id="edge8" class="edge"><title>Node1&#45;&gt;Node9</title>
-<path fill="none" stroke="midnightblue" d="M495.336,-58.9571C570.909,-49.3095 719.034,-30.3999 804.98,-19.4281"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="494.644,-55.517 485.168,-60.2552 495.53,-62.4606 494.644,-55.517"/>
+<path fill="none" stroke="midnightblue" d="M425.05,-57.8026C489.843,-47.8909 606.338,-30.07 675.369,-19.5102"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="424.466,-54.3511 415.11,-59.3231 425.524,-61.2706 424.466,-54.3511"/>
 </g>
 </g>
 </svg>

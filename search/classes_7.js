@@ -83,7 +83,6 @@ var searchData=
   ['torcnetworkbuttonoutput',['TorcNetworkButtonOutput',['../d0/da9/class_torc_network_button_output.html',1,'']]],
   ['torcnetworkedcontext',['TorcNetworkedContext',['../d8/d93/class_torc_networked_context.html',1,'']]],
   ['torcnetworkedcontextobject',['TorcNetworkedContextObject',['../d8/d0c/class_torc_networked_context_object.html',1,'']]],
-  ['torcnetworkinputs',['TorcNetworkInputs',['../d1/d27/class_torc_network_inputs.html',1,'']]],
   ['torcnetworkintegerinput',['TorcNetworkIntegerInput',['../d0/d36/class_torc_network_integer_input.html',1,'']]],
   ['torcnetworkobject',['TorcNetworkObject',['../da/dc5/class_torc_network_object.html',1,'']]],
   ['torcnetworkphinput',['TorcNetworkpHInput',['../d5/d8a/class_torc_networkp_h_input.html',1,'']]],

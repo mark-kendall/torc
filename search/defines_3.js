@@ -28,6 +28,6 @@ var searchData=
   ['camera_5fwhite_5fbalance_5fblue_5fgain',['CAMERA_WHITE_BALANCE_BLUE_GAIN',['../d7/de1/torcpicamera_8cpp.html#a547b331ceb80a6a72367643adfab62ed',1,'torcpicamera.cpp']]],
   ['camera_5fwhite_5fbalance_5fred_5fgain',['CAMERA_WHITE_BALANCE_RED_GAIN',['../d7/de1/torcpicamera_8cpp.html#af0270a47d4e04a0c6a88bed5aeee7b59',1,'torcpicamera.cpp']]],
   ['clockfreq',['CLOCKFREQ',['../d9/d02/torci2cpca9685_8cpp.html#a7694339ee1ba3ebdee3d87f7f26e8bfe',1,'torci2cpca9685.cpp']]],
-  ['constant_5finputs_5fstring',['CONSTANT_INPUTS_STRING',['../d7/dcc/torcnetworkinputs_8h.html#a2073edd3f027df1f2685cabcda232192',1,'torcnetworkinputs.h']]],
+  ['constant_5fdevice_5fstring',['CONSTANT_DEVICE_STRING',['../d1/df7/torcdevice_8h.html#aaa2a4e1f4bb80f93818425cde4abd656',1,'torcdevice.h']]],
   ['controls_5fdirectory',['CONTROLS_DIRECTORY',['../d9/d9a/torccontrol_8h.html#aa22c0a4b78ea26a9ec160a5fdb418e8e',1,'torccontrol.h']]]
 ];

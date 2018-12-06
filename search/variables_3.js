@@ -47,7 +47,6 @@ var searchData=
   ['gnetworkedcontext',['gNetworkedContext',['../de/d48/torcnetworkedcontext_8cpp.html#a1b38378b306e81b073443f73babdcc76',1,'gNetworkedContext():&#160;torcnetworkedcontext.cpp'],['../d5/d9a/torcnetworkedcontext_8h.html#a1b38378b306e81b073443f73babdcc76',1,'gNetworkedContext():&#160;torcnetworkedcontext.cpp']]],
   ['gnetworkhostnames',['gNetworkHostNames',['../da/d9c/torcnetwork_8cpp.html#ab5d3e848ce1ca4a3c79bffca5060c99e',1,'torcnetwork.cpp']]],
   ['gnetworkhostnameslock',['gNetworkHostNamesLock',['../da/d9c/torcnetwork_8cpp.html#a9105249b3d712e2ff819e0fe30dccd8a',1,'torcnetwork.cpp']]],
-  ['gnetworkinputs',['gNetworkInputs',['../d1/d27/class_torc_network_inputs.html#a08e1f712f910085bc4030bfc2ab43698',1,'TorcNetworkInputs']]],
   ['gnetworklock',['gNetworkLock',['../da/d9c/torcnetwork_8cpp.html#a97c67933e644b137e8b43f6c1e5f686c',1,'gNetworkLock():&#160;torcnetwork.cpp'],['../da/da5/torcnetwork_8h.html#a97c67933e644b137e8b43f6c1e5f686c',1,'gNetworkLock():&#160;torcnetwork.cpp']]],
   ['gnotify',['gNotify',['../df/d23/class_torc_notify.html#a1e322021a7c3575a4776423b73359a03',1,'TorcNotify']]],
   ['goriginwhitelist',['gOriginWhitelist',['../db/dc7/class_torc_h_t_t_p_server.html#a61551e66d3c5964033cb18f065fe16cf',1,'TorcHTTPServer']]],

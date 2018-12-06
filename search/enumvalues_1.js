@@ -20,5 +20,5 @@ var searchData=
   ['bplist_5fuint',['BPLIST_UINT',['../d4/d39/class_torc_p_list.html#af325c305e1bbf57509016504f9133e36ad7a8d757cdfaa8bb81ea8a09c44aeb49',1,'TorcPList']]],
   ['bplist_5funicode',['BPLIST_UNICODE',['../d4/d39/class_torc_p_list.html#af325c305e1bbf57509016504f9133e36a15a7920997f318f03c6fb11800f8b19e',1,'TorcPList']]],
   ['browse',['Browse',['../db/dff/class_torc_bonjour_service.html#aee3dcf4814b16c416242490cf343a72ba0c10514974537e9889a8f5d736bb8ebd',1,'TorcBonjourService']]],
-  ['button',['Button',['../d8/d61/class_torc_input.html#afb288ada1ecb4b2593398a9ae8df145aad97180f145d18f1ec315d953b1d8b0f4',1,'TorcInput']]]
+  ['button',['Button',['../d8/d61/class_torc_input.html#afb288ada1ecb4b2593398a9ae8df145aad97180f145d18f1ec315d953b1d8b0f4',1,'TorcInput::Button()'],['../d1/dc7/class_torc_output.html#a68bfe71abbe6a4a7634c22458da29391a2eeba0b3420aed14a790b92a31ffbab9',1,'TorcOutput::Button()']]]
 ];

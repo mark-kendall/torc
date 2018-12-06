@@ -46,7 +46,7 @@ if (edges && edges.length) {
         </defs>
 
 <script type="text/javascript">
-var viewWidth = 899;
+var viewWidth = 849;
 var viewHeight = 196;
 var sectionId = 'dynsection-1';
 </script>
@@ -54,11 +54,11 @@ var sectionId = 'dynsection-1';
 <svg id="graph" class="graph">
 <g id="viewport">
 <title>torcswitchinput.h</title>
-<polygon fill="white" stroke="none" points="-4,4 -4,-192 894.5,-192 894.5,4 -4,4"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-192 844.5,-192 844.5,4 -4,4"/>
 <!-- Node1 -->
 <g id="node1" class="node"><title>Node1</title>
-<polygon fill="#bfbfbf" stroke="black" points="618.5,-168.5 618.5,-187.5 716.5,-187.5 716.5,-168.5 618.5,-168.5"/>
-<text text-anchor="middle" x="667.5" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">torcswitchinput.h</text>
+<polygon fill="#bfbfbf" stroke="black" points="509.5,-168.5 509.5,-187.5 607.5,-187.5 607.5,-168.5 509.5,-168.5"/>
+<text text-anchor="middle" x="558.5" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">torcswitchinput.h</text>
 </g>
 <!-- Node2 -->
 <g id="node2" class="node"><title>Node2</title>
@@ -70,34 +70,34 @@ var sectionId = 'dynsection-1';
 </g>
 <!-- Node1&#45;&gt;Node2 -->
 <g id="edge1" class="edge"><title>Node1&#45;&gt;Node2</title>
-<path fill="none" stroke="midnightblue" d="M608.386,-169.289C527.711,-158.767 384.32,-140.064 306.797,-129.952"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="608.014,-172.771 618.383,-170.593 608.92,-165.829 608.014,-172.771"/>
+<path fill="none" stroke="midnightblue" d="M500.122,-166.664C442.482,-156.459 355.385,-141.039 301.602,-131.516"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="499.715,-170.146 510.172,-168.444 500.935,-163.254 499.715,-170.146"/>
 </g>
 <!-- Node8 -->
 <g id="node8" class="node"><title>Node8</title>
 <g id="a_node8"><a xlink:href="../../d1/d16/torcnetworkswitchinput_8h.html" target="_top" xlink:title="torcnetworkswitchinput.h">
-<polygon fill="white" stroke="black" points="600,-112.5 600,-131.5 735,-131.5 735,-112.5 600,-112.5"/>
-<text text-anchor="middle" x="667.5" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">torcnetworkswitchinput.h</text>
+<polygon fill="white" stroke="black" points="491,-112.5 491,-131.5 626,-131.5 626,-112.5 491,-112.5"/>
+<text text-anchor="middle" x="558.5" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">torcnetworkswitchinput.h</text>
 </a>
 </g>
 </g>
 <!-- Node1&#45;&gt;Node8 -->
 <g id="edge8" class="edge"><title>Node1&#45;&gt;Node8</title>
-<path fill="none" stroke="midnightblue" d="M667.5,-157.805C667.5,-148.91 667.5,-138.78 667.5,-131.751"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="664,-158.083 667.5,-168.083 671,-158.083 664,-158.083"/>
+<path fill="none" stroke="midnightblue" d="M558.5,-157.805C558.5,-148.91 558.5,-138.78 558.5,-131.751"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="555,-158.083 558.5,-168.083 562,-158.083 555,-158.083"/>
 </g>
 <!-- Node13 -->
 <g id="node13" class="node"><title>Node13</title>
 <g id="a_node13"><a xlink:href="../../dc/da2/torcswitchinput_8cpp.html" target="_top" xlink:title="torcswitchinput.cpp">
-<polygon fill="white" stroke="black" points="753,-112.5 753,-131.5 862,-131.5 862,-112.5 753,-112.5"/>
-<text text-anchor="middle" x="807.5" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">torcswitchinput.cpp</text>
+<polygon fill="white" stroke="black" points="644,-112.5 644,-131.5 753,-131.5 753,-112.5 644,-112.5"/>
+<text text-anchor="middle" x="698.5" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">torcswitchinput.cpp</text>
 </a>
 </g>
 </g>
 <!-- Node1&#45;&gt;Node13 -->
 <g id="edge14" class="edge"><title>Node1&#45;&gt;Node13</title>
-<path fill="none" stroke="midnightblue" d="M699.202,-164.772C725.5,-154.629 762.216,-140.467 785.42,-131.516"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="697.754,-161.579 689.683,-168.444 700.273,-168.11 697.754,-161.579"/>
+<path fill="none" stroke="midnightblue" d="M590.202,-164.772C616.5,-154.629 653.216,-140.467 676.42,-131.516"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="588.754,-161.579 580.683,-168.444 591.273,-168.11 588.754,-161.579"/>
 </g>
 <!-- Node3 -->
 <g id="node3" class="node"><title>Node3</title>
@@ -171,60 +171,60 @@ var sectionId = 'dynsection-1';
 </g>
 <!-- Node9 -->
 <g id="node9" class="node"><title>Node9</title>
-<g id="a_node9"><a xlink:href="../../d1/d68/torcnetworkbuttoninput_8h.html" target="_top" xlink:title="torcnetworkbuttoninput.h">
-<polygon fill="white" stroke="black" points="551,-56.5 551,-75.5 688,-75.5 688,-56.5 551,-56.5"/>
-<text text-anchor="middle" x="619.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">torcnetworkbuttoninput.h</text>
+<g id="a_node9"><a xlink:href="../../d1/d0c/torcinputs_8cpp.html" target="_top" xlink:title="torcinputs.cpp">
+<polygon fill="white" stroke="black" points="517,-0.5 517,-19.5 602,-19.5 602,-0.5 517,-0.5"/>
+<text text-anchor="middle" x="559.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">torcinputs.cpp</text>
 </a>
 </g>
 </g>
 <!-- Node8&#45;&gt;Node9 -->
 <g id="edge9" class="edge"><title>Node8&#45;&gt;Node9</title>
-<path fill="none" stroke="midnightblue" d="M652.772,-104.431C644.36,-94.9673 634.151,-83.4827 627.279,-75.7511"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="650.314,-106.934 659.574,-112.083 655.546,-102.284 650.314,-106.934"/>
+<path fill="none" stroke="midnightblue" d="M543.868,-104.509C534.249,-91.6281 524.321,-73.1044 529.5,-56 533.745,-41.9809 543.956,-28.3374 551.286,-19.8175"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="541.276,-106.868 550.289,-112.437 546.716,-102.463 541.276,-106.868"/>
 </g>
-<!-- Node11 -->
-<g id="node11" class="node"><title>Node11</title>
-<g id="a_node11"><a xlink:href="../../df/dc7/torcnetworkinputs_8cpp.html" target="_top" xlink:title="torcnetworkinputs.cpp">
-<polygon fill="white" stroke="black" points="684.5,-0.5 684.5,-19.5 806.5,-19.5 806.5,-0.5 684.5,-0.5"/>
-<text text-anchor="middle" x="745.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">torcnetworkinputs.cpp</text>
+<!-- Node10 -->
+<g id="node10" class="node"><title>Node10</title>
+<g id="a_node10"><a xlink:href="../../d1/d68/torcnetworkbuttoninput_8h.html" target="_top" xlink:title="torcnetworkbuttoninput.h">
+<polygon fill="white" stroke="black" points="539,-56.5 539,-75.5 676,-75.5 676,-56.5 539,-56.5"/>
+<text text-anchor="middle" x="607.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">torcnetworkbuttoninput.h</text>
 </a>
 </g>
 </g>
-<!-- Node8&#45;&gt;Node11 -->
-<g id="edge12" class="edge"><title>Node8&#45;&gt;Node11</title>
-<path fill="none" stroke="midnightblue" d="M679.585,-103.957C696.489,-80.1184 726.561,-37.7088 739.408,-19.5914"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="676.55,-102.187 673.621,-112.368 682.26,-106.236 676.55,-102.187"/>
+<!-- Node8&#45;&gt;Node10 -->
+<g id="edge10" class="edge"><title>Node8&#45;&gt;Node10</title>
+<path fill="none" stroke="midnightblue" d="M573.534,-104.431C582.122,-94.9673 592.543,-83.4827 599.559,-75.7511"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="570.719,-102.325 566.591,-112.083 575.903,-107.029 570.719,-102.325"/>
 </g>
 <!-- Node12 -->
 <g id="node12" class="node"><title>Node12</title>
 <g id="a_node12"><a xlink:href="../../d2/d56/torcnetworkswitchinput_8cpp.html" target="_top" xlink:title="torcnetworkswitchinput.cpp">
-<polygon fill="white" stroke="black" points="744.5,-56.5 744.5,-75.5 890.5,-75.5 890.5,-56.5 744.5,-56.5"/>
-<text text-anchor="middle" x="817.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">torcnetworkswitchinput.cpp</text>
+<polygon fill="white" stroke="black" points="694.5,-56.5 694.5,-75.5 840.5,-75.5 840.5,-56.5 694.5,-56.5"/>
+<text text-anchor="middle" x="767.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">torcnetworkswitchinput.cpp</text>
 </a>
 </g>
 </g>
 <!-- Node8&#45;&gt;Node12 -->
 <g id="edge13" class="edge"><title>Node8&#45;&gt;Node12</title>
-<path fill="none" stroke="midnightblue" d="M700.725,-109.039C728.948,-98.8786 768.762,-84.5457 793.843,-75.5164"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="699.491,-105.763 691.268,-112.444 701.862,-112.349 699.491,-105.763"/>
+<path fill="none" stroke="midnightblue" d="M601.484,-109.894C640.952,-99.6966 698.6,-84.802 734.538,-75.5164"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="600.423,-106.553 591.617,-112.444 602.174,-113.331 600.423,-106.553"/>
 </g>
-<!-- Node10 -->
-<g id="node10" class="node"><title>Node10</title>
-<g id="a_node10"><a xlink:href="../../db/d78/torcnetworkbuttoninput_8cpp.html" target="_top" xlink:title="torcnetworkbuttoninput.cpp">
-<polygon fill="white" stroke="black" points="517,-0.5 517,-19.5 666,-19.5 666,-0.5 517,-0.5"/>
-<text text-anchor="middle" x="591.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">torcnetworkbuttoninput.cpp</text>
+<!-- Node10&#45;&gt;Node9 -->
+<g id="edge11" class="edge"><title>Node10&#45;&gt;Node9</title>
+<path fill="none" stroke="midnightblue" d="M592.772,-48.4314C584.36,-38.9673 574.151,-27.4827 567.279,-19.7511"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="590.314,-50.9342 599.574,-56.083 595.546,-46.2836 590.314,-50.9342"/>
+</g>
+<!-- Node11 -->
+<g id="node11" class="node"><title>Node11</title>
+<g id="a_node11"><a xlink:href="../../db/d78/torcnetworkbuttoninput_8cpp.html" target="_top" xlink:title="torcnetworkbuttoninput.cpp">
+<polygon fill="white" stroke="black" points="620,-0.5 620,-19.5 769,-19.5 769,-0.5 620,-0.5"/>
+<text text-anchor="middle" x="694.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">torcnetworkbuttoninput.cpp</text>
 </a>
 </g>
 </g>
-<!-- Node9&#45;&gt;Node10 -->
-<g id="edge10" class="edge"><title>Node9&#45;&gt;Node10</title>
-<path fill="none" stroke="midnightblue" d="M610.158,-46.9827C605.405,-37.8168 599.844,-27.0922 596.038,-19.7511"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="607.166,-48.8166 614.876,-56.083 613.38,-45.5943 607.166,-48.8166"/>
-</g>
-<!-- Node9&#45;&gt;Node11 -->
-<g id="edge11" class="edge"><title>Node9&#45;&gt;Node11</title>
-<path fill="none" stroke="midnightblue" d="M648.66,-52.503C672.281,-42.3795 704.928,-28.388 725.628,-19.5164"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="647.278,-49.2873 639.465,-56.4435 650.035,-55.7213 647.278,-49.2873"/>
+<!-- Node10&#45;&gt;Node11 -->
+<g id="edge12" class="edge"><title>Node10&#45;&gt;Node11</title>
+<path fill="none" stroke="midnightblue" d="M630.216,-50.9005C646.169,-40.9986 666.997,-28.0705 680.557,-19.6545"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="628.129,-48.0765 621.478,-56.324 631.82,-54.024 628.129,-48.0765"/>
 </g>
 </g>
 </svg>

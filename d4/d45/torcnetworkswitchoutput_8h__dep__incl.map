@@ -1,6 +1,6 @@
 <map id="torcnetworkswitchoutput.h" name="torcnetworkswitchoutput.h">
-<area shape="rect" id="node2" href="$df/dc7/torcnetworkinputs_8cpp.html" title="torcnetworkinputs.cpp" alt="" coords="5,155,168,181"/>
-<area shape="rect" id="node3" href="$d0/d55/torcnetworkbuttonoutput_8h.html" title="torcnetworkbuttonoutput.h" alt="" coords="125,80,318,107"/>
-<area shape="rect" id="node5" href="$d3/df9/torcnetworkswitchoutput_8cpp.html" title="torcnetworkswitchoutput.cpp" alt="" coords="343,80,548,107"/>
-<area shape="rect" id="node4" href="$df/d6d/torcnetworkbuttonoutput_8cpp.html" title="torcnetworkbuttonoutput.cpp" alt="" coords="192,155,400,181"/>
+<area shape="rect" id="node2" href="$d0/d55/torcnetworkbuttonoutput_8h.html" title="torcnetworkbuttonoutput.h" alt="" coords="67,80,261,107"/>
+<area shape="rect" id="node4" href="$d5/da7/torcoutputs_8cpp.html" title="torcoutputs.cpp" alt="" coords="237,155,360,181"/>
+<area shape="rect" id="node5" href="$d3/df9/torcnetworkswitchoutput_8cpp.html" title="torcnetworkswitchoutput.cpp" alt="" coords="336,80,541,107"/>
+<area shape="rect" id="node3" href="$df/d6d/torcnetworkbuttonoutput_8cpp.html" title="torcnetworkbuttonoutput.cpp" alt="" coords="5,155,213,181"/>
 </map>

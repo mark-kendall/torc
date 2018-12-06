@@ -116,8 +116,6 @@ var searchData=
   ['torcnetworkbuttonoutput_2eh',['torcnetworkbuttonoutput.h',['../d0/d55/torcnetworkbuttonoutput_8h.html',1,'']]],
   ['torcnetworkedcontext_2ecpp',['torcnetworkedcontext.cpp',['../de/d48/torcnetworkedcontext_8cpp.html',1,'']]],
   ['torcnetworkedcontext_2eh',['torcnetworkedcontext.h',['../d5/d9a/torcnetworkedcontext_8h.html',1,'']]],
-  ['torcnetworkinputs_2ecpp',['torcnetworkinputs.cpp',['../df/dc7/torcnetworkinputs_8cpp.html',1,'']]],
-  ['torcnetworkinputs_2eh',['torcnetworkinputs.h',['../d7/dcc/torcnetworkinputs_8h.html',1,'']]],
   ['torcnetworkintegerinput_2ecpp',['torcnetworkintegerinput.cpp',['../da/dab/torcnetworkintegerinput_8cpp.html',1,'']]],
   ['torcnetworkintegerinput_2eh',['torcnetworkintegerinput.h',['../d7/d41/torcnetworkintegerinput_8h.html',1,'']]],
   ['torcnetworkphinput_2ecpp',['torcnetworkphinput.cpp',['../d4/df0/torcnetworkphinput_8cpp.html',1,'']]],
