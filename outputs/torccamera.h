@@ -134,6 +134,7 @@ class TorcCameraFactory
     TorcCameraFactory*          NextFactory          (void) const;
     virtual bool                CanHandle            (const QString &Type, const TorcCameraParams &Params) = 0;
     virtual TorcCameraDevice*   Create               (const QString &Type, const TorcCameraParams &Params) = 0;
+    virtual QString             GetCameraName        (void) = 0;
 
   protected:
     static TorcCameraFactory*   gTorcCameraFactory;

@@ -40,7 +40,8 @@ TorcCameraOutput::TorcCameraOutput(TorcOutput::Type Type, double Value, const QS
     m_thread(nullptr),
     m_threadLock(QReadWriteLock::Recursive),
     m_params(Details),
-    m_paramsLock(QReadWriteLock::Recursive)
+    m_paramsLock(QReadWriteLock::Recursive),
+    m_cameraName()
 {
 }
 
@@ -66,6 +67,19 @@ void TorcCameraOutput::ParamsChanged(TorcCameraParams &Params)
     m_params = Params;
     LOG(VB_GENERAL, LOG_INFO, QStringLiteral("Camera parameters changed - video codec '%1'").arg(m_params.m_videoCodec));
     m_paramsLock.unlock();
+}
+
+void TorcCameraOutput::Graph(QByteArray *Data)
+{
+    if (!Data)
+        return;
+    TorcOutput::Graph(Data);
+    Data->append(QStringLiteral("\"%1\"->%2\r\n").arg(m_cameraName).arg(uniqueId));
+}
+
+void TorcCameraOutput::SetCameraName(const QString &Name)
+{
+    m_cameraName = Name;
 }
 
 TorcCameraStillsOutput::TorcCameraStillsOutput(const QString &ModelId, const QVariantMap &Details)
@@ -688,6 +702,7 @@ void TorcCameraOutputs::Create(const QVariantMap &Details)
 
                             if (newcamera)
                             {
+                                newcamera->SetCameraName(factory->GetCameraName());
                                 m_cameras.insertMulti(it.key(), newcamera);
                                 LOG(VB_GENERAL, LOG_INFO, QStringLiteral("New '%1' camera '%2'").arg(it.key(), newcamera->GetUniqueId()));
                                 break;

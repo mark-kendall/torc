@@ -1004,6 +1004,11 @@ class TorcPiCameraFactory final : public TorcCameraFactory
             return new TorcPiCamera(Params);
         return nullptr;
     }
+
+    QString TorcPiCameraFactory::GetCameraName()
+    {
+        return tr("Pi Camera");
+    }
 } TorcPiCameraFactory;
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

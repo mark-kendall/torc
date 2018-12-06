@@ -33,12 +33,15 @@ class TorcCameraOutput : public TorcOutput
   protected:
     TorcCameraParams& GetParams (void);
     void              SetParams (TorcCameraParams &Params);
+    void              Graph     (QByteArray *Data) override;
+    void              SetCameraName(const QString &Name);
 
   public:
     TorcCameraThread *m_thread;
     QReadWriteLock    m_threadLock;
     TorcCameraParams  m_params;
     QReadWriteLock    m_paramsLock;
+    QString           m_cameraName;
 
   private:
    Q_DISABLE_COPY(TorcCameraOutput)
