@@ -29,6 +29,9 @@
 #include "wiringPi.h"
 #include "softPwm.h"
 
+// for lround
+#include <math.h>
+
 #define DEFAULT_VALUE 0
 #define PI_PWM_RESOLUTION 1024
 

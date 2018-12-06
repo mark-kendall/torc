@@ -41,6 +41,7 @@
 #define PCA9685_RANGE 4096
 
 #include <unistd.h>
+#include <math.h>
 
 TorcI2CPCA9685Channel::TorcI2CPCA9685Channel(int Number, TorcI2CPCA9685 *Parent, const QVariantMap &Details)
   : TorcPWMOutput(0.0, PCA9685, Details, PCA9685_RANGE),
