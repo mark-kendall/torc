@@ -108,7 +108,7 @@ OMX_U32 TorcOMXPort::GetInUseBuffers(void)
     return result;
 }
 
-OMX_ERRORTYPE TorcOMXPort::CreateBuffers(TorcOMXBufferOwner *Owner /*=nullptr*/)
+OMX_ERRORTYPE TorcOMXPort::CreateBuffers(QObject *Owner /*=nullptr*/)
 {
     if (!m_handle)
         return OMX_ErrorUndefined;
@@ -117,7 +117,7 @@ OMX_ERRORTYPE TorcOMXPort::CreateBuffers(TorcOMXBufferOwner *Owner /*=nullptr*/)
 
     m_owner = Owner;
     if (m_owner)
-        connect(this, &TorcOMXPort::BufferReady, m_owner, &TorcOMXBufferOwner::BufferReady);
+        connect(this, SIGNAL(BufferReady(OMX_BUFFERHEADERTYPE*, quint64)), m_owner, SLOT(BufferReady(OMX_BUFFERHEADERTYPE*, quint64)), Qt::QueuedConnection); // clazy:exclude=old-style-connect
 
     OMX_PARAM_PORTDEFINITIONTYPE portdefinition;
     OMX_INITSTRUCTURE(portdefinition);
@@ -160,7 +160,7 @@ OMX_ERRORTYPE TorcOMXPort::DestroyBuffers(void)
 
     if (m_owner)
     {
-        disconnect(this, &TorcOMXPort::BufferReady, m_owner, &TorcOMXBufferOwner::BufferReady);
+        disconnect(this, SIGNAL(BufferReady(OMX_BUFFERHEADERTYPE*, quint64)), m_owner, SLOT(BufferReady(OMX_BUFFERHEADERTYPE*, quint64))); // clazy:exclude=old-style-connect
         m_owner = nullptr;
     }
 

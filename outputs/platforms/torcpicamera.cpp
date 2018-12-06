@@ -83,8 +83,7 @@
 bool TorcPiCamera::gPiCameraDetected = false;
 
 TorcPiCamera::TorcPiCamera(const TorcCameraParams &Params)
-  : TorcOMXBufferOwner(),
-    TorcCameraDevice(Params),
+  : TorcCameraDevice(Params),
     m_cameraType(Unknown),
     m_stillsEnabled(true),
     m_videoEnabled(true),

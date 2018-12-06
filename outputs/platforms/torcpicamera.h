@@ -8,7 +8,7 @@
 #include "torcomxtunnel.h"
 #include "torccamera.h"
 
-class TorcPiCamera final : public TorcOMXBufferOwner
+class TorcPiCamera final : public TorcCameraDevice 
 {
     Q_OBJECT
 
@@ -30,7 +30,7 @@ class TorcPiCamera final : public TorcOMXBufferOwner
 
   public slots:
     void StreamVideo        (bool Video) override;
-    void BufferReady        (OMX_BUFFERHEADERTYPE *Buffer, quint64 Type) override;
+    void BufferReady        (OMX_BUFFERHEADERTYPE *Buffer, quint64 Type);
 
   protected:
     bool EnableStills       (uint Count) override;
