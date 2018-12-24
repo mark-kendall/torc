@@ -12,7 +12,6 @@ var searchData=
   ['_7etorcadminthread',['~TorcAdminThread',['../dd/d56/class_torc_admin_thread.html#ae1dd9c43597f8ca83f3ea5bdb6173f5e',1,'TorcAdminThread']]],
   ['_7etorcbinaryplistserialiser',['~TorcBinaryPListSerialiser',['../d7/dfd/class_torc_binary_p_list_serialiser.html#acf5b27030b9a07def9a3661f9935ef2a',1,'TorcBinaryPListSerialiser']]],
   ['_7etorcbonjour',['~TorcBonjour',['../d0/d9f/class_torc_bonjour.html#ac14fa1d63dd99f7215a19c30326d9153',1,'TorcBonjour']]],
-  ['_7etorcbonjourpriv',['~TorcBonjourPriv',['../dd/d16/class_torc_bonjour_priv.html#a7e68710905582e263a04ac62ae357b4d',1,'TorcBonjourPriv']]],
   ['_7etorcbonjourservice',['~TorcBonjourService',['../db/dff/class_torc_bonjour_service.html#a3b2f21ff8559ef706193a6f8a5af946e',1,'TorcBonjourService']]],
   ['_7etorccameradevice',['~TorcCameraDevice',['../d3/dfd/class_torc_camera_device.html#af52879f8d2daf6d8f656379899630817',1,'TorcCameraDevice']]],
   ['_7etorccamerafactory',['~TorcCameraFactory',['../d8/d67/class_torc_camera_factory.html#a0ebd2c58f70cea86ddc28a50d8e84155',1,'TorcCameraFactory']]],

@@ -11,7 +11,7 @@ var searchData=
   ['bonjourresolvecallback',['BonjourResolveCallback',['../dc/d96/torcbonjour_8cpp.html#a0fde63841df9953ab6b2bb0c7d626fb6',1,'torcbonjour.cpp']]],
   ['bonjoursearchchanged',['BonjourSearchChanged',['../db/dc7/class_torc_h_t_t_p_server.html#a1f9de74ceb7997f8b41b375bc6e2e476',1,'TorcHTTPServer']]],
   ['browse',['Browse',['../d0/d9f/class_torc_bonjour.html#a5db7f9dff8a4e28b42b18330a859d9a5',1,'TorcBonjour']]],
-  ['bufferready',['BufferReady',['../da/da1/class_torc_pi_camera.html#a39ca266e2bc1bc9b1b73a99de84d7ef7',1,'TorcPiCamera::BufferReady()'],['../d6/dac/class_torc_o_m_x_buffer_owner.html#a07c4a80d33ffae227189ec71c0e2351b',1,'TorcOMXBufferOwner::BufferReady()'],['../d7/d61/class_torc_o_m_x_port.html#adf7a8c2e929a1d0032b3770eceb95713',1,'TorcOMXPort::BufferReady()']]],
+  ['bufferready',['BufferReady',['../da/da1/class_torc_pi_camera.html#aa5556d4abb1cf5584c0a1894f996fe63',1,'TorcPiCamera::BufferReady()'],['../d7/d61/class_torc_o_m_x_port.html#adf7a8c2e929a1d0032b3770eceb95713',1,'TorcOMXPort::BufferReady()']]],
   ['bytesavailable',['BytesAvailable',['../d3/ded/class_torc_network_request.html#aa6a6b09693cc7dcdaf4f82e94bd7a8a6',1,'TorcNetworkRequest']]],
   ['byteswritten',['BytesWritten',['../d9/d0a/class_torc_web_socket.html#a0a704407554b058ff903fc8047397963',1,'TorcWebSocket']]]
 ];
