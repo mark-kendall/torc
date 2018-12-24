@@ -34,9 +34,7 @@
 #include "torccoreutils.h"
 
 // zlib
-#ifdef _WIN32
-#include <QtZlib/zlib.h>
-#else
+#ifdef USING_ZLIB
 #include "zlib.h"
 #endif
 
