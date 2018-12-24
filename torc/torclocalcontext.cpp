@@ -34,6 +34,7 @@
 #include <QTimer>
 
 // Torc
+#include "torccompat.h"
 #include "torcevent.h"
 #include "torcloggingimp.h"
 #include "torclogging.h"
@@ -45,8 +46,6 @@
 #include "torcdirectories.h"
 
 TorcLocalContext *gLocalContext = nullptr;
-TorcSetting       *gRootSetting = nullptr;
-qint64             gStartTime   = QDateTime::currentMSecsSinceEpoch();
 
 static void ExitHandler(int Sig)
 {
@@ -103,7 +102,9 @@ TorcLocalContext::TorcLocalContext(TorcCommandLine* CommandLine)
     m_language(nullptr),
     m_uuid(),
     m_shutdownDelay(0),
-    m_shutdownEvent(Torc::None)
+    m_shutdownEvent(Torc::None),
+    m_startTime(QDateTime::currentMSecsSinceEpoch()),
+    m_rootSetting(nullptr)
 {
     // listen to ourselves:)
     AddObserver(this);
@@ -170,11 +171,11 @@ TorcLocalContext::~TorcLocalContext()
     QThreadPool::globalInstance()->waitForDone();
 
     // remove root setting
-    if (gRootSetting)
+    if (m_rootSetting)
     {
-        gRootSetting->Remove();
-        gRootSetting->DownRef();
-        gRootSetting = nullptr;
+        m_rootSetting->Remove();
+        m_rootSetting->DownRef();
+        m_rootSetting = nullptr;
     }
 
     // delete the database connection(s)
@@ -222,7 +223,7 @@ bool TorcLocalContext::Init(void)
     }
 
     // Create the root settings object
-    gRootSetting = new TorcSettingGroup(nullptr, TORC_ROOT_SETTING);
+    m_rootSetting = new TorcSettingGroup(nullptr, TORC_ROOT_SETTING);
 
     // create/load the UUID - make this persistent to ensure peers do not think
     // there are multiple devices after a number of restarts.
@@ -240,7 +241,7 @@ bool TorcLocalContext::Init(void)
     LOG(VB_GENERAL, LOG_INFO, QStringLiteral("UUID: %1").arg(m_uuid));
 
     // Load language and translation preferences
-    m_language = new TorcLanguage(gRootSetting);
+    m_language = new TorcLanguage(m_rootSetting);
 
     /* We no longer use QRunnables, so ignore this for now at least
     // don't expire threads
@@ -469,13 +470,13 @@ QString TorcLocalContext::GetUuid(void) const
 TorcSetting* TorcLocalContext::GetRootSetting(void)
 {
     QReadLocker locker(&m_localSettingsLock);
-    return gRootSetting;
+    return m_rootSetting;
 }
 
 qint64 TorcLocalContext::GetStartTime(void)
 {
     QReadLocker locker(&m_localSettingsLock);
-    return gStartTime;
+    return m_startTime;
 }
 
 int TorcLocalContext::GetPriority(void)

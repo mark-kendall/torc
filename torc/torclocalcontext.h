@@ -124,9 +124,10 @@ class TorcLocalContext : public QObject, public TorcObservable
     QString                  m_uuid;
     uint                     m_shutdownDelay;
     int                      m_shutdownEvent;
+    qint64                   m_startTime;
+    TorcSetting             *m_rootSetting;
 };
 
 extern TorcLocalContext    *gLocalContext;
-extern TorcSetting         *gRootSetting;
 
 #endif // TORCLOCALCONTEXT_H

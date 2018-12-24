@@ -123,7 +123,7 @@ TorcPower::TorcPower()
     m_canHibernate(new TorcSetting(nullptr, QStringLiteral("CanHibernate"), QStringLiteral(), TorcSetting::Bool, TorcSetting::None, QVariant((bool)false))),
     m_canRestart(new TorcSetting(nullptr,   QStringLiteral("CanRestart"),   QStringLiteral(), TorcSetting::Bool, TorcSetting::None, QVariant((bool)false))),
     m_batteryLevel(TorcPower::UnknownPower),
-    m_powerGroupItem(new TorcSettingGroup(gRootSetting, tr("Power"))),
+    m_powerGroupItem(new TorcSettingGroup(gLocalContext->GetRootSetting(), tr("Power"))),
     m_powerEnabled(new TorcSetting(m_powerGroupItem, QStringLiteral("EnablePower"),
                                    tr("Enable power management"),
                                    TorcSetting::Bool, TorcSetting::Persistent | TorcSetting::Public, QVariant((bool)true))),
