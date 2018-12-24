@@ -36,12 +36,23 @@ QT         -= gui
 
 QMAKE_CXXFLAGS += -Wall -Wextra -Weffc++ -Werror
 
+mingw {
+    DEFINES += WIN32 USING_MINGW WIN32_LEAN_AND_MEAN NOMINMAX
+    INCLUDEPATH += C:/Qt/Tools/mingw530_32/opt/include
+    message("Windows MingW build")
+}
+
 # explicitly add SSL - this may need more work
 macx {
     # NB this is a brew workaround
     LIBS        += -L/usr/local/opt/openssl/lib -lssl
     LIBS        += -L/usr/local/opt/openssl/lib -lcrypto
     INCLUDEPATH += /usr/local/opt/openssl/include
+} else:mingw {
+    LIBS += -LC:/Qt/Tools/mingw530_32/opt/lib -lssl
+    LIBS += -LC:/Qt/Tools/mingw530_32/opt/lib -lcrypto
+} else:win32 {
+    message("No SSL support")
 } else {
     CONFIG    += link_pkgconfig
     PKGCONFIG += openssl
@@ -59,9 +70,7 @@ CONFIG(debug, debug|release) {
 # zlib on windows is too much like hard work
 win32 {
     message("Zlib support NOT available for compressed html")
-}
-else
-{
+} else {
     message("Zlib support available for compressed html")
     DEFINES += USING_ZLIB
     LIBS    += -lz
