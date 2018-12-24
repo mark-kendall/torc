@@ -24,23 +24,8 @@
 #include "torclogging.h"
 #include "torcbonjour.h"
 
-TorcBonjour* gBonjour = nullptr;                               //!< Global TorcBonjour singleton
+TorcBonjour* gBonjour = nullptr;                            //!< Global TorcBonjour singleton
 QMutex*      gBonjourLock = new QMutex(QMutex::Recursive);  //!< Lock around access to gBonjour
-
-
-/*! \class TorcBonjourWindows
- *  \brief Dummy Bonjour implementation.
- *
- *  Bonjour is not available on windows.
- *
- * \sa TorcBonjour
-*/
-class TorcBonjourPriv
-{
-  public:
-    TorcBonjourPriv()  {}
-    ~TorcBonjourPriv() {}
-};
 
 TorcBonjour* TorcBonjour::Instance(void)
 {
@@ -52,9 +37,8 @@ TorcBonjour* TorcBonjour::Instance(void)
     return gBonjour;
 }
 
-void TorcBonjour::Suspend(bool Suspend)
+void TorcBonjour::Suspend(bool)
 {
-    (void)Suspend;
 }
 
 void TorcBonjour::TearDown(void)
@@ -64,66 +48,55 @@ void TorcBonjour::TearDown(void)
     gBonjour = nullptr;
 }
 
-QByteArray TorcBonjour::MapToTxtRecord(const QMap<QByteArray, QByteArray> &Map)
+QByteArray TorcBonjour::MapToTxtRecord(const QMap<QByteArray, QByteArray> &)
 {
-    (void)Map;
     QByteArray result;
     return result;
 }
 
-QMap<QByteArray,QByteArray> TorcBonjour::TxtRecordToMap(const QByteArray &TxtRecord)
+QMap<QByteArray,QByteArray> TorcBonjour::TxtRecordToMap(const QByteArray &)
 {
-    (void)TxtRecord;
     QMap<QByteArray,QByteArray> result;
     return result;
 }
 
 TorcBonjour::TorcBonjour()
-  : QObject(nullptr), m_priv(new TorcBonjourPriv())
+  : m_suspended(false),
+    m_serviceLock(QMutex::Recursive),
+    m_services(),
+    m_discoveredLock(QMutex::Recursive),
+    m_discoveredServices()
 {
 }
 
 TorcBonjour::~TorcBonjour()
 {
-    // delete private implementation
-    delete m_priv;
-    m_priv = nullptr;
 }
 
-quint32 TorcBonjour::Register(quint16 Port, const QByteArray &Type, const QByteArray &Name,
-                              const QMap<QByteArray, QByteArray> &TxtRecords, quint32 Reference /*=0*/)
+quint32 TorcBonjour::Register(quint16, const QByteArray &, const QByteArray &,
+                              const QMap<QByteArray, QByteArray> &, quint32)
 {
-    (void)Port;
-    (void)Type;
-    (void)Name;
-    (void)TxtRecords;
-    (void)Reference;
     return 0;
 }
 
-quint32 TorcBonjour::Browse(const QByteArray &Type)
+quint32 TorcBonjour::Browse(const QByteArray &, quint32)
 {
-    (void)Type;
     return 0;
 }
 
-void TorcBonjour::Deregister(quint32 Reference)
+void TorcBonjour::Deregister(quint32)
 {
-    (void)Reference;
 }
 
-void TorcBonjour::socketReadyRead(int Socket)
+void TorcBonjour::socketReadyRead(int)
 {
-    (void)Socket;
 }
 
-void TorcBonjour::HostLookup(const QHostInfo &HostInfo)
+void TorcBonjour::HostLookup(const QHostInfo &)
 {
-    (void)HostInfo;
 }
 
-void TorcBonjour::SuspendPriv(bool Suspend)
+void TorcBonjour::SuspendPriv(bool)
 {
-    (void)Suspend;
 }
 

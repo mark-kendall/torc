@@ -8,7 +8,9 @@
 #include <QSocketNotifier>
 
 // DNS Service Discovery
+#ifndef WIN32
 #include <dns_sd.h>
+#endif
 
 #define TORC_BONJOUR_HOST      QStringLiteral("host")
 #define TORC_BONJOUR_ADDRESSES QStringLiteral("addresses")
@@ -32,7 +34,9 @@ class TorcBonjourService
   public:
     TorcBonjourService();
     TorcBonjourService(const TorcBonjourService &Other);
+#ifndef WIN32
     TorcBonjourService(ServiceType BonjourType, DNSServiceRef DNSSRef, const QByteArray &Name, const QByteArray &Type);
+#endif
     TorcBonjourService(ServiceType BonjourType, const QByteArray &Name, const QByteArray &Type, const QByteArray &Domain, uint32_t InterfaceIndex);
     TorcBonjourService& operator =(const TorcBonjourService &Other);
    ~TorcBonjourService() = default;
@@ -42,7 +46,9 @@ class TorcBonjourService
 
   public:
     ServiceType      m_serviceType;
+#ifndef WIN32
     DNSServiceRef    m_dnssRef;
+#endif
     QByteArray       m_name;
     QByteArray       m_type;
     QByteArray       m_txt;
@@ -75,12 +81,13 @@ class TorcBonjour : public QObject
     void    Deregister      (quint32 Reference);
 
     // callback handlers
+#ifndef WIN32
     void AddBrowseResult(DNSServiceRef Reference, const TorcBonjourService &Service);
     void RemoveBrowseResult(DNSServiceRef Reference, const TorcBonjourService &Service);
     void Resolve(DNSServiceRef Reference, DNSServiceErrorType ErrorType, const char *Fullname,
                  const char *HostTarget, uint16_t Port, uint16_t TxtLen,
                  const unsigned char *TxtRecord);
-
+#endif
   public slots:
     void    socketReadyRead (int Socket);
 
