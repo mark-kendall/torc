@@ -1005,9 +1005,9 @@ class TorcPiCameraFactory final : public TorcCameraFactory
         return nullptr;
     }
 
-    QString TorcPiCameraFactory::GetCameraName()
+    QString GetCameraName()
     {
-        return tr("Pi Camera");
+        return QObject::tr("Pi Camera");
     }
 } TorcPiCameraFactory;
 
